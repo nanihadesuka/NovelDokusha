@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	
+	<style name="Theme" />
+	
+	<style name="AppTheme" parent="Theme.AppCompat.NoActionBar">
+		<item name="colorPrimary">@color/dark_20</item>
+		<item name="colorPrimaryVariant">@color/dark_20</item>
+		<item name="colorOnPrimary">#eeeeee</item>
+		<item name="colorSecondary">#2962FF</item>
+		<item name="colorSecondaryVariant">#0039CB</item>
+		<item name="colorOnSecondary">#eeeeee</item>
+		<item name="colorAccent">#2A59B6</item>
+		<item name="colorError">#F44336</item>
+		<item name="colorOnError">#F0F0F0</item>
+		<item name="colorSurface">#F0F0F0</item>
+		<item name="colorOnSurface">@color/dark_20</item>
+		<item name="android:colorBackground">@color/dark_18</item>
+		<item name="colorOnBackground">@color/dark_20</item>
+		<item name="md_color_button_text">#F0F0F0</item>
+		<item name="md_background_color">@color/dark_28</item>
+		<item name="bottomNavigationStyle">@style/app.BottomNavigationStyle.Dark</item>
+		<item name="materialCardViewStyle">@style/app.CardView.Dark</item>
+		<item name="buttonStyle">@style/app.Button.Dark</item>
+	</style>
+	
+	<style name="app.CardView.Dark" parent="Widget.MaterialComponents.CardView">
+		<item name="cardBackgroundColor">@color/dark_20</item>
+	</style>
+	
+	<style name="app.Button.Dark" parent="Widget.AppCompat.Button">
+		<item name="android:backgroundTint">@color/dark_28</item>
+	</style>
+	
+	<style name="app.BottomNavigationStyle.Dark" parent="Widget.Design.BottomNavigationView">
+		<item name="itemIconTint">@color/icon_effect</item>
+		<item name="itemTextColor">@color/icon_effect</item>
+		<item name="android:background">@color/dark_20</item>
+	</style>
+	
+	<color name="red">#ff0000</color>
+	<color name="dark_green">#4caf50</color>
+	<color name="light_blue">#3D504D</color>
+	<color name="dark_orange_red">#A3593C</color>
+	<color name="dark_18">#181818</color>
+	<color name="dark_20">#202020</color>
+	<color name="dark_28">#282828</color>
+
+</resources>

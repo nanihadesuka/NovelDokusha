@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?><!--<androidx.appcompat.widget.AppCompatCheckBox xmlns:android="http://schemas.android.com/apk/res/android"-->
+
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:id="@+id/checkbox"
+	android:layout_width="match_parent"
+	android:layout_height="wrap_content"
+	android:foreground="?android:selectableItemBackground"
+	android:padding="10sp"
+	>
+
+	<ImageView
+		android:id="@+id/icon"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:layout_gravity="center_vertical"
+		android:background="@drawable/ic_twotone_check_box_outline_blank_24"
+		android:clickable="false"
+		/>
+
+	<TextView
+		android:id="@+id/text"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:layout_gravity="center_vertical"
+		android:clickable="false"
+		android:hint="Genre type"
+		android:paddingLeft="10sp"
+		/>
+</LinearLayout>

@@ -3,17 +3,20 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/mobile_navigation"
-    app:startDestination="@+id/navigation_home">
+    app:startDestination="@id/navigation_library"
+    >
 
     <fragment
-        android:id="@+id/navigation_home"
-        android:name="my.noveldokusha.ui.HomeFragment"
-        android:label="@string/title_home"
-        tools:layout="@layout/fragment_home" />
+        android:id="@+id/navigation_library"
+        android:name="my.noveldokusha.ui.main.LibraryFragment"
+        android:label="@string/title_library"
+        tools:layout="@layout/activity_main_fragment_library"
+        />
 
     <fragment
-        android:id="@+id/navigation_dashboard"
-        android:name="my.noveldokusha.ui.DashboardFragment"
-        android:label="@string/title_dashboard"
-        tools:layout="@layout/fragment_dashboard" />
+        android:id="@+id/navigation_finder"
+        android:name="my.noveldokusha.ui.main.FinderFragment"
+        android:label="@string/title_finder"
+        tools:layout="@layout/activity_main_fragment_finder"
+        />
 </navigation>

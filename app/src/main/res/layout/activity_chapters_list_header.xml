@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:app="http://schemas.android.com/apk/res-auto"
+	xmlns:tools="http://schemas.android.com/tools"
+	android:id="@+id/header"
+	android:layout_width="match_parent"
+	android:layout_height="wrap_content"
+	android:animateLayoutChanges="true"
+	android:fitsSystemWindows="true"
+	android:orientation="vertical"
+	>
+	
+	
+	<androidx.constraintlayout.widget.ConstraintLayout
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:columnCount="2"
+		android:orientation="horizontal"
+		android:padding="10sp"
+		>
+		
+		<LinearLayout
+			android:id="@+id/bookInfo"
+			android:layout_width="0dp"
+			android:layout_height="wrap_content"
+			android:columnCount="2"
+			android:orientation="vertical"
+			app:layout_constraintLeft_toLeftOf="parent"
+			app:layout_constraintRight_toLeftOf="@id/databaseSearchButton"
+			app:layout_constraintTop_toTopOf="parent"
+			>
+			
+			
+			<TextView
+				android:id="@+id/bookTitle"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:textSize="18sp"
+				android:textStyle="bold"
+				tools:text="Book name"
+				/>
+			
+			<LinearLayout
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				>
+				
+				<TextView
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:paddingEnd="6sp"
+					android:text="Source"
+					android:textStyle="bold"
+					/>
+				
+				<TextView
+					android:id="@+id/sourceName"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					tools:text="source name"
+					/>
+			</LinearLayout>
+			
+			<LinearLayout
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				>
+				
+				<TextView
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:paddingEnd="6sp"
+					android:text="Chapters"
+					android:textStyle="bold"
+					/>
+				
+				<TextView
+					android:id="@+id/numberOfChapters"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					tools:text="23"
+					/>
+			</LinearLayout>
+			
+			<LinearLayout
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				>
+				
+				<TextView
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:paddingEnd="6sp"
+					android:text="Description"
+					android:textStyle="bold"
+					/>
+				
+				<TextView
+					android:id="@+id/description"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					tools:text="novel description"
+					/>
+			</LinearLayout>
+		</LinearLayout>
+		
+		<Button
+			android:id="@+id/databaseSearchButton"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_margin="10sp"
+			android:text="Database"
+			android:textAllCaps="false"
+			android:tooltipText="Search in databse for more information"
+			app:layout_constraintLeft_toRightOf="@id/bookInfo"
+			app:layout_constraintRight_toRightOf="parent"
+			app:layout_constraintTop_toTopOf="parent"
+			/>
+	
+	</androidx.constraintlayout.widget.ConstraintLayout>
+	
+	<ScrollView
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		>
+		
+		<TextView
+			android:id="@+id/errorMessage"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:hint="An error has occurred"
+			android:maxLines="10"
+			android:padding="10sp"
+			android:scrollbars="vertical"
+			android:textColor="@color/design_default_color_error"
+			android:textColorHint="@color/design_default_color_error"
+			android:visibility="gone"
+			tools:visibility="visible"
+			/>
+	</ScrollView>
+</LinearLayout>
+
+

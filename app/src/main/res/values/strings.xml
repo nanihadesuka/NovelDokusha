@@ -1,5 +1,20 @@
 <resources>
     <string name="app_name">NovelDokusha</string>
-    <string name="title_home">Home</string>
-    <string name="title_dashboard">Dashboard</string>
+    <string name="title_library">Library</string>
+    <string name="title_finder">Finder</string>
+    <string name="reader_no_more_chapters">-- No more chapters --</string>
+    <string name="reader_first_chapter">-- First chapter -- </string>
+    <string name="downloaded">Downloaded</string>
+    <string name="set_as_all_read">Set as all read</string>
+    <string name="download_all_chapters">Download all chapters</string>
+	<string name="show_book_info">Show book info</string>
+	<string name="remove_from_library">Remove from library</string>
+	<string name="description_u"><u>Description</u></string>
+	<string name="alternative_titles_u"><u>Alternative titles</u></string>
+	<string name="authors_u"><u>Authors</u></string>
+	<string name="tags_u"><u>Tags</u></string>
+	<string name="genres_u"><u>Genres</u></string>
+	<string name="type_u"><u>Type</u></string>
+	<string name="related_books_u"><u>Related books</u></string>
+	<string name="similar_recommended_u"><u>Similar recommended</u></string>
 </resources>
