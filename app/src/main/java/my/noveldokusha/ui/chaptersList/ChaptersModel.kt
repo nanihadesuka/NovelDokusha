@@ -23,19 +23,19 @@ class ChaptersModel : ViewModel()
 		this.bookMetadata.title = bookMetadata.title
 		this.bookMetadata.url = bookMetadata.url
 		chaptersLiveData = bookstore.bookChapter.chaptersFlow(bookMetadata.url).distinctUntilChanged().asLiveData()
+		bookLastReadChapterFlow = bookstore.bookLibrary.bookLastReadChapterFlow(bookMetadata.url).distinctUntilChanged()
 		downloadedChaptersFlow = bookstore.bookChapterBody.getExistBodyChapterUrlsFlow(bookMetadata.url)
-		bookTitle.postValue(this.bookMetadata.title)
-		sourceName.postValue(scrubber.getCompatibleSource(this.bookMetadata.url)?.name ?: "")
 		loadChapters()
 	}
 	
 	lateinit var downloadedChaptersFlow: Flow<Set<String>>
 	lateinit var chaptersLiveData: LiveData<List<bookstore.Chapter>>
+	lateinit var bookLastReadChapterFlow: Flow<String?>
 	val chapters = ArrayList<ChaptersActivity.ChapterItem>()
 	val refresh = MutableLiveData<Boolean>()
 	val bookMetadata = bookstore.BookMetadata("", "")
-	val bookTitle = MutableLiveData<String>()
-	val sourceName = MutableLiveData<String>()
+	val bookTitle by lazy { this.bookMetadata.title }
+	val sourceName by lazy { scrubber.getCompatibleSource(this.bookMetadata.url)?.name ?: "" }
 	val errorMessage = MutableLiveData<String>()
 	val errorMessageVisibility = MutableLiveData<Int>()
 	val errorMessageMaxLines = MutableLiveData<Int>(10)

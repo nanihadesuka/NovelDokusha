@@ -1,5 +1,6 @@
 package my.noveldokusha.ui.chaptersList
 
+import android.animation.LayoutTransition
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
@@ -107,6 +108,10 @@ class ChaptersActivity : AppCompatActivity()
 	
 	inner class ChapterItem(val chapter: bookstore.Chapter)
 	{
+		val currentlyLastReadChapterLiveData by lazy {
+			viewModel.bookLastReadChapterFlow.mapLatest { it == chapter.url }.distinctUntilChanged().asLiveData()
+		}
+		
 		val downloadedLiveData by lazy {
 			viewModel.downloadedChaptersFlow.mapLatest { it.contains(chapter.url) }.distinctUntilChanged().asLiveData()
 		}
@@ -148,6 +153,12 @@ class ChaptersActivity : AppCompatActivity()
 		{
 			val itemData = this.list[position]
 			val itemView = binder.viewHolder
+			
+			itemData.currentlyLastReadChapterLiveData.removeObservers(this@ChaptersActivity)
+			itemData.currentlyLastReadChapterLiveData.observe(this@ChaptersActivity) { currentlyReading ->
+				itemView.currentlyReading.visibility = if (currentlyReading) View.VISIBLE else View.INVISIBLE
+			}
+			
 			itemData.downloadedLiveData.removeObservers(this@ChaptersActivity)
 			itemData.downloadedLiveData.observe(this@ChaptersActivity) { downloaded ->
 				itemView.downloaded.visibility = if (downloaded) View.VISIBLE else View.INVISIBLE
@@ -200,12 +211,16 @@ class ChaptersActivity : AppCompatActivity()
 		
 		override fun onBindViewHolder(binder: ViewBinder, position: Int)
 		{
-			viewModel.bookTitle.observe(this@ChaptersActivity) { binder.viewHolder.bookTitle.text = it }
-			viewModel.sourceName.observe(this@ChaptersActivity) { binder.viewHolder.sourceName.text = it }
+			binder.viewHolder.bookTitle.text = viewModel.bookTitle
+			binder.viewHolder.sourceName.text = viewModel.sourceName
+			
+			viewModel.numberOfChapters.observe(this@ChaptersActivity) {
+				binder.viewHolder.numberOfChapters.text = it.toString()
+				binder.viewHolder.numberOfChapters.visibility = if (it.toString().isEmpty()) View.INVISIBLE else View.VISIBLE
+			}
 			viewModel.errorMessage.observe(this@ChaptersActivity) { binder.viewHolder.errorMessage.text = it }
 			viewModel.errorMessageVisibility.observe(this@ChaptersActivity) { binder.viewHolder.errorMessage.visibility = it }
 			viewModel.errorMessageMaxLines.observe(this@ChaptersActivity) { binder.viewHolder.errorMessage.maxLines = it }
-			viewModel.numberOfChapters.observe(this@ChaptersActivity) { binder.viewHolder.numberOfChapters.text = it.toString() }
 			binder.viewHolder.errorMessage.setOnLongClickListener(object : View.OnLongClickListener
 			{
 				private var expand: Boolean = false

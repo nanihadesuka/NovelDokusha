@@ -51,6 +51,9 @@ object bookstore
 		@Query("SELECT * FROM Book")
 		fun booksFlow(): Flow<List<Book>>
 		
+		@Query("SELECT lastReadChapter FROM Book WHERE url == :bookUrl")
+		fun bookLastReadChapterFlow(bookUrl: String): Flow<String?>
+		
 		@Query("SELECT * FROM Book WHERE completed = 0")
 		fun booksReadingFlow(): Flow<List<Book>>
 		
@@ -150,6 +153,7 @@ object bookstore
 		val booksFlow by lazy { db.libraryDao().booksFlow() }
 		val booksReadingFlow by lazy { db.libraryDao().booksReadingFlow() }
 		val booksCompletedFlow by lazy { db.libraryDao().booksCompletedFlow() }
+		fun bookLastReadChapterFlow(bookUrl: String) = db.libraryDao().bookLastReadChapterFlow(bookUrl)
 		fun existFlow(url: String) = db.libraryDao().existFlow(url)
 		suspend fun insert(book: Book) = if (isValid(book)) db.libraryDao().insert(book) else Unit
 		suspend fun remove(book: Book) = db.libraryDao().remove(book)

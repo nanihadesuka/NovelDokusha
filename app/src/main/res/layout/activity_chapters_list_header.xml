@@ -16,15 +16,18 @@
 	<androidx.constraintlayout.widget.ConstraintLayout
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
+		android:animateLayoutChanges="true"
 		android:columnCount="2"
 		android:orientation="horizontal"
 		android:padding="10sp"
+		
 		>
 		
 		<LinearLayout
 			android:id="@+id/bookInfo"
 			android:layout_width="0dp"
 			android:layout_height="wrap_content"
+			android:animateLayoutChanges="true"
 			android:columnCount="2"
 			android:orientation="vertical"
 			app:layout_constraintLeft_toLeftOf="parent"
@@ -37,6 +40,7 @@
 				android:id="@+id/bookTitle"
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
+				android:animateLayoutChanges="false"
 				android:textSize="18sp"
 				android:textStyle="bold"
 				tools:text="Book name"
@@ -45,6 +49,7 @@
 			<LinearLayout
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
+				android:animateLayoutChanges="true"
 				>
 				
 				<TextView
@@ -66,6 +71,7 @@
 			<LinearLayout
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
+				android:animateLayoutChanges="true"
 				>
 				
 				<TextView
@@ -80,13 +86,17 @@
 					android:id="@+id/numberOfChapters"
 					android:layout_width="wrap_content"
 					android:layout_height="wrap_content"
+					android:visibility="invisible"
 					tools:text="23"
+					tools:visibility="visible"
+					
 					/>
 			</LinearLayout>
 			
 			<LinearLayout
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
+				android:animateLayoutChanges="true"
 				>
 				
 				<TextView
@@ -101,7 +111,9 @@
 					android:id="@+id/description"
 					android:layout_width="wrap_content"
 					android:layout_height="wrap_content"
+					android:visibility="invisible"
 					tools:text="novel description"
+					tools:visibility="visible"
 					/>
 			</LinearLayout>
 		</LinearLayout>
@@ -124,6 +136,7 @@
 	<ScrollView
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
+		android:animateLayoutChanges="true"
 		>
 		
 		<TextView
