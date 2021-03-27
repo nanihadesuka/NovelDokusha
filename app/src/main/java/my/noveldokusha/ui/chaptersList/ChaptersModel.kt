@@ -7,6 +7,7 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.launch
 import my.noveldokusha.Response
 import my.noveldokusha.bookstore
@@ -22,16 +23,29 @@ class ChaptersModel : ViewModel()
 		
 		this.bookMetadata.title = bookMetadata.title
 		this.bookMetadata.url = bookMetadata.url
-		chaptersLiveData = bookstore.bookChapter.chaptersFlow(bookMetadata.url).distinctUntilChanged().asLiveData()
+		chaptersItemsLiveData = bookstore.bookChapter.chaptersFlow(bookMetadata.url).distinctUntilChanged().mapLatest {
+			it.map(::ChapterItem).asReversed()
+		}.asLiveData()
 		bookLastReadChapterFlow = bookstore.bookLibrary.bookLastReadChapterFlow(bookMetadata.url).distinctUntilChanged()
 		downloadedChaptersFlow = bookstore.bookChapterBody.getExistBodyChapterUrlsFlow(bookMetadata.url)
 		loadChapters()
 	}
 	
+	inner class ChapterItem(val chapter: bookstore.Chapter)
+	{
+		val currentlyLastReadChapterLiveData by lazy {
+			bookLastReadChapterFlow.mapLatest { it == chapter.url }.distinctUntilChanged().asLiveData()
+		}
+		
+		val downloadedLiveData by lazy {
+			downloadedChaptersFlow.mapLatest { it.contains(chapter.url) }.distinctUntilChanged().asLiveData()
+		}
+	}
+	
 	lateinit var downloadedChaptersFlow: Flow<Set<String>>
-	lateinit var chaptersLiveData: LiveData<List<bookstore.Chapter>>
+	lateinit var chaptersItemsLiveData: LiveData<List<ChapterItem>>
 	lateinit var bookLastReadChapterFlow: Flow<String?>
-	val chapters = ArrayList<ChaptersActivity.ChapterItem>()
+	val chapters = ArrayList<ChapterItem>()
 	val refresh = MutableLiveData<Boolean>()
 	val bookMetadata = bookstore.BookMetadata("", "")
 	val bookTitle by lazy { this.bookMetadata.title }
@@ -67,7 +81,7 @@ class ChaptersModel : ViewModel()
 	 * Set as read all the chapters bellow the checked chapter (selected chapter included).
 	 * If no chapter checked then set all as read.
 	 */
-	fun setAsRead(selected: ChaptersActivity.ChapterItem?)
+	fun setAsRead(selected: ChapterItem?)
 	{
 		if (setAsReadJob?.isActive == true) return
 		setAsReadJob = GlobalScope.launch(Dispatchers.IO) {

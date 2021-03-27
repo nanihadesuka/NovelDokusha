@@ -1,6 +1,5 @@
 package my.noveldokusha.ui.chaptersList
 
-import android.animation.LayoutTransition
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
@@ -14,8 +13,6 @@ import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.runBlocking
 import my.noveldokusha.R
 import my.noveldokusha.bookstore
@@ -67,8 +64,8 @@ class ChaptersActivity : AppCompatActivity()
 		
 		viewModel.refresh.observe(this) { viewHolder.swipeRefreshLayout.isRefreshing = it }
 		
-		viewModel.chaptersLiveData.observe(this) {
-			viewAdapter.chapters.setList(it.map(::ChapterItem).asReversed())
+		viewModel.chaptersItemsLiveData.observe(this) {
+			viewAdapter.chapters.setList(it)
 			viewModel.numberOfChapters.value = it.size
 		}
 		
@@ -106,21 +103,10 @@ class ChaptersActivity : AppCompatActivity()
 		else -> super.onOptionsItemSelected(item)
 	}
 	
-	inner class ChapterItem(val chapter: bookstore.Chapter)
-	{
-		val currentlyLastReadChapterLiveData by lazy {
-			viewModel.bookLastReadChapterFlow.mapLatest { it == chapter.url }.distinctUntilChanged().asLiveData()
-		}
-		
-		val downloadedLiveData by lazy {
-			viewModel.downloadedChaptersFlow.mapLatest { it.contains(chapter.url) }.distinctUntilChanged().asLiveData()
-		}
-	}
-	
-	private inner class ChaptersArrayAdapter(private val list: ArrayList<ChaptersActivity.ChapterItem>) :
+	private inner class ChaptersArrayAdapter(private val list: ArrayList<ChaptersModel.ChapterItem>) :
 		RecyclerView.Adapter<ChaptersArrayAdapter.ViewBinder>()
 	{
-		private inner class Diff(private val new: List<ChaptersActivity.ChapterItem>) : DiffUtil.Callback()
+		private inner class Diff(private val new: List<ChaptersModel.ChapterItem>) : DiffUtil.Callback()
 		{
 			override fun getOldListSize(): Int = list.size
 			override fun getNewListSize(): Int = new.size
@@ -128,7 +114,7 @@ class ChaptersActivity : AppCompatActivity()
 			override fun areContentsTheSame(oldPos: Int, newPos: Int): Boolean = list[oldPos].chapter == new[newPos].chapter
 		}
 		
-		fun setList(newList: List<ChaptersActivity.ChapterItem>) = DiffUtil.calculateDiff(Diff(newList)).let {
+		fun setList(newList: List<ChaptersModel.ChapterItem>) = DiffUtil.calculateDiff(Diff(newList)).let {
 			val isEmpty = list.isEmpty()
 			list.clear()
 			list.addAll(newList)
@@ -137,7 +123,7 @@ class ChaptersActivity : AppCompatActivity()
 		
 		private var default_textColor = 0
 		
-		var selected: ChaptersActivity.ChapterItem? = null
+		var selected: ChaptersModel.ChapterItem? = null
 			private set
 		
 		override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewBinder
