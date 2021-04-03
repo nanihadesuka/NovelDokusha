@@ -141,22 +141,21 @@ class ChaptersActivity : AppCompatActivity()
 			val itemView = binder.viewHolder
 			
 			itemData.currentlyLastReadChapterLiveData.removeObservers(this@ChaptersActivity)
+			itemView.currentlyReading.visibility = View.INVISIBLE
 			itemData.currentlyLastReadChapterLiveData.observe(this@ChaptersActivity) { currentlyReading ->
 				itemView.currentlyReading.visibility = if (currentlyReading) View.VISIBLE else View.INVISIBLE
 			}
 			
 			itemData.downloadedLiveData.removeObservers(this@ChaptersActivity)
+			itemView.downloaded.visibility = View.INVISIBLE
 			itemData.downloadedLiveData.observe(this@ChaptersActivity) { downloaded ->
 				itemView.downloaded.visibility = if (downloaded) View.VISIBLE else View.INVISIBLE
 			}
 			
 			itemView.title.text = itemData.chapter.title
-			if (itemData.chapter.read) itemView.title.setTextColor(Color.GRAY)
-			else itemView.title.setTextColor(default_textColor)
+			itemView.title.setTextColor(if (itemData.chapter.read) Color.GRAY else default_textColor)
 			
 			itemView.selected.visibility = if (selected == itemData) View.VISIBLE else View.INVISIBLE
-			itemView.position.visibility = if (itemData.chapter.run { lastReadOffset == 0 || read }) View.INVISIBLE else View.VISIBLE
-			itemView.position.text = itemData.chapter.lastReadPosition.toString()
 			
 			itemView.root.setOnClickListener {
 				
