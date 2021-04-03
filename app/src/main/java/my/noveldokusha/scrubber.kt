@@ -2,6 +2,7 @@ package my.noveldokusha
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
+import org.jsoup.Connection
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.jsoup.nodes.Node
@@ -13,6 +14,11 @@ import java.net.URLDecoder
 import java.net.URLEncoder
 import java.util.*
 import java.util.Collections.max
+
+fun Connection.addUserAgent(): Connection =
+	this.userAgent("Mozilla/5.0 (X11; U; Linux i586; en-US; rv:1.7.3) Gecko/20040924 Epiphany/1.4.4 (Ubuntu)")
+
+fun Connection.addHeaderRequest(): Connection = this.header("x-requested-with", "XMLHttpRequest")!!
 
 object scrubber
 {
@@ -171,7 +177,8 @@ object scrubber
 				if (input.isBlank()) return Response.Success(listOf())
 				return tryConnect {
 					Jsoup.connect("https://www.readlightnovel.org/search/autocomplete")
-						.header("x-requested-with", "XMLHttpRequest")
+						.addUserAgent()
+						.addHeaderRequest()
 						.data("q", input)
 						.post()
 						.select("a")
@@ -204,7 +211,8 @@ object scrubber
 			{
 				val id = doc.selectFirst("#rating").attr("data-novel-id")
 				return Jsoup.connect("https://readnovelfull.com/ajax/chapter-archive")
-					.header("x-requested-with", "XMLHttpRequest")
+					.addUserAgent()
+					.addHeaderRequest()
 					.data("novelId", id)
 					.get()
 					.select("a")
@@ -271,7 +279,8 @@ object scrubber
 			override suspend fun getChapterList(doc: Document): List<bookstore.ChapterMetadata>
 			{
 				return Jsoup.connect("https://www.novelupdates.com/wp-admin/admin-ajax.php")
-					.header("x-requested-with", "XMLHttpRequest")
+					.addUserAgent()
+					.addHeaderRequest()
 					.data("action", "nd_getchapters")
 					.data("mygrr", doc.selectFirst("#grr_groups").attr("value"))
 					.data("mygroupfilter", "")
@@ -299,6 +308,7 @@ object scrubber
 				val value = URLEncoder.encode(input, "utf-8")
 				return tryConnect {
 					Jsoup.connect("https://www.novelupdates.com/?s=${value}")
+						.addUserAgent()
 						.get()
 						.select(".search_body_nu")
 						.select(".search_title")
@@ -594,9 +604,9 @@ suspend fun downloadChapter(chapterUrl: String): Response<String>
 {
 	return tryConnect<String> {
 		val con = Jsoup.connect(chapterUrl)
+			.addUserAgent()
 			.followRedirects(true)
 			.timeout(2 * 60 * 1000)
-			.userAgent("Mozilla/5.0 (X11; U; Linux i586; en-US; rv:1.7.3) Gecko/20040924 Epiphany/1.4.4 (Ubuntu)")
 			.referrer("http://www.google.com")
 			.header("Content-Language", "en-US")
 			.execute()
@@ -670,9 +680,13 @@ catch (e: Exception)
 fun <T> tryConnectSync(extraErrorInfo: String = "", call: suspend () -> Response<T>): Response<T> =
 	runBlocking(Dispatchers.IO) { tryConnect(extraErrorInfo, call) }
 
-suspend fun fetchDoc(url: String, timeoutMilliseconds: Int = 2 * 60 * 1000): Document = Jsoup.connect(url)
-	.timeout(timeoutMilliseconds)
-	.userAgent("Mozilla/5.0 (X11; U; Linux i586; en-US; rv:1.7.3) Gecko/20040924 Epiphany/1.4.4 (Ubuntu)")
-	.referrer("http://www.google.com")
-	.header("Content-Language", "en-US")
-	.get()
+suspend fun fetchDoc(url: String, timeoutMilliseconds: Int = 2 * 60 * 1000): Document
+{
+	return Jsoup.connect(url)
+		.timeout(timeoutMilliseconds)
+		.addUserAgent()
+		.referrer("http://www.google.com")
+		.header("Content-Language", "en-US")
+		.get()
+}
+
