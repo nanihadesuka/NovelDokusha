@@ -3,6 +3,7 @@ package my.noveldokusha.ui.chaptersList
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
+import android.net.Uri
 import android.os.Bundle
 import android.view.*
 import androidx.activity.viewModels
@@ -223,7 +224,13 @@ class ChaptersActivity : AppCompatActivity()
 			binder.viewHolder.databaseSearchButton.setOnClickListener {
 				DatabaseSearchResultsActivity
 					.Extras(scrubber.database.NovelUpdates.baseUrl, DatabaseSearchResultsModel.SearchMode.Text(viewModel.bookMetadata.title))
-					.intent(this@ChaptersActivity).let { intent -> startActivity(intent) }
+					.intent(this@ChaptersActivity).let(::startActivity)
+			}
+			
+			binder.viewHolder.webpageOpenButton.setOnClickListener {
+				Intent(Intent.ACTION_VIEW).also {
+					it.data = Uri.parse(this@ChaptersActivity.viewModel.bookMetadata.url)
+				}.let(::startActivity)
 			}
 		}
 		

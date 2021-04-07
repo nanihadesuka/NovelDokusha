@@ -31,7 +31,7 @@
 			android:columnCount="2"
 			android:orientation="vertical"
 			app:layout_constraintLeft_toLeftOf="parent"
-			app:layout_constraintRight_toLeftOf="@id/databaseSearchButton"
+			app:layout_constraintRight_toLeftOf="@id/buttons"
 			app:layout_constraintTop_toTopOf="parent"
 			>
 			
@@ -118,19 +118,34 @@
 			</LinearLayout>
 		</LinearLayout>
 		
-		<Button
-			android:id="@+id/databaseSearchButton"
+		<LinearLayout
+			android:id="@+id/buttons"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
-			android:layout_margin="10sp"
-			android:text="Database"
-			android:textAllCaps="false"
-			android:tooltipText="Search in databse for more information"
+			android:orientation="vertical"
 			app:layout_constraintLeft_toRightOf="@id/bookInfo"
 			app:layout_constraintRight_toRightOf="parent"
 			app:layout_constraintTop_toTopOf="parent"
-			/>
-	
+			>
+			
+			<Button
+				android:id="@+id/databaseSearchButton"
+				android:layout_width="wrap_content"
+				android:layout_height="40dp"
+				android:text="Database"
+				android:textAllCaps="false"
+				android:tooltipText="Search in databse for more information"
+				/>
+			
+			<Button
+				android:id="@+id/webpageOpenButton"
+				android:layout_width="wrap_content"
+				android:layout_height="40dp"
+				android:text="Webpage"
+				android:textAllCaps="false"
+				android:tooltipText="Open in browser"
+				/>
+		</LinearLayout>
 	</androidx.constraintlayout.widget.ConstraintLayout>
 	
 	<ScrollView
