@@ -596,8 +596,8 @@ object scrubber
 
 sealed class Response<T>
 {
-	class Success<T>(val data: T, val immediate: Boolean = false) : Response<T>()
-	class Error<T>(val message: String, val immediate: Boolean = false) : Response<T>()
+	class Success<T>(val data: T) : Response<T>()
+	class Error<T>(val message: String) : Response<T>()
 }
 
 suspend fun downloadChapter(chapterUrl: String): Response<String>
@@ -622,7 +622,7 @@ suspend fun downloadChapter(chapterUrl: String): Response<String>
 				
 				Source not supported
 			""".trimIndent()
-			Response.Error<String>(errorMessage, true)
+			Response.Error<String>(errorMessage)
 		}()
 		
 		val doc = fetchDoc(source.transformChapterUrl(realUrl))
@@ -639,7 +639,7 @@ suspend fun fetchChaptersList(bookUrl: String, tryCache: Boolean = true): Respon
 	
 	// Return if can't find compatible scrubber for url
 	val scrap = scrubber.getCompatibleSourceCatalog(bookUrl) ?: return Response.Error(
-		"Incompatible source\n\nCan't find compatible source for:\n$bookUrl", true
+		"Incompatible source\n\nCan't find compatible source for:\n$bookUrl"
 	)
 	
 	return tryConnect {

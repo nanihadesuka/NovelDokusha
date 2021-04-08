@@ -62,7 +62,7 @@ class ReaderActivity : AppCompatActivity()
 		
 		val insert = { item: Item -> viewAdapter.listView.add(item) }
 		val insertAll = { items: Collection<Item> -> viewAdapter.listView.addAll(items) }
-		val remove = { item: Item, _: Boolean -> viewAdapter.listView.remove(item) }
+		val remove = { item: Item -> viewAdapter.listView.remove(item) }
 		
 		val chapter = viewModel.orderedChapters.find { it.url == viewModel.bookSelectedChapterUrl }!!
 		addChapter(chapter, insert, insertAll, remove) {
@@ -161,7 +161,7 @@ class ReaderActivity : AppCompatActivity()
 		
 		val insert = { item: Item -> viewAdapter.listView.add(item) }
 		val insertAll = { items: Collection<Item> -> viewAdapter.listView.addAll(items) }
-		val remove = { item: Item, _: Boolean -> viewAdapter.listView.remove(item) }
+		val remove = { item: Item -> viewAdapter.listView.remove(item) }
 		
 		val nextIndex = viewModel.orderedChapters.indexOfFirst { it.url == lastItem.url } + 1
 		if (nextIndex >= viewModel.orderedChapters.size)
@@ -188,46 +188,33 @@ class ReaderActivity : AppCompatActivity()
 			return
 		}
 		
-		var i = 0
-		var child = viewHolder.listView.getChildAt(i)
-		var top = child.top - viewHolder.listView.paddingTop
+		var list_index = 0
+		val insert = { item: Item -> viewAdapter.listView.insert(item, list_index); list_index += 1 }
+		val insertAll = { items: Collection<Item> -> items.forEach { insert(it) } }
+		val remove = { item: Item -> viewAdapter.listView.remove(item); list_index -= 1 }
 		
-		val insert = { item: Item ->
-			viewAdapter.listView.insert(item, i); i += 1
-			viewHolder.listView.setSelectionFromTop(i, top)
-		}
-		
-		val insertAll = { items: Collection<Item> ->
-			items.forEach(insert)
-		}
-		
-		val remove = { item: Item, immediate: Boolean ->
-			// Dirty move so top doesn't jiggle when scroll is at top (max)
-			if (!immediate && viewHolder.listView.firstVisiblePosition == 0)
-			{
-				child = viewHolder.listView.getChildAt(i)
-				top = child.top - viewHolder.listView.paddingTop
-			}
-			viewAdapter.listView.remove(item); i -= 1
-			// Dirty move so top doesn't jiggle when scroll is not at top (max)
-			if (!immediate && viewHolder.listView.firstVisiblePosition != 0)
-			{
-				child = viewHolder.listView.getChildAt(i)
-				top = child.top - viewHolder.listView.paddingTop
-			}
-			viewHolder.listView.setSelectionFromTop(i, top)
+		val maintainLastVisiblePosition = { fn: () -> Unit ->
+			val oldSize = viewAdapter.listView.count
+			val lvp = viewHolder.listView.lastVisiblePosition
+			val ivpView = viewHolder.listView.lastVisiblePosition - viewHolder.listView.firstVisiblePosition
+			val top = viewHolder.listView.getChildAt(ivpView).run { top - paddingTop }
+			fn()
+			val displacement = viewAdapter.listView.count - oldSize
+			viewHolder.listView.setSelectionFromTop(lvp + displacement, top)
 		}
 		
 		val previousIndex = viewModel.orderedChapters.indexOfFirst { it.url == firstItem.url } - 1
 		if (previousIndex < 0)
 		{
-			insert(Item.BOOK_START(firstItem.url))
+			maintainLastVisiblePosition {
+				insert(Item.BOOK_START(firstItem.url))
+			}
 			viewModel.state = ReaderModel.State.IDLE
 			return
 		}
 		
 		val chapter = viewModel.orderedChapters[previousIndex]
-		addChapter(chapter, insert, insertAll, remove) {
+		addChapter(chapter, insert, insertAll, remove, maintainLastVisiblePosition) {
 			viewModel.state = ReaderModel.State.IDLE
 		}
 	}
@@ -257,41 +244,43 @@ class ReaderActivity : AppCompatActivity()
 		chapter: bookstore.Chapter,
 		insert: ((Item) -> Unit),
 		insertAll: ((Collection<Item>) -> Unit),
-		remove: ((Item, Boolean) -> Unit),
+		remove: ((Item) -> Unit),
+		maintainPosition: (() -> Unit) -> Unit = { it() },
 		onCompletion: (() -> Unit)
 	)
 	{
 		val itemProgressBar = Item.PROGRESSBAR(chapter.url)
-		insert(Item.DIVIDER(chapter.url))
-		insert(Item.TITLE(chapter.url, 0, chapter.title))
-		insert(itemProgressBar)
+		maintainPosition {
+			insert(Item.DIVIDER(chapter.url))
+			insert(Item.TITLE(chapter.url, 0, chapter.title))
+			insert(itemProgressBar)
+		}
 		
 		lifecycleScope.launch(Dispatchers.Default) {
 			when (val res = bookstore.bookChapterBody.fetchBody(chapter.url))
 			{
 				is Response.Success ->
 				{
-					runOnUiThread {
-						remove(itemProgressBar, res.immediate)
-					}
-					
 					val items = textToItems(chapter.url, res.data)
-					
 					runOnUiThread {
-						insertAll(items)
-						insert(Item.DIVIDER(chapter.url))
+						maintainPosition {
+							remove(itemProgressBar)
+							insertAll(items)
+							insert(Item.DIVIDER(chapter.url))
+						}
+						onCompletion()
 					}
 				}
 				is Response.Error ->
 				{
 					runOnUiThread {
-						remove(itemProgressBar, res.immediate)
-						insert(Item.ERROR(chapter.url, res.message))
+						maintainPosition {
+							remove(itemProgressBar)
+							insert(Item.ERROR(chapter.url, res.message))
+						}
+						onCompletion()
 					}
 				}
-			}
-			runOnUiThread {
-				onCompletion()
 			}
 		}
 	}
