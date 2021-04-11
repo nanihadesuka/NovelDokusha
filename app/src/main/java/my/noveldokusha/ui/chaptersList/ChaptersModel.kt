@@ -6,8 +6,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.mapLatest
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import my.noveldokusha.Response
 import my.noveldokusha.bookstore
@@ -23,23 +22,18 @@ class ChaptersModel : ViewModel()
 		
 		this.bookMetadata.title = bookMetadata.title
 		this.bookMetadata.url = bookMetadata.url
-		chaptersItemsLiveData = bookstore.bookChapter.chaptersFlow(bookMetadata.url).distinctUntilChanged().mapLatest {
+		chaptersItemsLiveData = bookstore.bookChapter.chaptersFlow(bookMetadata.url).map {
 			it.map(::ChapterItem).asReversed()
 		}.asLiveData()
-		bookLastReadChapterFlow = bookstore.bookLibrary.bookLastReadChapterFlow(bookMetadata.url).distinctUntilChanged()
+		bookLastReadChapterFlow = bookstore.bookLibrary.bookLastReadChapterFlow(bookMetadata.url)
 		downloadedChaptersFlow = bookstore.bookChapterBody.getExistBodyChapterUrlsFlow(bookMetadata.url)
 		loadChapters()
 	}
 	
 	inner class ChapterItem(val chapter: bookstore.Chapter)
 	{
-		val currentlyLastReadChapterLiveData by lazy {
-			bookLastReadChapterFlow.mapLatest { it == chapter.url }.distinctUntilChanged().asLiveData()
-		}
-		
-		val downloadedLiveData by lazy {
-			downloadedChaptersFlow.mapLatest { it.contains(chapter.url) }.distinctUntilChanged().asLiveData()
-		}
+		val currentlyLastReadChapterLiveData by lazy { bookLastReadChapterFlow.map { it == chapter.url }.asLiveData() }
+		val downloadedLiveData by lazy { downloadedChaptersFlow.map { it.contains(chapter.url) }.asLiveData() }
 	}
 	
 	lateinit var downloadedChaptersFlow: Flow<Set<String>>

@@ -6,7 +6,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import my.noveldokusha.Response
@@ -26,14 +25,14 @@ class LibraryPageModel : ViewModel()
 		{
 			true -> bookstore.bookLibrary.booksCompletedFlow
 			false -> bookstore.bookLibrary.booksReadingFlow
-		}.map { it.map(::BookItem) }.distinctUntilChanged().asLiveData()
+		}.map { it.map(::BookItem) }.asLiveData()
 	}
 	
 	lateinit var booksLiveData: LiveData<List<BookItem>>
 	
 	data class BookItem(val data: bookstore.Book)
 	{
-		val numberOfUnreadChapters = bookstore.bookChapter.numberOfUnreadChaptersFlow(data.url).distinctUntilChanged().asLiveData()
+		val numberOfUnreadChapters = bookstore.bookChapter.numberOfUnreadChaptersFlow(data.url).asLiveData()
 	}
 	
 	private var showCompleted: Boolean = false

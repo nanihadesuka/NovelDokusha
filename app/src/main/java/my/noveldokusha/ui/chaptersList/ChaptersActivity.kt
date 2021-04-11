@@ -9,6 +9,7 @@ import android.view.*
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.Observer
 import androidx.lifecycle.asLiveData
 import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.DefaultItemAnimator
@@ -138,20 +139,20 @@ class ChaptersActivity : AppCompatActivity()
 		
 		override fun onBindViewHolder(binder: ViewBinder, position: Int)
 		{
+			binder.lastItemData?.also {
+				it.currentlyLastReadChapterLiveData.removeObserver(binder.lastReadObserver)
+				it.downloadedLiveData.removeObserver(binder.downloadedObserver)
+			}
+			
 			val itemData = this.list[position]
 			val itemView = binder.viewHolder
+			binder.lastItemData = itemData
 			
-			itemData.currentlyLastReadChapterLiveData.removeObservers(this@ChaptersActivity)
 			itemView.currentlyReading.visibility = View.INVISIBLE
-			itemData.currentlyLastReadChapterLiveData.observe(this@ChaptersActivity) { currentlyReading ->
-				itemView.currentlyReading.visibility = if (currentlyReading) View.VISIBLE else View.INVISIBLE
-			}
-			
-			itemData.downloadedLiveData.removeObservers(this@ChaptersActivity)
 			itemView.downloaded.visibility = View.INVISIBLE
-			itemData.downloadedLiveData.observe(this@ChaptersActivity) { downloaded ->
-				itemView.downloaded.visibility = if (downloaded) View.VISIBLE else View.INVISIBLE
-			}
+			
+			itemData.currentlyLastReadChapterLiveData.observe(this@ChaptersActivity, binder.lastReadObserver)
+			itemData.downloadedLiveData.observe(this@ChaptersActivity, binder.downloadedObserver)
 			
 			itemView.title.text = itemData.chapter.title
 			itemView.title.setTextColor(if (itemData.chapter.read) Color.GRAY else default_textColor)
@@ -184,6 +185,15 @@ class ChaptersActivity : AppCompatActivity()
 		}
 		
 		inner class ViewBinder(val viewHolder: ActivityChaptersListItemBinding) : RecyclerView.ViewHolder(viewHolder.root)
+		{
+			var lastItemData: ChaptersModel.ChapterItem? = null
+			val lastReadObserver: Observer<Boolean> = Observer { currentlyReading ->
+				viewHolder.currentlyReading.visibility = if (currentlyReading) View.VISIBLE else View.INVISIBLE
+			}
+			val downloadedObserver: Observer<Boolean> = Observer { downloaded ->
+				viewHolder.downloaded.visibility = if (downloaded) View.VISIBLE else View.INVISIBLE
+			}
+		}
 	}
 	
 	inner class ChaptersHeaderAdapter : RecyclerView.Adapter<ChaptersHeaderAdapter.ViewBinder>()

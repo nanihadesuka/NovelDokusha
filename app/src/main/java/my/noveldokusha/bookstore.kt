@@ -3,7 +3,7 @@ package my.noveldokusha
 import android.content.Context
 import androidx.room.*
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.mapLatest
+import kotlinx.coroutines.flow.map
 
 object bookstore
 {
@@ -192,7 +192,7 @@ object bookstore
 		}
 		
 		fun getExistBodyChapterUrlsFlow(bookUrl: String): Flow<Set<String>> =
-			db.chapterBodyDao().getExistBodyChapterUrlsFlow(bookUrl).mapLatest { it.toSet() }
+			db.chapterBodyDao().getExistBodyChapterUrlsFlow(bookUrl).map { it.toSet() }
 	}
 	
 	fun isValid(book: Book): Boolean = book.url.matches("""^https?://.*""".toRegex())
