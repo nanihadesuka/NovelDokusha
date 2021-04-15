@@ -15,6 +15,7 @@
 		android:id="@+id/selected"
 		android:layout_width="0dp"
 		android:layout_height="0dp"
+		android:animateLayoutChanges="true"
 		android:clickable="false"
 		android:foreground="@color/light_blue"
 		android:visibility="invisible"
@@ -29,7 +30,9 @@
 		android:layout_width="0dp"
 		android:layout_height="wrap_content"
 		android:hint="Chapter placeholder"
-		android:padding="12sp"
+		android:paddingVertical="12sp"
+		android:paddingStart="12sp"
+		android:paddingEnd="6sp"
 		app:layout_constraintBottom_toBottomOf="parent"
 		app:layout_constraintEnd_toStartOf="@+id/currentlyReading"
 		app:layout_constraintHorizontal_chainStyle="spread_inside"
@@ -41,7 +44,8 @@
 		android:id="@+id/currentlyReading"
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
-		android:padding="12sp"
+		android:paddingHorizontal="6sp"
+		android:paddingVertical="12sp"
 		android:src="@drawable/ic_looking_24"
 		android:visibility="invisible"
 		app:layout_constraintBottom_toBottomOf="parent"
@@ -52,13 +56,15 @@
 		app:tint="#aaaaaa"
 		tools:visibility="visible"
 		/>
-
+	
 	
 	<ImageView
 		android:id="@+id/downloaded"
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
-		android:padding="12sp"
+		android:paddingVertical="12sp"
+		android:paddingStart="6sp"
+		android:paddingEnd="12sp"
 		android:visibility="invisible"
 		app:layout_constraintBottom_toBottomOf="parent"
 		app:layout_constraintEnd_toEndOf="parent"
