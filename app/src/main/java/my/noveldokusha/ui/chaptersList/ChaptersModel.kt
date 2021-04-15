@@ -75,11 +75,11 @@ class ChaptersModel : ViewModel()
 	 * Set as read all the chapters bellow the checked chapter (selected chapter included).
 	 * If no chapter checked then set all as read.
 	 */
-	fun setAsRead(selected: ChapterItem?)
+	fun setAsRead(position: Int)
 	{
 		if (setAsReadJob?.isActive == true) return
 		setAsReadJob = GlobalScope.launch(Dispatchers.IO) {
-			val index = chapters.indexOf(selected).coerceAtLeast(0)
+			val index = position.coerceAtLeast(0)
 			chapters.drop(index).map { it.chapter.url }.let {
 				bookstore.bookChapter.setAsRead(it)
 			}

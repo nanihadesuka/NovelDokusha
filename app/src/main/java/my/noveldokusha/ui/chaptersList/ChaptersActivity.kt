@@ -98,7 +98,7 @@ class ChaptersActivity : AppCompatActivity()
 	
 	override fun onOptionsItemSelected(item: MenuItem): Boolean = when (item.itemId)
 	{
-		R.id.action_set_all_chapters_read -> viewModel.setAsRead(viewAdapter.chapters.selected).let { true }
+		R.id.action_set_all_chapters_read -> viewModel.setAsRead(viewAdapter.chapters.selectedPos).let { true }
 		R.id.action_download_all_chapters -> viewModel.downloadAllChapters().let { true }
 		R.id.action_bookmarked -> viewModel.toggleBookmark().let { true }
 		android.R.id.home -> this.onBackPressed().let { true }
@@ -125,8 +125,10 @@ class ChaptersActivity : AppCompatActivity()
 		
 		private var default_textColor = 0
 		
-		var selected: ChaptersModel.ChapterItem? = null
+		var selectedPos = -1
 			private set
+		
+		private var selected: ChaptersModel.ChapterItem? = null
 		
 		override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewBinder
 		{
@@ -157,15 +159,14 @@ class ChaptersActivity : AppCompatActivity()
 			itemView.title.text = itemData.chapter.title
 			itemView.title.setTextColor(if (itemData.chapter.read) Color.GRAY else default_textColor)
 			
-			itemView.selected.visibility = if (selected == itemData) View.VISIBLE else View.INVISIBLE
+			itemView.selected.visibility = if (selectedPos != -1 && selectedPos <= position) View.VISIBLE else View.INVISIBLE
 			
 			itemView.root.setOnClickListener {
 				
 				selected?.let {
-					val lastIndex = this.list.indexOf(it)
 					selected = null
-					this.notifyItemChanged(lastIndex)
-					this.notifyItemChanged(this.list.indexOf(itemData))
+					selectedPos = -1
+					this.notifyDataSetChanged()
 					return@setOnClickListener
 				}
 				
@@ -176,10 +177,17 @@ class ChaptersActivity : AppCompatActivity()
 			}
 			
 			itemView.root.setOnLongClickListener {
-				val lastIndex = this.list.indexOf(selected)
-				selected = if (selected == itemData) null else itemData
-				this.notifyItemChanged(lastIndex)
-				this.notifyItemChanged(this.list.indexOf(itemData))
+				if (selected == itemData)
+				{
+					selected = null
+					selectedPos = -1
+				}
+				else
+				{
+					selected = itemData
+					selectedPos = position
+				}
+				this.notifyDataSetChanged()
 				true
 			}
 		}
