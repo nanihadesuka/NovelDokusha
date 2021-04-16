@@ -1,14 +1,14 @@
 package my.noveldokusha.ui.main
 
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.findNavController
 import androidx.navigation.ui.NavigationUI
 import androidx.navigation.ui.setupWithNavController
 import my.noveldokusha.R
 import my.noveldokusha.databinding.ActivityMainBinding
+import my.noveldokusha.ui.BaseActivity
 
-open class MainActivity : AppCompatActivity()
+open class MainActivity : BaseActivity()
 {
 	private val viewHolder by lazy { ActivityMainBinding.inflate(layoutInflater) }
 	

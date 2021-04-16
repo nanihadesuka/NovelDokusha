@@ -8,7 +8,6 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.ViewGroup
 import androidx.activity.viewModels
-import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.RecyclerView
@@ -16,10 +15,11 @@ import my.noveldokusha.R
 import my.noveldokusha.databinding.ActivityDatabaseSearchBinding
 import my.noveldokusha.databinding.ActivityDatabaseSearchGenreItemBinding
 import my.noveldokusha.scrubber
+import my.noveldokusha.ui.BaseActivity
 import my.noveldokusha.ui.databaseSearchResults.DatabaseSearchResultsActivity
 import my.noveldokusha.ui.databaseSearchResults.DatabaseSearchResultsModel
 
-class DatabaseSearchActivity : AppCompatActivity()
+class DatabaseSearchActivity : BaseActivity()
 {
 	class Extras(val databaseBaseUrl: String)
 	{

@@ -5,7 +5,6 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.*
 import androidx.activity.viewModels
-import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LiveData
@@ -19,9 +18,10 @@ import my.noveldokusha.bookstore
 import my.noveldokusha.databinding.ActivitySourceCatalogBinding
 import my.noveldokusha.databinding.ActivitySourceCatalogListviewItemBinding
 import my.noveldokusha.scrubber
+import my.noveldokusha.ui.BaseActivity
 import my.noveldokusha.ui.chaptersList.ChaptersActivity
 
-class SourceCatalogActivity : AppCompatActivity()
+class SourceCatalogActivity : BaseActivity()
 {
 	class Extras(val sourceBaseUrl: String)
 	{

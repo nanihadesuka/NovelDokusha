@@ -10,15 +10,15 @@ import android.view.WindowManager
 import android.widget.AbsListView
 import android.widget.ArrayAdapter
 import androidx.activity.viewModels
-import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import my.noveldokusha.*
 import my.noveldokusha.databinding.ActivityReaderBinding
 import my.noveldokusha.databinding.ActivityReaderListItemBinding
+import my.noveldokusha.ui.BaseActivity
 
-class ReaderActivity : AppCompatActivity()
+class ReaderActivity : BaseActivity()
 {
 	class Extras(val bookUrl: String, val bookSelectedChapterUrl: String)
 	{

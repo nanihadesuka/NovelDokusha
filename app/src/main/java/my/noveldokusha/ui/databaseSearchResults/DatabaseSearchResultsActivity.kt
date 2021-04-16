@@ -8,7 +8,6 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.viewModels
-import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -17,12 +16,13 @@ import my.noveldokusha.bookstore
 import my.noveldokusha.databinding.ActivityDatabaseSearchResultsBinding
 import my.noveldokusha.databinding.ActivityDatabaseSearchResultsListItemBinding
 import my.noveldokusha.scrubber
+import my.noveldokusha.ui.BaseActivity
 import my.noveldokusha.ui.databaseBookInfo.DatabaseBookInfoActivity
 import my.noveldokusha.uiUtils.ProgressBarAdapter
 import java.io.InvalidObjectException
 import java.util.*
 
-class DatabaseSearchResultsActivity : AppCompatActivity()
+class DatabaseSearchResultsActivity : BaseActivity()
 {
 	class Extras(val databaseUrlBase: String, val input: DatabaseSearchResultsModel.SearchMode)
 	{

@@ -3,7 +3,7 @@
 	
 	<style name="Theme" />
 	
-	<style name="AppTheme" parent="Theme.AppCompat.NoActionBar">
+	<style name="AppTheme_Dark" parent="Theme.AppCompat.NoActionBar">
 		<item name="colorPrimary">@color/dark_20</item>
 		<item name="colorPrimaryVariant">@color/dark_20</item>
 		<item name="colorOnPrimary">#eeeeee</item>
@@ -23,7 +23,17 @@
 		<item name="materialCardViewStyle">@style/app.CardView.Dark</item>
 		<item name="buttonStyle">@style/app.Button.Dark</item>
 		<item name="android:scrollbarThumbVertical">@drawable/scrollbar_thumb</item>
+<!--		<item name="android:windowAnimationStyle">@style/WindowTransition</item>-->
 	</style>
+	
+	<style name="AppTheme_Grey" parent="Theme.AppCompat.NoActionBar">
+<!--		<item name="android:windowAnimationStyle">@style/WindowTransition</item>-->
+	</style>
+	
+<!--	<style name="WindowTransition">-->
+<!--		<item name="android:windowEnterAnimation">@android:anim/fade_in</item>-->
+<!--		<item name="android:windowExitAnimation">@android:anim/fade_out</item>-->
+<!--	</style>-->
 	
 	<style name="app.CardView.Dark" parent="Widget.MaterialComponents.CardView">
 		<item name="cardBackgroundColor">@color/dark_20</item>
@@ -38,6 +48,7 @@
 		<item name="itemTextColor">@color/icon_effect</item>
 		<item name="android:background">@color/dark_20</item>
 	</style>
+	
 	
 	<color name="red">#ff0000</color>
 	<color name="dark_green">#4caf50</color>

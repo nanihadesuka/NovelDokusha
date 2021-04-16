@@ -8,16 +8,16 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.viewModels
-import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.RecyclerView
 import my.noveldokusha.bookstore
 import my.noveldokusha.databinding.ActivityGlobalSourceSearchBinding
 import my.noveldokusha.databinding.ActivityGlobalSourceSearchListItemBinding
 import my.noveldokusha.databinding.ActivityGlobalSourceSearchResultItemBinding
+import my.noveldokusha.ui.BaseActivity
 import my.noveldokusha.ui.chaptersList.ChaptersActivity
 
-class GlobalSourceSearchActivity : AppCompatActivity()
+class GlobalSourceSearchActivity : BaseActivity()
 {
 	class Extras(val input: String)
 	{

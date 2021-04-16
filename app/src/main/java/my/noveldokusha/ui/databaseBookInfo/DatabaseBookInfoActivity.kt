@@ -7,15 +7,15 @@ import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.ViewGroup
 import androidx.activity.viewModels
-import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.RecyclerView
 import my.noveldokusha.bookstore
 import my.noveldokusha.databinding.ActivityDatabaseBookInfoBinding
 import my.noveldokusha.databinding.ActivityDatabaseSearchResultsListItemBinding
 import my.noveldokusha.scrubber
+import my.noveldokusha.ui.BaseActivity
 import my.noveldokusha.ui.globalSourceSearch.GlobalSourceSearchActivity
 
-class DatabaseBookInfoActivity : AppCompatActivity()
+class DatabaseBookInfoActivity : BaseActivity()
 {
 	class Extras(val databaseUrlBase: String, val bookMetadata: bookstore.BookMetadata)
 	{

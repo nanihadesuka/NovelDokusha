@@ -7,7 +7,6 @@ import android.net.Uri
 import android.os.Bundle
 import android.view.*
 import androidx.activity.viewModels
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
 import androidx.lifecycle.asLiveData
@@ -22,12 +21,13 @@ import my.noveldokusha.databinding.ActivityChaptersBinding
 import my.noveldokusha.databinding.ActivityChaptersListHeaderBinding
 import my.noveldokusha.databinding.ActivityChaptersListItemBinding
 import my.noveldokusha.scrubber
+import my.noveldokusha.ui.BaseActivity
 import my.noveldokusha.ui.databaseSearchResults.DatabaseSearchResultsActivity
 import my.noveldokusha.ui.databaseSearchResults.DatabaseSearchResultsModel
 import my.noveldokusha.ui.reader.ReaderActivity
 import java.util.*
 
-class ChaptersActivity : AppCompatActivity()
+class ChaptersActivity : BaseActivity()
 {
 	class Extras(val bookUrl: String, val bookTitle: String)
 	{
