@@ -1,4 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
+	<color name="red">#ff0000</color>
+	<color name="dark_green">#4caf50</color>
+	<color name="light_blue">#3D504D</color>
+	<color name="dark_orange_red">#A3593C</color>
+	<color name="dark_18">#181818</color>
+	<color name="dark_20">#202020</color>
+	<color name="dark_28">#282828</color>
+	<color name="dark_0">#000000</color>
+	<attr format="reference" name="myReaderTextStyle"/>
 </resources>

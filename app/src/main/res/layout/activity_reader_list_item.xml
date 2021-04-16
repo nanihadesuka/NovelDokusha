@@ -63,11 +63,11 @@
 	
 	<TextView
 		android:id="@+id/body"
+		style="@style/myReaderTextStyle"
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
 		android:paddingLeft="15sp"
 		android:paddingRight="15sp"
-		android:textColor="#ddd"
 		android:textIsSelectable="false"
 		android:textSize="14sp"
 		android:textStyle="normal"

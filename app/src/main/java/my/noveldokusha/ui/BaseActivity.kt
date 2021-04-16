@@ -7,7 +7,7 @@ import my.noveldokusha.R
 
 open class BaseActivity : AppCompatActivity()
 {
-	private val preferenceThemeListener = SharedPreferences.OnSharedPreferenceChangeListener { sharedPreferences, key ->
+	private val preferenceThemeListener = SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
 		if (key == "id")
 			recreate()
 	}
@@ -26,8 +26,10 @@ open class BaseActivity : AppCompatActivity()
 	companion object
 	{
 		val globalThemeList = mapOf<String, Int>(
+			"Light" to R.style.AppTheme_Light,
 			"Dark" to R.style.AppTheme_Dark,
-			"Grey" to R.style.AppTheme_Grey
+			"Grey" to R.style.AppTheme_Grey,
+			"Black" to R.style.AppTheme_Black
 		)
 	}
 }

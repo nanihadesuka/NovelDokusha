@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	
+	<style name="AppTheme_Grey" parent="Theme.AppCompat.NoActionBar">
+		<item name="myReaderTextStyle">@style/myReaderTextStyle.Grey</item>
+	</style>
+	
+	<style name="myReaderTextStyle.Grey" parent="myReaderTextStyle">
+		<item name="android:textColor">#ddd</item>
+	</style>
+
+</resources>

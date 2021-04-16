@@ -19,4 +19,10 @@
         android:label="@string/title_finder"
         tools:layout="@layout/activity_main_fragment_finder"
         />
+    <fragment
+        android:id="@+id/navigation_settings"
+        android:name="my.noveldokusha.ui.main.SettingsFragment"
+        android:label="@string/title_settings"
+        tools:layout="@layout/activity_main_fragment_settings"
+        />
 </navigation>

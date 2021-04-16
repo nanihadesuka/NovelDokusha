@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	
+	<style name="AppTheme_Light" parent="Theme.AppCompat.Light.NoActionBar">
+		<item name="bottomNavigationStyle">@style/app.BottomNavigationStyle.Light</item>
+		<item name="materialCardViewStyle">@style/app.CardView.Light</item>
+		<item name="myReaderTextStyle">@style/myReaderTextStyle.Light</item>
+	</style>
+	
+	<style name="app.CardView.Light" parent="Widget.MaterialComponents.CardView">
+		<item name="cardBackgroundColor">#eee</item>
+	</style>
+	
+	<style name="app.BottomNavigationStyle.Light" parent="Widget.Design.BottomNavigationView">
+		<item name="itemIconTint">@color/icon_effect_light</item>
+		<item name="itemTextColor">@color/icon_effect_light</item>
+		<item name="android:background">#eee</item>
+	</style>
+	
+	<style name="myReaderTextStyle.Light" parent="myReaderTextStyle">
+		<item name="android:textColor">#111</item>
+	</style>
+
+</resources>
