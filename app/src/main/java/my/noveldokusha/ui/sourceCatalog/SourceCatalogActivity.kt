@@ -20,6 +20,7 @@ import my.noveldokusha.databinding.ActivitySourceCatalogListviewItemBinding
 import my.noveldokusha.scrubber
 import my.noveldokusha.ui.BaseActivity
 import my.noveldokusha.ui.chaptersList.ChaptersActivity
+import java.util.*
 
 class SourceCatalogActivity : BaseActivity()
 {
@@ -68,7 +69,8 @@ class SourceCatalogActivity : BaseActivity()
 		viewModel.loading.observe(this) { visible -> viewHolder.progressBar.visibility = if (visible) View.VISIBLE else View.GONE }
 		
 		supportActionBar!!.let {
-			it.title = "Source: ${viewModel.source.name}"
+			it.title = "Source"
+			it.subtitle = viewModel.source.name.capitalize(Locale.ROOT)
 		}
 	}
 	

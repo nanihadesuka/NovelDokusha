@@ -21,6 +21,7 @@ open class MainActivity : BaseActivity()
 		setSupportActionBar(viewHolder.toolbar)
 		
 		viewHolder.bottomNavigationView.setupWithNavController(bottomNavigationController)
+		
 		viewHolder.bottomNavigationView.setOnNavigationItemSelectedListener { item ->
 			if (viewHolder.bottomNavigationView.selectedItemId == item.itemId)
 				return@setOnNavigationItemSelectedListener false

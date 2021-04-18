@@ -18,6 +18,8 @@ import my.noveldokusha.scrubber
 import my.noveldokusha.ui.BaseActivity
 import my.noveldokusha.ui.databaseSearchResults.DatabaseSearchResultsActivity
 import my.noveldokusha.ui.databaseSearchResults.DatabaseSearchResultsModel
+import java.util.*
+import kotlin.collections.ArrayList
 
 class DatabaseSearchActivity : BaseActivity()
 {
@@ -48,7 +50,8 @@ class DatabaseSearchActivity : BaseActivity()
 		viewModel.initialization(scrubber.getCompatibleDatabase(extras.databaseBaseUrl())!!)
 		
 		supportActionBar!!.let {
-			it.title = "Database: ${viewModel.database.name}"
+			it.title = "Database"
+			it.subtitle = viewModel.database.name.capitalize(Locale.ROOT)
 			it.setDisplayHomeAsUpEnabled(true)
 		}
 		

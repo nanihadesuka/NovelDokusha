@@ -53,7 +53,8 @@ class GlobalSourceSearchActivity : BaseActivity()
 		}
 		
 		supportActionBar!!.let {
-			it.title = "Global search: ${viewModel.input}"
+			it.title = "Global source search"
+			it.subtitle = viewModel.input
 			it.setDisplayHomeAsUpEnabled(true)
 		}
 	}

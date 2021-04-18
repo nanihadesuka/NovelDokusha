@@ -14,6 +14,7 @@ import my.noveldokusha.databinding.ActivityDatabaseSearchResultsListItemBinding
 import my.noveldokusha.scrubber
 import my.noveldokusha.ui.BaseActivity
 import my.noveldokusha.ui.globalSourceSearch.GlobalSourceSearchActivity
+import java.util.*
 
 class DatabaseBookInfoActivity : BaseActivity()
 {
@@ -70,7 +71,8 @@ class DatabaseBookInfoActivity : BaseActivity()
 		}
 		
 		supportActionBar!!.let {
-			it.title = viewModel.database.name
+			it.title = "Book info"
+			it.subtitle = viewModel.database.name.capitalize(Locale.ROOT)
 			it.setDisplayHomeAsUpEnabled(true)
 		}
 	}

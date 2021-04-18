@@ -40,7 +40,6 @@ class LibraryFragment : Fragment()
 				else -> "Completed"
 			}
 		}.attach()
-		
 		return viewHolder.root
 	}
 }

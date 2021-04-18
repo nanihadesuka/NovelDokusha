@@ -107,7 +107,8 @@ class DatabaseSearchResultsActivity : BaseActivity()
 		}
 		
 		supportActionBar!!.let {
-			it.title = "Searching in ${viewModel.database.name}"
+			it.title = "Database search"
+			it.subtitle = viewModel.database.name.capitalize(Locale.ROOT)
 			it.setDisplayHomeAsUpEnabled(true)
 		}
 	}
