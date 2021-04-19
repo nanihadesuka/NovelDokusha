@@ -111,6 +111,9 @@ object bookstore
 		
 		@Query("SELECT lastReadPosition FROM Chapter WHERE bookUrl = :bookUrl AND url =:chapterUrl")
 		fun lastReadPositionChapterFlow(bookUrl: String, chapterUrl: String): Flow<Int>
+		
+		@Query("DELETE FROM Chapter WHERE Chapter.bookUrl NOT IN (SELECT Book.url FROM Book)")
+		suspend fun removeAllNonLibraryRows(): Unit
 	}
 	
 	@Dao
@@ -130,6 +133,9 @@ object bookstore
 		
 		@Query("SELECT url FROM ChapterBody WHERE url IN (SELECT url FROM Chapter	WHERE bookUrl == :bookUrl)")
 		fun getExistBodyChapterUrlsFlow(bookUrl: String): Flow<List<String>>
+		
+		@Query("DELETE FROM ChapterBody WHERE ChapterBody.url NOT IN (SELECT Chapter.url FROM Chapter)")
+		suspend fun removeAllNonChapterRows(): Unit
 	}
 	
 	@Database(entities = [Book::class, Chapter::class, ChapterBody::class], version = 1, exportSchema = false)
@@ -140,12 +146,25 @@ object bookstore
 		abstract fun chapterBodyDao(): ChapterBodyDao
 	}
 	
+	private const val db_name = "bookEntry"
+	
 	private val db by lazy {
 		Room.databaseBuilder(
 			db_context.applicationContext,
 			LibraryDatabase::class.java,
-			"bookEntry"
+			db_name
 		).build()
+	}
+	
+	fun getDatabaseSizeBytes() = db_context.getDatabasePath(db_name).length()
+	
+	object settings
+	{
+		suspend fun clearNonLibraryData()
+		{
+			db.chapterDao().removeAllNonLibraryRows()
+			db.chapterBodyDao().removeAllNonChapterRows()
+		}
 	}
 	
 	object bookLibrary

@@ -2,22 +2,94 @@
 
 <LinearLayout
 	xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:tools="http://schemas.android.com/tools"
 	android:layout_width="match_parent"
 	android:layout_height="wrap_content"
 	android:orientation="vertical"
-	android:padding="12sp"
 	>
 	
-	<TextView
+	<LinearLayout
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
-		android:text="Theme"
-		/>
+		android:orientation="vertical"
+		>
+		
+		<TextView
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:padding="12sp"
+			android:text="Theme"
+			android:textStyle="bold"
+			/>
+		
+		<RadioGroup
+			android:id="@+id/settings_theme"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:padding="12sp"
+			/>
+	</LinearLayout>
 	
-	<RadioGroup
-		android:id="@+id/settings_theme"
+	<LinearLayout
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
-		/>
-
+		android:orientation="vertical"
+		>
+		
+		<TextView
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:padding="12sp"
+			android:text="Data"
+			android:textStyle="bold"
+			/>
+		
+		<LinearLayout
+			android:id="@+id/database_button_clean"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:background="?android:attr/selectableItemBackground"
+			android:clickable="true"
+			android:orientation="vertical"
+			android:padding="12sp"
+			>
+			
+			<TextView
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:text="Clean database"
+				android:textSize="16sp"
+				/>
+			
+			<TextView
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:alpha="0.7"
+				android:text="Preserve only library books data"
+				/>
+			
+			<LinearLayout
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:orientation="horizontal"
+				>
+				
+				<TextView
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:alpha="0.7"
+					android:text="@string/database_size"
+					/>
+				
+				<TextView
+					android:id="@+id/database_size"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_marginStart="8sp"
+					android:alpha="0.7"
+					tools:text="10 MB"
+					/>
+			</LinearLayout>
+		</LinearLayout>
+	</LinearLayout>
 </LinearLayout>
