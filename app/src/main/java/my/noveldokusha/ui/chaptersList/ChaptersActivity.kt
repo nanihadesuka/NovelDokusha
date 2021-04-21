@@ -123,19 +123,13 @@ class ChaptersActivity : BaseActivity()
 			if (isEmpty) notifyDataSetChanged() else it.dispatchUpdatesTo(this)
 		}
 		
-		private var default_textColor = 0
-		
 		var selectedPos = -1
 			private set
 		
 		private var selected: ChaptersModel.ChapterItem? = null
 		
-		override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewBinder
-		{
-			val holder = ViewBinder(ActivityChaptersListItemBinding.inflate(LayoutInflater.from(parent.context), parent, false))
-			default_textColor = holder.viewHolder.title.currentTextColor
-			return holder
-		}
+		override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewBinder =
+			ViewBinder(ActivityChaptersListItemBinding.inflate(LayoutInflater.from(parent.context), parent, false))
 		
 		override fun getItemCount() = this@ChaptersArrayAdapter.list.size
 		
@@ -157,7 +151,7 @@ class ChaptersActivity : BaseActivity()
 			itemData.downloadedLiveData.observe(this@ChaptersActivity, binder.downloadedObserver)
 			
 			itemView.title.text = itemData.chapter.title
-			itemView.title.setTextColor(if (itemData.chapter.read) Color.GRAY else default_textColor)
+			itemView.title.alpha = if (itemData.chapter.read) 0.5f else 1.0f
 			
 			itemView.selected.visibility = if (selectedPos != -1 && selectedPos <= position) View.VISIBLE else View.INVISIBLE
 			
