@@ -1,10 +1,11 @@
 package my.noveldokusha.ui.databaseSearch
 
 import android.content.Context
+import android.content.res.ColorStateList
 import android.util.AttributeSet
+import android.util.TypedValue
 import android.view.LayoutInflater
 import android.widget.FrameLayout
-import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.content.ContextCompat
 import my.noveldokusha.R
 import my.noveldokusha.databinding.ViewCheckboxBinding
@@ -66,11 +67,13 @@ class Checkbox3StatesView : FrameLayout
 	
 	private fun updateButton(): Unit = when (state)
 	{
-		STATE.NONE -> Pair(R.drawable.ic_twotone_check_box_outline_blank_24, null)
-		STATE.POSITIVE -> Pair(R.drawable.ic_twotone_check_box_24, android.R.color.holo_green_dark)
-		STATE.NEGATIVE -> Pair(R.drawable.ic_twotone_indeterminate_check_box_24, android.R.color.holo_red_dark)
-	}.let { color: Pair<Int, Int?> ->
+		STATE.NONE -> Pair(R.drawable.ic_twotone_check_box_outline_blank_24, R.attr.noneStateTint)
+		STATE.POSITIVE -> Pair(R.drawable.ic_twotone_check_box_24, R.attr.positiveStateTint)
+		STATE.NEGATIVE -> Pair(R.drawable.ic_twotone_indeterminate_check_box_24, R.attr.negativeStateTint)
+	}.let { color: Pair<Int, Int> ->
 		holder.icon.background = ContextCompat.getDrawable(context, color.first)
-		holder.icon.backgroundTintList = color.second?.let { AppCompatResources.getColorStateList(context, it) }
+		val value = TypedValue()
+		context.theme.resolveAttribute(color.second, value, true)
+		holder.icon.backgroundTintList = ColorStateList.valueOf(value.data)
 	}
 }

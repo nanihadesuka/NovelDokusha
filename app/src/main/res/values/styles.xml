@@ -1,5 +1,7 @@
 <resources>
 	
+	<attr name="myReaderTextStyle" format="reference" />
+	
 	<style name="myReaderTextStyle" />
 	
 	<style name="myTabLayout" parent="Widget.Design.TabLayout">
@@ -10,4 +12,8 @@
 		<item name="tabMode">scrollable</item>
 	</style>
 	
+	<attr name="noneStateTint" format="reference|color">#fff</attr>
+	<attr name="positiveStateTint" format="reference|color">#71A30E</attr>
+	<attr name="negativeStateTint" format="reference|color">#C81414</attr>
+
 </resources>

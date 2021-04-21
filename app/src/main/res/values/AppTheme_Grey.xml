@@ -4,6 +4,9 @@
 	<style name="AppTheme_Grey" parent="Theme.AppCompat.NoActionBar">
 		<item name="myReaderTextStyle">@style/myReaderTextStyle.Grey</item>
 		<item name="tabStyle">@style/myTabStyle.Dark</item>
+		<item name="noneStateTint" >#ddd</item>
+		<item name="positiveStateTint" >#71A30E</item>
+		<item name="negativeStateTint" >#C81414</item>
 	</style>
 	
 	<style name="myTabStyle.Dark" parent="myTabLayout">

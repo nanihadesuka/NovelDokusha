@@ -23,6 +23,9 @@
 		<item name="android:scrollbarThumbVertical">@drawable/scrollbar_thumb</item>
 		<item name="myReaderTextStyle">@style/myReaderTextStyle.Black</item>
 		<item name="tabStyle">@style/myTabStyle.Black</item>
+		<item name="noneStateTint" >#ddd</item>
+		<item name="positiveStateTint" >#71A30E</item>
+		<item name="negativeStateTint" >#C81414</item>
 	</style>
 	
 	<style name="myTabStyle.Black" parent="myTabLayout">

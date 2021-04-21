@@ -8,5 +8,4 @@
 	<color name="dark_20">#202020</color>
 	<color name="dark_28">#282828</color>
 	<color name="dark_0">#000000</color>
-	<attr format="reference" name="myReaderTextStyle"/>
 </resources>
