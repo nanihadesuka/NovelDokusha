@@ -2,7 +2,10 @@ package my.noveldokusha
 
 import android.content.Context
 import androidx.room.*
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 
 object bookstore
@@ -165,6 +168,12 @@ object bookstore
 			db.chapterDao().removeAllNonLibraryRows()
 			db.chapterBodyDao().removeAllNonChapterRows()
 		}
+		
+		fun clearNonLibraryDataFlow() = flow {
+			db.chapterDao().removeAllNonLibraryRows()
+			db.chapterBodyDao().removeAllNonChapterRows()
+			emit(Unit)
+		}.flowOn(Dispatchers.IO)
 	}
 	
 	object bookLibrary
