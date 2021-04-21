@@ -3,10 +3,15 @@
 	
 	<style name="AppTheme_Grey" parent="Theme.AppCompat.NoActionBar">
 		<item name="myReaderTextStyle">@style/myReaderTextStyle.Grey</item>
+		<item name="tabStyle">@style/myTabStyle.Dark</item>
+	</style>
+	
+	<style name="myTabStyle.Dark" parent="myTabLayout">
+		<item name="android:background">?attr/colorPrimary</item>
 	</style>
 	
 	<style name="myReaderTextStyle.Grey" parent="myReaderTextStyle">
-		<item name="android:textColor">#ddd</item>
+		<item name="android:textColor">?attr/colorPrimary</item>
 	</style>
 
 </resources>

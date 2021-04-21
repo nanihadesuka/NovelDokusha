@@ -22,20 +22,25 @@
 		<item name="buttonStyle">@style/app.Button.Black</item>
 		<item name="android:scrollbarThumbVertical">@drawable/scrollbar_thumb</item>
 		<item name="myReaderTextStyle">@style/myReaderTextStyle.Black</item>
+		<item name="tabStyle">@style/myTabStyle.Black</item>
+	</style>
+	
+	<style name="myTabStyle.Black" parent="myTabLayout">
+		<item name="android:background">?attr/colorPrimary</item>
 	</style>
 	
 	<style name="app.CardView.Black" parent="Widget.MaterialComponents.CardView">
-		<item name="cardBackgroundColor">@color/dark_0</item>
+		<item name="cardBackgroundColor">?attr/colorPrimary</item>
 	</style>
 	
 	<style name="app.Button.Black" parent="Widget.AppCompat.Button">
-		<item name="android:backgroundTint">@color/dark_0</item>
+		<item name="android:backgroundTint">?attr/colorPrimary</item>
 	</style>
 	
 	<style name="app.BottomNavigationStyle.Black" parent="Widget.Design.BottomNavigationView">
 		<item name="itemIconTint">@color/icon_effect</item>
 		<item name="itemTextColor">@color/icon_effect</item>
-		<item name="android:background">@color/dark_0</item>
+		<item name="android:background">?attr/colorPrimary</item>
 	</style>
 	
 	<style name="myReaderTextStyle.Black" parent="myReaderTextStyle">

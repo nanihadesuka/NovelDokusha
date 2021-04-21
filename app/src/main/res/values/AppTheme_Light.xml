@@ -5,6 +5,11 @@
 		<item name="bottomNavigationStyle">@style/app.BottomNavigationStyle.Light</item>
 		<item name="materialCardViewStyle">@style/app.CardView.Light</item>
 		<item name="myReaderTextStyle">@style/myReaderTextStyle.Light</item>
+		<item name="tabStyle">@style/myTabLayout.Light</item>
+	</style>
+	
+	<style name="myTabLayout.Light" parent="myTabLayout">
+		<item name="android:background">?attr/colorPrimary</item>
 	</style>
 	
 	<style name="app.CardView.Light" parent="Widget.MaterialComponents.CardView">
@@ -14,7 +19,7 @@
 	<style name="app.BottomNavigationStyle.Light" parent="Widget.Design.BottomNavigationView">
 		<item name="itemIconTint">@color/icon_effect_light</item>
 		<item name="itemTextColor">@color/icon_effect_light</item>
-		<item name="android:background">#eee</item>
+		<item name="android:background">?attr/colorPrimary</item>
 	</style>
 	
 	<style name="myReaderTextStyle.Light" parent="myReaderTextStyle">

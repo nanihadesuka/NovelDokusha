@@ -1,3 +1,13 @@
 <resources>
+	
 	<style name="myReaderTextStyle" />
+	
+	<style name="myTabLayout" parent="Widget.Design.TabLayout">
+		<item name="tabContentStart">20dp</item>
+		<item name="tabUnboundedRipple">true</item>
+		<item name="tabGravity">start</item>
+		<item name="tabIndicatorFullWidth">false</item>
+		<item name="tabMode">scrollable</item>
+	</style>
+	
 </resources>
