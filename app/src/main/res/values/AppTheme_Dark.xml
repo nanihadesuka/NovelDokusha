@@ -9,12 +9,11 @@
 		<item name="colorSecondaryVariant">#0039CB</item>
 		<item name="colorOnSecondary">#eeeeee</item>
 		<item name="colorAccent">#2A59B6</item>
-		<item name="colorError">#F44336</item>
 		<item name="colorOnError">#F0F0F0</item>
 		<item name="colorSurface">#F0F0F0</item>
-		<item name="colorOnSurface">@color/dark_20</item>
+		<item name="colorOnSurface">?attr/colorPrimary</item>
 		<item name="android:colorBackground">@color/dark_18</item>
-		<item name="colorOnBackground">@color/dark_20</item>
+		<item name="colorOnBackground">?attr/colorPrimary</item>
 		<item name="md_color_button_text">#F0F0F0</item>
 		<item name="md_background_color">@color/dark_28</item>
 		<item name="bottomNavigationStyle">@style/app.BottomNavigationStyle.Dark</item>

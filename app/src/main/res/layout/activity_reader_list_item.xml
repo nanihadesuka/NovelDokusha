@@ -35,7 +35,7 @@
 		android:layout_height="wrap_content"
 		android:fontFamily="monospace"
 		android:padding="17sp"
-		android:textColor="#EC4427"
+		android:textColor="@color/colorError"
 		android:textIsSelectable="true"
 		android:textSize="14sp"
 		android:textStyle=""

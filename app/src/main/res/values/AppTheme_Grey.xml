@@ -14,7 +14,7 @@
 	</style>
 	
 	<style name="myReaderTextStyle.Grey" parent="myReaderTextStyle">
-		<item name="android:textColor">?attr/colorPrimary</item>
+		<item name="android:textColor">#ddd</item>
 	</style>
 
 </resources>

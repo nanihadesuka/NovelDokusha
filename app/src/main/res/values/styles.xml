@@ -12,8 +12,8 @@
 		<item name="tabMode">scrollable</item>
 	</style>
 	
-	<attr name="noneStateTint" format="reference|color">#fff</attr>
-	<attr name="positiveStateTint" format="reference|color">#71A30E</attr>
-	<attr name="negativeStateTint" format="reference|color">#C81414</attr>
-
+	<attr name="noneStateTint" format="color">#fff</attr>
+	<attr name="positiveStateTint" format="color">#71A30E</attr>
+	<attr name="negativeStateTint" format="color">#C81414</attr>
+	
 </resources>
