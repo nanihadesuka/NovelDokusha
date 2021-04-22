@@ -2,6 +2,7 @@
 <resources>
 	
 	<style name="AppTheme_Dark" parent="Theme.AppCompat.NoActionBar">
+		<item name="android:statusBarColor">?attr/colorPrimary</item>
 		<item name="colorPrimary">@color/dark_20</item>
 		<item name="colorPrimaryVariant">@color/dark_20</item>
 		<item name="colorOnPrimary">#eeeeee</item>

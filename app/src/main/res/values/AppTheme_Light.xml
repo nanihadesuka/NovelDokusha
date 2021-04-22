@@ -2,13 +2,15 @@
 <resources>
 	
 	<style name="AppTheme_Light" parent="Theme.AppCompat.Light.NoActionBar">
+		<item name="android:statusBarColor">?attr/colorPrimary</item>
+		<item name="android:windowLightStatusBar">true</item>
 		<item name="bottomNavigationStyle">@style/app.BottomNavigationStyle.Light</item>
 		<item name="materialCardViewStyle">@style/app.CardView.Light</item>
 		<item name="myReaderTextStyle">@style/myReaderTextStyle.Light</item>
 		<item name="tabStyle">@style/myTabLayout.Light</item>
-		<item name="noneStateTint" >#333</item>
-		<item name="positiveStateTint" >#71A30E</item>
-		<item name="negativeStateTint" >#C81414</item>
+		<item name="noneStateTint">#333</item>
+		<item name="positiveStateTint">#71A30E</item>
+		<item name="negativeStateTint">#C81414</item>
 	</style>
 	
 	<style name="myTabLayout.Light" parent="myTabLayout">

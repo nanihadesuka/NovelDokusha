@@ -2,6 +2,7 @@
 <resources>
 	
 	<style name="AppTheme_Grey" parent="Theme.AppCompat.NoActionBar">
+		<item name="android:statusBarColor">?attr/colorPrimary</item>
 		<item name="myReaderTextStyle">@style/myReaderTextStyle.Grey</item>
 		<item name="tabStyle">@style/myTabStyle.Dark</item>
 		<item name="noneStateTint" >#ddd</item>
