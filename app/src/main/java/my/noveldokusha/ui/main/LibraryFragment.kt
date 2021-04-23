@@ -32,6 +32,7 @@ class LibraryFragment : Fragment()
 		viewHolder = ActivityMainFragmentLibraryBinding.inflate(inflater, container, false)
 		viewAdapter = Adapter()
 		
+		viewHolder.viewPager.offscreenPageLimit = 3
 		viewHolder.viewPager.adapter = viewAdapter.viewPage
 		TabLayoutMediator(viewHolder.viewPagerTabs, viewHolder.viewPager) { tab, position ->
 			tab.text = when (position)
