@@ -28,7 +28,7 @@
 	</style>
 	
 	<style name="myReaderTextStyle.Light" parent="myReaderTextStyle">
-		<item name="android:textColor">#111</item>
+		<item name="android:textColor">#333</item>
 	</style>
 
 </resources>

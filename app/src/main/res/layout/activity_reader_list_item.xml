@@ -63,7 +63,7 @@
 	
 	<TextView
 		android:id="@+id/body"
-		style="@style/myReaderTextStyle"
+		style="?attr/myReaderTextStyle"
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
 		android:paddingLeft="15sp"
@@ -72,6 +72,7 @@
 		android:textSize="14sp"
 		android:textStyle="normal"
 		android:visibility="gone"
+		
 		tools:text="@tools:sample/lorem/random"
 		tools:visibility="visible"
 		/>
