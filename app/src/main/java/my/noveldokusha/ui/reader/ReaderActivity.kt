@@ -2,6 +2,7 @@ package my.noveldokusha.ui.reader
 
 import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -10,6 +11,7 @@ import android.view.WindowManager
 import android.widget.AbsListView
 import android.widget.ArrayAdapter
 import androidx.activity.viewModels
+import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -41,16 +43,52 @@ class ReaderActivity : BaseActivity()
 		fun bookSelectedChapterUrl() = intent.extras!!.getString(Extras::bookSelectedChapterUrl.name)!!
 	}
 	
+	private val preferences by lazy {
+		object
+		{
+			val preferences = getSharedPreferences("READER", MODE_PRIVATE)
+			
+			var textSize: Float = preferences.getFloat(::textSize.name, 14f)
+				set(value)
+				{
+					preferences.edit().putFloat(::textSize.name, value).apply()
+					field = value
+				}
+				get() = preferences.getFloat(::textSize.name, 14f)
+			
+			val listener = SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
+				when (key)
+				{
+					::textSize.name -> viewAdapter.listView.notifyDataSetChanged()
+				}
+			}
+			
+			init
+			{
+				preferences.registerOnSharedPreferenceChangeListener(listener)
+			}
+		}
+	}
+	
 	override fun onCreate(savedInstanceState: Bundle?)
 	{
 		super.onCreate(savedInstanceState)
 		setContentView(viewHolder.root)
+		
 		viewModel.initialization(bookUrl = extras.bookUrl(), bookSelectedChapterUrl = extras.bookSelectedChapterUrl())
 		
 		viewHolder.listView.adapter = viewAdapter.listView
+		viewHolder.settingTextSize.value = preferences.textSize
 		
 		loadInitialChapter()
 		
+		viewHolder.settingTextSize.addOnChangeListener { _, value, _ ->
+			preferences.textSize = value
+		}
+		viewHolder.listView.setOnItemLongClickListener { parent, view, position, id ->
+			viewHolder.settingsPanel.visibility = if (viewHolder.settingsPanel.isVisible) View.INVISIBLE else View.VISIBLE
+			true
+		}
 		@Suppress("DEPRECATION")
 		window.setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN)
 	}
@@ -324,6 +362,7 @@ class ReaderActivity : BaseActivity()
 			itemView.title.text = ""
 			itemView.error.text = ""
 			itemView.body.text = ""
+			itemView.body.textSize = preferences.textSize
 			
 			when (item)
 			{
