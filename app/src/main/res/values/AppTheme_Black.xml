@@ -2,6 +2,8 @@
 <resources>
 	
 	<style name="AppTheme_Black" parent="Theme.AppCompat.NoActionBar">
+		<item name="isLightTheme">false</item>
+		<item name="android:windowLightStatusBar">false</item>
 		<item name="android:statusBarColor">?attr/colorPrimary</item>
 		<item name="colorPrimary">@color/dark_0</item>
 		<item name="colorPrimaryVariant">@color/dark_0</item>
@@ -18,7 +20,6 @@
 		<item name="md_color_button_text">#F0F0F0</item>
 		<item name="md_background_color">?attr/colorPrimary</item>
 		<item name="bottomNavigationStyle">@style/app.BottomNavigationStyle.Dark</item>
-		<item name="materialCardViewStyle">@style/app.CardView.Black</item>
 		<item name="buttonStyle">@style/app.Button.Black</item>
 		<item name="android:scrollbarThumbVertical">@drawable/scrollbar_thumb</item>
 		<item name="myReaderTextStyle">@style/myReaderTextStyle.Black</item>
@@ -30,10 +31,6 @@
 	
 	<style name="myTabStyle.Black" parent="myTabLayout">
 		<item name="android:background">?attr/colorPrimary</item>
-	</style>
-	
-	<style name="app.CardView.Black" parent="Widget.MaterialComponents.CardView">
-		<item name="cardBackgroundColor">?attr/colorPrimary</item>
 	</style>
 	
 	<style name="app.Button.Black" parent="Widget.AppCompat.Button">

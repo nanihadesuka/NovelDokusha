@@ -20,7 +20,7 @@ open class BaseActivity : AppCompatActivity()
 	}
 	
 	fun preferencesGetTheme() = getSharedPreferences("GLOBAL_THEME", MODE_PRIVATE)
-	fun preferencesGetThemeId() = preferencesGetTheme().getInt("id", R.style.AppTheme_Dark)
+	fun preferencesGetThemeId() = preferencesGetTheme().getInt("id", R.style.AppTheme_Light)
 	fun preferencesSetThemeId(id: Int) = preferencesGetTheme().edit().putInt("id", id).apply()
 	
 	companion object

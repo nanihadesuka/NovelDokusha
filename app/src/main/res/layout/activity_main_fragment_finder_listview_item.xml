@@ -1,22 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.google.android.material.card.MaterialCardView
+
+<TextView
 	xmlns:android="http://schemas.android.com/apk/res/android"
-	xmlns:app="http://schemas.android.com/apk/res-auto"
+	android:id="@+id/title"
 	android:layout_width="match_parent"
 	android:layout_height="wrap_content"
 	android:layout_margin="3sp"
-	android:elevation="15sp"
-	android:foreground="?android:attr/selectableItemBackground"
-	app:cardCornerRadius="4sp"
-	>
-	
-	<TextView
-		android:id="@+id/title"
-		android:layout_width="match_parent"
-		android:layout_height="match_parent"
-		android:hint="Novel name"
-		android:padding="10sp"
-		android:textSize="15sp"
-		android:textStyle="bold"
-		/>
-</com.google.android.material.card.MaterialCardView>
+	android:background="@drawable/book_item_background"
+	android:foreground="@drawable/book_item_foreground_ripple"
+	android:hint="Novel name"
+	android:padding="10sp"
+	android:textSize="15sp"
+	android:textStyle="bold"
+	/>
