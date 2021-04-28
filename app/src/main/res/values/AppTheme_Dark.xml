@@ -1,49 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 	
-	<style name="AppTheme_Dark" parent="Theme.AppCompat.NoActionBar">
+	<style name="AppTheme.Dark" parent="Theme.AppCompat.NoActionBar">
 		<item name="isLightTheme">false</item>
 		<item name="android:windowLightStatusBar">false</item>
 		<item name="android:statusBarColor">?attr/colorPrimary</item>
-		<item name="colorPrimary">@color/dark_20</item>
-		<item name="colorPrimaryVariant">@color/dark_20</item>
-		<item name="colorOnPrimary">#eeeeee</item>
-		<item name="colorSecondary">#2962FF</item>
-		<item name="colorSecondaryVariant">#0039CB</item>
-		<item name="colorOnSecondary">#eeeeee</item>
+		
 		<item name="colorAccent">#2A59B6</item>
-		<item name="colorOnError">#F0F0F0</item>
-		<item name="colorSurface">#F0F0F0</item>
-		<item name="colorOnSurface">?attr/colorPrimary</item>
+		<item name="colorPrimary">@color/dark_20</item>
 		<item name="android:colorBackground">@color/dark_18</item>
-		<item name="colorOnBackground">?attr/colorPrimary</item>
-		<item name="md_color_button_text">#F0F0F0</item>
-		<item name="md_background_color">@color/dark_28</item>
-		<item name="bottomNavigationStyle">@style/app.BottomNavigationStyle.Dark</item>
-		<item name="buttonStyle">@style/app.Button.Dark</item>
-		<item name="android:scrollbarThumbVertical">@drawable/scrollbar_thumb</item>
+		<item name="colorOnPrimary">?attr/colorPrimary</item>
+		<item name="colorSecondary">?attr/colorPrimary</item>
+		<item name="colorOnSecondary">#aaa</item>
+		<item name="colorOnBackground">#888</item>
+		
+		<item name="bottomNavigationStyle">@style/myBottomNavigationStyle</item>
+		<item name="buttonStyle">@style/myButtonStyle</item>
 		<item name="myReaderTextStyle">@style/myReaderTextStyle.Dark</item>
-		<item name="tabStyle">@style/myTabLayout.Dark</item>
-		<item name="noneStateTint" >#ddd</item>
-		<item name="positiveStateTint" >#71A30E</item>
-		<item name="negativeStateTint" >#C81414</item>
+		<item name="tabStyle">@style/myTabLayout</item>
+		
+		<item name="noneStateTint">#ddd</item>
+		<item name="positiveStateTint">#71A30E</item>
+		<item name="negativeStateTint">#C81414</item>
+		
+		<item name="android:scrollbarThumbVertical">@drawable/scrollbar_thumb</item>
 	</style>
 	
-	<style name="myTabLayout.Dark" parent="myTabLayout">
-		<item name="android:background">?attr/colorPrimary</item>
-	</style>
-	
-	<style name="app.Button.Dark" parent="Widget.AppCompat.Button">
-		<item name="android:backgroundTint">@color/dark_28</item>
-	</style>
-	
-	<style name="app.BottomNavigationStyle.Dark" parent="Widget.Design.BottomNavigationView">
-		<item name="itemIconTint">@color/icon_effect</item>
-		<item name="itemTextColor">@color/icon_effect</item>
-		<item name="android:background">?attr/colorPrimary</item>
-	</style>
-	
-	<style name="myReaderTextStyle.Dark" parent="myReaderTextStyle">
+	<style name="myReaderTextStyle.Dark">
 		<item name="android:textColor">#ddd</item>
 	</style>
 

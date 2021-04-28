@@ -6,8 +6,10 @@
 	<color name="dark_orange_red">#A3593C</color>
 	<color name="dark_18">#181818</color>
 	<color name="dark_20">#202020</color>
+	<color name="dark_24">#242424</color>
 	<color name="dark_28">#282828</color>
 	<color name="dark_0">#000000</color>
+	<color name="pink">#BB00FF</color>
 	
 	<color name="colorError">#EC4427</color>
 </resources>

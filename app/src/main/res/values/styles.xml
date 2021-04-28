@@ -4,16 +4,27 @@
 	
 	<style name="myReaderTextStyle" />
 	
+	<attr name="noneStateTint" format="color">#fff</attr>
+	<attr name="positiveStateTint" format="color">#71A30E</attr>
+	<attr name="negativeStateTint" format="color">#C81414</attr>
+	
 	<style name="myTabLayout" parent="Widget.Design.TabLayout">
 		<item name="tabContentStart">20dp</item>
 		<item name="tabUnboundedRipple">true</item>
 		<item name="tabGravity">start</item>
 		<item name="tabIndicatorFullWidth">false</item>
 		<item name="tabMode">scrollable</item>
+		<item name="android:background">?attr/colorPrimary</item>
 	</style>
 	
-	<attr name="noneStateTint" format="color">#fff</attr>
-	<attr name="positiveStateTint" format="color">#71A30E</attr>
-	<attr name="negativeStateTint" format="color">#C81414</attr>
+	<style name="myButtonStyle" parent="Widget.AppCompat.Button">
+		<item name="android:backgroundTint">?attr/colorPrimary</item>
+	</style>
 	
+	<style name="myBottomNavigationStyle" parent="Widget.Design.BottomNavigationView">
+		<item name="itemIconTint">@color/icon_effect</item>
+		<item name="itemTextColor">@color/icon_effect</item>
+		<item name="android:background">?attr/colorPrimary</item>
+	</style>
+
 </resources>

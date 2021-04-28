@@ -1,22 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 	
-	<style name="AppTheme_Grey" parent="Theme.AppCompat.NoActionBar">
+	<style name="AppTheme.Grey" parent="Theme.MaterialComponents.NoActionBar.Bridge">
 		<item name="isLightTheme">false</item>
 		<item name="android:windowLightStatusBar">false</item>
 		<item name="android:statusBarColor">?attr/colorPrimary</item>
+		
+		<item name="colorAccent">#2A59B6</item>
+		<item name="colorPrimary">#333</item>
+		<item name="android:colorBackground">@color/dark_24</item>
+		<item name="colorOnPrimary">?attr/colorPrimary</item>
+		<item name="colorSecondary">?attr/colorPrimary</item>
+		<item name="colorOnSecondary">#aaa</item>
+		<item name="colorOnBackground">#888</item>
+		
+		<item name="bottomNavigationStyle">@style/myBottomNavigationStyle</item>
+		<item name="buttonStyle">@style/myButtonStyle</item>
 		<item name="myReaderTextStyle">@style/myReaderTextStyle.Grey</item>
-		<item name="tabStyle">@style/myTabStyle.Dark</item>
-		<item name="noneStateTint" >#ddd</item>
-		<item name="positiveStateTint" >#71A30E</item>
-		<item name="negativeStateTint" >#C81414</item>
+		<item name="tabStyle">@style/myTabLayout</item>
+		
+		<item name="noneStateTint">#ddd</item>
+		<item name="positiveStateTint">#71A30E</item>
+		<item name="negativeStateTint">#C81414</item>
+		
+		<item name="android:scrollbarThumbVertical">@drawable/scrollbar_thumb</item>
 	</style>
 	
-	<style name="myTabStyle.Dark" parent="myTabLayout">
-		<item name="android:background">?attr/colorPrimary</item>
-	</style>
-	
-	<style name="myReaderTextStyle.Grey" parent="myReaderTextStyle">
+	<style name="myReaderTextStyle.Grey">
 		<item name="android:textColor">#ddd</item>
 	</style>
 
