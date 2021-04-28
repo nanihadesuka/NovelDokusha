@@ -7,14 +7,12 @@
 	android:id="@+id/reader"
 	android:layout_width="match_parent"
 	android:layout_height="match_parent"
-	android:animateLayoutChanges="true"
 	>
 	
 	<ListView
 		android:id="@+id/listView"
 		android:layout_width="match_parent"
 		android:layout_height="match_parent"
-		android:animateLayoutChanges="true"
 		android:clickable="false"
 		android:defaultFocusHighlightEnabled="false"
 		android:divider="@null"
