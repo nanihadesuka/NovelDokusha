@@ -85,7 +85,7 @@ class ReaderActivity : BaseActivity()
 		viewHolder.settingTextSize.addOnChangeListener { _, value, _ ->
 			preferences.textSize = value
 		}
-		viewHolder.listView.setOnItemLongClickListener { parent, view, position, id ->
+		viewHolder.listView.setOnItemLongClickListener { _, _, _, _ ->
 			viewHolder.settingsPanel.visibility = if (viewHolder.settingsPanel.isVisible) View.INVISIBLE else View.VISIBLE
 			true
 		}
