@@ -2,6 +2,7 @@ package my.noveldokusha
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import org.jsoup.Connection
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
@@ -15,10 +16,14 @@ import java.net.URLEncoder
 import java.util.*
 import java.util.Collections.max
 
+suspend fun Connection.getIO(): Document = withContext(Dispatchers.IO) { get() }
+suspend fun Connection.postIO(): Document = withContext(Dispatchers.IO) { post() }
+suspend fun Connection.executeIO(): Connection.Response = withContext(Dispatchers.IO) { execute() }
+
 fun Connection.addUserAgent(): Connection =
 	this.userAgent("Mozilla/5.0 (X11; U; Linux i586; en-US; rv:1.7.3) Gecko/20040924 Epiphany/1.4.4 (Ubuntu)")
 
-fun Connection.addHeaderRequest(): Connection = this.header("x-requested-with", "XMLHttpRequest")!!
+fun Connection.addHeaderRequest() = this.header("x-requested-with", "XMLHttpRequest")!!
 
 object scrubber
 {
@@ -97,7 +102,7 @@ object scrubber
 						
 						val title: String = Regex(""".+/(.+)$""").find(decoded_url)?.destructured?.run {
 							
-							var title = this.component1().replace("-", " ").capitalize(Locale.ROOT)
+							val title = this.component1().replace("-", " ").capitalize(Locale.ROOT)
 							
 							Regex("""^(\w+) (\d+) (\S.*)$""").find(title)?.destructured?.let { m ->
 								val (prefix, number, name) = m
@@ -123,7 +128,7 @@ object scrubber
 				if (input.isBlank())
 					return Response.Success(listOf())
 				return tryConnect {
-					val encodedInput = URLEncoder.encode(input, "utf-8")
+					val encodedInput = withContext(Dispatchers.IO) { URLEncoder.encode(input, "utf-8") }
 					val doc = fetchDoc("https://lightnovelstranslations.com/?s=${encodedInput}&orderby=relevance&order=DESC")
 					doc.selectFirst(".jetpack-search-filters-widget__filter-list")
 						.select("a")
@@ -180,7 +185,7 @@ object scrubber
 						.addUserAgent()
 						.addHeaderRequest()
 						.data("q", input)
-						.post()
+						.postIO()
 						.select("a")
 						.map { bookstore.BookMetadata(title = it.text(), url = it.attr("href")) }
 						.let { Response.Success(it) }
@@ -214,7 +219,7 @@ object scrubber
 					.addUserAgent()
 					.addHeaderRequest()
 					.data("novelId", id)
-					.get()
+					.getIO()
 					.select("a")
 					.map { bookstore.ChapterMetadata(title = it.text(), url = baseUrl + it.attr("href")) }
 			}
@@ -229,7 +234,8 @@ object scrubber
 			{
 				if (input.isBlank()) return Response.Success(listOf())
 				return tryConnect {
-					fetchDoc("https://readnovelfull.com/search?keyword=${URLEncoder.encode(input, "utf-8")}")
+					val encodedInput = withContext(Dispatchers.IO) { URLEncoder.encode(input, "utf-8") }
+					fetchDoc("https://readnovelfull.com/search?keyword=$encodedInput")
 						.selectFirst(".col-novel-main, .archive")
 						.select(".novel-title")
 						.map { it.selectFirst("a") }
@@ -285,7 +291,7 @@ object scrubber
 					.data("mygrr", doc.selectFirst("#grr_groups").attr("value"))
 					.data("mygroupfilter", "")
 					.data("mypostid", doc.selectFirst("#mypostid").attr("value"))
-					.post()
+					.postIO()
 					.select("a")
 					.asSequence()
 					.filter { it.hasAttr("data-id") }
@@ -305,11 +311,11 @@ object scrubber
 			override suspend fun getSearchResult(input: String): Response<List<bookstore.BookMetadata>>
 			{
 				if (input.isBlank()) return Response.Success(listOf())
-				val value = URLEncoder.encode(input, "utf-8")
+				val value = withContext(Dispatchers.IO) { URLEncoder.encode(input, "utf-8") }
 				return tryConnect {
 					Jsoup.connect("https://www.novelupdates.com/?s=${value}")
 						.addUserAgent()
-						.get()
+						.getIO()
 						.select(".search_body_nu")
 						.select(".search_title")
 						.select("a")
@@ -381,8 +387,8 @@ object scrubber
 			
 			override suspend fun getChapterText(doc: Document): String
 			{
-				val title = doc.selectFirst(".entry-title").let { scrubber.getNodeTextTransversal(it) }
-				val body = doc.selectFirst(".entry-content").let { scrubber.getNodeTextTransversal(it) }
+				val title = getNodeTextTransversal(doc.selectFirst(".entry-title"))
+				val body = getNodeTextTransversal(doc.selectFirst(".entry-content"))
 				
 				return (title + body).joinToString("\n\n")
 			}
@@ -404,8 +410,8 @@ object scrubber
 		val searchGenres: Map<String, String>
 		
 		// We assume all functions to block the main thread, so need to be run in coroutines
-		fun getSearch(input: String): Sequence<ReturnSearch>
-		fun getSearchAdvanced(genresIncluded: List<String>, genresExcluded: List<String>): Sequence<ReturnSearch>
+		fun getSearchSequence(input: String): Sequence<ReturnSearch>
+		fun getSearchAdvancedSequence(genresIncluded: List<String>, genresExcluded: List<String>): Sequence<ReturnSearch>
 		
 		data class BookAuthor(val name: String, val url: String)
 		data class BookData(
@@ -471,7 +477,7 @@ object scrubber
 				"Yuri" to "922"
 			)
 			
-			override fun getSearch(input: String) = sequence<ReturnSearch> {
+			override fun getSearchSequence(input: String) = sequence<ReturnSearch> {
 				
 				val encodedInput = URLEncoder.encode(input, "utf-8")
 				var page = 1
@@ -514,7 +520,7 @@ object scrubber
 				yield(ReturnSearch.NoMoreEntries)
 			}
 			
-			override fun getSearchAdvanced(genresIncluded: List<String>, genresExcluded: List<String>) = sequence<ReturnSearch> {
+			override fun getSearchAdvancedSequence(genresIncluded: List<String>, genresExcluded: List<String>) = sequence<ReturnSearch> {
 				
 				var urlBase = "https://www.novelupdates.com/series-finder/?sf=1"
 				if (genresIncluded.isNotEmpty()) urlBase += "&gi=${genresIncluded.map { searchGenres[it] }.joinToString(",")}&mgi=and"
@@ -609,7 +615,7 @@ suspend fun downloadChapter(chapterUrl: String): Response<String>
 			.timeout(2 * 60 * 1000)
 			.referrer("http://www.google.com")
 			.header("Content-Language", "en-US")
-			.execute()
+			.executeIO()
 		
 		val realUrl = con.url().toString()
 		val source = scrubber.getCompatibleSource(realUrl) ?: return@tryConnect {
@@ -687,6 +693,6 @@ suspend fun fetchDoc(url: String, timeoutMilliseconds: Int = 2 * 60 * 1000): Doc
 		.addUserAgent()
 		.referrer("http://www.google.com")
 		.header("Content-Language", "en-US")
-		.get()
+		.getIO()
 }
 

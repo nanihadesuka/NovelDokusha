@@ -26,9 +26,6 @@ class SettingsFragment : BaseFragment()
 	private lateinit var viewAdapter: Adapter
 	
 	private inner class Adapter
-	{
-	
-	}
 	
 	override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View
 	{

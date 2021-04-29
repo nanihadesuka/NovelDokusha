@@ -19,13 +19,13 @@ open class BaseActivity : AppCompatActivity()
 		super.onCreate(savedInstanceState)
 	}
 	
-	fun preferencesGetTheme() = getSharedPreferences("GLOBAL_THEME", MODE_PRIVATE)
+	fun preferencesGetTheme(): SharedPreferences = getSharedPreferences("GLOBAL_THEME", MODE_PRIVATE)
 	fun preferencesGetThemeId() = preferencesGetTheme().getInt("id", R.style.AppTheme_Light)
 	fun preferencesSetThemeId(id: Int) = preferencesGetTheme().edit().putInt("id", id).apply()
 	
 	companion object
 	{
-		val globalThemeList = mapOf<String, Int>(
+		val globalThemeList = mapOf(
 			"Light" to R.style.AppTheme_Light,
 			"Dark" to R.style.AppTheme_Dark,
 			"Grey" to R.style.AppTheme_Grey,

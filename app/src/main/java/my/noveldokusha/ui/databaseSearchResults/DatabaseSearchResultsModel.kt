@@ -19,8 +19,8 @@ class DatabaseSearchResultsModel : ViewModel()
 		this.input = input
 		this.iterator = when (input)
 		{
-			is SearchMode.Text -> database.getSearch(input.text)
-			is SearchMode.Advanced -> database.getSearchAdvanced(input.genresInclude, input.genresExclude)
+			is SearchMode.Text -> database.getSearchSequence(input.text)
+			is SearchMode.Advanced -> database.getSearchAdvancedSequence(input.genresInclude, input.genresExclude)
 		}.iterator()
 		
 		loadMore()
