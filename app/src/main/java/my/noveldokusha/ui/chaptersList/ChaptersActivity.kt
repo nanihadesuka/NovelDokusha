@@ -184,6 +184,10 @@ class ChaptersActivity : BaseActivity()
 				this.notifyDataSetChanged()
 				true
 			}
+			
+			binder.itemView.layoutParams = (binder.itemView.layoutParams as ViewGroup.MarginLayoutParams).also {
+				it.bottomMargin = if (position == list.lastIndex) 600 else 0
+			}
 		}
 		
 		inner class ViewBinder(val viewHolder: ActivityChaptersListItemBinding) : RecyclerView.ViewHolder(viewHolder.root)
