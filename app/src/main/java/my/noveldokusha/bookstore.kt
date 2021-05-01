@@ -1,6 +1,5 @@
 package my.noveldokusha
 
-import android.content.Context
 import androidx.room.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -24,8 +23,7 @@ object bookstore
 	
 	data class LastReadChapter(var url: String, var position: Int, var offset: Int)
 	
-	private lateinit var db_context: Context
-	fun setContext(context: Context) = ::db_context.set(context)
+	private val db_context by lazy { App.instance }
 	
 	@Entity
 	data class Book(

@@ -6,7 +6,13 @@ class App : Application()
 {
 	override fun onCreate()
 	{
-		bookstore.setContext(this)
+		_instance = this
 		super.onCreate()
+	}
+	
+	companion object
+	{
+		private lateinit var _instance: App
+		val instance get() = _instance
 	}
 }
