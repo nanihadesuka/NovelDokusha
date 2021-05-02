@@ -180,8 +180,7 @@ object scrubber
 			
 			override suspend fun getCatalogSearch(index: Int, input: String): Response<List<bookstore.BookMetadata>>
 			{
-				val page = index + 1
-				if (input.isBlank() || page > 0)
+				if (input.isBlank() || index > 0)
 					return Response.Success(listOf())
 				
 				val url = "https://lightnovelstranslations.com/?order=DESC&orderby=relevance&s=${input.urlEncode()}"
