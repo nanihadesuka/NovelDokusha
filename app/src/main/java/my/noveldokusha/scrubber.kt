@@ -768,6 +768,10 @@ class BooksFetchIterator(
 				{
 					state = STATE.CONSUMED
 					onError.value = res
+					if (booksCount == 0)
+						onCompletedEmpty.value = Unit
+					else
+						onCompleted.value = Unit
 				}
 			}
 			index += 1
