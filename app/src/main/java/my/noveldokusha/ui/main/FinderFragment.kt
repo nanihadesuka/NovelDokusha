@@ -11,8 +11,8 @@ import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.RecyclerView
 import my.noveldokusha.R
 import my.noveldokusha.databinding.ActivityMainFragmentFinderBinding
-import my.noveldokusha.databinding.ActivityMainFragmentFinderListviewItemBinding
 import my.noveldokusha.databinding.ActivityMainFragmentFinderListviewItemHeaderBinding
+import my.noveldokusha.databinding.BookListItemBinding
 import my.noveldokusha.ui.databaseSearch.DatabaseSearchActivity
 import my.noveldokusha.ui.globalSourceSearch.GlobalSourceSearchActivity
 import my.noveldokusha.ui.sourceCatalog.SourceCatalogActivity
@@ -104,16 +104,16 @@ class FinderFragment : Fragment()
 		
 		override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) = when (ItemID.getByOrdinal(viewType))
 		{
-			ItemID.Source -> ItemViewHolder.Source(ActivityMainFragmentFinderListviewItemBinding.inflate(LayoutInflater.from(parent.context), parent, false))
-			ItemID.Database -> ItemViewHolder.Database(ActivityMainFragmentFinderListviewItemBinding.inflate(LayoutInflater.from(parent.context), parent, false))
+			ItemID.Source -> ItemViewHolder.Source(BookListItemBinding.inflate(LayoutInflater.from(parent.context), parent, false))
+			ItemID.Database -> ItemViewHolder.Database(BookListItemBinding.inflate(LayoutInflater.from(parent.context), parent, false))
 			ItemID.Header -> ItemViewHolder.Header(ActivityMainFragmentFinderListviewItemHeaderBinding.inflate(LayoutInflater.from(parent.context), parent, false))
 		}
 	}
 	
 	sealed class ItemViewHolder(view: View) : RecyclerView.ViewHolder(view)
 	{
-		class Source(val viewHolder: ActivityMainFragmentFinderListviewItemBinding) : ItemViewHolder(viewHolder.root)
-		class Database(val viewHolder: ActivityMainFragmentFinderListviewItemBinding) : ItemViewHolder(viewHolder.root)
+		class Source(val viewHolder: BookListItemBinding) : ItemViewHolder(viewHolder.root)
+		class Database(val viewHolder: BookListItemBinding) : ItemViewHolder(viewHolder.root)
 		class Header(val viewHolder: ActivityMainFragmentFinderListviewItemHeaderBinding) : ItemViewHolder(viewHolder.root)
 	}
 	

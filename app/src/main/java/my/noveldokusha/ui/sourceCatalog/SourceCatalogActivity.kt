@@ -20,7 +20,7 @@ import kotlinx.coroutines.launch
 import my.noveldokusha.R
 import my.noveldokusha.bookstore
 import my.noveldokusha.databinding.ActivitySourceCatalogBinding
-import my.noveldokusha.databinding.ActivitySourceCatalogListviewItemBinding
+import my.noveldokusha.databinding.BookListItemBinding
 import my.noveldokusha.scrubber
 import my.noveldokusha.ui.BaseActivity
 import my.noveldokusha.ui.chaptersList.ChaptersActivity
@@ -137,7 +137,7 @@ class SourceCatalogActivity : BaseActivity()
 		
 		override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewBinder
 		{
-			val binder = ViewBinder(ActivitySourceCatalogListviewItemBinding.inflate(LayoutInflater.from(parent.context), parent, false))
+			val binder = ViewBinder(BookListItemBinding.inflate(LayoutInflater.from(parent.context), parent, false))
 			defaultTextColor = binder.viewHolder.title.currentTextColor
 			return binder
 		}
@@ -171,7 +171,7 @@ class SourceCatalogActivity : BaseActivity()
 			binder.addBottomMargin { position == list.lastIndex  }
 		}
 		
-		inner class ViewBinder(val viewHolder: ActivitySourceCatalogListviewItemBinding) : RecyclerView.ViewHolder(viewHolder.root)
+		inner class ViewBinder(val viewHolder: BookListItemBinding) : RecyclerView.ViewHolder(viewHolder.root)
 		{
 			var exist: LiveData<Boolean> = liveData { }
 		}

@@ -10,10 +10,11 @@ import androidx.activity.viewModels
 import androidx.recyclerview.widget.RecyclerView
 import my.noveldokusha.bookstore
 import my.noveldokusha.databinding.ActivityDatabaseBookInfoBinding
-import my.noveldokusha.databinding.ActivityDatabaseSearchResultsListItemBinding
+import my.noveldokusha.databinding.BookListItemBinding
 import my.noveldokusha.scrubber
 import my.noveldokusha.ui.BaseActivity
 import my.noveldokusha.ui.globalSourceSearch.GlobalSourceSearchActivity
+import my.noveldokusha.uiUtils.addBottomMargin
 import java.util.*
 
 class DatabaseBookInfoActivity : BaseActivity()
@@ -40,8 +41,8 @@ class DatabaseBookInfoActivity : BaseActivity()
 	private val viewHolder by lazy { ActivityDatabaseBookInfoBinding.inflate(layoutInflater) }
 	private val viewAdapter = object
 	{
-		val relatedBooks by lazy { BookArrayAdapter(viewModel.relatedBooks) }
-		val similarRecommended by lazy { BookArrayAdapter(viewModel.similarRecommended) }
+		val relatedBooks by lazy { BookArrayAdapter(this@DatabaseBookInfoActivity, viewModel.relatedBooks, viewModel.database.baseUrl) }
+		val similarRecommended by lazy { BookArrayAdapter(this@DatabaseBookInfoActivity, viewModel.similarRecommended, viewModel.database.baseUrl) }
 	}
 	
 	override fun onCreate(savedInstanceState: Bundle?)
@@ -59,13 +60,19 @@ class DatabaseBookInfoActivity : BaseActivity()
 			startActivity(intent)
 		}
 		
-		viewModel.bookDataUpdated.observe(this) {
-			viewHolder.description.text = viewModel.bookData.description
-			viewHolder.alternativeTitles.text = viewModel.bookData.alternativeTitles.joinToString("\n\n")
-			viewHolder.authors.text = viewModel.bookData.authors.joinToString("\n") { author -> author.name }
-			viewHolder.tags.text = viewModel.bookData.tags.joinToString(" · ")
-			viewHolder.genres.text = viewModel.bookData.genres.joinToString(" · ")
-			viewHolder.bookType.text = viewModel.bookData.bookType
+		viewModel.bookDataLiveData.observe(this) {
+			viewModel.relatedBooks.clear()
+			viewModel.relatedBooks.addAll(it.relatedBooks)
+			viewModel.similarRecommended.clear()
+			viewModel.similarRecommended.addAll(it.similarRecommended)
+			
+			viewHolder.description.text = it.description
+			viewHolder.alternativeTitles.text = it.alternativeTitles.joinToString("\n\n")
+			viewHolder.authors.text = it.authors.joinToString("\n") { author -> author.name }
+			viewHolder.tags.text = it.tags.joinToString(" · ")
+			viewHolder.genres.text = it.genres.joinToString(" · ")
+			viewHolder.bookType.text = it.bookType
+			
 			viewAdapter.relatedBooks.notifyDataSetChanged()
 			viewAdapter.similarRecommended.notifyDataSetChanged()
 		}
@@ -86,26 +93,32 @@ class DatabaseBookInfoActivity : BaseActivity()
 		}
 		else -> super.onOptionsItemSelected(item)
 	}
+}
+
+private class BookArrayAdapter(
+	private val context: BaseActivity,
+	private val list: ArrayList<bookstore.BookMetadata>,
+	private val databaseUrlBase: String
+) : RecyclerView.Adapter<BookArrayAdapter.ViewBinder>()
+{
+	override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =
+		ViewBinder(BookListItemBinding.inflate(LayoutInflater.from(parent.context), parent, false))
 	
-	private inner class BookArrayAdapter(private val list: ArrayList<bookstore.BookMetadata>) : RecyclerView.Adapter<BookArrayAdapter.ViewBinder>()
+	override fun getItemCount() = this@BookArrayAdapter.list.size
+	
+	override fun onBindViewHolder(binder: ViewBinder, position: Int)
 	{
-		override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =
-			ViewBinder(ActivityDatabaseSearchResultsListItemBinding.inflate(LayoutInflater.from(parent.context), parent, false))
-		
-		override fun getItemCount() = this@BookArrayAdapter.list.size
-		
-		override fun onBindViewHolder(binder: ViewBinder, position: Int)
-		{
-			val itemData = this.list[position]
-			val itemHolder = binder.viewHolder
-			itemHolder.title.text = itemData.title
-			itemHolder.title.setOnClickListener {
-				val intent = Extras(databaseUrlBase = viewModel.database.baseUrl, bookMetadata = itemData)
-					.intent(this@DatabaseBookInfoActivity)
-				startActivity(intent)
-			}
+		val itemData = this.list[position]
+		val itemHolder = binder.viewHolder
+		itemHolder.title.text = itemData.title
+		itemHolder.title.setOnClickListener {
+			val intent = DatabaseBookInfoActivity.Extras(databaseUrlBase = databaseUrlBase, bookMetadata = itemData)
+				.intent(context)
+			context.startActivity(intent)
 		}
 		
-		inner class ViewBinder(val viewHolder: ActivityDatabaseSearchResultsListItemBinding) : RecyclerView.ViewHolder(viewHolder.root)
+		binder.addBottomMargin { position == list.lastIndex }
 	}
+	
+	inner class ViewBinder(val viewHolder: BookListItemBinding) : RecyclerView.ViewHolder(viewHolder.root)
 }

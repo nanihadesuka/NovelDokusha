@@ -14,11 +14,12 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import my.noveldokusha.bookstore
 import my.noveldokusha.databinding.ActivityDatabaseSearchResultsBinding
-import my.noveldokusha.databinding.ActivityDatabaseSearchResultsListItemBinding
+import my.noveldokusha.databinding.BookListItemBinding
 import my.noveldokusha.scrubber
 import my.noveldokusha.ui.BaseActivity
 import my.noveldokusha.ui.databaseBookInfo.DatabaseBookInfoActivity
 import my.noveldokusha.uiUtils.ProgressBarAdapter
+import my.noveldokusha.uiUtils.addBottomMargin
 import java.io.InvalidObjectException
 import java.util.*
 
@@ -64,7 +65,7 @@ class DatabaseSearchResultsActivity : BaseActivity()
 	private val viewHolder by lazy { ActivityDatabaseSearchResultsBinding.inflate(layoutInflater) }
 	private val viewAdapter = object
 	{
-		val recyclerView by lazy { ChaptersArrayAdapter(viewModel.searchResults) }
+		val recyclerView by lazy { ChaptersArrayAdapter(this@DatabaseSearchResultsActivity, viewModel.searchResults, viewModel.database.baseUrl) }
 		val progressBar by lazy { ProgressBarAdapter() }
 	}
 	private val viewLayoutManager = object
@@ -116,26 +117,33 @@ class DatabaseSearchResultsActivity : BaseActivity()
 		else -> super.onOptionsItemSelected(item)
 	}
 	
-	private inner class ChaptersArrayAdapter(private val list: ArrayList<bookstore.BookMetadata>) : RecyclerView.Adapter<ChaptersArrayAdapter.ViewBinder>()
+}
+
+private class ChaptersArrayAdapter(
+	private val context: BaseActivity,
+	private val list: ArrayList<bookstore.BookMetadata>,
+	private val databaseUrlBase: String
+) : RecyclerView.Adapter<ChaptersArrayAdapter.ViewBinder>()
+{
+	override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =
+		ViewBinder(BookListItemBinding.inflate(LayoutInflater.from(parent.context), parent, false))
+	
+	override fun getItemCount() = this@ChaptersArrayAdapter.list.size
+	
+	override fun onBindViewHolder(binder: ViewBinder, position: Int)
 	{
-		override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =
-			ViewBinder(ActivityDatabaseSearchResultsListItemBinding.inflate(LayoutInflater.from(parent.context), parent, false))
-		
-		override fun getItemCount() = this@ChaptersArrayAdapter.list.size
-		
-		override fun onBindViewHolder(binder: ViewBinder, position: Int)
-		{
-			val itemData = this.list[position]
-			val itemHolder = binder.viewHolder
-			itemHolder.title.text = itemData.title
-			itemHolder.title.setOnClickListener {
-				val intent = DatabaseBookInfoActivity
-					.Extras(databaseUrlBase = viewModel.database.baseUrl, bookMetadata = itemData)
-					.intent(this@DatabaseSearchResultsActivity)
-				startActivity(intent)
-			}
+		val itemModel = this.list[position]
+		val itemHolder = binder.viewHolder
+		itemHolder.title.text = itemModel.title
+		itemHolder.title.setOnClickListener {
+			val intent = DatabaseBookInfoActivity
+				.Extras(databaseUrlBase = databaseUrlBase, bookMetadata = itemModel)
+				.intent(context)
+			context.startActivity(intent)
 		}
 		
-		inner class ViewBinder(val viewHolder: ActivityDatabaseSearchResultsListItemBinding) : RecyclerView.ViewHolder(viewHolder.root)
+		binder.addBottomMargin { position == list.lastIndex }
 	}
+	
+	inner class ViewBinder(val viewHolder: BookListItemBinding) : RecyclerView.ViewHolder(viewHolder.root)
 }

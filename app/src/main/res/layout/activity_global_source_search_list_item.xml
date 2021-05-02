@@ -7,6 +7,7 @@
 	android:layout_height="wrap_content"
 	android:maxHeight="180sp"
 	android:orientation="vertical"
+	android:paddingBottom="10sp"
 	>
 	
 	<TextView
@@ -19,36 +20,23 @@
 		tool:text="Source name"
 		/>
 	
-	<LinearLayout
+	<androidx.recyclerview.widget.RecyclerView
+		android:id="@+id/recyclerView"
 		android:layout_width="match_parent"
-		android:layout_height="wrap_content"
+		android:layout_height="160sp"
 		android:orientation="horizontal"
-		android:paddingVertical="3sp"
-		android:paddingLeft="2sp"
-		>
-		
-		<ProgressBar
-			android:id="@+id/progressBar"
-			android:layout_width="wrap_content"
-			android:layout_height="160sp"
-			android:padding="30sp"
-			/>
-		
-		<androidx.recyclerview.widget.RecyclerView
-			android:id="@+id/localRecyclerView"
-			android:layout_width="match_parent"
-			android:layout_height="160sp"
-			android:orientation="horizontal"
-			app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-			tool:itemCount="5"
-			tool:listitem="@layout/activity_global_source_search_result_item"
-			/>
-	</LinearLayout>
+		android:overScrollMode="always"
+		android:padding="3sp"
+		app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+		tool:itemCount="5"
+		tool:listitem="@layout/activity_global_source_search_result_item"
+		/>
 	
 	<TextView
 		android:id="@+id/noResultsMessage"
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
+		android:layout_marginLeft="10sp"
 		android:gravity="center_vertical"
 		android:padding="8sp"
 		android:text="No results found"

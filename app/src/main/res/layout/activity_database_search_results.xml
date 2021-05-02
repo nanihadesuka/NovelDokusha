@@ -49,7 +49,7 @@
 			android:padding="3sp"
 			android:scrollbars="vertical"
 			android:splitMotionEvents="false"
-			tools:listitem="@layout/activity_database_search_results_list_item"
+			tools:listitem="@layout/book_list_item"
 			/>
 	
 	</LinearLayout>

@@ -4,7 +4,7 @@
 	android:id="@+id/title"
 	android:layout_width="match_parent"
 	android:layout_height="wrap_content"
-	android:layout_margin="3sp"
+	android:layout_margin="4sp"
 	android:background="@drawable/book_item_background"
 	android:clickable="true"
 	android:foreground="@drawable/book_item_foreground_ripple"
