@@ -2,6 +2,7 @@
 <androidx.coordinatorlayout.widget.CoordinatorLayout
 	xmlns:android="http://schemas.android.com/apk/res/android"
 	xmlns:app="http://schemas.android.com/apk/res-auto"
+	xmlns:tools="http://schemas.android.com/tools"
 	android:layout_width="match_parent"
 	android:layout_height="match_parent"
 	>
@@ -22,14 +23,11 @@
 	</com.google.android.material.appbar.AppBarLayout>
 	
 	<LinearLayout
-		xmlns:android="http://schemas.android.com/apk/res/android"
-		xmlns:tools="http://schemas.android.com/tools"
 		android:layout_width="match_parent"
 		android:layout_height="match_parent"
 		android:orientation="vertical"
 		app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior"
 		>
-		
 		
 		<TextView
 			android:id="@+id/noResultsMessage"
@@ -47,9 +45,10 @@
 			android:id="@+id/recyclerView"
 			android:layout_width="match_parent"
 			android:layout_height="match_parent"
+			android:clipToPadding="false"
+			android:padding="3sp"
 			android:scrollbars="vertical"
 			android:splitMotionEvents="false"
-			android:verticalScrollbarPosition="right"
 			tools:listitem="@layout/activity_database_search_results_list_item"
 			/>
 	

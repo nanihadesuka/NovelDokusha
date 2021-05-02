@@ -1,12 +1,11 @@
 package my.noveldokusha
 
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.MutableLiveData
+import kotlinx.coroutines.*
 import org.jsoup.Connection
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
-import org.jsoup.nodes.Node
 import org.jsoup.nodes.TextNode
 import java.io.PrintWriter
 import java.io.StringWriter
@@ -14,16 +13,24 @@ import java.net.SocketTimeoutException
 import java.net.URLDecoder
 import java.net.URLEncoder
 import java.util.*
-import java.util.Collections.max
+
+fun String.urlEncode(): String = URLEncoder.encode(this, "utf-8")
 
 suspend fun Connection.getIO(): Document = withContext(Dispatchers.IO) { get() }
 suspend fun Connection.postIO(): Document = withContext(Dispatchers.IO) { post() }
 suspend fun Connection.executeIO(): Connection.Response = withContext(Dispatchers.IO) { execute() }
+suspend fun String.urlEncodeAsync(): String = withContext(Dispatchers.IO) { this@urlEncodeAsync.urlEncode() }
 
 fun Connection.addUserAgent(): Connection =
 	this.userAgent("Mozilla/5.0 (X11; U; Linux i586; en-US; rv:1.7.3) Gecko/20040924 Epiphany/1.4.4 (Ubuntu)")
 
 fun Connection.addHeaderRequest() = this.header("x-requested-with", "XMLHttpRequest")!!
+
+sealed class Response<T>
+{
+	class Success<T>(val data: T) : Response<T>()
+	class Error<T>(val message: String) : Response<T>()
+}
 
 object scrubber
 {
@@ -51,12 +58,42 @@ object scrubber
 			val catalogUrl: String
 			
 			suspend fun getChapterList(doc: Document): List<bookstore.ChapterMetadata>
-			suspend fun getCatalogList(doc: Document): List<bookstore.BookMetadata>
-			suspend fun getSearchResult(input: String): Response<List<bookstore.BookMetadata>>
+			suspend fun getCatalogList(index: Int): Response<List<bookstore.BookMetadata>>
+			suspend fun getCatalogSearch(index: Int, input: String): Response<List<bookstore.BookMetadata>>
 		}
 	}
 	
-	fun getNodeTextTransversal(node: Node): List<String>
+	interface database_interface
+	{
+		val name: String
+		val baseUrl: String
+		
+		val searchGenres: Map<String, String>
+		
+		suspend fun getSearch(index: Int, input: String): Response<List<bookstore.BookMetadata>>
+		suspend fun getSearchAdvanced(
+			index: Int,
+			genresIncluded: List<String>,
+			genresExcluded: List<String>
+		): Response<List<bookstore.BookMetadata>>
+		
+		data class BookAuthor(val name: String, val url: String)
+		data class BookData(
+			val title: String,
+			val description: String,
+			val alternativeTitles: List<String>,
+			val authors: List<BookAuthor>,
+			val tags: List<String>,
+			val genres: List<String>,
+			val bookType: String,
+			val relatedBooks: List<bookstore.BookMetadata>,
+			val similarRecommended: List<bookstore.BookMetadata>
+		)
+		
+		fun getBookData(doc: Document): BookData
+	}
+	
+	fun getNodeTextTransversal(node: org.jsoup.nodes.Node): List<String>
 	{
 		if (node is TextNode)
 		{
@@ -114,23 +151,43 @@ object scrubber
 					}
 			}
 			
-			override suspend fun getCatalogList(doc: Document): List<bookstore.BookMetadata>
+			override suspend fun getCatalogList(index: Int): Response<List<bookstore.BookMetadata>>
 			{
-				return doc.selectFirst("#prime_nav").children().subList(1, 4).flatMap { it.select("a") }.filter {
-					val url = it.attr("href")
-					val text = it.text()
-					return@filter url != "#" && !url.endsWith("-illustrations/") && !url.endsWith("-illustration/") && !url.endsWith("-illustration-page/") && text != "Novel Illustrations" && text != "Novels Illustrations"
-				}.map { bookstore.BookMetadata(title = it.text(), url = it.attr("href")) }
+				val page = index + 1
+				if (page > 1)
+					return Response.Success(listOf())
+				
+				return tryConnect {
+					fetchDoc(catalogUrl)
+						.selectFirst("#prime_nav")
+						.children()
+						.subList(1, 4)
+						.flatMap { it.select("a") }
+						.filter {
+							val url = it.attr("href")
+							val text = it.text()
+							return@filter url != "#" &&
+							              !url.endsWith("-illustrations/") &&
+							              !url.endsWith("-illustration/") &&
+							              !url.endsWith("-illustration-page/") &&
+							              text != "Novel Illustrations" &&
+							              text != "Novels Illustrations"
+						}
+						.map { bookstore.BookMetadata(title = it.text(), url = it.attr("href")) }
+						.let { Response.Success(it) }
+				}
 			}
 			
-			override suspend fun getSearchResult(input: String): Response<List<bookstore.BookMetadata>>
+			override suspend fun getCatalogSearch(index: Int, input: String): Response<List<bookstore.BookMetadata>>
 			{
-				if (input.isBlank())
+				val page = index + 1
+				if (input.isBlank() || page > 0)
 					return Response.Success(listOf())
+				
+				val url = "https://lightnovelstranslations.com/?order=DESC&orderby=relevance&s=${input.urlEncode()}"
 				return tryConnect {
-					val encodedInput = withContext(Dispatchers.IO) { URLEncoder.encode(input, "utf-8") }
-					val doc = fetchDoc("https://lightnovelstranslations.com/?s=${encodedInput}&orderby=relevance&order=DESC")
-					doc.selectFirst(".jetpack-search-filters-widget__filter-list")
+					fetchDoc(url)
+						.selectFirst(".jetpack-search-filters-widget__filter-list")
 						.select("a")
 						.map {
 							val (name) = Regex("""^.*category_name=(.*)$""").find(it.attr("href"))!!.destructured
@@ -168,18 +225,33 @@ object scrubber
 				return doc.select(".chapter-chs").select("a").map { bookstore.ChapterMetadata(title = it.text(), url = it.attr("href")) }
 			}
 			
-			override suspend fun getCatalogList(doc: Document): List<bookstore.BookMetadata>
+			val catalogIndex by lazy { ("ABCDEFGHIJKLMNOPQRSTUVWXYZ").split("") }
+			
+			override suspend fun getCatalogList(index: Int): Response<List<bookstore.BookMetadata>>
 			{
-				return doc.selectFirst(".list-by-word-body")
-					.child(0)
-					.children()
-					.map { it.selectFirst("a") }
-					.map { bookstore.BookMetadata(title = it.text(), url = it.attr("href")) }
+				val url = if (index == 0) catalogUrl
+				else
+				{
+					val letter = catalogIndex.elementAtOrNull(index - 1) ?: return Response.Success(listOf())
+					"$catalogUrl/$letter"
+				}
+				
+				return tryConnect {
+					fetchDoc(url)
+						.selectFirst(".list-by-word-body")
+						.child(0)
+						.children()
+						.map { it.selectFirst("a") }
+						.map { bookstore.BookMetadata(title = it.text(), url = it.attr("href")) }
+						.let { Response.Success(it) }
+				}
 			}
 			
-			override suspend fun getSearchResult(input: String): Response<List<bookstore.BookMetadata>>
+			override suspend fun getCatalogSearch(index: Int, input: String): Response<List<bookstore.BookMetadata>>
 			{
-				if (input.isBlank()) return Response.Success(listOf())
+				if (input.isBlank() || index > 0)
+					return Response.Success(listOf())
+				
 				return tryConnect {
 					Jsoup.connect("https://www.readlightnovel.org/search/autocomplete")
 						.addUserAgent()
@@ -224,18 +296,28 @@ object scrubber
 					.map { bookstore.ChapterMetadata(title = it.text(), url = baseUrl + it.attr("href")) }
 			}
 			
-			override suspend fun getCatalogList(doc: Document): List<bookstore.BookMetadata>
+			override suspend fun getCatalogList(index: Int): Response<List<bookstore.BookMetadata>>
 			{
-				// TODO
-				return listOf()
+				val page = index + 1
+				var url = catalogUrl
+				if (page > 1) url += "?page=$page"
+				return tryConnect {
+					fetchDoc(url)
+						.selectFirst("#list-page")
+						.select(".row")
+						.map { it.selectFirst("a") }
+						.map { bookstore.BookMetadata(title = it.text(), url = baseUrl + it.attr("href")) }
+						.let { Response.Success(it) }
+				}
 			}
 			
-			override suspend fun getSearchResult(input: String): Response<List<bookstore.BookMetadata>>
+			override suspend fun getCatalogSearch(index: Int, input: String): Response<List<bookstore.BookMetadata>>
 			{
-				if (input.isBlank()) return Response.Success(listOf())
+				if (input.isBlank() || index > 0)
+					return Response.Success(listOf())
+				
 				return tryConnect {
-					val encodedInput = withContext(Dispatchers.IO) { URLEncoder.encode(input, "utf-8") }
-					fetchDoc("https://readnovelfull.com/search?keyword=$encodedInput")
+					fetchDoc("https://readnovelfull.com/search?keyword=${input.urlEncodeAsync()}")
 						.selectFirst(".col-novel-main, .archive")
 						.select(".novel-title")
 						.map { it.selectFirst("a") }
@@ -302,18 +384,28 @@ object scrubber
 					}.toList().reversed()
 			}
 			
-			override suspend fun getCatalogList(doc: Document): List<bookstore.BookMetadata>
+			override suspend fun getCatalogList(index: Int): Response<List<bookstore.BookMetadata>>
 			{
-				// TODO
-				return listOf()
+				val page = index + 1
+				var url = "$catalogUrl?st=1"
+				if (page > 1) url += "&pg=$page"
+				
+				return tryConnect {
+					fetchDoc(url)
+						.select(".search_title")
+						.map { it.selectFirst("a") }
+						.map { bookstore.BookMetadata(title = it.text(), url = it.attr("href")) }
+						.let { Response.Success(it) }
+				}
 			}
 			
-			override suspend fun getSearchResult(input: String): Response<List<bookstore.BookMetadata>>
+			override suspend fun getCatalogSearch(index: Int, input: String): Response<List<bookstore.BookMetadata>>
 			{
-				if (input.isBlank()) return Response.Success(listOf())
-				val value = withContext(Dispatchers.IO) { URLEncoder.encode(input, "utf-8") }
+				if (input.isBlank() || index > 0)
+					return Response.Success(listOf())
+				
 				return tryConnect {
-					Jsoup.connect("https://www.novelupdates.com/?s=${value}")
+					Jsoup.connect("https://www.novelupdates.com/?s=${input.urlEncode()}")
 						.addUserAgent()
 						.getIO()
 						.select(".search_body_nu")
@@ -395,40 +487,6 @@ object scrubber
 		}
 	}
 	
-	sealed class ReturnSearch
-	{
-		data class Entries(val books: List<bookstore.BookMetadata>, val page: Int) : ReturnSearch()
-		data class Error(val message: String, val page: Int) : ReturnSearch()
-		object NoMoreEntries : ReturnSearch()
-	}
-	
-	interface database_interface
-	{
-		val name: String
-		val baseUrl: String
-		
-		val searchGenres: Map<String, String>
-		
-		// We assume all functions to block the main thread, so need to be run in coroutines
-		fun getSearchSequence(input: String): Sequence<ReturnSearch>
-		fun getSearchAdvancedSequence(genresIncluded: List<String>, genresExcluded: List<String>): Sequence<ReturnSearch>
-		
-		data class BookAuthor(val name: String, val url: String)
-		data class BookData(
-			val title: String,
-			val description: String,
-			val alternativeTitles: List<String>,
-			val authors: List<BookAuthor>,
-			val tags: List<String>,
-			val genres: List<String>,
-			val bookType: String,
-			val relatedBooks: List<bookstore.BookMetadata>,
-			val similarRecommended: List<bookstore.BookMetadata>
-		)
-		
-		fun getBookData(doc: Document): BookData
-	}
-	
 	object database
 	{
 		/**
@@ -477,87 +535,39 @@ object scrubber
 				"Yuri" to "922"
 			)
 			
-			override fun getSearchSequence(input: String) = sequence<ReturnSearch> {
+			override suspend fun getSearch(index: Int, input: String): Response<List<bookstore.BookMetadata>>
+			{
+				val page = index + 1
+				val pagePath = if (page > 1) "page/$page/" else ""
+				val url = "https://www.novelupdates.com/$pagePath?s=${input.urlEncode()}&post_type=seriesplans"
 				
-				val encodedInput = URLEncoder.encode(input, "utf-8")
-				var page = 1
-				loop@ while (true)
-				{
-					val url = "https://www.novelupdates.com/${if (page > 1) "page/$page/" else ""}?s=$encodedInput&post_type=seriesplans"
-					
-					val res = tryConnectSync("page: $page\nurl: $url") {
-						val doc = fetchDoc(url)
-						val results = doc
-							.select(".search_title")
-							.map { it.selectFirst("a") }
-							.map { bookstore.BookMetadata(it.text(), it.attr("href")) }
-						
-						val lastPage = doc.select(".page-numbers")
-							.mapNotNull { it.text().toIntOrNull() }
-							.let { if (it.isEmpty()) 1 else max(it) }
-						
-						Response.Success(Pair(results, lastPage))
-					}
-					
-					when (res)
-					{
-						is Response.Error -> yield(ReturnSearch.Error(res.message, page))
-						is Response.Success ->
-						{
-							if (res.data.first.isEmpty())
-								break@loop
-							
-							yield(ReturnSearch.Entries(res.data.first, page))
-							
-							if (res.data.second == page)
-								break@loop
-							
-							page += 1
-						}
-					}
+				return tryConnect("page: $page\nurl: $url") {
+					fetchDoc(url)
+						.select(".search_title")
+						.map { it.selectFirst("a") }
+						.map { bookstore.BookMetadata(it.text(), it.attr("href")) }
+						.let { Response.Success(it) }
 				}
-				
-				yield(ReturnSearch.NoMoreEntries)
 			}
 			
-			override fun getSearchAdvancedSequence(genresIncluded: List<String>, genresExcluded: List<String>) = sequence<ReturnSearch> {
+			override suspend fun getSearchAdvanced(index: Int, genresIncluded: List<String>, genresExcluded: List<String>):
+					Response<List<bookstore.BookMetadata>>
+			{
+				val page = index + 1
 				
-				var urlBase = "https://www.novelupdates.com/series-finder/?sf=1"
-				if (genresIncluded.isNotEmpty()) urlBase += "&gi=${genresIncluded.map { searchGenres[it] }.joinToString(",")}&mgi=and"
-				if (genresExcluded.isNotEmpty()) urlBase += "&ge=${genresExcluded.map { searchGenres[it] }.joinToString(",")}"
+				var url = "https://www.novelupdates.com/series-finder/?sf=1"
+				if (genresIncluded.isNotEmpty()) url += "&gi=${genresIncluded.map { searchGenres[it] }.joinToString(",")}&mgi=and"
+				if (genresExcluded.isNotEmpty()) url += "&ge=${genresExcluded.map { searchGenres[it] }.joinToString(",")}"
+				url += "&sort=sdate&order=desc"
+				if (page > 1) url += "&pg=$page"
 				
-				urlBase += "&sort=sdate&order=desc"
-				
-				var page = 1
-				loop@ while (true)
-				{
-					val url = urlBase + if (page > 1) "&pg=$page" else ""
-					
-					val res = tryConnectSync("page: $page\nurl: $url") {
-						val doc = fetchDoc(url)
-						val results = doc
-							.select(".search_title")
-							.map { it.selectFirst("a") }
-							.map { bookstore.BookMetadata(it.text(), it.attr("href")) }
-						
-						Response.Success(results)
-					}
-					
-					when (res)
-					{
-						is Response.Error -> yield(ReturnSearch.Error(res.message, page))
-						is Response.Success ->
-						{
-							if (res.data.isEmpty())
-								break@loop
-							
-							yield(ReturnSearch.Entries(res.data, page))
-							page += 1
-						}
-					}
+				return tryConnect("page: $page\nurl: $url") {
+					fetchDoc(url)
+						.select(".search_title")
+						.map { it.selectFirst("a") }
+						.map { bookstore.BookMetadata(it.text(), it.attr("href")) }
+						.let { Response.Success(it) }
 				}
-				
-				yield(ReturnSearch.NoMoreEntries)
 			}
 			
 			override fun getBookData(doc: Document): database_interface.BookData
@@ -600,15 +610,9 @@ object scrubber
 	
 }
 
-sealed class Response<T>
-{
-	class Success<T>(val data: T) : Response<T>()
-	class Error<T>(val message: String) : Response<T>()
-}
-
 suspend fun downloadChapter(chapterUrl: String): Response<String>
 {
-	return tryConnect<String> {
+	return tryConnect {
 		val con = Jsoup.connect(chapterUrl)
 			.addUserAgent()
 			.followRedirects(true)
@@ -659,16 +663,6 @@ suspend fun fetchChaptersList(bookUrl: String, tryCache: Boolean = true): Respon
 	}
 }
 
-suspend fun downloadSourceCatalog(source: scrubber.source_interface.catalog): Response<List<bookstore.BookMetadata>>
-{
-	return tryConnect("catalog: ${source.catalogUrl}") {
-		val doc = fetchDoc(source.catalogUrl, timeoutMilliseconds = 30 * 1000)
-		source.getCatalogList(doc).let {
-			Response.Success(it)
-		}
-	}
-}
-
 suspend fun <T> tryConnect(extraErrorInfo: String = "", call: suspend () -> Response<T>): Response<T> = try
 {
 	call()
@@ -683,9 +677,6 @@ catch (e: Exception)
 	Response.Error("Unknown error.\n\n${if (extraErrorInfo.isEmpty()) "" else "Info:\n$extraErrorInfo\n\n"}Message:\n${e.message}\n\nStacktrace:\n$stacktrace")
 }
 
-fun <T> tryConnectSync(extraErrorInfo: String = "", call: suspend () -> Response<T>): Response<T> =
-	runBlocking(Dispatchers.IO) { tryConnect(extraErrorInfo, call) }
-
 suspend fun fetchDoc(url: String, timeoutMilliseconds: Int = 2 * 60 * 1000): Document
 {
 	return Jsoup.connect(url)
@@ -693,6 +684,95 @@ suspend fun fetchDoc(url: String, timeoutMilliseconds: Int = 2 * 60 * 1000): Doc
 		.addUserAgent()
 		.referrer("http://www.google.com")
 		.header("Content-Language", "en-US")
+		.header("Accept", "text/html")
+		.header("Accept-Encoding", "gzip,deflate")
 		.getIO()
 }
 
+class BooksFetchIterator(
+	private val coroutineScope: CoroutineScope,
+	private var fn: (suspend (index: Int) -> Response<List<bookstore.BookMetadata>>)
+)
+{
+	enum class STATE
+	{ IDLE, LOADING, CONSUMED }
+	
+	private var state = STATE.IDLE
+	private var booksCount: Int = 0
+	private var index = 0
+	private var job: Job? = null
+	
+	val onSuccess = MutableLiveData<Response.Success<List<bookstore.BookMetadata>>>()
+	val onCompleted = MutableLiveData<Unit>()
+	val onCompletedEmpty = MutableLiveData<Unit>()
+	val onError = MutableLiveData<Response.Error<List<bookstore.BookMetadata>>>()
+	val onFetching = MutableLiveData<Boolean>()
+	val onReset = MutableLiveData<Unit>()
+	
+	fun setFunction(fn: (suspend (index: Int) -> Response<List<bookstore.BookMetadata>>))
+	{
+		this.fn = fn
+	}
+	
+	fun reset()
+	{
+		state = STATE.IDLE
+		booksCount = 0
+		index = 0
+		job?.cancel()
+		onReset.value = Unit
+	}
+	
+	fun removeAllObservers(owner: LifecycleOwner)
+	{
+		listOf(onSuccess, onCompleted, onCompletedEmpty, onError, onFetching).forEach {
+			it.removeObservers(owner)
+		}
+	}
+	
+	fun fetchTrigger(trigger: () -> Boolean)
+	{
+		if (state == STATE.IDLE && trigger())
+			fetchNext()
+	}
+	
+	fun fetchNext()
+	{
+		if (state != STATE.IDLE) return
+		state = STATE.LOADING
+		
+		job = coroutineScope.launch(Dispatchers.Main) {
+			onFetching.value = true
+			val res = withContext(Dispatchers.IO) { fn(index) }
+			onFetching.value = false
+			if (!isActive) return@launch
+			when (res)
+			{
+				is Response.Success ->
+				{
+					if (res.data.isEmpty())
+					{
+						state = STATE.CONSUMED
+						if (booksCount == 0)
+							onCompletedEmpty.value = Unit
+						else
+							onCompleted.value = Unit
+					}
+					else
+					{
+						state = STATE.IDLE
+						booksCount += res.data.size
+						onSuccess.value = res
+					}
+				}
+				is Response.Error ->
+				{
+					state = STATE.CONSUMED
+					onError.value = res
+				}
+			}
+			index += 1
+		}
+	}
+	
+}

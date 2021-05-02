@@ -9,10 +9,14 @@ import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.asLiveData
+import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.liveData
+import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import my.noveldokusha.R
 import my.noveldokusha.bookstore
 import my.noveldokusha.databinding.ActivitySourceCatalogBinding
@@ -20,6 +24,8 @@ import my.noveldokusha.databinding.ActivitySourceCatalogListviewItemBinding
 import my.noveldokusha.scrubber
 import my.noveldokusha.ui.BaseActivity
 import my.noveldokusha.ui.chaptersList.ChaptersActivity
+import my.noveldokusha.uiUtils.ProgressBarAdapter
+import my.noveldokusha.uiUtils.addBottomMargin
 import java.util.*
 
 class SourceCatalogActivity : BaseActivity()
@@ -40,7 +46,13 @@ class SourceCatalogActivity : BaseActivity()
 	private val viewHolder by lazy { ActivitySourceCatalogBinding.inflate(layoutInflater) }
 	private val viewAdapter = object
 	{
-		val listView by lazy { BooksItemAdapter(viewModel.catalogList) }
+		val recyclerView by lazy { BooksItemAdapter(viewModel.list) }
+		val progressBar by lazy { ProgressBarAdapter() }
+	}
+	
+	private val viewLayoutManager = object
+	{
+		val recyclerView by lazy { LinearLayoutManager(this@SourceCatalogActivity) }
 	}
 	
 	override fun onCreate(savedInstanceState: Bundle?)
@@ -50,23 +62,36 @@ class SourceCatalogActivity : BaseActivity()
 		setSupportActionBar(viewHolder.toolbar)
 		viewModel.initialization(scrubber.getCompatibleSourceCatalog(extras.sourceBaseUrl())!!)
 		
-		viewHolder.listView.adapter = viewAdapter.listView
-		viewHolder.listView.layoutManager = LinearLayoutManager(this)
-		viewHolder.listView.itemAnimator = DefaultItemAnimator()
-		viewHolder.swipeRefreshLayout.setOnRefreshListener {
-			when (viewModel.mode)
-			{
-				SourceCatalogModel.Mode.MAIN -> viewModel.loadCatalog()
-				SourceCatalogModel.Mode.BAR_SEARCH -> Unit
+		viewHolder.recyclerView.adapter = ConcatAdapter(viewAdapter.recyclerView, viewAdapter.progressBar)
+		viewHolder.recyclerView.layoutManager = viewLayoutManager.recyclerView
+		viewHolder.recyclerView.itemAnimator = DefaultItemAnimator()
+		
+		viewHolder.recyclerView.setOnScrollChangeListener { _, _, _, _, _ ->
+			viewModel.booksFetchIterator.fetchTrigger {
+				val pos = viewLayoutManager.recyclerView.findLastVisibleItemPosition()
+				pos >= viewModel.list.size - 3
 			}
 		}
 		
-		viewModel.catalogListUpdates.observe(this) {
-			viewAdapter.listView.notifyDataSetChanged()
-			viewHolder.textNotice.visibility = if (viewModel.catalogList.isEmpty()) View.VISIBLE else View.GONE
+		viewModel.booksFetchIterator.onSuccess.observe(this) {
+			viewModel.list.addAll(it.data)
+			viewAdapter.recyclerView.notifyDataSetChanged()
 		}
-		viewModel.refreshing.observe(this) { viewHolder.swipeRefreshLayout.isRefreshing = it }
-		viewModel.loading.observe(this) { visible -> viewHolder.progressBar.visibility = if (visible) View.VISIBLE else View.GONE }
+		viewModel.booksFetchIterator.onError.observe(this) {
+			viewHolder.errorMessage.visibility = View.VISIBLE
+			viewHolder.errorMessage.text = it.message
+		}
+		viewModel.booksFetchIterator.onCompletedEmpty.observe(this) {
+			viewHolder.noResultsMessage.visibility = View.VISIBLE
+		}
+		viewModel.booksFetchIterator.onFetching.observe(this) {
+			viewAdapter.progressBar.visible = it
+		}
+		viewModel.booksFetchIterator.onReset.observe(this) {
+			viewHolder.errorMessage.visibility = View.GONE
+			viewHolder.noResultsMessage.visibility = View.GONE
+			viewAdapter.recyclerView.notifyDataSetChanged()
+		}
 		
 		supportActionBar!!.let {
 			it.title = "Source"
@@ -87,26 +112,16 @@ class SourceCatalogActivity : BaseActivity()
 			
 			override fun onMenuItemActionCollapse(item: MenuItem?): Boolean
 			{
-				runOnUiThread {
-					viewHolder.textNotice.visibility = View.GONE
-					viewHolder.progressBar.visibility = View.GONE
-				}
-				viewModel.exitSearchCatalogMode()
+				viewModel.startCatalogListMode()
 				return true
 			}
 		})
 		
 		searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener
 		{
-			
 			override fun onQueryTextSubmit(query: String?): Boolean
 			{
-				viewModel.exitLoadCatalogMode()
-				runOnUiThread {
-					viewHolder.progressBar.visibility = View.VISIBLE
-					viewHolder.textNotice.visibility = View.GONE
-				}
-				viewModel.searchCatalog(query ?: "")
+				query?.let { viewModel.startCatalogSearchMode(it) }
 				return true
 			}
 			
@@ -116,7 +131,7 @@ class SourceCatalogActivity : BaseActivity()
 		return true
 	}
 	
-	inner class BooksItemAdapter(private val list: ArrayList<bookstore.BookMetadata>) : RecyclerView.Adapter<BooksItemAdapter.ViewBinder>()
+	inner class BooksItemAdapter(private val list: List<bookstore.BookMetadata>) : RecyclerView.Adapter<BooksItemAdapter.ViewBinder>()
 	{
 		var defaultTextColor = 0
 		
@@ -150,9 +165,10 @@ class SourceCatalogActivity : BaseActivity()
 			}
 			
 			itemView.title.setOnLongClickListener {
-				viewModel.toggleBookmark(itemData)
+				lifecycleScope.launch(Dispatchers.IO) { bookstore.bookLibrary.toggleBookmark(itemData) }
 				true
 			}
+			binder.addBottomMargin { position == list.lastIndex  }
 		}
 		
 		inner class ViewBinder(val viewHolder: ActivitySourceCatalogListviewItemBinding) : RecyclerView.ViewHolder(viewHolder.root)

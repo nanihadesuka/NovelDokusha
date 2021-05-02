@@ -186,6 +186,11 @@ object bookstore
 		suspend fun update(book: Book) = db.libraryDao().update(book)
 		suspend fun get(url: String) = db.libraryDao().get(url)
 		suspend fun exist(url: String) = db.libraryDao().exist(url)
+		suspend fun toggleBookmark(bookMetadata: BookMetadata)
+		{
+			val book = Book(title = bookMetadata.title, url = bookMetadata.url)
+			if (exist(book.url)) remove(book) else insert(book)
+		}
 	}
 	
 	object bookChapter

@@ -25,6 +25,7 @@ import my.noveldokusha.ui.BaseActivity
 import my.noveldokusha.ui.databaseSearchResults.DatabaseSearchResultsActivity
 import my.noveldokusha.ui.databaseSearchResults.DatabaseSearchResultsModel
 import my.noveldokusha.ui.reader.ReaderActivity
+import my.noveldokusha.uiUtils.addBottomMargin
 import java.util.*
 
 class ChaptersActivity : BaseActivity()
@@ -185,9 +186,7 @@ class ChaptersActivity : BaseActivity()
 				true
 			}
 			
-			binder.itemView.layoutParams = (binder.itemView.layoutParams as ViewGroup.MarginLayoutParams).also {
-				it.bottomMargin = if (position == list.lastIndex) 600 else 0
-			}
+			binder.addBottomMargin { position == list.lastIndex }
 		}
 		
 		inner class ViewBinder(val viewHolder: ActivityChaptersListItemBinding) : RecyclerView.ViewHolder(viewHolder.root)
@@ -253,3 +252,4 @@ class ChaptersActivity : BaseActivity()
 		inner class ViewBinder(val viewHolder: ActivityChaptersListHeaderBinding) : RecyclerView.ViewHolder(viewHolder.root)
 	}
 }
+

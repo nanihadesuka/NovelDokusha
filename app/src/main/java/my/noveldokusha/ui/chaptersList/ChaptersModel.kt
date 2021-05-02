@@ -91,11 +91,6 @@ class ChaptersModel : ViewModel()
 	}.let {}
 	
 	fun toggleBookmark() = viewModelScope.launch(Dispatchers.IO) {
-		val book = bookstore.Book(title = bookMetadata.title, url = bookMetadata.url)
-		when (bookstore.bookLibrary.exist(url = book.url))
-		{
-			true -> bookstore.bookLibrary.remove(book)
-			false -> bookstore.bookLibrary.insert(book)
-		}
+		bookstore.bookLibrary.toggleBookmark(bookMetadata)
 	}
 }

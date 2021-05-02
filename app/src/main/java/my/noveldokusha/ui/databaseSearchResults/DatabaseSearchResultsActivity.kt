@@ -84,25 +84,22 @@ class DatabaseSearchResultsActivity : BaseActivity()
 		viewHolder.recyclerView.itemAnimator = DefaultItemAnimator()
 		
 		viewHolder.recyclerView.setOnScrollChangeListener { _, _, _, _, _ ->
-			when (viewModel.state)
-			{
-				DatabaseSearchResultsModel.STATE.IDLE ->
-				{
-					val pos = viewLayoutManager.recyclerView.findLastVisibleItemPosition()
-					if (pos >= viewModel.searchResults.size - 3)
-					{
-						viewAdapter.progressBar.visible = true
-						viewModel.loadMore()
-					}
-				}
-				DatabaseSearchResultsModel.STATE.LOADING -> Unit
-				DatabaseSearchResultsModel.STATE.END -> Unit
+			viewModel.booksFetchIterator.fetchTrigger {
+				val pos = viewLayoutManager.recyclerView.findLastVisibleItemPosition()
+				pos >= viewModel.searchResults.size - 3
 			}
 		}
 		
-		viewModel.searchResultsUpdate.observe(this) {
-			viewAdapter.progressBar.visible = false
-			viewHolder.noResultsMessage.visibility = if (viewModel.searchResults.isEmpty()) View.VISIBLE else View.GONE
+		viewModel.booksFetchIterator.onError.observe(this) { }
+		viewModel.booksFetchIterator.onCompleted.observe(this) { }
+		viewModel.booksFetchIterator.onCompletedEmpty.observe(this) {
+			viewHolder.noResultsMessage.visibility = View.VISIBLE
+		}
+		viewModel.booksFetchIterator.onFetching.observe(this) {
+			viewAdapter.progressBar.visible = it
+		}
+		viewModel.booksFetchIterator.onSuccess.observe(this) {
+			viewModel.searchResults.addAll(it.data)
 			viewAdapter.recyclerView.notifyDataSetChanged()
 		}
 		
@@ -141,5 +138,4 @@ class DatabaseSearchResultsActivity : BaseActivity()
 		
 		inner class ViewBinder(val viewHolder: ActivityDatabaseSearchResultsListItemBinding) : RecyclerView.ViewHolder(viewHolder.root)
 	}
-	
 }

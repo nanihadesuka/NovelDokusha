@@ -1,10 +1,8 @@
 package my.noveldokusha.ui.databaseSearchResults
 
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
+import androidx.lifecycle.viewModelScope
+import my.noveldokusha.BooksFetchIterator
 import my.noveldokusha.bookstore
 import my.noveldokusha.scrubber
 
@@ -16,25 +14,19 @@ class DatabaseSearchResultsModel : ViewModel()
 		if (initialized) return else initialized = true
 		
 		this.database = database
-		this.input = input
-		this.iterator = when (input)
-		{
-			is SearchMode.Text -> database.getSearchSequence(input.text)
-			is SearchMode.Advanced -> database.getSearchAdvancedSequence(input.genresInclude, input.genresExclude)
-		}.iterator()
-		
-		loadMore()
+		this.booksFetchIterator = BooksFetchIterator(viewModelScope) { index ->
+			when (input)
+			{
+				is SearchMode.Text -> database.getSearch(index, input.text)
+				is SearchMode.Advanced -> database.getSearchAdvanced(index, input.genresInclude, input.genresExclude)
+			}
+		}
+		this.booksFetchIterator.fetchNext()
 	}
 	
-	val searchResults = ArrayList<bookstore.BookMetadata>()
-	val searchResultsUpdate = MutableLiveData<Unit>()
+	lateinit var booksFetchIterator: BooksFetchIterator
 	lateinit var database: scrubber.database_interface
-	private lateinit var input: SearchMode
-	lateinit var iterator: Iterator<scrubber.ReturnSearch>
-	var state: STATE = STATE.LOADING
-	
-	enum class STATE
-	{ IDLE, LOADING, END }
+	val searchResults = ArrayList<bookstore.BookMetadata>()
 	
 	sealed class SearchMode
 	{
@@ -45,30 +37,6 @@ class DatabaseSearchResultsModel : ViewModel()
 			const val name = "SearchMode"
 		}
 	}
-	
-	fun loadMore()
-	{
-		state = STATE.LOADING
-		GlobalScope.launch(Dispatchers.IO) {
-			state = when (val res = iterator.next())
-			{
-				is scrubber.ReturnSearch.Entries ->
-				{
-					searchResults.addAll(res.books)
-					searchResultsUpdate.postValue(Unit)
-					STATE.IDLE
-				}
-				is scrubber.ReturnSearch.NoMoreEntries ->
-				{
-					searchResultsUpdate.postValue(Unit)
-					STATE.END
-				}
-				is scrubber.ReturnSearch.Error ->
-				{
-					searchResultsUpdate.postValue(Unit)
-					STATE.END
-				}
-			}
-		}
-	}
 }
+
+
