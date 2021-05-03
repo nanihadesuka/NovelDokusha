@@ -18,6 +18,7 @@
 		<item name="buttonStyle">@style/myButtonStyle</item>
 		<item name="myReaderTextStyle">@style/myReaderTextStyle.Black</item>
 		<item name="tabStyle">@style/myTabLayout</item>
+		<item name="appBarLayoutStyle">@style/myAppBarLayoutStyle</item>
 		
 		<item name="noneStateTint">#ddd</item>
 		<item name="positiveStateTint">#71A30E</item>

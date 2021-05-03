@@ -26,5 +26,9 @@
 		<item name="itemTextColor">@color/icon_effect</item>
 		<item name="android:background">?attr/colorPrimary</item>
 	</style>
+	
+	<style name="myAppBarLayoutStyle" parent="Widget.MaterialComponents.AppBarLayout.Primary">
+		<item name="elevation">0dp</item>
+	</style>
 
 </resources>
