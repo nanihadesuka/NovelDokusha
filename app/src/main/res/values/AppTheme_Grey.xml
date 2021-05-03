@@ -4,15 +4,24 @@
 	<style name="AppTheme.Grey" parent="Theme.MaterialComponents.NoActionBar.Bridge">
 		<item name="isLightTheme">false</item>
 		<item name="android:windowLightStatusBar">false</item>
-		<item name="android:statusBarColor">?attr/colorPrimary</item>
+		<item name="android:statusBarColor">?colorPrimary</item>
 		
 		<item name="colorAccent">#2A59B6</item>
+		
 		<item name="colorPrimary">#333</item>
+		<item name="colorOnPrimary">#eee</item>
+		<item name="colorSecondary">#444</item>
+		<item name="colorOnSecondary">?colorOnPrimary</item>
+		<item name="colorSurface">#555</item>
+		<item name="colorOnSurface">?colorOnPrimary</item>
+		<item name="colorOnBackground">?colorOnPrimary</item>
+		
 		<item name="android:colorBackground">@color/dark_24</item>
-		<item name="colorOnPrimary">?attr/colorPrimary</item>
-		<item name="colorSecondary">?attr/colorPrimary</item>
-		<item name="colorOnSecondary">#aaa</item>
-		<item name="colorOnBackground">#888</item>
+		
+		<item name="md_background_color">?colorSurface</item>
+		<item name="md_color_title">?colorOnSurface</item>
+		<item name="md_color_content">?colorOnSurface</item>
+		<item name="md_color_button_text">?colorAccent</item>
 		
 		<item name="bottomNavigationStyle">@style/myBottomNavigationStyle</item>
 		<item name="buttonStyle">@style/myButtonStyle</item>
