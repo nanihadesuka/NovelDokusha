@@ -28,39 +28,80 @@
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
 		android:layout_gravity="bottom"
-		android:layout_marginHorizontal="10sp"
-		android:layout_marginBottom="60sp"
+		android:layout_marginBottom="20sp"
 		android:animateLayoutChanges="true"
-		android:background="@drawable/background_round"
-		android:padding="5sp"
 		android:visibility="invisible"
+		android:orientation="vertical"
 		tools:visibility="visible"
 		>
 		
-		<ImageView
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:layout_gravity="center_vertical"
-			android:layout_margin="5sp"
-			android:background="@drawable/ic_twotone_format_size_24"
-			android:padding="15sp"
-			tools:text="Setting"
-			/>
-		
-		<com.google.android.material.slider.Slider
-			android:id="@+id/settingTextSize"
+		<LinearLayout
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
-			android:layout_gravity="center_vertical"
-			android:stepSize="1"
-			android:value="14"
-			android:valueFrom="8"
-			android:valueTo="24"
-			app:labelBehavior="floating"
-			app:thumbColor="?attr/colorOnSecondary"
-			app:trackColor="?attr/colorOnSecondary"
-			app:trackColorActive="?attr/colorAccent"
-			/>
+			android:layout_gravity="bottom"
+			android:layout_marginHorizontal="10sp"
+			android:animateLayoutChanges="true"
+			android:background="@drawable/background_round"
+			android:padding="5sp"
+			android:layout_margin="10sp"
+			>
+			
+			<ImageView
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:layout_gravity="center_vertical"
+				android:layout_margin="5sp"
+				android:background="@drawable/ic_baseline_font_download_24"
+				android:padding="15sp"
+				tools:text="Setting"
+				/>
+			
+			<androidx.appcompat.widget.AppCompatSpinner
+				android:id="@+id/settingTextFont"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:layout_gravity="center_vertical"
+				tools:listitem="@layout/book_list_item"
+				/>
+		</LinearLayout>
+		
+		<LinearLayout
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:layout_gravity="bottom"
+			android:layout_marginHorizontal="10sp"
+			android:layout_marginBottom="60sp"
+			android:animateLayoutChanges="true"
+			android:background="@drawable/background_round"
+			android:padding="5sp"
+			android:layout_margin="10sp"
+			>
+			
+			<ImageView
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:layout_gravity="center_vertical"
+				android:layout_margin="5sp"
+				android:background="@drawable/ic_twotone_format_size_24"
+				android:padding="15sp"
+				tools:text="Setting"
+				/>
+			
+			<com.google.android.material.slider.Slider
+				android:id="@+id/settingTextSize"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:layout_gravity="center_vertical"
+				android:stepSize="1"
+				android:value="14"
+				android:valueFrom="8"
+				android:valueTo="24"
+				app:labelBehavior="floating"
+				app:thumbColor="?attr/colorOnSecondary"
+				app:trackColor="?attr/colorOnSecondary"
+				app:trackColorActive="?attr/colorAccent"
+				/>
+		</LinearLayout>
 	</LinearLayout>
 
 

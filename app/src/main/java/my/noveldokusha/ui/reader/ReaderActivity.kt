@@ -3,12 +3,14 @@ package my.noveldokusha.ui.reader
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
+import android.graphics.Typeface
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
 import android.widget.AbsListView
+import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import androidx.activity.viewModels
 import androidx.core.view.isVisible
@@ -36,6 +38,7 @@ class ReaderActivity : BaseActivity()
 	{
 		val listView by lazy { ItemArrayAdapter(this@ReaderActivity, viewModel.items) }
 	}
+	val settingTextFont by lazy { ItemArrayAdapter(this@ReaderActivity, viewModel.items) }
 	
 	private val extras = object
 	{
@@ -56,10 +59,19 @@ class ReaderActivity : BaseActivity()
 				}
 				get() = preferences.getFloat(::textSize.name, 14f)
 			
+			var textFontFamily: String = preferences.getString(::textFontFamily.name, null) ?: "sans-serif"
+				set(value)
+				{
+					preferences.edit().putString(::textFontFamily.name, value).apply()
+					field = value
+				}
+				get() = preferences.getString(::textFontFamily.name, null) ?: "sans-serif"
+			
 			val listener = SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
 				when (key)
 				{
 					::textSize.name -> viewAdapter.listView.notifyDataSetChanged()
+					::textFontFamily.name -> viewAdapter.listView.notifyDataSetChanged()
 				}
 			}
 			
@@ -69,6 +81,27 @@ class ReaderActivity : BaseActivity()
 			}
 		}
 	}
+	
+	val availableFonts = listOf(
+		"casual",
+		"cursive",
+		"monospace",
+		"sans-serif",
+		"sans-serif-black",
+		"sans-serif-condensed",
+		"sans-serif-condensed-light",
+		"sans-serif-light",
+		"sans-serif-medium",
+		"sans-serif-smallcaps",
+		"sans-serif-thin",
+		"serif",
+		"serif-monospace"
+	)
+	
+	private val fontFamilyNORMALCache = mutableMapOf<String, Typeface>()
+	private val fontFamilyBOLDCache = mutableMapOf<String, Typeface>()
+	fun getFontFamilyNORMAL(name: String) = fontFamilyNORMALCache.getOrPut(name) { Typeface.create(name, Typeface.NORMAL) }
+	fun getFontFamilyBOLD(name: String) = fontFamilyBOLDCache.getOrPut(name) { Typeface.create(name, Typeface.BOLD) }
 	
 	override fun onCreate(savedInstanceState: Bundle?)
 	{
@@ -89,6 +122,19 @@ class ReaderActivity : BaseActivity()
 			viewHolder.settingsPanel.visibility = if (viewHolder.settingsPanel.isVisible) View.INVISIBLE else View.VISIBLE
 			true
 		}
+		
+		viewHolder.settingTextFont.adapter = ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, availableFonts)
+		viewHolder.settingTextFont.setSelection(availableFonts.indexOfFirst { it == preferences.textFontFamily })
+		viewHolder.settingTextFont.onItemSelectedListener = object : AdapterView.OnItemSelectedListener
+		{
+			override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long)
+			{
+				preferences.textFontFamily = availableFonts[position]
+			}
+			
+			override fun onNothingSelected(parent: AdapterView<*>?) = Unit
+		}
+		
 		@Suppress("DEPRECATION")
 		window.setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN)
 	}
@@ -360,9 +406,11 @@ class ReaderActivity : BaseActivity()
 			itemView.error.visibility = View.GONE
 			itemView.body.visibility = View.GONE
 			itemView.title.text = ""
+			itemView.title.typeface = getFontFamilyBOLD(preferences.textFontFamily)
 			itemView.error.text = ""
 			itemView.body.text = ""
 			itemView.body.textSize = preferences.textSize
+			itemView.body.typeface = getFontFamilyNORMAL(preferences.textFontFamily)
 			
 			when (item)
 			{
