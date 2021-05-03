@@ -22,6 +22,9 @@ class GlobalSourceSearchModel : ViewModel()
 	
 	data class SourceResults(val source: scrubber.source_interface.catalog, val searchInput: String, val coroutineScope: CoroutineScope)
 	{
+		var positionOffset : Int? = null
+		var position : Int? = null
+		
 		val list = mutableListOf<bookstore.BookMetadata>()
 		val booksFetchIterator = BooksFetchIterator(coroutineScope) { source.getCatalogSearch(it, searchInput) }
 		

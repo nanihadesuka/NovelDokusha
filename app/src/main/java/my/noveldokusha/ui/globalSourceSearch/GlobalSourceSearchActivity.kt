@@ -11,6 +11,7 @@ import androidx.activity.viewModels
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.DefaultItemAnimator
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import my.noveldokusha.BooksFetchIterator
 import my.noveldokusha.bookstore
@@ -19,7 +20,7 @@ import my.noveldokusha.databinding.ActivityGlobalSourceSearchListItemBinding
 import my.noveldokusha.databinding.ActivityGlobalSourceSearchResultItemBinding
 import my.noveldokusha.ui.BaseActivity
 import my.noveldokusha.ui.chaptersList.ChaptersActivity
-import my.noveldokusha.uiUtils.ProgressBarAdapter
+import my.noveldokusha.uiUtils.ProgressBarHorizontalAdapter
 import my.noveldokusha.uiUtils.addBottomMargin
 import my.noveldokusha.uiUtils.addRightMargin
 
@@ -102,10 +103,16 @@ private class GlobalArrayAdapter(
 		val viewAdapter = object
 		{
 			val recyclerView = LocalArrayAdapter(context, viewModel.list, viewModel.booksFetchIterator)
-			val progressBar = binder.progressBarAdapter
+			val progressBar = binder.progressBarHorizontalAdapter
 		}
 		
 		binder.lastItemData = viewModel
+		
+		binder.lastItemData?.let {
+			val (pos, offset) = Pair(it.position, it.positionOffset)
+			if (pos != null && offset != null)
+				binder.layoutManager.scrollToPositionWithOffset(pos, offset)
+		}
 		
 		viewHolder.recyclerView.adapter = ConcatAdapter(viewAdapter.recyclerView, viewAdapter.progressBar)
 		viewHolder.recyclerView.adapter?.notifyDataSetChanged()
@@ -117,6 +124,19 @@ private class GlobalArrayAdapter(
 		viewModel.booksFetchIterator.onFetching.observe(context, binder.onFetching)
 		viewModel.booksFetchIterator.onCompletedEmpty.observe(context, binder.onCompletedEmpty)
 		
+		viewHolder.recyclerView.setOnScrollChangeListener { _, _, _, _, _ ->
+			
+			binder.layoutManager.findFirstVisibleItemPosition().let {
+				viewModel.position = it
+				viewModel.positionOffset = viewHolder.recyclerView.run { getChildAt(0).left - paddingLeft }
+			}
+			
+			viewModel.booksFetchIterator.fetchTrigger {
+				val pos = binder.layoutManager.findLastVisibleItemPosition()
+				pos >= viewModel.list.size - 3
+			}
+		}
+		
 		binder.addBottomMargin { position == list.lastIndex }
 	}
 	
@@ -124,14 +144,20 @@ private class GlobalArrayAdapter(
 	{
 		var lastItemData: GlobalSourceSearchModel.SourceResults? = null
 		val onFetching = Observer<Boolean> {
-			progressBarAdapter.visible = it
+			progressBarHorizontalAdapter.visible = it
 		}
 		val onCompletedEmpty = Observer<Unit> {
 			viewHolder.recyclerView.visibility = View.GONE
 			viewHolder.noResultsMessage.visibility = View.VISIBLE
 		}
 		
-		val progressBarAdapter = ProgressBarAdapter()
+		val progressBarHorizontalAdapter = ProgressBarHorizontalAdapter()
+		val layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
+		
+		init
+		{
+			viewHolder.recyclerView.layoutManager = layoutManager
+		}
 	}
 }
 
