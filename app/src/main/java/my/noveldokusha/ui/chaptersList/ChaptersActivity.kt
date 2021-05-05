@@ -16,9 +16,7 @@ import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.*
 import my.noveldokusha.R
 import my.noveldokusha.bookstore
 import my.noveldokusha.databinding.ActivityChaptersBinding
@@ -101,7 +99,7 @@ class ChaptersActivity : BaseActivity()
 		
 		viewHolder.selectionModeDownload.setOnClickListener {
 			val list = viewModel.selectedChaptersUrl.toList()
-			lifecycleScope.launch(Dispatchers.IO) {
+			GlobalScope.launch(Dispatchers.IO) {
 				list.forEach { bookstore.bookChapterBody.fetchBody(it) }
 			}
 		}
