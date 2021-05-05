@@ -2,20 +2,8 @@
 <menu
 	xmlns:android="http://schemas.android.com/apk/res/android"
 	xmlns:app="http://schemas.android.com/apk/res-auto"
-	xmlns:tools="http://schemas.android.com/tools"
 	>
-	<item
-		android:id="@+id/action_set_all_chapters_read"
-		android:icon="@drawable/ic_baseline_done_all_24"
-		android:title="@string/set_as_all_read"
-		app:showAsAction="collapseActionView"
-		/>
-	<item
-		android:id="@+id/action_download_all_chapters"
-		android:icon="@drawable/ic_outline_arrow_downward_24"
-		android:title="@string/download_all_chapters"
-		app:showAsAction="collapseActionView"
-		/>
+	
 	<item
 		android:id="@+id/action_bookmarked"
 		android:icon="@drawable/ic_twotone_bookmark_24"

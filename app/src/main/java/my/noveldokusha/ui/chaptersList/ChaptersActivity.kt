@@ -6,14 +6,18 @@ import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
 import android.view.*
+import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
 import androidx.lifecycle.asLiveData
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import my.noveldokusha.R
 import my.noveldokusha.bookstore
@@ -72,10 +76,66 @@ class ChaptersActivity : BaseActivity()
 			viewModel.numberOfChapters.value = it.size
 		}
 		
+		viewHolder.selectionSelectAll.setOnClickListener {
+			viewModel.selectedChaptersUrl.addAll(viewModel.chapters.map { it.chapter.url })
+			viewAdapter.chapters.notifyDataSetChanged()
+		}
+		
+		viewHolder.selectionSelectAllUnderSelected.setOnClickListener {
+			val index = viewModel.chapters.indexOfFirst { viewModel.selectedChaptersUrl.contains(it.chapter.url) }
+			if (index == -1) return@setOnClickListener
+			
+			viewModel.selectedChaptersUrl.addAll(viewModel.chapters.drop(index).map { it.chapter.url })
+			viewAdapter.chapters.notifyDataSetChanged()
+		}
+		
+		viewHolder.selectionModeSetAsUnread.setOnClickListener {
+			val list = viewModel.selectedChaptersUrl.toList()
+			lifecycleScope.launch(Dispatchers.IO) { bookstore.bookChapter.setAsUnread(list) }
+		}
+		
+		viewHolder.selectionModeSetAsRead.setOnClickListener {
+			val list = viewModel.selectedChaptersUrl.toList()
+			lifecycleScope.launch(Dispatchers.IO) { bookstore.bookChapter.setAsRead(list) }
+		}
+		
+		viewHolder.selectionModeDownload.setOnClickListener {
+			val list = viewModel.selectedChaptersUrl.toList()
+			lifecycleScope.launch(Dispatchers.IO) {
+				list.forEach { bookstore.bookChapterBody.fetchBody(it) }
+			}
+		}
+		
+		viewHolder.selectionModeDeleteDownload.setOnClickListener {
+			val list = viewModel.selectedChaptersUrl.toList()
+			lifecycleScope.launch(Dispatchers.IO) {
+				bookstore.bookChapterBody.removeRows(list)
+			}
+		}
+		
+		viewHolder.selectionClose.setOnClickListener {
+			viewModel.selectedChaptersUrl.clear()
+			viewHolder.selectionModeBar.visibility = View.INVISIBLE
+			viewAdapter.chapters.notifyDataSetChanged()
+		}
+		
+		viewHolder.selectionModeBar.visibility = if (viewModel.selectedChaptersUrl.isNotEmpty()) View.VISIBLE else View.INVISIBLE
+		
 		supportActionBar!!.let {
 			it.title = "Chapters"
 			it.setDisplayHomeAsUpEnabled(true)
 		}
+	}
+	
+	override fun onBackPressed() = when (viewHolder.selectionModeBar.visibility)
+	{
+		View.VISIBLE ->
+		{
+			viewModel.selectedChaptersUrl.clear()
+			viewHolder.selectionModeBar.visibility = View.INVISIBLE
+			viewAdapter.chapters.notifyDataSetChanged()
+		}
+		else -> super.onBackPressed()
 	}
 	
 	override fun onCreateOptionsMenu(menu: Menu?): Boolean
@@ -87,9 +147,12 @@ class ChaptersActivity : BaseActivity()
 		setBookmarkIconActive(runBlocking { bookstore.bookLibrary.exist(viewModel.bookMetadata.url) }, itemBookmark)
 		bookstore.bookLibrary.existFlow(viewModel.bookMetadata.url).asLiveData().observe(this) { bookmarked ->
 			setBookmarkIconActive(bookmarked, itemBookmark)
+			this.bookmarked = bookmarked
 		}
 		return true
 	}
+	
+	var bookmarked: Boolean = false
 	
 	private fun setBookmarkIconActive(active: Boolean, item: MenuItem)
 	{
@@ -99,9 +162,12 @@ class ChaptersActivity : BaseActivity()
 	
 	override fun onOptionsItemSelected(item: MenuItem): Boolean = when (item.itemId)
 	{
-		R.id.action_set_all_chapters_read -> viewModel.setAsRead(viewAdapter.chapters.selectedPos).let { true }
-		R.id.action_download_all_chapters -> viewModel.downloadAllChapters().let { true }
-		R.id.action_bookmarked -> viewModel.toggleBookmark().let { true }
+		R.id.action_bookmarked ->
+		{
+			Toast.makeText(this, if (!bookmarked) "Bookmark added" else "Bookmark removed", Toast.LENGTH_SHORT).show()
+			lifecycleScope.launch(Dispatchers.IO) { bookstore.bookLibrary.toggleBookmark(viewModel.bookMetadata) }
+			true
+		}
 		android.R.id.home -> this.onBackPressed().let { true }
 		else -> super.onOptionsItemSelected(item)
 	}
@@ -123,11 +189,6 @@ class ChaptersActivity : BaseActivity()
 			list.addAll(newList)
 			if (isEmpty) notifyDataSetChanged() else it.dispatchUpdatesTo(this)
 		}
-		
-		var selectedPos = -1
-			private set
-		
-		private var selected: ChaptersModel.ChapterItem? = null
 		
 		override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewBinder =
 			ViewBinder(ActivityChaptersListItemBinding.inflate(LayoutInflater.from(parent.context), parent, false))
@@ -154,14 +215,21 @@ class ChaptersActivity : BaseActivity()
 			itemView.title.text = itemData.chapter.title
 			itemView.title.alpha = if (itemData.chapter.read) 0.5f else 1.0f
 			
-			itemView.selected.visibility = if (selectedPos != -1 && selectedPos <= position) View.VISIBLE else View.INVISIBLE
+			itemView.selected.visibility =
+				if (viewModel.selectedChaptersUrl.contains(itemData.chapter.url)) View.VISIBLE else View.INVISIBLE
 			
 			itemView.root.setOnClickListener {
 				
-				selected?.let {
-					selected = null
-					selectedPos = -1
-					this.notifyDataSetChanged()
+				if (viewModel.selectedChaptersUrl.isNotEmpty())
+				{
+					val isSelected = viewModel.selectedChaptersUrl.contains(itemData.chapter.url)
+					if (isSelected) viewModel.selectedChaptersUrl.remove(itemData.chapter.url)
+					else viewModel.selectedChaptersUrl.add(itemData.chapter.url)
+					
+					if (viewModel.selectedChaptersUrl.isEmpty())
+						viewHolder.selectionModeBar.visibility = View.INVISIBLE
+					
+					notifyDataSetChanged()
 					return@setOnClickListener
 				}
 				
@@ -172,17 +240,23 @@ class ChaptersActivity : BaseActivity()
 			}
 			
 			itemView.root.setOnLongClickListener {
-				if (selected == itemData)
+				if (viewModel.selectedChaptersUrl.isEmpty())
 				{
-					selected = null
-					selectedPos = -1
+					viewModel.selectedChaptersUrl.add(itemData.chapter.url)
+					viewHolder.selectionModeBar.visibility = View.VISIBLE
+					notifyDataSetChanged()
 				}
 				else
 				{
-					selected = itemData
-					selectedPos = position
+					val isSelected = viewModel.selectedChaptersUrl.contains(itemData.chapter.url)
+					if (isSelected) viewModel.selectedChaptersUrl.remove(itemData.chapter.url)
+					else viewModel.selectedChaptersUrl.add(itemData.chapter.url)
+					
+					if (viewModel.selectedChaptersUrl.isEmpty())
+						viewHolder.selectionModeBar.visibility = View.INVISIBLE
+					
+					notifyDataSetChanged()
 				}
-				this.notifyDataSetChanged()
 				true
 			}
 			

@@ -49,6 +49,8 @@ class ChaptersModel : ViewModel()
 	val errorMessageMaxLines = MutableLiveData<Int>(10)
 	val numberOfChapters = MutableLiveData<Int>()
 	
+	val selectedChaptersUrl = mutableSetOf<String>()
+	
 	private var loadChaptersJob: Job? = null
 	fun loadChapters(tryCache: Boolean = true)
 	{
@@ -71,24 +73,6 @@ class ChaptersModel : ViewModel()
 	
 	private var setAsReadJob: Job? = null
 	
-	/**
-	 * Set as read all the chapters bellow the checked chapter (selected chapter included).
-	 * If no chapter checked then set all as read.
-	 */
-	fun setAsRead(position: Int)
-	{
-		if (setAsReadJob?.isActive == true) return
-		setAsReadJob = GlobalScope.launch(Dispatchers.IO) {
-			val index = position.coerceAtLeast(0)
-			chapters.drop(index).map { it.chapter.url }.let {
-				bookstore.bookChapter.setAsRead(it)
-			}
-		}
-	}
-	
-	fun downloadAllChapters() = GlobalScope.launch(Dispatchers.IO) {
-		chapters.reversed().forEach { bookstore.bookChapterBody.fetchBody(it.chapter.url) }
-	}.let {}
 	
 	fun toggleBookmark() = viewModelScope.launch(Dispatchers.IO) {
 		bookstore.bookLibrary.toggleBookmark(bookMetadata)

@@ -101,6 +101,9 @@ object bookstore
 		@Query("UPDATE Chapter SET read = 1 WHERE url in (:chaptersUrl)")
 		suspend fun setAsRead(chaptersUrl: List<String>)
 		
+		@Query("UPDATE Chapter SET read = 0 WHERE url in (:chaptersUrl)")
+		suspend fun setAsUnread(chaptersUrl: List<String>)
+		
 		@Insert(onConflict = OnConflictStrategy.IGNORE)
 		suspend fun insert(chapters: List<Chapter>)
 		
@@ -137,6 +140,9 @@ object bookstore
 		
 		@Query("DELETE FROM ChapterBody WHERE ChapterBody.url NOT IN (SELECT Chapter.url FROM Chapter)")
 		suspend fun removeAllNonChapterRows(): Unit
+		
+		@Query("DELETE FROM ChapterBody WHERE ChapterBody.url IN (:chaptersUrl)")
+		suspend fun removeChapterRows(chaptersUrl: List<String>): Unit
 	}
 	
 	@Database(entities = [Book::class, Chapter::class, ChapterBody::class], version = 1, exportSchema = false)
@@ -200,6 +206,7 @@ object bookstore
 		suspend fun update(chapters: List<Chapter>) = db.chapterDao().update(chapters)
 		suspend fun get(url: String) = db.chapterDao().get(url)
 		suspend fun setAsRead(chaptersUrl: List<String>) = chaptersUrl.chunked(500).forEach { db.chapterDao().setAsRead(it) }
+		suspend fun setAsUnread(chaptersUrl: List<String>) = chaptersUrl.chunked(500).forEach { db.chapterDao().setAsUnread(it) }
 		suspend fun insert(chapters: List<Chapter>) = db.chapterDao().insert(chapters.filter(::isValid))
 		suspend fun chapters(bookUrl: String) = db.chapterDao().chapters(bookUrl)
 		fun chaptersFlow(bookUrl: String) = db.chapterDao().chaptersFlow(bookUrl)
@@ -210,6 +217,7 @@ object bookstore
 	{
 		fun existsFlow(url: String) = db.chapterBodyDao().existsFlow(url)
 		suspend fun exists(url: String) = db.chapterBodyDao().exists(url)
+		suspend fun removeRows(chaptersUrl: List<String>) = chaptersUrl.chunked(500).forEach { db.chapterBodyDao().removeChapterRows(it) }
 		suspend fun fetchBody(urlChapter: String, tryCache: Boolean = true): Response<String>
 		{
 			if (tryCache) db.chapterBodyDao().get(urlChapter)?.let {

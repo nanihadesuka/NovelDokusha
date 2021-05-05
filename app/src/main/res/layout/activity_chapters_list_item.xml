@@ -15,10 +15,10 @@
 		android:id="@+id/selected"
 		android:layout_width="0dp"
 		android:layout_height="0dp"
-		android:animateLayoutChanges="true"
 		android:clickable="false"
-		android:foreground="@color/light_blue"
+		android:foreground="?colorPrimaryDark"
 		android:visibility="invisible"
+		tools:visibility="visible"
 		app:layout_constraintBottom_toBottomOf="parent"
 		app:layout_constraintLeft_toLeftOf="parent"
 		app:layout_constraintRight_toRightOf="parent"
@@ -29,7 +29,6 @@
 		android:id="@+id/title"
 		android:layout_width="0dp"
 		android:layout_height="wrap_content"
-		android:hint="Chapter placeholder"
 		android:paddingVertical="12sp"
 		android:paddingStart="12sp"
 		android:paddingEnd="6sp"
@@ -38,6 +37,7 @@
 		app:layout_constraintHorizontal_chainStyle="spread_inside"
 		app:layout_constraintStart_toStartOf="parent"
 		app:layout_constraintTop_toTopOf="parent"
+		tools:text="Chapter 1"
 		/>
 	
 	<ImageView
@@ -53,7 +53,7 @@
 		app:layout_constraintLeft_toRightOf="@id/title"
 		app:layout_constraintRight_toLeftOf="@id/downloaded"
 		app:layout_constraintTop_toTopOf="parent"
-		app:tint="#aaaaaa"
+		app:tint="?myColorControlNormalPale"
 		tools:visibility="visible"
 		/>
 	
@@ -65,14 +65,14 @@
 		android:paddingVertical="12sp"
 		android:paddingStart="6sp"
 		android:paddingEnd="12sp"
+		android:src="@drawable/ic_outline_cloud_download_24"
 		android:visibility="invisible"
 		app:layout_constraintBottom_toBottomOf="parent"
 		app:layout_constraintEnd_toEndOf="parent"
 		app:layout_constraintHorizontal_chainStyle="spread_inside"
 		app:layout_constraintStart_toEndOf="@id/currentlyReading"
 		app:layout_constraintTop_toTopOf="parent"
-		app:srcCompat="@drawable/ic_outline_cloud_download_24"
-		app:tint="#707070"
+		app:tint="?myColorControlNormalPale"
 		tools:visibility="visible"
 		/>
 

@@ -9,6 +9,7 @@
 		<item name="colorAccent">#2A59B6</item>
 		
 		<item name="colorPrimary">#fbfbfb</item>
+		<item name="colorPrimaryDark">#e0e0e0</item>
 		<item name="colorOnPrimary">#111</item>
 		<item name="colorSecondary">?colorPrimary</item>
 		<item name="colorOnSecondary">?colorOnPrimary</item>
@@ -32,6 +33,7 @@
 		<item name="noneStateTint">#333</item>
 		<item name="positiveStateTint">#71A30E</item>
 		<item name="negativeStateTint">#C81414</item>
+		<item name="myColorControlNormalPale">#aaa</item>
 		
 		<item name="android:scrollbarThumbVertical">@drawable/scrollbar_thumb</item>
 	</style>

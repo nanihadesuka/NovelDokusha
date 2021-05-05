@@ -8,6 +8,8 @@
 	<attr name="positiveStateTint" format="color">#71A30E</attr>
 	<attr name="negativeStateTint" format="color">#C81414</attr>
 	
+	<attr name="myColorControlNormalPale" format="color|reference" />
+	
 	<style name="myTabLayout" parent="Widget.Design.TabLayout">
 		<item name="tabContentStart">20dp</item>
 		<item name="tabUnboundedRipple">true</item>
