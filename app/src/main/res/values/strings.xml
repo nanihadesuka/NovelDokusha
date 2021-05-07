@@ -10,13 +10,14 @@
 	<string name="download_all_chapters">Download all chapters</string>
 	<string name="show_book_info">Show book info</string>
 	<string name="remove_from_library">Remove from library</string>
-	<string name="description_u"><u>Description</u></string>
-	<string name="alternative_titles_u"><u>Alternative titles</u></string>
-	<string name="authors_u"><u>Authors</u></string>
-	<string name="tags_u"><u>Tags</u></string>
-	<string name="genres_u"><u>Genres</u></string>
-	<string name="type_u"><u>Type</u></string>
-	<string name="related_books_u"><u>Related books</u></string>
-	<string name="similar_recommended_u"><u>Similar recommended</u></string>
+	<string name="description">Description</string>
+	<string name="alternative_titles">Alternative titles</string>
+	<string name="authors">Authors</string>
+	<string name="tags">Tags</string>
+	<string name="genres">Genres</string>
+	<string name="type">Type</string>
+	<string name="related_books">Related books</string>
+	<string name="similar_recommended">Similar recommended</string>
 	<string name="database_size">Database size:</string>
+	<string name="none">None</string>
 </resources>

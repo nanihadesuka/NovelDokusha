@@ -33,7 +33,9 @@
 		<LinearLayout
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
+			android:baselineAligned="false"
 			android:orientation="vertical"
+			android:paddingBottom="300sp"
 			>
 			
 			<androidx.constraintlayout.widget.ConstraintLayout
@@ -46,9 +48,9 @@
 					android:layout_width="0dp"
 					android:layout_height="wrap_content"
 					android:hint="Novel title"
-					android:padding="16sp"
+					android:padding="10sp"
 					android:textIsSelectable="true"
-					android:textSize="18sp"
+					android:textSize="20sp"
 					android:textStyle="bold"
 					app:layout_constraintLeft_toLeftOf="parent"
 					app:layout_constraintRight_toLeftOf="@id/globalSourceSearch"
@@ -76,7 +78,8 @@
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
 				android:padding="10sp"
-				android:text="@string/description_u"
+				android:text="@string/description"
+				android:textSize="16sp"
 				android:textStyle="bold"
 				
 				/>
@@ -85,8 +88,9 @@
 				android:id="@+id/description"
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
-				android:justificationMode="inter_word"
-				android:padding="12sp"
+				android:paddingHorizontal="10sp"
+				android:paddingTop="0sp"
+				android:paddingBottom="10sp"
 				android:textIsSelectable="true"
 				tools:text="Novel description goes here but there is more come from where it is from"
 				/>
@@ -96,8 +100,9 @@
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
 				android:padding="10sp"
-				android:text="@string/alternative_titles_u"
+				android:text="@string/alternative_titles"
 				android:textIsSelectable="true"
+				android:textSize="16sp"
 				android:textStyle="bold"
 				/>
 			
@@ -105,7 +110,9 @@
 				android:id="@+id/alternativeTitles"
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
-				android:padding="12sp"
+				android:paddingHorizontal="10sp"
+				android:paddingTop="0sp"
+				android:paddingBottom="10sp"
 				android:textIsSelectable="true"
 				tools:text="Alternative titles"
 				/>
@@ -115,7 +122,8 @@
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
 				android:padding="10sp"
-				android:text="@string/authors_u"
+				android:text="@string/authors"
+				android:textSize="16sp"
 				android:textStyle="bold"
 				/>
 			
@@ -123,7 +131,9 @@
 				android:id="@+id/authors"
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
-				android:padding="12sp"
+				android:paddingHorizontal="10sp"
+				android:paddingTop="0sp"
+				android:paddingBottom="10sp"
 				android:textIsSelectable="true"
 				tools:text="Author(s) name(s)"
 				/>
@@ -133,7 +143,8 @@
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
 				android:padding="10sp"
-				android:text="@string/tags_u"
+				android:text="@string/tags"
+				android:textSize="16sp"
 				android:textStyle="bold"
 				/>
 			
@@ -141,7 +152,9 @@
 				android:id="@+id/tags"
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
-				android:padding="12sp"
+				android:paddingHorizontal="10sp"
+				android:paddingTop="0sp"
+				android:paddingBottom="10sp"
 				android:textIsSelectable="true"
 				tools:text="Tag1, Tag2, Tag3 ..."
 				/>
@@ -151,7 +164,8 @@
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
 				android:padding="10sp"
-				android:text="@string/genres_u"
+				android:text="@string/genres"
+				android:textSize="16sp"
 				android:textStyle="bold"
 				/>
 			
@@ -159,7 +173,9 @@
 				android:id="@+id/genres"
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
-				android:padding="12sp"
+				android:paddingHorizontal="10sp"
+				android:paddingTop="0sp"
+				android:paddingBottom="10sp"
 				android:textIsSelectable="true"
 				tools:text="Genre1, Genre2, Genre3 ..."
 				/>
@@ -169,7 +185,8 @@
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
 				android:padding="10sp"
-				android:text="@string/type_u"
+				android:text="@string/type"
+				android:textSize="16sp"
 				android:textStyle="bold"
 				/>
 			
@@ -177,7 +194,9 @@
 				android:id="@+id/bookType"
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
-				android:padding="12sp"
+				android:paddingHorizontal="10sp"
+				android:paddingTop="0sp"
+				android:paddingBottom="10sp"
 				android:textIsSelectable="true"
 				tools:text="Web Novel"
 				/>
@@ -186,17 +205,33 @@
 				android:id="@+id/header_relatedBooks"
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
-				android:padding="8sp"
-				android:text="@string/related_books_u"
+				android:padding="10sp"
+				android:text="@string/related_books"
+				android:textSize="16sp"
+				
 				android:textStyle="bold"
 				/>
 			
+			<TextView
+				android:id="@+id/relatedBooks_noEntries"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:paddingHorizontal="10sp"
+				android:paddingTop="0sp"
+				android:paddingBottom="10sp"
+				android:text="@string/none"
+				android:textIsSelectable="true"
+				android:visibility="gone"
+				tools:text="Web Novel"
+				/>
 			
 			<androidx.recyclerview.widget.RecyclerView
 				android:id="@+id/relatedBooks"
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
-				android:padding="8sp"
+				android:paddingHorizontal="6sp"
+				android:paddingTop="0sp"
+				android:paddingBottom="10sp"
 				app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
 				tools:itemCount="4"
 				tools:listitem="@layout/book_list_item"
@@ -206,17 +241,32 @@
 				android:id="@+id/header_similarRecommended"
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
-				android:padding="8sp"
-				android:text="@string/similar_recommended_u"
+				android:padding="10sp"
+				android:text="@string/similar_recommended"
+				android:textSize="16sp"
 				android:textStyle="bold"
 				/>
 			
+			<TextView
+				android:id="@+id/similarRecommended_noEntries"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:paddingHorizontal="10sp"
+				android:paddingTop="0sp"
+				android:paddingBottom="10sp"
+				android:text="@string/none"
+				android:textIsSelectable="true"
+				android:visibility="gone"
+				tools:text="Web Novel"
+				/>
 			
 			<androidx.recyclerview.widget.RecyclerView
 				android:id="@+id/similarRecommended"
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
-				android:padding="8sp"
+				android:paddingHorizontal="6sp"
+				android:paddingTop="0sp"
+				android:paddingBottom="10sp"
 				app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
 				tools:itemCount="6"
 				tools:listitem="@layout/book_list_item"

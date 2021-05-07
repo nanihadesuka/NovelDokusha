@@ -32,6 +32,14 @@ class SettingsFragment : BaseFragment()
 		viewHolder = ActivityMainFragmentSettingsBinding.inflate(inflater, container, false)
 		viewAdapter = Adapter()
 		
+		settingTheme()
+		settingDatabaseClean()
+		
+		return viewHolder.root
+	}
+	
+	fun settingTheme()
+	{
 		val currentThemeId = preferencesGetThemeId()
 		globalThemeList.forEach { (name, id) ->
 			viewHolder.settingsTheme.addView(MaterialRadioButton(requireActivity()).also {
@@ -40,14 +48,15 @@ class SettingsFragment : BaseFragment()
 				it.isChecked = currentThemeId == id
 			})
 		}
-		
+	}
+	
+	fun settingDatabaseClean()
+	{
 		viewHolder.databaseSize.text = Formatter.formatFileSize(context, bookstore.getDatabaseSizeBytes())
 		viewHolder.databaseButtonClean.setOnClickListener {
 			bookstore.settings.clearNonLibraryDataFlow().asLiveData().observe(viewLifecycleOwner) {
 				viewHolder.databaseSize.text = Formatter.formatFileSize(context, bookstore.getDatabaseSizeBytes())
 			}
 		}
-		
-		return viewHolder.root
 	}
 }

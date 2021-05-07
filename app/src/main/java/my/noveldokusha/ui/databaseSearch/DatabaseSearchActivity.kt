@@ -107,22 +107,23 @@ class DatabaseSearchActivity : BaseActivity()
 		else -> super.onOptionsItemSelected(item)
 	}
 	
-	inner class GenresAdapter(private val list: ArrayList<DatabaseSearchModel.Item>) : RecyclerView.Adapter<GenresAdapter.ViewBinder>()
+}
+
+private class GenresAdapter(private val list: ArrayList<DatabaseSearchModel.Item>) : RecyclerView.Adapter<GenresAdapter.ViewBinder>()
+{
+	override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewBinder =
+		ViewBinder(ActivityDatabaseSearchGenreItemBinding.inflate(LayoutInflater.from(parent.context), parent, false))
+	
+	override fun getItemCount() = list.size
+	
+	override fun onBindViewHolder(binder: ViewBinder, position: Int)
 	{
-		override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewBinder =
-			ViewBinder(ActivityDatabaseSearchGenreItemBinding.inflate(LayoutInflater.from(parent.context), parent, false))
-		
-		override fun getItemCount() = list.size
-		
-		override fun onBindViewHolder(binder: ViewBinder, position: Int)
-		{
-			val itemData = list[position]
-			val itemView = binder.viewHolder
-			itemView.item.text = itemData.genre
-			itemView.item.onStateChangeListener = { itemData.state = it }
-			itemView.item.state = itemData.state
-		}
-		
-		inner class ViewBinder(val viewHolder: ActivityDatabaseSearchGenreItemBinding) : RecyclerView.ViewHolder(viewHolder.root)
+		val itemData = list[position]
+		val itemView = binder.viewHolder
+		itemView.item.text = itemData.genre
+		itemView.item.onStateChangeListener = { itemData.state = it }
+		itemView.item.state = itemData.state
 	}
+	
+	class ViewBinder(val viewHolder: ActivityDatabaseSearchGenreItemBinding) : RecyclerView.ViewHolder(viewHolder.root)
 }

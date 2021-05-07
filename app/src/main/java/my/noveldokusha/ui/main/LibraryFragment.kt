@@ -45,7 +45,7 @@ class LibraryFragment : Fragment()
 	}
 }
 
-class LibraryViewPageAdapter(fragmentActivity: FragmentActivity) : FragmentStateAdapter(fragmentActivity)
+private class LibraryViewPageAdapter(fragmentActivity: FragmentActivity) : FragmentStateAdapter(fragmentActivity)
 {
 	override fun getItemCount(): Int = 2
 	

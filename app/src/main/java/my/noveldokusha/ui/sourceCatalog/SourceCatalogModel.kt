@@ -1,6 +1,7 @@
 package my.noveldokusha.ui.sourceCatalog
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import my.noveldokusha.BooksFetchIterator
 import my.noveldokusha.bookstore
@@ -17,14 +18,19 @@ class SourceCatalogModel : ViewModel()
 		startCatalogListMode()
 	}
 	
-	val list = arrayListOf<bookstore.BookMetadata>()
+	data class CatalogItem(val bookMetadata: bookstore.BookMetadata)
+	{
+		val isInLibraryLiveData = bookstore.bookLibrary.existFlow(bookMetadata.url).asLiveData()
+	}
+	
+	val list = arrayListOf<CatalogItem>()
 	lateinit var source: scrubber.source_interface.catalog
 	lateinit var booksFetchIterator: BooksFetchIterator
 	
 	fun startCatalogListMode()
 	{
 		list.clear()
-		booksFetchIterator.setFunction{ source.getCatalogList(it) }
+		booksFetchIterator.setFunction { source.getCatalogList(it) }
 		booksFetchIterator.reset()
 		booksFetchIterator.fetchNext()
 	}
@@ -32,7 +38,7 @@ class SourceCatalogModel : ViewModel()
 	fun startCatalogSearchMode(input: String)
 	{
 		list.clear()
-		booksFetchIterator.setFunction{ source.getCatalogSearch(it,input) }
+		booksFetchIterator.setFunction { source.getCatalogSearch(it, input) }
 		booksFetchIterator.reset()
 		booksFetchIterator.fetchNext()
 	}

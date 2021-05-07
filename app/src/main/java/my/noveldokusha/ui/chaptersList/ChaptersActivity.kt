@@ -52,8 +52,8 @@ class ChaptersActivity : BaseActivity()
 	private val viewHolder by lazy { ActivityChaptersBinding.inflate(layoutInflater) }
 	private val viewAdapter = object
 	{
-		val chapters by lazy { ChaptersArrayAdapter(viewModel.chapters) }
-		val header by lazy { ChaptersHeaderAdapter() }
+		val chapters by lazy { ChaptersArrayAdapter(this@ChaptersActivity, viewModel.chapters, viewModel, viewHolder.selectionModeBar) }
+		val header by lazy { ChaptersHeaderAdapter(this@ChaptersActivity, viewModel) }
 	}
 	
 	override fun onCreate(savedInstanceState: Bundle?)
@@ -143,7 +143,9 @@ class ChaptersActivity : BaseActivity()
 		val itemBookmark = menu!!.findItem(R.id.action_bookmarked)!!
 		
 		setBookmarkIconActive(runBlocking { bookstore.bookLibrary.exist(viewModel.bookMetadata.url) }, itemBookmark)
+		
 		bookstore.bookLibrary.existFlow(viewModel.bookMetadata.url).asLiveData().observe(this) { bookmarked ->
+			
 			setBookmarkIconActive(bookmarked, itemBookmark)
 			this.bookmarked = bookmarked
 		}
@@ -170,131 +172,147 @@ class ChaptersActivity : BaseActivity()
 		else -> super.onOptionsItemSelected(item)
 	}
 	
-	private inner class ChaptersArrayAdapter(private val list: ArrayList<ChaptersModel.ChapterItem>) :
-		RecyclerView.Adapter<ChaptersArrayAdapter.ViewBinder>()
+}
+
+private class ChaptersArrayAdapter(
+	private val context: BaseActivity,
+	private val list: ArrayList<ChaptersModel.ChapterItem>,
+	private val viewModel: ChaptersModel,
+	private val selectionModeBar: View
+) :
+	RecyclerView.Adapter<ChaptersArrayAdapter.ViewBinder>()
+{
+	private inner class Diff(private val new: List<ChaptersModel.ChapterItem>) : DiffUtil.Callback()
 	{
-		private inner class Diff(private val new: List<ChaptersModel.ChapterItem>) : DiffUtil.Callback()
-		{
-			override fun getOldListSize(): Int = list.size
-			override fun getNewListSize(): Int = new.size
-			override fun areItemsTheSame(oldPos: Int, newPos: Int): Boolean = list[oldPos].chapter.url == new[newPos].chapter.url
-			override fun areContentsTheSame(oldPos: Int, newPos: Int): Boolean = list[oldPos].chapter == new[newPos].chapter
-		}
-		
-		fun setList(newList: List<ChaptersModel.ChapterItem>) = DiffUtil.calculateDiff(Diff(newList)).let {
-			val isEmpty = list.isEmpty()
-			list.clear()
-			list.addAll(newList)
-			if (isEmpty) notifyDataSetChanged() else it.dispatchUpdatesTo(this)
-		}
-		
-		override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewBinder =
-			ViewBinder(ActivityChaptersListItemBinding.inflate(LayoutInflater.from(parent.context), parent, false))
-		
-		override fun getItemCount() = this@ChaptersArrayAdapter.list.size
-		
-		override fun onBindViewHolder(binder: ViewBinder, position: Int)
-		{
-			binder.lastItemData?.also {
-				it.currentlyLastReadChapterLiveData.removeObserver(binder.lastReadObserver)
-				it.downloadedLiveData.removeObserver(binder.downloadedObserver)
-			}
-			
-			val itemData = this.list[position]
-			val itemView = binder.viewHolder
-			binder.lastItemData = itemData
-			
-			itemView.currentlyReading.visibility = View.INVISIBLE
-			itemView.downloaded.visibility = View.INVISIBLE
-			
-			itemData.currentlyLastReadChapterLiveData.observe(this@ChaptersActivity, binder.lastReadObserver)
-			itemData.downloadedLiveData.observe(this@ChaptersActivity, binder.downloadedObserver)
-			
-			itemView.title.text = itemData.chapter.title
-			itemView.title.alpha = if (itemData.chapter.read) 0.5f else 1.0f
-			
-			itemView.selected.visibility =
-				if (viewModel.selectedChaptersUrl.contains(itemData.chapter.url)) View.VISIBLE else View.INVISIBLE
-			
-			itemView.root.setOnClickListener {
-				
-				if (viewModel.selectedChaptersUrl.isNotEmpty())
-				{
-					val isSelected = viewModel.selectedChaptersUrl.contains(itemData.chapter.url)
-					if (isSelected) viewModel.selectedChaptersUrl.remove(itemData.chapter.url)
-					else viewModel.selectedChaptersUrl.add(itemData.chapter.url)
-					
-					if (viewModel.selectedChaptersUrl.isEmpty())
-						viewHolder.selectionModeBar.visibility = View.INVISIBLE
-					
-					notifyDataSetChanged()
-					return@setOnClickListener
-				}
-				
-				val intent = ReaderActivity
-					.Extras(bookUrl = viewModel.bookMetadata.url, bookSelectedChapterUrl = itemData.chapter.url)
-					.intent(this@ChaptersActivity)
-				this@ChaptersActivity.startActivity(intent)
-			}
-			
-			itemView.root.setOnLongClickListener {
-				if (viewModel.selectedChaptersUrl.isEmpty())
-				{
-					viewModel.selectedChaptersUrl.add(itemData.chapter.url)
-					viewHolder.selectionModeBar.visibility = View.VISIBLE
-					notifyDataSetChanged()
-				}
-				else
-				{
-					val isSelected = viewModel.selectedChaptersUrl.contains(itemData.chapter.url)
-					if (isSelected) viewModel.selectedChaptersUrl.remove(itemData.chapter.url)
-					else viewModel.selectedChaptersUrl.add(itemData.chapter.url)
-					
-					if (viewModel.selectedChaptersUrl.isEmpty())
-						viewHolder.selectionModeBar.visibility = View.INVISIBLE
-					
-					notifyDataSetChanged()
-				}
-				true
-			}
-			
-			binder.addBottomMargin { position == list.lastIndex }
-		}
-		
-		inner class ViewBinder(val viewHolder: ActivityChaptersListItemBinding) : RecyclerView.ViewHolder(viewHolder.root)
-		{
-			var lastItemData: ChaptersModel.ChapterItem? = null
-			val lastReadObserver: Observer<Boolean> = Observer { currentlyReading ->
-				viewHolder.currentlyReading.visibility = if (currentlyReading) View.VISIBLE else View.INVISIBLE
-			}
-			val downloadedObserver: Observer<Boolean> = Observer { downloaded ->
-				viewHolder.downloaded.visibility = if (downloaded) View.VISIBLE else View.INVISIBLE
-			}
-		}
+		override fun getOldListSize(): Int = list.size
+		override fun getNewListSize(): Int = new.size
+		override fun areItemsTheSame(oldPos: Int, newPos: Int): Boolean = list[oldPos].chapter.url == new[newPos].chapter.url
+		override fun areContentsTheSame(oldPos: Int, newPos: Int): Boolean = list[oldPos].chapter == new[newPos].chapter
 	}
 	
-	inner class ChaptersHeaderAdapter : RecyclerView.Adapter<ChaptersHeaderAdapter.ViewBinder>()
+	fun setList(newList: List<ChaptersModel.ChapterItem>) = DiffUtil.calculateDiff(Diff(newList)).let {
+		val isEmpty = list.isEmpty()
+		list.clear()
+		list.addAll(newList)
+		if (isEmpty) notifyDataSetChanged() else it.dispatchUpdatesTo(this)
+	}
+	
+	override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewBinder =
+		ViewBinder(ActivityChaptersListItemBinding.inflate(LayoutInflater.from(parent.context), parent, false))
+	
+	override fun getItemCount() = this@ChaptersArrayAdapter.list.size
+	
+	override fun onBindViewHolder(binder: ViewBinder, position: Int)
 	{
-		override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewBinder
-		{
-			return ViewBinder(ActivityChaptersListHeaderBinding.inflate(LayoutInflater.from(parent.context), parent, false))
+		binder.lastItemData?.also {
+			it.currentlyLastReadChapterLiveData.removeObserver(binder.lastReadObserver)
+			it.downloadedLiveData.removeObserver(binder.downloadedObserver)
 		}
 		
-		override fun getItemCount() = 1
+		val itemData = this.list[position]
+		val itemView = binder.viewHolder
+		binder.lastItemData = itemData
 		
-		override fun onBindViewHolder(binder: ViewBinder, position: Int)
-		{
-			binder.viewHolder.bookTitle.text = viewModel.bookTitle
-			binder.viewHolder.sourceName.text = viewModel.sourceName
+		itemView.currentlyReading.visibility = View.INVISIBLE
+		itemView.downloaded.visibility = View.INVISIBLE
+		
+		itemData.currentlyLastReadChapterLiveData.observe(context, binder.lastReadObserver)
+		itemData.downloadedLiveData.observe(context, binder.downloadedObserver)
+		
+		itemView.title.text = itemData.chapter.title
+		itemView.title.alpha = if (itemData.chapter.read) 0.5f else 1.0f
+		
+		itemView.selected.visibility =
+			if (viewModel.selectedChaptersUrl.contains(itemData.chapter.url)) View.VISIBLE else View.INVISIBLE
+		
+		itemView.root.setOnClickListener {
 			
-			viewModel.numberOfChapters.observe(this@ChaptersActivity) {
-				binder.viewHolder.numberOfChapters.text = it.toString()
-				binder.viewHolder.numberOfChapters.visibility = if (it.toString().isEmpty()) View.INVISIBLE else View.VISIBLE
+			if (viewModel.selectedChaptersUrl.isNotEmpty())
+			{
+				val isSelected = viewModel.selectedChaptersUrl.contains(itemData.chapter.url)
+				if (isSelected) viewModel.selectedChaptersUrl.remove(itemData.chapter.url)
+				else viewModel.selectedChaptersUrl.add(itemData.chapter.url)
+				
+				if (viewModel.selectedChaptersUrl.isEmpty())
+					selectionModeBar.visibility = View.INVISIBLE
+				
+				notifyDataSetChanged()
+				return@setOnClickListener
 			}
-			viewModel.errorMessage.observe(this@ChaptersActivity) { binder.viewHolder.errorMessage.text = it }
-			viewModel.errorMessageVisibility.observe(this@ChaptersActivity) { binder.viewHolder.errorMessage.visibility = it }
-			viewModel.errorMessageMaxLines.observe(this@ChaptersActivity) { binder.viewHolder.errorMessage.maxLines = it }
-			binder.viewHolder.errorMessage.setOnLongClickListener(object : View.OnLongClickListener
+			
+			val intent = ReaderActivity
+				.Extras(bookUrl = viewModel.bookMetadata.url, bookSelectedChapterUrl = itemData.chapter.url)
+				.intent(context)
+			context.startActivity(intent)
+		}
+		
+		itemView.root.setOnLongClickListener {
+			if (viewModel.selectedChaptersUrl.isEmpty())
+			{
+				viewModel.selectedChaptersUrl.add(itemData.chapter.url)
+				selectionModeBar.visibility = View.VISIBLE
+				notifyDataSetChanged()
+			}
+			else
+			{
+				val isSelected = viewModel.selectedChaptersUrl.contains(itemData.chapter.url)
+				if (isSelected) viewModel.selectedChaptersUrl.remove(itemData.chapter.url)
+				else viewModel.selectedChaptersUrl.add(itemData.chapter.url)
+				
+				if (viewModel.selectedChaptersUrl.isEmpty())
+					selectionModeBar.visibility = View.INVISIBLE
+				
+				notifyDataSetChanged()
+			}
+			true
+		}
+		
+		binder.addBottomMargin { position == list.lastIndex }
+	}
+	
+	inner class ViewBinder(val viewHolder: ActivityChaptersListItemBinding) : RecyclerView.ViewHolder(viewHolder.root)
+	{
+		var lastItemData: ChaptersModel.ChapterItem? = null
+		val lastReadObserver: Observer<Boolean> = Observer { currentlyReading ->
+			viewHolder.currentlyReading.visibility = if (currentlyReading) View.VISIBLE else View.INVISIBLE
+		}
+		val downloadedObserver: Observer<Boolean> = Observer { downloaded ->
+			viewHolder.downloaded.visibility = if (downloaded) View.VISIBLE else View.INVISIBLE
+		}
+	}
+}
+
+private class ChaptersHeaderAdapter(
+	val context: BaseActivity,
+	val viewModel: ChaptersModel
+) : RecyclerView.Adapter<ChaptersHeaderAdapter.ViewBinder>()
+{
+	override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewBinder
+	{
+		return ViewBinder(ActivityChaptersListHeaderBinding.inflate(LayoutInflater.from(parent.context), parent, false))
+	}
+	
+	override fun getItemCount() = 1
+	
+	override fun onBindViewHolder(binder: ViewBinder, position: Int)
+	{
+	}
+	
+	private inner class ViewBinder(val viewHolder: ActivityChaptersListHeaderBinding) : RecyclerView.ViewHolder(viewHolder.root)
+	{
+		init
+		{
+			viewHolder.bookTitle.text = viewModel.bookTitle
+			viewHolder.sourceName.text = viewModel.sourceName
+			
+			viewModel.numberOfChapters.observe(context) {
+				viewHolder.numberOfChapters.text = it.toString()
+				viewHolder.numberOfChapters.visibility = if (it.toString().isEmpty()) View.INVISIBLE else View.VISIBLE
+			}
+			viewModel.errorMessage.observe(context) { viewHolder.errorMessage.text = it }
+			viewModel.errorMessageVisibility.observe(context) { viewHolder.errorMessage.visibility = it }
+			viewModel.errorMessageMaxLines.observe(context) { viewHolder.errorMessage.maxLines = it }
+			viewHolder.errorMessage.setOnLongClickListener(object : View.OnLongClickListener
 			{
 				private var expand: Boolean = false
 				override fun onLongClick(v: View?): Boolean
@@ -308,20 +326,18 @@ class ChaptersActivity : BaseActivity()
 					return true
 				}
 			})
-			binder.viewHolder.databaseSearchButton.setOnClickListener {
+			viewHolder.databaseSearchButton.setOnClickListener {
 				DatabaseSearchResultsActivity
 					.Extras(scrubber.database.NovelUpdates.baseUrl, DatabaseSearchResultsModel.SearchMode.Text(viewModel.bookMetadata.title))
-					.intent(this@ChaptersActivity).let(::startActivity)
+					.intent(context).let(context::startActivity)
 			}
 			
-			binder.viewHolder.webpageOpenButton.setOnClickListener {
+			viewHolder.webpageOpenButton.setOnClickListener {
 				Intent(Intent.ACTION_VIEW).also {
-					it.data = Uri.parse(this@ChaptersActivity.viewModel.bookMetadata.url)
-				}.let(::startActivity)
+					it.data = Uri.parse(viewModel.bookMetadata.url)
+				}.let(context::startActivity)
 			}
 		}
-		
-		inner class ViewBinder(val viewHolder: ActivityChaptersListHeaderBinding) : RecyclerView.ViewHolder(viewHolder.root)
 	}
 }
 

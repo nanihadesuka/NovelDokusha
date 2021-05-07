@@ -7,10 +7,8 @@ import android.view.*
 import androidx.activity.viewModels
 import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.asLiveData
+import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.liveData
 import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -24,6 +22,7 @@ import my.noveldokusha.databinding.BookListItemBinding
 import my.noveldokusha.scrubber
 import my.noveldokusha.ui.BaseActivity
 import my.noveldokusha.ui.chaptersList.ChaptersActivity
+import my.noveldokusha.ui.sourceCatalog.SourceCatalogModel.CatalogItem
 import my.noveldokusha.uiUtils.ProgressBarAdapter
 import my.noveldokusha.uiUtils.addBottomMargin
 import java.util.*
@@ -74,7 +73,7 @@ class SourceCatalogActivity : BaseActivity()
 		}
 		
 		viewModel.booksFetchIterator.onSuccess.observe(this) {
-			viewModel.list.addAll(it.data)
+			viewModel.list.addAll(it.data.map(::CatalogItem))
 			viewAdapter.recyclerView.notifyDataSetChanged()
 		}
 		viewModel.booksFetchIterator.onError.observe(this) {
@@ -131,16 +130,10 @@ class SourceCatalogActivity : BaseActivity()
 		return true
 	}
 	
-	inner class BooksItemAdapter(private val list: List<bookstore.BookMetadata>) : RecyclerView.Adapter<BooksItemAdapter.ViewBinder>()
+	inner class BooksItemAdapter(private val list: List<CatalogItem>) : RecyclerView.Adapter<BooksItemAdapter.ViewBinder>()
 	{
-		var defaultTextColor = 0
-		
-		override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewBinder
-		{
-			val binder = ViewBinder(BookListItemBinding.inflate(LayoutInflater.from(parent.context), parent, false))
-			defaultTextColor = binder.viewHolder.title.currentTextColor
-			return binder
-		}
+		override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewBinder =
+			ViewBinder(BookListItemBinding.inflate(LayoutInflater.from(parent.context), parent, false))
 		
 		override fun getItemCount() = list.size
 		
@@ -148,32 +141,40 @@ class SourceCatalogActivity : BaseActivity()
 		{
 			val itemData = this.list[position]
 			val itemView = binder.viewHolder
+			binder.setObservers(itemData)
 			
-			itemView.title.text = itemData.title
-			
-			binder.exist.removeObservers(this@SourceCatalogActivity)
-			binder.exist = bookstore.bookLibrary.existFlow(itemData.url).asLiveData()
-			binder.exist.observe(this@SourceCatalogActivity) { inLibrary ->
-				if (inLibrary)
-					itemView.title.setTextColor(ContextCompat.getColor(this@SourceCatalogActivity, R.color.dark_green))
-				else itemView.title.setTextColor(defaultTextColor)
-			}
-			
-			itemView.title.setOnClickListener() {
-				val intent = ChaptersActivity.Extras(bookUrl = itemData.url, bookTitle = itemData.title).intent(this@SourceCatalogActivity)
+			itemView.title.text = itemData.bookMetadata.title
+			itemView.title.setOnClickListener {
+				val intent = ChaptersActivity
+					.Extras(bookUrl = itemData.bookMetadata.url, bookTitle = itemData.bookMetadata.title)
+					.intent(this@SourceCatalogActivity)
 				startActivity(intent)
 			}
-			
 			itemView.title.setOnLongClickListener {
-				lifecycleScope.launch(Dispatchers.IO) { bookstore.bookLibrary.toggleBookmark(itemData) }
+				lifecycleScope.launch(Dispatchers.IO) { bookstore.bookLibrary.toggleBookmark(itemData.bookMetadata) }
 				true
 			}
-			binder.addBottomMargin { position == list.lastIndex  }
+			
+			binder.addBottomMargin { position == list.lastIndex }
 		}
 		
 		inner class ViewBinder(val viewHolder: BookListItemBinding) : RecyclerView.ViewHolder(viewHolder.root)
 		{
-			var exist: LiveData<Boolean> = liveData { }
+			private var itemDataLast: CatalogItem? = null
+			
+			private val unselectedTextColor = viewHolder.title.currentTextColor
+			private val selectedTextColor by lazy { ContextCompat.getColor(this@SourceCatalogActivity, R.color.dark_green) }
+			
+			val isInLibraryObserver = Observer<Boolean> { isInLibrary ->
+				viewHolder.title.setTextColor(if (isInLibrary) selectedTextColor else unselectedTextColor)
+			}
+			
+			fun setObservers(itemData: CatalogItem)
+			{
+				itemDataLast?.isInLibraryLiveData?.removeObserver(isInLibraryObserver)
+				itemData.isInLibraryLiveData.observe(this@SourceCatalogActivity, isInLibraryObserver)
+				itemDataLast = itemData
+			}
 		}
 	}
 }

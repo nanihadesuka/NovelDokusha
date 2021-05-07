@@ -5,6 +5,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.MenuItem
+import android.view.View
 import android.view.ViewGroup
 import androidx.activity.viewModels
 import androidx.recyclerview.widget.RecyclerView
@@ -14,7 +15,6 @@ import my.noveldokusha.databinding.BookListItemBinding
 import my.noveldokusha.scrubber
 import my.noveldokusha.ui.BaseActivity
 import my.noveldokusha.ui.globalSourceSearch.GlobalSourceSearchActivity
-import my.noveldokusha.uiUtils.addBottomMargin
 import java.util.*
 
 class DatabaseBookInfoActivity : BaseActivity()
@@ -73,6 +73,16 @@ class DatabaseBookInfoActivity : BaseActivity()
 			viewHolder.genres.text = it.genres.joinToString(" · ")
 			viewHolder.bookType.text = it.bookType
 			
+			viewModel.relatedBooks.isEmpty().let { empty ->
+				viewHolder.relatedBooks.visibility = if (empty) View.GONE else View.VISIBLE
+				viewHolder.relatedBooksNoEntries.visibility = if (empty) View.VISIBLE else View.GONE
+			}
+			
+			viewModel.similarRecommended.isEmpty().let { empty ->
+				viewHolder.similarRecommended.visibility = if (empty) View.GONE else View.VISIBLE
+				viewHolder.similarRecommendedNoEntries.visibility = if (empty) View.VISIBLE else View.GONE
+			}
+			
 			viewAdapter.relatedBooks.notifyDataSetChanged()
 			viewAdapter.similarRecommended.notifyDataSetChanged()
 		}
@@ -116,8 +126,6 @@ private class BookArrayAdapter(
 				.intent(context)
 			context.startActivity(intent)
 		}
-		
-		binder.addBottomMargin { position == list.lastIndex }
 	}
 	
 	inner class ViewBinder(val viewHolder: BookListItemBinding) : RecyclerView.ViewHolder(viewHolder.root)
