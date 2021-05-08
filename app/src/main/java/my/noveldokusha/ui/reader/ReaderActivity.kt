@@ -308,15 +308,15 @@ class ReaderActivity : BaseActivity()
 			.map { it + "\n" }.withIndex().iterator()
 		
 		return sequence {
-			while (paragraphs.hasNext())
+			for ((index, paragraph) in paragraphs)
 			{
-				val (index, paragraph) = paragraphs.next()
-				when
+				val item = when
 				{
-					index == 0 -> yield(Item.BODY_START(chapterUrl, index + 1, paragraph) as Item)
-					!paragraphs.hasNext() -> yield(Item.BODY_END(chapterUrl, index + 1, paragraph) as Item)
-					else -> yield(Item.BODY(chapterUrl, index + 1, paragraph) as Item)
+					index == 0 -> Item.BODY_START(chapterUrl, index + 1, paragraph)
+					!paragraphs.hasNext() -> Item.BODY_END(chapterUrl, index + 1, paragraph)
+					else -> Item.BODY(chapterUrl, index + 1, paragraph)
 				}
+				yield(item)
 			}
 		}.toList()
 	}

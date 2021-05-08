@@ -1,11 +1,14 @@
 package my.noveldokusha.ui.databaseBookInfo
 
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.asLiveData
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import my.noveldokusha.*
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
+import my.noveldokusha.Response
+import my.noveldokusha.bookstore
+import my.noveldokusha.fetchDoc
+import my.noveldokusha.scrubber
 
 class DatabaseBookInfoModel : ViewModel()
 {
@@ -15,7 +18,6 @@ class DatabaseBookInfoModel : ViewModel()
 		if (initialized) return else initialized = true
 		this.database = database
 		this.bookMetadata = bookMetadata
-		downloadBookData()
 	}
 	
 	val relatedBooks = ArrayList<bookstore.BookMetadata>()
@@ -23,21 +25,11 @@ class DatabaseBookInfoModel : ViewModel()
 	
 	lateinit var database: scrubber.database_interface
 	lateinit var bookMetadata: bookstore.BookMetadata
-	val bookDataLiveData = MutableLiveData<scrubber.database_interface.BookData>()
 	
-	private fun downloadBookData()
-	{
-		viewModelScope.launch(Dispatchers.IO) {
-			
-			val res: Response<scrubber.database_interface.BookData> = tryConnect {
-				Response.Success(database.getBookData(fetchDoc(bookMetadata.url)))
-			}
-			
-			if (res is Response.Success)
-			{
-				val data = res.data
-				bookDataLiveData.postValue(data)
-			}
-		}
+	val bookDataLiveData by lazy {
+		flow {
+			val doc = fetchDoc(bookMetadata.url)
+			emit(Response.Success(database.getBookData(doc)))
+		}.flowOn(Dispatchers.IO).asLiveData()
 	}
 }

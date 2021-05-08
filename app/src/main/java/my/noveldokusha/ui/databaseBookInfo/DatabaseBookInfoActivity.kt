@@ -9,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.activity.viewModels
 import androidx.recyclerview.widget.RecyclerView
+import my.noveldokusha.Response
 import my.noveldokusha.bookstore
 import my.noveldokusha.databinding.ActivityDatabaseBookInfoBinding
 import my.noveldokusha.databinding.BookListItemBinding
@@ -60,7 +61,9 @@ class DatabaseBookInfoActivity : BaseActivity()
 			startActivity(intent)
 		}
 		
-		viewModel.bookDataLiveData.observe(this) {
+		viewModel.bookDataLiveData.observe(this) { res ->
+			val it = if (res is Response.Success) res.data else return@observe
+			
 			viewModel.relatedBooks.clear()
 			viewModel.relatedBooks.addAll(it.relatedBooks)
 			viewModel.similarRecommended.clear()

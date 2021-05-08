@@ -9,13 +9,13 @@ import kotlinx.coroutines.flow.map
 
 object bookstore
 {
-	data class BookMetadata(var title: String, var url: String)
+	data class BookMetadata(val title: String, val url: String)
 	{
 		override fun equals(other: Any?): Boolean = if (other is BookMetadata) (url == other.url) else false
 		override fun hashCode(): Int = url.hashCode()
 	}
 	
-	data class ChapterMetadata(var title: String, var url: String)
+	data class ChapterMetadata(val title: String, val url: String)
 	{
 		override fun equals(other: Any?): Boolean = if (other is ChapterMetadata) (url == other.url) else false
 		override fun hashCode(): Int = url.hashCode()

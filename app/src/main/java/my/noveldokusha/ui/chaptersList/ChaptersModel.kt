@@ -1,11 +1,13 @@
 package my.noveldokusha.ui.chaptersList
 
 import android.view.View
-import androidx.lifecycle.*
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.asLiveData
+import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import my.noveldokusha.Response
@@ -20,13 +22,7 @@ class ChaptersModel : ViewModel()
 	{
 		if (initialized) return else initialized = true
 		
-		this.bookMetadata.title = bookMetadata.title
-		this.bookMetadata.url = bookMetadata.url
-		chaptersItemsLiveData = bookstore.bookChapter.chaptersFlow(bookMetadata.url).map {
-			it.map(::ChapterItem).asReversed()
-		}.asLiveData()
-		bookLastReadChapterFlow = bookstore.bookLibrary.bookLastReadChapterFlow(bookMetadata.url)
-		downloadedChaptersFlow = bookstore.bookChapterBody.getExistBodyChapterUrlsFlow(bookMetadata.url)
+		this.bookMetadata = bookMetadata
 		loadChapters()
 	}
 	
@@ -36,13 +32,18 @@ class ChaptersModel : ViewModel()
 		val downloadedLiveData by lazy { downloadedChaptersFlow.map { it.contains(chapter.url) }.asLiveData() }
 	}
 	
-	lateinit var downloadedChaptersFlow: Flow<Set<String>>
-	lateinit var chaptersItemsLiveData: LiveData<List<ChapterItem>>
-	lateinit var bookLastReadChapterFlow: Flow<String?>
+	lateinit var bookMetadata: bookstore.BookMetadata
+	val downloadedChaptersFlow by lazy {
+		bookstore.bookChapterBody.getExistBodyChapterUrlsFlow(bookMetadata.url)
+	}
+	val chaptersItemsLiveData by lazy {
+		bookstore.bookChapter.chaptersFlow(bookMetadata.url).map {
+			it.map(::ChapterItem).asReversed()
+		}.asLiveData()
+	}
+	val bookLastReadChapterFlow by lazy { bookstore.bookLibrary.bookLastReadChapterFlow(bookMetadata.url) }
 	val chapters = ArrayList<ChapterItem>()
 	val refresh = MutableLiveData<Boolean>()
-	val bookMetadata = bookstore.BookMetadata("", "")
-	val bookTitle by lazy { this.bookMetadata.title }
 	val sourceName by lazy { scrubber.getCompatibleSource(this.bookMetadata.url)?.name ?: "" }
 	val errorMessage = MutableLiveData<String>()
 	val errorMessageVisibility = MutableLiveData<Int>()
@@ -72,7 +73,6 @@ class ChaptersModel : ViewModel()
 	}
 	
 	private var setAsReadJob: Job? = null
-	
 	
 	fun toggleBookmark() = viewModelScope.launch(Dispatchers.IO) {
 		bookstore.bookLibrary.toggleBookmark(bookMetadata)

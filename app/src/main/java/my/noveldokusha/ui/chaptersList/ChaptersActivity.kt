@@ -74,6 +74,18 @@ class ChaptersActivity : BaseActivity()
 			viewModel.numberOfChapters.value = it.size
 		}
 		
+		setupSelectionModeBar()
+		
+		supportActionBar!!.let {
+			it.title = "Chapters"
+			it.setDisplayHomeAsUpEnabled(true)
+		}
+	}
+	
+	fun setupSelectionModeBar()
+	{
+		viewHolder.selectionModeBar.visibility = if (viewModel.selectedChaptersUrl.isNotEmpty()) View.VISIBLE else View.INVISIBLE
+		
 		viewHolder.selectionSelectAll.setOnClickListener {
 			viewModel.selectedChaptersUrl.addAll(viewModel.chapters.map { it.chapter.url })
 			viewAdapter.chapters.notifyDataSetChanged()
@@ -115,13 +127,6 @@ class ChaptersActivity : BaseActivity()
 			viewModel.selectedChaptersUrl.clear()
 			viewHolder.selectionModeBar.visibility = View.INVISIBLE
 			viewAdapter.chapters.notifyDataSetChanged()
-		}
-		
-		viewHolder.selectionModeBar.visibility = if (viewModel.selectedChaptersUrl.isNotEmpty()) View.VISIBLE else View.INVISIBLE
-		
-		supportActionBar!!.let {
-			it.title = "Chapters"
-			it.setDisplayHomeAsUpEnabled(true)
 		}
 	}
 	
@@ -171,7 +176,6 @@ class ChaptersActivity : BaseActivity()
 		android.R.id.home -> this.onBackPressed().let { true }
 		else -> super.onOptionsItemSelected(item)
 	}
-	
 }
 
 private class ChaptersArrayAdapter(
@@ -204,20 +208,9 @@ private class ChaptersArrayAdapter(
 	
 	override fun onBindViewHolder(binder: ViewBinder, position: Int)
 	{
-		binder.lastItemData?.also {
-			it.currentlyLastReadChapterLiveData.removeObserver(binder.lastReadObserver)
-			it.downloadedLiveData.removeObserver(binder.downloadedObserver)
-		}
-		
 		val itemData = this.list[position]
 		val itemView = binder.viewHolder
-		binder.lastItemData = itemData
-		
-		itemView.currentlyReading.visibility = View.INVISIBLE
-		itemView.downloaded.visibility = View.INVISIBLE
-		
-		itemData.currentlyLastReadChapterLiveData.observe(context, binder.lastReadObserver)
-		itemData.downloadedLiveData.observe(context, binder.downloadedObserver)
+		binder.setObservers(itemData)
 		
 		itemView.title.text = itemData.chapter.title
 		itemView.title.alpha = if (itemData.chapter.read) 0.5f else 1.0f
@@ -228,40 +221,23 @@ private class ChaptersArrayAdapter(
 		itemView.root.setOnClickListener {
 			
 			if (viewModel.selectedChaptersUrl.isNotEmpty())
+				toggleItemSelection(itemData)
+			else
 			{
-				val isSelected = viewModel.selectedChaptersUrl.contains(itemData.chapter.url)
-				if (isSelected) viewModel.selectedChaptersUrl.remove(itemData.chapter.url)
-				else viewModel.selectedChaptersUrl.add(itemData.chapter.url)
-				
-				if (viewModel.selectedChaptersUrl.isEmpty())
-					selectionModeBar.visibility = View.INVISIBLE
-				
-				notifyDataSetChanged()
-				return@setOnClickListener
+				val intent = ReaderActivity
+					.Extras(bookUrl = viewModel.bookMetadata.url, bookSelectedChapterUrl = itemData.chapter.url)
+					.intent(context)
+				context.startActivity(intent)
 			}
-			
-			val intent = ReaderActivity
-				.Extras(bookUrl = viewModel.bookMetadata.url, bookSelectedChapterUrl = itemData.chapter.url)
-				.intent(context)
-			context.startActivity(intent)
 		}
 		
 		itemView.root.setOnLongClickListener {
-			if (viewModel.selectedChaptersUrl.isEmpty())
+			if (viewModel.selectedChaptersUrl.isNotEmpty())
+				toggleItemSelection(itemData)
+			else
 			{
 				viewModel.selectedChaptersUrl.add(itemData.chapter.url)
 				selectionModeBar.visibility = View.VISIBLE
-				notifyDataSetChanged()
-			}
-			else
-			{
-				val isSelected = viewModel.selectedChaptersUrl.contains(itemData.chapter.url)
-				if (isSelected) viewModel.selectedChaptersUrl.remove(itemData.chapter.url)
-				else viewModel.selectedChaptersUrl.add(itemData.chapter.url)
-				
-				if (viewModel.selectedChaptersUrl.isEmpty())
-					selectionModeBar.visibility = View.INVISIBLE
-				
 				notifyDataSetChanged()
 			}
 			true
@@ -270,14 +246,39 @@ private class ChaptersArrayAdapter(
 		binder.addBottomMargin { position == list.lastIndex }
 	}
 	
+	fun toggleItemSelection(itemData: ChaptersModel.ChapterItem)
+	{
+		val isSelected = viewModel.selectedChaptersUrl.contains(itemData.chapter.url)
+		if (isSelected) viewModel.selectedChaptersUrl.remove(itemData.chapter.url)
+		else viewModel.selectedChaptersUrl.add(itemData.chapter.url)
+		
+		if (viewModel.selectedChaptersUrl.isEmpty())
+			selectionModeBar.visibility = View.INVISIBLE
+		
+		notifyDataSetChanged()
+	}
+	
 	inner class ViewBinder(val viewHolder: ActivityChaptersListItemBinding) : RecyclerView.ViewHolder(viewHolder.root)
 	{
-		var lastItemData: ChaptersModel.ChapterItem? = null
-		val lastReadObserver: Observer<Boolean> = Observer { currentlyReading ->
+		private var lastItemData: ChaptersModel.ChapterItem? = null
+		private val lastReadObserver: Observer<Boolean> = Observer { currentlyReading ->
 			viewHolder.currentlyReading.visibility = if (currentlyReading) View.VISIBLE else View.INVISIBLE
 		}
-		val downloadedObserver: Observer<Boolean> = Observer { downloaded ->
+		private val downloadedObserver: Observer<Boolean> = Observer { downloaded ->
 			viewHolder.downloaded.visibility = if (downloaded) View.VISIBLE else View.INVISIBLE
+		}
+		
+		fun setObservers(itemData: ChaptersModel.ChapterItem)
+		{
+			lastItemData?.also {
+				it.currentlyLastReadChapterLiveData.removeObserver(lastReadObserver)
+				it.downloadedLiveData.removeObserver(downloadedObserver)
+			}
+			
+			itemData.currentlyLastReadChapterLiveData.observe(context, lastReadObserver)
+			itemData.downloadedLiveData.observe(context, downloadedObserver)
+			
+			lastItemData = itemData
 		}
 	}
 }
@@ -302,7 +303,7 @@ private class ChaptersHeaderAdapter(
 	{
 		init
 		{
-			viewHolder.bookTitle.text = viewModel.bookTitle
+			viewHolder.bookTitle.text = viewModel.bookMetadata.title
 			viewHolder.sourceName.text = viewModel.sourceName
 			
 			viewModel.numberOfChapters.observe(context) {
