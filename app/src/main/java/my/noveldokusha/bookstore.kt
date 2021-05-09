@@ -1,11 +1,13 @@
 package my.noveldokusha
 
+import android.content.Context
 import androidx.room.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
+import java.io.InputStream
 
 object bookstore
 {
@@ -22,8 +24,6 @@ object bookstore
 	}
 	
 	data class LastReadChapter(var url: String, var position: Int, var offset: Int)
-	
-	private val db_context by lazy { App.instance }
 	
 	@Entity
 	data class Book(
@@ -50,6 +50,9 @@ object bookstore
 	interface LibraryDao
 	{
 		@Query("SELECT * FROM Book")
+		suspend fun getAll(): List<Book>
+		
+		@Query("SELECT * FROM Book")
 		fun booksFlow(): Flow<List<Book>>
 		
 		@Query("SELECT lastReadChapter FROM Book WHERE url == :bookUrl")
@@ -63,6 +66,9 @@ object bookstore
 		
 		@Insert(onConflict = OnConflictStrategy.IGNORE)
 		suspend fun insert(book: Book)
+		
+		@Insert(onConflict = OnConflictStrategy.IGNORE)
+		suspend fun insert(book: List<Book>)
 		
 		@Delete
 		suspend fun remove(book: Book)
@@ -83,6 +89,9 @@ object bookstore
 	@Dao
 	interface ChapterDao
 	{
+		@Query("SELECT * FROM Chapter")
+		suspend fun getAll(): List<Chapter>
+		
 		@Query("SELECT * FROM Chapter WHERE bookUrl = :bookUrl")
 		fun chaptersFlow(bookUrl: String): Flow<List<Chapter>>
 		
@@ -117,17 +126,23 @@ object bookstore
 		fun lastReadPositionChapterFlow(bookUrl: String, chapterUrl: String): Flow<Int>
 		
 		@Query("DELETE FROM Chapter WHERE Chapter.bookUrl NOT IN (SELECT Book.url FROM Book)")
-		suspend fun removeAllNonLibraryRows(): Unit
+		suspend fun removeAllNonLibraryRows()
 	}
 	
 	@Dao
 	interface ChapterBodyDao
 	{
+		@Query("SELECT * FROM ChapterBody")
+		suspend fun getAll(): List<ChapterBody>
+		
 		@Query("SELECT EXISTS(SELECT * FROM ChapterBody WHERE url == :url)")
 		suspend fun exists(url: String): Boolean
 		
 		@Insert(onConflict = OnConflictStrategy.REPLACE)
 		suspend fun insert(chapterBody: ChapterBody)
+		
+		@Insert(onConflict = OnConflictStrategy.REPLACE)
+		suspend fun insert(chapterBody: List<ChapterBody>)
 		
 		@Query("SELECT EXISTS(SELECT * FROM ChapterBody WHERE url == :url)")
 		fun existsFlow(url: String): Flow<Boolean>
@@ -139,10 +154,10 @@ object bookstore
 		fun getExistBodyChapterUrlsFlow(bookUrl: String): Flow<List<String>>
 		
 		@Query("DELETE FROM ChapterBody WHERE ChapterBody.url NOT IN (SELECT Chapter.url FROM Chapter)")
-		suspend fun removeAllNonChapterRows(): Unit
+		suspend fun removeAllNonChapterRows()
 		
 		@Query("DELETE FROM ChapterBody WHERE ChapterBody.url IN (:chaptersUrl)")
-		suspend fun removeChapterRows(chaptersUrl: List<String>): Unit
+		suspend fun removeChapterRows(chaptersUrl: List<String>)
 	}
 	
 	@Database(entities = [Book::class, Chapter::class, ChapterBody::class], version = 1, exportSchema = false)
@@ -153,85 +168,119 @@ object bookstore
 		abstract fun chapterBodyDao(): ChapterBodyDao
 	}
 	
-	private const val db_name = "bookEntry"
+	val db_context: Context by lazy { App.instance.applicationContext }
+	val appDB by lazy { DBase(db_context, "bookEntry") }
 	
-	private val db by lazy {
-		Room.databaseBuilder(
-			db_context.applicationContext,
-			LibraryDatabase::class.java,
-			db_name
-		).build()
-	}
+	val settings by lazy { appDB.settings }
+	val bookLibrary by lazy { appDB.bookLibrary }
+	val bookChapter by lazy { appDB.bookChapter }
+	val bookChapterBody by lazy { appDB.bookChapterBody }
 	
-	fun getDatabaseSizeBytes() = db_context.getDatabasePath(db_name).length()
-	
-	object settings
+	class DBase
 	{
-		suspend fun clearNonLibraryData()
+		private val db: LibraryDatabase
+		val context: Context
+		val name: String
+		
+		constructor(context: Context, name: String)
 		{
-			db.chapterDao().removeAllNonLibraryRows()
-			db.chapterBodyDao().removeAllNonChapterRows()
+			this.context = context
+			this.name = name
+			db = Room.databaseBuilder(context, LibraryDatabase::class.java, name).build()
 		}
 		
-		fun clearNonLibraryDataFlow() = flow {
-			db.chapterDao().removeAllNonLibraryRows()
-			db.chapterBodyDao().removeAllNonChapterRows()
-			emit(Unit)
-		}.flowOn(Dispatchers.IO)
-	}
-	
-	object bookLibrary
-	{
-		val booksFlow by lazy { db.libraryDao().booksFlow() }
-		val booksReadingFlow by lazy { db.libraryDao().booksReadingFlow() }
-		val booksCompletedFlow by lazy { db.libraryDao().booksCompletedFlow() }
-		fun bookLastReadChapterFlow(bookUrl: String) = db.libraryDao().bookLastReadChapterFlow(bookUrl)
-		fun existFlow(url: String) = db.libraryDao().existFlow(url)
-		suspend fun insert(book: Book) = if (isValid(book)) db.libraryDao().insert(book) else Unit
-		suspend fun remove(book: Book) = db.libraryDao().remove(book)
-		suspend fun update(book: Book) = db.libraryDao().update(book)
-		suspend fun get(url: String) = db.libraryDao().get(url)
-		suspend fun exist(url: String) = db.libraryDao().exist(url)
-		suspend fun toggleBookmark(bookMetadata: BookMetadata)
+		// External database, used for backup restore
+		constructor(context: Context, name: String, inputStream: InputStream)
 		{
-			val book = Book(title = bookMetadata.title, url = bookMetadata.url)
-			if (exist(book.url)) remove(book) else insert(book)
+			this.context = context
+			this.name = name
+			db = Room.databaseBuilder(context, LibraryDatabase::class.java, name).createFromInputStream { inputStream }.build()
 		}
-	}
-	
-	object bookChapter
-	{
-		fun numberOfUnreadChaptersFlow(bookUrl: String) = db.chapterDao().numberOfUnreadChaptersFlow(bookUrl)
-		suspend fun update(chapter: Chapter) = db.chapterDao().update(chapter)
-		suspend fun update(chapters: List<Chapter>) = db.chapterDao().update(chapters)
-		suspend fun get(url: String) = db.chapterDao().get(url)
-		suspend fun setAsRead(chaptersUrl: List<String>) = chaptersUrl.chunked(500).forEach { db.chapterDao().setAsRead(it) }
-		suspend fun setAsUnread(chaptersUrl: List<String>) = chaptersUrl.chunked(500).forEach { db.chapterDao().setAsUnread(it) }
-		suspend fun insert(chapters: List<Chapter>) = db.chapterDao().insert(chapters.filter(::isValid))
-		suspend fun chapters(bookUrl: String) = db.chapterDao().chapters(bookUrl)
-		fun chaptersFlow(bookUrl: String) = db.chapterDao().chaptersFlow(bookUrl)
-		suspend fun existBookChapters(bookUrl: String) = db.chapterDao().existBookChapters(bookUrl)
-	}
-	
-	object bookChapterBody
-	{
-		fun existsFlow(url: String) = db.chapterBodyDao().existsFlow(url)
-		suspend fun exists(url: String) = db.chapterBodyDao().exists(url)
-		suspend fun removeRows(chaptersUrl: List<String>) = chaptersUrl.chunked(500).forEach { db.chapterBodyDao().removeChapterRows(it) }
-		suspend fun fetchBody(urlChapter: String, tryCache: Boolean = true): Response<String>
+		
+		val settings = Settings()
+		val bookLibrary = BookLibrary()
+		val bookChapter = BookChapter()
+		val bookChapterBody = BookChapterBody()
+		
+		fun getDatabaseSizeBytes() = context.getDatabasePath(name).length()
+		fun close() = db.close()
+		fun clearAllTables() = db.clearAllTables()
+		
+		inner class Settings
 		{
-			if (tryCache) db.chapterBodyDao().get(urlChapter)?.let {
-				return@fetchBody Response.Success(it.body)
+			suspend fun clearNonLibraryData()
+			{
+				db.chapterDao().removeAllNonLibraryRows()
+				db.chapterBodyDao().removeAllNonChapterRows()
 			}
 			
-			val res = downloadChapter(urlChapter)
-			if (res is Response.Success)
-				db.chapterBodyDao().insert(ChapterBody(url = urlChapter, body = res.data))
-			return res
+			fun clearNonLibraryDataFlow() = flow {
+				db.chapterDao().removeAllNonLibraryRows()
+				db.chapterBodyDao().removeAllNonChapterRows()
+				emit(Unit)
+			}.flowOn(Dispatchers.IO)
 		}
 		
-		fun getExistBodyChapterUrlsFlow(bookUrl: String): Flow<Set<String>> =
-			db.chapterBodyDao().getExistBodyChapterUrlsFlow(bookUrl).map { it.toSet() }
+		inner class BookLibrary
+		{
+			val booksFlow by lazy { db.libraryDao().booksFlow() }
+			val booksReadingFlow by lazy { db.libraryDao().booksReadingFlow() }
+			val booksCompletedFlow by lazy { db.libraryDao().booksCompletedFlow() }
+			fun bookLastReadChapterFlow(bookUrl: String) = db.libraryDao().bookLastReadChapterFlow(bookUrl)
+			fun existFlow(url: String) = db.libraryDao().existFlow(url)
+			suspend fun insert(book: Book) = if (isValid(book)) db.libraryDao().insert(book) else Unit
+			suspend fun insert(books: List<Book>) = db.libraryDao().insert(books.filter(::isValid))
+			suspend fun remove(book: Book) = db.libraryDao().remove(book)
+			suspend fun update(book: Book) = db.libraryDao().update(book)
+			suspend fun get(url: String) = db.libraryDao().get(url)
+			suspend fun getAll() = db.libraryDao().getAll()
+			suspend fun exist(url: String) = db.libraryDao().exist(url)
+			suspend fun toggleBookmark(bookMetadata: BookMetadata)
+			{
+				val book = Book(title = bookMetadata.title, url = bookMetadata.url)
+				if (exist(book.url)) remove(book) else insert(book)
+			}
+		}
+		
+		inner class BookChapter
+		{
+			fun numberOfUnreadChaptersFlow(bookUrl: String) = db.chapterDao().numberOfUnreadChaptersFlow(bookUrl)
+			suspend fun update(chapter: Chapter) = db.chapterDao().update(chapter)
+			suspend fun update(chapters: List<Chapter>) = db.chapterDao().update(chapters)
+			suspend fun get(url: String) = db.chapterDao().get(url)
+			suspend fun getAll() = db.chapterDao().getAll()
+			suspend fun setAsRead(chaptersUrl: List<String>) = chaptersUrl.chunked(500).forEach { db.chapterDao().setAsRead(it) }
+			suspend fun setAsUnread(chaptersUrl: List<String>) = chaptersUrl.chunked(500).forEach { db.chapterDao().setAsUnread(it) }
+			suspend fun insert(chapters: List<Chapter>) = db.chapterDao().insert(chapters.filter(::isValid))
+			suspend fun chapters(bookUrl: String) = db.chapterDao().chapters(bookUrl)
+			fun chaptersFlow(bookUrl: String) = db.chapterDao().chaptersFlow(bookUrl)
+			suspend fun existBookChapters(bookUrl: String) = db.chapterDao().existBookChapters(bookUrl)
+		}
+		
+		inner class BookChapterBody
+		{
+			fun existsFlow(url: String) = db.chapterBodyDao().existsFlow(url)
+			suspend fun getAll() = db.chapterBodyDao().getAll()
+			suspend fun insert(chapterBodies: List<ChapterBody>) = db.chapterBodyDao().insert(chapterBodies)
+			suspend fun exists(url: String) = db.chapterBodyDao().exists(url)
+			suspend fun removeRows(chaptersUrl: List<String>) =
+				chaptersUrl.chunked(500).forEach { db.chapterBodyDao().removeChapterRows(it) }
+			
+			suspend fun fetchBody(urlChapter: String, tryCache: Boolean = true): Response<String>
+			{
+				if (tryCache) db.chapterBodyDao().get(urlChapter)?.let {
+					return@fetchBody Response.Success(it.body)
+				}
+				
+				val res = downloadChapter(urlChapter)
+				if (res is Response.Success)
+					db.chapterBodyDao().insert(ChapterBody(url = urlChapter, body = res.data))
+				return res
+			}
+			
+			fun getExistBodyChapterUrlsFlow(bookUrl: String): Flow<Set<String>> =
+				db.chapterBodyDao().getExistBodyChapterUrlsFlow(bookUrl).map { it.toSet() }
+		}
 	}
 	
 	fun isValid(book: Book): Boolean = book.url.matches("""^https?://.*""".toRegex())

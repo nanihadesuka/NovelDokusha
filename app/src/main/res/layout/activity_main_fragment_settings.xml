@@ -18,7 +18,7 @@
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
 			android:padding="12sp"
-			android:text="Theme"
+			android:text="@string/theme"
 			android:textStyle="bold"
 			/>
 		
@@ -40,7 +40,7 @@
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
 			android:padding="12sp"
-			android:text="Data"
+			android:text="@string/data"
 			android:textStyle="bold"
 			/>
 		
@@ -57,7 +57,7 @@
 			<TextView
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
-				android:text="Clean database"
+				android:text="@string/clean_database"
 				android:textSize="16sp"
 				/>
 			
@@ -65,7 +65,7 @@
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
 				android:alpha="0.7"
-				android:text="Preserve only library books data"
+				android:text="@string/preserve_only_library_books_data"
 				/>
 			
 			<LinearLayout
@@ -90,6 +90,71 @@
 					tools:text="10 MB"
 					/>
 			</LinearLayout>
+		</LinearLayout>
+	</LinearLayout>
+	
+	<LinearLayout
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:orientation="vertical"
+		>
+		
+		<TextView
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:padding="12sp"
+			android:text="@string/backup"
+			android:textStyle="bold"
+			/>
+		
+		<LinearLayout
+			android:id="@+id/backup_database_button"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:background="?android:attr/selectableItemBackground"
+			android:clickable="true"
+			android:orientation="vertical"
+			android:padding="12sp"
+			>
+			
+			<TextView
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:text="@string/backup_database"
+				android:textSize="16sp"
+				/>
+			
+			<TextView
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:alpha="0.7"
+				android:text="@string/opens_the_file_explorer_to_select_the_backup_saving_location"
+				/>
+		</LinearLayout>
+		
+		<LinearLayout
+			android:id="@+id/restore_database_button"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:background="?android:attr/selectableItemBackground"
+			android:clickable="true"
+			android:orientation="vertical"
+			android:padding="12sp"
+			>
+			
+			<TextView
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:text="@string/restore_database"
+				android:textSize="16sp"
+				/>
+			
+			<TextView
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:alpha="0.7"
+				android:text="@string/opens_the_file_explorer_to_select_the_backup_file"
+				/>
 		</LinearLayout>
 	</LinearLayout>
 </LinearLayout>

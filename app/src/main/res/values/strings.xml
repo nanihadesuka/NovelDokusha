@@ -20,4 +20,13 @@
 	<string name="similar_recommended">Similar recommended</string>
 	<string name="database_size">Database size:</string>
 	<string name="none">None</string>
+	<string name="backup">Backup</string>
+	<string name="theme">Theme</string>
+	<string name="data">Data</string>
+	<string name="clean_database">Clean database</string>
+	<string name="preserve_only_library_books_data">Preserve only library books data</string>
+	<string name="backup_database">Backup database</string>
+	<string name="opens_the_file_explorer_to_select_the_backup_saving_location">Opens the file explorer to select the backup saving location</string>
+	<string name="restore_database">Restore database</string>
+	<string name="opens_the_file_explorer_to_select_the_backup_file">Opens the file explorer to select the backup file</string>
 </resources>

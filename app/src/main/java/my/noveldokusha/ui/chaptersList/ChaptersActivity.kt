@@ -6,7 +6,6 @@ import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
 import android.view.*
-import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
@@ -28,6 +27,7 @@ import my.noveldokusha.ui.databaseSearchResults.DatabaseSearchResultsActivity
 import my.noveldokusha.ui.databaseSearchResults.DatabaseSearchResultsModel
 import my.noveldokusha.ui.reader.ReaderActivity
 import my.noveldokusha.uiUtils.addBottomMargin
+import my.noveldokusha.uiUtils.toast
 import java.util.*
 
 class ChaptersActivity : BaseActivity()
@@ -169,7 +169,7 @@ class ChaptersActivity : BaseActivity()
 	{
 		R.id.action_bookmarked ->
 		{
-			Toast.makeText(this, if (!bookmarked) "Bookmark added" else "Bookmark removed", Toast.LENGTH_SHORT).show()
+			toast(if (!bookmarked) "Bookmark added" else "Bookmark removed")
 			lifecycleScope.launch(Dispatchers.IO) { bookstore.bookLibrary.toggleBookmark(viewModel.bookMetadata) }
 			true
 		}
