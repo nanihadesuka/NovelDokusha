@@ -1,25 +1,17 @@
 package my.noveldokusha.ui
 
-import android.content.Context.MODE_PRIVATE
 import android.content.Intent
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import my.noveldokusha.R
+import my.noveldokusha.appSharedPreferences
 import my.noveldokusha.uiUtils.toast
 
 open class BaseFragment : Fragment()
 {
-	companion object
-	{
-		val globalThemeList = BaseActivity.globalThemeList
-	}
-	
-	fun preferencesGetTheme(): SharedPreferences = requireActivity().getSharedPreferences("GLOBAL_THEME", MODE_PRIVATE)
-	fun preferencesGetThemeId() = preferencesGetTheme().getInt("id", R.style.AppTheme_Light)
-	fun preferencesSetThemeId(id: Int) = preferencesGetTheme().edit().putInt("id", id).apply()
+	val sharedPreferences: SharedPreferences get() = requireContext().appSharedPreferences()
 	
 	fun permissionsCondition(vararg permissions: String): Boolean
 	{

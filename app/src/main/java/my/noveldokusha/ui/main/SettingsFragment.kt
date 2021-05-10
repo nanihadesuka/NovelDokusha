@@ -4,14 +4,12 @@ import android.Manifest
 import android.app.Activity.RESULT_OK
 import android.content.Context
 import android.content.Intent
-import android.content.SharedPreferences
 import android.os.Bundle
 import android.text.format.Formatter
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.asLiveData
 import com.google.android.material.radiobutton.MaterialRadioButton
@@ -21,6 +19,9 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import my.noveldokusha.bookstore
 import my.noveldokusha.databinding.ActivityMainFragmentSettingsBinding
+import my.noveldokusha.getAppThemeId
+import my.noveldokusha.globalThemeList
+import my.noveldokusha.setAppThemeId
 import my.noveldokusha.ui.BaseFragment
 import my.noveldokusha.uiUtils.toast
 import java.io.PrintWriter
@@ -41,8 +42,6 @@ class SettingsFragment : BaseFragment()
 	
 	private inner class Adapter
 	
-	val preferences: SharedPreferences get() = requireActivity().getSharedPreferences("SETTINGS", AppCompatActivity.MODE_PRIVATE)
-	
 	override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View
 	{
 		viewHolder = ActivityMainFragmentSettingsBinding.inflate(inflater, container, false)
@@ -58,11 +57,11 @@ class SettingsFragment : BaseFragment()
 	
 	fun settingTheme()
 	{
-		val currentThemeId = preferencesGetThemeId()
+		val currentThemeId = sharedPreferences.getAppThemeId()
 		globalThemeList.forEach { (name, id) ->
 			viewHolder.settingsTheme.addView(MaterialRadioButton(requireActivity()).also {
 				it.text = name
-				it.setOnCheckedChangeListener { _, _ -> preferencesSetThemeId(id) }
+				it.setOnCheckedChangeListener { _, _ -> sharedPreferences.edit().setAppThemeId(id).apply() }
 				it.isChecked = currentThemeId == id
 			})
 		}

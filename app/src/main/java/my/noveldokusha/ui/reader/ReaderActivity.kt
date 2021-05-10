@@ -46,35 +46,33 @@ class ReaderActivity : BaseActivity()
 	private val preferences by lazy {
 		object
 		{
-			val preferences = getSharedPreferences("READER", MODE_PRIVATE)
-			
-			var textSize: Float = preferences.getFloat(::textSize.name, 14f)
+			var textSize: Float = sharedPreferences.getReaderFontSize()
 				set(value)
 				{
-					preferences.edit().putFloat(::textSize.name, value).apply()
+					sharedPreferences.edit().setReaderFontSize(value).apply()
 					field = value
 				}
-				get() = preferences.getFloat(::textSize.name, 14f)
+				get() = sharedPreferences.getReaderFontSize()
 			
-			var textFontFamily: String = preferences.getString(::textFontFamily.name, null) ?: "sans-serif"
+			var textFontFamily: String = sharedPreferences.getReaderFontFamily()
 				set(value)
 				{
-					preferences.edit().putString(::textFontFamily.name, value).apply()
+					sharedPreferences.edit().setReaderFontFamily(value).apply()
 					field = value
 				}
-				get() = preferences.getString(::textFontFamily.name, null) ?: "sans-serif"
+				get() = sharedPreferences.getReaderFontFamily()
 			
 			val listener = SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
 				when (key)
 				{
-					::textSize.name -> viewAdapter.listView.notifyDataSetChanged()
-					::textFontFamily.name -> viewAdapter.listView.notifyDataSetChanged()
+					AppPreferences.READER_FONT_SIZE.name -> viewAdapter.listView.notifyDataSetChanged()
+					AppPreferences.READER_FONT_FAMILY.name -> viewAdapter.listView.notifyDataSetChanged()
 				}
 			}
 			
 			init
 			{
-				preferences.registerOnSharedPreferenceChangeListener(listener)
+				sharedPreferences.registerOnSharedPreferenceChangeListener(listener)
 			}
 		}
 	}
