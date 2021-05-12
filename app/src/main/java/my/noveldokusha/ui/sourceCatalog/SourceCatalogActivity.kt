@@ -146,9 +146,10 @@ class SourceCatalogActivity : BaseActivity()
 			
 			itemView.title.text = itemData.bookMetadata.title
 			itemView.title.setOnClickListener {
-				ChaptersActivity
-					.IntentData(this@SourceCatalogActivity, bookMetadata = itemData.bookMetadata)
-					.let(this@SourceCatalogActivity::startActivity)
+				ChaptersActivity.IntentData(
+					this@SourceCatalogActivity,
+					bookMetadata = itemData.bookMetadata
+				).let(this@SourceCatalogActivity::startActivity)
 			}
 			itemView.title.setOnLongClickListener {
 				lifecycleScope.launch(Dispatchers.IO) { bookstore.bookLibrary.toggleBookmark(itemData.bookMetadata) }

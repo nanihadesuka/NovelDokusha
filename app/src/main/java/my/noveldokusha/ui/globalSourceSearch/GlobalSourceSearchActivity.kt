@@ -179,9 +179,10 @@ private class LocalArrayAdapter(
 		val viewHolder = binder.viewHolder
 		viewHolder.name.text = viewModel.title
 		viewHolder.name.setOnClickListener {
-			ChaptersActivity
-				.IntentData(context, bookMetadata = BookMetadata(title = viewModel.title, url = viewModel.url))
-				.let(context::startActivity)
+			ChaptersActivity.IntentData(
+				context,
+				bookMetadata = BookMetadata(title = viewModel.title, url = viewModel.url)
+			).let(context::startActivity)
 		}
 		
 		binder.addRightMargin { position == list.lastIndex }

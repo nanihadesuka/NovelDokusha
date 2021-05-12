@@ -130,9 +130,10 @@ private class NovelItemAdapter(
 		viewHolder.title.text = viewModel.data.title
 		viewHolder.unreadChaptersCounter.visibility = View.INVISIBLE
 		viewHolder.book.setOnClickListener {
-			ChaptersActivity
-				.IntentData(context.requireActivity(), bookMetadata = BookMetadata(url = viewModel.data.url, title = viewModel.data.title))
-				.let(context.requireActivity()::startActivity)
+			ChaptersActivity.IntentData(
+				context.requireContext(),
+				bookMetadata = BookMetadata(url = viewModel.data.url, title = viewModel.data.title)
+			).let(context::startActivity)
 		}
 		viewHolder.book.setOnLongClickListener {
 			completedDialog(context, viewModel.data)
