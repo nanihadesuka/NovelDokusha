@@ -19,9 +19,10 @@ import my.noveldokusha.ui.sourceCatalog.SourceCatalogActivity
 
 class FinderFragment : Fragment()
 {
-	class Extras
+	class IntentData : Intent
 	{
-		fun intent(ctx: Context) = Intent(ctx, FinderFragment::class.java)
+		constructor(intent: Intent) : super(intent)
+		constructor(ctx: Context) : super(ctx, FinderFragment::class.java)
 	}
 	
 	private val viewModel by viewModels<FinderModel>()
@@ -61,8 +62,9 @@ class FinderFragment : Fragment()
 			override fun onQueryTextSubmit(query: String?): Boolean
 			{
 				query?.let {
-					val intent = GlobalSourceSearchActivity.Extras(it).intent(requireActivity())
-					startActivity(intent)
+					GlobalSourceSearchActivity
+						.IntentData(requireContext(), it)
+						.let(this@FinderFragment::startActivity)
 				}
 				return true
 			}
@@ -84,16 +86,18 @@ class FinderFragment : Fragment()
 			{
 				viewHolder.title.text = itemData.name
 				viewHolder.title.setOnClickListener {
-					val intent = SourceCatalogActivity.Extras(sourceBaseUrl = itemData.baseUrl).intent(requireActivity())
-					context?.startActivity(intent)
+					SourceCatalogActivity
+						.IntentData(requireContext(), sourceBaseUrl = itemData.baseUrl)
+						.let(requireContext()::startActivity)
 				}
 			}
 			is Item.Database -> with(holder as ItemViewHolder.Database)
 			{
 				viewHolder.title.text = itemData.name
 				viewHolder.title.setOnClickListener {
-					val intent = DatabaseSearchActivity.Extras(databaseBaseUrl = itemData.baseUrl).intent(requireActivity())
-					context?.startActivity(intent)
+					DatabaseSearchActivity
+						.IntentData(requireContext(), databaseBaseUrl = itemData.baseUrl)
+						.let(this@FinderFragment::startActivity)
 				}
 			}
 			is Item.Header -> with(holder as ItemViewHolder.Header)

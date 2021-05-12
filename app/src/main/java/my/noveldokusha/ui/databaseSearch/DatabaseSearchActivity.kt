@@ -17,24 +17,25 @@ import my.noveldokusha.databinding.ActivityDatabaseSearchGenreItemBinding
 import my.noveldokusha.scrubber
 import my.noveldokusha.ui.BaseActivity
 import my.noveldokusha.ui.databaseSearchResults.DatabaseSearchResultsActivity
-import my.noveldokusha.ui.databaseSearchResults.DatabaseSearchResultsModel
+import my.noveldokusha.uiUtils.Extra_String
 import java.util.*
 import kotlin.collections.ArrayList
 
 class DatabaseSearchActivity : BaseActivity()
 {
-	class Extras(val databaseBaseUrl: String)
+	
+	class IntentData : Intent
 	{
-		fun intent(ctx: Context) = Intent(ctx, DatabaseSearchActivity::class.java).also {
-			it.putExtra(::databaseBaseUrl.name, databaseBaseUrl)
+		var databaseBaseUrl by Extra_String(this)
+		
+		constructor(intent: Intent) : super(intent)
+		constructor(ctx: Context, databaseBaseUrl: String) : super(ctx, DatabaseSearchActivity::class.java)
+		{
+			this.databaseBaseUrl = databaseBaseUrl
 		}
 	}
 	
-	private val extras = object
-	{
-		fun databaseBaseUrl() = intent.extras!!.get(Extras::databaseBaseUrl.name)!! as String
-	}
-	
+	private val extras by lazy { IntentData(intent) }
 	private val viewModel by viewModels<DatabaseSearchModel>()
 	private val viewHolder by lazy { ActivityDatabaseSearchBinding.inflate(layoutInflater) }
 	private val viewAdapter = object
@@ -47,7 +48,7 @@ class DatabaseSearchActivity : BaseActivity()
 		super.onCreate(savedInstanceState)
 		setContentView(viewHolder.root)
 		setSupportActionBar(viewHolder.toolbar)
-		viewModel.initialization(scrubber.getCompatibleDatabase(extras.databaseBaseUrl())!!)
+		viewModel.initialization(scrubber.getCompatibleDatabase(extras.databaseBaseUrl)!!)
 		
 		supportActionBar!!.let {
 			it.title = "Database"
@@ -58,12 +59,14 @@ class DatabaseSearchActivity : BaseActivity()
 		viewHolder.listView.adapter = viewAdapter.listView
 		viewHolder.listView.itemAnimator = DefaultItemAnimator()
 		viewHolder.searchByGenreButton.setOnClickListener { _ ->
-			val input = DatabaseSearchResultsModel.SearchMode.Advanced(
+			val input = DatabaseSearchResultsActivity.SearchMode.Advanced(
 				genresInclude = ArrayList(viewModel.genreList.filter { it.state == Checkbox3StatesView.STATE.POSITIVE }.map { it.genre }),
 				genresExclude = ArrayList(viewModel.genreList.filter { it.state == Checkbox3StatesView.STATE.NEGATIVE }.map { it.genre })
 			)
-			val intent = DatabaseSearchResultsActivity.Extras(databaseUrlBase = viewModel.database.baseUrl, input = input).intent(this)
-			startActivity(intent)
+			
+			DatabaseSearchResultsActivity
+				.IntentData(this@DatabaseSearchActivity, databaseUrlBase = viewModel.database.baseUrl, input = input)
+				.let(this@DatabaseSearchActivity::startActivity)
 		}
 		viewModel.genreListUpdated.observe(this) {
 			viewAdapter.listView.notifyDataSetChanged()
@@ -82,11 +85,12 @@ class DatabaseSearchActivity : BaseActivity()
 			override fun onQueryTextSubmit(query: String?): Boolean
 			{
 				query?.let {
-					val input = DatabaseSearchResultsModel.SearchMode.Text(text = query)
-					val intent = DatabaseSearchResultsActivity
-						.Extras(databaseUrlBase = viewModel.database.baseUrl, input = input)
-						.intent(this@DatabaseSearchActivity)
-					startActivity(intent)
+					DatabaseSearchResultsActivity
+						.IntentData(
+							this@DatabaseSearchActivity,
+							databaseUrlBase = viewModel.database.baseUrl,
+							input = DatabaseSearchResultsActivity.SearchMode.Text(text = it)
+						).let(this@DatabaseSearchActivity::startActivity)
 				}
 				return true
 			}

@@ -31,9 +31,10 @@ import java.util.*
 
 class SettingsFragment : BaseFragment()
 {
-	class Extras
+	class IntentData : Intent
 	{
-		fun intent(ctx: Context) = Intent(ctx, SettingsFragment::class.java)
+		constructor(intent: Intent) : super(intent)
+		constructor(ctx: Context) : super(ctx, SettingsFragment::class.java)
 	}
 	
 	private val viewModel by viewModels<SettingsModel>()

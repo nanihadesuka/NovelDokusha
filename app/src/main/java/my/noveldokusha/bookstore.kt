@@ -9,21 +9,22 @@ import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import java.io.InputStream
 
+data class BookMetadata(val title: String, val url: String)
+{
+	override fun equals(other: Any?): Boolean = if (other is BookMetadata) (url == other.url) else false
+	override fun hashCode(): Int = url.hashCode()
+}
+
+data class ChapterMetadata(val title: String, val url: String)
+{
+	override fun equals(other: Any?): Boolean = if (other is ChapterMetadata) (url == other.url) else false
+	override fun hashCode(): Int = url.hashCode()
+}
+
+data class LastReadChapter(var url: String, var position: Int, var offset: Int)
+
 object bookstore
 {
-	data class BookMetadata(val title: String, val url: String)
-	{
-		override fun equals(other: Any?): Boolean = if (other is BookMetadata) (url == other.url) else false
-		override fun hashCode(): Int = url.hashCode()
-	}
-	
-	data class ChapterMetadata(val title: String, val url: String)
-	{
-		override fun equals(other: Any?): Boolean = if (other is ChapterMetadata) (url == other.url) else false
-		override fun hashCode(): Int = url.hashCode()
-	}
-	
-	data class LastReadChapter(var url: String, var position: Int, var offset: Int)
 	
 	@Entity
 	data class Book(

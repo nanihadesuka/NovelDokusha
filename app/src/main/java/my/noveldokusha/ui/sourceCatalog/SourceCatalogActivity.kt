@@ -23,24 +23,25 @@ import my.noveldokusha.scrubber
 import my.noveldokusha.ui.BaseActivity
 import my.noveldokusha.ui.chaptersList.ChaptersActivity
 import my.noveldokusha.ui.sourceCatalog.SourceCatalogModel.CatalogItem
+import my.noveldokusha.uiUtils.Extra_String
 import my.noveldokusha.uiUtils.ProgressBarAdapter
 import my.noveldokusha.uiUtils.addBottomMargin
 import java.util.*
 
 class SourceCatalogActivity : BaseActivity()
 {
-	class Extras(val sourceBaseUrl: String)
+	class IntentData : Intent
 	{
-		fun intent(ctx: Context) = Intent(ctx, SourceCatalogActivity::class.java).also {
-			it.putExtra(::sourceBaseUrl.name, sourceBaseUrl)
+		var sourceBaseUrl by Extra_String(this)
+		
+		constructor(intent: Intent) : super(intent)
+		constructor(ctx: Context, sourceBaseUrl: String) : super(ctx, SourceCatalogActivity::class.java)
+		{
+			this.sourceBaseUrl = sourceBaseUrl
 		}
 	}
 	
-	private val extras = object
-	{
-		fun sourceBaseUrl() = intent.extras!!.get(Extras::sourceBaseUrl.name)!! as String
-	}
-	
+	private val extras by lazy { IntentData(intent) }
 	private val viewModel by viewModels<SourceCatalogModel>()
 	private val viewHolder by lazy { ActivitySourceCatalogBinding.inflate(layoutInflater) }
 	private val viewAdapter = object
@@ -59,7 +60,7 @@ class SourceCatalogActivity : BaseActivity()
 		super.onCreate(savedInstanceState)
 		setContentView(viewHolder.root)
 		setSupportActionBar(viewHolder.toolbar)
-		viewModel.initialization(scrubber.getCompatibleSourceCatalog(extras.sourceBaseUrl())!!)
+		viewModel.initialization(scrubber.getCompatibleSourceCatalog(extras.sourceBaseUrl)!!)
 		
 		viewHolder.recyclerView.adapter = ConcatAdapter(viewAdapter.recyclerView, viewAdapter.progressBar)
 		viewHolder.recyclerView.layoutManager = viewLayoutManager.recyclerView
@@ -145,10 +146,9 @@ class SourceCatalogActivity : BaseActivity()
 			
 			itemView.title.text = itemData.bookMetadata.title
 			itemView.title.setOnClickListener {
-				val intent = ChaptersActivity
-					.Extras(bookUrl = itemData.bookMetadata.url, bookTitle = itemData.bookMetadata.title)
-					.intent(this@SourceCatalogActivity)
-				startActivity(intent)
+				ChaptersActivity
+					.IntentData(this@SourceCatalogActivity, bookMetadata = itemData.bookMetadata)
+					.let(this@SourceCatalogActivity::startActivity)
 			}
 			itemView.title.setOnLongClickListener {
 				lifecycleScope.launch(Dispatchers.IO) { bookstore.bookLibrary.toggleBookmark(itemData.bookMetadata) }

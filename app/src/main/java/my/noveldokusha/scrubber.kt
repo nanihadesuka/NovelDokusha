@@ -57,9 +57,9 @@ object scrubber
 		{
 			val catalogUrl: String
 			
-			suspend fun getChapterList(doc: Document): List<bookstore.ChapterMetadata>
-			suspend fun getCatalogList(index: Int): Response<List<bookstore.BookMetadata>>
-			suspend fun getCatalogSearch(index: Int, input: String): Response<List<bookstore.BookMetadata>>
+			suspend fun getChapterList(doc: Document): List<ChapterMetadata>
+			suspend fun getCatalogList(index: Int): Response<List<BookMetadata>>
+			suspend fun getCatalogSearch(index: Int, input: String): Response<List<BookMetadata>>
 		}
 	}
 	
@@ -70,12 +70,12 @@ object scrubber
 		
 		val searchGenres: Map<String, String>
 		
-		suspend fun getSearch(index: Int, input: String): Response<List<bookstore.BookMetadata>>
+		suspend fun getSearch(index: Int, input: String): Response<List<BookMetadata>>
 		suspend fun getSearchAdvanced(
 			index: Int,
 			genresIncluded: List<String>,
 			genresExcluded: List<String>
-		): Response<List<bookstore.BookMetadata>>
+		): Response<List<BookMetadata>>
 		
 		data class BookAuthor(val name: String, val url: String)
 		data class BookData(
@@ -86,8 +86,8 @@ object scrubber
 			val tags: List<String>,
 			val genres: List<String>,
 			val bookType: String,
-			val relatedBooks: List<bookstore.BookMetadata>,
-			val similarRecommended: List<bookstore.BookMetadata>
+			val relatedBooks: List<BookMetadata>,
+			val similarRecommended: List<BookMetadata>
 		)
 		
 		fun getBookData(doc: Document): BookData
@@ -125,7 +125,7 @@ object scrubber
 				}.joinToString("\n\n")
 			}
 			
-			override suspend fun getChapterList(doc: Document): List<bookstore.ChapterMetadata>
+			override suspend fun getChapterList(doc: Document): List<ChapterMetadata>
 			{
 				return doc
 					.select(".su-spoiler-content")
@@ -147,11 +147,11 @@ object scrubber
 							} ?: title
 						} ?: "** Can't get chapter title :("
 						
-						bookstore.ChapterMetadata(title = title, url = url)
+						ChapterMetadata(title = title, url = url)
 					}
 			}
 			
-			override suspend fun getCatalogList(index: Int): Response<List<bookstore.BookMetadata>>
+			override suspend fun getCatalogList(index: Int): Response<List<BookMetadata>>
 			{
 				val page = index + 1
 				if (page > 1)
@@ -173,12 +173,12 @@ object scrubber
 							              text != "Novel Illustrations" &&
 							              text != "Novels Illustrations"
 						}
-						.map { bookstore.BookMetadata(title = it.text(), url = it.attr("href")) }
+						.map { BookMetadata(title = it.text(), url = it.attr("href")) }
 						.let { Response.Success(it) }
 				}
 			}
 			
-			override suspend fun getCatalogSearch(index: Int, input: String): Response<List<bookstore.BookMetadata>>
+			override suspend fun getCatalogSearch(index: Int, input: String): Response<List<BookMetadata>>
 			{
 				if (input.isBlank() || index > 0)
 					return Response.Success(listOf())
@@ -190,7 +190,7 @@ object scrubber
 						.select("a")
 						.map {
 							val (name) = Regex("""^.*category_name=(.*)$""").find(it.attr("href"))!!.destructured
-							bookstore.BookMetadata(title = it.text(), url = "https://lightnovelstranslations.com/${name}/")
+							BookMetadata(title = it.text(), url = "https://lightnovelstranslations.com/${name}/")
 						}.let { Response.Success(it) }
 				}
 			}
@@ -219,14 +219,14 @@ object scrubber
 				}
 			}
 			
-			override suspend fun getChapterList(doc: Document): List<bookstore.ChapterMetadata>
+			override suspend fun getChapterList(doc: Document): List<ChapterMetadata>
 			{
-				return doc.select(".chapter-chs").select("a").map { bookstore.ChapterMetadata(title = it.text(), url = it.attr("href")) }
+				return doc.select(".chapter-chs").select("a").map { ChapterMetadata(title = it.text(), url = it.attr("href")) }
 			}
 			
 			val catalogIndex by lazy { ("ABCDEFGHIJKLMNOPQRSTUVWXYZ").split("") }
 			
-			override suspend fun getCatalogList(index: Int): Response<List<bookstore.BookMetadata>>
+			override suspend fun getCatalogList(index: Int): Response<List<BookMetadata>>
 			{
 				val url = if (index == 0) catalogUrl
 				else
@@ -241,12 +241,12 @@ object scrubber
 						.child(0)
 						.children()
 						.map { it.selectFirst("a") }
-						.map { bookstore.BookMetadata(title = it.text(), url = it.attr("href")) }
+						.map { BookMetadata(title = it.text(), url = it.attr("href")) }
 						.let { Response.Success(it) }
 				}
 			}
 			
-			override suspend fun getCatalogSearch(index: Int, input: String): Response<List<bookstore.BookMetadata>>
+			override suspend fun getCatalogSearch(index: Int, input: String): Response<List<BookMetadata>>
 			{
 				if (input.isBlank() || index > 0)
 					return Response.Success(listOf())
@@ -258,7 +258,7 @@ object scrubber
 						.data("q", input)
 						.postIO()
 						.select("a")
-						.map { bookstore.BookMetadata(title = it.text(), url = it.attr("href")) }
+						.map { BookMetadata(title = it.text(), url = it.attr("href")) }
 						.let { Response.Success(it) }
 				}
 			}
@@ -283,7 +283,7 @@ object scrubber
 				}
 			}
 			
-			override suspend fun getChapterList(doc: Document): List<bookstore.ChapterMetadata>
+			override suspend fun getChapterList(doc: Document): List<ChapterMetadata>
 			{
 				val id = doc.selectFirst("#rating").attr("data-novel-id")
 				return Jsoup.connect("https://readnovelfull.com/ajax/chapter-archive")
@@ -292,10 +292,10 @@ object scrubber
 					.data("novelId", id)
 					.getIO()
 					.select("a")
-					.map { bookstore.ChapterMetadata(title = it.text(), url = baseUrl + it.attr("href")) }
+					.map { ChapterMetadata(title = it.text(), url = baseUrl + it.attr("href")) }
 			}
 			
-			override suspend fun getCatalogList(index: Int): Response<List<bookstore.BookMetadata>>
+			override suspend fun getCatalogList(index: Int): Response<List<BookMetadata>>
 			{
 				val page = index + 1
 				var url = catalogUrl
@@ -305,12 +305,12 @@ object scrubber
 						.selectFirst("#list-page")
 						.select(".row")
 						.map { it.selectFirst("a") }
-						.map { bookstore.BookMetadata(title = it.text(), url = baseUrl + it.attr("href")) }
+						.map { BookMetadata(title = it.text(), url = baseUrl + it.attr("href")) }
 						.let { Response.Success(it) }
 				}
 			}
 			
-			override suspend fun getCatalogSearch(index: Int, input: String): Response<List<bookstore.BookMetadata>>
+			override suspend fun getCatalogSearch(index: Int, input: String): Response<List<BookMetadata>>
 			{
 				if (input.isBlank() || index > 0)
 					return Response.Success(listOf())
@@ -320,7 +320,7 @@ object scrubber
 						.selectFirst(".col-novel-main, .archive")
 						.select(".novel-title")
 						.map { it.selectFirst("a") }
-						.map { bookstore.BookMetadata(title = it.text(), url = baseUrl + it.attr("href")) }
+						.map { BookMetadata(title = it.text(), url = baseUrl + it.attr("href")) }
 						.let { Response.Success(it) }
 				}
 			}
@@ -363,7 +363,7 @@ object scrubber
 				TODO("NOT SUPPOSED TO EVER BE CALLED")
 			}
 			
-			override suspend fun getChapterList(doc: Document): List<bookstore.ChapterMetadata>
+			override suspend fun getChapterList(doc: Document): List<ChapterMetadata>
 			{
 				return Jsoup.connect("https://www.novelupdates.com/wp-admin/admin-ajax.php")
 					.addUserAgent()
@@ -379,11 +379,11 @@ object scrubber
 					.map {
 						val title = it.selectFirst("span").attr("title")
 						val url = "https:" + it.attr("href")
-						bookstore.ChapterMetadata(title = title, url = url)
+						ChapterMetadata(title = title, url = url)
 					}.toList().reversed()
 			}
 			
-			override suspend fun getCatalogList(index: Int): Response<List<bookstore.BookMetadata>>
+			override suspend fun getCatalogList(index: Int): Response<List<BookMetadata>>
 			{
 				val page = index + 1
 				var url = "$catalogUrl?st=1"
@@ -393,12 +393,12 @@ object scrubber
 					fetchDoc(url)
 						.select(".search_title")
 						.map { it.selectFirst("a") }
-						.map { bookstore.BookMetadata(title = it.text(), url = it.attr("href")) }
+						.map { BookMetadata(title = it.text(), url = it.attr("href")) }
 						.let { Response.Success(it) }
 				}
 			}
 			
-			override suspend fun getCatalogSearch(index: Int, input: String): Response<List<bookstore.BookMetadata>>
+			override suspend fun getCatalogSearch(index: Int, input: String): Response<List<BookMetadata>>
 			{
 				if (input.isBlank() || index > 0)
 					return Response.Success(listOf())
@@ -410,7 +410,7 @@ object scrubber
 						.select(".search_body_nu")
 						.select(".search_title")
 						.select("a")
-						.map { bookstore.BookMetadata(title = it.text(), url = it.attr("href")) }
+						.map { BookMetadata(title = it.text(), url = it.attr("href")) }
 						.let { Response.Success(it) }
 				}
 			}
@@ -534,7 +534,7 @@ object scrubber
 				"Yuri" to "922"
 			)
 			
-			override suspend fun getSearch(index: Int, input: String): Response<List<bookstore.BookMetadata>>
+			override suspend fun getSearch(index: Int, input: String): Response<List<BookMetadata>>
 			{
 				val page = index + 1
 				val pagePath = if (page > 1) "page/$page/" else ""
@@ -544,13 +544,13 @@ object scrubber
 					fetchDoc(url)
 						.select(".search_title")
 						.map { it.selectFirst("a") }
-						.map { bookstore.BookMetadata(it.text(), it.attr("href")) }
+						.map { BookMetadata(it.text(), it.attr("href")) }
 						.let { Response.Success(it) }
 				}
 			}
 			
 			override suspend fun getSearchAdvanced(index: Int, genresIncluded: List<String>, genresExcluded: List<String>):
-					Response<List<bookstore.BookMetadata>>
+					Response<List<BookMetadata>>
 			{
 				val page = index + 1
 				
@@ -564,7 +564,7 @@ object scrubber
 					fetchDoc(url)
 						.select(".search_title")
 						.map { it.selectFirst("a") }
-						.map { bookstore.BookMetadata(it.text(), it.attr("href")) }
+						.map { BookMetadata(it.text(), it.attr("href")) }
 						.let { Response.Success(it) }
 				}
 			}
@@ -577,7 +577,7 @@ object scrubber
 					.nextElementSiblings().asSequence()
 					.takeWhile { elem -> !elem.`is`("h5") }
 					.filter { it.`is`("a") }
-					.map { bookstore.BookMetadata(it.text(), it.attr("href")) }.toList()
+					.map { BookMetadata(it.text(), it.attr("href")) }.toList()
 				
 				val similarRecommended = doc
 					.select("h5")
@@ -585,7 +585,7 @@ object scrubber
 					.nextElementSiblings().asSequence()
 					.takeWhile { elem -> !elem.`is`("h5") }
 					.filter { it.`is`("a") }
-					.map { bookstore.BookMetadata(it.text(), it.attr("href")) }.toList()
+					.map { BookMetadata(it.text(), it.attr("href")) }.toList()
 				
 				val authors = doc
 					.selectFirst("#showauthors")
@@ -690,7 +690,7 @@ suspend fun fetchDoc(url: String, timeoutMilliseconds: Int = 2 * 60 * 1000): Doc
 
 class BooksFetchIterator(
 	private val coroutineScope: CoroutineScope,
-	private var fn: (suspend (index: Int) -> Response<List<bookstore.BookMetadata>>)
+	private var fn: (suspend (index: Int) -> Response<List<BookMetadata>>)
 )
 {
 	enum class STATE
@@ -701,14 +701,14 @@ class BooksFetchIterator(
 	private var index = 0
 	private var job: Job? = null
 	
-	val onSuccess = MutableLiveData<Response.Success<List<bookstore.BookMetadata>>>()
+	val onSuccess = MutableLiveData<Response.Success<List<BookMetadata>>>()
 	val onCompleted = MutableLiveData<Unit>()
 	val onCompletedEmpty = MutableLiveData<Unit>()
-	val onError = MutableLiveData<Response.Error<List<bookstore.BookMetadata>>>()
+	val onError = MutableLiveData<Response.Error<List<BookMetadata>>>()
 	val onFetching = MutableLiveData<Boolean>()
 	val onReset = MutableLiveData<Unit>()
 	
-	fun setFunction(fn: (suspend (index: Int) -> Response<List<bookstore.BookMetadata>>))
+	fun setFunction(fn: (suspend (index: Int) -> Response<List<BookMetadata>>))
 	{
 		this.fn = fn
 	}

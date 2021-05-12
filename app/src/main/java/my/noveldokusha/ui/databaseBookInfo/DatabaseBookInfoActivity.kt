@@ -9,35 +9,35 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.activity.viewModels
 import androidx.recyclerview.widget.RecyclerView
+import my.noveldokusha.BookMetadata
 import my.noveldokusha.Response
-import my.noveldokusha.bookstore
 import my.noveldokusha.databinding.ActivityDatabaseBookInfoBinding
 import my.noveldokusha.databinding.BookListItemBinding
 import my.noveldokusha.scrubber
 import my.noveldokusha.ui.BaseActivity
 import my.noveldokusha.ui.globalSourceSearch.GlobalSourceSearchActivity
+import my.noveldokusha.uiUtils.Extra_String
 import java.util.*
 
 class DatabaseBookInfoActivity : BaseActivity()
 {
-	class Extras(val databaseUrlBase: String, val bookMetadata: bookstore.BookMetadata)
+	class IntentData : Intent
 	{
-		fun intent(ctx: Context) = Intent(ctx, DatabaseBookInfoActivity::class.java).also {
-			it.putExtra(::databaseUrlBase.name, databaseUrlBase)
-			it.putExtra(bookMetadata::title.name, bookMetadata.title)
-			it.putExtra(bookMetadata::url.name, bookMetadata.url)
+		val bookMetadata get() = BookMetadata(title = bookTitle, url = bookUrl)
+		var databaseUrlBase by Extra_String(this)
+		private var bookUrl by Extra_String(this)
+		private var bookTitle by Extra_String(this)
+		
+		constructor(intent: Intent) : super(intent)
+		constructor(ctx: Context, databaseUrlBase: String, bookMetadata: BookMetadata) :super(ctx, DatabaseBookInfoActivity::class.java)
+		{
+			this.databaseUrlBase = databaseUrlBase
+			this.bookUrl = bookMetadata.url
+			this.bookTitle = bookMetadata.title
 		}
 	}
 	
-	private val extras = object
-	{
-		fun databaseUrlBase(): String = intent.extras!!.getString(Extras::databaseUrlBase.name)!!
-		fun bookMetadata(): bookstore.BookMetadata = bookstore.BookMetadata(
-			title = intent.extras!!.getString(bookstore.BookMetadata::title.name)!!,
-			url = intent.extras!!.getString(bookstore.BookMetadata::url.name)!!
-		)
-	}
-	
+	private val extras by lazy { IntentData(intent) }
 	private val viewModel by viewModels<DatabaseBookInfoModel>()
 	private val viewHolder by lazy { ActivityDatabaseBookInfoBinding.inflate(layoutInflater) }
 	private val viewAdapter = object
@@ -51,14 +51,16 @@ class DatabaseBookInfoActivity : BaseActivity()
 		super.onCreate(savedInstanceState)
 		setContentView(viewHolder.root)
 		setSupportActionBar(viewHolder.toolbar)
-		viewModel.initialization(database = scrubber.getCompatibleDatabase(extras.databaseUrlBase())!!, bookMetadata = extras.bookMetadata())
+		viewModel.initialization(database = scrubber.getCompatibleDatabase(extras.databaseUrlBase)!!, bookMetadata = extras.bookMetadata)
 		
 		viewHolder.relatedBooks.adapter = viewAdapter.relatedBooks
 		viewHolder.similarRecommended.adapter = viewAdapter.similarRecommended
 		viewHolder.title.text = viewModel.bookMetadata.title
 		viewHolder.globalSourceSearch.setOnClickListener {
-			val intent = GlobalSourceSearchActivity.Extras(viewModel.bookMetadata.title).intent(this)
-			startActivity(intent)
+			GlobalSourceSearchActivity.IntentData(
+				this,
+				input = viewModel.bookMetadata.title
+			).let(this@DatabaseBookInfoActivity::startActivity)
 		}
 		
 		viewModel.bookDataLiveData.observe(this) { res ->
@@ -110,7 +112,7 @@ class DatabaseBookInfoActivity : BaseActivity()
 
 private class BookArrayAdapter(
 	private val context: BaseActivity,
-	private val list: ArrayList<bookstore.BookMetadata>,
+	private val list: ArrayList<BookMetadata>,
 	private val databaseUrlBase: String
 ) : RecyclerView.Adapter<BookArrayAdapter.ViewBinder>()
 {
@@ -125,9 +127,11 @@ private class BookArrayAdapter(
 		val itemHolder = binder.viewHolder
 		itemHolder.title.text = itemData.title
 		itemHolder.title.setOnClickListener {
-			val intent = DatabaseBookInfoActivity.Extras(databaseUrlBase = databaseUrlBase, bookMetadata = itemData)
-				.intent(context)
-			context.startActivity(intent)
+			DatabaseBookInfoActivity.IntentData(
+				context,
+				databaseUrlBase = databaseUrlBase,
+				bookMetadata = itemData
+			).let(context::startActivity)
 		}
 	}
 	

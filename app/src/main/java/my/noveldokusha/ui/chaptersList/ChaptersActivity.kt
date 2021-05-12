@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.coroutines.*
+import my.noveldokusha.BookMetadata
 import my.noveldokusha.R
 import my.noveldokusha.bookstore
 import my.noveldokusha.databinding.ActivityChaptersBinding
@@ -24,30 +25,29 @@ import my.noveldokusha.databinding.ActivityChaptersListItemBinding
 import my.noveldokusha.scrubber
 import my.noveldokusha.ui.BaseActivity
 import my.noveldokusha.ui.databaseSearchResults.DatabaseSearchResultsActivity
-import my.noveldokusha.ui.databaseSearchResults.DatabaseSearchResultsModel
 import my.noveldokusha.ui.reader.ReaderActivity
+import my.noveldokusha.uiUtils.Extra_String
 import my.noveldokusha.uiUtils.addBottomMargin
 import my.noveldokusha.uiUtils.toast
 import java.util.*
 
 class ChaptersActivity : BaseActivity()
 {
-	class Extras(val bookUrl: String, val bookTitle: String)
+	class IntentData : Intent
 	{
-		fun intent(ctx: Context) = Intent(ctx, ChaptersActivity::class.java).also {
-			it.putExtra(::bookUrl.name, bookUrl)
-			it.putExtra(::bookTitle.name, bookTitle)
+		val bookMetadata get() = BookMetadata(title = bookTitle, url = bookUrl)
+		private var bookUrl by Extra_String(this)
+		private var bookTitle by Extra_String(this)
+		
+		constructor(intent: Intent) : super(intent)
+		constructor(ctx: Context, bookMetadata: BookMetadata) : super(ctx, ChaptersActivity::class.java)
+		{
+			this.bookUrl = bookMetadata.url
+			this.bookTitle = bookMetadata.title
 		}
 	}
 	
-	private val extras = object
-	{
-		fun bookMetadata() = bookstore.BookMetadata(
-			title = intent.extras!!.getString(Extras::bookTitle.name)!!,
-			url = intent.extras!!.getString(Extras::bookUrl.name)!!
-		)
-	}
-	
+	private val extras by lazy { IntentData(intent) }
 	private val viewModel by viewModels<ChaptersModel>()
 	private val viewHolder by lazy { ActivityChaptersBinding.inflate(layoutInflater) }
 	private val viewAdapter = object
@@ -61,7 +61,7 @@ class ChaptersActivity : BaseActivity()
 		super.onCreate(savedInstanceState)
 		setContentView(viewHolder.root)
 		setSupportActionBar(viewHolder.toolbar)
-		viewModel.initialization(extras.bookMetadata())
+		viewModel.initialization(extras.bookMetadata)
 		
 		viewHolder.recyclerView.adapter = ConcatAdapter(viewAdapter.header, viewAdapter.chapters)
 		viewHolder.recyclerView.itemAnimator = DefaultItemAnimator()
@@ -224,10 +224,9 @@ private class ChaptersArrayAdapter(
 				toggleItemSelection(itemData)
 			else
 			{
-				val intent = ReaderActivity
-					.Extras(bookUrl = viewModel.bookMetadata.url, bookSelectedChapterUrl = itemData.chapter.url)
-					.intent(context)
-				context.startActivity(intent)
+				ReaderActivity
+					.IntentData(context, bookUrl = viewModel.bookMetadata.url, bookSelectedChapterUrl = itemData.chapter.url)
+					.let(context::startActivity)
 			}
 		}
 		
@@ -329,8 +328,8 @@ private class ChaptersHeaderAdapter(
 			})
 			viewHolder.databaseSearchButton.setOnClickListener {
 				DatabaseSearchResultsActivity
-					.Extras(scrubber.database.NovelUpdates.baseUrl, DatabaseSearchResultsModel.SearchMode.Text(viewModel.bookMetadata.title))
-					.intent(context).let(context::startActivity)
+					.IntentData(context, scrubber.database.NovelUpdates.baseUrl, DatabaseSearchResultsActivity.SearchMode.Text(viewModel.bookMetadata.title))
+					.let(context::startActivity)
 			}
 			
 			viewHolder.webpageOpenButton.setOnClickListener {

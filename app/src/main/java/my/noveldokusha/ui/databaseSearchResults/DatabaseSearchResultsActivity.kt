@@ -12,53 +12,65 @@ import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import my.noveldokusha.bookstore
+import my.noveldokusha.BookMetadata
 import my.noveldokusha.databinding.ActivityDatabaseSearchResultsBinding
 import my.noveldokusha.databinding.BookListItemBinding
 import my.noveldokusha.scrubber
 import my.noveldokusha.ui.BaseActivity
 import my.noveldokusha.ui.databaseBookInfo.DatabaseBookInfoActivity
-import my.noveldokusha.uiUtils.ProgressBarAdapter
-import my.noveldokusha.uiUtils.addBottomMargin
+import my.noveldokusha.uiUtils.*
 import java.io.InvalidObjectException
 import java.util.*
 
 class DatabaseSearchResultsActivity : BaseActivity()
 {
-	class Extras(val databaseUrlBase: String, val input: DatabaseSearchResultsModel.SearchMode)
+	class IntentData : Intent
 	{
-		fun intent(ctx: Context) = Intent(ctx, DatabaseSearchResultsActivity::class.java).also {
-			it.putExtra(::databaseUrlBase.name, databaseUrlBase)
-			val subclassName: String = when (input)
+		var databaseUrlBase by Extra_String(this)
+		private var text by Extra_String(this)
+		private var genresInclude by Extra_StringArrayList(this)
+		private var genresExclude by Extra_StringArrayList(this)
+		private var searchMode by Extra_String(this)
+		
+		private enum class MODE
+		{ TEXT, ADVANCED }
+		
+		constructor(intent: Intent) : super(intent)
+		constructor(ctx: Context, databaseUrlBase: String, input: SearchMode) : super(ctx, DatabaseSearchResultsActivity::class.java)
+		{
+			this.databaseUrlBase = databaseUrlBase
+			
+			this.searchMode = when (input)
 			{
-				is DatabaseSearchResultsModel.SearchMode.Text ->
+				is SearchMode.Text ->
 				{
-					it.putExtra(input::text.name, input.text)
-					DatabaseSearchResultsModel.SearchMode.Text::class.simpleName!!
+					this.text = input.text
+					MODE.TEXT.name
 				}
-				is DatabaseSearchResultsModel.SearchMode.Advanced ->
+				is SearchMode.Advanced ->
 				{
-					it.putStringArrayListExtra(input::genresInclude.name, input.genresInclude)
-					it.putStringArrayListExtra(input::genresExclude.name, input.genresExclude)
-					DatabaseSearchResultsModel.SearchMode.Advanced::class.simpleName!!
+					this.genresInclude = input.genresInclude
+					this.genresExclude = input.genresExclude
+					MODE.ADVANCED.name
 				}
 			}
-			it.putExtra(DatabaseSearchResultsModel.SearchMode.name, subclassName)
 		}
+		
+		val input
+			get() = when (searchMode)
+			{
+				MODE.TEXT.name -> SearchMode.Text(text = text)
+				MODE.ADVANCED.name -> SearchMode.Advanced(genresInclude = genresInclude, genresExclude = genresExclude)
+				else -> throw InvalidObjectException("Invalid SearchMode subclass: $searchMode")
+			}
 	}
 	
-	private val extras = object
+	val extras by lazy { IntentData(intent) }
+	
+	sealed class SearchMode
 	{
-		fun databaseUrlBase(): String = intent.extras!!.getString(Extras::databaseUrlBase.name)!!
-		fun input(): DatabaseSearchResultsModel.SearchMode = when (intent.extras!!.getString(DatabaseSearchResultsModel.SearchMode.name)!!)
-		{
-			DatabaseSearchResultsModel.SearchMode.Text::class.simpleName!! -> DatabaseSearchResultsModel.SearchMode.Text(text = intent.extras!!.getString(DatabaseSearchResultsModel.SearchMode.Text::text.name)!!)
-			DatabaseSearchResultsModel.SearchMode.Advanced::class.simpleName!! -> DatabaseSearchResultsModel.SearchMode.Advanced(
-				genresInclude = intent.extras!!.getStringArrayList(DatabaseSearchResultsModel.SearchMode.Advanced::genresInclude.name)!!,
-				genresExclude = intent.extras!!.getStringArrayList(DatabaseSearchResultsModel.SearchMode.Advanced::genresExclude.name)!!
-			)
-			else -> throw InvalidObjectException("Invalid SearchMode subclass name")
-		}
+		data class Text(val text: String) : SearchMode()
+		data class Advanced(val genresInclude: ArrayList<String>, val genresExclude: ArrayList<String>) : SearchMode()
 	}
 	
 	private val viewModel by viewModels<DatabaseSearchResultsModel>()
@@ -75,10 +87,11 @@ class DatabaseSearchResultsActivity : BaseActivity()
 	
 	override fun onCreate(savedInstanceState: Bundle?)
 	{
+		
 		super.onCreate(savedInstanceState)
 		setContentView(viewHolder.root)
 		setSupportActionBar(viewHolder.toolbar)
-		viewModel.initialization(database = scrubber.getCompatibleDatabase(extras.databaseUrlBase())!!, input = extras.input())
+		viewModel.initialization(database = scrubber.getCompatibleDatabase(extras.databaseUrlBase)!!, input = extras.input)
 		
 		viewHolder.recyclerView.adapter = ConcatAdapter(viewAdapter.recyclerView, viewAdapter.progressBar)
 		viewHolder.recyclerView.layoutManager = viewLayoutManager.recyclerView
@@ -87,7 +100,7 @@ class DatabaseSearchResultsActivity : BaseActivity()
 		viewHolder.recyclerView.setOnScrollChangeListener { _, _, _, _, _ ->
 			viewModel.booksFetchIterator.fetchTrigger {
 				val pos = viewLayoutManager.recyclerView.findLastVisibleItemPosition()
-				pos >= viewModel.searchResults.size - 3
+				return@fetchTrigger pos >= viewModel.searchResults.size - 3
 			}
 		}
 		
@@ -121,7 +134,7 @@ class DatabaseSearchResultsActivity : BaseActivity()
 
 private class ChaptersArrayAdapter(
 	private val context: BaseActivity,
-	private val list: ArrayList<bookstore.BookMetadata>,
+	private val list: ArrayList<BookMetadata>,
 	private val databaseUrlBase: String
 ) : RecyclerView.Adapter<ChaptersArrayAdapter.ViewBinder>()
 {
@@ -136,10 +149,9 @@ private class ChaptersArrayAdapter(
 		val itemHolder = binder.viewHolder
 		itemHolder.title.text = itemModel.title
 		itemHolder.title.setOnClickListener {
-			val intent = DatabaseBookInfoActivity
-				.Extras(databaseUrlBase = databaseUrlBase, bookMetadata = itemModel)
-				.intent(context)
-			context.startActivity(intent)
+			DatabaseBookInfoActivity
+				.IntentData(context, databaseUrlBase = databaseUrlBase, bookMetadata = itemModel)
+				.let(context::startActivity)
 		}
 		
 		binder.addBottomMargin { position == list.lastIndex }

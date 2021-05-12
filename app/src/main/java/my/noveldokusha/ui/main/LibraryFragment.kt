@@ -14,9 +14,11 @@ import my.noveldokusha.databinding.ActivityMainFragmentLibraryBinding
 
 class LibraryFragment : Fragment()
 {
-	class Extras
+	
+	class IntentData : Intent
 	{
-		fun intent(ctx: Context) = Intent(ctx, LibraryFragment::class.java)
+		constructor(intent: Intent) : super(intent)
+		constructor(ctx: Context) : super(ctx, LibraryFragment::class.java)
 	}
 	
 	private lateinit var viewHolder: ActivityMainFragmentLibraryBinding

@@ -4,6 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.*
+import my.noveldokusha.LastReadChapter
 import my.noveldokusha.bookstore
 import java.util.*
 import kotlin.collections.ArrayList
@@ -44,7 +45,7 @@ class ReaderModel(private val savedState: SavedStateHandle) : ViewModel()
 	
 	val orderedChapters = mutableListOf<bookstore.Chapter>()
 	val items = ArrayList<ReaderActivity.Item>()
-	val currentChapter = bookstore.LastReadChapter("", 0, 0)
+	val currentChapter = LastReadChapter("", 0, 0)
 	var state = State.INITIAL_LOAD
 	var isTop_firstCall = true
 	

@@ -10,15 +10,12 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
-import my.noveldokusha.Response
-import my.noveldokusha.bookstore
-import my.noveldokusha.fetchChaptersList
-import my.noveldokusha.scrubber
+import my.noveldokusha.*
 
 class ChaptersModel : ViewModel()
 {
 	private var initialized = false
-	fun initialization(bookMetadata: bookstore.BookMetadata)
+	fun initialization(bookMetadata: BookMetadata)
 	{
 		if (initialized) return else initialized = true
 		
@@ -32,7 +29,7 @@ class ChaptersModel : ViewModel()
 		val downloadedLiveData by lazy { downloadedChaptersFlow.map { it.contains(chapter.url) }.asLiveData() }
 	}
 	
-	lateinit var bookMetadata: bookstore.BookMetadata
+	lateinit var bookMetadata: BookMetadata
 	val downloadedChaptersFlow by lazy {
 		bookstore.bookChapterBody.getExistBodyChapterUrlsFlow(bookMetadata.url)
 	}

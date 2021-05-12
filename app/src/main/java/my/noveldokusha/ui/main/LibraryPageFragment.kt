@@ -16,6 +16,7 @@ import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.checkbox.checkBoxPrompt
 import com.afollestad.materialdialogs.checkbox.isCheckPromptChecked
 import kotlinx.coroutines.launch
+import my.noveldokusha.BookMetadata
 import my.noveldokusha.R
 import my.noveldokusha.bookstore
 import my.noveldokusha.databinding.ActivityMainFragmentLibraryPageBinding
@@ -134,9 +135,9 @@ private class NovelItemAdapter(
 		viewHolder.title.text = viewModel.data.title
 		viewHolder.unreadChaptersCounter.visibility = View.INVISIBLE
 		viewHolder.book.setOnClickListener {
-			val intent = ChaptersActivity.Extras(bookUrl = viewModel.data.url, bookTitle = viewModel.data.title)
-				.intent(context.requireActivity())
-			context.startActivity(intent)
+			ChaptersActivity
+				.IntentData(context.requireActivity(), bookMetadata = BookMetadata(url = viewModel.data.url, title = viewModel.data.title))
+				.let(context.requireActivity()::startActivity)
 		}
 		viewHolder.book.setOnLongClickListener {
 			completedDialog(context, viewModel.data)

@@ -13,31 +13,32 @@ import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import my.noveldokusha.BookMetadata
 import my.noveldokusha.BooksFetchIterator
-import my.noveldokusha.bookstore
 import my.noveldokusha.databinding.ActivityGlobalSourceSearchBinding
 import my.noveldokusha.databinding.ActivityGlobalSourceSearchListItemBinding
 import my.noveldokusha.databinding.ActivityGlobalSourceSearchResultItemBinding
 import my.noveldokusha.ui.BaseActivity
 import my.noveldokusha.ui.chaptersList.ChaptersActivity
+import my.noveldokusha.uiUtils.Extra_String
 import my.noveldokusha.uiUtils.ProgressBarHorizontalAdapter
 import my.noveldokusha.uiUtils.addBottomMargin
 import my.noveldokusha.uiUtils.addRightMargin
 
 class GlobalSourceSearchActivity : BaseActivity()
 {
-	class Extras(val input: String)
+	class IntentData : Intent
 	{
-		fun intent(ctx: Context) = Intent(ctx, GlobalSourceSearchActivity::class.java).also {
-			it.putExtra(::input.name, input)
+		var input by Extra_String(this)
+		
+		constructor(intent: Intent) : super(intent)
+		constructor(ctx: Context, input: String) : super(ctx, GlobalSourceSearchActivity::class.java)
+		{
+			this.input = input
 		}
 	}
 	
-	private val extras = object
-	{
-		fun input(): String = intent.extras!!.getString(Extras::input.name)!!
-	}
-	
+	private val extras by lazy { IntentData(intent) }
 	private val viewModel by viewModels<GlobalSourceSearchModel>()
 	private val viewHolder by lazy { ActivityGlobalSourceSearchBinding.inflate(layoutInflater) }
 	private val viewAdapter = object
@@ -50,7 +51,7 @@ class GlobalSourceSearchActivity : BaseActivity()
 		super.onCreate(savedInstanceState)
 		setContentView(viewHolder.root)
 		setSupportActionBar(viewHolder.toolbar)
-		viewModel.initialization(extras.input())
+		viewModel.initialization(extras.input)
 		
 		viewHolder.recyclerView.adapter = viewAdapter.recyclerView
 		viewHolder.recyclerView.itemAnimator = DefaultItemAnimator()
@@ -133,7 +134,7 @@ private class GlobalArrayAdapter(
 			
 			viewModel.booksFetchIterator.fetchTrigger {
 				val pos = binder.layoutManager.findLastVisibleItemPosition()
-				pos >= viewModel.list.size - 3
+				return@fetchTrigger pos >= viewModel.list.size - 3
 			}
 		}
 		
@@ -163,7 +164,7 @@ private class GlobalArrayAdapter(
 
 private class LocalArrayAdapter(
 	private val context: BaseActivity,
-	private val list: MutableList<bookstore.BookMetadata>,
+	private val list: MutableList<BookMetadata>,
 	private val booksFetchIterator: BooksFetchIterator
 ) : RecyclerView.Adapter<LocalArrayAdapter.ViewBinder>()
 {
@@ -178,10 +179,9 @@ private class LocalArrayAdapter(
 		val viewHolder = binder.viewHolder
 		viewHolder.name.text = viewModel.title
 		viewHolder.name.setOnClickListener {
-			val intent = ChaptersActivity
-				.Extras(bookUrl = viewModel.url, bookTitle = viewModel.title)
-				.intent(context)
-			context.startActivity(intent)
+			ChaptersActivity
+				.IntentData(context, bookMetadata = BookMetadata(title = viewModel.title, url = viewModel.url))
+				.let(context::startActivity)
 		}
 		
 		binder.addRightMargin { position == list.lastIndex }

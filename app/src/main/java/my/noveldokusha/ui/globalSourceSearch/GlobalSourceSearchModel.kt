@@ -3,8 +3,8 @@ package my.noveldokusha.ui.globalSourceSearch
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.CoroutineScope
+import my.noveldokusha.BookMetadata
 import my.noveldokusha.BooksFetchIterator
-import my.noveldokusha.bookstore
 import my.noveldokusha.scrubber
 
 class GlobalSourceSearchModel : ViewModel()
@@ -25,7 +25,7 @@ class GlobalSourceSearchModel : ViewModel()
 		var positionOffset : Int? = null
 		var position : Int? = null
 		
-		val list = mutableListOf<bookstore.BookMetadata>()
+		val list = mutableListOf<BookMetadata>()
 		val booksFetchIterator = BooksFetchIterator(coroutineScope) { source.getCatalogSearch(it, searchInput) }
 		
 		init

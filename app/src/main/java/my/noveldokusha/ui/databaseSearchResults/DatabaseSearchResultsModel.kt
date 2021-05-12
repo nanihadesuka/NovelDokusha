@@ -2,14 +2,14 @@ package my.noveldokusha.ui.databaseSearchResults
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import my.noveldokusha.BookMetadata
 import my.noveldokusha.BooksFetchIterator
-import my.noveldokusha.bookstore
 import my.noveldokusha.scrubber
 
 class DatabaseSearchResultsModel : ViewModel()
 {
 	private var initialized = false
-	fun initialization(database: scrubber.database_interface, input: SearchMode)
+	fun initialization(database: scrubber.database_interface, input: DatabaseSearchResultsActivity.SearchMode)
 	{
 		if (initialized) return else initialized = true
 		
@@ -17,8 +17,8 @@ class DatabaseSearchResultsModel : ViewModel()
 		this.booksFetchIterator = BooksFetchIterator(viewModelScope) { index ->
 			when (input)
 			{
-				is SearchMode.Text -> database.getSearch(index, input.text)
-				is SearchMode.Advanced -> database.getSearchAdvanced(index, input.genresInclude, input.genresExclude)
+				is DatabaseSearchResultsActivity.SearchMode.Text -> database.getSearch(index, input.text)
+				is DatabaseSearchResultsActivity.SearchMode.Advanced -> database.getSearchAdvanced(index, input.genresInclude, input.genresExclude)
 			}
 		}
 		this.booksFetchIterator.fetchNext()
@@ -26,17 +26,9 @@ class DatabaseSearchResultsModel : ViewModel()
 	
 	lateinit var booksFetchIterator: BooksFetchIterator
 	lateinit var database: scrubber.database_interface
-	val searchResults = ArrayList<bookstore.BookMetadata>()
+	val searchResults = ArrayList<BookMetadata>()
 	
-	sealed class SearchMode
-	{
-		data class Text(val text: String) : SearchMode()
-		data class Advanced(val genresInclude: ArrayList<String>, val genresExclude: ArrayList<String>) : SearchMode()
-		companion object
-		{
-			const val name = "SearchMode"
-		}
-	}
+
 }
 
 

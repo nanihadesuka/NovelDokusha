@@ -18,17 +18,24 @@ import my.noveldokusha.*
 import my.noveldokusha.databinding.ActivityReaderBinding
 import my.noveldokusha.databinding.ActivityReaderListItemBinding
 import my.noveldokusha.ui.BaseActivity
+import my.noveldokusha.uiUtils.Extra_String
 
 class ReaderActivity : BaseActivity()
 {
-	class Extras(val bookUrl: String, val bookSelectedChapterUrl: String)
+	class IntentData : Intent
 	{
-		fun intent(ctx: Context) = Intent(ctx, ReaderActivity::class.java).also {
-			it.putExtra(::bookUrl.name, bookUrl)
-			it.putExtra(::bookSelectedChapterUrl.name, bookSelectedChapterUrl)
+		var bookUrl by Extra_String(this)
+		var bookSelectedChapterUrl by Extra_String(this)
+		
+		constructor(intent: Intent) : super(intent)
+		constructor(ctx: Context, bookUrl: String, bookSelectedChapterUrl: String) : super(ctx, ReaderActivity::class.java)
+		{
+			this.bookUrl = bookUrl
+			this.bookSelectedChapterUrl = bookSelectedChapterUrl
 		}
 	}
 	
+	private val extras by lazy { IntentData(intent) }
 	private val viewModel by viewModels<ReaderModel>()
 	private val viewHolder by lazy { ActivityReaderBinding.inflate(layoutInflater) }
 	private val viewAdapter = object
@@ -36,12 +43,6 @@ class ReaderActivity : BaseActivity()
 		val listView by lazy { ItemArrayAdapter(this@ReaderActivity, viewModel.items) }
 	}
 	val settingTextFont by lazy { ItemArrayAdapter(this@ReaderActivity, viewModel.items) }
-	
-	private val extras = object
-	{
-		fun bookUrl() = intent.extras!!.getString(Extras::bookUrl.name)!!
-		fun bookSelectedChapterUrl() = intent.extras!!.getString(Extras::bookSelectedChapterUrl.name)!!
-	}
 	
 	private val preferences by lazy {
 		object
@@ -103,7 +104,7 @@ class ReaderActivity : BaseActivity()
 		super.onCreate(savedInstanceState)
 		setContentView(viewHolder.root)
 		
-		viewModel.initialization(bookUrl = extras.bookUrl(), bookSelectedChapterUrl = extras.bookSelectedChapterUrl())
+		viewModel.initialization(bookUrl = extras.bookUrl, bookSelectedChapterUrl = extras.bookSelectedChapterUrl)
 		
 		viewHolder.listView.adapter = viewAdapter.listView
 		viewHolder.settingTextSize.value = preferences.textSize
