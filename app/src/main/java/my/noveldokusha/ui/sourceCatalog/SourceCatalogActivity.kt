@@ -32,7 +32,7 @@ class SourceCatalogActivity : BaseActivity()
 {
 	class IntentData : Intent
 	{
-		var sourceBaseUrl by Extra_String(this)
+		var sourceBaseUrl by Extra_String()
 		
 		constructor(intent: Intent) : super(intent)
 		constructor(ctx: Context, sourceBaseUrl: String) : super(ctx, SourceCatalogActivity::class.java)

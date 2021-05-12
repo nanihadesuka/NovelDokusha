@@ -26,11 +26,11 @@ class DatabaseSearchResultsActivity : BaseActivity()
 {
 	class IntentData : Intent
 	{
-		var databaseUrlBase by Extra_String(this)
-		private var text by Extra_String(this)
-		private var genresInclude by Extra_StringArrayList(this)
-		private var genresExclude by Extra_StringArrayList(this)
-		private var searchMode by Extra_String(this)
+		var databaseUrlBase by Extra_String()
+		private var text by Extra_String()
+		private var genresInclude by Extra_StringArrayList()
+		private var genresExclude by Extra_StringArrayList()
+		private var searchMode by Extra_String()
 		
 		private enum class MODE
 		{ TEXT, ADVANCED }

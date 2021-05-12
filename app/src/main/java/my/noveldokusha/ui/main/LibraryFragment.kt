@@ -1,7 +1,5 @@
 package my.noveldokusha.ui.main
 
-import android.content.Context
-import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -14,13 +12,6 @@ import my.noveldokusha.databinding.ActivityMainFragmentLibraryBinding
 
 class LibraryFragment : Fragment()
 {
-	
-	class IntentData : Intent
-	{
-		constructor(intent: Intent) : super(intent)
-		constructor(ctx: Context) : super(ctx, LibraryFragment::class.java)
-	}
-	
 	private lateinit var viewHolder: ActivityMainFragmentLibraryBinding
 	private lateinit var viewAdapter: Adapter
 	
@@ -53,7 +44,7 @@ private class LibraryViewPageAdapter(fragmentActivity: FragmentActivity) : Fragm
 	
 	override fun createFragment(position: Int): Fragment = when (position)
 	{
-		0 -> LibraryPageFragment.createInstance(showCompleted = false)
-		else -> LibraryPageFragment.createInstance(showCompleted = true)
+		0 -> LibraryPageFragment(showCompleted = false)
+		else -> LibraryPageFragment(showCompleted = true)
 	}
 }

@@ -2,7 +2,6 @@ package my.noveldokusha.ui.main
 
 import android.Manifest
 import android.app.Activity.RESULT_OK
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.text.format.Formatter
@@ -31,12 +30,6 @@ import java.util.*
 
 class SettingsFragment : BaseFragment()
 {
-	class IntentData : Intent
-	{
-		constructor(intent: Intent) : super(intent)
-		constructor(ctx: Context) : super(ctx, SettingsFragment::class.java)
-	}
-	
 	private val viewModel by viewModels<SettingsModel>()
 	private lateinit var viewHolder: ActivityMainFragmentSettingsBinding
 	private lateinit var viewAdapter: Adapter

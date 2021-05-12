@@ -26,7 +26,7 @@ class DatabaseSearchActivity : BaseActivity()
 	
 	class IntentData : Intent
 	{
-		var databaseBaseUrl by Extra_String(this)
+		var databaseBaseUrl by Extra_String()
 		
 		constructor(intent: Intent) : super(intent)
 		constructor(ctx: Context, databaseBaseUrl: String) : super(ctx, DatabaseSearchActivity::class.java)

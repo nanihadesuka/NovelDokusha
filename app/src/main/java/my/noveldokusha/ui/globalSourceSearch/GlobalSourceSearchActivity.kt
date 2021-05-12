@@ -29,7 +29,7 @@ class GlobalSourceSearchActivity : BaseActivity()
 {
 	class IntentData : Intent
 	{
-		var input by Extra_String(this)
+		var input by Extra_String()
 		
 		constructor(intent: Intent) : super(intent)
 		constructor(ctx: Context, input: String) : super(ctx, GlobalSourceSearchActivity::class.java)

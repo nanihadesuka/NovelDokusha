@@ -36,8 +36,8 @@ class ChaptersActivity : BaseActivity()
 	class IntentData : Intent
 	{
 		val bookMetadata get() = BookMetadata(title = bookTitle, url = bookUrl)
-		private var bookUrl by Extra_String(this)
-		private var bookTitle by Extra_String(this)
+		private var bookUrl by Extra_String()
+		private var bookTitle by Extra_String()
 		
 		constructor(intent: Intent) : super(intent)
 		constructor(ctx: Context, bookMetadata: BookMetadata) : super(ctx, ChaptersActivity::class.java)

@@ -1,7 +1,5 @@
 package my.noveldokusha.ui.main
 
-import android.content.Context
-import android.content.Intent
 import android.os.Bundle
 import android.view.*
 import androidx.appcompat.widget.SearchView
@@ -19,12 +17,6 @@ import my.noveldokusha.ui.sourceCatalog.SourceCatalogActivity
 
 class FinderFragment : Fragment()
 {
-	class IntentData : Intent
-	{
-		constructor(intent: Intent) : super(intent)
-		constructor(ctx: Context) : super(ctx, FinderFragment::class.java)
-	}
-	
 	private val viewModel by viewModels<FinderModel>()
 	private lateinit var viewHolder: ActivityMainFragmentFinderBinding
 	private lateinit var viewAdapter: Adapter

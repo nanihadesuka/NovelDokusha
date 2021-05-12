@@ -23,22 +23,17 @@ import my.noveldokusha.databinding.ActivityMainFragmentLibraryPageBinding
 import my.noveldokusha.databinding.ActivityMainFragmentLibraryPageGridviewItemBinding
 import my.noveldokusha.ui.BaseFragment
 import my.noveldokusha.ui.chaptersList.ChaptersActivity
+import my.noveldokusha.uiUtils.Argument_Boolean
 
-class LibraryPageFragment : BaseFragment()
+class LibraryPageFragment : BaseFragment
 {
-	companion object
+	constructor() : super()
+	constructor(showCompleted: Boolean) : super()
 	{
-		fun createInstance(showCompleted: Boolean) = LibraryPageFragment().apply {
-			arguments = Bundle().also {
-				it.putBoolean("showCompleted", showCompleted)
-			}
-		}
+		this.showCompleted = showCompleted
 	}
 	
-	private val extras = object
-	{
-		fun showCompleted() = arguments!!.getBoolean("showCompleted")
-	}
+	var showCompleted by Argument_Boolean()
 	
 	private val viewModel by viewModels<LibraryPageModel>()
 	private lateinit var viewHolder: ActivityMainFragmentLibraryPageBinding
@@ -54,7 +49,7 @@ class LibraryPageFragment : BaseFragment()
 		viewHolder = ActivityMainFragmentLibraryPageBinding.inflate(inflater, container, false)
 		viewAdapter = Adapter()
 		
-		viewModel.initialization(extras.showCompleted())
+		viewModel.initialization(showCompleted)
 		
 		viewHolder.gridView.adapter = viewAdapter.gridView
 		viewHolder.gridView.itemAnimator = DefaultItemAnimator()

@@ -24,9 +24,9 @@ class DatabaseBookInfoActivity : BaseActivity()
 	class IntentData : Intent
 	{
 		val bookMetadata get() = BookMetadata(title = bookTitle, url = bookUrl)
-		var databaseUrlBase by Extra_String(this)
-		private var bookUrl by Extra_String(this)
-		private var bookTitle by Extra_String(this)
+		var databaseUrlBase by Extra_String()
+		private var bookUrl by Extra_String()
+		private var bookTitle by Extra_String()
 		
 		constructor(intent: Intent) : super(intent)
 		constructor(ctx: Context, databaseUrlBase: String, bookMetadata: BookMetadata) :super(ctx, DatabaseBookInfoActivity::class.java)

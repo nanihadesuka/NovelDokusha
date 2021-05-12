@@ -24,8 +24,8 @@ class ReaderActivity : BaseActivity()
 {
 	class IntentData : Intent
 	{
-		var bookUrl by Extra_String(this)
-		var bookSelectedChapterUrl by Extra_String(this)
+		var bookUrl by Extra_String()
+		var bookSelectedChapterUrl by Extra_String()
 		
 		constructor(intent: Intent) : super(intent)
 		constructor(ctx: Context, bookUrl: String, bookSelectedChapterUrl: String) : super(ctx, ReaderActivity::class.java)
