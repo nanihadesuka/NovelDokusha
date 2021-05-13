@@ -3,7 +3,6 @@ package my.noveldokusha.ui.databaseBookInfo
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
@@ -17,6 +16,7 @@ import my.noveldokusha.scrubber
 import my.noveldokusha.ui.BaseActivity
 import my.noveldokusha.ui.globalSourceSearch.GlobalSourceSearchActivity
 import my.noveldokusha.uiUtils.Extra_String
+import my.noveldokusha.uiUtils.inflater
 import java.util.*
 
 class DatabaseBookInfoActivity : BaseActivity()
@@ -29,7 +29,7 @@ class DatabaseBookInfoActivity : BaseActivity()
 		private var bookTitle by Extra_String()
 		
 		constructor(intent: Intent) : super(intent)
-		constructor(ctx: Context, databaseUrlBase: String, bookMetadata: BookMetadata) :super(ctx, DatabaseBookInfoActivity::class.java)
+		constructor(ctx: Context, databaseUrlBase: String, bookMetadata: BookMetadata) : super(ctx, DatabaseBookInfoActivity::class.java)
 		{
 			this.databaseUrlBase = databaseUrlBase
 			this.bookUrl = bookMetadata.url
@@ -117,7 +117,7 @@ private class BookArrayAdapter(
 ) : RecyclerView.Adapter<BookArrayAdapter.ViewBinder>()
 {
 	override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =
-		ViewBinder(BookListItemBinding.inflate(LayoutInflater.from(parent.context), parent, false))
+		ViewBinder(BookListItemBinding.inflate(parent.inflater, parent, false))
 	
 	override fun getItemCount() = this@BookArrayAdapter.list.size
 	

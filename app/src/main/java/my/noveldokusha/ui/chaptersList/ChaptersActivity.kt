@@ -26,10 +26,9 @@ import my.noveldokusha.scrubber
 import my.noveldokusha.ui.BaseActivity
 import my.noveldokusha.ui.databaseSearchResults.DatabaseSearchResultsActivity
 import my.noveldokusha.ui.reader.ReaderActivity
-import my.noveldokusha.uiUtils.Extra_String
-import my.noveldokusha.uiUtils.addBottomMargin
-import my.noveldokusha.uiUtils.toast
+import my.noveldokusha.uiUtils.*
 import java.util.*
+import kotlin.properties.Delegates
 
 class ChaptersActivity : BaseActivity()
 {
@@ -202,7 +201,7 @@ private class ChaptersArrayAdapter(
 	}
 	
 	override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewBinder =
-		ViewBinder(ActivityChaptersListItemBinding.inflate(LayoutInflater.from(parent.context), parent, false))
+		ViewBinder(ActivityChaptersListItemBinding.inflate(parent.inflater, parent, false))
 	
 	override fun getItemCount() = this@ChaptersArrayAdapter.list.size
 	
@@ -210,7 +209,7 @@ private class ChaptersArrayAdapter(
 	{
 		val itemData = this.list[position]
 		val itemView = binder.viewHolder
-		binder.setObservers(itemData)
+		binder.itemData = itemData
 		
 		itemView.title.text = itemData.chapter.title
 		itemView.title.alpha = if (itemData.chapter.read) 0.5f else 1.0f
@@ -259,25 +258,16 @@ private class ChaptersArrayAdapter(
 	
 	inner class ViewBinder(val viewHolder: ActivityChaptersListItemBinding) : RecyclerView.ViewHolder(viewHolder.root)
 	{
-		private var lastItemData: ChaptersModel.ChapterItem? = null
+		var itemData: ChaptersModel.ChapterItem? by Delegates.observable(null) { _, old, new ->
+			lastReadObserver.switchLiveData(old, new, context) { currentlyLastReadChapterLiveData }
+			downloadedObserver.switchLiveData(old, new, context) { downloadedLiveData }
+		}
+		
 		private val lastReadObserver: Observer<Boolean> = Observer { currentlyReading ->
 			viewHolder.currentlyReading.visibility = if (currentlyReading) View.VISIBLE else View.INVISIBLE
 		}
 		private val downloadedObserver: Observer<Boolean> = Observer { downloaded ->
 			viewHolder.downloaded.visibility = if (downloaded) View.VISIBLE else View.INVISIBLE
-		}
-		
-		fun setObservers(itemData: ChaptersModel.ChapterItem)
-		{
-			lastItemData?.also {
-				it.currentlyLastReadChapterLiveData.removeObserver(lastReadObserver)
-				it.downloadedLiveData.removeObserver(downloadedObserver)
-			}
-			
-			itemData.currentlyLastReadChapterLiveData.observe(context, lastReadObserver)
-			itemData.downloadedLiveData.observe(context, downloadedObserver)
-			
-			lastItemData = itemData
 		}
 	}
 }
@@ -289,7 +279,7 @@ private class ChaptersHeaderAdapter(
 {
 	override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewBinder
 	{
-		return ViewBinder(ActivityChaptersListHeaderBinding.inflate(LayoutInflater.from(parent.context), parent, false))
+		return ViewBinder(ActivityChaptersListHeaderBinding.inflate(parent.inflater, parent, false))
 	}
 	
 	override fun getItemCount() = 1

@@ -18,6 +18,7 @@ import my.noveldokusha.scrubber
 import my.noveldokusha.ui.BaseActivity
 import my.noveldokusha.ui.databaseSearchResults.DatabaseSearchResultsActivity
 import my.noveldokusha.uiUtils.Extra_String
+import my.noveldokusha.uiUtils.inflater
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -116,7 +117,7 @@ class DatabaseSearchActivity : BaseActivity()
 private class GenresAdapter(private val list: ArrayList<DatabaseSearchModel.Item>) : RecyclerView.Adapter<GenresAdapter.ViewBinder>()
 {
 	override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewBinder =
-		ViewBinder(ActivityDatabaseSearchGenreItemBinding.inflate(LayoutInflater.from(parent.context), parent, false))
+		ViewBinder(ActivityDatabaseSearchGenreItemBinding.inflate(parent.inflater, parent, false))
 	
 	override fun getItemCount() = list.size
 	

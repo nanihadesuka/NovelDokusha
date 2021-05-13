@@ -20,10 +20,8 @@ import my.noveldokusha.databinding.ActivityGlobalSourceSearchListItemBinding
 import my.noveldokusha.databinding.ActivityGlobalSourceSearchResultItemBinding
 import my.noveldokusha.ui.BaseActivity
 import my.noveldokusha.ui.chaptersList.ChaptersActivity
-import my.noveldokusha.uiUtils.Extra_String
-import my.noveldokusha.uiUtils.ProgressBarHorizontalAdapter
-import my.noveldokusha.uiUtils.addBottomMargin
-import my.noveldokusha.uiUtils.addRightMargin
+import my.noveldokusha.uiUtils.*
+import kotlin.properties.Delegates
 
 class GlobalSourceSearchActivity : BaseActivity()
 {
@@ -88,17 +86,12 @@ private class GlobalArrayAdapter(
 ) : RecyclerView.Adapter<GlobalArrayAdapter.ViewBinder>()
 {
 	override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =
-		ViewBinder(ActivityGlobalSourceSearchListItemBinding.inflate(LayoutInflater.from(parent.context), parent, false))
+		ViewBinder(ActivityGlobalSourceSearchListItemBinding.inflate(parent.inflater, parent, false))
 	
 	override fun getItemCount() = this.list.size
 	
 	override fun onBindViewHolder(binder: ViewBinder, position: Int)
 	{
-		binder.lastItemData?.also {
-			it.booksFetchIterator.onFetching.removeObserver(binder.onFetching)
-			it.booksFetchIterator.onCompletedEmpty.removeObserver(binder.onCompletedEmpty)
-		}
-		
 		val viewModel = this.list[position]
 		val viewHolder = binder.viewHolder
 		val viewAdapter = object
@@ -106,10 +99,9 @@ private class GlobalArrayAdapter(
 			val recyclerView = LocalArrayAdapter(context, viewModel.list, viewModel.booksFetchIterator)
 			val progressBar = binder.progressBarHorizontalAdapter
 		}
+		binder.itemData = viewModel
 		
-		binder.lastItemData = viewModel
-		
-		binder.lastItemData?.let {
+		viewModel.let {
 			val (pos, offset) = Pair(it.position, it.positionOffset)
 			if (pos != null && offset != null)
 				binder.layoutManager.scrollToPositionWithOffset(pos, offset)
@@ -121,9 +113,6 @@ private class GlobalArrayAdapter(
 		viewHolder.name.text = viewModel.source.name
 		viewHolder.recyclerView.visibility = View.VISIBLE
 		viewHolder.noResultsMessage.visibility = View.GONE
-		
-		viewModel.booksFetchIterator.onFetching.observe(context, binder.onFetching)
-		viewModel.booksFetchIterator.onCompletedEmpty.observe(context, binder.onCompletedEmpty)
 		
 		viewHolder.recyclerView.setOnScrollChangeListener { _, _, _, _, _ ->
 			
@@ -143,7 +132,10 @@ private class GlobalArrayAdapter(
 	
 	inner class ViewBinder(val viewHolder: ActivityGlobalSourceSearchListItemBinding) : RecyclerView.ViewHolder(viewHolder.root)
 	{
-		var lastItemData: GlobalSourceSearchModel.SourceResults? = null
+		var itemData: GlobalSourceSearchModel.SourceResults? by Delegates.observable(null) { _, oldValue, newValue ->
+			onFetching.switchLiveData(oldValue, newValue, context) { booksFetchIterator.onFetching }
+			onCompletedEmpty.switchLiveData(oldValue, newValue, context) { booksFetchIterator.onCompletedEmpty }
+		}
 		val onFetching = Observer<Boolean> {
 			progressBarHorizontalAdapter.visible = it
 		}
@@ -169,7 +161,7 @@ private class LocalArrayAdapter(
 ) : RecyclerView.Adapter<LocalArrayAdapter.ViewBinder>()
 {
 	override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =
-		ViewBinder(ActivityGlobalSourceSearchResultItemBinding.inflate(LayoutInflater.from(parent.context), parent, false))
+		ViewBinder(ActivityGlobalSourceSearchResultItemBinding.inflate(parent.inflater, parent, false))
 	
 	override fun getItemCount() = this.list.size
 	

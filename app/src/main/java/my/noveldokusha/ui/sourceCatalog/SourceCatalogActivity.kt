@@ -26,6 +26,7 @@ import my.noveldokusha.ui.sourceCatalog.SourceCatalogModel.CatalogItem
 import my.noveldokusha.uiUtils.Extra_String
 import my.noveldokusha.uiUtils.ProgressBarAdapter
 import my.noveldokusha.uiUtils.addBottomMargin
+import my.noveldokusha.uiUtils.inflater
 import java.util.*
 
 class SourceCatalogActivity : BaseActivity()
@@ -134,7 +135,7 @@ class SourceCatalogActivity : BaseActivity()
 	inner class BooksItemAdapter(private val list: List<CatalogItem>) : RecyclerView.Adapter<BooksItemAdapter.ViewBinder>()
 	{
 		override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewBinder =
-			ViewBinder(BookListItemBinding.inflate(LayoutInflater.from(parent.context), parent, false))
+			ViewBinder(BookListItemBinding.inflate(parent.inflater, parent, false))
 		
 		override fun getItemCount() = list.size
 		

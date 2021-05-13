@@ -10,7 +10,7 @@ import kotlin.properties.Delegates
 class ProgressBarAdapter : RecyclerView.Adapter<ProgressBarAdapter.ViewBinder>()
 {
 	override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewBinder =
-		ViewBinder(ProgressBarBinding.inflate(LayoutInflater.from(parent.context), parent, false))
+		ViewBinder(ProgressBarBinding.inflate(parent.inflater, parent, false))
 	
 	var visible: Boolean by Delegates.observable(true) { _, oldValue, newValue ->
 		if (oldValue != newValue) this.notifyDataSetChanged()
@@ -26,7 +26,7 @@ class ProgressBarAdapter : RecyclerView.Adapter<ProgressBarAdapter.ViewBinder>()
 class ProgressBarHorizontalAdapter : RecyclerView.Adapter<ProgressBarHorizontalAdapter.ViewBinder>()
 {
 	override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewBinder =
-		ViewBinder(ProgressBarHorizontalBinding.inflate(LayoutInflater.from(parent.context), parent, false))
+		ViewBinder(ProgressBarHorizontalBinding.inflate(parent.inflater, parent, false))
 	
 	var visible: Boolean by Delegates.observable(true) { _, oldValue, newValue ->
 		if (oldValue != newValue) this.notifyDataSetChanged()

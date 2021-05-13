@@ -19,6 +19,7 @@ import my.noveldokusha.databinding.ActivityReaderBinding
 import my.noveldokusha.databinding.ActivityReaderListItemBinding
 import my.noveldokusha.ui.BaseActivity
 import my.noveldokusha.uiUtils.Extra_String
+import my.noveldokusha.uiUtils.inflater
 
 class ReaderActivity : BaseActivity()
 {
@@ -385,14 +386,12 @@ class ReaderActivity : BaseActivity()
 	
 	inner class ItemArrayAdapter(context: Context, list: ArrayList<Item>) : ArrayAdapter<Item>(context, 0, list)
 	{
-		private val inflater = LayoutInflater.from(super.getContext())
-		
 		override fun getView(position: Int, convertView: View?, parent: ViewGroup): View
 		{
 			val item = this.getItem(position)!!
 			val itemView = when (convertView)
 			{
-				null -> ActivityReaderListItemBinding.inflate(inflater, parent, false).also { it.root.tag = it }
+				null -> ActivityReaderListItemBinding.inflate(parent.inflater, parent, false).also { it.root.tag = it }
 				else -> ActivityReaderListItemBinding.bind(convertView)
 			}
 			

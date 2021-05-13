@@ -14,6 +14,7 @@ import my.noveldokusha.databinding.BookListItemBinding
 import my.noveldokusha.ui.databaseSearch.DatabaseSearchActivity
 import my.noveldokusha.ui.globalSourceSearch.GlobalSourceSearchActivity
 import my.noveldokusha.ui.sourceCatalog.SourceCatalogActivity
+import my.noveldokusha.uiUtils.inflater
 
 class FinderFragment : Fragment()
 {
@@ -100,9 +101,9 @@ class FinderFragment : Fragment()
 		
 		override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) = when (ItemID.getByOrdinal(viewType))
 		{
-			ItemID.Source -> ItemViewHolder.Source(BookListItemBinding.inflate(LayoutInflater.from(parent.context), parent, false))
-			ItemID.Database -> ItemViewHolder.Database(BookListItemBinding.inflate(LayoutInflater.from(parent.context), parent, false))
-			ItemID.Header -> ItemViewHolder.Header(ActivityMainFragmentFinderListviewItemHeaderBinding.inflate(LayoutInflater.from(parent.context), parent, false))
+			ItemID.Source -> ItemViewHolder.Source(BookListItemBinding.inflate(parent.inflater, parent, false))
+			ItemID.Database -> ItemViewHolder.Database(BookListItemBinding.inflate(parent.inflater, parent, false))
+			ItemID.Header -> ItemViewHolder.Header(ActivityMainFragmentFinderListviewItemHeaderBinding.inflate(parent.inflater, parent, false))
 		}
 	}
 	

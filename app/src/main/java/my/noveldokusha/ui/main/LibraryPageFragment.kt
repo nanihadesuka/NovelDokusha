@@ -24,6 +24,9 @@ import my.noveldokusha.databinding.ActivityMainFragmentLibraryPageGridviewItemBi
 import my.noveldokusha.ui.BaseFragment
 import my.noveldokusha.ui.chaptersList.ChaptersActivity
 import my.noveldokusha.uiUtils.Argument_Boolean
+import my.noveldokusha.uiUtils.inflater
+import my.noveldokusha.uiUtils.switchLiveData
+import kotlin.properties.Delegates
 
 class LibraryPageFragment : BaseFragment
 {
@@ -116,7 +119,7 @@ private class NovelItemAdapter(
 	
 	override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewBinder
 	{
-		return ViewBinder(ActivityMainFragmentLibraryPageGridviewItemBinding.inflate(LayoutInflater.from(parent.context), parent, false))
+		return ViewBinder(ActivityMainFragmentLibraryPageGridviewItemBinding.inflate(parent.inflater, parent, false))
 	}
 	
 	override fun getItemCount() = list.size
@@ -125,7 +128,7 @@ private class NovelItemAdapter(
 	{
 		val viewModel = this.list[position]
 		val viewHolder = binder.viewHolder
-		binder.setObservers(viewModel)
+		binder.viewModel = viewModel
 		
 		viewHolder.title.text = viewModel.data.title
 		viewHolder.unreadChaptersCounter.visibility = View.INVISIBLE
@@ -143,19 +146,14 @@ private class NovelItemAdapter(
 	
 	inner class ViewBinder(val viewHolder: ActivityMainFragmentLibraryPageGridviewItemBinding) : RecyclerView.ViewHolder(viewHolder.root)
 	{
-		var viewModelLast: LibraryPageModel.BookItem? = null
+		var viewModel: LibraryPageModel.BookItem? by Delegates.observable(null) { _, old, new ->
+			numberOfUnreadChaptersObserver.switchLiveData(old, new, context.viewLifecycleOwner) { numberOfUnreadChapters }
+		}
+		
 		val numberOfUnreadChaptersObserver = Observer<Int> {
 			viewHolder.unreadChaptersCounter.text = it.toString()
 			viewHolder.unreadChaptersCounter.visibility = if (it == 0) View.INVISIBLE else View.VISIBLE
 		}
-		
-		fun setObservers(viewModel: LibraryPageModel.BookItem)
-		{
-			viewModelLast?.numberOfUnreadChapters?.removeObserver(numberOfUnreadChaptersObserver)
-			viewModel.numberOfUnreadChapters.observe(context.viewLifecycleOwner, numberOfUnreadChaptersObserver)
-			viewModelLast = viewModel
-		}
-		
 	}
 }
 

@@ -139,7 +139,7 @@ private class ChaptersArrayAdapter(
 ) : RecyclerView.Adapter<ChaptersArrayAdapter.ViewBinder>()
 {
 	override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =
-		ViewBinder(BookListItemBinding.inflate(LayoutInflater.from(parent.context), parent, false))
+		ViewBinder(BookListItemBinding.inflate(parent.inflater, parent, false))
 	
 	override fun getItemCount() = this@ChaptersArrayAdapter.list.size
 	

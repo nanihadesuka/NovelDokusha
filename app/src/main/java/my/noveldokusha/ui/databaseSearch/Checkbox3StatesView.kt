@@ -4,15 +4,15 @@ import android.content.Context
 import android.content.res.ColorStateList
 import android.util.AttributeSet
 import android.util.TypedValue
-import android.view.LayoutInflater
 import android.widget.FrameLayout
 import androidx.core.content.ContextCompat
 import my.noveldokusha.R
 import my.noveldokusha.databinding.ViewCheckboxBinding
+import my.noveldokusha.uiUtils.inflater
 
 class Checkbox3StatesView : FrameLayout
 {
-	private val holder by lazy { ViewCheckboxBinding.inflate(LayoutInflater.from(context), this, false) }
+	private val holder by lazy { ViewCheckboxBinding.inflate(inflater, this, false) }
 	
 	constructor(context: Context) : super(context)
 	{
