@@ -19,6 +19,7 @@
 		<item name="colorOnBackground">?colorOnPrimary</item>
 		
 		<item name="android:colorBackground">#fff</item>
+		<item name="android:colorEdgeEffect">?colorAccent</item>
 		
 		<item name="md_background_color">?colorSurface</item>
 		<item name="md_color_title">?colorOnSurface</item>
