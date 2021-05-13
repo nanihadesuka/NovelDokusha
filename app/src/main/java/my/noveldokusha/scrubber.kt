@@ -777,5 +777,4 @@ class BooksFetchIterator(
 			index += 1
 		}
 	}
-	
 }

@@ -24,6 +24,7 @@ import my.noveldokusha.databinding.ActivityMainFragmentLibraryPageGridviewItemBi
 import my.noveldokusha.ui.BaseFragment
 import my.noveldokusha.ui.chaptersList.ChaptersActivity
 import my.noveldokusha.uiUtils.Argument_Boolean
+import my.noveldokusha.uiUtils.addBottomMargin
 import my.noveldokusha.uiUtils.inflater
 import my.noveldokusha.uiUtils.switchLiveData
 import kotlin.properties.Delegates
@@ -142,6 +143,8 @@ private class NovelItemAdapter(
 			completedDialog(context, viewModel.data)
 			true
 		}
+		
+		binder.addBottomMargin { position == list.lastIndex }
 	}
 	
 	inner class ViewBinder(val viewHolder: ActivityMainFragmentLibraryPageGridviewItemBinding) : RecyclerView.ViewHolder(viewHolder.root)
