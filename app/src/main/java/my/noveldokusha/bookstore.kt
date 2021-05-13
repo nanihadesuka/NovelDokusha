@@ -21,8 +21,6 @@ data class ChapterMetadata(val title: String, val url: String)
 	override fun hashCode(): Int = url.hashCode()
 }
 
-data class LastReadChapter(var url: String, var position: Int, var offset: Int)
-
 object bookstore
 {
 	

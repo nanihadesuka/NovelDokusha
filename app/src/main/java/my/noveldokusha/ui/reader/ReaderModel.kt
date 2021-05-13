@@ -4,7 +4,6 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.*
-import my.noveldokusha.LastReadChapter
 import my.noveldokusha.bookstore
 import java.util.*
 import kotlin.collections.ArrayList
@@ -28,8 +27,8 @@ class ReaderModel(private val savedState: SavedStateHandle) : ViewModel()
 				currentChapter.position = it.lastReadPosition
 				currentChapter.offset = it.lastReadOffset
 			}
-			orderedChapters.clear()
-			orderedChapters.addAll(bookstore.bookChapter.chapters(bookUrl))
+			_orderedChapters.clear()
+			_orderedChapters.addAll(bookstore.bookChapter.chapters(bookUrl))
 		}
 	}
 	
@@ -43,9 +42,14 @@ class ReaderModel(private val savedState: SavedStateHandle) : ViewModel()
 			savedState.set<String>(::bookSelectedChapterUrl.name, value)
 		}
 	
-	val orderedChapters = mutableListOf<bookstore.Chapter>()
+	private val _orderedChapters = mutableListOf<bookstore.Chapter>()
+	val orderedChapters: List<bookstore.Chapter> = _orderedChapters
+	val chaptersSize = mutableMapOf<String, Int>()
+	
+	data class LastReadChapter(var url: String, var title: String, var position: Int, var offset: Int)
+	
 	val items = ArrayList<ReaderActivity.Item>()
-	val currentChapter = LastReadChapter("", 0, 0)
+	val currentChapter = LastReadChapter("", "", 0, 0)
 	var state = State.INITIAL_LOAD
 	var isTop_firstCall = true
 	

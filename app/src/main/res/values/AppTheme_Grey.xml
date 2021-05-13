@@ -9,6 +9,7 @@
 		<item name="colorAccent">#2A59B6</item>
 		
 		<item name="colorPrimary">#333</item>
+		<item name="colorPrimaryTransparent">#0333</item>
 		<item name="colorPrimaryDark">#444</item>
 		<item name="colorOnPrimary">#eee</item>
 		<item name="colorSecondary">#444</item>

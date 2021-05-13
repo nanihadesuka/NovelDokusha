@@ -23,15 +23,15 @@
 		tools:listitem="@layout/activity_reader_list_item"
 		/>
 	
-	<LinearLayout
+	<androidx.constraintlayout.widget.ConstraintLayout
 		android:id="@+id/settingsPanel"
 		android:layout_width="match_parent"
-		android:layout_height="wrap_content"
+		android:layout_height="match_parent"
 		android:layout_gravity="bottom"
 		android:layout_marginBottom="20sp"
-		android:animateLayoutChanges="true"
-		android:visibility="invisible"
+		android:clickable="false"
 		android:orientation="vertical"
+		android:visibility="invisible"
 		tools:visibility="visible"
 		>
 		
@@ -39,11 +39,88 @@
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
 			android:layout_gravity="bottom"
-			android:layout_marginHorizontal="10sp"
-			android:animateLayoutChanges="true"
-			android:background="@drawable/background_round"
-			android:padding="5sp"
+			android:background="@drawable/background_gradient_downwards"
+			android:orientation="vertical"
+			android:paddingHorizontal="20sp"
+			android:paddingTop="10sp"
+			android:paddingBottom="40sp"
+			app:layout_constraintLeft_toLeftOf="parent"
+			app:layout_constraintTop_toTopOf="parent"
+			>
+			
+			<TextView
+				android:id="@+id/infoChapterTitle"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:elegantTextHeight="true"
+				android:textSize="20sp"
+				android:textStyle="bold"
+				tools:text="Chapter title"
+				/>
+			
+			<LinearLayout
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				>
+				
+				<TextView
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:elegantTextHeight="true"
+					android:text="Chapter:"
+					android:textSize="15sp"
+					android:textStyle="bold"
+					/>
+				
+				<TextView
+					android:id="@+id/infoCurrentChapterFromTotal"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:elegantTextHeight="true"
+					android:textSize="15sp"
+					android:textStyle="bold"
+					tools:text="64/540"
+					/>
+			
+			</LinearLayout>
+			
+			<LinearLayout
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				>
+				
+				<TextView
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:elegantTextHeight="true"
+					android:text="Progress:"
+					android:textSize="15sp"
+					android:textStyle="bold"
+					/>
+				
+				<TextView
+					android:id="@+id/infoChapterProgressPercentage"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:elegantTextHeight="true"
+					android:textSize="15sp"
+					android:textStyle="bold"
+					tools:text="20%"
+					/>
+			</LinearLayout>
+		</LinearLayout>
+		
+		
+		<LinearLayout
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:layout_gravity="bottom"
 			android:layout_margin="10sp"
+			android:layout_marginHorizontal="10sp"
+			android:background="@drawable/background_round"
+			android:gravity="bottom"
+			android:padding="5sp"
+			app:layout_constraintBottom_toTopOf="@id/textSizeLayout"
 			>
 			
 			<ImageView
@@ -66,15 +143,17 @@
 		</LinearLayout>
 		
 		<LinearLayout
+			android:id="@+id/textSizeLayout"
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
 			android:layout_gravity="bottom"
+			android:layout_margin="10sp"
 			android:layout_marginHorizontal="10sp"
 			android:layout_marginBottom="60sp"
-			android:animateLayoutChanges="true"
 			android:background="@drawable/background_round"
+			android:gravity="bottom"
 			android:padding="5sp"
-			android:layout_margin="10sp"
+			app:layout_constraintBottom_toBottomOf="parent"
 			>
 			
 			<ImageView
@@ -102,7 +181,5 @@
 				app:trackColorActive="?attr/colorAccent"
 				/>
 		</LinearLayout>
-	</LinearLayout>
-
-
+	</androidx.constraintlayout.widget.ConstraintLayout>
 </FrameLayout>

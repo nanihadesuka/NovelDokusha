@@ -14,12 +14,14 @@ import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import my.noveldokusha.*
 import my.noveldokusha.databinding.ActivityReaderBinding
 import my.noveldokusha.databinding.ActivityReaderListItemBinding
 import my.noveldokusha.ui.BaseActivity
 import my.noveldokusha.uiUtils.Extra_String
 import my.noveldokusha.uiUtils.inflater
+import kotlin.math.ceil
 
 class ReaderActivity : BaseActivity()
 {
@@ -43,7 +45,6 @@ class ReaderActivity : BaseActivity()
 	{
 		val listView by lazy { ItemArrayAdapter(this@ReaderActivity, viewModel.items) }
 	}
-	val settingTextFont by lazy { ItemArrayAdapter(this@ReaderActivity, viewModel.items) }
 	
 	private val preferences by lazy {
 		object
@@ -151,6 +152,28 @@ class ReaderActivity : BaseActivity()
 		}
 	}
 	
+	fun updateInfoView()
+	{
+		val lastVisiblePosition = viewHolder.listView.lastVisiblePosition
+		if (lastVisiblePosition < 0) return
+		val item = viewAdapter.listView.getItem(lastVisiblePosition)
+		if (item !is Item.Position) return
+		
+		val currentChapterUrl = item.url
+		lifecycleScope.launch(Dispatchers.Default) {
+			val index = viewModel.orderedChapters.indexOfFirst { it.url == currentChapterUrl }
+			val pos = index + 1
+			val itemPos = item.pos.toFloat()
+			val title = viewModel.orderedChapters[index].title
+			withContext(Dispatchers.Main) {
+				viewHolder.infoChapterTitle.text = title
+				viewHolder.infoCurrentChapterFromTotal.text = " $pos/${viewModel.orderedChapters.size}"
+				val itemMaxPos = viewModel.chaptersSize.getOrDefault(item.url, 0).coerceAtLeast(1).toFloat()
+				viewHolder.infoChapterProgressPercentage.text = " ${ceil((itemPos / itemMaxPos) * 100f)}%"
+			}
+		}
+	}
+	
 	override fun onStart()
 	{
 		super.onStart()
@@ -158,6 +181,8 @@ class ReaderActivity : BaseActivity()
 		{
 			override fun onScroll(view: AbsListView?, firstVisibleItem: Int, visibleItemCount: Int, totalItemCount: Int)
 			{
+				updateInfoView()
+				
 				val isTop = visibleItemCount != 0 && firstVisibleItem == 0
 				val isBottom = visibleItemCount != 0 && (firstVisibleItem + visibleItemCount) == totalItemCount
 				if (isTop && viewModel.isTop_firstCall)
@@ -344,6 +369,7 @@ class ReaderActivity : BaseActivity()
 				{
 					val items = textToItems(chapter.url, res.data)
 					runOnUiThread {
+						viewModel.chaptersSize[chapter.url] = items.size
 						maintainPosition {
 							remove(itemProgressBar)
 							insertAll(items)
