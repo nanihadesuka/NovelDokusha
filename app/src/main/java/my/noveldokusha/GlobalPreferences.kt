@@ -12,9 +12,9 @@ enum class AppPreferences
 
 val globalThemeList = mapOf(
 	"light" to R.style.AppTheme_Light,
-	"dark" to R.style.AppTheme_Dark,
-	"grey" to R.style.AppTheme_Grey,
-	"black" to R.style.AppTheme_Black
+	"dark" to R.style.AppTheme_BaseDark_Dark,
+	"grey" to R.style.AppTheme_BaseDark_Grey,
+	"black" to R.style.AppTheme_BaseDark_Black
 )
 
 fun SharedPreferences.getAppThemeId(): Int = this.get(AppPreferences.THEME_ID, R.style.AppTheme_Light)
