@@ -46,38 +46,17 @@ class ReaderActivity : BaseActivity()
 		val listView by lazy { ItemArrayAdapter(this@ReaderActivity, viewModel.items) }
 	}
 	
-	private val preferences by lazy {
-		object
+	val listenerSharedPreferences = SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
+		when (key)
 		{
-			var textSize: Float = sharedPreferences.getReaderFontSize()
-				set(value)
-				{
-					sharedPreferences.edit().setReaderFontSize(value).apply()
-					field = value
-				}
-				get() = sharedPreferences.getReaderFontSize()
-			
-			var textFontFamily: String = sharedPreferences.getReaderFontFamily()
-				set(value)
-				{
-					sharedPreferences.edit().setReaderFontFamily(value).apply()
-					field = value
-				}
-				get() = sharedPreferences.getReaderFontFamily()
-			
-			val listener = SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
-				when (key)
-				{
-					AppPreferences.READER_FONT_SIZE.name -> viewAdapter.listView.notifyDataSetChanged()
-					AppPreferences.READER_FONT_FAMILY.name -> viewAdapter.listView.notifyDataSetChanged()
-				}
-			}
-			
-			init
-			{
-				sharedPreferences.registerOnSharedPreferenceChangeListener(listener)
-			}
+			sharedPreferences::READER_FONT_SIZE.name -> viewAdapter.listView.notifyDataSetChanged()
+			sharedPreferences::READER_FONT_FAMILY.name -> viewAdapter.listView.notifyDataSetChanged()
 		}
+	}
+	
+	init
+	{
+		sharedPreferences.registerOnSharedPreferenceChangeListener(listenerSharedPreferences)
 	}
 	
 	val availableFonts = listOf(
@@ -109,12 +88,12 @@ class ReaderActivity : BaseActivity()
 		viewModel.initialization(bookUrl = extras.bookUrl, bookSelectedChapterUrl = extras.bookSelectedChapterUrl)
 		
 		viewHolder.listView.adapter = viewAdapter.listView
-		viewHolder.settingTextSize.value = preferences.textSize
+		viewHolder.settingTextSize.value = sharedPreferences.READER_FONT_SIZE
 		
 		loadInitialChapter()
 		
 		viewHolder.settingTextSize.addOnChangeListener { _, value, _ ->
-			preferences.textSize = value
+			sharedPreferences.READER_FONT_SIZE = value
 		}
 		viewHolder.listView.setOnItemLongClickListener { _, _, _, _ ->
 			viewHolder.settingsPanel.visibility = if (viewHolder.settingsPanel.isVisible) View.INVISIBLE else View.VISIBLE
@@ -122,12 +101,12 @@ class ReaderActivity : BaseActivity()
 		}
 		
 		viewHolder.settingTextFont.adapter = ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, availableFonts)
-		viewHolder.settingTextFont.setSelection(availableFonts.indexOfFirst { it == preferences.textFontFamily })
+		viewHolder.settingTextFont.setSelection(availableFonts.indexOfFirst { it == sharedPreferences.READER_FONT_FAMILY })
 		viewHolder.settingTextFont.onItemSelectedListener = object : AdapterView.OnItemSelectedListener
 		{
 			override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long)
 			{
-				preferences.textFontFamily = availableFonts[position]
+				sharedPreferences.READER_FONT_FAMILY = availableFonts[position]
 			}
 			
 			override fun onNothingSelected(parent: AdapterView<*>?) = Unit
@@ -427,11 +406,11 @@ class ReaderActivity : BaseActivity()
 			itemView.error.visibility = View.GONE
 			itemView.body.visibility = View.GONE
 			itemView.title.text = ""
-			itemView.title.typeface = getFontFamilyBOLD(preferences.textFontFamily)
+			itemView.title.typeface = getFontFamilyBOLD(sharedPreferences.READER_FONT_FAMILY)
 			itemView.error.text = ""
 			itemView.body.text = ""
-			itemView.body.textSize = preferences.textSize
-			itemView.body.typeface = getFontFamilyNORMAL(preferences.textFontFamily)
+			itemView.body.textSize = sharedPreferences.READER_FONT_SIZE
+			itemView.body.typeface = getFontFamilyNORMAL(sharedPreferences.READER_FONT_FAMILY)
 			
 			when (item)
 			{

@@ -16,11 +16,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import my.noveldokusha.THEME_ID
 import my.noveldokusha.bookstore
 import my.noveldokusha.databinding.ActivityMainFragmentSettingsBinding
-import my.noveldokusha.getAppThemeId
 import my.noveldokusha.globalThemeList
-import my.noveldokusha.setAppThemeId
 import my.noveldokusha.ui.BaseFragment
 import my.noveldokusha.uiUtils.toast
 import java.io.PrintWriter
@@ -51,11 +50,11 @@ class SettingsFragment : BaseFragment()
 	
 	fun settingTheme()
 	{
-		val currentThemeId = sharedPreferences.getAppThemeId()
+		val currentThemeId = sharedPreferences.THEME_ID
 		globalThemeList.forEach { (name, id) ->
 			viewHolder.settingsTheme.addView(MaterialRadioButton(requireActivity()).also {
 				it.text = name
-				it.setOnCheckedChangeListener { _, _ -> sharedPreferences.edit().setAppThemeId(id).apply() }
+				it.setOnCheckedChangeListener { _, _ -> sharedPreferences.THEME_ID = id }
 				it.isChecked = currentThemeId == id
 			})
 		}
