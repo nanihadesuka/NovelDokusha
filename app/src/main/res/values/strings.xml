@@ -5,10 +5,6 @@
 	<string name="title_settings">Settings</string>
 	<string name="reader_no_more_chapters">-- No more chapters --</string>
 	<string name="reader_first_chapter">-- First chapter -- </string>
-	<string name="downloaded">Downloaded</string>
-	<string name="set_as_all_read">Set as all read</string>
-	<string name="download_all_chapters">Download all chapters</string>
-	<string name="show_book_info">Show book info</string>
 	<string name="remove_from_library">Remove from library</string>
 	<string name="description">Description</string>
 	<string name="alternative_titles">Alternative titles</string>
