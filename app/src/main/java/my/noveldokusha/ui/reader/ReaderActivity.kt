@@ -93,7 +93,18 @@ class ReaderActivity : BaseActivity()
 			sharedPreferences.READER_FONT_SIZE = value
 		}
 		viewHolder.listView.setOnItemLongClickListener { _, _, _, _ ->
-			viewHolder.settingsPanel.visibility = if (viewHolder.settingsPanel.isVisible) View.INVISIBLE else View.VISIBLE
+			if (viewHolder.infoContainer.isVisible)
+			{
+				viewHolder.infoContainer.fadeOutVertical(-200f)
+				viewHolder.settingTextFontContainer.fadeOutVertical(200f)
+				viewHolder.settingTextSizeContainer.fadeOutVertical(200f)
+			}
+			else
+			{
+				viewHolder.infoContainer.fadeInVertical(-200f)
+				viewHolder.settingTextFontContainer.fadeInVertical(200f)
+				viewHolder.settingTextSizeContainer.fadeInVertical(200f)
+			}
 			true
 		}
 		

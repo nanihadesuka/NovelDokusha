@@ -31,11 +31,11 @@
 		android:layout_marginBottom="20sp"
 		android:clickable="false"
 		android:orientation="vertical"
-		android:visibility="invisible"
-		tools:visibility="visible"
+		
 		>
 		
 		<LinearLayout
+			android:id="@+id/infoContainer"
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
 			android:layout_gravity="bottom"
@@ -44,8 +44,10 @@
 			android:paddingHorizontal="20sp"
 			android:paddingTop="10sp"
 			android:paddingBottom="40sp"
+			android:visibility="invisible"
 			app:layout_constraintLeft_toLeftOf="parent"
 			app:layout_constraintTop_toTopOf="parent"
+			tools:visibility="visible"
 			>
 			
 			<TextView
@@ -112,6 +114,7 @@
 		
 		
 		<LinearLayout
+			android:id="@+id/settingTextFontContainer"
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
 			android:layout_gravity="bottom"
@@ -120,7 +123,9 @@
 			android:background="@drawable/background_round"
 			android:gravity="bottom"
 			android:padding="5sp"
-			app:layout_constraintBottom_toTopOf="@id/textSizeLayout"
+			android:visibility="invisible"
+			app:layout_constraintBottom_toTopOf="@id/settingTextSizeContainer"
+			tools:visibility="visible"
 			>
 			
 			<ImageView
@@ -143,7 +148,7 @@
 		</LinearLayout>
 		
 		<LinearLayout
-			android:id="@+id/textSizeLayout"
+			android:id="@+id/settingTextSizeContainer"
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
 			android:layout_gravity="bottom"
@@ -153,7 +158,9 @@
 			android:background="@drawable/background_round"
 			android:gravity="bottom"
 			android:padding="5sp"
+			android:visibility="invisible"
 			app:layout_constraintBottom_toBottomOf="parent"
+			tools:visibility="visible"
 			>
 			
 			<ImageView

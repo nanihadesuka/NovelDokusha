@@ -51,7 +51,7 @@ class ChaptersActivity : BaseActivity()
 	private val viewHolder by lazy { ActivityChaptersBinding.inflate(layoutInflater) }
 	private val viewAdapter = object
 	{
-		val chapters by lazy { ChaptersArrayAdapter(this@ChaptersActivity, viewModel.chapters, viewModel, viewHolder.selectionModeBar) }
+		val chapters by lazy { ChaptersArrayAdapter(this@ChaptersActivity, viewModel.chapters, viewModel) { selectionModeBarUpdateVisibility() } }
 		val header by lazy { ChaptersHeaderAdapter(this@ChaptersActivity, viewModel) }
 	}
 	
@@ -81,9 +81,17 @@ class ChaptersActivity : BaseActivity()
 		}
 	}
 	
+	fun selectionModeBarUpdateVisibility()
+	{
+		if (viewModel.selectedChaptersUrl.isNotEmpty())
+			viewHolder.selectionModeBar.fadeInVertical(displacement = 200f)
+		else
+			viewHolder.selectionModeBar.fadeOutVertical(displacement = 200f)
+	}
+	
 	fun setupSelectionModeBar()
 	{
-		viewHolder.selectionModeBar.visibility = if (viewModel.selectedChaptersUrl.isNotEmpty()) View.VISIBLE else View.INVISIBLE
+		selectionModeBarUpdateVisibility()
 		
 		viewHolder.selectionSelectAll.setOnClickListener {
 			viewModel.selectedChaptersUrl.addAll(viewModel.chapters.map { it.chapter.url })
@@ -124,7 +132,7 @@ class ChaptersActivity : BaseActivity()
 		
 		viewHolder.selectionClose.setOnClickListener {
 			viewModel.selectedChaptersUrl.clear()
-			viewHolder.selectionModeBar.visibility = View.INVISIBLE
+			selectionModeBarUpdateVisibility()
 			viewAdapter.chapters.notifyDataSetChanged()
 		}
 	}
@@ -134,7 +142,7 @@ class ChaptersActivity : BaseActivity()
 		View.VISIBLE ->
 		{
 			viewModel.selectedChaptersUrl.clear()
-			viewHolder.selectionModeBar.visibility = View.INVISIBLE
+			selectionModeBarUpdateVisibility()
 			viewAdapter.chapters.notifyDataSetChanged()
 		}
 		else -> super.onBackPressed()
@@ -181,7 +189,7 @@ private class ChaptersArrayAdapter(
 	private val context: BaseActivity,
 	private val list: ArrayList<ChaptersModel.ChapterItem>,
 	private val viewModel: ChaptersModel,
-	private val selectionModeBar: View
+	private val selectionModeBarUpdateVisibility: () -> Unit
 ) :
 	RecyclerView.Adapter<ChaptersArrayAdapter.ViewBinder>()
 {
@@ -235,7 +243,7 @@ private class ChaptersArrayAdapter(
 			else
 			{
 				viewModel.selectedChaptersUrl.add(itemData.chapter.url)
-				selectionModeBar.visibility = View.VISIBLE
+				selectionModeBarUpdateVisibility()
 				notifyDataSetChanged()
 			}
 			true
@@ -251,7 +259,7 @@ private class ChaptersArrayAdapter(
 		else viewModel.selectedChaptersUrl.add(itemData.chapter.url)
 		
 		if (viewModel.selectedChaptersUrl.isEmpty())
-			selectionModeBar.visibility = View.INVISIBLE
+			selectionModeBarUpdateVisibility()
 		
 		notifyDataSetChanged()
 	}
