@@ -54,11 +54,6 @@ class ReaderActivity : BaseActivity()
 		}
 	}
 	
-	init
-	{
-		sharedPreferences.registerOnSharedPreferenceChangeListener(listenerSharedPreferences)
-	}
-	
 	val availableFonts = listOf(
 		"casual",
 		"cursive",
@@ -86,6 +81,8 @@ class ReaderActivity : BaseActivity()
 		setContentView(viewHolder.root)
 		
 		viewModel.initialization(bookUrl = extras.bookUrl, bookSelectedChapterUrl = extras.bookSelectedChapterUrl)
+		
+		sharedPreferences.registerOnSharedPreferenceChangeListener(listenerSharedPreferences)
 		
 		viewHolder.listView.adapter = viewAdapter.listView
 		viewHolder.settingTextSize.value = sharedPreferences.READER_FONT_SIZE
