@@ -16,6 +16,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import my.noveldokusha.THEME_FOLLOW_SYSTEM
 import my.noveldokusha.THEME_ID
 import my.noveldokusha.bookstore
 import my.noveldokusha.databinding.ActivityMainFragmentSettingsBinding
@@ -50,13 +51,21 @@ class SettingsFragment : BaseFragment()
 	
 	fun settingTheme()
 	{
-		val currentThemeId = sharedPreferences.THEME_ID
-		globalThemeList.forEach { (name, id) ->
+		viewHolder.settingsFollowSystemTheme.isChecked = sharedPreferences.THEME_FOLLOW_SYSTEM
+		viewHolder.settingsFollowSystemTheme.setOnCheckedChangeListener { _, isChecked ->
+			sharedPreferences.THEME_FOLLOW_SYSTEM = isChecked
+		}
+		
+		val themes = (globalThemeList.light + globalThemeList.dark)
+		for ((id, name) in themes)
 			viewHolder.settingsTheme.addView(MaterialRadioButton(requireActivity()).also {
+				it.id = id
 				it.text = name
-				it.setOnCheckedChangeListener { _, _ -> sharedPreferences.THEME_ID = id }
-				it.isChecked = currentThemeId == id
 			})
+		
+		viewHolder.settingsTheme.check(sharedPreferences.THEME_ID)
+		viewHolder.settingsTheme.setOnCheckedChangeListener { _, _ ->
+			sharedPreferences.THEME_ID = viewHolder.settingsTheme.checkedRadioButtonId
 		}
 	}
 	

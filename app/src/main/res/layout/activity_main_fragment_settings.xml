@@ -2,6 +2,7 @@
 
 <LinearLayout
 	xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:app="http://schemas.android.com/apk/res-auto"
 	xmlns:tools="http://schemas.android.com/tools"
 	android:layout_width="match_parent"
 	android:layout_height="wrap_content"
@@ -19,7 +20,19 @@
 			android:layout_height="wrap_content"
 			android:padding="12sp"
 			android:text="@string/theme"
+			android:textColor="?colorAccent"
 			android:textStyle="bold"
+			/>
+		
+		<androidx.appcompat.widget.SwitchCompat
+			android:id="@+id/settings_follow_system_theme"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:padding="12sp"
+			android:text="Follow system"
+			android:textSize="16sp"
+			android:textColor="?colorControlNormal"
+			app:switchPadding="10sp"
 			/>
 		
 		<RadioGroup
@@ -41,6 +54,7 @@
 			android:layout_height="wrap_content"
 			android:padding="12sp"
 			android:text="@string/data"
+			android:textColor="?colorAccent"
 			android:textStyle="bold"
 			/>
 		
@@ -104,6 +118,7 @@
 			android:layout_height="wrap_content"
 			android:padding="12sp"
 			android:text="@string/backup"
+			android:textColor="?colorAccent"
 			android:textStyle="bold"
 			/>
 		
@@ -157,4 +172,5 @@
 				/>
 		</LinearLayout>
 	</LinearLayout>
+
 </LinearLayout>
