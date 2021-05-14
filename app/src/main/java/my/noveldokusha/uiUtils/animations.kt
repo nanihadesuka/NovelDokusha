@@ -4,28 +4,28 @@ import android.view.View
 import android.view.animation.AccelerateInterpolator
 import android.view.animation.DecelerateInterpolator
 
-fun View.fadeInVertical(displacement: Float = 0f, duration: Long = 150) = also {
-	it.alpha = 0f
-	it.translationY = displacement
-	it.visibility = View.VISIBLE
-	it.animate().apply {
-		alpha(1f)
-		translationY(0f)
-		this.duration = duration
-		interpolator = DecelerateInterpolator()
+fun View.fadeInVertical(displacement: Float = 0f, duration: Long = 150) = apply {
+	alpha = 0f
+	translationY = displacement
+	visibility = View.VISIBLE
+	animate().also {
+		it.alpha(1f)
+		it.translationY(0f)
+		it.duration = duration
+		it.interpolator = DecelerateInterpolator()
 	}
 }
 
-fun View.fadeOutVertical(displacement: Float = 0f, duration: Long = 150) = also {
-	it.alpha = 1f
-	it.translationY = 0f
-	it.animate().apply {
-		alpha(0f)
-		translationY(displacement)
-		this.duration = duration
-		interpolator = AccelerateInterpolator()
-		withEndAction {
-			it.visibility = View.INVISIBLE
+fun View.fadeOutVertical(displacement: Float = 0f, duration: Long = 150) = apply {
+	alpha = 1f
+	translationY = 0f
+	animate().also {
+		it.alpha(0f)
+		it.translationY(displacement)
+		it.duration = duration
+		it.interpolator = AccelerateInterpolator()
+		it.withEndAction {
+			visibility = View.INVISIBLE
 		}
 	}
 }

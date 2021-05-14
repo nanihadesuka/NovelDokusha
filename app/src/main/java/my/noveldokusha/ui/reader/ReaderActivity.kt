@@ -20,6 +20,8 @@ import my.noveldokusha.databinding.ActivityReaderBinding
 import my.noveldokusha.databinding.ActivityReaderListItemBinding
 import my.noveldokusha.ui.BaseActivity
 import my.noveldokusha.uiUtils.Extra_String
+import my.noveldokusha.uiUtils.fadeInVertical
+import my.noveldokusha.uiUtils.fadeOutVertical
 import my.noveldokusha.uiUtils.inflater
 import kotlin.math.ceil
 

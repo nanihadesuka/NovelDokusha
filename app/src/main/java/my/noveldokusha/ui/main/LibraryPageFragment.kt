@@ -23,10 +23,7 @@ import my.noveldokusha.databinding.ActivityMainFragmentLibraryPageBinding
 import my.noveldokusha.databinding.ActivityMainFragmentLibraryPageGridviewItemBinding
 import my.noveldokusha.ui.BaseFragment
 import my.noveldokusha.ui.chaptersList.ChaptersActivity
-import my.noveldokusha.uiUtils.Argument_Boolean
-import my.noveldokusha.uiUtils.addBottomMargin
-import my.noveldokusha.uiUtils.inflater
-import my.noveldokusha.uiUtils.switchLiveData
+import my.noveldokusha.uiUtils.*
 import kotlin.properties.Delegates
 
 class LibraryPageFragment : BaseFragment
@@ -112,10 +109,9 @@ private class NovelItemAdapter(
 	}
 	
 	fun setList(newList: List<LibraryPageModel.BookItem>) = DiffUtil.calculateDiff(Diff(newList)).let {
-		val isEmpty = list.isEmpty()
 		list.clear()
 		list.addAll(newList)
-		if (isEmpty) notifyDataSetChanged() else it.dispatchUpdatesTo(this)
+		it.dispatchUpdatesTo(this)
 	}
 	
 	override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewBinder
