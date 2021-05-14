@@ -12,6 +12,7 @@
 		android:id="@+id/swipeRefreshLayout"
 		android:layout_width="match_parent"
 		android:layout_height="match_parent"
+		android:paddingHorizontal="4sp"
 		>
 		
 		<androidx.recyclerview.widget.RecyclerView
@@ -19,7 +20,7 @@
 			android:layout_width="match_parent"
 			android:layout_height="match_parent"
 			android:clipToPadding="false"
-			android:padding="4sp"
+			android:paddingBottom="300sp"
 			android:scrollbars="vertical"
 			android:splitMotionEvents="false"
 			app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"

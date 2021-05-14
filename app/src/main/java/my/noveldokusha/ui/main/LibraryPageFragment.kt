@@ -139,8 +139,6 @@ private class NovelItemAdapter(
 			completedDialog(context, viewModel.data)
 			true
 		}
-		
-		binder.addBottomMargin { position == list.lastIndex }
 	}
 	
 	inner class ViewBinder(val viewHolder: ActivityMainFragmentLibraryPageGridviewItemBinding) : RecyclerView.ViewHolder(viewHolder.root)
