@@ -3,7 +3,6 @@ package my.noveldokusha.ui.databaseSearchResults
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
@@ -28,8 +27,8 @@ class DatabaseSearchResultsActivity : BaseActivity()
 	{
 		var databaseUrlBase by Extra_String()
 		private var text by Extra_String()
-		private var genresInclude by Extra_StringArrayList()
-		private var genresExclude by Extra_StringArrayList()
+		private var genresIncludeId by Extra_StringArrayList()
+		private var genresExcludeId by Extra_StringArrayList()
 		private var searchMode by Extra_String()
 		
 		private enum class MODE
@@ -49,8 +48,8 @@ class DatabaseSearchResultsActivity : BaseActivity()
 				}
 				is SearchMode.Advanced ->
 				{
-					this.genresInclude = input.genresInclude
-					this.genresExclude = input.genresExclude
+					this.genresIncludeId = input.genresIncludeId
+					this.genresExcludeId = input.genresExcludeId
 					MODE.ADVANCED.name
 				}
 			}
@@ -60,7 +59,7 @@ class DatabaseSearchResultsActivity : BaseActivity()
 			get() = when (searchMode)
 			{
 				MODE.TEXT.name -> SearchMode.Text(text = text)
-				MODE.ADVANCED.name -> SearchMode.Advanced(genresInclude = genresInclude, genresExclude = genresExclude)
+				MODE.ADVANCED.name -> SearchMode.Advanced(genresIncludeId = genresIncludeId, genresExcludeId = genresExcludeId)
 				else -> throw InvalidObjectException("Invalid SearchMode subclass: $searchMode")
 			}
 	}
@@ -70,7 +69,7 @@ class DatabaseSearchResultsActivity : BaseActivity()
 	sealed class SearchMode
 	{
 		data class Text(val text: String) : SearchMode()
-		data class Advanced(val genresInclude: ArrayList<String>, val genresExclude: ArrayList<String>) : SearchMode()
+		data class Advanced(val genresIncludeId: ArrayList<String>, val genresExcludeId: ArrayList<String>) : SearchMode()
 	}
 	
 	private val viewModel by viewModels<DatabaseSearchResultsModel>()

@@ -65,19 +65,21 @@ object scrubber
 	
 	interface database_interface
 	{
+		val id: String
 		val name: String
 		val baseUrl: String
 		
-		val searchGenres: Map<String, String>
+		val searchGenresCache get() = DataCache_DatabaseSearchGenres(id)
 		
+		suspend fun getSearchGenres(): Response<Map<String, String>>
 		suspend fun getSearch(index: Int, input: String): Response<List<BookMetadata>>
 		suspend fun getSearchAdvanced(
 			index: Int,
-			genresIncluded: List<String>,
-			genresExcluded: List<String>
+			genresIncludedId: List<String>,
+			genresExcludedId: List<String>
 		): Response<List<BookMetadata>>
 		
-		data class BookAuthor(val name: String, val url: String)
+		data class BookAuthor(val name: String, val url: String?)
 		data class BookData(
 			val title: String,
 			val description: String,
@@ -494,45 +496,21 @@ object scrubber
 		 */
 		object NovelUpdates : database_interface
 		{
+			override val id = "novel_updates"
 			override val name = "Novel Updates"
 			override val baseUrl = "https://www.novelupdates.com/"
-			override val searchGenres = mapOf(
-				"Action" to "8",
-				"Adult" to "280",
-				"Adventure" to "13",
-				"Comedy" to "17",
-				"Drama" to "9",
-				"Ecchi" to "292",
-				"Fantasy" to "5",
-				"Gender Bender" to "168",
-				"Harem" to "3",
-				"Historical" to "330",
-				"Horror" to "343",
-				"Josei" to "324",
-				"Martial Arts" to "14",
-				"Mature" to "4",
-				"Mecha" to "10",
-				"Mystery" to "245",
-				"Psychological" to "486",
-				"Romance" to "15",
-				"School Life" to "6",
-				"Sci-fi" to "11",
-				"Seinen" to "18",
-				"Shoujo" to "157",
-				"Shoujo Ai" to "851",
-				"Shounen" to "12",
-				"Shounen Ai" to "1692",
-				"Slice to Life" to "7",
-				"Smut" to "281",
-				"Sports" to "1357",
-				"Supernatural" to "16",
-				"Tragedy" to "132",
-				"Wuxia" to "479",
-				"Xianxia" to "480",
-				"Xuanhuan" to "3954",
-				"Yaoi" to "560",
-				"Yuri" to "922"
-			)
+			
+			override suspend fun getSearchGenres(): Response<Map<String, String>>
+			{
+				return searchGenresCache.fetch {
+					tryConnect {
+						fetchDoc("https://www.novelupdates.com/series-finder/")
+							.select(".genreme")
+							.associate { it.text().trim() to it.attr("genreid")!! }
+							.let { Response.Success(it) }
+					}
+				}
+			}
 			
 			override suspend fun getSearch(index: Int, input: String): Response<List<BookMetadata>>
 			{
@@ -549,14 +527,14 @@ object scrubber
 				}
 			}
 			
-			override suspend fun getSearchAdvanced(index: Int, genresIncluded: List<String>, genresExcluded: List<String>):
+			override suspend fun getSearchAdvanced(index: Int, genresIncludedId: List<String>, genresExcludedId: List<String>):
 					Response<List<BookMetadata>>
 			{
 				val page = index + 1
 				
 				var url = "https://www.novelupdates.com/series-finder/?sf=1"
-				if (genresIncluded.isNotEmpty()) url += "&gi=${genresIncluded.map { searchGenres[it] }.joinToString(",")}&mgi=and"
-				if (genresExcluded.isNotEmpty()) url += "&ge=${genresExcluded.map { searchGenres[it] }.joinToString(",")}"
+				if (genresIncludedId.isNotEmpty()) url += "&gi=${genresIncludedId.joinToString(",")}&mgi=and"
+				if (genresExcludedId.isNotEmpty()) url += "&ge=${genresExcludedId.joinToString(",")}"
 				url += "&sort=sdate&order=desc"
 				if (page > 1) url += "&pg=$page"
 				
@@ -605,8 +583,118 @@ object scrubber
 				)
 			}
 		}
+		
+		/**
+		 * Novel main page example:
+		 * https://www.novelupdates.com/series/mushoku-tensei/
+		 */
+		object BakaUpdates : database_interface
+		{
+			override val id = "baka_updates"
+			override val name = "Baka-Updates"
+			override val baseUrl = "https://www.mangaupdates.com/"
+			
+			fun String.removeNovelTag() = this.removeSuffix("(Novel)").trim()
+			
+			override suspend fun getSearchGenres(): Response<Map<String, String>>
+			{
+				return searchGenresCache.fetch {
+					tryConnect {
+						fetchDoc("https://www.mangaupdates.com/series.html?act=genresearch")
+							.select(".p-1.col-6.text")
+							.map { it.text().trim() }
+							.associateWith { it.replace(" ", "+") }
+							.let { Response.Success(it) }
+					}
+				}
+			}
+			
+			override suspend fun getSearch(index: Int, input: String): Response<List<BookMetadata>>
+			{
+				val page = index + 1
+				val settings = mutableListOf<String>().apply {
+					if (page > 1) add("page=$page")
+					add("display=list")
+					add("perpage=50")
+					add("type=novel")
+					add("search=${input.urlEncode()}")
+				}
+				val url = "https://www.mangaupdates.com/series.html?" + settings.joinToString("&")
+				
+				return tryConnect("page: $page\nurl: $url") {
+					fetchDoc(url)
+						.select("div.col-6.py-1.py-md-0.text")
+						.map { it.selectFirst("a[href]") }
+						.map { BookMetadata(it.text().removeNovelTag(), it.attr("href")) }
+						.let { Response.Success(it) }
+				}
+			}
+			
+			override suspend fun getSearchAdvanced(index: Int, genresIncludedId: List<String>, genresExcludedId: List<String>):
+					Response<List<BookMetadata>>
+			{
+				val page = index + 1
+				val settings = mutableListOf<String>().apply {
+					if (page > 1) add("page=$page")
+					add("display=list")
+					if (genresIncludedId.isNotEmpty()) add("genre=" + genresIncludedId.joinToString("_"))
+					if (genresExcludedId.isNotEmpty()) add("exclude_genre=" + genresExcludedId.joinToString("_"))
+					add("type=novel")
+					add("perpage=50")
+				}
+				val url = "https://www.mangaupdates.com/series.html?" + settings.joinToString("&")
+				
+				return tryConnect("page: $page\nurl: $url") {
+					fetchDoc(url)
+						.select("div.col-6.py-1.py-md-0.text")
+						.map { it.selectFirst("a[href]") }
+						.map { BookMetadata(it.text().removeNovelTag(), it.attr("href")) }
+						.let { Response.Success(it) }
+				}
+			}
+			
+			override fun getBookData(doc: Document): database_interface.BookData
+			{
+				fun entry(header: String) = doc.selectFirst("div.sCat > b:containsOwn($header)").parent().nextElementSibling()
+				
+				val relatedBooks = entry("Category Recommendations")
+					.select("a[href]")
+					.map { BookMetadata(it.text().removeNovelTag(), "https://www.mangaupdates.com/" + it.attr("href")) }
+					.toList()
+				
+				val similarRecommended = entry("Recommendations")
+					.select("a[href]")
+					.map { BookMetadata(it.text().removeNovelTag(), "https://www.mangaupdates.com/" + it.attr("href")) }
+					.toList()
+				
+				val authors = entry("Author\\(s\\)")
+					.select("a")
+					.map { database_interface.BookAuthor(name = it.text(), url = it.attr("href")) }
+				
+				val description = entry("Description").let {
+					it.selectFirst("[id=div_desc_more]") ?: it.selectFirst("div")
+				}.also { it.select("a").remove() }
+					.let { getNodeTextTransversal(it) }
+					.joinToString("\n\n")
+				
+				val tags = entry("Categories")
+					.select("li > a")
+					.map { it.text() }
+				
+				return database_interface.BookData(
+					title = doc.selectFirst(".releasestitle.tabletitle").text().removeNovelTag(),
+					description = description,
+					alternativeTitles = getNodeTextTransversal(entry("Associated Names")),
+					relatedBooks = relatedBooks,
+					similarRecommended = similarRecommended,
+					bookType = entry("Type").text(),
+					genres = entry("Genre").select("a").map { it.text() },
+					tags = tags,
+					authors = authors
+				)
+			}
+		}
 	}
-	
 }
 
 suspend fun downloadChapter(chapterUrl: String): Response<String>

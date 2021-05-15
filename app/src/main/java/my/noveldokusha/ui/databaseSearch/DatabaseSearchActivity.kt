@@ -3,13 +3,13 @@ package my.noveldokusha.ui.databaseSearch
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
 import android.view.ViewGroup
 import androidx.activity.viewModels
 import androidx.appcompat.widget.SearchView
 import androidx.recyclerview.widget.DefaultItemAnimator
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import my.noveldokusha.R
 import my.noveldokusha.databinding.ActivityDatabaseSearchBinding
@@ -41,7 +41,7 @@ class DatabaseSearchActivity : BaseActivity()
 	private val viewHolder by lazy { ActivityDatabaseSearchBinding.inflate(layoutInflater) }
 	private val viewAdapter = object
 	{
-		val listView by lazy { GenresAdapter(viewModel.genreList) }
+		val listView by lazy { GenresAdapter() }
 	}
 	
 	override fun onCreate(savedInstanceState: Bundle?)
@@ -60,17 +60,18 @@ class DatabaseSearchActivity : BaseActivity()
 		viewHolder.listView.adapter = viewAdapter.listView
 		viewHolder.listView.itemAnimator = DefaultItemAnimator()
 		viewHolder.searchByGenreButton.setOnClickListener { _ ->
+			val list = viewAdapter.listView.list
 			val input = DatabaseSearchResultsActivity.SearchMode.Advanced(
-				genresInclude = ArrayList(viewModel.genreList.filter { it.state == Checkbox3StatesView.STATE.POSITIVE }.map { it.genre }),
-				genresExclude = ArrayList(viewModel.genreList.filter { it.state == Checkbox3StatesView.STATE.NEGATIVE }.map { it.genre })
+				genresIncludeId = ArrayList(list.filter { it.state == Checkbox3StatesView.STATE.POSITIVE }.map { it.genreId }),
+				genresExcludeId = ArrayList(list.filter { it.state == Checkbox3StatesView.STATE.NEGATIVE }.map { it.genreId })
 			)
 			
 			DatabaseSearchResultsActivity
 				.IntentData(this@DatabaseSearchActivity, databaseUrlBase = viewModel.database.baseUrl, input = input)
 				.let(this@DatabaseSearchActivity::startActivity)
 		}
-		viewModel.genreListUpdated.observe(this) {
-			viewAdapter.listView.notifyDataSetChanged()
+		viewModel.genreListLiveData.observe(this) { list ->
+			viewAdapter.listView.setList(list)
 		}
 	}
 	
@@ -114,8 +115,24 @@ class DatabaseSearchActivity : BaseActivity()
 	
 }
 
-private class GenresAdapter(private val list: ArrayList<DatabaseSearchModel.Item>) : RecyclerView.Adapter<GenresAdapter.ViewBinder>()
+private class GenresAdapter() : RecyclerView.Adapter<GenresAdapter.ViewBinder>()
 {
+	val list = arrayListOf<DatabaseSearchModel.Item>()
+	
+	private inner class Diff(private val new: List<DatabaseSearchModel.Item>) : DiffUtil.Callback()
+	{
+		override fun getOldListSize(): Int = list.size
+		override fun getNewListSize(): Int = new.size
+		override fun areItemsTheSame(oldPos: Int, newPos: Int): Boolean = list[oldPos].genreId == new[newPos].genreId
+		override fun areContentsTheSame(oldPos: Int, newPos: Int): Boolean = list[oldPos].state == new[newPos].state
+	}
+	
+	fun setList(newList: List<DatabaseSearchModel.Item>) = DiffUtil.calculateDiff(Diff(newList)).let {
+		list.clear()
+		list.addAll(newList)
+		it.dispatchUpdatesTo(this)
+	}
+	
 	override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewBinder =
 		ViewBinder(ActivityDatabaseSearchGenreItemBinding.inflate(parent.inflater, parent, false))
 	
