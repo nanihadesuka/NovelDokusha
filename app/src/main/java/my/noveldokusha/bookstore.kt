@@ -203,6 +203,7 @@ object bookstore
 		
 		fun getDatabaseSizeBytes() = context.getDatabasePath(name).length()
 		fun close() = db.close()
+		fun delete() = context.deleteDatabase(name)
 		fun clearAllTables() = db.clearAllTables()
 		
 		inner class Settings

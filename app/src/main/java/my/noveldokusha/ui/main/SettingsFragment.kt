@@ -146,6 +146,8 @@ class SettingsFragment : BaseFragment()
 						bookstore.bookChapter.insert(backupDatabase.bookChapter.getAll())
 						bookstore.bookChapterBody.insert(backupDatabase.bookChapterBody.getAll())
 						withContext(Dispatchers.Main) { toast("Database restored") }
+						backupDatabase.close()
+						backupDatabase.delete()
 					}
 				}
 			}
