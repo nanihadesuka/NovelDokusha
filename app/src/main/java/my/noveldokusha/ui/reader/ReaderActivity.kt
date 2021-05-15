@@ -24,6 +24,7 @@ import my.noveldokusha.uiUtils.fadeInVertical
 import my.noveldokusha.uiUtils.fadeOutVertical
 import my.noveldokusha.uiUtils.inflater
 import kotlin.math.ceil
+import kotlin.math.roundToInt
 
 class ReaderActivity : BaseActivity()
 {
@@ -158,7 +159,7 @@ class ReaderActivity : BaseActivity()
 				viewHolder.infoChapterTitle.text = title
 				viewHolder.infoCurrentChapterFromTotal.text = " $pos/${viewModel.orderedChapters.size}"
 				val itemMaxPos = viewModel.chaptersSize.getOrDefault(item.url, 0).coerceAtLeast(1).toFloat()
-				viewHolder.infoChapterProgressPercentage.text = " ${ceil((itemPos / itemMaxPos) * 100f)}%"
+				viewHolder.infoChapterProgressPercentage.text = " ${ceil((itemPos / itemMaxPos) * 100f).roundToInt()}%"
 			}
 		}
 	}
