@@ -1,6 +1,7 @@
 package my.noveldokusha
 
 import android.app.Application
+import java.io.File
 
 class App : Application()
 {
@@ -14,5 +15,6 @@ class App : Application()
 	{
 		private lateinit var _instance: App
 		val instance get() = _instance
+		val cacheDir: File get() = _instance.cacheDir
 	}
 }
