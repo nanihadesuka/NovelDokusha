@@ -18,7 +18,10 @@
 		android:supportsRtl="true"
 		android:theme="@style/AppTheme.Light"
 		>
-		<activity android:name=".ui.main.MainActivity">
+		<activity
+			android:name=".ui.main.MainActivity"
+			android:theme="@style/AppTheme.Launcher"
+			>
 			<intent-filter>
 				<action android:name="android.intent.action.MAIN" />
 				<category android:name="android.intent.category.LAUNCHER" />

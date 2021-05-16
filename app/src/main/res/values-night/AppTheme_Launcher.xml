@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	
+	<style name="AppTheme.Launcher" parent="AppTheme.BaseDark.Dark">
+		<item name="android:windowBackground">@drawable/launcher_screen</item>
+	</style>
+</resources>
