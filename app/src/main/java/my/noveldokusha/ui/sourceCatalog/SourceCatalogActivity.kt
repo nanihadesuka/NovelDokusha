@@ -27,7 +27,9 @@ import my.noveldokusha.uiAdapters.ProgressBarAdapter
 import my.noveldokusha.uiUtils.Extra_String
 import my.noveldokusha.uiUtils.addBottomMargin
 import my.noveldokusha.uiUtils.inflater
+import my.noveldokusha.uiUtils.switchLiveData
 import java.util.*
+import kotlin.properties.Delegates
 
 class SourceCatalogActivity : BaseActivity()
 {
@@ -75,8 +77,7 @@ class SourceCatalogActivity : BaseActivity()
 		}
 		
 		viewModel.booksFetchIterator.onSuccess.observe(this) {
-			viewModel.list.addAll(it.data.map(::CatalogItem))
-			viewAdapter.recyclerView.notifyDataSetChanged()
+			viewAdapter.recyclerView.addAll(it.data.map(::CatalogItem))
 		}
 		viewModel.booksFetchIterator.onError.observe(this) {
 			viewHolder.errorMessage.visibility = View.VISIBLE
@@ -132,8 +133,15 @@ class SourceCatalogActivity : BaseActivity()
 		return true
 	}
 	
-	inner class BooksItemAdapter(private val list: List<CatalogItem>) : RecyclerView.Adapter<BooksItemAdapter.ViewBinder>()
+	inner class BooksItemAdapter(private val list: MutableList<CatalogItem>) : RecyclerView.Adapter<BooksItemAdapter.ViewBinder>()
 	{
+		fun addAll(newItems: List<CatalogItem>)
+		{
+			val size = list.size
+			list.addAll(newItems)
+			notifyItemRangeInserted(size, newItems.size)
+		}
+		
 		override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewBinder =
 			ViewBinder(BookListItemBinding.inflate(parent.inflater, parent, false))
 		
@@ -143,7 +151,7 @@ class SourceCatalogActivity : BaseActivity()
 		{
 			val itemData = this.list[position]
 			val itemView = binder.viewHolder
-			binder.setObservers(itemData)
+			binder.itemData = itemData
 			
 			itemView.title.text = itemData.bookMetadata.title
 			itemView.title.setOnClickListener {
@@ -162,20 +170,14 @@ class SourceCatalogActivity : BaseActivity()
 		
 		inner class ViewBinder(val viewHolder: BookListItemBinding) : RecyclerView.ViewHolder(viewHolder.root)
 		{
-			private var itemDataLast: CatalogItem? = null
+			var itemData: CatalogItem? by Delegates.observable(null) { _, oldValue, newValue ->
+				isInLibraryObserver.switchLiveData(oldValue, newValue, this@SourceCatalogActivity) { isInLibraryLiveData }
+			}
 			
 			private val unselectedTextColor = viewHolder.title.currentTextColor
 			private val selectedTextColor by lazy { ContextCompat.getColor(this@SourceCatalogActivity, R.color.dark_green) }
-			
-			val isInLibraryObserver = Observer<Boolean> { isInLibrary ->
+			private val isInLibraryObserver = Observer<Boolean> { isInLibrary ->
 				viewHolder.title.setTextColor(if (isInLibrary) selectedTextColor else unselectedTextColor)
-			}
-			
-			fun setObservers(itemData: CatalogItem)
-			{
-				itemDataLast?.isInLibraryLiveData?.removeObserver(isInLibraryObserver)
-				itemData.isInLibraryLiveData.observe(this@SourceCatalogActivity, isInLibraryObserver)
-				itemDataLast = itemData
 			}
 		}
 	}
