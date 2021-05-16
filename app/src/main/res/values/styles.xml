@@ -25,14 +25,14 @@
 		<item name="android:backgroundTint">?attr/colorPrimary</item>
 	</style>
 	
-	<style name="myBottomNavigationStyle" parent="Widget.Design.BottomNavigationView">
+	<style name="myBottomNavigationStyle" parent="Widget.MaterialComponents.BottomNavigationView">
 		<item name="itemIconTint">@color/icon_effect</item>
 		<item name="itemTextColor">@color/icon_effect</item>
-		<item name="android:background">?attr/colorPrimary</item>
+		<item name="android:background">?colorPrimary</item>
+		<item name="elevation">0dp</item>
 	</style>
 	
 	<style name="myAppBarLayoutStyle" parent="Widget.MaterialComponents.AppBarLayout.Primary">
 		<item name="elevation">0dp</item>
 	</style>
-
 </resources>
