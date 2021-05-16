@@ -7,3 +7,6 @@
 /captures
 .externalNativeBuild
 .cxx
+/word_database
+/word_database-shm
+/word_database-wal
