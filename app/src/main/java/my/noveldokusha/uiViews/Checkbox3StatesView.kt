@@ -1,4 +1,4 @@
-package my.noveldokusha.ui.databaseSearch
+package my.noveldokusha.uiViews
 
 import android.content.Context
 import android.content.res.ColorStateList

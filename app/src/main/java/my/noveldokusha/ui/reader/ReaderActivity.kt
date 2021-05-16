@@ -13,16 +13,15 @@ import androidx.activity.viewModels
 import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import my.noveldokusha.*
 import my.noveldokusha.databinding.ActivityReaderBinding
 import my.noveldokusha.databinding.ActivityReaderListItemBinding
 import my.noveldokusha.ui.BaseActivity
-import my.noveldokusha.uiUtils.Extra_String
-import my.noveldokusha.uiUtils.fadeInVertical
-import my.noveldokusha.uiUtils.fadeOutVertical
-import my.noveldokusha.uiUtils.inflater
+import my.noveldokusha.uiUtils.*
+import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.math.ceil
 import kotlin.math.roundToInt
 
@@ -38,6 +37,14 @@ class ReaderActivity : BaseActivity()
 		{
 			this.bookUrl = bookUrl
 			this.bookSelectedChapterUrl = bookSelectedChapterUrl
+		}
+	}
+	
+	private val fadeInAlready = AtomicBoolean(false)
+	private fun fadeIn()
+	{
+		if (fadeInAlready.compareAndSet(false, true)) lifecycleScope.launch(Dispatchers.Main) {
+			viewHolder.listView.fadeIn()
 		}
 	}
 	
@@ -140,6 +147,11 @@ class ReaderActivity : BaseActivity()
 		addChapter(chapter, insert, insertAll, remove) {
 			viewModel.state = ReaderModel.State.INITIAL_LOAD_COMPLETED
 		}
+		
+		lifecycleScope.launch(Dispatchers.Default) {
+			delay(200)
+			fadeIn()
+		}
 	}
 	
 	fun updateInfoView()
@@ -175,12 +187,6 @@ class ReaderActivity : BaseActivity()
 				
 				val isTop = visibleItemCount != 0 && firstVisibleItem == 0
 				val isBottom = visibleItemCount != 0 && (firstVisibleItem + visibleItemCount) == totalItemCount
-				if (isTop && viewModel.isTop_firstCall)
-				{
-					// Ignore first event
-					viewModel.isTop_firstCall = false
-					return
-				}
 				
 				when (viewModel.state)
 				{
@@ -197,13 +203,13 @@ class ReaderActivity : BaseActivity()
 					}
 					ReaderModel.State.INITIAL_LOAD -> return
 					ReaderModel.State.INITIAL_LOAD_COMPLETED -> lifecycleScope.launch {
-						
 						val (index: Int, offset: Int) = getChapterInitialPosition(
 							bookUrl = viewModel.bookUrl,
 							chapterUrl = viewModel.bookSelectedChapterUrl,
 							items = viewModel.items
 						)
 						runOnUiThread {
+							fadeIn()
 							viewHolder.listView.setSelectionFromTop(index, offset)
 							viewModel.state = ReaderModel.State.IDLE
 						}
@@ -434,13 +440,13 @@ class ReaderActivity : BaseActivity()
 				{
 					itemView.body.visibility = View.VISIBLE
 					itemView.body.text = item.text
-					viewModel.readRoutine?.setReadStart(item.url)
+					viewModel.readRoutine.setReadStart(item.url)
 				}
 				is Item.BODY_END ->
 				{
 					itemView.body.visibility = View.VISIBLE
 					itemView.body.text = item.text
-					viewModel.readRoutine?.setReadEnd(item.url)
+					viewModel.readRoutine.setReadEnd(item.url)
 				}
 				is Item.PROGRESSBAR -> itemView.progressBar.visibility = View.VISIBLE
 				is Item.DIVIDER -> itemView.divider.visibility = View.VISIBLE

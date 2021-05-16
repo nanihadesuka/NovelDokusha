@@ -20,6 +20,7 @@ import my.noveldokusha.databinding.ActivityGlobalSourceSearchListItemBinding
 import my.noveldokusha.databinding.ActivityGlobalSourceSearchResultItemBinding
 import my.noveldokusha.ui.BaseActivity
 import my.noveldokusha.ui.chaptersList.ChaptersActivity
+import my.noveldokusha.uiAdapters.ProgressBarHorizontalAdapter
 import my.noveldokusha.uiUtils.*
 import kotlin.properties.Delegates
 

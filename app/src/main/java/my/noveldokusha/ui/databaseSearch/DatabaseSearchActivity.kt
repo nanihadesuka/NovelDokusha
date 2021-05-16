@@ -17,6 +17,7 @@ import my.noveldokusha.databinding.ActivityDatabaseSearchGenreItemBinding
 import my.noveldokusha.scrubber
 import my.noveldokusha.ui.BaseActivity
 import my.noveldokusha.ui.databaseSearchResults.DatabaseSearchResultsActivity
+import my.noveldokusha.uiViews.Checkbox3StatesView
 import my.noveldokusha.uiUtils.Extra_String
 import my.noveldokusha.uiUtils.inflater
 import java.util.*

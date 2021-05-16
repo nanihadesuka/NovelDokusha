@@ -17,6 +17,7 @@ import my.noveldokusha.databinding.BookListItemBinding
 import my.noveldokusha.scrubber
 import my.noveldokusha.ui.BaseActivity
 import my.noveldokusha.ui.databaseBookInfo.DatabaseBookInfoActivity
+import my.noveldokusha.uiAdapters.ProgressBarAdapter
 import my.noveldokusha.uiUtils.*
 import java.io.InvalidObjectException
 import java.util.*

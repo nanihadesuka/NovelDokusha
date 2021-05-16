@@ -1,25 +1,21 @@
 package my.noveldokusha.ui.reader
 
 import androidx.lifecycle.SavedStateHandle
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.*
 import my.noveldokusha.bookstore
+import my.noveldokusha.ui.BaseViewModel
 import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.concurrent.schedule
+import kotlin.properties.Delegates
 
-class ReaderModel(private val savedState: SavedStateHandle) : ViewModel()
+class ReaderModel(private val savedState: SavedStateHandle) : BaseViewModel()
 {
-	private var initialized: Boolean = false
-	fun initialization(bookUrl: String, bookSelectedChapterUrl: String)
-	{
-		if (initialized) return else initialized = true
-		
-		this.bookUrl = bookUrl
+	
+	fun initialization(bookUrl: String, bookSelectedChapterUrl: String) = callOneTime {
+		this._bookUrl = bookUrl
 		this.bookSelectedChapterUrl = savedState.get<String>(this::bookSelectedChapterUrl.name) ?: bookSelectedChapterUrl
-		
-		readRoutine = ChaptersIsReadRoutine()
 		
 		runBlocking {
 			currentChapter.url = bookstore.bookLibrary.get(bookUrl)?.lastReadChapter ?: bookSelectedChapterUrl
@@ -32,27 +28,21 @@ class ReaderModel(private val savedState: SavedStateHandle) : ViewModel()
 		}
 	}
 	
-	var readRoutine: ChaptersIsReadRoutine? = null
+	data class LastReadChapter(var url: String, var title: String, var position: Int, var offset: Int)
 	
-	lateinit var bookUrl: String
-	var bookSelectedChapterUrl: String = ""
-		set(value)
-		{
-			field = value
-			savedState.set<String>(::bookSelectedChapterUrl.name, value)
-		}
+	private lateinit var _bookUrl: String
+	val bookUrl by lazy { _bookUrl }
+
+	val readRoutine = ChaptersIsReadRoutine()
+	
+	val chaptersSize = mutableMapOf<String, Int>()
+	val items = ArrayList<ReaderActivity.Item>()
+	var state = State.INITIAL_LOAD
 	
 	private val _orderedChapters = mutableListOf<bookstore.Chapter>()
 	val orderedChapters: List<bookstore.Chapter> = _orderedChapters
-	val chaptersSize = mutableMapOf<String, Int>()
 	
-	data class LastReadChapter(var url: String, var title: String, var position: Int, var offset: Int)
-	
-	val items = ArrayList<ReaderActivity.Item>()
 	val currentChapter = LastReadChapter("", "", 0, 0)
-	var state = State.INITIAL_LOAD
-	var isTop_firstCall = true
-	
 	private var currentChapterOld = currentChapter.copy()
 	private val timer = Timer(false).schedule(delay = 1000 * 10, period = 1000 * 10) {
 		if (currentChapterOld == currentChapter)
@@ -62,9 +52,12 @@ class ReaderModel(private val savedState: SavedStateHandle) : ViewModel()
 		currentChapterOld = currentChapter.copy()
 	}
 	
+	var bookSelectedChapterUrl: String by Delegates.observable("") { _, _, newValue ->
+		savedState.set<String>(::bookSelectedChapterUrl.name, newValue)
+	}
+	
 	fun saveLastReadPositionState()
 	{
-		val bookUrl = bookUrl
 		val currentChapter = currentChapter.copy()
 		viewModelScope.launch {
 			

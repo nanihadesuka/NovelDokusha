@@ -1,5 +1,5 @@
 package my.noveldokusha.ui.main
 
-import androidx.lifecycle.ViewModel
+import my.noveldokusha.ui.BaseViewModel
 
-class SettingsModel : ViewModel()
+class SettingsModel : BaseViewModel()

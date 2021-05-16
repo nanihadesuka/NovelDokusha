@@ -164,7 +164,7 @@ object scrubber
 						.selectFirst("#prime_nav")
 						.children()
 						.subList(1, 4)
-						.flatMap { it.select("a") }
+						.flatMap { it.select("a[href]") }
 						.filter {
 							val url = it.attr("href")
 							val text = it.text()
@@ -189,7 +189,7 @@ object scrubber
 				return tryConnect {
 					fetchDoc(url)
 						.selectFirst(".jetpack-search-filters-widget__filter-list")
-						.select("a")
+						.select("a[href]")
 						.map {
 							val (name) = Regex("""^.*category_name=(.*)$""").find(it.attr("href"))!!.destructured
 							BookMetadata(title = it.text(), url = "https://lightnovelstranslations.com/${name}/")
@@ -223,7 +223,7 @@ object scrubber
 			
 			override suspend fun getChapterList(doc: Document): List<ChapterMetadata>
 			{
-				return doc.select(".chapter-chs").select("a").map { ChapterMetadata(title = it.text(), url = it.attr("href")) }
+				return doc.select(".chapter-chs").select("a[href]").map { ChapterMetadata(title = it.text(), url = it.attr("href")) }
 			}
 			
 			val catalogIndex by lazy { ("ABCDEFGHIJKLMNOPQRSTUVWXYZ").split("") }
@@ -242,7 +242,7 @@ object scrubber
 						.selectFirst(".list-by-word-body")
 						.child(0)
 						.children()
-						.map { it.selectFirst("a") }
+						.map { it.selectFirst("a[href]") }
 						.map { BookMetadata(title = it.text(), url = it.attr("href")) }
 						.let { Response.Success(it) }
 				}
@@ -259,7 +259,7 @@ object scrubber
 						.addHeaderRequest()
 						.data("q", input)
 						.postIO()
-						.select("a")
+						.select("a[href]")
 						.map { BookMetadata(title = it.text(), url = it.attr("href")) }
 						.let { Response.Success(it) }
 				}
@@ -293,7 +293,7 @@ object scrubber
 					.addHeaderRequest()
 					.data("novelId", id)
 					.getIO()
-					.select("a")
+					.select("a[href]")
 					.map { ChapterMetadata(title = it.text(), url = baseUrl + it.attr("href")) }
 			}
 			
@@ -306,7 +306,7 @@ object scrubber
 					fetchDoc(url)
 						.selectFirst("#list-page")
 						.select(".row")
-						.map { it.selectFirst("a") }
+						.map { it.selectFirst("a[href]") }
 						.map { BookMetadata(title = it.text(), url = baseUrl + it.attr("href")) }
 						.let { Response.Success(it) }
 				}
@@ -321,7 +321,7 @@ object scrubber
 					fetchDoc("https://readnovelfull.com/search?keyword=${input.urlEncodeAsync()}")
 						.selectFirst(".col-novel-main, .archive")
 						.select(".novel-title")
-						.map { it.selectFirst("a") }
+						.map { it.selectFirst("a[href]") }
 						.map { BookMetadata(title = it.text(), url = baseUrl + it.attr("href")) }
 						.let { Response.Success(it) }
 				}
@@ -362,7 +362,9 @@ object scrubber
 			
 			override suspend fun getChapterText(doc: Document): String
 			{
-				TODO("NOT SUPPOSED TO EVER BE CALLED")
+				// Given novel updates only host the chapters list (they redirect to a diferent webpage) and
+				// not the content, it will return nothing.
+				return ""
 			}
 			
 			override suspend fun getChapterList(doc: Document): List<ChapterMetadata>
@@ -375,7 +377,7 @@ object scrubber
 					.data("mygroupfilter", "")
 					.data("mypostid", doc.selectFirst("#mypostid").attr("value"))
 					.postIO()
-					.select("a")
+					.select("a[href]")
 					.asSequence()
 					.filter { it.hasAttr("data-id") }
 					.map {
@@ -394,7 +396,7 @@ object scrubber
 				return tryConnect {
 					fetchDoc(url)
 						.select(".search_title")
-						.map { it.selectFirst("a") }
+						.map { it.selectFirst("a[href]") }
 						.map { BookMetadata(title = it.text(), url = it.attr("href")) }
 						.let { Response.Success(it) }
 				}
@@ -411,7 +413,7 @@ object scrubber
 						.getIO()
 						.select(".search_body_nu")
 						.select(".search_title")
-						.select("a")
+						.select("a[href]")
 						.map { BookMetadata(title = it.text(), url = it.attr("href")) }
 						.let { Response.Success(it) }
 				}
@@ -709,8 +711,9 @@ suspend fun downloadChapter(chapterUrl: String): Response<String>
 			.executeIO()
 		
 		val realUrl = con.url().toString()
-		val source = scrubber.getCompatibleSource(realUrl) ?: return@tryConnect {
-			val errorMessage = """
+		
+		val error by lazy {
+			"""
 				Unable to load chapter from url:
 				$chapterUrl
 				
@@ -719,8 +722,9 @@ suspend fun downloadChapter(chapterUrl: String): Response<String>
 				
 				Source not supported
 			""".trimIndent()
-			Response.Error<String>(errorMessage)
-		}()
+		}
+		
+		val source = scrubber.getCompatibleSource(realUrl) ?: return@tryConnect { Response.Error<String>(error) }()
 		
 		val doc = fetchDoc(source.transformChapterUrl(realUrl))
 		val body = source.getChapterText(doc)
@@ -734,10 +738,17 @@ suspend fun fetchChaptersList(bookUrl: String, tryCache: Boolean = true): Respon
 		if (it.isNotEmpty()) return Response.Success(it)
 	}
 	
+	val error by lazy {
+		"""
+			Incompatible source.
+			
+			Can't find compatible source for:
+			$bookUrl
+		""".trimIndent()
+	}
+	
 	// Return if can't find compatible scrubber for url
-	val scrap = scrubber.getCompatibleSourceCatalog(bookUrl) ?: return Response.Error(
-		"Incompatible source\n\nCan't find compatible source for:\n$bookUrl"
-	)
+	val scrap = scrubber.getCompatibleSourceCatalog(bookUrl) ?: return Response.Error(error)
 	
 	return tryConnect {
 		val doc = fetchDoc(bookUrl)
@@ -756,12 +767,33 @@ suspend fun <T> tryConnect(extraErrorInfo: String = "", call: suspend () -> Resp
 }
 catch (e: SocketTimeoutException)
 {
-	Response.Error("Timeout error.\n\n${if (extraErrorInfo.isEmpty()) "" else "Info:\n$extraErrorInfo\n\n"}Message:\n${e.message}")
+	val error = """
+		Timeout error.
+
+		Info:
+		${extraErrorInfo.ifBlank { "No info" }}
+		
+		Message:
+		${e.message}
+	""".trimIndent()
+	Response.Error(error)
 }
 catch (e: Exception)
 {
 	val stacktrace = StringWriter().apply { e.printStackTrace(PrintWriter(this)) }
-	Response.Error("Unknown error.\n\n${if (extraErrorInfo.isEmpty()) "" else "Info:\n$extraErrorInfo\n\n"}Message:\n${e.message}\n\nStacktrace:\n$stacktrace")
+	val error = """
+		Unknown error.
+		
+		Info:
+		${extraErrorInfo.ifBlank { "No Info" }}
+		
+		Message:
+		${e.message}
+
+		Stacktrace:
+		$stacktrace
+	""".trimIndent()
+	Response.Error(error)
 }
 
 suspend fun fetchDoc(url: String, timeoutMilliseconds: Int = 2 * 60 * 1000): Document

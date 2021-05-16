@@ -2,7 +2,6 @@ package my.noveldokusha.ui.main
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -11,14 +10,11 @@ import kotlinx.coroutines.launch
 import my.noveldokusha.Response
 import my.noveldokusha.bookstore
 import my.noveldokusha.fetchChaptersList
+import my.noveldokusha.ui.BaseViewModel
 
-class LibraryPageModel : ViewModel()
+class LibraryPageModel : BaseViewModel()
 {
-	private var initialized = false
-	fun initialization(showCompleted: Boolean)
-	{
-		if (initialized) return else initialized = true
-		
+	fun initialization(showCompleted: Boolean) = callOneTime {
 		this.showCompleted = showCompleted
 		
 		booksLiveData = when (this.showCompleted)

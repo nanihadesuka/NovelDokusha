@@ -7,12 +7,12 @@ import kotlin.reflect.KProperty
 object globalThemeList
 {
 	val light = mapOf(
-		R.style.AppTheme_Light to "light",
+		R.style.AppTheme_Light to "Light",
 	)
 	val dark = mapOf(
-		R.style.AppTheme_BaseDark_Dark to "dark",
-		R.style.AppTheme_BaseDark_Grey to "grey",
-		R.style.AppTheme_BaseDark_Black to "black"
+		R.style.AppTheme_BaseDark_Dark to "Dark",
+		R.style.AppTheme_BaseDark_Grey to "Grey",
+		R.style.AppTheme_BaseDark_Black to "Black"
 	)
 }
 

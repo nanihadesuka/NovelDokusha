@@ -23,8 +23,8 @@ import my.noveldokusha.scrubber
 import my.noveldokusha.ui.BaseActivity
 import my.noveldokusha.ui.chaptersList.ChaptersActivity
 import my.noveldokusha.ui.sourceCatalog.SourceCatalogModel.CatalogItem
+import my.noveldokusha.uiAdapters.ProgressBarAdapter
 import my.noveldokusha.uiUtils.Extra_String
-import my.noveldokusha.uiUtils.ProgressBarAdapter
 import my.noveldokusha.uiUtils.addBottomMargin
 import my.noveldokusha.uiUtils.inflater
 import java.util.*

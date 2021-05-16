@@ -1,18 +1,14 @@
 package my.noveldokusha.ui.databaseSearchResults
 
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import my.noveldokusha.BookMetadata
 import my.noveldokusha.BooksFetchIterator
 import my.noveldokusha.scrubber
+import my.noveldokusha.ui.BaseViewModel
 
-class DatabaseSearchResultsModel : ViewModel()
+class DatabaseSearchResultsModel : BaseViewModel()
 {
-	private var initialized = false
-	fun initialization(database: scrubber.database_interface, input: DatabaseSearchResultsActivity.SearchMode)
-	{
-		if (initialized) return else initialized = true
-		
+	fun initialization(database: scrubber.database_interface, input: DatabaseSearchResultsActivity.SearchMode) = callOneTime {
 		this.database = database
 		this.booksFetchIterator = BooksFetchIterator(viewModelScope) { index ->
 			when (input)
@@ -28,7 +24,6 @@ class DatabaseSearchResultsModel : ViewModel()
 	lateinit var database: scrubber.database_interface
 	val searchResults = ArrayList<BookMetadata>()
 	
-
 }
 
 

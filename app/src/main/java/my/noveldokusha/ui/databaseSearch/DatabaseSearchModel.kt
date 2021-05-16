@@ -1,20 +1,18 @@
 package my.noveldokusha.ui.databaseSearch
 
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import my.noveldokusha.Response
 import my.noveldokusha.scrubber
+import my.noveldokusha.ui.BaseViewModel
+import my.noveldokusha.uiViews.Checkbox3StatesView
 
-class DatabaseSearchModel : ViewModel()
+class DatabaseSearchModel : BaseViewModel()
 {
-	private var initialized = false
-	fun initialization(database: scrubber.database_interface)
-	{
-		if (initialized) return else initialized = true
+	fun initialization(database: scrubber.database_interface) = callOneTime {
 		this.database = database
 		viewModelScope.launch(Dispatchers.IO) {
 			
@@ -31,7 +29,6 @@ class DatabaseSearchModel : ViewModel()
 				is Response.Error -> Unit
 			}
 		}
-		
 	}
 	
 	data class Item(val genre: String, val genreId: String, var state: Checkbox3StatesView.STATE)

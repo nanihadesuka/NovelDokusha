@@ -1,9 +1,9 @@
 package my.noveldokusha.ui.main
 
-import androidx.lifecycle.ViewModel
 import my.noveldokusha.scrubber
+import my.noveldokusha.ui.BaseViewModel
 
-class FinderModel : ViewModel()
+class FinderModel : BaseViewModel()
 {
 	var sourcesList = arrayListOf<FinderFragment.Item>(
 		FinderFragment.Item.Header("Databases"),

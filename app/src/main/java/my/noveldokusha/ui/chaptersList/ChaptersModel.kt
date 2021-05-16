@@ -2,7 +2,6 @@ package my.noveldokusha.ui.chaptersList
 
 import android.view.View
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
@@ -11,14 +10,11 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import my.noveldokusha.*
+import my.noveldokusha.ui.BaseViewModel
 
-class ChaptersModel : ViewModel()
+class ChaptersModel : BaseViewModel()
 {
-	private var initialized = false
-	fun initialization(bookMetadata: BookMetadata)
-	{
-		if (initialized) return else initialized = true
-		
+	fun initialization(bookMetadata: BookMetadata) = callOneTime {
 		this.bookMetadata = bookMetadata
 		loadChapters()
 	}

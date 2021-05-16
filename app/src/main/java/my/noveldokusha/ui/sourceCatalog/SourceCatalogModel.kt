@@ -1,19 +1,16 @@
 package my.noveldokusha.ui.sourceCatalog
 
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import my.noveldokusha.BookMetadata
 import my.noveldokusha.BooksFetchIterator
 import my.noveldokusha.bookstore
 import my.noveldokusha.scrubber
+import my.noveldokusha.ui.BaseViewModel
 
-class SourceCatalogModel : ViewModel()
+class SourceCatalogModel : BaseViewModel()
 {
-	private var initialized: Boolean = false
-	fun initialization(source: scrubber.source_interface.catalog)
-	{
-		if (initialized) return else initialized = true
+	fun initialization(source: scrubber.source_interface.catalog) = callOneTime {
 		this.source = source
 		booksFetchIterator = BooksFetchIterator(viewModelScope) { source.getCatalogList(it) }
 		startCatalogListMode()
