@@ -22,7 +22,6 @@ import my.noveldokusha.bookstore
 import my.noveldokusha.databinding.ActivityChaptersBinding
 import my.noveldokusha.databinding.ActivityChaptersListHeaderBinding
 import my.noveldokusha.databinding.ActivityChaptersListItemBinding
-import my.noveldokusha.scrubber
 import my.noveldokusha.ui.BaseActivity
 import my.noveldokusha.ui.databaseSearchResults.DatabaseSearchResultsActivity
 import my.noveldokusha.ui.reader.ReaderActivity
@@ -326,7 +325,7 @@ private class ChaptersHeaderAdapter(
 			})
 			viewHolder.databaseSearchButton.setOnClickListener {
 				DatabaseSearchResultsActivity
-					.IntentData(context, scrubber.database.NovelUpdates.baseUrl, DatabaseSearchResultsActivity.SearchMode.Text(viewModel.bookMetadata.title))
+					.IntentData(context, "https://www.novelupdates.com/", DatabaseSearchResultsActivity.SearchMode.Text(viewModel.bookMetadata.title))
 					.let(context::startActivity)
 			}
 			

@@ -19,6 +19,7 @@ import kotlinx.coroutines.withContext
 import my.noveldokusha.*
 import my.noveldokusha.databinding.ActivityReaderBinding
 import my.noveldokusha.databinding.ActivityReaderListItemBinding
+import my.noveldokusha.scraper.Response
 import my.noveldokusha.ui.BaseActivity
 import my.noveldokusha.uiUtils.*
 import java.util.concurrent.atomic.AtomicBoolean
@@ -92,13 +93,12 @@ class ReaderActivity : BaseActivity()
 		
 		viewModel.initialization(bookUrl = extras.bookUrl, bookSelectedChapterUrl = extras.bookSelectedChapterUrl)
 		
-		sharedPreferences.registerOnSharedPreferenceChangeListener(listenerSharedPreferences)
-		
-		viewHolder.listView.adapter = viewAdapter.listView
-		viewHolder.settingTextSize.value = sharedPreferences.READER_FONT_SIZE
-		
 		loadInitialChapter()
 		
+		viewHolder.listView.adapter = viewAdapter.listView
+		sharedPreferences.registerOnSharedPreferenceChangeListener(listenerSharedPreferences)
+		
+		viewHolder.settingTextSize.value = sharedPreferences.READER_FONT_SIZE
 		viewHolder.settingTextSize.addOnChangeListener { _, value, _ ->
 			sharedPreferences.READER_FONT_SIZE = value
 		}
@@ -209,9 +209,9 @@ class ReaderActivity : BaseActivity()
 							items = viewModel.items
 						)
 						runOnUiThread {
-							fadeIn()
 							viewHolder.listView.setSelectionFromTop(index, offset)
 							viewModel.state = ReaderModel.State.IDLE
+							fadeIn()
 						}
 					}
 				}

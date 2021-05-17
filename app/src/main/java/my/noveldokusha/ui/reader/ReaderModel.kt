@@ -12,7 +12,6 @@ import kotlin.properties.Delegates
 
 class ReaderModel(private val savedState: SavedStateHandle) : BaseViewModel()
 {
-	
 	fun initialization(bookUrl: String, bookSelectedChapterUrl: String) = callOneTime {
 		this._bookUrl = bookUrl
 		this.bookSelectedChapterUrl = savedState.get<String>(this::bookSelectedChapterUrl.name) ?: bookSelectedChapterUrl

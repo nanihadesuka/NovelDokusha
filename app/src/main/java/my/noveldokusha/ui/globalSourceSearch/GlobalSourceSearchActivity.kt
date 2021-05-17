@@ -3,7 +3,6 @@ package my.noveldokusha.ui.globalSourceSearch
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
@@ -14,7 +13,7 @@ import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import my.noveldokusha.BookMetadata
-import my.noveldokusha.BooksFetchIterator
+import my.noveldokusha.scraper.BooksFetchIterator
 import my.noveldokusha.databinding.ActivityGlobalSourceSearchBinding
 import my.noveldokusha.databinding.ActivityGlobalSourceSearchListItemBinding
 import my.noveldokusha.databinding.ActivityGlobalSourceSearchResultItemBinding

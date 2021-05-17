@@ -7,6 +7,8 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
+import my.noveldokusha.scraper.Response
+import my.noveldokusha.scraper.downloadChapter
 import java.io.InputStream
 
 data class BookMetadata(val title: String, val url: String)

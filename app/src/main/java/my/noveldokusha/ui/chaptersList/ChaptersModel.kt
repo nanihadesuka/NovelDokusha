@@ -10,6 +10,9 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import my.noveldokusha.*
+import my.noveldokusha.scraper.Response
+import my.noveldokusha.scraper.fetchChaptersList
+import my.noveldokusha.scraper.scrubber
 import my.noveldokusha.ui.BaseViewModel
 
 class ChaptersModel : BaseViewModel()

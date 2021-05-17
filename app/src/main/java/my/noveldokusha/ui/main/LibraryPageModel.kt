@@ -7,9 +7,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
-import my.noveldokusha.Response
+import my.noveldokusha.scraper.Response
 import my.noveldokusha.bookstore
-import my.noveldokusha.fetchChaptersList
+import my.noveldokusha.scraper.fetchChaptersList
 import my.noveldokusha.ui.BaseViewModel
 
 class LibraryPageModel : BaseViewModel()

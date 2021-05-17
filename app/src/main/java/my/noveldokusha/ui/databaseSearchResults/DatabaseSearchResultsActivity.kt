@@ -14,7 +14,7 @@ import androidx.recyclerview.widget.RecyclerView
 import my.noveldokusha.BookMetadata
 import my.noveldokusha.databinding.ActivityDatabaseSearchResultsBinding
 import my.noveldokusha.databinding.BookListItemBinding
-import my.noveldokusha.scrubber
+import my.noveldokusha.scraper.scrubber
 import my.noveldokusha.ui.BaseActivity
 import my.noveldokusha.ui.databaseBookInfo.DatabaseBookInfoActivity
 import my.noveldokusha.uiAdapters.ProgressBarAdapter

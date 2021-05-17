@@ -5,8 +5,8 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import my.noveldokusha.Response
-import my.noveldokusha.scrubber
+import my.noveldokusha.scraper.Response
+import my.noveldokusha.scraper.scrubber
 import my.noveldokusha.ui.BaseViewModel
 import my.noveldokusha.uiViews.Checkbox3StatesView
 

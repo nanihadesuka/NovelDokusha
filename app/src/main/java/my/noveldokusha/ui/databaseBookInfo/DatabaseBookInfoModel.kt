@@ -5,9 +5,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import my.noveldokusha.BookMetadata
-import my.noveldokusha.Response
-import my.noveldokusha.fetchDoc
-import my.noveldokusha.scrubber
+import my.noveldokusha.scraper.Response
+import my.noveldokusha.scraper.fetchDoc
+import my.noveldokusha.scraper.scrubber
 import my.noveldokusha.ui.BaseViewModel
 
 class DatabaseBookInfoModel : BaseViewModel()

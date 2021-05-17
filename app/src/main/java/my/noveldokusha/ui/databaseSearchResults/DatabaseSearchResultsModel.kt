@@ -2,8 +2,8 @@ package my.noveldokusha.ui.databaseSearchResults
 
 import androidx.lifecycle.viewModelScope
 import my.noveldokusha.BookMetadata
-import my.noveldokusha.BooksFetchIterator
-import my.noveldokusha.scrubber
+import my.noveldokusha.scraper.BooksFetchIterator
+import my.noveldokusha.scraper.scrubber
 import my.noveldokusha.ui.BaseViewModel
 
 class DatabaseSearchResultsModel : BaseViewModel()

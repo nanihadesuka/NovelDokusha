@@ -3,9 +3,9 @@ package my.noveldokusha.ui.sourceCatalog
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import my.noveldokusha.BookMetadata
-import my.noveldokusha.BooksFetchIterator
+import my.noveldokusha.scraper.BooksFetchIterator
 import my.noveldokusha.bookstore
-import my.noveldokusha.scrubber
+import my.noveldokusha.scraper.scrubber
 import my.noveldokusha.ui.BaseViewModel
 
 class SourceCatalogModel : BaseViewModel()

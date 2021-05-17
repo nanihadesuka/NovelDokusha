@@ -1,6 +1,6 @@
 package my.noveldokusha.ui.main
 
-import my.noveldokusha.scrubber
+import my.noveldokusha.scraper.scrubber
 import my.noveldokusha.ui.BaseViewModel
 
 class FinderModel : BaseViewModel()

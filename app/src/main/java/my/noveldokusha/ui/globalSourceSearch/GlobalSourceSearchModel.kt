@@ -3,8 +3,8 @@ package my.noveldokusha.ui.globalSourceSearch
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.CoroutineScope
 import my.noveldokusha.BookMetadata
-import my.noveldokusha.BooksFetchIterator
-import my.noveldokusha.scrubber
+import my.noveldokusha.scraper.BooksFetchIterator
+import my.noveldokusha.scraper.scrubber
 import my.noveldokusha.ui.BaseViewModel
 
 class GlobalSourceSearchModel : BaseViewModel()

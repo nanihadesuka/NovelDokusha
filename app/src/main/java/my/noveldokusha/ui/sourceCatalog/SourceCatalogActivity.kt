@@ -19,7 +19,7 @@ import my.noveldokusha.R
 import my.noveldokusha.bookstore
 import my.noveldokusha.databinding.ActivitySourceCatalogBinding
 import my.noveldokusha.databinding.BookListItemBinding
-import my.noveldokusha.scrubber
+import my.noveldokusha.scraper.scrubber
 import my.noveldokusha.ui.BaseActivity
 import my.noveldokusha.ui.chaptersList.ChaptersActivity
 import my.noveldokusha.ui.sourceCatalog.SourceCatalogModel.CatalogItem

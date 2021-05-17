@@ -9,10 +9,10 @@ import android.view.ViewGroup
 import androidx.activity.viewModels
 import androidx.recyclerview.widget.RecyclerView
 import my.noveldokusha.BookMetadata
-import my.noveldokusha.Response
+import my.noveldokusha.scraper.Response
 import my.noveldokusha.databinding.ActivityDatabaseBookInfoBinding
 import my.noveldokusha.databinding.BookListItemBinding
-import my.noveldokusha.scrubber
+import my.noveldokusha.scraper.scrubber
 import my.noveldokusha.ui.BaseActivity
 import my.noveldokusha.ui.globalSourceSearch.GlobalSourceSearchActivity
 import my.noveldokusha.uiUtils.Extra_String

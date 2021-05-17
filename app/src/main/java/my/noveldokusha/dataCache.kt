@@ -3,6 +3,7 @@ package my.noveldokusha
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
+import my.noveldokusha.scraper.Response
 import java.io.File
 
 internal fun <T> Gson.fromJson(json: String): T = fromJson<T>(json, object : TypeToken<T>()
