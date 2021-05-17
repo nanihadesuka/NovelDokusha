@@ -109,7 +109,7 @@ class BakaUpdates : scrubber.database_interface
 			relatedBooks = relatedBooks,
 			similarRecommended = similarRecommended,
 			bookType = entry("Type").text(),
-			genres = entry("Genre").select("a").map { it.text() },
+			genres = entry("Genre").select("a").dropLast(1).map { it.text() },
 			tags = tags,
 			authors = authors
 		)
