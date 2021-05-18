@@ -8,6 +8,7 @@ import android.os.Bundle
 import android.view.*
 import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
+import androidx.core.view.isVisible
 import androidx.lifecycle.Observer
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.lifecycleScope
@@ -82,10 +83,10 @@ class ChaptersActivity : BaseActivity()
 	
 	fun selectionModeBarUpdateVisibility()
 	{
-		if (viewModel.selectedChaptersUrl.isNotEmpty())
-			viewHolder.selectionModeBar.fadeInVertical(displacement = 200f)
-		else
+		if (viewModel.selectedChaptersUrl.isEmpty() && viewHolder.selectionModeBar.isVisible)
 			viewHolder.selectionModeBar.fadeOutVertical(displacement = 200f)
+		else if (viewModel.selectedChaptersUrl.isNotEmpty() && !viewHolder.selectionModeBar.isVisible)
+			viewHolder.selectionModeBar.fadeInVertical(displacement = 200f)
 	}
 	
 	fun setupSelectionModeBar()
@@ -136,9 +137,9 @@ class ChaptersActivity : BaseActivity()
 		}
 	}
 	
-	override fun onBackPressed() = when (viewHolder.selectionModeBar.visibility)
+	override fun onBackPressed() = when
 	{
-		View.VISIBLE ->
+		viewHolder.selectionModeBar.isVisible ->
 		{
 			viewModel.selectedChaptersUrl.clear()
 			selectionModeBarUpdateVisibility()
@@ -221,13 +222,12 @@ private class ChaptersArrayAdapter(
 		itemView.title.text = itemData.chapter.title
 		itemView.title.alpha = if (itemData.chapter.read) 0.5f else 1.0f
 		
-		itemView.selected.visibility =
-			if (viewModel.selectedChaptersUrl.contains(itemData.chapter.url)) View.VISIBLE else View.INVISIBLE
+		itemView.selected.visibility = if (viewModel.selectedChaptersUrl.contains(itemData.chapter.url)) View.VISIBLE else View.INVISIBLE
 		
 		itemView.root.setOnClickListener {
 			
 			if (viewModel.selectedChaptersUrl.isNotEmpty())
-				toggleItemSelection(itemData)
+				toggleItemSelection(itemData, itemView.selected)
 			else
 			{
 				ReaderActivity
@@ -237,30 +237,19 @@ private class ChaptersArrayAdapter(
 		}
 		
 		itemView.root.setOnLongClickListener {
-			if (viewModel.selectedChaptersUrl.isNotEmpty())
-				toggleItemSelection(itemData)
-			else
-			{
-				viewModel.selectedChaptersUrl.add(itemData.chapter.url)
-				selectionModeBarUpdateVisibility()
-				notifyDataSetChanged()
-			}
+			toggleItemSelection(itemData, itemView.selected)
 			true
 		}
 		
 		binder.addBottomMargin { position == list.lastIndex }
 	}
 	
-	fun toggleItemSelection(itemData: ChaptersModel.ChapterItem)
+	fun toggleItemSelection(itemData: ChaptersModel.ChapterItem, view: View)
 	{
-		val isSelected = viewModel.selectedChaptersUrl.contains(itemData.chapter.url)
-		if (isSelected) viewModel.selectedChaptersUrl.remove(itemData.chapter.url)
-		else viewModel.selectedChaptersUrl.add(itemData.chapter.url)
-		
-		if (viewModel.selectedChaptersUrl.isEmpty())
-			selectionModeBarUpdateVisibility()
-		
-		notifyDataSetChanged()
+		fun <T> MutableSet<T>.removeOrAdd(value: T) = contains(value).also { if (it) remove(value) else add(value) }
+		val isRemoved = viewModel.selectedChaptersUrl.removeOrAdd(itemData.chapter.url)
+		view.visibility = if (isRemoved) View.INVISIBLE else View.VISIBLE
+		selectionModeBarUpdateVisibility()
 	}
 	
 	inner class ViewBinder(val viewHolder: ActivityChaptersListItemBinding) : RecyclerView.ViewHolder(viewHolder.root)
