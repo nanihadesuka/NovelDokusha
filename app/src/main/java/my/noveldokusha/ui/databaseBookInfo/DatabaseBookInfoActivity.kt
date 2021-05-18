@@ -7,17 +7,24 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
 import my.noveldokusha.BookMetadata
-import my.noveldokusha.scraper.Response
 import my.noveldokusha.databinding.ActivityDatabaseBookInfoBinding
 import my.noveldokusha.databinding.BookListItemBinding
+import my.noveldokusha.scraper.Response
 import my.noveldokusha.scraper.scrubber
 import my.noveldokusha.ui.BaseActivity
+import my.noveldokusha.ui.databaseSearchResults.DatabaseSearchResultsActivity
 import my.noveldokusha.ui.globalSourceSearch.GlobalSourceSearchActivity
 import my.noveldokusha.uiUtils.Extra_String
+import my.noveldokusha.uiUtils.fadeIn
 import my.noveldokusha.uiUtils.inflater
 import java.util.*
+import kotlin.collections.ArrayList
 
 class DatabaseBookInfoActivity : BaseActivity()
 {
@@ -64,19 +71,44 @@ class DatabaseBookInfoActivity : BaseActivity()
 		}
 		
 		viewModel.bookDataLiveData.observe(this) { res ->
-			val it = if (res is Response.Success) res.data else return@observe
+			val data = if (res is Response.Success) res.data else return@observe
 			
 			viewModel.relatedBooks.clear()
-			viewModel.relatedBooks.addAll(it.relatedBooks)
+			viewModel.relatedBooks.addAll(data.relatedBooks)
 			viewModel.similarRecommended.clear()
-			viewModel.similarRecommended.addAll(it.similarRecommended)
+			viewModel.similarRecommended.addAll(data.similarRecommended)
 			
-			viewHolder.description.text = it.description
-			viewHolder.alternativeTitles.text = it.alternativeTitles.joinToString("\n\n")
-			viewHolder.authors.text = it.authors.joinToString("\n") { author -> author.name }
-			viewHolder.tags.text = it.tags.joinToString(" · ")
-			viewHolder.genres.text = it.genres.joinToString(" · ")
-			viewHolder.bookType.text = it.bookType
+			if (data.genres.isNotEmpty())
+			{
+				viewHolder.genres.text = data.genres.joinToString(" · ")
+				viewHolder.genres.fadeIn()
+				viewHolder.genres.setOnClickListener {
+					lifecycleScope.launch(Dispatchers.IO) {
+						val databaseGenres = (viewModel.database.getSearchGenres() as? Response.Success ?: return@launch).data
+						if(!isActive) return@launch
+						val input = DatabaseSearchResultsActivity.SearchMode.Advanced(
+							genresIncludeId = ArrayList(data.genres.mapNotNull { databaseGenres.get(it) }),
+							genresExcludeId = arrayListOf()
+						)
+						val intent = DatabaseSearchResultsActivity.IntentData(this@DatabaseBookInfoActivity, viewModel.database.baseUrl, input)
+						startActivity(intent)
+					}
+				}
+			}
+			else
+				viewHolder.genres.visibility = View.GONE
+			
+			viewHolder.description.text = data.description
+			viewHolder.alternativeTitles.text = data.alternativeTitles.joinToString("\n\n")
+			viewHolder.authors.text = data.authors.joinToString("\n") { author -> author.name }
+			viewHolder.tags.text = data.tags.joinToString(" · ").ifEmpty { "No tags" }
+			viewHolder.bookType.text = data.bookType
+			
+			viewHolder.description.fadeIn()
+			viewHolder.alternativeTitles.fadeIn()
+			viewHolder.authors.fadeIn()
+			viewHolder.tags.fadeIn()
+			viewHolder.bookType.fadeIn()
 			
 			viewModel.relatedBooks.isEmpty().let { empty ->
 				viewHolder.relatedBooks.visibility = if (empty) View.GONE else View.VISIBLE
