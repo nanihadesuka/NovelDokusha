@@ -35,4 +35,9 @@
 	<style name="myAppBarLayoutStyle" parent="Widget.MaterialComponents.AppBarLayout.Primary">
 		<item name="elevation">0dp</item>
 	</style>
+	
+	<style name="WindowAnimationStyle" parent="android:Animation.Activity">
+		<item name="android:windowEnterAnimation">@android:anim/fade_in</item>
+		<item name="android:windowExitAnimation">@android:anim/fade_out</item>
+	</style>
 </resources>
