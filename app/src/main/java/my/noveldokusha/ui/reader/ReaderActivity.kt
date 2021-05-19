@@ -406,7 +406,7 @@ class ReaderActivity : BaseActivity()
 		class ERROR(override val url: String, val text: String) : Item(url)
 	}
 	
-	inner class ItemArrayAdapter(context: Context, list: ArrayList<Item>) : ArrayAdapter<Item>(context, 0, list)
+	inner class ItemArrayAdapter(context: Context, val list: ArrayList<Item>) : ArrayAdapter<Item>(context, 0, list)
 	{
 		override fun getView(position: Int, convertView: View?, parent: ViewGroup): View
 		{
@@ -420,10 +420,13 @@ class ReaderActivity : BaseActivity()
 			itemView.progressBar.visibility = View.GONE
 			itemView.divider.visibility = View.GONE
 			itemView.title.visibility = View.GONE
+			itemView.specialTitle.visibility = View.GONE
 			itemView.error.visibility = View.GONE
 			itemView.body.visibility = View.GONE
 			itemView.title.text = ""
+			itemView.specialTitle.text = ""
 			itemView.title.typeface = getFontFamilyBOLD(sharedPreferences.READER_FONT_FAMILY)
+			itemView.specialTitle.typeface = getFontFamilyBOLD(sharedPreferences.READER_FONT_FAMILY)
 			itemView.error.text = ""
 			itemView.body.text = ""
 			itemView.body.textSize = sharedPreferences.READER_FONT_SIZE
@@ -448,8 +451,16 @@ class ReaderActivity : BaseActivity()
 					itemView.body.text = item.text
 					viewModel.readRoutine.setReadEnd(item.url)
 				}
-				is Item.PROGRESSBAR -> itemView.progressBar.visibility = View.VISIBLE
-				is Item.DIVIDER -> itemView.divider.visibility = View.VISIBLE
+				is Item.PROGRESSBAR ->
+				{
+					itemView.progressBar.visibility = View.VISIBLE
+					itemView.progressBar.addBottomMargin { position == list.lastIndex }
+				}
+				is Item.DIVIDER ->
+				{
+					itemView.divider.visibility = View.VISIBLE
+					itemView.title.addTopMargin { position == 0 }
+				}
 				is Item.TITLE ->
 				{
 					itemView.title.visibility = View.VISIBLE
@@ -457,20 +468,24 @@ class ReaderActivity : BaseActivity()
 				}
 				is Item.BOOK_END ->
 				{
-					itemView.title.visibility = View.VISIBLE
-					itemView.title.text = getString(R.string.reader_no_more_chapters)
+					itemView.specialTitle.visibility = View.VISIBLE
+					itemView.specialTitle.text = getString(R.string.reader_no_more_chapters)
+					itemView.specialTitle.addBottomMargin(800) { position == list.lastIndex }
 				}
 				is Item.BOOK_START ->
 				{
-					itemView.title.visibility = View.VISIBLE
-					itemView.title.text = getString(R.string.reader_first_chapter)
+					itemView.specialTitle.visibility = View.VISIBLE
+					itemView.specialTitle.text = getString(R.string.reader_first_chapter)
+					itemView.specialTitle.addTopMargin(500) { position == 0 }
 				}
 				is Item.ERROR ->
 				{
 					itemView.error.visibility = View.VISIBLE
 					itemView.error.text = item.text
+					itemView.specialTitle.addBottomMargin(800) { position == list.lastIndex }
 				}
 			}
+			
 			return itemView.root
 		}
 	}
