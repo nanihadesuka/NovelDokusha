@@ -9,7 +9,6 @@ import android.view.*
 import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
-import androidx.lifecycle.Observer
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.ConcatAdapter
@@ -28,7 +27,6 @@ import my.noveldokusha.ui.databaseSearchResults.DatabaseSearchResultsActivity
 import my.noveldokusha.ui.reader.ReaderActivity
 import my.noveldokusha.uiUtils.*
 import java.util.*
-import kotlin.properties.Delegates
 
 class ChaptersActivity : BaseActivity()
 {
@@ -68,7 +66,7 @@ class ChaptersActivity : BaseActivity()
 		
 		viewModel.refresh.observe(this) { viewHolder.swipeRefreshLayout.isRefreshing = it }
 		
-		viewModel.chaptersItemsLiveData.observe(this) {
+		viewModel.chaptersWithContextLiveData.observe(this) {
 			viewAdapter.chapters.setList(it)
 			viewModel.numberOfChapters.value = it.size
 		}
@@ -187,21 +185,23 @@ class ChaptersActivity : BaseActivity()
 
 private class ChaptersArrayAdapter(
 	private val context: BaseActivity,
-	private val list: ArrayList<ChaptersModel.ChapterItem>,
+	private val list: ArrayList<bookstore.ChapterDao.ChapterWithContext>,
 	private val viewModel: ChaptersModel,
 	private val selectionModeBarUpdateVisibility: () -> Unit
 ) :
 	RecyclerView.Adapter<ChaptersArrayAdapter.ViewBinder>()
 {
-	private inner class Diff(private val new: List<ChaptersModel.ChapterItem>) : DiffUtil.Callback()
+	private inner class Diff(private val aNew: List<bookstore.ChapterDao.ChapterWithContext>) : DiffUtil.Callback()
 	{
 		override fun getOldListSize(): Int = list.size
-		override fun getNewListSize(): Int = new.size
-		override fun areItemsTheSame(oldPos: Int, newPos: Int): Boolean = list[oldPos].chapter.url == new[newPos].chapter.url
-		override fun areContentsTheSame(oldPos: Int, newPos: Int): Boolean = list[oldPos].chapter == new[newPos].chapter
+		override fun getNewListSize(): Int = aNew.size
+		override fun areItemsTheSame(oldPos: Int, newPos: Int): Boolean = list[oldPos].chapter.url == aNew[newPos].chapter.url
+		override fun areContentsTheSame(oldPos: Int, newPos: Int): Boolean =
+			(list[oldPos].chapter.read == aNew[newPos].chapter.read) &&
+			(list[oldPos].downloaded == aNew[newPos].downloaded)
 	}
 	
-	fun setList(newList: List<ChaptersModel.ChapterItem>) = DiffUtil.calculateDiff(Diff(newList)).let {
+	fun setList(newList: List<bookstore.ChapterDao.ChapterWithContext>) = DiffUtil.calculateDiff(Diff(newList)).let {
 		val isEmpty = list.isEmpty()
 		list.clear()
 		list.addAll(newList)
@@ -217,15 +217,14 @@ private class ChaptersArrayAdapter(
 	{
 		val itemData = this.list[position]
 		val itemView = binder.viewHolder
-		binder.itemData = itemData
 		
 		itemView.title.text = itemData.chapter.title
 		itemView.title.alpha = if (itemData.chapter.read) 0.5f else 1.0f
-		
+		itemView.downloaded.visibility = if (itemData.downloaded) View.VISIBLE else View.INVISIBLE
+		itemView.currentlyReading.visibility = if (itemData.lastReadChapter) View.VISIBLE else View.INVISIBLE
 		itemView.selected.visibility = if (viewModel.selectedChaptersUrl.contains(itemData.chapter.url)) View.VISIBLE else View.INVISIBLE
 		
 		itemView.root.setOnClickListener {
-			
 			if (viewModel.selectedChaptersUrl.isNotEmpty())
 				toggleItemSelection(itemData, itemView.selected)
 			else
@@ -244,7 +243,7 @@ private class ChaptersArrayAdapter(
 		binder.addBottomMargin { position == list.lastIndex }
 	}
 	
-	fun toggleItemSelection(itemData: ChaptersModel.ChapterItem, view: View)
+	fun toggleItemSelection(itemData: bookstore.ChapterDao.ChapterWithContext, view: View)
 	{
 		fun <T> MutableSet<T>.removeOrAdd(value: T) = contains(value).also { if (it) remove(value) else add(value) }
 		val isRemoved = viewModel.selectedChaptersUrl.removeOrAdd(itemData.chapter.url)
@@ -253,19 +252,6 @@ private class ChaptersArrayAdapter(
 	}
 	
 	inner class ViewBinder(val viewHolder: ActivityChaptersListItemBinding) : RecyclerView.ViewHolder(viewHolder.root)
-	{
-		var itemData: ChaptersModel.ChapterItem? by Delegates.observable(null) { _, old, new ->
-			lastReadObserver.switchLiveData(old, new, context) { currentlyLastReadChapterLiveData }
-			downloadedObserver.switchLiveData(old, new, context) { downloadedLiveData }
-		}
-		
-		private val lastReadObserver: Observer<Boolean> = Observer { currentlyReading ->
-			viewHolder.currentlyReading.visibility = if (currentlyReading) View.VISIBLE else View.INVISIBLE
-		}
-		private val downloadedObserver: Observer<Boolean> = Observer { downloaded ->
-			viewHolder.downloaded.visibility = if (downloaded) View.VISIBLE else View.INVISIBLE
-		}
-	}
 }
 
 private class ChaptersHeaderAdapter(

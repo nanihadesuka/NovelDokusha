@@ -17,9 +17,9 @@ import my.noveldokusha.databinding.ActivityDatabaseSearchGenreItemBinding
 import my.noveldokusha.scraper.scrubber
 import my.noveldokusha.ui.BaseActivity
 import my.noveldokusha.ui.databaseSearchResults.DatabaseSearchResultsActivity
-import my.noveldokusha.uiViews.Checkbox3StatesView
 import my.noveldokusha.uiUtils.Extra_String
 import my.noveldokusha.uiUtils.inflater
+import my.noveldokusha.uiViews.Checkbox3StatesView
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -62,7 +62,7 @@ class DatabaseSearchActivity : BaseActivity()
 		viewHolder.listView.itemAnimator = DefaultItemAnimator()
 		viewHolder.searchByGenreButton.setOnClickListener { _ ->
 			val list = viewAdapter.listView.list
-			val input = DatabaseSearchResultsActivity.SearchMode.Advanced(
+			val input = DatabaseSearchResultsActivity.SearchMode.Genres(
 				genresIncludeId = ArrayList(list.filter { it.state == Checkbox3StatesView.STATE.POSITIVE }.map { it.genreId }),
 				genresExcludeId = ArrayList(list.filter { it.state == Checkbox3StatesView.STATE.NEGATIVE }.map { it.genreId })
 			)

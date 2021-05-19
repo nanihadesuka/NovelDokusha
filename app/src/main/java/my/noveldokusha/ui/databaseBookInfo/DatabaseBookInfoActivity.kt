@@ -86,7 +86,7 @@ class DatabaseBookInfoActivity : BaseActivity()
 					lifecycleScope.launch(Dispatchers.IO) {
 						val databaseGenres = (viewModel.database.getSearchGenres() as? Response.Success ?: return@launch).data
 						if(!isActive) return@launch
-						val input = DatabaseSearchResultsActivity.SearchMode.Advanced(
+						val input = DatabaseSearchResultsActivity.SearchMode.Genres(
 							genresIncludeId = ArrayList(data.genres.mapNotNull { databaseGenres.get(it) }),
 							genresExcludeId = arrayListOf()
 						)

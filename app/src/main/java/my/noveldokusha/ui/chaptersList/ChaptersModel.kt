@@ -9,7 +9,8 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
-import my.noveldokusha.*
+import my.noveldokusha.BookMetadata
+import my.noveldokusha.bookstore
 import my.noveldokusha.scraper.Response
 import my.noveldokusha.scraper.fetchChaptersList
 import my.noveldokusha.scraper.scrubber
@@ -22,23 +23,15 @@ class ChaptersModel : BaseViewModel()
 		loadChapters()
 	}
 	
-	inner class ChapterItem(val chapter: bookstore.Chapter)
-	{
-		val currentlyLastReadChapterLiveData by lazy { bookLastReadChapterFlow.map { it == chapter.url }.asLiveData() }
-		val downloadedLiveData by lazy { downloadedChaptersFlow.map { it.contains(chapter.url) }.asLiveData() }
+	lateinit var bookMetadata: BookMetadata
+	
+	val chaptersWithContextLiveData by lazy {
+		bookstore.bookChapter.getChaptersWithContexFlow(bookMetadata.url)
+			.map { it.asReversed() }
+			.asLiveData()
 	}
 	
-	lateinit var bookMetadata: BookMetadata
-	val downloadedChaptersFlow by lazy {
-		bookstore.bookChapterBody.getExistBodyChapterUrlsFlow(bookMetadata.url)
-	}
-	val chaptersItemsLiveData by lazy {
-		bookstore.bookChapter.chaptersFlow(bookMetadata.url).map {
-			it.map(::ChapterItem).asReversed()
-		}.asLiveData()
-	}
-	val bookLastReadChapterFlow by lazy { bookstore.bookLibrary.bookLastReadChapterFlow(bookMetadata.url) }
-	val chapters = ArrayList<ChapterItem>()
+	val chapters = ArrayList<bookstore.ChapterDao.ChapterWithContext>()
 	val refresh = MutableLiveData<Boolean>()
 	val sourceName by lazy { scrubber.getCompatibleSource(this.bookMetadata.url)?.name ?: "" }
 	val errorMessage = MutableLiveData<String>()

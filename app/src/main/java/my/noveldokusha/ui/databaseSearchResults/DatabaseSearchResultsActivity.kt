@@ -47,7 +47,7 @@ class DatabaseSearchResultsActivity : BaseActivity()
 					this.text = input.text
 					MODE.TEXT.name
 				}
-				is SearchMode.Advanced ->
+				is SearchMode.Genres ->
 				{
 					this.genresIncludeId = input.genresIncludeId
 					this.genresExcludeId = input.genresExcludeId
@@ -60,7 +60,7 @@ class DatabaseSearchResultsActivity : BaseActivity()
 			get() = when (searchMode)
 			{
 				MODE.TEXT.name -> SearchMode.Text(text = text)
-				MODE.ADVANCED.name -> SearchMode.Advanced(genresIncludeId = genresIncludeId, genresExcludeId = genresExcludeId)
+				MODE.ADVANCED.name -> SearchMode.Genres(genresIncludeId = genresIncludeId, genresExcludeId = genresExcludeId)
 				else -> throw InvalidObjectException("Invalid SearchMode subclass: $searchMode")
 			}
 	}
@@ -70,7 +70,8 @@ class DatabaseSearchResultsActivity : BaseActivity()
 	sealed class SearchMode
 	{
 		data class Text(val text: String) : SearchMode()
-		data class Advanced(val genresIncludeId: ArrayList<String>, val genresExcludeId: ArrayList<String>) : SearchMode()
+		data class Genres(val genresIncludeId: ArrayList<String>, val genresExcludeId: ArrayList<String>) : SearchMode()
+//		data class Author(val name:String) : SearchMode()
 	}
 	
 	private val viewModel by viewModels<DatabaseSearchResultsModel>()

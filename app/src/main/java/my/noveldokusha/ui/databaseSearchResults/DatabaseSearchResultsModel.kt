@@ -14,7 +14,7 @@ class DatabaseSearchResultsModel : BaseViewModel()
 			when (input)
 			{
 				is DatabaseSearchResultsActivity.SearchMode.Text -> database.getSearch(index, input.text)
-				is DatabaseSearchResultsActivity.SearchMode.Advanced -> database.getSearchAdvanced(index, input.genresIncludeId, input.genresExcludeId)
+				is DatabaseSearchResultsActivity.SearchMode.Genres -> database.getSearchAdvanced(index, input.genresIncludeId, input.genresExcludeId)
 			}
 		}
 		this.booksFetchIterator.fetchNext()

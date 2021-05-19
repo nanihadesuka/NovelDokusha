@@ -7,7 +7,7 @@ import android.view.ViewGroup
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
+import androidx.lifecycle.asLiveData
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.DiffUtil
@@ -24,7 +24,6 @@ import my.noveldokusha.databinding.ActivityMainFragmentLibraryPageGridviewItemBi
 import my.noveldokusha.ui.BaseFragment
 import my.noveldokusha.ui.chaptersList.ChaptersActivity
 import my.noveldokusha.uiUtils.*
-import kotlin.properties.Delegates
 
 class LibraryPageFragment : BaseFragment
 {
@@ -42,7 +41,7 @@ class LibraryPageFragment : BaseFragment
 	
 	private inner class Adapter
 	{
-		val gridView by lazy { NovelItemAdapter(this@LibraryPageFragment, viewModel.books) }
+		val gridView by lazy { NovelItemAdapter(this@LibraryPageFragment, viewModel.booksWithContext) }
 	}
 	
 	override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View
@@ -56,7 +55,7 @@ class LibraryPageFragment : BaseFragment
 		viewHolder.gridView.itemAnimator = DefaultItemAnimator()
 		viewHolder.swipeRefreshLayout.setOnRefreshListener { viewModel.update() }
 		
-		viewModel.booksLiveData.observe(viewLifecycleOwner) { viewAdapter.gridView.setList(it) }
+		viewModel.booksWithContextFlow.asLiveData().observe(viewLifecycleOwner) { viewAdapter.gridView.setList(it) }
 		
 		viewModel.refreshing.observe(viewLifecycleOwner) { viewHolder.swipeRefreshLayout.isRefreshing = it }
 		viewModel.updateNotice.observe(viewLifecycleOwner) {
@@ -97,18 +96,21 @@ class LibraryPageFragment : BaseFragment
 
 private class NovelItemAdapter(
 	private val context: BaseFragment,
-	private val list: MutableList<LibraryPageModel.BookItem>
+	private val list: MutableList<bookstore.LibraryDao.BookWithContext>
 ) : RecyclerView.Adapter<NovelItemAdapter.ViewBinder>()
 {
-	private inner class Diff(private val new: List<LibraryPageModel.BookItem>) : DiffUtil.Callback()
+	private inner class Diff(private val new: List<bookstore.LibraryDao.BookWithContext>) : DiffUtil.Callback()
 	{
 		override fun getOldListSize(): Int = list.size
 		override fun getNewListSize(): Int = new.size
-		override fun areItemsTheSame(oldPos: Int, newPos: Int): Boolean = list[oldPos].data.url == new[newPos].data.url
-		override fun areContentsTheSame(oldPos: Int, newPos: Int): Boolean = list[oldPos].data == new[newPos].data
+		override fun areItemsTheSame(oldPos: Int, newPos: Int): Boolean = list[oldPos].book.url == new[newPos].book.url
+		override fun areContentsTheSame(oldPos: Int, newPos: Int): Boolean =
+			(list[oldPos].book.completed == new[newPos].book.completed) &&
+			(list[oldPos].chaptersCount == new[newPos].chaptersCount) &&
+			(list[oldPos].chaptersReadCount == new[newPos].chaptersReadCount)
 	}
 	
-	fun setList(newList: List<LibraryPageModel.BookItem>) = DiffUtil.calculateDiff(Diff(newList)).let {
+	fun setList(newList: List<bookstore.LibraryDao.BookWithContext>) = DiffUtil.calculateDiff(Diff(newList)).let {
 		list.clear()
 		list.addAll(newList)
 		it.dispatchUpdatesTo(this)
@@ -125,33 +127,25 @@ private class NovelItemAdapter(
 	{
 		val viewModel = this.list[position]
 		val viewHolder = binder.viewHolder
-		binder.viewModel = viewModel
 		
-		viewHolder.title.text = viewModel.data.title
-		viewHolder.unreadChaptersCounter.visibility = View.INVISIBLE
+		viewHolder.title.text = viewModel.book.title
+		val unreadChaptersCount = viewModel.chaptersCount - viewModel.chaptersReadCount
+		viewHolder.unreadChaptersCounter.visibility = if (unreadChaptersCount == 0) View.INVISIBLE else View.VISIBLE
+		viewHolder.unreadChaptersCounter.text = unreadChaptersCount.toString()
+		
 		viewHolder.book.setOnClickListener {
 			ChaptersActivity.IntentData(
 				context.requireContext(),
-				bookMetadata = BookMetadata(url = viewModel.data.url, title = viewModel.data.title)
+				bookMetadata = BookMetadata(url = viewModel.book.url, title = viewModel.book.title)
 			).let(context::startActivity)
 		}
 		viewHolder.book.setOnLongClickListener {
-			completedDialog(context, viewModel.data)
+			completedDialog(context, viewModel.book)
 			true
 		}
 	}
 	
 	inner class ViewBinder(val viewHolder: ActivityMainFragmentLibraryPageGridviewItemBinding) : RecyclerView.ViewHolder(viewHolder.root)
-	{
-		var viewModel: LibraryPageModel.BookItem? by Delegates.observable(null) { _, old, new ->
-			numberOfUnreadChaptersObserver.switchLiveData(old, new, context.viewLifecycleOwner) { numberOfUnreadChapters }
-		}
-		
-		val numberOfUnreadChaptersObserver = Observer<Int> {
-			viewHolder.unreadChaptersCounter.text = it.toString()
-			viewHolder.unreadChaptersCounter.visibility = if (it == 0) View.INVISIBLE else View.VISIBLE
-		}
-	}
 }
 
 private fun completedDialog(context: BaseFragment, book: bookstore.Book) = MaterialDialog(context.requireActivity()).show {

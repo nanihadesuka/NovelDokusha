@@ -56,15 +56,6 @@ object bookstore
 		@Query("SELECT * FROM Book")
 		fun booksFlow(): Flow<List<Book>>
 		
-		@Query("SELECT lastReadChapter FROM Book WHERE url == :bookUrl")
-		fun bookLastReadChapterFlow(bookUrl: String): Flow<String?>
-		
-		@Query("SELECT * FROM Book WHERE completed = 0")
-		fun booksReadingFlow(): Flow<List<Book>>
-		
-		@Query("SELECT * FROM Book WHERE completed = 1")
-		fun booksCompletedFlow(): Flow<List<Book>>
-		
 		@Insert(onConflict = OnConflictStrategy.IGNORE)
 		suspend fun insert(book: Book)
 		
@@ -85,6 +76,18 @@ object bookstore
 		
 		@Query("SELECT EXISTS(SELECT * FROM Book WHERE url == :url)")
 		fun existFlow(url: String): Flow<Boolean>
+		
+		data class BookWithContext(@Embedded val book: Book, val chaptersCount: Int, val chaptersReadCount: Int)
+		
+		@Query(
+			"""
+			SELECT Book.*, COUNT(Chapter.read) AS chaptersCount, SUM(Chapter.read) AS chaptersReadCount
+			FROM Book
+			LEFT JOIN Chapter ON Chapter.bookUrl = Book.url
+			GROUP BY Book.url
+		"""
+		)
+		fun getBooksWithContextFlow(): Flow<List<BookWithContext>>
 	}
 	
 	@Dao
@@ -98,10 +101,7 @@ object bookstore
 		
 		@Query("SELECT * FROM Chapter WHERE bookUrl = :bookUrl")
 		suspend fun chapters(bookUrl: String): List<Chapter>
-		
-		@Query("SELECT EXISTS(SELECT * FROM Chapter WHERE bookUrl = :bookUrl)")
-		suspend fun existBookChapters(bookUrl: String): Boolean
-		
+	
 		@Update
 		suspend fun update(chapter: Chapter)
 		
@@ -128,6 +128,19 @@ object bookstore
 		
 		@Query("DELETE FROM Chapter WHERE Chapter.bookUrl NOT IN (SELECT Book.url FROM Book)")
 		suspend fun removeAllNonLibraryRows()
+		
+		data class ChapterWithContext(@Embedded val chapter: Chapter, val downloaded: Boolean, val lastReadChapter: Boolean)
+		
+		@Query(
+			"""
+			SELECT Chapter.*, ChapterBody.url IS NOT NULL AS downloaded , Book.lastReadChapter IS NOT NULL AS lastReadChapter
+			FROM Chapter
+			LEFT JOIN ChapterBody ON ChapterBody.url = Chapter.url
+			LEFT JOIN Book ON Book.url = :bookUrl AND Book.lastReadChapter == Chapter.url
+			WHERE Chapter.bookUrl == :bookUrl
+		"""
+		)
+		fun getChaptersWithContextFlow(bookUrl: String): Flow<List<ChapterWithContext>>
 	}
 	
 	@Dao
@@ -226,9 +239,7 @@ object bookstore
 		inner class BookLibrary
 		{
 			val booksFlow by lazy { db.libraryDao().booksFlow() }
-			val booksReadingFlow by lazy { db.libraryDao().booksReadingFlow() }
-			val booksCompletedFlow by lazy { db.libraryDao().booksCompletedFlow() }
-			fun bookLastReadChapterFlow(bookUrl: String) = db.libraryDao().bookLastReadChapterFlow(bookUrl)
+			val getBooksWithContextFlow by lazy { db.libraryDao().getBooksWithContextFlow() }
 			fun existFlow(url: String) = db.libraryDao().existFlow(url)
 			suspend fun insert(book: Book) = if (isValid(book)) db.libraryDao().insert(book) else Unit
 			suspend fun insert(books: List<Book>) = db.libraryDao().insert(books.filter(::isValid))
@@ -256,7 +267,7 @@ object bookstore
 			suspend fun insert(chapters: List<Chapter>) = db.chapterDao().insert(chapters.filter(::isValid))
 			suspend fun chapters(bookUrl: String) = db.chapterDao().chapters(bookUrl)
 			fun chaptersFlow(bookUrl: String) = db.chapterDao().chaptersFlow(bookUrl)
-			suspend fun existBookChapters(bookUrl: String) = db.chapterDao().existBookChapters(bookUrl)
+			fun getChaptersWithContexFlow(bookUrl: String) = db.chapterDao().getChaptersWithContextFlow(bookUrl)
 		}
 		
 		inner class BookChapterBody
