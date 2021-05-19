@@ -198,7 +198,8 @@ private class ChaptersArrayAdapter(
 		override fun areItemsTheSame(oldPos: Int, newPos: Int): Boolean = list[oldPos].chapter.url == aNew[newPos].chapter.url
 		override fun areContentsTheSame(oldPos: Int, newPos: Int): Boolean =
 			(list[oldPos].chapter.read == aNew[newPos].chapter.read) &&
-			(list[oldPos].downloaded == aNew[newPos].downloaded)
+			(list[oldPos].downloaded == aNew[newPos].downloaded) &&
+			(list[oldPos].lastReadChapter == aNew[newPos].lastReadChapter)
 	}
 	
 	fun setList(newList: List<bookstore.ChapterDao.ChapterWithContext>) = DiffUtil.calculateDiff(Diff(newList)).let {
