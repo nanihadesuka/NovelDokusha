@@ -46,12 +46,14 @@ class NovelUpdates : scrubber.database_interface
 			Response<List<BookMetadata>>
 	{
 		val page = index + 1
-		
-		var url = "https://www.novelupdates.com/series-finder/?sf=1"
-		if (genresIncludedId.isNotEmpty()) url += "&gi=${genresIncludedId.joinToString(",")}&mgi=and"
-		if (genresExcludedId.isNotEmpty()) url += "&ge=${genresExcludedId.joinToString(",")}"
-		url += "&sort=sdate&order=desc"
-		if (page > 1) url += "&pg=$page"
+		val settings = mutableListOf<String>().apply {
+			if (genresIncludedId.isNotEmpty()) add("gi=${genresIncludedId.joinToString(",")}&mgi=and")
+			if (genresExcludedId.isNotEmpty()) add("ge=${genresExcludedId.joinToString(",")}")
+			add("sort=sdate")
+			add("order=desc")
+			if (page > 1) add("pg=$page")
+		}
+		val url = "https://www.novelupdates.com/series-finder/?sf=1" + settings.joinToString("&")
 		
 		return tryConnect("page: $page\nurl: $url") {
 			fetchDoc(url)

@@ -13,7 +13,6 @@ class DivineDaoLibrary : scrubber.source_interface.base
 {
 	override val name = "Divine Dao Library"
 	override val baseUrl = "https://www.divinedaolibrary.com/"
-	//			override val catalogUrl = "https://www.centinni.com/novel/"
 	
 	override suspend fun getChapterText(doc: Document): String
 	{
