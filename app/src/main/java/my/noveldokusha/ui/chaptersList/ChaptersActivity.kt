@@ -68,7 +68,6 @@ class ChaptersActivity : BaseActivity()
 		
 		viewModel.chaptersWithContextLiveData.observe(this) {
 			viewAdapter.chapters.setList(it)
-			viewModel.numberOfChapters.value = it.size
 		}
 		
 		setupSelectionModeBar()
@@ -278,9 +277,8 @@ private class ChaptersHeaderAdapter(
 			viewHolder.bookTitle.text = viewModel.bookMetadata.title
 			viewHolder.sourceName.text = viewModel.sourceName
 			
-			viewModel.numberOfChapters.observe(context) {
-				viewHolder.numberOfChapters.text = it.toString()
-				viewHolder.numberOfChapters.visibility = if (it.toString().isEmpty()) View.INVISIBLE else View.VISIBLE
+			viewModel.chaptersWithContextLiveData.observe(context) { list ->
+				viewHolder.numberOfChapters.text = list.size.toString()
 			}
 			viewModel.errorMessage.observe(context) { viewHolder.errorMessage.text = it }
 			viewModel.errorMessageVisibility.observe(context) { viewHolder.errorMessage.visibility = it }

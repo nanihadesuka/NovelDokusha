@@ -7,20 +7,15 @@
 	android:id="@+id/header"
 	android:layout_width="match_parent"
 	android:layout_height="wrap_content"
-	android:animateLayoutChanges="true"
-	android:fitsSystemWindows="true"
 	android:orientation="vertical"
 	>
-	
 	
 	<androidx.constraintlayout.widget.ConstraintLayout
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
-		android:animateLayoutChanges="true"
 		android:columnCount="2"
 		android:orientation="horizontal"
 		android:padding="10sp"
-		
 		>
 		
 		<LinearLayout
@@ -35,12 +30,10 @@
 			app:layout_constraintTop_toTopOf="parent"
 			>
 			
-			
 			<TextView
 				android:id="@+id/bookTitle"
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
-				android:animateLayoutChanges="false"
 				android:textSize="18sp"
 				android:textStyle="bold"
 				tools:text="Book name"
@@ -49,7 +42,6 @@
 			<LinearLayout
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
-				android:animateLayoutChanges="true"
 				>
 				
 				<TextView
@@ -71,7 +63,6 @@
 			<LinearLayout
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
-				android:animateLayoutChanges="true"
 				>
 				
 				<TextView
@@ -86,9 +77,7 @@
 					android:id="@+id/numberOfChapters"
 					android:layout_width="wrap_content"
 					android:layout_height="wrap_content"
-					android:visibility="invisible"
 					tools:text="23"
-					tools:visibility="visible"
 					/>
 			</LinearLayout>
 		</LinearLayout>
@@ -134,14 +123,14 @@
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
 			android:fontFamily="monospace"
+			android:maxLines="10"
 			android:padding="17sp"
+			android:scrollbars="vertical"
 			android:textColor="#EC4427"
 			android:textIsSelectable="true"
 			android:textSize="14sp"
 			android:textStyle=""
-			android:maxLines="10"
 			android:visibility="gone"
-			android:scrollbars="vertical"
 			tools:text="Error:\nError message\n\nReason:\nReason message\n\nError stack:\nCall stack tree "
 			tools:visibility="visible"
 			/>

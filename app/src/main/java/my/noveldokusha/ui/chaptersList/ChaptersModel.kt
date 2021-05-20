@@ -37,7 +37,6 @@ class ChaptersModel : BaseViewModel()
 	val errorMessage = MutableLiveData<String>()
 	val errorMessageVisibility = MutableLiveData<Int>()
 	val errorMessageMaxLines = MutableLiveData<Int>(10)
-	val numberOfChapters = MutableLiveData<Int>()
 	
 	val selectedChaptersUrl = mutableSetOf<String>()
 	
