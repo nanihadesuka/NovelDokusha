@@ -1,18 +1,25 @@
 package my.noveldokusha.ui.databaseBookInfo
 
+import android.animation.LayoutTransition
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.TypedValue
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.viewModels
+import androidx.core.view.updateLayoutParams
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import my.noveldokusha.BookMetadata
+import my.noveldokusha.R
 import my.noveldokusha.databinding.ActivityDatabaseBookInfoBinding
 import my.noveldokusha.databinding.BookListItemBinding
 import my.noveldokusha.scraper.Response
@@ -98,17 +105,36 @@ class DatabaseBookInfoActivity : BaseActivity()
 			else
 				viewHolder.genres.visibility = View.GONE
 			
+			Glide.with(this)
+				.load(data.coverImageUrl)
+				.error(R.drawable.ic_baseline_error_outline_24)
+				.transform(RoundedCorners(32))
+				.transition(DrawableTransitionOptions.withCrossFade())
+				.into(viewHolder.coverImage)
+			
+			fun Float.spToPx() = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, this, resources.displayMetrics).toInt()
+			
+			viewHolder.linearLayout.layoutTransition.enableTransitionType(LayoutTransition.CHANGING)
+			var imgFullWidth = false
+			viewHolder.coverImage.setOnClickListener {
+				imgFullWidth = !imgFullWidth
+				viewHolder.coverImage.updateLayoutParams {
+					width = if (imgFullWidth) ViewGroup.LayoutParams.MATCH_PARENT else ViewGroup.LayoutParams.WRAP_CONTENT
+					height = if (imgFullWidth) ViewGroup.LayoutParams.WRAP_CONTENT else 220f.spToPx()
+				}
+			}
+			
 			viewHolder.description.text = data.description
 			viewHolder.alternativeTitles.text = data.alternativeTitles.joinToString("\n\n")
 			viewHolder.authors.text = data.authors.joinToString("\n") { author -> author.name }
 			viewHolder.tags.text = data.tags.joinToString(" · ").ifEmpty { "No tags" }
 			viewHolder.bookType.text = data.bookType
 			
-			viewHolder.description.fadeIn()
-			viewHolder.alternativeTitles.fadeIn()
-			viewHolder.authors.fadeIn()
-			viewHolder.tags.fadeIn()
-			viewHolder.bookType.fadeIn()
+			viewHolder.description.fadeIn(700)
+			viewHolder.alternativeTitles.fadeIn(700)
+			viewHolder.authors.fadeIn(700)
+			viewHolder.tags.fadeIn(700)
+			viewHolder.bookType.fadeIn(700)
 			
 			viewModel.relatedBooks.isEmpty().let { empty ->
 				viewHolder.relatedBooks.visibility = if (empty) View.GONE else View.VISIBLE

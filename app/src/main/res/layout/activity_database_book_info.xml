@@ -4,6 +4,7 @@
 	xmlns:app="http://schemas.android.com/apk/res-auto"
 	xmlns:tools="http://schemas.android.com/tools"
 	android:layout_width="match_parent"
+	android:animateLayoutChanges="true"
 	android:layout_height="match_parent"
 	>
 	
@@ -26,15 +27,18 @@
 		android:id="@+id/nestedScrollView"
 		android:layout_width="match_parent"
 		android:layout_height="match_parent"
+		android:animateLayoutChanges="true"
 		android:descendantFocusability="beforeDescendants"
 		app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior"
 		>
 		
 		<LinearLayout
+			android:id="@+id/linearLayout"
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
 			android:baselineAligned="false"
 			android:orientation="vertical"
+			android:animateLayoutChanges="true"
 			android:paddingBottom="300sp"
 			>
 			
@@ -48,7 +52,7 @@
 					android:layout_width="0dp"
 					android:layout_height="wrap_content"
 					android:hint="Novel title"
-					android:padding="10sp"
+					android:padding="16sp"
 					android:textIsSelectable="true"
 					android:textSize="20sp"
 					android:textStyle="bold"
@@ -72,6 +76,20 @@
 					/>
 			
 			</androidx.constraintlayout.widget.ConstraintLayout>
+			
+			
+			<ImageView
+				android:id="@+id/coverImage"
+				android:layout_width="match_parent"
+				android:layout_height="220sp"
+				android:layout_gravity="center"
+				android:elevation="2sp"
+				android:animateLayoutChanges="true"
+				android:paddingHorizontal="10sp"
+				android:paddingVertical="0sp"
+				tools:layout_width="150sp"
+				tools:src="@mipmap/ic_logo"
+				/>
 			
 			<TextView
 				android:id="@+id/header_description"

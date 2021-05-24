@@ -89,8 +89,14 @@ class BakaUpdates : scrubber.database_interface
 			.toList()
 		
 		val authors = entry("Author\\(s\\)")
-			.select("a")
-			.map { scrubber.database_interface.BookAuthor(name = it.text(), url = it.attr("href")) }
+			.select("a[href]")
+			.map {
+				if (it.attr("href").startsWith("https://www.mangaupdates.com/authors.html"))
+					return@map scrubber.database_interface.BookAuthor(name = it.text(), url = it.attr("href"))
+				
+				val authorName = it.previousSibling().outerHtml().removeSuffix("&nbsp;[")
+				return@map scrubber.database_interface.BookAuthor(name = authorName, url = null)
+			}
 		
 		val description = entry("Description").let {
 			it.selectFirst("[id=div_desc_more]") ?: it.selectFirst("div")
@@ -102,6 +108,10 @@ class BakaUpdates : scrubber.database_interface
 			.select("li > a")
 			.map { it.text() }
 		
+		val coverImageUrl = entry("Image")
+			.selectFirst("img[src]")
+			?.attr("src")
+		
 		return scrubber.database_interface.BookData(
 			title = doc.selectFirst(".releasestitle.tabletitle").text().removeNovelTag(),
 			description = description,
@@ -111,7 +121,8 @@ class BakaUpdates : scrubber.database_interface
 			bookType = entry("Type").text(),
 			genres = entry("Genre").select("a").dropLast(1).map { it.text() },
 			tags = tags,
-			authors = authors
+			authors = authors,
+			coverImageUrl = coverImageUrl
 		)
 	}
 }

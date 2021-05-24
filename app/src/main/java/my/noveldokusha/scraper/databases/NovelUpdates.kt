@@ -71,7 +71,7 @@ class NovelUpdates : scrubber.database_interface
 			.find { it.hasClass("seriesother") && it.text() == "Related Series" }!!
 			.nextElementSiblings().asSequence()
 			.takeWhile { elem -> !elem.`is`("h5") }
-			.filter { it.`is`("a") }
+			.filter { it.`is`("a[href]") }
 			.map { BookMetadata(it.text(), it.attr("href")) }.toList()
 		
 		val similarRecommended = doc
@@ -79,12 +79,12 @@ class NovelUpdates : scrubber.database_interface
 			.find { it.hasClass("seriesother") && it.text() == "Recommendations" }!!
 			.nextElementSiblings().asSequence()
 			.takeWhile { elem -> !elem.`is`("h5") }
-			.filter { it.`is`("a") }
+			.filter { it.`is`("a[href]") }
 			.map { BookMetadata(it.text(), it.attr("href")) }.toList()
 		
 		val authors = doc
 			.selectFirst("#showauthors")
-			.select("a")
+			.select("a[href]")
 			.map { scrubber.database_interface.BookAuthor(name = it.text(), url = it.attr("href")) }
 		
 		return scrubber.database_interface.BookData(
@@ -96,7 +96,8 @@ class NovelUpdates : scrubber.database_interface
 			bookType = doc.selectFirst(".genre, .type").text(),
 			genres = doc.selectFirst("#seriesgenre").select("a").map { it.text() },
 			tags = doc.selectFirst("#showtags").select("a").map { it.text() },
-			authors = authors
+			authors = authors,
+			coverImageUrl = doc.selectFirst("div.seriesimg > img[src]")?.attr("src")
 		)
 	}
 }

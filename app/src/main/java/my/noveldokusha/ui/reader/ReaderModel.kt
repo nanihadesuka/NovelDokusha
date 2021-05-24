@@ -84,8 +84,8 @@ suspend fun getChapterInitialPosition(bookUrl: String, chapterUrl: String, items
 {
 	
 	val titlePos by lazy { items.indexOfFirst { it is ReaderActivity.Item.TITLE } }
-	val book = bookstore.bookLibrary.get(bookUrl)
 	val chapter = bookstore.bookChapter.get(chapterUrl) ?: return Pair(titlePos, 0)
+	val book = bookstore.bookLibrary.get(bookUrl)
 	val position by lazy {
 		items.indexOfFirst {
 			it is ReaderActivity.Item.Position && it.pos == chapter.lastReadPosition

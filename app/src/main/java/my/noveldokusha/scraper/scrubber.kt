@@ -88,7 +88,8 @@ object scrubber
 			val genres: List<String>,
 			val bookType: String,
 			val relatedBooks: List<BookMetadata>,
-			val similarRecommended: List<BookMetadata>
+			val similarRecommended: List<BookMetadata>,
+			val coverImageUrl: String?
 		)
 		
 		fun getBookData(doc: Document): BookData
