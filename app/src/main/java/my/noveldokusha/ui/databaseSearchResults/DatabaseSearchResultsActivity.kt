@@ -31,36 +31,39 @@ class DatabaseSearchResultsActivity : BaseActivity()
 		private var genresIncludeId by Extra_StringArrayList()
 		private var genresExcludeId by Extra_StringArrayList()
 		private var searchMode by Extra_String()
-		
-		private enum class MODE
-		{ TEXT, ADVANCED }
+		private var authorName by Extra_String()
+		private var urlAuthorPage by Extra_String()
 		
 		constructor(intent: Intent) : super(intent)
 		constructor(ctx: Context, databaseUrlBase: String, input: SearchMode) : super(ctx, DatabaseSearchResultsActivity::class.java)
 		{
 			this.databaseUrlBase = databaseUrlBase
-			
-			this.searchMode = when (input)
+			this.searchMode = input::class.simpleName!!
+			when (input)
 			{
 				is SearchMode.Text ->
 				{
 					this.text = input.text
-					MODE.TEXT.name
 				}
 				is SearchMode.Genres ->
 				{
 					this.genresIncludeId = input.genresIncludeId
 					this.genresExcludeId = input.genresExcludeId
-					MODE.ADVANCED.name
+				}
+				is SearchMode.AuthorSeries ->
+				{
+					this.authorName = input.authorName
+					this.urlAuthorPage = input.urlAuthorPage
 				}
 			}
 		}
 		
 		val input
-			get() = when (searchMode)
+			get() = when (this.searchMode)
 			{
-				MODE.TEXT.name -> SearchMode.Text(text = text)
-				MODE.ADVANCED.name -> SearchMode.Genres(genresIncludeId = genresIncludeId, genresExcludeId = genresExcludeId)
+				SearchMode.Text::class.simpleName -> SearchMode.Text(text = text)
+				SearchMode.Genres::class.simpleName -> SearchMode.Genres(genresIncludeId = genresIncludeId, genresExcludeId = genresExcludeId)
+				SearchMode.AuthorSeries::class.simpleName -> SearchMode.AuthorSeries(authorName = authorName, urlAuthorPage = urlAuthorPage)
 				else -> throw InvalidObjectException("Invalid SearchMode subclass: $searchMode")
 			}
 	}
@@ -71,7 +74,7 @@ class DatabaseSearchResultsActivity : BaseActivity()
 	{
 		data class Text(val text: String) : SearchMode()
 		data class Genres(val genresIncludeId: ArrayList<String>, val genresExcludeId: ArrayList<String>) : SearchMode()
-//		data class Author(val name:String) : SearchMode()
+		data class AuthorSeries(val authorName: String, val urlAuthorPage: String) : SearchMode()
 	}
 	
 	private val viewModel by viewModels<DatabaseSearchResultsModel>()
@@ -114,13 +117,19 @@ class DatabaseSearchResultsActivity : BaseActivity()
 			viewAdapter.progressBar.visible = it
 		}
 		viewModel.booksFetchIterator.onSuccess.observe(this) {
+			viewModel.searchResults.clear()
 			viewModel.searchResults.addAll(it.data)
 			viewAdapter.recyclerView.notifyDataSetChanged()
 		}
 		
 		supportActionBar!!.let {
-			it.title = "Database search"
-			it.subtitle = viewModel.database.name.capitalize(Locale.ROOT)
+			it.title = "Database: " + viewModel.database.name.capitalize(Locale.ROOT)
+			it.subtitle = when (val res = extras.input)
+			{
+				is SearchMode.AuthorSeries -> "Search by author: ${res.authorName}"
+				is SearchMode.Genres -> "Search by genre"
+				is SearchMode.Text -> "Search by title: " + res.text
+			}
 			it.setDisplayHomeAsUpEnabled(true)
 		}
 	}

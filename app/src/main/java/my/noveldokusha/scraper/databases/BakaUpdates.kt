@@ -15,7 +15,21 @@ class BakaUpdates : scrubber.database_interface
 	override val name = "Baka-Updates"
 	override val baseUrl = "https://www.mangaupdates.com/"
 	
-	fun String.removeNovelTag() = this.removeSuffix("(Novel)").trim()
+	private fun String.removeNovelTag() = this.removeSuffix("(Novel)").trim()
+	
+	override suspend fun getSearchAuthorSeries(index: Int, urlAuthorPage: String): Response<List<BookMetadata>>
+	{
+		if (index > 0) return Response.Success(listOf())
+		
+		return tryConnect {
+			fetchDoc(urlAuthorPage)
+				.select("div.pl-2.col-md-5.col-7.text-truncate.text")
+				.map { it.select("a[href]")[1] }
+				.filter { it.text().endsWith("(Novel)") }
+				.map { BookMetadata(title = it.text(), url = it.attr("href")) }
+				.let { Response.Success(it) }
+		}
+	}
 	
 	override suspend fun getSearchGenres(): Response<Map<String, String>>
 	{

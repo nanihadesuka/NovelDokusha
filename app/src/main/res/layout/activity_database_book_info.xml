@@ -4,8 +4,8 @@
 	xmlns:app="http://schemas.android.com/apk/res-auto"
 	xmlns:tools="http://schemas.android.com/tools"
 	android:layout_width="match_parent"
-	android:animateLayoutChanges="true"
 	android:layout_height="match_parent"
+	android:animateLayoutChanges="true"
 	>
 	
 	<com.google.android.material.appbar.AppBarLayout
@@ -36,9 +36,9 @@
 			android:id="@+id/linearLayout"
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
+			android:animateLayoutChanges="true"
 			android:baselineAligned="false"
 			android:orientation="vertical"
-			android:animateLayoutChanges="true"
 			android:paddingBottom="300sp"
 			>
 			
@@ -83,8 +83,8 @@
 				android:layout_width="match_parent"
 				android:layout_height="220sp"
 				android:layout_gravity="center"
-				android:elevation="2sp"
 				android:animateLayoutChanges="true"
+				android:elevation="2sp"
 				android:paddingHorizontal="10sp"
 				android:paddingVertical="0sp"
 				tools:layout_width="150sp"
@@ -151,12 +151,20 @@
 			
 			<TextView
 				android:id="@+id/authors"
-				android:layout_width="match_parent"
+				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
+				android:layout_marginHorizontal="10sp"
+				android:layout_marginTop="6sp"
+				android:background="@drawable/book_item_background"
+				android:clickable="true"
+				android:foreground="@drawable/book_item_foreground_ripple"
+				android:padding="10sp"
 				android:paddingHorizontal="10sp"
 				android:paddingBottom="10sp"
-				android:textIsSelectable="true"
+				android:tooltipText="Search novels from author"
+				android:visibility="invisible"
 				tools:text="Author(s) name(s)"
+				tools:visibility="visible"
 				/>
 			
 			<TextView

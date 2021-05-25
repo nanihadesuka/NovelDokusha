@@ -15,6 +15,18 @@ class NovelUpdates : scrubber.database_interface
 	override val name = "Novel Updates"
 	override val baseUrl = "https://www.novelupdates.com/"
 	
+	override suspend fun getSearchAuthorSeries(index: Int, urlAuthorPage: String): Response<List<BookMetadata>>
+	{
+		if (index > 0) return Response.Success(listOf())
+		
+		return tryConnect {
+			fetchDoc(urlAuthorPage)
+				.select("div.search_title > a[href]")
+				.map { BookMetadata(title = it.text(), url = it.attr("href")) }
+				.let { Response.Success(it) }
+		}
+	}
+	
 	override suspend fun getSearchGenres(): Response<Map<String, String>>
 	{
 		return searchGenresCache.fetch {

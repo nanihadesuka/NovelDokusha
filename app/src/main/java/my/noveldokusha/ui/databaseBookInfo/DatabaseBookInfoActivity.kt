@@ -88,11 +88,11 @@ class DatabaseBookInfoActivity : BaseActivity()
 			if (data.genres.isNotEmpty())
 			{
 				viewHolder.genres.text = data.genres.joinToString(" · ")
-				viewHolder.genres.fadeIn()
+				viewHolder.genres.fadeIn(700)
 				viewHolder.genres.setOnClickListener {
 					lifecycleScope.launch(Dispatchers.IO) {
 						val databaseGenres = (viewModel.database.getSearchGenres() as? Response.Success ?: return@launch).data
-						if(!isActive) return@launch
+						if (!isActive) return@launch
 						val input = DatabaseSearchResultsActivity.SearchMode.Genres(
 							genresIncludeId = ArrayList(data.genres.mapNotNull { databaseGenres.get(it) }),
 							genresExcludeId = arrayListOf()
@@ -124,15 +124,33 @@ class DatabaseBookInfoActivity : BaseActivity()
 				}
 			}
 			
+			if (data.authors.isNotEmpty())
+			{
+				val author = data.authors.first()
+				viewHolder.authors.text = author.name
+				viewHolder.authors.fadeIn(700)
+				if (author.url != null)
+					viewHolder.authors.setOnClickListener {
+						lifecycleScope.launch(Dispatchers.IO) {
+							val input = DatabaseSearchResultsActivity.SearchMode.AuthorSeries(
+								authorName = author.name, urlAuthorPage = author.url
+							)
+							val intent =
+								DatabaseSearchResultsActivity.IntentData(this@DatabaseBookInfoActivity, viewModel.database.baseUrl, input)
+							startActivity(intent)
+						}
+					}
+			}
+			else
+				viewHolder.authors.visibility = View.GONE
+			
 			viewHolder.description.text = data.description
 			viewHolder.alternativeTitles.text = data.alternativeTitles.joinToString("\n\n")
-			viewHolder.authors.text = data.authors.joinToString("\n") { author -> author.name }
 			viewHolder.tags.text = data.tags.joinToString(" · ").ifEmpty { "No tags" }
 			viewHolder.bookType.text = data.bookType
 			
 			viewHolder.description.fadeIn(700)
 			viewHolder.alternativeTitles.fadeIn(700)
-			viewHolder.authors.fadeIn(700)
 			viewHolder.tags.fadeIn(700)
 			viewHolder.bookType.fadeIn(700)
 			

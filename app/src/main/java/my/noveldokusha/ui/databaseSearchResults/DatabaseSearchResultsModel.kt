@@ -15,6 +15,7 @@ class DatabaseSearchResultsModel : BaseViewModel()
 			{
 				is DatabaseSearchResultsActivity.SearchMode.Text -> database.getSearch(index, input.text)
 				is DatabaseSearchResultsActivity.SearchMode.Genres -> database.getSearchAdvanced(index, input.genresIncludeId, input.genresExcludeId)
+				is DatabaseSearchResultsActivity.SearchMode.AuthorSeries -> database.getSearchAuthorSeries(index, input.urlAuthorPage)
 			}
 		}
 		this.booksFetchIterator.fetchNext()

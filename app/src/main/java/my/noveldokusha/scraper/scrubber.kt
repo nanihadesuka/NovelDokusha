@@ -70,6 +70,7 @@ object scrubber
 		
 		val searchGenresCache get() = DataCache_DatabaseSearchGenres(id)
 		
+		suspend fun getSearchAuthorSeries(index: Int, urlAuthorPage: String): Response<List<BookMetadata>>
 		suspend fun getSearchGenres(): Response<Map<String, String>>
 		suspend fun getSearch(index: Int, input: String): Response<List<BookMetadata>>
 		suspend fun getSearchAdvanced(
