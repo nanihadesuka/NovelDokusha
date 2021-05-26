@@ -62,11 +62,11 @@ class ChaptersActivity : BaseActivity()
 		
 		viewHolder.recyclerView.adapter = ConcatAdapter(viewAdapter.header, viewAdapter.chapters)
 		viewHolder.recyclerView.itemAnimator = DefaultItemAnimator()
-		viewHolder.swipeRefreshLayout.setOnRefreshListener { viewModel.loadChapters(false) }
 		
-		viewModel.refresh.observe(this) { viewHolder.swipeRefreshLayout.isRefreshing = it }
-		
+		viewHolder.swipeRefreshLayout.setOnRefreshListener { viewModel.fetchIterator.fetchNext() }
+		viewModel.fetchIterator.onFetching.observe(this) { viewHolder.swipeRefreshLayout.isRefreshing = it }
 		viewModel.chaptersWithContextLiveData.observe(this) {
+			if (it.isEmpty()) viewModel.fetchIterator.fetchNext()
 			viewAdapter.chapters.setList(it)
 		}
 		
@@ -280,23 +280,24 @@ private class ChaptersHeaderAdapter(
 			viewModel.chaptersWithContextLiveData.observe(context) { list ->
 				viewHolder.numberOfChapters.text = list.size.toString()
 			}
-			viewModel.errorMessage.observe(context) { viewHolder.errorMessage.text = it }
-			viewModel.errorMessageVisibility.observe(context) { viewHolder.errorMessage.visibility = it }
-			viewModel.errorMessageMaxLines.observe(context) { viewHolder.errorMessage.maxLines = it }
+			
+			viewModel.fetchIterator.onError.observe(context) {
+				viewHolder.errorMessage.visibility = View.VISIBLE
+				viewHolder.errorMessage.text = it.message
+			}
+			viewModel.fetchIterator.onReset.observe(context) { viewHolder.errorMessage.visibility = View.GONE }
+			viewModel.fetchIterator.onCompletedEmpty.observe(context) { toast("No chapters found") }
 			viewHolder.errorMessage.setOnLongClickListener(object : View.OnLongClickListener
 			{
 				private var expand: Boolean = false
 				override fun onLongClick(v: View?): Boolean
 				{
 					expand = !expand
-					when (expand)
-					{
-						true -> viewModel.errorMessageMaxLines.postValue(100)
-						false -> viewModel.errorMessageMaxLines.postValue(10)
-					}
+					viewHolder.errorMessage.maxLines = if (expand) 100 else 10
 					return true
 				}
 			})
+			
 			viewHolder.databaseSearchButton.setOnClickListener {
 				DatabaseSearchResultsActivity
 					.IntentData(context, "https://www.novelupdates.com/", DatabaseSearchResultsActivity.SearchMode.Text(viewModel.bookMetadata.title))

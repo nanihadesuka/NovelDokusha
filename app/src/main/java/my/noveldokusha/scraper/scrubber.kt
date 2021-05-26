@@ -173,7 +173,7 @@ suspend fun fetchChaptersList(bookUrl: String, tryCache: Boolean = true): Respon
 		""".trimIndent()
 	}
 	
-	// Return if can't find compatible scrubber for url
+	// Return if can't find compatible source for url
 	val scrap = scrubber.getCompatibleSourceCatalog(bookUrl) ?: return Response.Error(error)
 	
 	return tryConnect {
@@ -222,7 +222,7 @@ catch (e: Exception)
 	Response.Error(error)
 }
 
-suspend fun fetchDoc(url: String, timeoutMilliseconds: Int = 2 * 60 * 1000): Document
+suspend fun fetchDoc(url: String, timeoutMilliseconds: Int = 20 * 1000): Document
 {
 	return Jsoup.connect(url)
 		.timeout(timeoutMilliseconds)

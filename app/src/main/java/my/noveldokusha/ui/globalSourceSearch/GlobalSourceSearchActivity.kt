@@ -51,7 +51,6 @@ class GlobalSourceSearchActivity : BaseActivity()
 		viewHolder.recyclerView.itemAnimator = DefaultItemAnimator()
 		viewAdapter.recyclerView.notifyDataSetChanged()
 		
-		
 		supportActionBar!!.let {
 			it.title = "Global source search"
 			it.subtitle = extras.input
@@ -72,7 +71,7 @@ class GlobalSourceSearchActivity : BaseActivity()
 
 private class GlobalArrayAdapter(
 	private val context: BaseActivity,
-	private val list: ArrayList<GlobalSourceSearchModel.SourceResults>
+	private val list: ArrayList<SourceResults>
 ) : RecyclerView.Adapter<GlobalArrayAdapter.ViewBinder>()
 {
 	override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =
@@ -117,7 +116,7 @@ private class GlobalArrayAdapter(
 		val viewHolder: ActivityGlobalSourceSearchListItemBinding
 	) : RecyclerView.ViewHolder(viewHolder.root)
 	{
-		var itemData: GlobalSourceSearchModel.SourceResults? by Delegates.observable(null) { _, oldValue, newValue ->
+		var itemData: SourceResults? by Delegates.observable(null) { _, oldValue, newValue ->
 			onFetching.switchLiveData(oldValue, newValue, ctx) { booksFetchIterator.onFetching }
 			onCompletedEmpty.switchLiveData(oldValue, newValue, ctx) { booksFetchIterator.onCompletedEmpty }
 			onSuccess.switchLiveData(oldValue, newValue, ctx) { booksFetchIterator.onSuccess }

@@ -14,18 +14,18 @@ class GlobalSourceSearchModel : BaseViewModel()
 	}
 	
 	val globalResults = ArrayList<SourceResults>()
+}
+
+data class SourceResults(val source: scrubber.source_interface.catalog, val searchInput: String, val coroutineScope: CoroutineScope)
+{
+	var positionOffset: Int? = null
+	var position: Int? = null
 	
-	data class SourceResults(val source: scrubber.source_interface.catalog, val searchInput: String, val coroutineScope: CoroutineScope)
+	val list = ArrayList<BookMetadata>()
+	val booksFetchIterator = FetchIterator(coroutineScope, list) { source.getCatalogSearch(it, searchInput) }
+	
+	init
 	{
-		var positionOffset: Int? = null
-		var position: Int? = null
-		
-		val list = ArrayList<BookMetadata>()
-		val booksFetchIterator = FetchIterator(coroutineScope, list) { source.getCatalogSearch(it, searchInput) }
-		
-		init
-		{
-			booksFetchIterator.fetchNext()
-		}
+		booksFetchIterator.fetchNext()
 	}
 }
