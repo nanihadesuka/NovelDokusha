@@ -7,10 +7,7 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.viewModels
-import androidx.recyclerview.widget.ConcatAdapter
-import androidx.recyclerview.widget.DefaultItemAnimator
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.*
 import my.noveldokusha.BookMetadata
 import my.noveldokusha.databinding.ActivityDatabaseSearchResultsBinding
 import my.noveldokusha.databinding.BookListItemBinding
@@ -81,7 +78,7 @@ class DatabaseSearchResultsActivity : BaseActivity()
 	private val viewHolder by lazy { ActivityDatabaseSearchResultsBinding.inflate(layoutInflater) }
 	private val viewAdapter = object
 	{
-		val recyclerView by lazy { ChaptersArrayAdapter(this@DatabaseSearchResultsActivity, viewModel.searchResults, viewModel.database.baseUrl) }
+		val recyclerView by lazy { ChaptersArrayAdapter(this@DatabaseSearchResultsActivity, viewModel.database.baseUrl) }
 		val progressBar by lazy { ProgressBarAdapter() }
 	}
 	private val viewLayoutManager = object
@@ -102,24 +99,20 @@ class DatabaseSearchResultsActivity : BaseActivity()
 		viewHolder.recyclerView.itemAnimator = DefaultItemAnimator()
 		
 		viewHolder.recyclerView.setOnScrollChangeListener { _, _, _, _, _ ->
-			viewModel.booksFetchIterator.fetchTrigger {
+			viewModel.fetchIterator.fetchTrigger {
 				val pos = viewLayoutManager.recyclerView.findLastVisibleItemPosition()
-				return@fetchTrigger pos >= viewModel.searchResults.size - 3
+				return@fetchTrigger pos >= viewAdapter.recyclerView.itemCount - 3
 			}
 		}
 		
-		viewModel.booksFetchIterator.onError.observe(this) { }
-		viewModel.booksFetchIterator.onCompleted.observe(this) { }
-		viewModel.booksFetchIterator.onCompletedEmpty.observe(this) {
+		viewModel.fetchIterator.onCompletedEmpty.observe(this) {
 			viewHolder.noResultsMessage.visibility = View.VISIBLE
 		}
-		viewModel.booksFetchIterator.onFetching.observe(this) {
+		viewModel.fetchIterator.onFetching.observe(this) {
 			viewAdapter.progressBar.visible = it
 		}
-		viewModel.booksFetchIterator.onSuccess.observe(this) {
-			viewModel.searchResults.clear()
-			viewModel.searchResults.addAll(it.data)
-			viewAdapter.recyclerView.notifyDataSetChanged()
+		viewModel.fetchIterator.onSuccess.observe(this) {
+			viewAdapter.recyclerView.setList(it)
 		}
 		
 		supportActionBar!!.let {
@@ -144,14 +137,29 @@ class DatabaseSearchResultsActivity : BaseActivity()
 
 private class ChaptersArrayAdapter(
 	private val context: BaseActivity,
-	private val list: ArrayList<BookMetadata>,
 	private val databaseUrlBase: String
 ) : RecyclerView.Adapter<ChaptersArrayAdapter.ViewBinder>()
 {
+	private val list = ArrayList<BookMetadata>()
+	
+	private inner class Diff(private val new: List<BookMetadata>) : DiffUtil.Callback()
+	{
+		override fun getOldListSize(): Int = list.size
+		override fun getNewListSize(): Int = new.size
+		override fun areItemsTheSame(oldPos: Int, newPos: Int): Boolean = list[oldPos].url == new[newPos].url
+		override fun areContentsTheSame(oldPos: Int, newPos: Int): Boolean = list[oldPos] == new[newPos]
+	}
+	
+	fun setList(newList: List<BookMetadata>) = DiffUtil.calculateDiff(Diff(newList)).let {
+		list.clear()
+		list.addAll(newList)
+		it.dispatchUpdatesTo(this)
+	}
+	
 	override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =
 		ViewBinder(BookListItemBinding.inflate(parent.inflater, parent, false))
 	
-	override fun getItemCount() = this@ChaptersArrayAdapter.list.size
+	override fun getItemCount() = list.size
 	
 	override fun onBindViewHolder(binder: ViewBinder, position: Int)
 	{

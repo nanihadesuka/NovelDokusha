@@ -16,6 +16,7 @@ import java.io.StringWriter
 import java.net.SocketTimeoutException
 import java.net.URLEncoder
 import java.util.*
+import kotlin.collections.ArrayList
 
 fun String.urlEncode(): String = URLEncoder.encode(this, "utf-8")
 
@@ -233,27 +234,27 @@ suspend fun fetchDoc(url: String, timeoutMilliseconds: Int = 2 * 60 * 1000): Doc
 		.getIO()
 }
 
-class BooksFetchIterator(
+class FetchIterator<T>(
 	private val coroutineScope: CoroutineScope,
-	private var fn: (suspend (index: Int) -> Response<List<BookMetadata>>)
+	val list: ArrayList<T> = ArrayList(),
+	private var fn: (suspend (index: Int) -> Response<List<T>>)
 )
 {
 	enum class STATE
 	{ IDLE, LOADING, CONSUMED }
 	
 	private var state = STATE.IDLE
-	private var booksCount: Int = 0
 	private var index = 0
 	private var job: Job? = null
 	
-	val onSuccess = MutableLiveData<Response.Success<List<BookMetadata>>>()
+	val onSuccess = MutableLiveData<List<T>>()
 	val onCompleted = MutableLiveData<Unit>()
 	val onCompletedEmpty = MutableLiveData<Unit>()
-	val onError = MutableLiveData<Response.Error<List<BookMetadata>>>()
+	val onError = MutableLiveData<Response.Error<List<T>>>()
 	val onFetching = MutableLiveData<Boolean>()
 	val onReset = MutableLiveData<Unit>()
 	
-	fun setFunction(fn: (suspend (index: Int) -> Response<List<BookMetadata>>))
+	fun setFunction(fn: (suspend (index: Int) -> Response<List<T>>))
 	{
 		this.fn = fn
 	}
@@ -261,7 +262,7 @@ class BooksFetchIterator(
 	fun reset()
 	{
 		state = STATE.IDLE
-		booksCount = 0
+		list.clear()
 		index = 0
 		job?.cancel()
 		onReset.value = Unit
@@ -297,7 +298,7 @@ class BooksFetchIterator(
 					if (res.data.isEmpty())
 					{
 						state = STATE.CONSUMED
-						if (booksCount == 0)
+						if (list.isEmpty())
 							onCompletedEmpty.value = Unit
 						else
 							onCompleted.value = Unit
@@ -305,15 +306,15 @@ class BooksFetchIterator(
 					else
 					{
 						state = STATE.IDLE
-						booksCount += res.data.size
-						onSuccess.value = res
+						list.addAll(res.data)
+						onSuccess.value = list
 					}
 				}
 				is Response.Error ->
 				{
 					state = STATE.CONSUMED
 					onError.value = res
-					if (booksCount == 0)
+					if (list.isEmpty())
 						onCompletedEmpty.value = Unit
 					else
 						onCompleted.value = Unit

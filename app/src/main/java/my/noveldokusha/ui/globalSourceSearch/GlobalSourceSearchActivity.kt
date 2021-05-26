@@ -8,12 +8,8 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.activity.viewModels
 import androidx.lifecycle.Observer
-import androidx.recyclerview.widget.ConcatAdapter
-import androidx.recyclerview.widget.DefaultItemAnimator
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.*
 import my.noveldokusha.BookMetadata
-import my.noveldokusha.scraper.BooksFetchIterator
 import my.noveldokusha.databinding.ActivityGlobalSourceSearchBinding
 import my.noveldokusha.databinding.ActivityGlobalSourceSearchListItemBinding
 import my.noveldokusha.databinding.ActivityGlobalSourceSearchResultItemBinding
@@ -55,16 +51,10 @@ class GlobalSourceSearchActivity : BaseActivity()
 		viewHolder.recyclerView.itemAnimator = DefaultItemAnimator()
 		viewAdapter.recyclerView.notifyDataSetChanged()
 		
-		viewModel.globalResults.forEach {
-			it.booksFetchIterator.onSuccess.observe(this) { res ->
-				it.list.addAll(res.data)
-				viewAdapter.recyclerView.notifyDataSetChanged()
-			}
-		}
 		
 		supportActionBar!!.let {
 			it.title = "Global source search"
-			it.subtitle = viewModel.input
+			it.subtitle = extras.input
 			it.setDisplayHomeAsUpEnabled(true)
 		}
 	}
@@ -86,7 +76,7 @@ private class GlobalArrayAdapter(
 ) : RecyclerView.Adapter<GlobalArrayAdapter.ViewBinder>()
 {
 	override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =
-		ViewBinder(ActivityGlobalSourceSearchListItemBinding.inflate(parent.inflater, parent, false))
+		ViewBinder(context, ActivityGlobalSourceSearchListItemBinding.inflate(parent.inflater, parent, false))
 	
 	override fun getItemCount() = this.list.size
 	
@@ -94,11 +84,6 @@ private class GlobalArrayAdapter(
 	{
 		val viewModel = this.list[position]
 		val viewHolder = binder.viewHolder
-		val viewAdapter = object
-		{
-			val recyclerView = LocalArrayAdapter(context, viewModel.list, viewModel.booksFetchIterator)
-			val progressBar = binder.progressBarHorizontalAdapter
-		}
 		binder.itemData = viewModel
 		
 		viewModel.let {
@@ -106,9 +91,6 @@ private class GlobalArrayAdapter(
 			if (pos != null && offset != null)
 				binder.layoutManager.scrollToPositionWithOffset(pos, offset)
 		}
-		
-		viewHolder.recyclerView.adapter = ConcatAdapter(viewAdapter.recyclerView, viewAdapter.progressBar)
-		viewHolder.recyclerView.adapter?.notifyDataSetChanged()
 		
 		viewHolder.name.text = viewModel.source.name
 		viewHolder.recyclerView.visibility = View.VISIBLE
@@ -123,19 +105,27 @@ private class GlobalArrayAdapter(
 			
 			viewModel.booksFetchIterator.fetchTrigger {
 				val pos = binder.layoutManager.findLastVisibleItemPosition()
-				return@fetchTrigger pos >= viewModel.list.size - 3
+				return@fetchTrigger pos >= binder.recyclerViewAdapter.itemCount - 3
 			}
 		}
 		
 		binder.addBottomMargin { position == list.lastIndex }
 	}
 	
-	inner class ViewBinder(val viewHolder: ActivityGlobalSourceSearchListItemBinding) : RecyclerView.ViewHolder(viewHolder.root)
+	class ViewBinder(
+		val ctx: BaseActivity,
+		val viewHolder: ActivityGlobalSourceSearchListItemBinding
+	) : RecyclerView.ViewHolder(viewHolder.root)
 	{
 		var itemData: GlobalSourceSearchModel.SourceResults? by Delegates.observable(null) { _, oldValue, newValue ->
-			onFetching.switchLiveData(oldValue, newValue, context) { booksFetchIterator.onFetching }
-			onCompletedEmpty.switchLiveData(oldValue, newValue, context) { booksFetchIterator.onCompletedEmpty }
+			onFetching.switchLiveData(oldValue, newValue, ctx) { booksFetchIterator.onFetching }
+			onCompletedEmpty.switchLiveData(oldValue, newValue, ctx) { booksFetchIterator.onCompletedEmpty }
+			onSuccess.switchLiveData(oldValue, newValue, ctx) { booksFetchIterator.onSuccess }
 		}
+		
+		val recyclerViewAdapter = LocalArrayAdapter(ctx)
+		val progressBarHorizontalAdapter = ProgressBarHorizontalAdapter()
+		
 		val onFetching = Observer<Boolean> {
 			progressBarHorizontalAdapter.visible = it
 		}
@@ -144,22 +134,40 @@ private class GlobalArrayAdapter(
 			viewHolder.noResultsMessage.visibility = View.VISIBLE
 		}
 		
-		val progressBarHorizontalAdapter = ProgressBarHorizontalAdapter()
-		val layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
+		val onSuccess = Observer<List<BookMetadata>> {
+			recyclerViewAdapter.setList(it)
+		}
+		
+		val layoutManager = LinearLayoutManager(ctx, LinearLayoutManager.HORIZONTAL, false)
 		
 		init
 		{
+			viewHolder.recyclerView.adapter = ConcatAdapter(recyclerViewAdapter, progressBarHorizontalAdapter)
 			viewHolder.recyclerView.layoutManager = layoutManager
 		}
 	}
 }
 
 private class LocalArrayAdapter(
-	private val context: BaseActivity,
-	private val list: MutableList<BookMetadata>,
-	private val booksFetchIterator: BooksFetchIterator
+	private val context: BaseActivity
 ) : RecyclerView.Adapter<LocalArrayAdapter.ViewBinder>()
 {
+	private val list = ArrayList<BookMetadata>()
+	
+	private inner class Diff(private val new: List<BookMetadata>) : DiffUtil.Callback()
+	{
+		override fun getOldListSize(): Int = list.size
+		override fun getNewListSize(): Int = new.size
+		override fun areItemsTheSame(oldPos: Int, newPos: Int): Boolean = list[oldPos].url == new[newPos].url
+		override fun areContentsTheSame(oldPos: Int, newPos: Int): Boolean = list[oldPos] == new[newPos]
+	}
+	
+	fun setList(newList: List<BookMetadata>) = DiffUtil.calculateDiff(Diff(newList)).let {
+		list.clear()
+		list.addAll(newList)
+		it.dispatchUpdatesTo(this)
+	}
+	
 	override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =
 		ViewBinder(ActivityGlobalSourceSearchResultItemBinding.inflate(parent.inflater, parent, false))
 	
@@ -177,7 +185,7 @@ private class LocalArrayAdapter(
 			).let(context::startActivity)
 		}
 		
-		binder.addRightMargin { position == list.lastIndex }
+		binder.addRightMargin(500) { position == list.lastIndex }
 	}
 	
 	inner class ViewBinder(val viewHolder: ActivityGlobalSourceSearchResultItemBinding) : RecyclerView.ViewHolder(viewHolder.root)

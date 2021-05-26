@@ -9,10 +9,7 @@ import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
-import androidx.recyclerview.widget.ConcatAdapter
-import androidx.recyclerview.widget.DefaultItemAnimator
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import my.noveldokusha.R
@@ -29,6 +26,7 @@ import my.noveldokusha.uiUtils.addBottomMargin
 import my.noveldokusha.uiUtils.inflater
 import my.noveldokusha.uiUtils.switchLiveData
 import java.util.*
+import kotlin.collections.ArrayList
 import kotlin.properties.Delegates
 
 class SourceCatalogActivity : BaseActivity()
@@ -49,7 +47,7 @@ class SourceCatalogActivity : BaseActivity()
 	private val viewHolder by lazy { ActivitySourceCatalogBinding.inflate(layoutInflater) }
 	private val viewAdapter = object
 	{
-		val recyclerView by lazy { BooksItemAdapter(viewModel.list) }
+		val recyclerView by lazy { BooksItemAdapter(this@SourceCatalogActivity) }
 		val progressBar by lazy { ProgressBarAdapter() }
 	}
 	
@@ -70,26 +68,26 @@ class SourceCatalogActivity : BaseActivity()
 		viewHolder.recyclerView.itemAnimator = DefaultItemAnimator()
 		
 		viewHolder.recyclerView.setOnScrollChangeListener { _, _, _, _, _ ->
-			viewModel.booksFetchIterator.fetchTrigger {
+			viewModel.fetchIterator.fetchTrigger {
 				val pos = viewLayoutManager.recyclerView.findLastVisibleItemPosition()
 				pos >= viewModel.list.size - 3
 			}
 		}
 		
-		viewModel.booksFetchIterator.onSuccess.observe(this) {
-			viewAdapter.recyclerView.addAll(it.data.map(::CatalogItem))
+		viewModel.fetchIterator.onSuccess.observe(this) {
+			viewAdapter.recyclerView.setList(it)
 		}
-		viewModel.booksFetchIterator.onError.observe(this) {
+		viewModel.fetchIterator.onError.observe(this) {
 			viewHolder.errorMessage.visibility = View.VISIBLE
 			viewHolder.errorMessage.text = it.message
 		}
-		viewModel.booksFetchIterator.onCompletedEmpty.observe(this) {
+		viewModel.fetchIterator.onCompletedEmpty.observe(this) {
 			viewHolder.noResultsMessage.visibility = View.VISIBLE
 		}
-		viewModel.booksFetchIterator.onFetching.observe(this) {
+		viewModel.fetchIterator.onFetching.observe(this) {
 			viewAdapter.progressBar.visible = it
 		}
-		viewModel.booksFetchIterator.onReset.observe(this) {
+		viewModel.fetchIterator.onReset.observe(this) {
 			viewHolder.errorMessage.visibility = View.GONE
 			viewHolder.noResultsMessage.visibility = View.GONE
 			viewAdapter.recyclerView.notifyDataSetChanged()
@@ -133,13 +131,29 @@ class SourceCatalogActivity : BaseActivity()
 		return true
 	}
 	
-	inner class BooksItemAdapter(private val list: MutableList<CatalogItem>) : RecyclerView.Adapter<BooksItemAdapter.ViewBinder>()
+	class BooksItemAdapter(val ctx: BaseActivity) : RecyclerView.Adapter<BooksItemAdapter.ViewBinder>()
 	{
+		private val list = ArrayList<CatalogItem>()
+		
 		fun addAll(newItems: List<CatalogItem>)
 		{
 			val size = list.size
 			list.addAll(newItems)
 			notifyItemRangeInserted(size, newItems.size)
+		}
+		
+		private inner class Diff(private val new: List<CatalogItem>) : DiffUtil.Callback()
+		{
+			override fun getOldListSize(): Int = list.size
+			override fun getNewListSize(): Int = new.size
+			override fun areItemsTheSame(oldPos: Int, newPos: Int): Boolean = list[oldPos].bookMetadata.url == new[newPos].bookMetadata.url
+			override fun areContentsTheSame(oldPos: Int, newPos: Int): Boolean = list[oldPos].bookMetadata == new[newPos].bookMetadata
+		}
+		
+		fun setList(newList: List<CatalogItem>) = DiffUtil.calculateDiff(Diff(newList)).let {
+			list.clear()
+			list.addAll(newList)
+			it.dispatchUpdatesTo(this)
 		}
 		
 		override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewBinder =
@@ -156,12 +170,12 @@ class SourceCatalogActivity : BaseActivity()
 			itemView.title.text = itemData.bookMetadata.title
 			itemView.title.setOnClickListener {
 				ChaptersActivity.IntentData(
-					this@SourceCatalogActivity,
+					ctx,
 					bookMetadata = itemData.bookMetadata
-				).let(this@SourceCatalogActivity::startActivity)
+				).let(ctx::startActivity)
 			}
 			itemView.title.setOnLongClickListener {
-				lifecycleScope.launch(Dispatchers.IO) { bookstore.bookLibrary.toggleBookmark(itemData.bookMetadata) }
+				ctx.lifecycleScope.launch(Dispatchers.IO) { bookstore.bookLibrary.toggleBookmark(itemData.bookMetadata) }
 				true
 			}
 			
@@ -171,11 +185,11 @@ class SourceCatalogActivity : BaseActivity()
 		inner class ViewBinder(val viewHolder: BookListItemBinding) : RecyclerView.ViewHolder(viewHolder.root)
 		{
 			var itemData: CatalogItem? by Delegates.observable(null) { _, oldValue, newValue ->
-				isInLibraryObserver.switchLiveData(oldValue, newValue, this@SourceCatalogActivity) { isInLibraryLiveData }
+				isInLibraryObserver.switchLiveData(oldValue, newValue, ctx) { isInLibraryLiveData }
 			}
 			
 			private val unselectedTextColor = viewHolder.title.currentTextColor
-			private val selectedTextColor by lazy { ContextCompat.getColor(this@SourceCatalogActivity, R.color.dark_green) }
+			private val selectedTextColor by lazy { ContextCompat.getColor(ctx, R.color.dark_green) }
 			private val isInLibraryObserver = Observer<Boolean> { isInLibrary ->
 				viewHolder.title.setTextColor(if (isInLibrary) selectedTextColor else unselectedTextColor)
 			}
