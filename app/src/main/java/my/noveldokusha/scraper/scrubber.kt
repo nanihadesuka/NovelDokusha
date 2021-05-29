@@ -29,6 +29,12 @@ fun Connection.addUserAgent(): Connection =
 	this.userAgent("Mozilla/5.0 (X11; U; Linux i586; en-US; rv:1.7.3) Gecko/20040924 Epiphany/1.4.4 (Ubuntu)")
 
 fun Connection.addHeaderRequest() = this.header("x-requested-with", "XMLHttpRequest")!!
+fun Connection.addHeaderCommons() = this.apply {
+	referrer("http://www.google.com")
+	header("Content-Language", "en-US")
+	header("Accept", "text/html")
+	header("Accept-Encoding", "gzip,deflate")
+}
 
 sealed class Response<T>
 {
@@ -129,11 +135,10 @@ suspend fun downloadChapter(chapterUrl: String): Response<String>
 {
 	return tryConnect {
 		val con = Jsoup.connect(chapterUrl)
+			.timeout(30 * 1000)
 			.addUserAgent()
+			.addHeaderCommons()
 			.followRedirects(true)
-			.timeout(2 * 60 * 1000)
-			.referrer("http://www.google.com")
-			.header("Content-Language", "en-US")
 			.executeIO()
 		
 		val realUrl = con.url().toString()
@@ -158,12 +163,8 @@ suspend fun downloadChapter(chapterUrl: String): Response<String>
 	}
 }
 
-suspend fun fetchChaptersList(bookUrl: String, tryCache: Boolean = true): Response<List<bookstore.Chapter>>
+suspend fun downloadChaptersList(bookUrl: String): Response<List<bookstore.Chapter>>
 {
-	if (tryCache) bookstore.bookChapter.chapters(bookUrl).let {
-		if (it.isNotEmpty()) return Response.Success(it)
-	}
-	
 	val error by lazy {
 		"""
 			Incompatible source.
@@ -180,10 +181,7 @@ suspend fun fetchChaptersList(bookUrl: String, tryCache: Boolean = true): Respon
 		val doc = fetchDoc(bookUrl)
 		scrap.getChapterList(doc)
 			.map { bookstore.Chapter(title = it.title, url = it.url, bookUrl = bookUrl) }
-			.let {
-				bookstore.bookChapter.insert(it)
-				Response.Success(bookstore.bookChapter.chapters(bookUrl))
-			}
+			.let { Response.Success(it) }
 	}
 }
 
@@ -227,10 +225,7 @@ suspend fun fetchDoc(url: String, timeoutMilliseconds: Int = 20 * 1000): Documen
 	return Jsoup.connect(url)
 		.timeout(timeoutMilliseconds)
 		.addUserAgent()
-		.referrer("http://www.google.com")
-		.header("Content-Language", "en-US")
-		.header("Accept", "text/html")
-		.header("Accept-Encoding", "gzip,deflate")
+		.addHeaderCommons()
 		.getIO()
 }
 

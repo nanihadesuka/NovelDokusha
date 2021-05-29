@@ -62,7 +62,7 @@ class ChaptersActivity : BaseActivity()
 		
 		viewHolder.recyclerView.adapter = ConcatAdapter(viewAdapter.header, viewAdapter.chapters)
 		viewHolder.recyclerView.itemAnimator = DefaultItemAnimator()
-		viewHolder.swipeRefreshLayout.setOnRefreshListener { viewModel.loadChapters(false) }
+		viewHolder.swipeRefreshLayout.setOnRefreshListener { viewModel.updateChaptersList() }
 		viewModel.onFetching.observe(this) { viewHolder.swipeRefreshLayout.isRefreshing = it }
 		viewModel.chaptersWithContextLiveData.observe(this) {
 			viewAdapter.chapters.setList(it)

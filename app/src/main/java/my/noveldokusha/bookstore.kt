@@ -101,12 +101,15 @@ object bookstore
 		
 		@Query("SELECT * FROM Chapter WHERE bookUrl = :bookUrl")
 		suspend fun chapters(bookUrl: String): List<Chapter>
-	
+		
 		@Update
 		suspend fun update(chapter: Chapter)
 		
 		@Update
 		suspend fun update(chapters: List<Chapter>)
+		
+		@Query("SELECT EXISTS(SELECT * FROM Chapter WHERE Chapter.bookUrl = :bookUrl LIMIT 1)")
+		suspend fun hasChapters(bookUrl: String): Boolean
 		
 		@Query("UPDATE Chapter SET read = 1 WHERE url in (:chaptersUrl)")
 		suspend fun setAsRead(chaptersUrl: List<String>)
@@ -261,6 +264,7 @@ object bookstore
 			suspend fun update(chapter: Chapter) = db.chapterDao().update(chapter)
 			suspend fun update(chapters: List<Chapter>) = db.chapterDao().update(chapters)
 			suspend fun get(url: String) = db.chapterDao().get(url)
+			suspend fun hasChapters(bookUrl: String) = db.chapterDao().hasChapters(bookUrl)
 			suspend fun getAll() = db.chapterDao().getAll()
 			suspend fun setAsRead(chaptersUrl: List<String>) = chaptersUrl.chunked(500).forEach { db.chapterDao().setAsRead(it) }
 			suspend fun setAsUnread(chaptersUrl: List<String>) = chaptersUrl.chunked(500).forEach { db.chapterDao().setAsUnread(it) }

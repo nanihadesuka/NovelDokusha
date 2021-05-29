@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import my.noveldokusha.bookstore
 import my.noveldokusha.scraper.Response
-import my.noveldokusha.scraper.fetchChaptersList
+import my.noveldokusha.scraper.downloadChaptersList
 import my.noveldokusha.ui.BaseViewModel
 import kotlin.properties.Delegates
 
@@ -41,9 +41,14 @@ class LibraryPageModel : BaseViewModel()
 			for (book in books)
 			{
 				val oldChaptersList = bookstore.bookChapter.chapters(book.url)
-				when (val res = fetchChaptersList(book.url, false))
+				when (val res = downloadChaptersList(book.url))
 				{
-					is Response.Success -> if (res.data.size > oldChaptersList.size) newChapters.add(book.title)
+					is Response.Success ->
+					{
+						bookstore.bookChapter.insert(res.data)
+						if (res.data.size > oldChaptersList.size)
+							newChapters.add(book.title)
+					}
 					is Response.Error -> failed.add(book.title)
 				}
 			}

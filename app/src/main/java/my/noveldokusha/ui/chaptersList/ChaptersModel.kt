@@ -9,15 +9,19 @@ import kotlinx.coroutines.flow.map
 import my.noveldokusha.BookMetadata
 import my.noveldokusha.bookstore
 import my.noveldokusha.scraper.Response
-import my.noveldokusha.scraper.fetchChaptersList
+import my.noveldokusha.scraper.downloadChaptersList
 import my.noveldokusha.scraper.scrubber
 import my.noveldokusha.ui.BaseViewModel
+import my.noveldokusha.uiUtils.toast
 
 class ChaptersModel : BaseViewModel()
 {
 	fun initialization(bookMetadata: BookMetadata) = callOneTime {
 		this.bookMetadata = bookMetadata
-		loadChapters()
+		viewModelScope.launch(Dispatchers.IO) {
+			if (!bookstore.bookChapter.hasChapters(bookMetadata.url))
+				updateChaptersList()
+		}
 	}
 	
 	lateinit var bookMetadata: BookMetadata
@@ -34,26 +38,30 @@ class ChaptersModel : BaseViewModel()
 	val onError = MutableLiveData<String>()
 	val onErrorVisibility = MutableLiveData<Int>()
 	val selectedChaptersUrl = mutableSetOf<String>()
-
+	
 	private var loadChaptersJob: Job? = null
-	fun loadChapters(tryCache: Boolean = true)
+	fun updateChaptersList()
 	{
 		if (loadChaptersJob?.isActive == true) return
 		loadChaptersJob = GlobalScope.launch(Dispatchers.Main) {
 			
 			onErrorVisibility.value = View.GONE
 			onFetching.value = true
-			val res = withContext(Dispatchers.IO) { fetchChaptersList(bookMetadata.url, tryCache) }
+			val res = withContext(Dispatchers.IO) { downloadChaptersList(bookMetadata.url) }
 			onFetching.value = false
-			
 			when (res)
 			{
+				is Response.Success ->
+				{
+					bookstore.bookChapter.insert(res.data)
+					if(res.data.isEmpty())
+						toast("No chaptes found")
+				}
 				is Response.Error ->
 				{
 					onErrorVisibility.value = View.VISIBLE
 					onError.value = res.message
 				}
-				else -> Unit
 			}
 		}
 	}
