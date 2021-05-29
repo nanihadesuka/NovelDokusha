@@ -6,7 +6,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.flow.map
 import my.noveldokusha.scraper.Response
 import my.noveldokusha.scraper.downloadChapter
 import java.io.InputStream
@@ -97,16 +96,10 @@ object bookstore
 		suspend fun getAll(): List<Chapter>
 		
 		@Query("SELECT * FROM Chapter WHERE bookUrl = :bookUrl")
-		fun chaptersFlow(bookUrl: String): Flow<List<Chapter>>
-		
-		@Query("SELECT * FROM Chapter WHERE bookUrl = :bookUrl")
 		suspend fun chapters(bookUrl: String): List<Chapter>
 		
 		@Update
 		suspend fun update(chapter: Chapter)
-		
-		@Update
-		suspend fun update(chapters: List<Chapter>)
 		
 		@Query("SELECT EXISTS(SELECT * FROM Chapter WHERE Chapter.bookUrl = :bookUrl LIMIT 1)")
 		suspend fun hasChapters(bookUrl: String): Boolean
@@ -125,9 +118,6 @@ object bookstore
 		
 		@Query("SELECT COUNT(*) FROM Chapter WHERE bookUrl = :bookUrl AND read = 0")
 		fun numberOfUnreadChaptersFlow(bookUrl: String): Flow<Int>
-		
-		@Query("SELECT lastReadPosition FROM Chapter WHERE bookUrl = :bookUrl AND url =:chapterUrl")
-		fun lastReadPositionChapterFlow(bookUrl: String, chapterUrl: String): Flow<Int>
 		
 		@Query("DELETE FROM Chapter WHERE Chapter.bookUrl NOT IN (SELECT Book.url FROM Book)")
 		suspend fun removeAllNonLibraryRows()
@@ -152,23 +142,14 @@ object bookstore
 		@Query("SELECT * FROM ChapterBody")
 		suspend fun getAll(): List<ChapterBody>
 		
-		@Query("SELECT EXISTS(SELECT * FROM ChapterBody WHERE url == :url)")
-		suspend fun exists(url: String): Boolean
-		
 		@Insert(onConflict = OnConflictStrategy.REPLACE)
 		suspend fun insert(chapterBody: ChapterBody)
 		
 		@Insert(onConflict = OnConflictStrategy.REPLACE)
 		suspend fun insert(chapterBody: List<ChapterBody>)
 		
-		@Query("SELECT EXISTS(SELECT * FROM ChapterBody WHERE url == :url)")
-		fun existsFlow(url: String): Flow<Boolean>
-		
 		@Query("SELECT * FROM ChapterBody WHERE url = :url")
 		suspend fun get(url: String): ChapterBody?
-		
-		@Query("SELECT url FROM ChapterBody WHERE url IN (SELECT url FROM Chapter	WHERE bookUrl == :bookUrl)")
-		fun getExistBodyChapterUrlsFlow(bookUrl: String): Flow<List<String>>
 		
 		@Query("DELETE FROM ChapterBody WHERE ChapterBody.url NOT IN (SELECT Chapter.url FROM Chapter)")
 		suspend fun removeAllNonChapterRows()
@@ -262,7 +243,6 @@ object bookstore
 		{
 			fun numberOfUnreadChaptersFlow(bookUrl: String) = db.chapterDao().numberOfUnreadChaptersFlow(bookUrl)
 			suspend fun update(chapter: Chapter) = db.chapterDao().update(chapter)
-			suspend fun update(chapters: List<Chapter>) = db.chapterDao().update(chapters)
 			suspend fun get(url: String) = db.chapterDao().get(url)
 			suspend fun hasChapters(bookUrl: String) = db.chapterDao().hasChapters(bookUrl)
 			suspend fun getAll() = db.chapterDao().getAll()
@@ -270,16 +250,13 @@ object bookstore
 			suspend fun setAsUnread(chaptersUrl: List<String>) = chaptersUrl.chunked(500).forEach { db.chapterDao().setAsUnread(it) }
 			suspend fun insert(chapters: List<Chapter>) = db.chapterDao().insert(chapters.filter(::isValid))
 			suspend fun chapters(bookUrl: String) = db.chapterDao().chapters(bookUrl)
-			fun chaptersFlow(bookUrl: String) = db.chapterDao().chaptersFlow(bookUrl)
 			fun getChaptersWithContexFlow(bookUrl: String) = db.chapterDao().getChaptersWithContextFlow(bookUrl)
 		}
 		
 		inner class BookChapterBody
 		{
-			fun existsFlow(url: String) = db.chapterBodyDao().existsFlow(url)
 			suspend fun getAll() = db.chapterBodyDao().getAll()
 			suspend fun insert(chapterBodies: List<ChapterBody>) = db.chapterBodyDao().insert(chapterBodies)
-			suspend fun exists(url: String) = db.chapterBodyDao().exists(url)
 			suspend fun removeRows(chaptersUrl: List<String>) =
 				chaptersUrl.chunked(500).forEach { db.chapterBodyDao().removeChapterRows(it) }
 			
@@ -294,9 +271,6 @@ object bookstore
 					db.chapterBodyDao().insert(ChapterBody(url = urlChapter, body = res.data))
 				return res
 			}
-			
-			fun getExistBodyChapterUrlsFlow(bookUrl: String): Flow<Set<String>> =
-				db.chapterBodyDao().getExistBodyChapterUrlsFlow(bookUrl).map { it.toSet() }
 		}
 	}
 	
