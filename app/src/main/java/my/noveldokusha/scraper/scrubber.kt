@@ -180,7 +180,7 @@ suspend fun downloadChaptersList(bookUrl: String): Response<List<bookstore.Chapt
 	return tryConnect {
 		val doc = fetchDoc(bookUrl)
 		scrap.getChapterList(doc)
-			.map { bookstore.Chapter(title = it.title, url = it.url, bookUrl = bookUrl) }
+			.mapIndexed { index, it -> bookstore.Chapter(title = it.title, url = it.url, bookUrl = bookUrl, position = index) }
 			.let { Response.Success(it) }
 	}
 }

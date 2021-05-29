@@ -45,7 +45,7 @@ class LibraryPageModel : BaseViewModel()
 				{
 					is Response.Success ->
 					{
-						bookstore.bookChapter.insert(res.data)
+						bookstore.bookChapter.merge(res.data, book.url)
 						if (res.data.size > oldChaptersList.size)
 							newChapters.add(book.title)
 					}

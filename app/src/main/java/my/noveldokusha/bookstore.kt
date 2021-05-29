@@ -2,6 +2,8 @@ package my.noveldokusha
 
 import android.content.Context
 import androidx.room.*
+import androidx.room.migration.Migration
+import androidx.sqlite.db.SupportSQLiteDatabase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -38,6 +40,7 @@ object bookstore
 		val title: String,
 		@PrimaryKey val url: String,
 		val bookUrl: String,
+		val position: Int,
 		val read: Boolean = false,
 		val lastReadPosition: Int = 0,
 		val lastReadOffset: Int = 0
@@ -113,6 +116,9 @@ object bookstore
 		@Insert(onConflict = OnConflictStrategy.IGNORE)
 		suspend fun insert(chapters: List<Chapter>)
 		
+		@Insert(onConflict = OnConflictStrategy.REPLACE)
+		suspend fun replace(chapters: List<Chapter>)
+		
 		@Query("SELECT * FROM Chapter WHERE url = :url")
 		suspend fun get(url: String): Chapter?
 		
@@ -131,6 +137,7 @@ object bookstore
 			LEFT JOIN ChapterBody ON ChapterBody.url = Chapter.url
 			LEFT JOIN Book ON Book.url = :bookUrl AND Book.lastReadChapter == Chapter.url
 			WHERE Chapter.bookUrl == :bookUrl
+			ORDER BY position ASC
 		"""
 		)
 		fun getChaptersWithContextFlow(bookUrl: String): Flow<List<ChapterWithContext>>
@@ -158,12 +165,21 @@ object bookstore
 		suspend fun removeChapterRows(chaptersUrl: List<String>)
 	}
 	
-	@Database(entities = [Book::class, Chapter::class, ChapterBody::class], version = 1, exportSchema = false)
+	@Database(entities = [Book::class, Chapter::class, ChapterBody::class], version = 2, exportSchema = false)
 	abstract class LibraryDatabase : RoomDatabase()
 	{
 		abstract fun libraryDao(): LibraryDao
 		abstract fun chapterDao(): ChapterDao
 		abstract fun chapterBodyDao(): ChapterBodyDao
+	}
+	
+	fun migration(vi: Int, vf: Int, migrate: (SupportSQLiteDatabase) -> Unit) = object : Migration(vi, vf)
+	{
+		override fun migrate(database: SupportSQLiteDatabase) = migrate(database)
+	}
+	
+	val migration_1_2 = migration(1, 2) {
+		it.execSQL("ALTER TABLE Chapter ADD COLUMN position INTEGER NOT NULL DEFAULT 0")
 	}
 	
 	val db_context: Context by lazy { App.instance.applicationContext }
@@ -173,6 +189,10 @@ object bookstore
 	val bookLibrary by lazy { appDB.bookLibrary }
 	val bookChapter by lazy { appDB.bookChapter }
 	val bookChapterBody by lazy { appDB.bookChapterBody }
+	
+	private fun createRoom(ctx: Context, name: String) = Room
+		.databaseBuilder(ctx, LibraryDatabase::class.java, name)
+		.addMigrations(migration_1_2)
 	
 	class DBase
 	{
@@ -184,7 +204,8 @@ object bookstore
 		{
 			this.context = context
 			this.name = name
-			db = Room.databaseBuilder(context, LibraryDatabase::class.java, name).build()
+			db = createRoom(context, name)
+				.build()
 		}
 		
 		// External database, used for backup restore
@@ -192,7 +213,9 @@ object bookstore
 		{
 			this.context = context
 			this.name = name
-			db = Room.databaseBuilder(context, LibraryDatabase::class.java, name).createFromInputStream { inputStream }.build()
+			db = createRoom(context, name)
+				.createFromInputStream { inputStream }
+				.build()
 		}
 		
 		val settings = Settings()
@@ -249,8 +272,16 @@ object bookstore
 			suspend fun setAsRead(chaptersUrl: List<String>) = chaptersUrl.chunked(500).forEach { db.chapterDao().setAsRead(it) }
 			suspend fun setAsUnread(chaptersUrl: List<String>) = chaptersUrl.chunked(500).forEach { db.chapterDao().setAsUnread(it) }
 			suspend fun insert(chapters: List<Chapter>) = db.chapterDao().insert(chapters.filter(::isValid))
+			suspend fun replace(chapters: List<Chapter>) = db.chapterDao().replace(chapters.filter(::isValid))
 			suspend fun chapters(bookUrl: String) = db.chapterDao().chapters(bookUrl)
 			fun getChaptersWithContexFlow(bookUrl: String) = db.chapterDao().getChaptersWithContextFlow(bookUrl)
+			suspend fun merge(newChapters: List<Chapter>, bookUrl: String)
+			{
+				val current = bookstore.bookChapter.chapters(bookUrl).associateBy { it.url }.toMutableMap()
+				for (chapter in newChapters)
+					current.merge(chapter.url, chapter) { old, new -> old.copy(position = new.position) }
+				bookstore.bookChapter.replace(current.values.toList())
+			}
 		}
 		
 		inner class BookChapterBody

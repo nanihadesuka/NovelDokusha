@@ -47,15 +47,19 @@ class ChaptersModel : BaseViewModel()
 			
 			onErrorVisibility.value = View.GONE
 			onFetching.value = true
-			val res = withContext(Dispatchers.IO) { downloadChaptersList(bookMetadata.url) }
+			val url = bookMetadata.url
+			val res = withContext(Dispatchers.IO) { downloadChaptersList(url) }
 			onFetching.value = false
 			when (res)
 			{
 				is Response.Success ->
 				{
-					bookstore.bookChapter.insert(res.data)
-					if(res.data.isEmpty())
+					if (res.data.isEmpty())
 						toast("No chaptes found")
+					
+					withContext(Dispatchers.IO) {
+						bookstore.bookChapter.merge(res.data, url)
+					}
 				}
 				is Response.Error ->
 				{
