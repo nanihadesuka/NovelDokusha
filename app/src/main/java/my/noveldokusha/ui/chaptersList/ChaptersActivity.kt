@@ -172,7 +172,7 @@ class ChaptersActivity : BaseActivity()
 		R.id.action_bookmarked ->
 		{
 			toast(if (!bookmarked) "Bookmark added" else "Bookmark removed")
-			lifecycleScope.launch(Dispatchers.IO) { bookstore.bookLibrary.toggleBookmark(viewModel.bookMetadata) }
+			viewModel.toggleBookmark()
 			true
 		}
 		android.R.id.home -> this.onBackPressed().let { true }
