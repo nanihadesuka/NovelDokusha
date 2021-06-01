@@ -55,7 +55,7 @@ class ChaptersModel : BaseViewModel()
 				is Response.Success ->
 				{
 					if (res.data.isEmpty())
-						toast("No chaptes found")
+						toast("No chapters found")
 					
 					withContext(Dispatchers.IO) {
 						bookstore.bookChapter.merge(res.data, url)
