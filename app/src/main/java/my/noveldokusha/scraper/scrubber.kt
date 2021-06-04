@@ -2,11 +2,13 @@ package my.noveldokusha.scraper
 
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.MutableLiveData
+import com.chimbori.crux.articles.ArticleExtractor
 import kotlinx.coroutines.*
 import my.noveldokusha.BookMetadata
 import my.noveldokusha.ChapterMetadata
 import my.noveldokusha.DataCache_DatabaseSearchGenres
 import my.noveldokusha.bookstore
+import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import org.jsoup.Connection
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
@@ -155,11 +157,28 @@ suspend fun downloadChapter(chapterUrl: String): Response<String>
 			""".trimIndent()
 		}
 		
-		val source = scrubber.getCompatibleSource(realUrl) ?: return@tryConnect { Response.Error<String>(error) }()
+		scrubber.getCompatibleSource(realUrl)?.also { source ->
+			val doc = fetchDoc(source.transformChapterUrl(realUrl))
+			val body = source.getChapterText(doc)
+			return@tryConnect Response.Success(body)
+		}
 		
-		val doc = fetchDoc(source.transformChapterUrl(realUrl))
-		val body = source.getChapterText(doc)
-		Response.Success(body)
+		// If no predefined source is found try extracting text with Crux library.
+		realUrl.toHttpUrlOrNull()?.also { okUrl ->
+			val article = ArticleExtractor(okUrl, fetchDoc(realUrl))
+				.extractMetadata()
+				.extractContent()
+				.article
+			
+			val document = article.document
+			if (document != null)
+			{
+				val text = scrubber.getNodeTextTransversal(document)
+				return@tryConnect Response.Success(text.joinToString("\n\n"))
+			}
+		}
+		
+		Response.Error<String>(error)
 	}
 }
 
