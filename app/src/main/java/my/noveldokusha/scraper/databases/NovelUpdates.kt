@@ -44,7 +44,6 @@ class NovelUpdates : scrubber.database_interface
 		val page = index + 1
 		val url = baseUrl.toUrlBuilder().apply {
 			if (page > 1) appendPath("page").appendPath(page.toString())
-			appendPath("pagePath")
 			add("s", input)
 			add("post_type", "seriesplans")
 		}
