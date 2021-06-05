@@ -3,13 +3,12 @@ package my.noveldokusha.scraper
 import android.net.Uri
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.MutableLiveData
-import com.chimbori.crux.articles.ArticleExtractor
 import kotlinx.coroutines.*
 import my.noveldokusha.BookMetadata
 import my.noveldokusha.ChapterMetadata
 import my.noveldokusha.DataCache_DatabaseSearchGenres
 import my.noveldokusha.bookstore
-import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
+import net.dankito.readability4j.Readability4J
 import org.jsoup.Connection
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
@@ -167,21 +166,13 @@ suspend fun downloadChapter(chapterUrl: String): Response<String>
 			return@tryConnect Response.Success(body)
 		}
 		
-		// If no predefined source is found try extracting text with Crux library.
-		realUrl.toHttpUrlOrNull()?.also { okUrl ->
-			val article = ArticleExtractor(okUrl, fetchDoc(realUrl))
-				.extractMetadata()
-				.extractContent()
-				.article
-			
-			val document = article.document
-			if (document != null)
-			{
-				val text = mutableListOf<String>()
-				article.title?.let { text.add(it) }
-				text.addAll(scrubber.getNodeTextTransversal(document))
-				return@tryConnect Response.Success(text.joinToString("\n\n"))
-			}
+		// If no predefined source is found try extracting text with Readability3J library
+		Readability4J(realUrl, fetchDoc(realUrl)).parse().also { article ->
+			val content = article.articleContent ?: return@also
+			val text = mutableListOf<String>()
+			article.title?.let { text.add(it) }
+			text.addAll(scrubber.getNodeTextTransversal(content))
+			return@tryConnect Response.Success(text.joinToString("\n\n"))
 		}
 		
 		Response.Error<String>(error)
