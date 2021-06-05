@@ -173,7 +173,9 @@ suspend fun downloadChapter(chapterUrl: String): Response<String>
 			val document = article.document
 			if (document != null)
 			{
-				val text = scrubber.getNodeTextTransversal(document)
+				val text = mutableListOf<String>()
+				article.title?.let { text.add(it) }
+				text.addAll(scrubber.getNodeTextTransversal(document))
 				return@tryConnect Response.Success(text.joinToString("\n\n"))
 			}
 		}
