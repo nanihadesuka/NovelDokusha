@@ -122,10 +122,8 @@ object scrubber
 		my.noveldokusha.scraper.sources.LightNovelsTranslations(),
 		my.noveldokusha.scraper.sources.ReadLightNovel(),
 		my.noveldokusha.scraper.sources.ReadNovelFull(),
-		my.noveldokusha.scraper.sources.DivineDaoLibrary(),
 		my.noveldokusha.scraper.sources.NovelUpdates(),
 		my.noveldokusha.scraper.sources.Reddit(),
-		my.noveldokusha.scraper.sources.Hoopla2017(),
 	)
 	
 	val sourcesListCatalog = sourcesList.filterIsInstance<source_interface.catalog>().toSet()
