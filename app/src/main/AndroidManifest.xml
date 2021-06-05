@@ -17,6 +17,7 @@
 		android:roundIcon="@mipmap/ic_logo_round"
 		android:supportsRtl="true"
 		android:theme="@style/AppTheme.Light"
+		android:usesCleartextTraffic="true"
 		>
 		<activity
 			android:name=".ui.main.MainActivity"
