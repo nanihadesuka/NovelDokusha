@@ -47,14 +47,14 @@ class BakaUpdates : scrubber.database_interface
 	override suspend fun getSearch(index: Int, input: String): Response<List<BookMetadata>>
 	{
 		val page = index + 1
-		val settings = mutableListOf<String>().apply {
-			if (page > 1) add("page=$page")
-			add("display=list")
-			add("perpage=50")
-			add("type=novel")
-			add("search=${input.urlEncode()}")
+		
+		val url = "https://www.mangaupdates.com/series.html".toUrlBuilder().apply {
+			if (page > 1) add("page", page)
+			add("display", "list")
+			add("perpage", 50)
+			add("type", "novel")
+			add("search", input)
 		}
-		val url = "https://www.mangaupdates.com/series.html?" + settings.joinToString("&")
 		
 		return tryConnect("page: $page\nurl: $url") {
 			fetchDoc(url)
@@ -69,15 +69,15 @@ class BakaUpdates : scrubber.database_interface
 			Response<List<BookMetadata>>
 	{
 		val page = index + 1
-		val settings = mutableListOf<String>().apply {
-			if (page > 1) add("page=$page")
-			add("display=list")
-			if (genresIncludedId.isNotEmpty()) add("genre=" + genresIncludedId.joinToString("_"))
-			if (genresExcludedId.isNotEmpty()) add("exclude_genre=" + genresExcludedId.joinToString("_"))
-			add("type=novel")
-			add("perpage=50")
+		
+		val url = "https://www.mangaupdates.com/series.html".toUrlBuilder().apply {
+			if (page > 1) add("page", page)
+			add("display", "list")
+			if (genresIncludedId.isNotEmpty()) add("genre", genresIncludedId.joinToString("_"))
+			if (genresExcludedId.isNotEmpty()) add("exclude_genre", genresExcludedId.joinToString("_"))
+			add("type", "novel")
+			add("perpage", 50)
 		}
-		val url = "https://www.mangaupdates.com/series.html?" + settings.joinToString("&")
 		
 		return tryConnect("page: $page\nurl: $url") {
 			fetchDoc(url)

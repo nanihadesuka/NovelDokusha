@@ -1,5 +1,6 @@
 package my.noveldokusha.scraper
 
+import android.net.Uri
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.MutableLiveData
 import com.chimbori.crux.articles.ArticleExtractor
@@ -26,6 +27,9 @@ suspend fun Connection.getIO(): Document = withContext(Dispatchers.IO) { get() }
 suspend fun Connection.postIO(): Document = withContext(Dispatchers.IO) { post() }
 suspend fun Connection.executeIO(): Connection.Response = withContext(Dispatchers.IO) { execute() }
 suspend fun String.urlEncodeAsync(): String = withContext(Dispatchers.IO) { this@urlEncodeAsync.urlEncode() }
+
+fun String.toUrlBuilder(): Uri.Builder = Uri.parse(this).buildUpon()
+fun Uri.Builder.add(key: String, value: Any): Uri.Builder = appendQueryParameter(key, value.toString())
 
 fun Connection.addUserAgent(): Connection =
 	this.userAgent("Mozilla/5.0 (X11; U; Linux i586; en-US; rv:1.7.3) Gecko/20040924 Epiphany/1.4.4 (Ubuntu)")
@@ -249,6 +253,8 @@ suspend fun fetchDoc(url: String, timeoutMilliseconds: Int = 20 * 1000): Documen
 		.addHeaderCommons()
 		.getIO()
 }
+
+suspend fun fetchDoc(url: Uri.Builder, timeoutMilliseconds: Int = 20 * 1000) = fetchDoc(url.toString(), timeoutMilliseconds)
 
 class FetchIterator<T>(
 	private val coroutineScope: CoroutineScope,

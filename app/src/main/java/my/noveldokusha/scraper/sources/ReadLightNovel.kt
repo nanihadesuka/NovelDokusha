@@ -39,11 +39,10 @@ class ReadLightNovel : scrubber.source_interface.catalog
 	
 	override suspend fun getCatalogList(index: Int): Response<List<BookMetadata>>
 	{
-		val url = if (index == 0) catalogUrl
-		else
-		{
+		val url = catalogUrl.toUrlBuilder().apply {
+			if (index == 0) return@apply
 			val letter = catalogIndex.elementAtOrNull(index - 1) ?: return Response.Success(listOf())
-			"$catalogUrl/$letter"
+			appendPath(letter)
 		}
 		
 		return tryConnect {

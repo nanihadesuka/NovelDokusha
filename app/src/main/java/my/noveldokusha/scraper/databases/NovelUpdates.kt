@@ -42,8 +42,12 @@ class NovelUpdates : scrubber.database_interface
 	override suspend fun getSearch(index: Int, input: String): Response<List<BookMetadata>>
 	{
 		val page = index + 1
-		val pagePath = if (page > 1) "page/$page/" else ""
-		val url = "https://www.novelupdates.com/$pagePath?s=${input.urlEncode()}&post_type=seriesplans"
+		val url = baseUrl.toUrlBuilder().apply {
+			if (page > 1) appendPath("page").appendPath(page.toString())
+			appendPath("pagePath")
+			add("s", input)
+			add("post_type", "seriesplans")
+		}
 		
 		return tryConnect("page: $page\nurl: $url") {
 			fetchDoc(url)
@@ -58,14 +62,13 @@ class NovelUpdates : scrubber.database_interface
 			Response<List<BookMetadata>>
 	{
 		val page = index + 1
-		val settings = mutableListOf<String>().apply {
-			if (genresIncludedId.isNotEmpty()) add("gi=${genresIncludedId.joinToString(",")}&mgi=and")
-			if (genresExcludedId.isNotEmpty()) add("ge=${genresExcludedId.joinToString(",")}")
-			add("sort=sdate")
-			add("order=desc")
-			if (page > 1) add("pg=$page")
+		val url = "https://www.novelupdates.com/series-finder/?sf=1".toUrlBuilder().apply {
+			if (genresIncludedId.isNotEmpty()) add("gi", genresIncludedId.joinToString(",")).add("mgi", "and")
+			if (genresExcludedId.isNotEmpty()) add("ge", genresExcludedId.joinToString(","))
+			add("sort", "sdate")
+			add("order", "desc")
+			if (page > 1) add("pg", page)
 		}
-		val url = "https://www.novelupdates.com/series-finder/?sf=1" + settings.joinToString("&")
 		
 		return tryConnect("page: $page\nurl: $url") {
 			fetchDoc(url)

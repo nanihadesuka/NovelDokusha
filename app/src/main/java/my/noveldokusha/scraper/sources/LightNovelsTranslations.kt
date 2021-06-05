@@ -84,7 +84,12 @@ class LightNovelsTranslations : scrubber.source_interface.catalog
 		if (input.isBlank() || index > 0)
 			return Response.Success(listOf())
 		
-		val url = "https://lightnovelstranslations.com/?order=DESC&orderby=relevance&s=${input.urlEncode()}"
+		val url = baseUrl.toUrlBuilder().apply {
+			add("order", "DESC")
+			add("orderby", "relevance")
+			add("s", input)
+		}
+		
 		return tryConnect {
 			fetchDoc(url)
 				.selectFirst(".jetpack-search-filters-widget__filter-list")

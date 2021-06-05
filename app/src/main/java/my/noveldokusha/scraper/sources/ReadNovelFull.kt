@@ -40,8 +40,10 @@ class ReadNovelFull : scrubber.source_interface.catalog
 	override suspend fun getCatalogList(index: Int): Response<List<BookMetadata>>
 	{
 		val page = index + 1
-		var url = catalogUrl
-		if (page > 1) url += "?page=$page"
+		val url = catalogUrl.toUrlBuilder().apply {
+			if (page > 1) add("page", page)
+		}
+		
 		return tryConnect {
 			fetchDoc(url)
 				.selectFirst("#list-page")
@@ -57,8 +59,13 @@ class ReadNovelFull : scrubber.source_interface.catalog
 		if (input.isBlank() || index > 0)
 			return Response.Success(listOf())
 		
+		val url = baseUrl.toUrlBuilder().apply {
+			appendPath("search")
+			add("keyword", input)
+		}
+		
 		return tryConnect {
-			fetchDoc("https://readnovelfull.com/search?keyword=${input.urlEncodeAsync()}")
+			fetchDoc(url)
 				.selectFirst(".col-novel-main, .archive")
 				.select(".novel-title")
 				.map { it.selectFirst("a[href]") }

@@ -1,6 +1,7 @@
 package my.noveldokusha.scraper.sources
 
 import my.noveldokusha.scraper.scrubber
+import my.noveldokusha.scraper.toUrlBuilder
 import org.jsoup.nodes.Document
 
 /**
@@ -16,7 +17,7 @@ class Reddit : scrubber.source_interface.base
 	
 	override fun transformChapterUrl(url: String): String
 	{
-		return url.replaceFirst(baseUrl, "https://old.reddit.com/")
+		return url.toUrlBuilder().authority("old.reddit.com").toString()
 	}
 	
 	override suspend fun getChapterText(doc: Document): String

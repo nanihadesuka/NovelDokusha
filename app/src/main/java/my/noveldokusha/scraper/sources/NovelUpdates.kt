@@ -48,8 +48,10 @@ class NovelUpdates : scrubber.source_interface.catalog
 	override suspend fun getCatalogList(index: Int): Response<List<BookMetadata>>
 	{
 		val page = index + 1
-		var url = "$catalogUrl?st=1"
-		if (page > 1) url += "&pg=$page"
+		val url = catalogUrl.toUrlBuilder().apply {
+			add("st", 1)
+			if (page > 1) add("pg", page)
+		}
 		
 		return tryConnect {
 			fetchDoc(url)
@@ -65,8 +67,12 @@ class NovelUpdates : scrubber.source_interface.catalog
 		if (input.isBlank() || index > 0)
 			return Response.Success(listOf())
 		
+		val url = baseUrl.toUrlBuilder().apply {
+			add("s", input)
+		}
+		
 		return tryConnect {
-			Jsoup.connect("https://www.novelupdates.com/?s=${input.urlEncode()}")
+			Jsoup.connect(url.toString())
 				.addUserAgent()
 				.getIO()
 				.select(".search_body_nu")
