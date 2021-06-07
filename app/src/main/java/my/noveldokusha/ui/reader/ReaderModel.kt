@@ -31,7 +31,7 @@ class ReaderModel(private val savedState: SavedStateHandle) : BaseViewModel()
 	
 	private lateinit var _bookUrl: String
 	val bookUrl by lazy { _bookUrl }
-
+	
 	val readRoutine = ChaptersIsReadRoutine()
 	
 	val chaptersSize = mutableMapOf<String, Int>()
@@ -58,7 +58,7 @@ class ReaderModel(private val savedState: SavedStateHandle) : BaseViewModel()
 	fun saveLastReadPositionState()
 	{
 		val currentChapter = currentChapter.copy()
-		viewModelScope.launch {
+		viewModelScope.launch(Dispatchers.IO) {
 			
 			bookstore.bookLibrary.get(bookUrl)?.let {
 				bookstore.bookLibrary.update(it.copy(lastReadChapter = currentChapter.url))
@@ -82,7 +82,6 @@ class ReaderModel(private val savedState: SavedStateHandle) : BaseViewModel()
 
 suspend fun getChapterInitialPosition(bookUrl: String, chapterUrl: String, items: ArrayList<ReaderActivity.Item>): Pair<Int, Int>
 {
-	
 	val titlePos by lazy { items.indexOfFirst { it is ReaderActivity.Item.TITLE } }
 	val chapter = bookstore.bookChapter.get(chapterUrl) ?: return Pair(titlePos, 0)
 	val book = bookstore.bookLibrary.get(bookUrl)
@@ -109,14 +108,14 @@ class ChaptersIsReadRoutine
 	
 	private data class ChapterReadStatus(val startSeen: Boolean, val endSeen: Boolean)
 	
+	private val scope = CoroutineScope(Dispatchers.IO)
 	private val chapterRead = mutableMapOf<String, ChapterReadStatus>()
-	private fun checkLoadStatus(chapterUrl: String, fn: (ChapterReadStatus) -> ChapterReadStatus) = GlobalScope.launch(Dispatchers.IO) {
+	
+	private fun checkLoadStatus(chapterUrl: String, fn: (ChapterReadStatus) -> ChapterReadStatus) = scope.launch(Dispatchers.IO) {
 		
 		val chapter = bookstore.bookChapter.get(chapterUrl) ?: return@launch
-		val oldStatus = withContext(Dispatchers.Main) {
-			chapterRead.getOrPut(chapterUrl) {
-				if (chapter.read) ChapterReadStatus(true, true) else ChapterReadStatus(false, false)
-			}
+		val oldStatus = chapterRead.getOrPut(chapterUrl) {
+			if (chapter.read) ChapterReadStatus(true, true) else ChapterReadStatus(false, false)
 		}
 		
 		if (oldStatus.startSeen && oldStatus.endSeen) return@launch
@@ -125,8 +124,6 @@ class ChaptersIsReadRoutine
 		if (newStatus.startSeen && newStatus.endSeen)
 			bookstore.bookChapter.update(chapter.copy(read = true))
 		
-		withContext(Dispatchers.Main) {
-			chapterRead[chapterUrl] = newStatus
-		}
+		chapterRead[chapterUrl] = newStatus
 	}
 }
