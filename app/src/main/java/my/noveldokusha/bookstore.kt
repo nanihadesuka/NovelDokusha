@@ -115,6 +115,9 @@ object bookstore
 		@Query("UPDATE Chapter SET read = 1 WHERE url in (:chaptersUrl)")
 		suspend fun setAsRead(chaptersUrl: List<String>)
 		
+		@Query("UPDATE Chapter SET title = :title WHERE url == :url")
+		suspend fun updateTitle(url: String, title: String)
+		
 		@Query("UPDATE Chapter SET read = 0 WHERE url in (:chaptersUrl)")
 		suspend fun setAsUnread(chaptersUrl: List<String>)
 		
@@ -283,6 +286,7 @@ object bookstore
 			suspend fun get(url: String) = db.chapterDao().get(url)
 			suspend fun hasChapters(bookUrl: String) = db.chapterDao().hasChapters(bookUrl)
 			suspend fun getAll() = db.chapterDao().getAll()
+			suspend fun updateTitle(url: String, title: String) = db.chapterDao().updateTitle(url, title)
 			suspend fun setAsRead(chaptersUrl: List<String>) = chaptersUrl.chunked(500).forEach { db.chapterDao().setAsRead(it) }
 			suspend fun setAsUnread(chaptersUrl: List<String>) = chaptersUrl.chunked(500).forEach { db.chapterDao().setAsUnread(it) }
 			suspend fun insert(chapters: List<Chapter>) = db.chapterDao().insert(chapters.filter(::isValid))
@@ -291,19 +295,27 @@ object bookstore
 			fun getChaptersWithContexFlow(bookUrl: String) = db.chapterDao().getChaptersWithContextFlow(bookUrl)
 			suspend fun merge(newChapters: List<Chapter>, bookUrl: String)
 			{
-				val current = bookstore.bookChapter.chapters(bookUrl).associateBy { it.url }.toMutableMap()
+				val current = chapters(bookUrl).associateBy { it.url }.toMutableMap()
 				for (chapter in newChapters)
 					current.merge(chapter.url, chapter) { old, new -> old.copy(position = new.position) }
-				bookstore.bookChapter.replace(current.values.toList())
+				replace(current.values.toList())
 			}
+			
 		}
 		
 		inner class BookChapterBody
 		{
 			suspend fun getAll() = db.chapterBodyDao().getAll()
 			suspend fun insert(chapterBodies: List<ChapterBody>) = db.chapterBodyDao().insert(chapterBodies)
+			suspend fun insert(chapterBody: ChapterBody) = db.chapterBodyDao().insert(chapterBody)
 			suspend fun removeRows(chaptersUrl: List<String>) =
 				chaptersUrl.chunked(500).forEach { db.chapterBodyDao().removeChapterRows(it) }
+			
+			suspend fun insertWithTitle(chapterBody: ChapterBody, title: String?) = db.withTransaction {
+				insert(chapterBody)
+				if (title != null)
+					bookstore.bookChapter.updateTitle(chapterBody.url, title)
+			}
 			
 			suspend fun fetchBody(urlChapter: String, tryCache: Boolean = true): Response<String>
 			{
@@ -311,14 +323,24 @@ object bookstore
 					return@fetchBody Response.Success(it.body)
 				}
 				
-				val res = downloadChapter(urlChapter)
-				if (res is Response.Success)
-					db.chapterBodyDao().insert(ChapterBody(url = urlChapter, body = res.data))
-				return res
+				return when (val res = downloadChapter(urlChapter))
+				{
+					is Response.Success ->
+					{
+						insertWithTitle(ChapterBody(url = urlChapter, body = res.data.body), res.data.title)
+						return Response.Success(res.data.body)
+					}
+					is Response.Error ->
+					{
+						Response.Error(res.message)
+					}
+				}
 			}
+			
 		}
 	}
 	
 	fun isValid(book: Book): Boolean = book.url.matches("""^https?://.*""".toRegex())
 	fun isValid(chapter: Chapter): Boolean = chapter.url.matches("""^https?://.*""".toRegex())
 }
+

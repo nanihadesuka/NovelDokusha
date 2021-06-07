@@ -135,7 +135,9 @@ object scrubber
 	)
 }
 
-suspend fun downloadChapter(chapterUrl: String): Response<String>
+data class ChapterDownload(val body: String, val title: String?)
+
+suspend fun downloadChapter(chapterUrl: String): Response<ChapterDownload>
 {
 	return tryConnect {
 		val con = Jsoup.connect(chapterUrl)
@@ -159,30 +161,26 @@ suspend fun downloadChapter(chapterUrl: String): Response<String>
 			""".trimIndent()
 		}
 		
-		fun updateTitle(title: String?) = title?.let {
-			GlobalScope.launch(Dispatchers.IO) {
-				bookstore.bookChapter.get(chapterUrl)?.let { chapter ->
-					bookstore.bookChapter.update(chapter.copy(title = it))
-				}
-			}
-		}
-		
 		scrubber.getCompatibleSource(realUrl)?.also { source ->
 			val doc = fetchDoc(source.transformChapterUrl(realUrl))
-			val body = source.getChapterText(doc)
-			updateTitle(source.getChapterTitle(doc))
-			return@tryConnect Response.Success(body)
+			val data = ChapterDownload(
+				body = source.getChapterText(doc),
+				title = source.getChapterTitle(doc)
+			)
+			return@tryConnect Response.Success(data)
 		}
 		
-		// If no predefined source is found try extracting text with Readability3J library
+		// If no predefined source is found try extracting text with Readability4J library
 		Readability4J(realUrl, fetchDoc(realUrl)).parse().also { article ->
 			val content = article.articleContent ?: return@also
-			val text = scrubber.getNodeTextTransversal(content)
-			updateTitle(article.title)
-			return@tryConnect Response.Success(text.joinToString("\n\n"))
+			val data = ChapterDownload(
+				body = scrubber.getNodeTextTransversal(content).joinToString("\n\n"),
+				title = article.title
+			)
+			return@tryConnect Response.Success(data)
 		}
 		
-		Response.Error<String>(error)
+		Response.Error(error)
 	}
 }
 
