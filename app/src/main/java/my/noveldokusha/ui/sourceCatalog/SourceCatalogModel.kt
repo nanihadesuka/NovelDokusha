@@ -25,7 +25,7 @@ class SourceCatalogModel : BaseViewModel()
 	
 	data class CatalogItem(val bookMetadata: BookMetadata)
 	{
-		val isInLibraryLiveData = bookstore.bookLibrary.existFlow(bookMetadata.url).asLiveData()
+		val isInLibraryLiveData = bookstore.bookLibrary.existInLibraryFlow(bookMetadata.url).asLiveData()
 	}
 	
 	val list = ArrayList<CatalogItem>()

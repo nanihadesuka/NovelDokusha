@@ -32,7 +32,8 @@ object bookstore
 		val title: String,
 		@PrimaryKey val url: String,
 		val completed: Boolean = false,
-		val lastReadChapter: String? = null
+		val lastReadChapter: String? = null,
+		val inLibrary: Boolean = false
 	)
 	
 	@Entity
@@ -55,8 +56,8 @@ object bookstore
 		@Query("SELECT * FROM Book")
 		suspend fun getAll(): List<Book>
 		
-		@Query("SELECT * FROM Book")
-		fun booksFlow(): Flow<List<Book>>
+		@Query("SELECT * FROM Book WHERE inLibrary == 1")
+		fun booksInLibraryFlow(): Flow<List<Book>>
 		
 		@Insert(onConflict = OnConflictStrategy.IGNORE)
 		suspend fun insert(book: Book)
@@ -73,11 +74,11 @@ object bookstore
 		@Query("SELECT * FROM Book WHERE url = :url")
 		suspend fun get(url: String): Book?
 		
-		@Query("SELECT EXISTS(SELECT * FROM Book WHERE url == :url)")
-		suspend fun exist(url: String): Boolean
+		@Query("SELECT EXISTS(SELECT * FROM Book WHERE url == :url AND inLibrary == 1)")
+		suspend fun existInLibrary(url: String): Boolean
 		
-		@Query("SELECT EXISTS(SELECT * FROM Book WHERE url == :url)")
-		fun existFlow(url: String): Flow<Boolean>
+		@Query("SELECT EXISTS(SELECT * FROM Book WHERE url == :url AND inLibrary == 1)")
+		fun existInLibraryFlow(url: String): Flow<Boolean>
 		
 		data class BookWithContext(@Embedded val book: Book, val chaptersCount: Int, val chaptersReadCount: Int)
 		
@@ -86,10 +87,14 @@ object bookstore
 			SELECT Book.*, COUNT(Chapter.read) AS chaptersCount, SUM(Chapter.read) AS chaptersReadCount
 			FROM Book
 			LEFT JOIN Chapter ON Chapter.bookUrl = Book.url
+			WHERE Book.inLibrary == 1
 			GROUP BY Book.url
 		"""
 		)
-		fun getBooksWithContextFlow(): Flow<List<BookWithContext>>
+		fun getBooksInLibraryWithContextFlow(): Flow<List<BookWithContext>>
+		
+		@Query("DELETE FROM Book WHERE inLibrary == 0")
+		suspend fun removeAllNonLibraryRows()
 	}
 	
 	@Dao
@@ -165,7 +170,7 @@ object bookstore
 		suspend fun removeChapterRows(chaptersUrl: List<String>)
 	}
 	
-	@Database(entities = [Book::class, Chapter::class, ChapterBody::class], version = 2, exportSchema = false)
+	@Database(entities = [Book::class, Chapter::class, ChapterBody::class], version = 3, exportSchema = false)
 	abstract class LibraryDatabase : RoomDatabase()
 	{
 		abstract fun libraryDao(): LibraryDao
@@ -178,9 +183,13 @@ object bookstore
 		override fun migrate(database: SupportSQLiteDatabase) = migrate(database)
 	}
 	
-	val migration_1_2 = migration(1, 2) {
-		it.execSQL("ALTER TABLE Chapter ADD COLUMN position INTEGER NOT NULL DEFAULT 0")
-	}
+	fun migrations() = arrayOf(
+		migration(1, 2) { it.execSQL("ALTER TABLE Chapter ADD COLUMN position INTEGER NOT NULL DEFAULT 0") },
+		migration(2, 3) {
+			it.execSQL("ALTER TABLE Book ADD COLUMN inLibrary INTEGER NOT NULL DEFAULT 0")
+			it.execSQL("UPDATE Book SET inLibrary = 1")
+		}
+	)
 	
 	val db_context: Context by lazy { App.instance.applicationContext }
 	val appDB by lazy { DBase(db_context, "bookEntry") }
@@ -192,7 +201,7 @@ object bookstore
 	
 	private fun createRoom(ctx: Context, name: String) = Room
 		.databaseBuilder(ctx, LibraryDatabase::class.java, name)
-		.addMigrations(migration_1_2)
+		.addMigrations(*migrations())
 	
 	class DBase
 	{
@@ -232,11 +241,13 @@ object bookstore
 		{
 			suspend fun clearNonLibraryData()
 			{
+				db.libraryDao().removeAllNonLibraryRows()
 				db.chapterDao().removeAllNonLibraryRows()
 				db.chapterBodyDao().removeAllNonChapterRows()
 			}
 			
 			fun clearNonLibraryDataFlow() = flow {
+				db.libraryDao().removeAllNonLibraryRows()
 				db.chapterDao().removeAllNonLibraryRows()
 				db.chapterBodyDao().removeAllNonChapterRows()
 				emit(Unit)
@@ -245,20 +256,23 @@ object bookstore
 		
 		inner class BookLibrary
 		{
-			val booksFlow by lazy { db.libraryDao().booksFlow() }
-			val getBooksWithContextFlow by lazy { db.libraryDao().getBooksWithContextFlow() }
-			fun existFlow(url: String) = db.libraryDao().existFlow(url)
+			val booksInLibraryFlow by lazy { db.libraryDao().booksInLibraryFlow() }
+			val getBooksInLibraryWithContextFlow by lazy { db.libraryDao().getBooksInLibraryWithContextFlow() }
+			fun existInLibraryFlow(url: String) = db.libraryDao().existInLibraryFlow(url)
 			suspend fun insert(book: Book) = if (isValid(book)) db.libraryDao().insert(book) else Unit
 			suspend fun insert(books: List<Book>) = db.libraryDao().insert(books.filter(::isValid))
 			suspend fun remove(book: Book) = db.libraryDao().remove(book)
 			suspend fun update(book: Book) = db.libraryDao().update(book)
 			suspend fun get(url: String) = db.libraryDao().get(url)
 			suspend fun getAll() = db.libraryDao().getAll()
-			suspend fun exist(url: String) = db.libraryDao().exist(url)
+			suspend fun existInLibrary(url: String) = db.libraryDao().existInLibrary(url)
 			suspend fun toggleBookmark(bookMetadata: BookMetadata)
 			{
-				val book = Book(title = bookMetadata.title, url = bookMetadata.url)
-				if (exist(book.url)) remove(book) else insert(book)
+				val book = get(bookMetadata.url)
+				if (book == null)
+					insert(Book(title = bookMetadata.title, url = bookMetadata.url, inLibrary = true))
+				else
+					update(book.copy(inLibrary = !book.inLibrary))
 			}
 		}
 		

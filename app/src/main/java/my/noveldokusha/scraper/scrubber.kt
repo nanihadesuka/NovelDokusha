@@ -61,6 +61,7 @@ object scrubber
 		// Transform current url to preferred url
 		fun transformChapterUrl(url: String): String = url
 		
+		suspend fun getChapterTitle(doc: Document): String?
 		suspend fun getChapterText(doc: Document): String
 		
 		interface base : source_interface
@@ -158,18 +159,26 @@ suspend fun downloadChapter(chapterUrl: String): Response<String>
 			""".trimIndent()
 		}
 		
+		fun updateTitle(title: String?) = title?.let {
+			GlobalScope.launch(Dispatchers.IO) {
+				bookstore.bookChapter.get(chapterUrl)?.let { chapter ->
+					bookstore.bookChapter.update(chapter.copy(title = it))
+				}
+			}
+		}
+		
 		scrubber.getCompatibleSource(realUrl)?.also { source ->
 			val doc = fetchDoc(source.transformChapterUrl(realUrl))
 			val body = source.getChapterText(doc)
+			updateTitle(source.getChapterTitle(doc))
 			return@tryConnect Response.Success(body)
 		}
 		
 		// If no predefined source is found try extracting text with Readability3J library
 		Readability4J(realUrl, fetchDoc(realUrl)).parse().also { article ->
 			val content = article.articleContent ?: return@also
-			val text = mutableListOf<String>()
-			article.title?.let { text.add(it) }
-			text.addAll(scrubber.getNodeTextTransversal(content))
+			val text = scrubber.getNodeTextTransversal(content)
+			updateTitle(article.title)
 			return@tryConnect Response.Success(text.joinToString("\n\n"))
 		}
 		

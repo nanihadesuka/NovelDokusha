@@ -18,6 +18,8 @@ class NovelUpdates : scrubber.source_interface.catalog
 	override val baseUrl = "https://www.novelupdates.com/"
 	override val catalogUrl = "https://www.novelupdates.com/novelslisting/?sort=7&order=1&status=1"
 	
+	override suspend fun getChapterTitle(doc: Document): String? = null
+	
 	override suspend fun getChapterText(doc: Document): String
 	{
 		// Given novel updates only host the chapters list (they redirect to a diferent webpage) and

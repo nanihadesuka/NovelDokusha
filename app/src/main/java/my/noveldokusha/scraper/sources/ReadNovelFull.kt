@@ -18,6 +18,8 @@ class ReadNovelFull : scrubber.source_interface.catalog
 	override val baseUrl = "https://readnovelfull.com"
 	override val catalogUrl = "https://readnovelfull.com/most-popular-novel"
 	
+	override suspend fun getChapterTitle(doc: Document): String? = null
+	
 	override suspend fun getChapterText(doc: Document): String
 	{
 		doc.selectFirst("#chr-content").let {

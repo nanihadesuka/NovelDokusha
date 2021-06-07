@@ -18,6 +18,8 @@ class LightNovelsTranslations : scrubber.source_interface.catalog
 	override val baseUrl = "https://lightnovelstranslations.com/"
 	override val catalogUrl = "https://lightnovelstranslations.com/"
 	
+	override suspend fun getChapterTitle(doc: Document): String? = doc.selectFirst("h1.entry-title")?.text()
+	
 	override suspend fun getChapterText(doc: Document): String
 	{
 		return doc.selectFirst(".page, .type-page, .status-publish, .hentry").selectFirst(".entry-content").run {

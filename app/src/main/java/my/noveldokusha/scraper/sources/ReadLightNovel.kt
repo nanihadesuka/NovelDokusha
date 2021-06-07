@@ -19,6 +19,8 @@ class ReadLightNovel : scrubber.source_interface.catalog
 	override val baseUrl = "https://www.readlightnovel.org"
 	override val catalogUrl = "https://www.readlightnovel.org/novel-list"
 	
+	override suspend fun getChapterTitle(doc: Document): String? = doc.selectFirst(".chapter-content3 h4")?.text()
+	
 	override suspend fun getChapterText(doc: Document): String
 	{
 		doc.selectFirst(".chapter-content3 > .desc").let {

@@ -20,6 +20,8 @@ class Reddit : scrubber.source_interface.base
 		return url.toUrlBuilder().authority("old.reddit.com").toString()
 	}
 	
+	override suspend fun getChapterTitle(doc: Document): String? = doc.title().ifBlank { null }
+	
 	override suspend fun getChapterText(doc: Document): String
 	{
 		return doc.selectFirst(".linklisting")

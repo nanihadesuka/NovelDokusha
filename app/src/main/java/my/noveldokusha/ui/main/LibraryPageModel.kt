@@ -18,7 +18,7 @@ class LibraryPageModel : BaseViewModel()
 	}
 	
 	val booksWithContextFlow by lazy {
-		bookstore.bookLibrary.getBooksWithContextFlow.map { it.filter { book -> book.book.completed == showCompleted } }
+		bookstore.bookLibrary.getBooksInLibraryWithContextFlow.map { it.filter { book -> book.book.completed == showCompleted } }
 	}
 	
 	val booksWithContext = mutableListOf<bookstore.LibraryDao.BookWithContext>()

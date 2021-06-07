@@ -104,10 +104,7 @@ private class NovelItemAdapter(
 		override fun getOldListSize(): Int = list.size
 		override fun getNewListSize(): Int = new.size
 		override fun areItemsTheSame(oldPos: Int, newPos: Int): Boolean = list[oldPos].book.url == new[newPos].book.url
-		override fun areContentsTheSame(oldPos: Int, newPos: Int): Boolean =
-			(list[oldPos].book.completed == new[newPos].book.completed) &&
-			(list[oldPos].chaptersCount == new[newPos].chaptersCount) &&
-			(list[oldPos].chaptersReadCount == new[newPos].chaptersReadCount)
+		override fun areContentsTheSame(oldPos: Int, newPos: Int): Boolean = list[oldPos] == new[newPos]
 	}
 	
 	fun setList(newList: List<bookstore.LibraryDao.BookWithContext>) = DiffUtil.calculateDiff(Diff(newList)).let {

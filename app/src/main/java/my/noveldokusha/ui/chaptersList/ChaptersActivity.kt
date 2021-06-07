@@ -149,10 +149,9 @@ class ChaptersActivity : BaseActivity()
 		
 		val itemBookmark = menu!!.findItem(R.id.action_bookmarked)!!
 		
-		setBookmarkIconActive(runBlocking { bookstore.bookLibrary.exist(viewModel.bookMetadata.url) }, itemBookmark)
+		setBookmarkIconActive(runBlocking { bookstore.bookLibrary.existInLibrary(viewModel.bookMetadata.url) }, itemBookmark)
 		
-		bookstore.bookLibrary.existFlow(viewModel.bookMetadata.url).asLiveData().observe(this) { bookmarked ->
-			
+		bookstore.bookLibrary.existInLibraryFlow(viewModel.bookMetadata.url).asLiveData().observe(this) { bookmarked ->
 			setBookmarkIconActive(bookmarked, itemBookmark)
 			this.bookmarked = bookmarked
 		}
@@ -193,10 +192,7 @@ private class ChaptersArrayAdapter(
 		override fun getOldListSize(): Int = list.size
 		override fun getNewListSize(): Int = aNew.size
 		override fun areItemsTheSame(oldPos: Int, newPos: Int): Boolean = list[oldPos].chapter.url == aNew[newPos].chapter.url
-		override fun areContentsTheSame(oldPos: Int, newPos: Int): Boolean =
-			(list[oldPos].chapter.read == aNew[newPos].chapter.read) &&
-			(list[oldPos].downloaded == aNew[newPos].downloaded) &&
-			(list[oldPos].lastReadChapter == aNew[newPos].lastReadChapter)
+		override fun areContentsTheSame(oldPos: Int, newPos: Int): Boolean = list[oldPos] == aNew[newPos]
 	}
 	
 	fun setList(newList: List<bookstore.ChapterDao.ChapterWithContext>) = DiffUtil.calculateDiff(Diff(newList)).let {
@@ -288,7 +284,7 @@ private class ChaptersHeaderAdapter(
 				override fun onLongClick(v: View?): Boolean
 				{
 					expand = !expand
-					viewHolder.errorMessage.maxLines = if(expand) 100 else 10
+					viewHolder.errorMessage.maxLines = if (expand) 100 else 10
 					return true
 				}
 			})

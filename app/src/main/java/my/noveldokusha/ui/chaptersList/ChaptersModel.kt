@@ -21,6 +21,10 @@ class ChaptersModel : BaseViewModel()
 		viewModelScope.launch(Dispatchers.IO) {
 			if (!bookstore.bookChapter.hasChapters(bookMetadata.url))
 				updateChaptersList()
+			
+			val book = bookstore.bookLibrary.get(bookMetadata.url)
+			if (book == null)
+				bookstore.bookLibrary.insert(bookstore.Book(title = bookMetadata.title, url = bookMetadata.url))
 		}
 	}
 	
