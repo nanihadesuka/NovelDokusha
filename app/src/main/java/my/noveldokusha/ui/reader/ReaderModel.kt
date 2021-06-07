@@ -51,6 +51,7 @@ class ReaderModel(private val savedState: SavedStateHandle) : BaseViewModel()
 		currentChapterOld = currentChapter.copy()
 	}
 	
+	
 	var bookSelectedChapterUrl: String by Delegates.observable("") { _, _, newValue ->
 		savedState.set<String>(::bookSelectedChapterUrl.name, newValue)
 	}
@@ -59,13 +60,14 @@ class ReaderModel(private val savedState: SavedStateHandle) : BaseViewModel()
 	{
 		val currentChapter = currentChapter.copy()
 		viewModelScope.launch(Dispatchers.IO) {
-			
-			bookstore.bookLibrary.get(bookUrl)?.let {
-				bookstore.bookLibrary.update(it.copy(lastReadChapter = currentChapter.url))
-			}
-			
-			bookstore.bookChapter.get(currentChapter.url)?.let {
-				bookstore.bookChapter.update(it.copy(lastReadPosition = currentChapter.position, lastReadOffset = currentChapter.offset))
+			bookstore.appDB.withTransaction {
+				bookstore.bookLibrary.get(bookUrl)?.let {
+					bookstore.bookLibrary.update(it.copy(lastReadChapter = currentChapter.url))
+				}
+				
+				bookstore.bookChapter.get(currentChapter.url)?.let {
+					bookstore.bookChapter.update(it.copy(lastReadPosition = currentChapter.position, lastReadOffset = currentChapter.offset))
+				}
 			}
 		}
 	}

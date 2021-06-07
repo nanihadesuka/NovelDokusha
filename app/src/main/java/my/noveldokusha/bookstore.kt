@@ -240,6 +240,8 @@ object bookstore
 		fun delete() = context.deleteDatabase(name)
 		fun clearAllTables() = db.clearAllTables()
 		
+		suspend fun <T>withTransaction(fn: suspend ()-> T) = db.withTransaction(fn)
+		
 		inner class Settings
 		{
 			suspend fun clearNonLibraryData()
