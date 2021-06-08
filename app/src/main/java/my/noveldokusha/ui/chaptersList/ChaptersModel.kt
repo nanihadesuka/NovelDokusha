@@ -32,6 +32,17 @@ class ChaptersModel : BaseViewModel()
 	
 	val chaptersWithContextLiveData by lazy {
 		bookstore.bookChapter.getChaptersWithContexFlow(bookMetadata.url)
+			.map {
+				// Try removing repetitive title text from chapters
+				if (it.size <= 1) return@map it
+				val first = it.first().chapter.title
+				val prefix = it.fold(first) { acc, e -> e.chapter.title.commonPrefixWith(acc) }
+				val suffix = it.fold(first) { acc, e -> e.chapter.title.commonSuffixWith(acc) }
+				return@map it.map { data ->
+					val newTitle = data.chapter.title.removeSurrounding(prefix, suffix).ifBlank { data.chapter.title }
+					data.copy(chapter = data.chapter.copy(title = newTitle))
+				}
+			}
 			.map { it.asReversed() }
 			.asLiveData()
 	}
