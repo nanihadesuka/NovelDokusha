@@ -94,4 +94,6 @@ dependencies {
 
     implementation "com.chimbori.crux:crux:3.0.1"
     implementation "net.dankito.readability4j:readability4j:1.0.6"
+
+    implementation "com.l4digital.fastscroll:fastscroll:2.0.1"
 }

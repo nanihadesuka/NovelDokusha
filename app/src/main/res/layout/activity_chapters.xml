@@ -23,25 +23,38 @@
 	
 	</com.google.android.material.appbar.AppBarLayout>
 	
-	<androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-		android:id="@+id/swipeRefreshLayout"
+	<FrameLayout
 		android:layout_width="match_parent"
 		android:layout_height="match_parent"
 		app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior"
 		>
 		
-		<androidx.recyclerview.widget.RecyclerView
-			android:id="@+id/recyclerView"
+		<androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+			android:id="@+id/swipeRefreshLayout"
 			android:layout_width="match_parent"
 			android:layout_height="match_parent"
-			android:scrollbars="vertical"
-			android:splitMotionEvents="false"
-			android:verticalScrollbarPosition="right"
-			app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-			tools:itemCount="30"
-			tools:listitem="@layout/activity_chapters_list_item"
+			>
+			
+			<androidx.recyclerview.widget.RecyclerView
+				android:id="@+id/recyclerView"
+				android:layout_width="match_parent"
+				android:layout_height="match_parent"
+				android:splitMotionEvents="false"
+				app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+				tools:itemCount="30"
+				tools:listitem="@layout/activity_chapters_list_item"
+				/>
+		
+		</androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+		
+		<my.noveldokusha.uiViews.myFastScroll
+			android:id="@+id/recyclerView_fastScroll"
+			android:layout_width="match_parent"
+			android:layout_height="match_parent"
+			app:attachedRecyclerView="@id/recyclerView"
+			app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior"
 			/>
-	</androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+	</FrameLayout>
 	
 	<androidx.constraintlayout.widget.ConstraintLayout
 		android:id="@+id/selectionModeBar"
