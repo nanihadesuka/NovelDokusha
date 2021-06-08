@@ -13,7 +13,7 @@ class ReaderModel(private val savedState: SavedStateHandle) : BaseViewModel()
 	private val savedStateChapterUrlID = "chapterUrl"
 	
 	fun initialization(bookUrl: String, selectedChapter: String, fn: () -> Unit) = callOneTime {
-		this._bookUrl = bookUrl
+		this.bookUrl = bookUrl
 		val url = savedState.get<String>(savedStateChapterUrlID) ?: selectedChapter
 		
 		runBlocking {
@@ -26,7 +26,6 @@ class ReaderModel(private val savedState: SavedStateHandle) : BaseViewModel()
 			orderedChapters.clear()
 			orderedChapters.addAll(bookstore.bookChapter.chapters(bookUrl))
 		}
-		
 		fn()
 	}
 	
@@ -35,9 +34,9 @@ class ReaderModel(private val savedState: SavedStateHandle) : BaseViewModel()
 		if (old.url != new.url) saveLastReadPositionState(bookUrl, new)
 	}
 	
-	private lateinit var _bookUrl: String
+	lateinit var bookUrl: String
+		private set
 	
-	val bookUrl by lazy { _bookUrl }
 	val orderedChapters = mutableListOf<bookstore.Chapter>()
 	val chaptersSize = mutableMapOf<String, Int>()
 	val items = ArrayList<ReaderActivity.Item>()

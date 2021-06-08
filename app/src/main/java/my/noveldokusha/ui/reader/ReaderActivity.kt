@@ -22,6 +22,7 @@ import my.noveldokusha.databinding.ActivityReaderListItemBinding
 import my.noveldokusha.scraper.Response
 import my.noveldokusha.ui.BaseActivity
 import my.noveldokusha.uiUtils.*
+import java.util.*
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.math.ceil
 import kotlin.math.roundToInt
@@ -44,9 +45,8 @@ class ReaderActivity : BaseActivity()
 	private val fadeInAlready = AtomicBoolean(false)
 	private fun fadeIn()
 	{
-		if (fadeInAlready.compareAndSet(false, true)) lifecycleScope.launch(Dispatchers.Main) {
+		if (fadeInAlready.compareAndSet(false, true))
 			viewHolder.listView.fadeIn()
-		}
 	}
 	
 	private val extras by lazy { IntentData(intent) }
@@ -159,7 +159,7 @@ class ReaderActivity : BaseActivity()
 							chapterUrl = viewModel.currentChapter.url,
 							items = viewModel.items
 						)
-						runOnUiThread {
+						withContext(Dispatchers.Main) {
 							viewHolder.listView.setSelectionFromTop(index, offset)
 							viewModel.state = ReaderModel.State.IDLE
 							fadeIn()
@@ -176,7 +176,7 @@ class ReaderActivity : BaseActivity()
 		// Show reader if text hasn't load after 200 ms of waiting
 		lifecycleScope.launch(Dispatchers.Default) {
 			delay(200)
-			fadeIn()
+			withContext(Dispatchers.Main) { fadeIn() }
 		}
 		
 		@Suppress("DEPRECATION")
