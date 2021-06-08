@@ -31,13 +31,13 @@ class ReaderActivity : BaseActivity()
 	class IntentData : Intent
 	{
 		var bookUrl by Extra_String()
-		var bookSelectedChapterUrl by Extra_String()
+		var chapterUrl by Extra_String()
 		
 		constructor(intent: Intent) : super(intent)
-		constructor(ctx: Context, bookUrl: String, bookSelectedChapterUrl: String) : super(ctx, ReaderActivity::class.java)
+		constructor(ctx: Context, bookUrl: String, chapterUrl: String) : super(ctx, ReaderActivity::class.java)
 		{
 			this.bookUrl = bookUrl
-			this.bookSelectedChapterUrl = bookSelectedChapterUrl
+			this.chapterUrl = chapterUrl
 		}
 	}
 	
@@ -91,9 +91,9 @@ class ReaderActivity : BaseActivity()
 		super.onCreate(savedInstanceState)
 		setContentView(viewHolder.root)
 		
-		viewModel.initialization(bookUrl = extras.bookUrl, bookSelectedChapterUrl = extras.bookSelectedChapterUrl)
-		
-		loadInitialChapter()
+		viewModel.initialization(bookUrl = extras.bookUrl, selectedChapter = extras.chapterUrl) {
+			loadInitialChapter()
+		}
 		
 		viewHolder.listView.adapter = viewAdapter.listView
 		sharedPreferences.registerOnSharedPreferenceChangeListener(listenerSharedPreferences)
@@ -130,55 +130,6 @@ class ReaderActivity : BaseActivity()
 			override fun onNothingSelected(parent: AdapterView<*>?) = Unit
 		}
 		
-		@Suppress("DEPRECATION")
-		window.setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN)
-	}
-	
-	private fun loadInitialChapter()
-	{
-		viewModel.state = ReaderModel.State.INITIAL_LOAD
-		viewAdapter.listView.clear()
-		
-		val insert = { item: Item -> viewAdapter.listView.add(item) }
-		val insertAll = { items: Collection<Item> -> viewAdapter.listView.addAll(items) }
-		val remove = { item: Item -> viewAdapter.listView.remove(item) }
-		
-		val chapter = viewModel.orderedChapters.find { it.url == viewModel.bookSelectedChapterUrl }!!
-		addChapter(chapter, insert, insertAll, remove) {
-			viewModel.state = ReaderModel.State.INITIAL_LOAD_COMPLETED
-		}
-		
-		lifecycleScope.launch(Dispatchers.Default) {
-			delay(200)
-			fadeIn()
-		}
-	}
-	
-	fun updateInfoView()
-	{
-		val lastVisiblePosition = viewHolder.listView.lastVisiblePosition
-		if (lastVisiblePosition < 0) return
-		val item = viewAdapter.listView.getItem(lastVisiblePosition)
-		if (item !is Item.Position) return
-		
-		val currentChapterUrl = item.url
-		lifecycleScope.launch(Dispatchers.Default) {
-			val index = viewModel.orderedChapters.indexOfFirst { it.url == currentChapterUrl }
-			val pos = index + 1
-			val itemPos = item.pos.toFloat()
-			val title = viewModel.orderedChapters[index].title
-			withContext(Dispatchers.Main) {
-				viewHolder.infoChapterTitle.text = title
-				viewHolder.infoCurrentChapterFromTotal.text = " $pos/${viewModel.orderedChapters.size}"
-				val itemMaxPos = viewModel.chaptersSize.getOrDefault(item.url, 0).coerceAtLeast(1).toFloat()
-				viewHolder.infoChapterProgressPercentage.text = " ${ceil((itemPos / itemMaxPos) * 100f).roundToInt()}%"
-			}
-		}
-	}
-	
-	override fun onStart()
-	{
-		super.onStart()
 		viewHolder.listView.setOnScrollListener(object : AbsListView.OnScrollListener
 		{
 			override fun onScroll(view: AbsListView?, firstVisibleItem: Int, visibleItemCount: Int, totalItemCount: Int)
@@ -205,7 +156,7 @@ class ReaderActivity : BaseActivity()
 					ReaderModel.State.INITIAL_LOAD_COMPLETED -> lifecycleScope.launch {
 						val (index: Int, offset: Int) = getChapterInitialPosition(
 							bookUrl = viewModel.bookUrl,
-							chapterUrl = viewModel.bookSelectedChapterUrl,
+							chapterUrl = viewModel.currentChapter.url,
 							items = viewModel.items
 						)
 						runOnUiThread {
@@ -221,6 +172,52 @@ class ReaderActivity : BaseActivity()
 			{
 			}
 		})
+		
+		// Show reader if text hasn't load after 200 ms of waiting
+		lifecycleScope.launch(Dispatchers.Default) {
+			delay(200)
+			fadeIn()
+		}
+		
+		@Suppress("DEPRECATION")
+		window.setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN)
+	}
+	
+	private fun loadInitialChapter()
+	{
+		viewModel.state = ReaderModel.State.INITIAL_LOAD
+		viewAdapter.listView.clear()
+		
+		val insert = { item: Item -> viewAdapter.listView.add(item) }
+		val insertAll = { items: Collection<Item> -> viewAdapter.listView.addAll(items) }
+		val remove = { item: Item -> viewAdapter.listView.remove(item) }
+		
+		val chapter = viewModel.orderedChapters.find { it.url == viewModel.currentChapter.url }!!
+		addChapter(chapter, insert, insertAll, remove) {
+			viewModel.state = ReaderModel.State.INITIAL_LOAD_COMPLETED
+		}
+	}
+	
+	fun updateInfoView()
+	{
+		val lastVisiblePosition = viewHolder.listView.lastVisiblePosition
+		if (lastVisiblePosition < 0) return
+		val item = viewAdapter.listView.getItem(lastVisiblePosition)
+		if (item !is Item.Position) return
+		
+		val currentChapterUrl = item.url
+		lifecycleScope.launch(Dispatchers.Default) {
+			val index = viewModel.orderedChapters.indexOfFirst { it.url == currentChapterUrl }
+			val pos = index + 1
+			val itemPos = item.pos.toFloat()
+			val title = viewModel.orderedChapters[index].title
+			withContext(Dispatchers.Main) {
+				viewHolder.infoChapterTitle.text = title
+				viewHolder.infoCurrentChapterFromTotal.text = " $pos/${viewModel.orderedChapters.size}"
+				val itemMaxPos = viewModel.chaptersSize.getOrDefault(item.url, 0).coerceAtLeast(1).toFloat()
+				viewHolder.infoChapterProgressPercentage.text = " ${ceil((itemPos / itemMaxPos) * 100f).roundToInt()}%"
+			}
+		}
 	}
 	
 	private fun updateCurrentReadingPosSavingState(firstVisibleItem: Int)
@@ -229,25 +226,8 @@ class ReaderActivity : BaseActivity()
 		if (item is Item.Position)
 		{
 			val offset = viewHolder.listView.run { getChildAt(0).top - paddingTop }
-			viewModel.currentChapter.url = item.url
-			viewModel.currentChapter.position = item.pos
-			viewModel.currentChapter.offset = offset
-			viewModel.bookSelectedChapterUrl = item.url
+			viewModel.currentChapter = ChapterState(url = item.url, position = item.pos, offset = offset)
 		}
-	}
-	
-	override fun onPause()
-	{
-		updateCurrentReadingPosSavingState(viewHolder.listView.firstVisiblePosition)
-		viewModel.saveLastReadPositionState()
-		super.onPause()
-	}
-	
-	override fun onBackPressed()
-	{
-		updateCurrentReadingPosSavingState(viewHolder.listView.firstVisiblePosition)
-		viewModel.saveLastReadPositionState()
-		super.onBackPressed()
 	}
 	
 	fun loadNextChapter()

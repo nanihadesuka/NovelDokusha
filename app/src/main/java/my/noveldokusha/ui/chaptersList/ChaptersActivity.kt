@@ -224,7 +224,7 @@ private class ChaptersArrayAdapter(
 			else
 			{
 				ReaderActivity
-					.IntentData(context, bookUrl = viewModel.bookMetadata.url, bookSelectedChapterUrl = itemData.chapter.url)
+					.IntentData(context, bookUrl = viewModel.bookMetadata.url, chapterUrl = itemData.chapter.url)
 					.let(context::startActivity)
 			}
 		}

@@ -1,84 +1,74 @@
 package my.noveldokusha.ui.reader
 
 import androidx.lifecycle.SavedStateHandle
-import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.*
 import my.noveldokusha.bookstore
 import my.noveldokusha.ui.BaseViewModel
 import java.util.*
 import kotlin.collections.ArrayList
-import kotlin.concurrent.schedule
 import kotlin.properties.Delegates
 
 class ReaderModel(private val savedState: SavedStateHandle) : BaseViewModel()
 {
-	fun initialization(bookUrl: String, bookSelectedChapterUrl: String) = callOneTime {
+	private val savedStateChapterUrlID = "chapterUrl"
+	
+	fun initialization(bookUrl: String, selectedChapter: String, fn: () -> Unit) = callOneTime {
 		this._bookUrl = bookUrl
-		this.bookSelectedChapterUrl = savedState.get<String>(this::bookSelectedChapterUrl.name) ?: bookSelectedChapterUrl
+		val url = savedState.get<String>(savedStateChapterUrlID) ?: selectedChapter
 		
 		runBlocking {
-			currentChapter.url = bookstore.bookLibrary.get(bookUrl)?.lastReadChapter ?: bookSelectedChapterUrl
-			bookstore.bookChapter.get(currentChapter.url)?.let {
-				currentChapter.position = it.lastReadPosition
-				currentChapter.offset = it.lastReadOffset
-			}
-			_orderedChapters.clear()
-			_orderedChapters.addAll(bookstore.bookChapter.chapters(bookUrl))
+			val chapter = bookstore.bookChapter.get(url)
+			currentChapter = ChapterState(
+				url = url,
+				position = chapter?.lastReadPosition ?: 0,
+				offset = chapter?.lastReadOffset ?: 0
+			)
+			orderedChapters.clear()
+			orderedChapters.addAll(bookstore.bookChapter.chapters(bookUrl))
 		}
+		
+		fn()
 	}
 	
-	data class LastReadChapter(var url: String, var title: String, var position: Int, var offset: Int)
+	var currentChapter: ChapterState by Delegates.observable(ChapterState("", 0, 0)) { _, old, new ->
+		savedState.set<String>(savedStateChapterUrlID, new.url)
+		if (old.url != new.url) saveLastReadPositionState(bookUrl, new)
+	}
 	
 	private lateinit var _bookUrl: String
+	
 	val bookUrl by lazy { _bookUrl }
-	
-	val readRoutine = ChaptersIsReadRoutine()
-	
+	val orderedChapters = mutableListOf<bookstore.Chapter>()
 	val chaptersSize = mutableMapOf<String, Int>()
 	val items = ArrayList<ReaderActivity.Item>()
+	val readRoutine = ChaptersIsReadRoutine()
+	
 	var state = State.INITIAL_LOAD
-	
-	private val _orderedChapters = mutableListOf<bookstore.Chapter>()
-	val orderedChapters: List<bookstore.Chapter> = _orderedChapters
-	
-	val currentChapter = LastReadChapter("", "", 0, 0)
-	private var currentChapterOld = currentChapter.copy()
-	private val timer = Timer(false).schedule(delay = 1000 * 10, period = 1000 * 10) {
-		if (currentChapterOld == currentChapter)
-			return@schedule
-		
-		saveLastReadPositionState()
-		currentChapterOld = currentChapter.copy()
-	}
-	
-	
-	var bookSelectedChapterUrl: String by Delegates.observable("") { _, _, newValue ->
-		savedState.set<String>(::bookSelectedChapterUrl.name, newValue)
-	}
-	
-	fun saveLastReadPositionState()
-	{
-		val currentChapter = currentChapter.copy()
-		viewModelScope.launch(Dispatchers.IO) {
-			bookstore.appDB.withTransaction {
-				bookstore.bookLibrary.get(bookUrl)?.let {
-					bookstore.bookLibrary.update(it.copy(lastReadChapter = currentChapter.url))
-				}
-				
-				bookstore.bookChapter.get(currentChapter.url)?.let {
-					bookstore.bookChapter.update(it.copy(lastReadPosition = currentChapter.position, lastReadOffset = currentChapter.offset))
-				}
-			}
-		}
-	}
 	
 	enum class State
 	{ IDLE, LOADING, INITIAL_LOAD, INITIAL_LOAD_COMPLETED }
 	
 	override fun onCleared()
 	{
-		timer.cancel()
+		saveLastReadPositionState(bookUrl, currentChapter)
 		super.onCleared()
+	}
+}
+
+data class ChapterState(val url: String, val position: Int, val offset: Int)
+
+private fun saveLastReadPositionState(bookUrl: String, chapter: ChapterState)
+{
+	CoroutineScope(Dispatchers.IO).launch(Dispatchers.IO) {
+		bookstore.appDB.withTransaction {
+			bookstore.bookLibrary.get(bookUrl)?.let {
+				bookstore.bookLibrary.update(it.copy(lastReadChapter = chapter.url))
+			}
+			
+			bookstore.bookChapter.get(chapter.url)?.let {
+				bookstore.bookChapter.update(it.copy(lastReadPosition = chapter.position, lastReadOffset = chapter.offset))
+			}
+		}
 	}
 }
 
