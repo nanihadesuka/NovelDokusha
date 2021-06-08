@@ -22,35 +22,25 @@ class LightNovelsTranslations : scrubber.source_interface.catalog
 	
 	override suspend fun getChapterText(doc: Document): String
 	{
-		return doc.selectFirst(".page, .type-page, .status-publish, .hentry").selectFirst(".entry-content").run {
-			this.select("#textbox").remove()
-			scrubber.getNodeTextTransversal(this)
-		}.joinToString("\n\n")
+		return doc.selectFirst(".page, .type-page, .status-publish, .hentry")
+			.selectFirst(".entry-content").run {
+				this.select("#textbox").remove()
+				scrubber.getNodeTextTransversal(this)
+			}.joinToString("\n\n")
 	}
 	
 	override suspend fun getChapterList(doc: Document): List<ChapterMetadata>
 	{
 		return doc
-			.select(".su-spoiler-content")
-			.select(".su-u-clearfix")
-			.select(".su-u-trim")
-			.select("a[href]")
+			.select(".su-spoiler-content.su-u-clearfix.su-u-trim a[href]")
 			.map {
-				
 				val url = it.attr("href")
-				val decoded_url = URLDecoder.decode(url, "UTF-8").removeSuffix("/")
+				val decoded_url = URLDecoder.decode(url, "UTF-8")
+				val title: String = Regex(""".+/(.+)/?$""").find(decoded_url)?.destructured?.run {
+					this.component1().replace("-", " ")
+				} ?: it.text()
 				
-				val title: String = Regex(""".+/(.+)$""").find(decoded_url)?.destructured?.run {
-					
-					val title = this.component1().replace("-", " ").capitalize(Locale.ROOT)
-					
-					Regex("""^(\w+) (\d+) (\S.*)$""").find(title)?.destructured?.let { m ->
-						val (prefix, number, name) = m
-						"""$prefix $number - ${name.capitalize(Locale.ROOT)}"""
-					} ?: title
-				} ?: "** Can't get chapter title :("
-				
-				ChapterMetadata(title = title, url = url)
+				ChapterMetadata(title = title.trim().capitalize(Locale.ROOT), url = url)
 			}
 	}
 	
