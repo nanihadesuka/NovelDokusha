@@ -4,9 +4,9 @@ import androidx.lifecycle.SavedStateHandle
 import kotlinx.coroutines.*
 import my.noveldokusha.bookstore
 import my.noveldokusha.ui.BaseViewModel
+import my.noveldokusha.uiUtils.ObservableNoInitValue
 import java.util.*
 import kotlin.collections.ArrayList
-import kotlin.properties.Delegates
 
 class ReaderModel(private val savedState: SavedStateHandle) : BaseViewModel()
 {
@@ -23,29 +23,31 @@ class ReaderModel(private val savedState: SavedStateHandle) : BaseViewModel()
 				position = chapter?.lastReadPosition ?: 0,
 				offset = chapter?.lastReadOffset ?: 0
 			)
-			orderedChapters.clear()
 			orderedChapters.addAll(bookstore.bookChapter.chapters(bookUrl))
 		}
 		fn()
 	}
 	
-	var currentChapter: ChapterState by Delegates.observable(ChapterState("", 0, 0)) { _, old, new ->
+	var currentChapter: ChapterState by ObservableNoInitValue { _, old, new ->
 		savedState.set<String>(savedStateChapterUrlID, new.url)
-		if (old.url != new.url) saveLastReadPositionState(bookUrl, new)
+		if (old.url.isNotEmpty() && old.url != new.url) saveLastReadPositionState(bookUrl, new)
 	}
 	
 	lateinit var bookUrl: String
 		private set
 	
 	val orderedChapters = mutableListOf<bookstore.Chapter>()
-	val chaptersSize = mutableMapOf<String, Int>()
+	
+	data class ChapterStats(val size: Int, val chapter: bookstore.Chapter)
+	
+	val chaptersStats = mutableMapOf<String, ChapterStats>()
 	val items = ArrayList<ReaderActivity.Item>()
 	val readRoutine = ChaptersIsReadRoutine()
 	
 	var state = State.INITIAL_LOAD
 	
 	enum class State
-	{ IDLE, LOADING, INITIAL_LOAD, INITIAL_LOAD_COMPLETED }
+	{ IDLE, LOADING, INITIAL_LOAD}
 	
 	override fun onCleared()
 	{
@@ -71,25 +73,27 @@ private fun saveLastReadPositionState(bookUrl: String, chapter: ChapterState)
 	}
 }
 
-suspend fun getChapterInitialPosition(bookUrl: String, chapterUrl: String, items: ArrayList<ReaderActivity.Item>): Pair<Int, Int>
+suspend fun getChapterInitialPosition(bookUrl: String, chapter: bookstore.Chapter, items: ArrayList<ReaderActivity.Item>): Pair<Int, Int>
 {
-	val titlePos by lazy { items.indexOfFirst { it is ReaderActivity.Item.TITLE } }
-	val chapter = bookstore.bookChapter.get(chapterUrl) ?: return Pair(titlePos, 0)
-	val book = bookstore.bookLibrary.get(bookUrl)
-	val position by lazy {
+	val titlePos = CoroutineScope(Dispatchers.Default).async {
+		items.indexOfFirst { it is ReaderActivity.Item.TITLE }
+	}
+	val position = CoroutineScope(Dispatchers.Default).async {
 		items.indexOfFirst {
 			it is ReaderActivity.Item.Position && it.pos == chapter.lastReadPosition
 		}.let { index ->
-			if (index == -1) Pair(titlePos, 0)
+			if (index == -1) Pair(titlePos.await(), 0)
 			else Pair(index, chapter.lastReadOffset)
 		}
 	}
+	
+	val book = bookstore.bookLibrary.get(bookUrl)
 	return when
 	{
-		chapterUrl == book?.lastReadChapter -> position
-		chapter.read -> Pair(titlePos, 0)
-		else -> position
-	}.let { Pair(it.first.coerceAtLeast(titlePos), it.second) }
+		chapter.url == book?.lastReadChapter -> position.await()
+		chapter.read -> Pair(titlePos.await(), 0)
+		else -> position.await()
+	}.let { Pair(it.first.coerceAtLeast(titlePos.await()), it.second) }
 }
 
 class ChaptersIsReadRoutine

@@ -3,6 +3,7 @@ package my.noveldokusha.uiUtils
 import android.content.Intent
 import android.os.Bundle
 import androidx.fragment.app.Fragment
+import kotlin.properties.Delegates
 import kotlin.reflect.KProperty
 
 class Extra_StringArrayList
@@ -70,4 +71,17 @@ class Argument_Float
 {
 	operator fun getValue(thisRef: Fragment, property: KProperty<*>) = thisRef.defArgs.get(property.name)
 	operator fun setValue(thisRef: Fragment, property: KProperty<*>, value: Float) = thisRef.defArgs.putFloat(property.name, value)
+}
+
+class ObservableNoInitValue<T>(private val fn: (KProperty<*>, T, T) -> Unit)
+{
+	private var value by Delegates.observable<T?>(null) { prep, old, new ->
+		if (old != null) fn(prep, old, new!!)
+	}
+	
+	operator fun getValue(thisRef: Any?, property: KProperty<*>): T = value!!
+	operator fun setValue(thisRef: Any?, property: KProperty<*>, value: T)
+	{
+		this.value = value
+	}
 }

@@ -153,18 +153,6 @@ class ReaderActivity : BaseActivity()
 						updateCurrentReadingPosSavingState(firstVisibleItem)
 					}
 					ReaderModel.State.INITIAL_LOAD -> return
-					ReaderModel.State.INITIAL_LOAD_COMPLETED -> lifecycleScope.launch {
-						val (index: Int, offset: Int) = getChapterInitialPosition(
-							bookUrl = viewModel.bookUrl,
-							chapterUrl = viewModel.currentChapter.url,
-							items = viewModel.items
-						)
-						withContext(Dispatchers.Main) {
-							viewHolder.listView.setSelectionFromTop(index, offset)
-							viewModel.state = ReaderModel.State.IDLE
-							fadeIn()
-						}
-					}
 				}
 			}
 			
@@ -194,7 +182,20 @@ class ReaderActivity : BaseActivity()
 		
 		val chapter = viewModel.orderedChapters.find { it.url == viewModel.currentChapter.url }!!
 		addChapter(chapter, insert, insertAll, remove) {
-			viewModel.state = ReaderModel.State.INITIAL_LOAD_COMPLETED
+			calculateInitialChapterPosition()
+		}
+	}
+	
+	private fun calculateInitialChapterPosition() = lifecycleScope.launch(Dispatchers.Default) {
+		val (index: Int, offset: Int) = getChapterInitialPosition(
+			bookUrl = viewModel.bookUrl,
+			chapter = viewModel.chaptersStats[viewModel.currentChapter.url]!!.chapter,
+			items = viewModel.items
+		)
+		withContext(Dispatchers.Main) {
+			viewHolder.listView.setSelectionFromTop(index, offset)
+			viewModel.state = ReaderModel.State.IDLE
+			fadeIn()
 		}
 	}
 	
@@ -205,19 +206,13 @@ class ReaderActivity : BaseActivity()
 		val item = viewAdapter.listView.getItem(lastVisiblePosition)
 		if (item !is Item.Position) return
 		
-		val currentChapterUrl = item.url
-		lifecycleScope.launch(Dispatchers.Default) {
-			val index = viewModel.orderedChapters.indexOfFirst { it.url == currentChapterUrl }
-			val pos = index + 1
-			val itemPos = item.pos.toFloat()
-			val title = viewModel.orderedChapters[index].title
-			withContext(Dispatchers.Main) {
-				viewHolder.infoChapterTitle.text = title
-				viewHolder.infoCurrentChapterFromTotal.text = " $pos/${viewModel.orderedChapters.size}"
-				val itemMaxPos = viewModel.chaptersSize.getOrDefault(item.url, 0).coerceAtLeast(1).toFloat()
-				viewHolder.infoChapterProgressPercentage.text = " ${ceil((itemPos / itemMaxPos) * 100f).roundToInt()}%"
-			}
-		}
+		val chapterUrl = item.url
+		val itemPos = item.pos.toFloat()
+		val stats = viewModel.chaptersStats.get(chapterUrl) ?: return
+		
+		viewHolder.infoChapterTitle.text = stats.chapter.title
+		viewHolder.infoCurrentChapterFromTotal.text = " ${stats.chapter.position + 1}/${viewModel.orderedChapters.size}"
+		viewHolder.infoChapterProgressPercentage.text = " ${ceil((itemPos / stats.size.toFloat()) * 100f).roundToInt()}%"
 	}
 	
 	private fun updateCurrentReadingPosSavingState(firstVisibleItem: Int)
@@ -245,7 +240,7 @@ class ReaderActivity : BaseActivity()
 		val insertAll = { items: Collection<Item> -> viewAdapter.listView.addAll(items) }
 		val remove = { item: Item -> viewAdapter.listView.remove(item) }
 		
-		val nextIndex = viewModel.orderedChapters.indexOfFirst { it.url == lastItem.url } + 1
+		val nextIndex = viewModel.chaptersStats[lastItem.url]!!.chapter.position + 1
 		if (nextIndex >= viewModel.orderedChapters.size)
 		{
 			insert(Item.BOOK_END(lastItem.url))
@@ -285,7 +280,7 @@ class ReaderActivity : BaseActivity()
 			viewHolder.listView.setSelectionFromTop(lvp + displacement, top)
 		}
 		
-		val previousIndex = viewModel.orderedChapters.indexOfFirst { it.url == firstItem.url } - 1
+		val previousIndex = viewModel.chaptersStats[firstItem.url]!!.chapter.position - 1
 		if (previousIndex < 0)
 		{
 			maintainLastVisiblePosition {
@@ -345,7 +340,7 @@ class ReaderActivity : BaseActivity()
 				{
 					val items = textToItems(chapter.url, res.data)
 					runOnUiThread {
-						viewModel.chaptersSize[chapter.url] = items.size
+						viewModel.chaptersStats[chapter.url] = ReaderModel.ChapterStats(size = items.size, chapter = chapter)
 						maintainPosition {
 							remove(itemProgressBar)
 							insertAll(items)
@@ -357,6 +352,7 @@ class ReaderActivity : BaseActivity()
 				is Response.Error ->
 				{
 					runOnUiThread {
+						viewModel.chaptersStats[chapter.url] = ReaderModel.ChapterStats(size = 1, chapter = chapter)
 						maintainPosition {
 							remove(itemProgressBar)
 							insert(Item.ERROR(chapter.url, res.message))
