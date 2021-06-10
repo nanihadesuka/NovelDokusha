@@ -37,7 +37,7 @@ class LightNovelsTranslations : scrubber.source_interface.catalog
 				val url = it.attr("href")
 				val decoded_url = URLDecoder.decode(url, "UTF-8")
 				val title: String = Regex(""".+/(.+)/?$""").find(decoded_url)?.destructured?.run {
-					this.component1().replace("-", " ")
+					this.component1().replace("-", " ").removeSuffix("/")
 				} ?: it.text()
 				
 				ChapterMetadata(title = title.trim().capitalize(Locale.ROOT), url = url)
