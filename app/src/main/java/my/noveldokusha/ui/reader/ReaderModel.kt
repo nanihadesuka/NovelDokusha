@@ -30,7 +30,7 @@ class ReaderModel(private val savedState: SavedStateHandle) : BaseViewModel()
 	
 	var currentChapter: ChapterState by ObservableNoInitValue { _, old, new ->
 		savedState.set<String>(savedStateChapterUrlID, new.url)
-		if (old.url.isNotEmpty() && old.url != new.url) saveLastReadPositionState(bookUrl, new)
+		if (old.url != new.url) saveLastReadPositionState(bookUrl, new)
 	}
 	
 	lateinit var bookUrl: String
