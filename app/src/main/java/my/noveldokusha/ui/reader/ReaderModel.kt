@@ -75,6 +75,7 @@ private fun saveLastReadPositionState(bookUrl: String, chapter: ChapterState)
 
 suspend fun getChapterInitialPosition(bookUrl: String, chapter: bookstore.Chapter, items: ArrayList<ReaderActivity.Item>): Pair<Int, Int>
 {
+	val book = CoroutineScope(Dispatchers.IO).async { bookstore.bookLibrary.get(bookUrl) }
 	val titlePos = CoroutineScope(Dispatchers.Default).async {
 		items.indexOfFirst { it is ReaderActivity.Item.TITLE }
 	}
@@ -87,10 +88,9 @@ suspend fun getChapterInitialPosition(bookUrl: String, chapter: bookstore.Chapte
 		}
 	}
 	
-	val book = bookstore.bookLibrary.get(bookUrl)
 	return when
 	{
-		chapter.url == book?.lastReadChapter -> position.await()
+		chapter.url == book.await()?.lastReadChapter -> position.await()
 		chapter.read -> Pair(titlePos.await(), 0)
 		else -> position.await()
 	}.let { Pair(it.first.coerceAtLeast(titlePos.await()), it.second) }

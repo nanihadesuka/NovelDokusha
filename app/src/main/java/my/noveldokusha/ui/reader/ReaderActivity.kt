@@ -216,13 +216,10 @@ class ReaderActivity : BaseActivity()
 		val item = viewAdapter.listView.getItem(lastVisiblePosition)
 		if (item !is Item.Position) return
 		
-		val chapterUrl = item.url
-		val itemPos = item.pos.toFloat()
-		val stats = viewModel.chaptersStats.get(chapterUrl) ?: return
-		
+		val stats = viewModel.chaptersStats.get(item.url) ?: return
 		viewHolder.infoChapterTitle.text = stats.chapter.title
 		viewHolder.infoCurrentChapterFromTotal.text = " ${stats.index + 1}/${viewModel.orderedChapters.size}"
-		viewHolder.infoChapterProgressPercentage.text = " ${ceil((itemPos / stats.size.toFloat()) * 100f).roundToInt()}%"
+		viewHolder.infoChapterProgressPercentage.text = " ${ceil((item.pos.toFloat() / stats.size.toFloat()) * 100f).roundToInt()}%"
 	}
 	
 	private fun updateCurrentReadingPosSavingState(firstVisibleItem: Int)
