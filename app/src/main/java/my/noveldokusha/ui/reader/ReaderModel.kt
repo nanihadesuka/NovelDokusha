@@ -38,7 +38,7 @@ class ReaderModel(private val savedState: SavedStateHandle) : BaseViewModel()
 	
 	val orderedChapters = mutableListOf<bookstore.Chapter>()
 	
-	data class ChapterStats(val size: Int, val chapter: bookstore.Chapter)
+	data class ChapterStats(val size: Int, val chapter: bookstore.Chapter, val index: Int)
 	
 	val chaptersStats = mutableMapOf<String, ChapterStats>()
 	val items = ArrayList<ReaderActivity.Item>()
@@ -47,7 +47,7 @@ class ReaderModel(private val savedState: SavedStateHandle) : BaseViewModel()
 	var state = State.INITIAL_LOAD
 	
 	enum class State
-	{ IDLE, LOADING, INITIAL_LOAD}
+	{ IDLE, LOADING, INITIAL_LOAD }
 	
 	override fun onCleared()
 	{
