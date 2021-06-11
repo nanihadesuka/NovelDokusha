@@ -3,7 +3,6 @@ package my.noveldokusha.scraper.sources
 import my.noveldokusha.BookMetadata
 import my.noveldokusha.ChapterMetadata
 import my.noveldokusha.scraper.*
-import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 
 /**
@@ -29,8 +28,7 @@ class NovelUpdates : scrubber.source_interface.catalog
 	
 	override suspend fun getChapterList(doc: Document): List<ChapterMetadata>
 	{
-		return Jsoup.connect("https://www.novelupdates.com/wp-admin/admin-ajax.php")
-			.addUserAgent()
+		return connect("https://www.novelupdates.com/wp-admin/admin-ajax.php")
 			.addHeaderRequest()
 			.data("action", "nd_getchapters")
 			.data("mygrr", doc.selectFirst("#grr_groups").attr("value"))
@@ -66,21 +64,18 @@ class NovelUpdates : scrubber.source_interface.catalog
 	
 	override suspend fun getCatalogSearch(index: Int, input: String): Response<List<BookMetadata>>
 	{
-		if (input.isBlank() || index > 0)
-			return Response.Success(listOf())
-		
+		val page = index + 1
 		val url = baseUrl.toUrlBuilder().apply {
+			if (page > 1) appendPath("page").appendPath(page.toString())
 			add("s", input)
+			add("post_type", "seriesplans")
 		}
 		
-		return tryConnect {
-			Jsoup.connect(url.toString())
-				.addUserAgent()
-				.getIO()
-				.select(".search_body_nu")
+		return tryConnect("page: $page\nurl: $url") {
+			fetchDoc(url)
 				.select(".search_title")
-				.select("a[href]")
-				.map { BookMetadata(title = it.text(), url = it.attr("href")) }
+				.map { it.selectFirst("a") }
+				.map { BookMetadata(it.text(), it.attr("href")) }
 				.let { Response.Success(it) }
 		}
 	}

@@ -35,6 +35,7 @@
 		<activity android:name=".ui.databaseSearchResults.DatabaseSearchResultsActivity" />
 		<activity android:name=".ui.databaseBookInfo.DatabaseBookInfoActivity" />
 		<activity android:name=".ui.globalSourceSearch.GlobalSourceSearchActivity" />
+		<activity android:name=".ui.webView.WebViewActivity" />
 	</application>
 
 </manifest>

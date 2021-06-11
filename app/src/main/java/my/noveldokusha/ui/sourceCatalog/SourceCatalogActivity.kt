@@ -20,6 +20,7 @@ import my.noveldokusha.scraper.scrubber
 import my.noveldokusha.ui.BaseActivity
 import my.noveldokusha.ui.chaptersList.ChaptersActivity
 import my.noveldokusha.ui.sourceCatalog.SourceCatalogModel.CatalogItem
+import my.noveldokusha.ui.webView.WebViewActivity
 import my.noveldokusha.uiAdapters.ProgressBarAdapter
 import my.noveldokusha.uiUtils.Extra_String
 import my.noveldokusha.uiUtils.addBottomMargin
@@ -105,6 +106,7 @@ class SourceCatalogActivity : BaseActivity()
 		
 		val searchViewItem = menu!!.findItem(R.id.action_search)
 		val searchView = searchViewItem.actionView as SearchView
+		val webViewItem = menu.findItem(R.id.webview)
 		
 		searchViewItem.setOnActionExpandListener(object : MenuItem.OnActionExpandListener
 		{
@@ -127,6 +129,12 @@ class SourceCatalogActivity : BaseActivity()
 			
 			override fun onQueryTextChange(newText: String?): Boolean = true
 		})
+		
+		webViewItem.setOnMenuItemClickListener {
+			WebViewActivity.IntentData(this, extras.sourceBaseUrl).let(::startActivity)
+			true
+		}
+		
 		
 		return true
 	}

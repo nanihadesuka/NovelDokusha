@@ -8,6 +8,8 @@ class App : Application()
 	override fun onCreate()
 	{
 		_instance = this
+		cookiesData.load()
+		headersData.load()
 		super.onCreate()
 	}
 	

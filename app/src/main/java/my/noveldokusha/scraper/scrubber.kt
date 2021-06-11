@@ -4,10 +4,7 @@ import android.net.Uri
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.MutableLiveData
 import kotlinx.coroutines.*
-import my.noveldokusha.BookMetadata
-import my.noveldokusha.ChapterMetadata
-import my.noveldokusha.DataCache_DatabaseSearchGenres
-import my.noveldokusha.bookstore
+import my.noveldokusha.*
 import net.dankito.readability4j.Readability4J
 import org.jsoup.Connection
 import org.jsoup.Jsoup
@@ -27,19 +24,21 @@ suspend fun Connection.postIO(): Document = withContext(Dispatchers.IO) { post()
 suspend fun Connection.executeIO(): Connection.Response = withContext(Dispatchers.IO) { execute() }
 suspend fun String.urlEncodeAsync(): String = withContext(Dispatchers.IO) { this@urlEncodeAsync.urlEncode() }
 
-fun String.toUrlBuilder(): Uri.Builder = Uri.parse(this).buildUpon()
-fun Uri.Builder.add(key: String, value: Any): Uri.Builder = appendQueryParameter(key, value.toString())
-
-fun Connection.addUserAgent(): Connection =
-	this.userAgent("Mozilla/5.0 (X11; U; Linux i586; en-US; rv:1.7.3) Gecko/20040924 Epiphany/1.4.4 (Ubuntu)")
-
-fun Connection.addHeaderRequest() = this.header("x-requested-with", "XMLHttpRequest")!!
-fun Connection.addHeaderCommons() = this.apply {
+fun connect(url: String): Connection = Jsoup.connect(url).apply {
 	referrer("http://www.google.com")
+	userAgent("Mozilla/5.0 (X11; U; Linux i586; en-US; rv:1.7.3) Gecko/20040924 Epiphany/1.4.4 (Ubuntu)")
 	header("Content-Language", "en-US")
 	header("Accept", "text/html")
 	header("Accept-Encoding", "gzip,deflate")
+	headers(headersData.get(url))
+	cookies(cookiesData.get(url))
 }
+
+fun String.toUrl(): Uri = Uri.parse(this)
+fun String.toUrlBuilder(): Uri.Builder = Uri.parse(this).buildUpon()
+fun Uri.Builder.add(key: String, value: Any): Uri.Builder = appendQueryParameter(key, value.toString())
+
+fun Connection.addHeaderRequest() = this.header("X-Requested-With", "XMLHttpRequest")!!
 
 sealed class Response<T>
 {
@@ -140,10 +139,8 @@ data class ChapterDownload(val body: String, val title: String?)
 suspend fun downloadChapter(chapterUrl: String): Response<ChapterDownload>
 {
 	return tryConnect {
-		val con = Jsoup.connect(chapterUrl)
+		val con = connect(chapterUrl)
 			.timeout(30 * 1000)
-			.addUserAgent()
-			.addHeaderCommons()
 			.followRedirects(true)
 			.executeIO()
 		
@@ -243,10 +240,8 @@ catch (e: Exception)
 
 suspend fun fetchDoc(url: String, timeoutMilliseconds: Int = 20 * 1000): Document
 {
-	return Jsoup.connect(url)
+	return connect(url)
 		.timeout(timeoutMilliseconds)
-		.addUserAgent()
-		.addHeaderCommons()
 		.getIO()
 }
 

@@ -3,7 +3,6 @@ package my.noveldokusha.scraper.sources
 import my.noveldokusha.BookMetadata
 import my.noveldokusha.ChapterMetadata
 import my.noveldokusha.scraper.*
-import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 
 /**
@@ -30,8 +29,7 @@ class ReadNovelFull : scrubber.source_interface.catalog
 	override suspend fun getChapterList(doc: Document): List<ChapterMetadata>
 	{
 		val id = doc.selectFirst("#rating").attr("data-novel-id")
-		return Jsoup.connect("https://readnovelfull.com/ajax/chapter-archive")
-			.addUserAgent()
+		return connect("https://readnovelfull.com/ajax/chapter-archive")
 			.addHeaderRequest()
 			.data("novelId", id)
 			.getIO()

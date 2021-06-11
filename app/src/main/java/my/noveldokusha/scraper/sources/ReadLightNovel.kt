@@ -3,7 +3,6 @@ package my.noveldokusha.scraper.sources
 import my.noveldokusha.BookMetadata
 import my.noveldokusha.ChapterMetadata
 import my.noveldokusha.scraper.*
-import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 
 /**
@@ -64,8 +63,7 @@ class ReadLightNovel : scrubber.source_interface.catalog
 			return Response.Success(listOf())
 		
 		return tryConnect {
-			Jsoup.connect("https://www.readlightnovel.org/search/autocomplete")
-				.addUserAgent()
+			connect("https://www.readlightnovel.org/search/autocomplete")
 				.addHeaderRequest()
 				.data("q", input)
 				.postIO()

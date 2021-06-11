@@ -6,7 +6,7 @@ import com.google.gson.reflect.TypeToken
 import my.noveldokusha.scraper.Response
 import java.io.File
 
-internal fun <T> Gson.fromJson(json: String): T = fromJson<T>(json, object : TypeToken<T>()
+fun <T> Gson.fromJson(json: String): T = fromJson<T>(json, object : TypeToken<T>()
 {}.type)
 
 class DataCache<T>(val prefix: String, val name: String)
