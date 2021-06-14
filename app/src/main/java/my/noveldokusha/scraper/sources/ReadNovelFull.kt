@@ -40,7 +40,7 @@ class ReadNovelFull : scrubber.source_interface.catalog
 	override suspend fun getCatalogList(index: Int): Response<List<BookMetadata>>
 	{
 		val page = index + 1
-		val url = catalogUrl.toUrlBuilder().apply {
+		val url = catalogUrl.toUrlBuilder()!!.apply {
 			if (page > 1) add("page", page)
 		}
 		
@@ -59,7 +59,7 @@ class ReadNovelFull : scrubber.source_interface.catalog
 		if (input.isBlank() || index > 0)
 			return Response.Success(listOf())
 		
-		val url = baseUrl.toUrlBuilder().apply {
+		val url = baseUrl.toUrlBuilder()!!.apply {
 			appendPath("search")
 			add("keyword", input)
 		}

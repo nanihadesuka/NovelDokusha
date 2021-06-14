@@ -5,10 +5,14 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.MutableLiveData
 import kotlinx.coroutines.*
 import my.noveldokusha.*
+import my.noveldokusha.scraper.databases.BakaUpdates
+import my.noveldokusha.scraper.databases.NovelUpdates
+import my.noveldokusha.scraper.sources.*
 import net.dankito.readability4j.Readability4J
 import org.jsoup.Connection
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
+import org.jsoup.nodes.Node
 import org.jsoup.nodes.TextNode
 import java.io.PrintWriter
 import java.io.StringWriter
@@ -34,8 +38,8 @@ fun connect(url: String): Connection = Jsoup.connect(url).apply {
 	cookies(cookiesData.get(url))
 }
 
-fun String.toUrl(): Uri = Uri.parse(this)
-fun String.toUrlBuilder(): Uri.Builder = Uri.parse(this).buildUpon()
+fun String.toUrl(): Uri? = runCatching { Uri.parse(this) }.getOrNull()
+fun String.toUrlBuilder(): Uri.Builder? = toUrl()?.buildUpon()
 fun Uri.Builder.add(key: String, value: Any): Uri.Builder = appendQueryParameter(key, value.toString())
 
 fun Connection.addHeaderRequest() = this.header("X-Requested-With", "XMLHttpRequest")!!
@@ -108,7 +112,7 @@ object scrubber
 		fun getBookData(doc: Document): BookData
 	}
 	
-	fun getNodeTextTransversal(node: org.jsoup.nodes.Node): List<String>
+	fun getNodeTextTransversal(node: Node): List<String>
 	{
 		if (node is TextNode)
 		{
@@ -119,18 +123,18 @@ object scrubber
 	}
 	
 	val sourcesList = setOf(
-		my.noveldokusha.scraper.sources.LightNovelsTranslations(),
-		my.noveldokusha.scraper.sources.ReadLightNovel(),
-		my.noveldokusha.scraper.sources.ReadNovelFull(),
+		LightNovelsTranslations(),
+		ReadLightNovel(),
+		ReadNovelFull(),
 		my.noveldokusha.scraper.sources.NovelUpdates(),
-		my.noveldokusha.scraper.sources.Reddit(),
+		Reddit(),
 	)
 	
 	val sourcesListCatalog = sourcesList.filterIsInstance<source_interface.catalog>().toSet()
 	
 	val databasesList = setOf(
-		my.noveldokusha.scraper.databases.NovelUpdates(),
-		my.noveldokusha.scraper.databases.BakaUpdates()
+		NovelUpdates(),
+		BakaUpdates()
 	)
 }
 

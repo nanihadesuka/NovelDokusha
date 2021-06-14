@@ -76,7 +76,7 @@ class LightNovelsTranslations : scrubber.source_interface.catalog
 		if (input.isBlank() || index > 0)
 			return Response.Success(listOf())
 		
-		val url = baseUrl.toUrlBuilder().apply {
+		val url = baseUrl.toUrlBuilder()!!.apply {
 			add("order", "DESC")
 			add("orderby", "relevance")
 			add("s", input)

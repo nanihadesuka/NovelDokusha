@@ -1,4 +1,4 @@
-package my.noveldokusha.ui.sourceCatalog
+package my.noveldokusha.ui.webView
 
 import my.noveldokusha.ui.BaseViewModel
 

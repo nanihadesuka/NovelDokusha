@@ -17,7 +17,7 @@ class Reddit : scrubber.source_interface.base
 	
 	override fun transformChapterUrl(url: String): String
 	{
-		return url.toUrlBuilder().authority("old.reddit.com").toString()
+		return url.toUrlBuilder()!!.authority("old.reddit.com").toString()
 	}
 	
 	override suspend fun getChapterTitle(doc: Document): String? = doc.title().ifBlank { null }

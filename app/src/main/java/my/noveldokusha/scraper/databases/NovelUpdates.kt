@@ -42,7 +42,7 @@ class NovelUpdates : scrubber.database_interface
 	override suspend fun getSearch(index: Int, input: String): Response<List<BookMetadata>>
 	{
 		val page = index + 1
-		val url = baseUrl.toUrlBuilder().apply {
+		val url = baseUrl.toUrlBuilder()!!.apply {
 			if (page > 1) appendPath("page").appendPath(page.toString())
 			add("s", input)
 			add("post_type", "seriesplans")
@@ -61,7 +61,7 @@ class NovelUpdates : scrubber.database_interface
 			Response<List<BookMetadata>>
 	{
 		val page = index + 1
-		val url = "https://www.novelupdates.com/series-finder/?sf=1".toUrlBuilder().apply {
+		val url = "https://www.novelupdates.com/series-finder/?sf=1".toUrlBuilder()!!.apply {
 			if (genresIncludedId.isNotEmpty()) add("gi", genresIncludedId.joinToString(",")).add("mgi", "and")
 			if (genresExcludedId.isNotEmpty()) add("ge", genresExcludedId.joinToString(","))
 			add("sort", "sdate")

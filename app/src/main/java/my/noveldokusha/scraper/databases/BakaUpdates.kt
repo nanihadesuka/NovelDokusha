@@ -48,7 +48,7 @@ class BakaUpdates : scrubber.database_interface
 	{
 		val page = index + 1
 		
-		val url = "https://www.mangaupdates.com/series.html".toUrlBuilder().apply {
+		val url = "https://www.mangaupdates.com/series.html".toUrlBuilder()!!.apply {
 			if (page > 1) add("page", page)
 			add("display", "list")
 			add("perpage", 50)
@@ -70,7 +70,7 @@ class BakaUpdates : scrubber.database_interface
 	{
 		val page = index + 1
 		
-		val url = "https://www.mangaupdates.com/series.html".toUrlBuilder().apply {
+		val url = "https://www.mangaupdates.com/series.html".toUrlBuilder()!!.apply {
 			if (page > 1) add("page", page)
 			add("display", "list")
 			if (genresIncludedId.isNotEmpty()) add("genre", genresIncludedId.joinToString("_"))

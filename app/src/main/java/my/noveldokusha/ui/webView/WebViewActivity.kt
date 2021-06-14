@@ -1,5 +1,6 @@
 package my.noveldokusha.ui.webView
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -9,8 +10,8 @@ import androidx.activity.viewModels
 import my.noveldokusha.cookiesData
 import my.noveldokusha.databinding.ActivityWebviewBinding
 import my.noveldokusha.headersData
+import my.noveldokusha.scraper.toUrl
 import my.noveldokusha.ui.BaseActivity
-import my.noveldokusha.ui.sourceCatalog.WebViewModel
 import my.noveldokusha.uiUtils.Extra_String
 import my.noveldokusha.uiUtils.toast
 
@@ -35,6 +36,7 @@ class WebViewActivity : BaseActivity()
 	private val viewLayoutManager = object
 	{}
 	
+	@SuppressLint("SetJavaScriptEnabled")
 	override fun onCreate(savedInstanceState: Bundle?)
 	{
 		super.onCreate(savedInstanceState)
@@ -46,21 +48,29 @@ class WebViewActivity : BaseActivity()
 		{
 			toast("Web view not available")
 			finish()
+			return
+		}
+		
+		val authority = extras.url.toUrl()?.authority ?: run {
+			toast("Invalid URL")
+			finish()
+			return
 		}
 		
 		viewHolder.webview.settings.javaScriptEnabled = true
+		
 		viewHolder.webview.webViewClient = object : WebViewClient()
 		{
 			
 			override fun onPageFinished(view: WebView?, url: String?)
 			{
-				if (url != null) CookieManager.getInstance().also { manager ->
+				if (url?.toUrl()?.authority == authority) CookieManager.getInstance().also { manager ->
 					val cookies = manager.getCookie(url)
 						.split(";")
 						.map { it.split("=") }
 						.associate { it[0].trim() to it[1].trim() }
-					
 					cookiesData.add(url, cookies)
+					toast("Cookies saved")
 				}
 				
 				super.onPageFinished(view, url)
@@ -68,15 +78,13 @@ class WebViewActivity : BaseActivity()
 			
 			override fun shouldInterceptRequest(view: WebView?, request: WebResourceRequest?): WebResourceResponse?
 			{
-				request?.also { rq ->
-					headersData.add(rq.url.toString(), rq.requestHeaders)
-				}
+				if (request?.url?.authority == authority)
+					headersData.add(request.url.toString(), request.requestHeaders)
 				return super.shouldInterceptRequest(view, request)
 			}
 		}
+		
 		viewHolder.webview.loadUrl(extras.url)
-		
-		
 		
 		supportActionBar!!.let {
 			it.subtitle = extras.url
