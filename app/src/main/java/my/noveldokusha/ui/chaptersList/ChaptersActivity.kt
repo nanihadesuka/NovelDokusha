@@ -7,7 +7,6 @@ import android.net.Uri
 import android.os.Bundle
 import android.view.*
 import androidx.activity.viewModels
-import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.lifecycleScope
@@ -146,28 +145,28 @@ class ChaptersActivity : BaseActivity()
 	{
 		menuInflater.inflate(R.menu.chapters_list_menu__appbar, menu)
 		
-		val itemBookmark = menu!!.findItem(R.id.action_bookmarked)!!
+		val itemLibrary = menu!!.findItem(R.id.action_library_bookmark)!!
 		
-		bookstore.bookLibrary.existInLibraryFlow(viewModel.bookMetadata.url).asLiveData().observe(this) { bookmarked ->
-			setBookmarkIconActive(bookmarked, itemBookmark)
-			this.bookmarked = bookmarked
+		val isInLibrary = runBlocking { bookstore.bookLibrary.existInLibrary(viewModel.bookMetadata.url) }
+		setMenuIconLibraryState(isInLibrary, itemLibrary)
+		
+		bookstore.bookLibrary.existInLibraryFlow(viewModel.bookMetadata.url).asLiveData().observe(this) {
+			setMenuIconLibraryState(it, itemLibrary)
 		}
 		return true
 	}
 	
-	var bookmarked: Boolean = false
-	
-	private fun setBookmarkIconActive(active: Boolean, item: MenuItem)
+	private fun setMenuIconLibraryState(isInLibrary: Boolean, item: MenuItem)
 	{
-		val color = if (active) ContextCompat.getColor(this, R.color.dark_orange_red) else Color.DKGRAY
-		item.icon.setTint(color)
+		item.icon.setTint(if (isInLibrary) R.color.dark_orange_red.colorIdRes(this) else Color.DKGRAY)
+		item.isChecked = isInLibrary
 	}
 	
 	override fun onOptionsItemSelected(item: MenuItem): Boolean = when (item.itemId)
 	{
-		R.id.action_bookmarked ->
+		R.id.action_library_bookmark ->
 		{
-			val msg = if (!bookmarked) R.string.added_to_library else R.string.removed_from_library
+			val msg = if (!item.isChecked) R.string.added_to_library else R.string.removed_from_library
 			toast(msg.stringRes())
 			viewModel.toggleBookmark()
 			true

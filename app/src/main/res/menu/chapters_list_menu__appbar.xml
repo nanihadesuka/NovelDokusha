@@ -7,14 +7,13 @@
 	<item
 		android:id="@+id/action_filter"
 		android:icon="@drawable/ic_baseline_filter_list_24"
-		android:title="Sort ascending or descending"
+		android:title="@string/sort_ascending_or_descending"
 		app:showAsAction="always"
 		/>
 	
 	<item
-		android:id="@+id/action_bookmarked"
+		android:id="@+id/action_library_bookmark"
 		android:icon="@drawable/ic_twotone_bookmark_24"
-		android:iconTint="@color/dark_orange_red"
 		android:title="@string/library_bookmark"
 		app:showAsAction="always"
 		/>

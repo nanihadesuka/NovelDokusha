@@ -43,4 +43,5 @@
 	<string name="source">Source</string>
 	<string name="open_in_browser">Open in browser</string>
 	<string name="search_in_database_for_more_information">Search in databse for more information</string>
+	<string name="sort_ascending_or_descending">Sort ascending or descending</string>
 </resources>

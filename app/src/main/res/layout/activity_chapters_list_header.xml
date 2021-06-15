@@ -42,7 +42,7 @@
 			<LinearLayout
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
-				android:alpha="0.8"
+				android:alpha="0.6"
 				>
 				
 				<TextView
@@ -64,7 +64,7 @@
 			<LinearLayout
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
-				android:alpha="0.8"
+				android:alpha="0.6"
 				>
 				
 				<TextView
@@ -100,7 +100,7 @@
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
 				android:layout_margin="4sp"
-				android:background="@drawable/book_item_background"
+				android:background="@drawable/book_item_background_borderless"
 				android:clickable="true"
 				android:foreground="@drawable/book_item_foreground_ripple"
 				android:minHeight="32sp"
@@ -115,7 +115,7 @@
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
 				android:layout_margin="4sp"
-				android:background="@drawable/book_item_background"
+				android:background="@drawable/book_item_background_borderless"
 				android:clickable="true"
 				android:foreground="@drawable/book_item_foreground_ripple"
 				android:minHeight="32sp"

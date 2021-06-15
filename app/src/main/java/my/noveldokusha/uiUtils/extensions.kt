@@ -1,10 +1,16 @@
 package my.noveldokusha.uiUtils
 
+import android.content.Context
+import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.annotation.AttrRes
+import androidx.annotation.ColorInt
 import androidx.annotation.StringRes
+import androidx.core.content.ContextCompat
+import androidx.core.content.res.use
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
@@ -46,6 +52,14 @@ fun View.addBottomMargin(margin: Int = 1000, condition: () -> Boolean): Unit
 		it.bottomMargin = if (condition()) margin else 0
 	}
 }
+
+@ColorInt
+fun @receiver:AttrRes Int.colorAttrRes(ctx: Context): Int = ctx.theme.obtainStyledAttributes(intArrayOf(this)).use {
+	it.getColor(0, Color.MAGENTA)
+}
+
+@ColorInt
+fun @receiver:AttrRes Int.colorIdRes(ctx: Context): Int = ContextCompat.getColor(ctx, this)
 
 fun @receiver:StringRes Int.stringRes(): String = App.instance.getString(this)
 
