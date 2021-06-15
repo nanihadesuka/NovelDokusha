@@ -1,6 +1,7 @@
 package my.noveldokusha
 
 import android.app.Application
+import android.content.SharedPreferences
 import java.io.File
 
 class App : Application()
@@ -12,6 +13,8 @@ class App : Application()
 		headersData.load()
 		super.onCreate()
 	}
+	
+	val preferencesChangeListeners = mutableSetOf<SharedPreferences.OnSharedPreferenceChangeListener>()
 	
 	companion object
 	{

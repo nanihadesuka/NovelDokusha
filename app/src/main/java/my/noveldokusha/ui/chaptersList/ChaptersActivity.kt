@@ -16,9 +16,7 @@ import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.coroutines.*
-import my.noveldokusha.BookMetadata
-import my.noveldokusha.R
-import my.noveldokusha.bookstore
+import my.noveldokusha.*
 import my.noveldokusha.databinding.ActivityChaptersBinding
 import my.noveldokusha.databinding.ActivityChaptersListHeaderBinding
 import my.noveldokusha.databinding.ActivityChaptersListItemBinding
@@ -62,6 +60,7 @@ class ChaptersActivity : BaseActivity()
 		
 		viewHolder.recyclerView.adapter = ConcatAdapter(viewAdapter.header, viewAdapter.chapters)
 		viewHolder.recyclerView.itemAnimator = DefaultItemAnimator()
+		viewHolder.recyclerView.itemAnimator = null
 		viewHolder.swipeRefreshLayout.setOnRefreshListener { viewModel.updateChaptersList() }
 		viewModel.onFetching.observe(this) { viewHolder.swipeRefreshLayout.isRefreshing = it }
 		viewModel.chaptersWithContextLiveData.observe(this) {
@@ -298,6 +297,18 @@ private class ChaptersHeaderAdapter(
 				Intent(Intent.ACTION_VIEW).also {
 					it.data = Uri.parse(viewModel.bookMetadata.url)
 				}.let(context::startActivity)
+			}
+			
+			context.appSharedPreferences().CHAPTERS_SORT_POSITION_flow().asLiveData().observe(context) { itemView ->
+				viewHolder.sortButton.text = itemView.name
+			}
+			viewHolder.sortButton.setOnClickListener {
+				context.appSharedPreferences().CHAPTERS_SORT_POSITION = when (context.appSharedPreferences().CHAPTERS_SORT_POSITION)
+				{
+					CHAPTER_SORT_POSITION_ENUM.ascending -> CHAPTER_SORT_POSITION_ENUM.descending
+					CHAPTER_SORT_POSITION_ENUM.descending -> CHAPTER_SORT_POSITION_ENUM.ascending
+					CHAPTER_SORT_POSITION_ENUM.none -> CHAPTER_SORT_POSITION_ENUM.ascending
+				}
 			}
 		}
 	}

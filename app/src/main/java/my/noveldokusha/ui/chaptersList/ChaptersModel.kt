@@ -5,9 +5,9 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
-import my.noveldokusha.BookMetadata
-import my.noveldokusha.bookstore
+import my.noveldokusha.*
 import my.noveldokusha.scraper.Response
 import my.noveldokusha.scraper.downloadChaptersList
 import my.noveldokusha.scraper.scrubber
@@ -42,10 +42,17 @@ class ChaptersModel : BaseViewModel()
 					val newTitle = data.chapter.title.removeSurrounding(prefix, suffix).ifBlank { data.chapter.title }
 					data.copy(chapter = data.chapter.copy(title = newTitle))
 				}
-			}
-			.map { it.asReversed() }
-			.asLiveData()
+			}.combine(preferences.CHAPTERS_SORT_POSITION_flow()) { chapters, sorted ->
+				when (sorted)
+				{
+					CHAPTER_SORT_POSITION_ENUM.ascending -> chapters.sortedBy { it.chapter.position }
+					CHAPTER_SORT_POSITION_ENUM.descending -> chapters.sortedByDescending { it.chapter.position }
+					CHAPTER_SORT_POSITION_ENUM.none -> chapters
+				}
+			}.asLiveData()
 	}
+	
+	val preferences = App.instance.appSharedPreferences()
 	
 	val chapters = ArrayList<bookstore.ChapterDao.ChapterWithContext>()
 	val sourceName by lazy { scrubber.getCompatibleSource(this.bookMetadata.url)?.name ?: "" }
