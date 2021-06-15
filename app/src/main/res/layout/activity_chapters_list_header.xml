@@ -15,7 +15,6 @@
 		android:layout_height="wrap_content"
 		android:columnCount="2"
 		android:orientation="horizontal"
-		android:padding="10sp"
 		>
 		
 		<LinearLayout
@@ -25,6 +24,7 @@
 			android:animateLayoutChanges="true"
 			android:columnCount="2"
 			android:orientation="vertical"
+			android:padding="12sp"
 			app:layout_constraintLeft_toLeftOf="parent"
 			app:layout_constraintRight_toLeftOf="@id/buttons"
 			app:layout_constraintTop_toTopOf="parent"
@@ -42,6 +42,7 @@
 			<LinearLayout
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
+				android:alpha="0.8"
 				>
 				
 				<TextView
@@ -63,6 +64,7 @@
 			<LinearLayout
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
+				android:alpha="0.8"
 				>
 				
 				<TextView
@@ -87,6 +89,7 @@
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
 			android:orientation="vertical"
+			android:padding="6sp"
 			app:layout_constraintLeft_toRightOf="@id/bookInfo"
 			app:layout_constraintRight_toRightOf="parent"
 			app:layout_constraintTop_toTopOf="parent"
@@ -96,6 +99,8 @@
 				android:id="@+id/databaseSearchButton"
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
+				android:layout_margin="0sp"
+				android:padding="4sp"
 				android:text="Database"
 				android:textAllCaps="false"
 				android:tooltipText="Search in databse for more information"
@@ -105,6 +110,8 @@
 				android:id="@+id/webpageOpenButton"
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
+				android:layout_margin="0sp"
+				android:padding="4sp"
 				android:text="Webpage"
 				android:textAllCaps="false"
 				android:tooltipText="Open in browser"
