@@ -173,6 +173,16 @@ class ChaptersActivity : BaseActivity()
 			viewModel.toggleBookmark()
 			true
 		}
+		R.id.action_filter ->
+		{
+			appSharedPreferences().CHAPTERS_SORT_POSITION = when (appSharedPreferences().CHAPTERS_SORT_POSITION)
+			{
+				CHAPTER_SORT_POSITION_ENUM.ascending -> CHAPTER_SORT_POSITION_ENUM.descending
+				CHAPTER_SORT_POSITION_ENUM.descending -> CHAPTER_SORT_POSITION_ENUM.ascending
+				CHAPTER_SORT_POSITION_ENUM.none -> CHAPTER_SORT_POSITION_ENUM.ascending
+			}
+			true
+		}
 		android.R.id.home -> this.onBackPressed().let { true }
 		else -> super.onOptionsItemSelected(item)
 	}
@@ -297,18 +307,6 @@ private class ChaptersHeaderAdapter(
 				Intent(Intent.ACTION_VIEW).also {
 					it.data = Uri.parse(viewModel.bookMetadata.url)
 				}.let(context::startActivity)
-			}
-			
-			context.appSharedPreferences().CHAPTERS_SORT_POSITION_flow().asLiveData().observe(context) { itemView ->
-				viewHolder.sortButton.text = itemView.name
-			}
-			viewHolder.sortButton.setOnClickListener {
-				context.appSharedPreferences().CHAPTERS_SORT_POSITION = when (context.appSharedPreferences().CHAPTERS_SORT_POSITION)
-				{
-					CHAPTER_SORT_POSITION_ENUM.ascending -> CHAPTER_SORT_POSITION_ENUM.descending
-					CHAPTER_SORT_POSITION_ENUM.descending -> CHAPTER_SORT_POSITION_ENUM.ascending
-					CHAPTER_SORT_POSITION_ENUM.none -> CHAPTER_SORT_POSITION_ENUM.ascending
-				}
 			}
 		}
 	}

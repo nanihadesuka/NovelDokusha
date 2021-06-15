@@ -5,6 +5,13 @@
 	>
 	
 	<item
+		android:id="@+id/action_filter"
+		android:icon="@drawable/ic_baseline_filter_list_24"
+		android:title="Sort ascending or descending"
+		app:showAsAction="always"
+		/>
+	
+	<item
 		android:id="@+id/action_bookmarked"
 		android:icon="@drawable/ic_twotone_bookmark_24"
 		android:iconTint="@color/dark_orange_red"
