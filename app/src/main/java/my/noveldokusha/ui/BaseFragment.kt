@@ -6,7 +6,9 @@ import android.content.pm.PackageManager
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import my.noveldokusha.R
 import my.noveldokusha.appSharedPreferences
+import my.noveldokusha.uiUtils.stringRes
 import my.noveldokusha.uiUtils.toast
 
 open class BaseFragment : Fragment()
@@ -46,7 +48,7 @@ open class BaseFragment : Fragment()
 	
 	fun permissionRequest(
 		vararg permissions: String,
-		denied: (deniedPermissions: List<String>) -> Unit = { toast("Permissions denied") },
+		denied: (deniedPermissions: List<String>) -> Unit = { toast(R.string.permissions_denied.stringRes()) },
 		granted: () -> Unit
 	)
 	{

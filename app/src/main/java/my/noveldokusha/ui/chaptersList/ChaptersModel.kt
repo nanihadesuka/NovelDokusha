@@ -12,6 +12,7 @@ import my.noveldokusha.scraper.Response
 import my.noveldokusha.scraper.downloadChaptersList
 import my.noveldokusha.scraper.scrubber
 import my.noveldokusha.ui.BaseViewModel
+import my.noveldokusha.uiUtils.stringRes
 import my.noveldokusha.uiUtils.toast
 
 class ChaptersModel : BaseViewModel()
@@ -77,7 +78,7 @@ class ChaptersModel : BaseViewModel()
 				is Response.Success ->
 				{
 					if (res.data.isEmpty())
-						toast("No chapters found")
+						toast(R.string.no_chapters_found.stringRes())
 					
 					withContext(Dispatchers.IO) {
 						bookstore.bookChapter.merge(res.data, url)

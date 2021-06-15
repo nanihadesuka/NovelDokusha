@@ -148,8 +148,6 @@ class ChaptersActivity : BaseActivity()
 		
 		val itemBookmark = menu!!.findItem(R.id.action_bookmarked)!!
 		
-		setBookmarkIconActive(runBlocking { bookstore.bookLibrary.existInLibrary(viewModel.bookMetadata.url) }, itemBookmark)
-		
 		bookstore.bookLibrary.existInLibraryFlow(viewModel.bookMetadata.url).asLiveData().observe(this) { bookmarked ->
 			setBookmarkIconActive(bookmarked, itemBookmark)
 			this.bookmarked = bookmarked
@@ -169,7 +167,8 @@ class ChaptersActivity : BaseActivity()
 	{
 		R.id.action_bookmarked ->
 		{
-			toast(if (!bookmarked) "Bookmark added" else "Bookmark removed")
+			val msg = if (!bookmarked) R.string.added_to_library else R.string.removed_from_library
+			toast(msg.stringRes())
 			viewModel.toggleBookmark()
 			true
 		}

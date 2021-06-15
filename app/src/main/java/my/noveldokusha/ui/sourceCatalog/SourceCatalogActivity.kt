@@ -22,10 +22,7 @@ import my.noveldokusha.ui.chaptersList.ChaptersActivity
 import my.noveldokusha.ui.sourceCatalog.SourceCatalogModel.CatalogItem
 import my.noveldokusha.ui.webView.WebViewActivity
 import my.noveldokusha.uiAdapters.ProgressBarAdapter
-import my.noveldokusha.uiUtils.Extra_String
-import my.noveldokusha.uiUtils.addBottomMargin
-import my.noveldokusha.uiUtils.inflater
-import my.noveldokusha.uiUtils.switchLiveData
+import my.noveldokusha.uiUtils.*
 import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.properties.Delegates
@@ -183,7 +180,12 @@ class SourceCatalogActivity : BaseActivity()
 				).let(ctx::startActivity)
 			}
 			itemView.title.setOnLongClickListener {
-				ctx.lifecycleScope.launch(Dispatchers.IO) { bookstore.bookLibrary.toggleBookmark(itemData.bookMetadata) }
+				ctx.lifecycleScope.launch(Dispatchers.IO) {
+					bookstore.bookLibrary.toggleBookmark(itemData.bookMetadata)
+					val isInLibrary = bookstore.bookLibrary.existInLibrary(itemData.bookMetadata.url)
+					val res = if (isInLibrary) R.string.added_to_library else R.string.removed_from_library
+					toast(res.stringRes())
+				}
 				true
 			}
 			

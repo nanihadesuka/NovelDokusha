@@ -5,7 +5,6 @@
 	<string name="title_settings">Settings</string>
 	<string name="reader_no_more_chapters">༺  Last chapter  ༻</string>
 	<string name="reader_first_chapter">༺  First chapter  ༻</string>
-	<string name="remove_from_library">Remove from library</string>
 	<string name="description">Description</string>
 	<string name="alternative_titles">Alternative titles</string>
 	<string name="authors">Authors</string>
@@ -25,4 +24,23 @@
 	<string name="opens_the_file_explorer_to_select_the_backup_saving_location">Opens the file explorer to select the backup saving location</string>
 	<string name="restore_database">Restore database</string>
 	<string name="opens_the_file_explorer_to_select_the_backup_file">Opens the file explorer to select the backup file</string>
+	<string name="added_to_library">Added to library</string>
+	<string name="removed_from_library">Removed from library</string>
+	<string name="library_bookmark">Library bookmark</string>
+	<string name="permissions_denied">Permissions denied</string>
+	<string name="no_chapters_found">No chapters found</string>
+	<string name="backup_saved">Backup saved</string>
+	<string name="failed_to_make_backup">Failed to make backup</string>
+	<string name="failed_to_restore_cant_access_file">Failed to restore, can\'t access file</string>
+	<string name="failed_to_restore_invalid_backup">Failed to restore, invalid backup</string>
+	<string name="database_restored">Database restored</string>
+	<string name="webview_not_available">Webview not available</string>
+	<string name="invalid_URL">Invalid URL</string>
+	<string name="cookies_saved">Tasty cookies saved</string>
+	<string name="webpage">Webpage</string>
+	<string name="database">Database</string>
+	<string name="chapters">Chapters</string>
+	<string name="source">Source</string>
+	<string name="open_in_browser">Open in browser</string>
+	<string name="search_in_database_for_more_information">Search in databse for more information</string>
 </resources>

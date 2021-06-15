@@ -7,12 +7,14 @@ import android.content.pm.PackageManager
 import android.os.Bundle
 import android.webkit.*
 import androidx.activity.viewModels
+import my.noveldokusha.R
 import my.noveldokusha.cookiesData
 import my.noveldokusha.databinding.ActivityWebviewBinding
 import my.noveldokusha.headersData
 import my.noveldokusha.scraper.toUrl
 import my.noveldokusha.ui.BaseActivity
 import my.noveldokusha.uiUtils.Extra_String
+import my.noveldokusha.uiUtils.stringRes
 import my.noveldokusha.uiUtils.toast
 
 class WebViewActivity : BaseActivity()
@@ -46,13 +48,13 @@ class WebViewActivity : BaseActivity()
 		
 		if (!packageManager.hasSystemFeature(PackageManager.FEATURE_WEBVIEW))
 		{
-			toast("Web view not available")
+			toast(R.string.webview_not_available.stringRes())
 			finish()
 			return
 		}
 		
 		val authority = extras.url.toUrl()?.authority ?: run {
-			toast("Invalid URL")
+			toast(R.string.invalid_URL.stringRes())
 			finish()
 			return
 		}
@@ -70,7 +72,7 @@ class WebViewActivity : BaseActivity()
 						.map { it.split("=") }
 						.associate { it[0].trim() to it[1].trim() }
 					cookiesData.add(url, cookies)
-					toast("Cookies saved")
+					toast(R.string.cookies_saved.stringRes())
 				}
 				
 				super.onPageFinished(view, url)

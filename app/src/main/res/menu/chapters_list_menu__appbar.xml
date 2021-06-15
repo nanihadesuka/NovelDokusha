@@ -15,7 +15,7 @@
 		android:id="@+id/action_bookmarked"
 		android:icon="@drawable/ic_twotone_bookmark_24"
 		android:iconTint="@color/dark_orange_red"
-		android:title="@string/remove_from_library"
+		android:title="@string/library_bookmark"
 		app:showAsAction="always"
 		/>
 </menu>

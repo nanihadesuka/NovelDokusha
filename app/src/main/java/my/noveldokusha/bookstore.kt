@@ -240,7 +240,7 @@ object bookstore
 		fun delete() = context.deleteDatabase(name)
 		fun clearAllTables() = db.clearAllTables()
 		
-		suspend fun <T>withTransaction(fn: suspend ()-> T) = db.withTransaction(fn)
+		suspend fun <T> withTransaction(fn: suspend () -> T) = db.withTransaction(fn)
 		
 		inner class Settings
 		{
@@ -271,8 +271,7 @@ object bookstore
 			suspend fun get(url: String) = db.libraryDao().get(url)
 			suspend fun getAll() = db.libraryDao().getAll()
 			suspend fun existInLibrary(url: String) = db.libraryDao().existInLibrary(url)
-			suspend fun toggleBookmark(bookMetadata: BookMetadata)
-			{
+			suspend fun toggleBookmark(bookMetadata: BookMetadata) = db.withTransaction {
 				val book = get(bookMetadata.url)
 				if (book == null)
 					insert(Book(title = bookMetadata.title, url = bookMetadata.url, inLibrary = true))

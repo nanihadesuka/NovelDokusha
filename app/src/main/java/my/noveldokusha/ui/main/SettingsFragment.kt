@@ -15,13 +15,10 @@ import com.google.android.material.radiobutton.MaterialRadioButton
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import my.noveldokusha.THEME_FOLLOW_SYSTEM
-import my.noveldokusha.THEME_ID
-import my.noveldokusha.bookstore
+import my.noveldokusha.*
 import my.noveldokusha.databinding.ActivityMainFragmentSettingsBinding
-import my.noveldokusha.globalThemeList
 import my.noveldokusha.ui.BaseFragment
+import my.noveldokusha.uiUtils.stringRes
 import my.noveldokusha.uiUtils.toast
 import java.io.PrintWriter
 import java.io.StringWriter
@@ -100,8 +97,8 @@ class SettingsFragment : BaseFragment()
 					val inputStream = requireActivity().applicationContext.getDatabasePath(bookstore.appDB.name).inputStream()
 					requireActivity().contentResolver.openOutputStream(uri)?.use { outputStream ->
 						inputStream.copyTo(outputStream)
-						toast("Backup saved")
-					} ?: toast("Failed to make backup")
+						toast(R.string.backup_saved.stringRes())
+					} ?: toast(R.string.failed_to_make_backup.stringRes())
 					inputStream.close()
 				}
 			}
@@ -125,7 +122,7 @@ class SettingsFragment : BaseFragment()
 					val inputStream = requireActivity().contentResolver.openInputStream(uri)
 					if (inputStream == null)
 					{
-						toast("Failed to restore, can't access file")
+						toast(R.string.failed_to_restore_cant_access_file.stringRes())
 						return@activityRequest
 					}
 					
@@ -135,7 +132,7 @@ class SettingsFragment : BaseFragment()
 					}
 					catch (e: Exception)
 					{
-						toast("Failed to restore, invalid backup")
+						toast(R.string.failed_to_restore_invalid_backup.stringRes())
 						val stacktrace = StringWriter().apply { e.printStackTrace(PrintWriter(this)) }
 						Log.e("ERROR", "Message:\n${e.message}\n\nStacktrace:\n$stacktrace")
 						return@activityRequest
@@ -145,7 +142,7 @@ class SettingsFragment : BaseFragment()
 						bookstore.bookLibrary.insert(backupDatabase.bookLibrary.getAll())
 						bookstore.bookChapter.insert(backupDatabase.bookChapter.getAll())
 						bookstore.bookChapterBody.insert(backupDatabase.bookChapterBody.getAll())
-						withContext(Dispatchers.Main) { toast("Database restored") }
+						toast(R.string.database_restored.stringRes())
 						backupDatabase.close()
 						backupDatabase.delete()
 					}
