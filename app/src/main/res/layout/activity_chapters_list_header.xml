@@ -49,7 +49,7 @@
 					android:layout_width="wrap_content"
 					android:layout_height="wrap_content"
 					android:paddingEnd="6sp"
-					android:text="Source"
+					android:text="@string/source"
 					android:textStyle="bold"
 					/>
 				
@@ -71,7 +71,7 @@
 					android:layout_width="wrap_content"
 					android:layout_height="wrap_content"
 					android:paddingEnd="6sp"
-					android:text="Chapters"
+					android:text="@string/chapters"
 					android:textStyle="bold"
 					/>
 				
@@ -95,27 +95,36 @@
 			app:layout_constraintTop_toTopOf="parent"
 			>
 			
-			<Button
+			<TextView
 				android:id="@+id/databaseSearchButton"
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
-				android:layout_margin="0sp"
-				android:padding="4sp"
-				android:text="Database"
-				android:textAllCaps="false"
-				android:tooltipText="Search in databse for more information"
+				android:layout_margin="4sp"
+				android:background="@drawable/book_item_background"
+				android:clickable="true"
+				android:foreground="@drawable/book_item_foreground_ripple"
+				android:minHeight="32sp"
+				android:padding="8sp"
+				android:text="@string/database"
+				android:textStyle="bold"
+				android:tooltipText="@string/search_in_database_for_more_information"
 				/>
 			
-			<Button
+			<TextView
 				android:id="@+id/webpageOpenButton"
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
-				android:layout_margin="0sp"
-				android:padding="4sp"
-				android:text="Webpage"
-				android:textAllCaps="false"
-				android:tooltipText="Open in browser"
+				android:layout_margin="4sp"
+				android:background="@drawable/book_item_background"
+				android:clickable="true"
+				android:foreground="@drawable/book_item_foreground_ripple"
+				android:minHeight="32sp"
+				android:padding="8sp"
+				android:text="@string/webpage"
+				android:textStyle="bold"
+				android:tooltipText="@string/open_in_browser"
 				/>
+		
 		</LinearLayout>
 	</androidx.constraintlayout.widget.ConstraintLayout>
 	
