@@ -52,7 +52,8 @@
 					android:layout_width="0dp"
 					android:layout_height="wrap_content"
 					android:hint="Novel title"
-					android:padding="16sp"
+					android:paddingHorizontal="10sp"
+					android:paddingVertical="16sp"
 					android:textIsSelectable="true"
 					android:textSize="20sp"
 					android:textStyle="bold"
@@ -61,13 +62,17 @@
 					app:layout_constraintTop_toTopOf="parent"
 					/>
 				
-				<Button
+				<TextView
 					android:id="@+id/globalSourceSearch"
 					android:layout_width="wrap_content"
 					android:layout_height="wrap_content"
 					android:layout_margin="10sp"
-					android:text="Sources"
-					android:textAllCaps="false"
+					android:background="@drawable/book_item_background_borderless"
+					android:clickable="true"
+					android:foreground="@drawable/book_item_foreground_ripple"
+					android:minHeight="32sp"
+					android:padding="8sp"
+					android:text="@string/sources"
 					android:tooltipText="Search for sources"
 					app:layout_constraintBaseline_toBaselineOf="@id/title"
 					app:layout_constraintLeft_toRightOf="@id/title"
@@ -76,7 +81,6 @@
 					/>
 			
 			</androidx.constraintlayout.widget.ConstraintLayout>
-			
 			
 			<ImageView
 				android:id="@+id/coverImage"
@@ -183,10 +187,11 @@
 				android:id="@+id/tags"
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
+				android:maxLines="3"
 				android:paddingHorizontal="10sp"
 				android:paddingBottom="10sp"
 				android:textIsSelectable="true"
-				tools:text="Tag1, Tag2, Tag3 ..."
+				tools:text="@tools:sample/lorem/random"
 				/>
 			
 			<TextView
