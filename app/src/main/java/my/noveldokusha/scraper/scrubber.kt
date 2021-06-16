@@ -278,10 +278,11 @@ class FetchIterator<T>(
 	
 	fun reset()
 	{
-		state = STATE.IDLE
-		list.clear()
-		index = 0
 		job?.cancel()
+		state = STATE.IDLE
+		index = 0
+		list.clear()
+		onSuccess.value = list
 		onReset.value = Unit
 	}
 	
