@@ -4,7 +4,7 @@
     >
     <item
         android:id="@+id/webview"
-        android:icon="@drawable/ic_baseline_travel_explore_24"
+        android:icon="@drawable/ic_baseline_public_24"
         android:title="Open the Webview"
         app:showAsAction="ifRoom|collapseActionView"
         />

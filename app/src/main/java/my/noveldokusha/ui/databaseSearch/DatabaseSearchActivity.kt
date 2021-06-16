@@ -78,7 +78,7 @@ class DatabaseSearchActivity : BaseActivity()
 	
 	override fun onCreateOptionsMenu(menu: Menu?): Boolean
 	{
-		menuInflater.inflate(R.menu.source_catalog_menu__appbar, menu)
+		menuInflater.inflate(R.menu.search_menu__appbar, menu)
 		
 		val searchViewItem = menu!!.findItem(R.id.action_search)
 		val searchView = searchViewItem.actionView as SearchView
