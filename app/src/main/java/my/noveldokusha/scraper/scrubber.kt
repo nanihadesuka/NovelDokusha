@@ -62,7 +62,7 @@ object scrubber
 		val baseUrl: String
 		
 		// Transform current url to preferred url
-		fun transformChapterUrl(url: String): String = url
+		suspend fun transformChapterUrl(url: String): String = url
 		
 		suspend fun getChapterTitle(doc: Document): String?
 		suspend fun getChapterText(doc: Document): String
@@ -128,6 +128,7 @@ object scrubber
 		ReadNovelFull(),
 		my.noveldokusha.scraper.sources.NovelUpdates(),
 		Reddit(),
+		AT(),
 	)
 	
 	val sourcesListCatalog = sourcesList.filterIsInstance<source_interface.catalog>().toSet()

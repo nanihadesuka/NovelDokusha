@@ -15,7 +15,7 @@ class Reddit : scrubber.source_interface.base
 	override val name = "Reddit"
 	override val baseUrl = "https://www.reddit.com/"
 	
-	override fun transformChapterUrl(url: String): String
+	override suspend fun transformChapterUrl(url: String): String
 	{
 		return url.toUrlBuilder()!!.authority("old.reddit.com").toString()
 	}
