@@ -25,7 +25,7 @@ class LightNovelsTranslations : scrubber.source_interface.catalog
 		return doc.selectFirst(".page, .type-page, .status-publish, .hentry")
 			.selectFirst(".entry-content").run {
 				this.select("#textbox").remove()
-				scrubber.getNodeTextTransversal(this)
+				scrubber.getNodeTextTraverse(this)
 			}.joinToString("\n\n")
 	}
 	

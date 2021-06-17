@@ -2,7 +2,7 @@ package my.noveldokusha.scraper.databases
 
 import my.noveldokusha.BookMetadata
 import my.noveldokusha.scraper.*
-import my.noveldokusha.scraper.scrubber.getNodeTextTransversal
+import my.noveldokusha.scraper.scrubber.getNodeTextTraverse
 import org.jsoup.nodes.Document
 
 /**
@@ -115,7 +115,7 @@ class BakaUpdates : scrubber.database_interface
 		val description = entry("Description").let {
 			it.selectFirst("[id=div_desc_more]") ?: it.selectFirst("div")
 		}.also { it.select("a").remove() }
-			.let { getNodeTextTransversal(it) }
+			.let { getNodeTextTraverse(it) }
 			.joinToString("\n\n")
 		
 		val tags = entry("Categories")
@@ -129,7 +129,7 @@ class BakaUpdates : scrubber.database_interface
 		return scrubber.database_interface.BookData(
 			title = doc.selectFirst(".releasestitle.tabletitle").text().removeNovelTag(),
 			description = description,
-			alternativeTitles = getNodeTextTransversal(entry("Associated Names")),
+			alternativeTitles = getNodeTextTraverse(entry("Associated Names")),
 			relatedBooks = relatedBooks,
 			similarRecommended = similarRecommended,
 			bookType = entry("Type").text(),

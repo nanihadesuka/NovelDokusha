@@ -2,7 +2,7 @@ package my.noveldokusha.scraper.databases
 
 import my.noveldokusha.BookMetadata
 import my.noveldokusha.scraper.*
-import my.noveldokusha.scraper.scrubber.getNodeTextTransversal
+import my.noveldokusha.scraper.scrubber.getNodeTextTraverse
 import org.jsoup.nodes.Document
 
 /**
@@ -103,8 +103,8 @@ class NovelUpdates : scrubber.database_interface
 		
 		return scrubber.database_interface.BookData(
 			title = doc.selectFirst(".seriestitlenu").text(),
-			description = getNodeTextTransversal(doc.selectFirst("#editdescription")).joinToString("\n\n"),
-			alternativeTitles = getNodeTextTransversal(doc.selectFirst("#editassociated")),
+			description = getNodeTextTraverse(doc.selectFirst("#editdescription")).joinToString("\n\n"),
+			alternativeTitles = getNodeTextTraverse(doc.selectFirst("#editassociated")),
 			relatedBooks = relatedBooks,
 			similarRecommended = similarRecommended,
 			bookType = doc.selectFirst(".genre, .type").text(),

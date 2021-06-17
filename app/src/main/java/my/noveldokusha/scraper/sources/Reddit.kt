@@ -29,7 +29,7 @@ class Reddit : scrubber.source_interface.base
 			.let {
 				it.select("table").remove()
 				it.select("blockquote").remove()
-				scrubber.getNodeTextTransversal(it).joinToString("\n\n")
+				scrubber.getNodeTextTraverse(it).joinToString("\n\n")
 			}
 	}
 }
