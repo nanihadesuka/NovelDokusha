@@ -112,14 +112,38 @@ object scrubber
 		fun getBookData(doc: Document): BookData
 	}
 	
-	fun getNodeTextTransversal(node: Node): List<String>
+	fun getPTraverse(node: Node): String
 	{
-		if (node is TextNode)
-		{
-			val text = node.text().trim()
-			return if (text.isEmpty()) listOf() else listOf(text)
+		val children = node.childNodes()
+		if (children.isEmpty())
+			return ""
+		
+		return children.joinToString("") { child ->
+			when
+			{
+				child is TextNode -> child.text().trim()
+				child.nodeName() == "br" -> "\n"
+				child.nodeName() == "hr" -> "\n"
+				child.nodeName() == "p" -> getPTraverse(child)
+				else -> getNodeTextTraverse(child).joinToString("")
+			}
 		}
-		return node.childNodes().flatMap { childNode -> getNodeTextTransversal(childNode) }
+	}
+	
+	fun getNodeTextTraverse(node: Node): List<String>
+	{
+		val children = node.childNodes()
+		if (children.isEmpty())
+			return listOf()
+		
+		return children.flatMap { child ->
+			when
+			{
+				child is TextNode -> listOf(child.text().trim())
+				child.nodeName() == "p" -> listOf(getPTraverse(child), "")
+				else -> getNodeTextTraverse(child)
+			}
+		}
 	}
 	
 	val sourcesList = setOf(
@@ -176,7 +200,7 @@ suspend fun downloadChapter(chapterUrl: String): Response<ChapterDownload>
 		Readability4J(realUrl, fetchDoc(realUrl)).parse().also { article ->
 			val content = article.articleContent ?: return@also
 			val data = ChapterDownload(
-				body = scrubber.getNodeTextTransversal(content).joinToString("\n\n"),
+				body = scrubber.getNodeTextTraverse(content).joinToString("\n\n"),
 				title = article.title
 			)
 			return@tryConnect Response.Success(data)
