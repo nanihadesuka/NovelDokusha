@@ -142,6 +142,7 @@ object scrubber
 			{
 				child is TextNode -> listOf(child.text().trim())
 				child.nodeName() == "p" -> listOf(getPTraverse(child), "")
+				child.nodeName() == "hr" -> listOf("")
 				else -> getNodeTextTraverse(child)
 			}
 		}
