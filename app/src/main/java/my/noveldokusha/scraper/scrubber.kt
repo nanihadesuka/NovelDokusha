@@ -72,6 +72,7 @@ object scrubber
 		{
 			val catalogUrl: String
 			
+			// The chapter order is ascendent: from 1 ... etc
 			suspend fun getChapterList(doc: Document): List<ChapterMetadata>
 			suspend fun getCatalogList(index: Int): Response<List<BookMetadata>>
 			suspend fun getCatalogSearch(index: Int, input: String): Response<List<BookMetadata>>
@@ -153,6 +154,7 @@ object scrubber
 		my.noveldokusha.scraper.sources.NovelUpdates(),
 		Reddit(),
 		AT(),
+		Wuxia()
 	)
 	
 	val sourcesListCatalog = sourcesList.filterIsInstance<source_interface.catalog>().toSet()
