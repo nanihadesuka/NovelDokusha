@@ -22,7 +22,7 @@ class ReadNovelFull : scrubber.source_interface.catalog
 	override suspend fun getChapterText(doc: Document): String
 	{
 		doc.selectFirst("#chr-content").let {
-			return scrubber.getNodeTextTraverse(it).joinToString("\n\n")
+			return scrubber.getNodeStructuredText(it)
 		}
 	}
 	

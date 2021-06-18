@@ -27,7 +27,7 @@ class ReadLightNovel : scrubber.source_interface.catalog
 			it.select("a").remove()
 			it.select(".ads-title").remove()
 			it.select(".hidden").remove()
-			return scrubber.getNodeTextTraverse(it).joinToString("\n\n")
+			return scrubber.getNodeStructuredText(it)
 		}
 	}
 	

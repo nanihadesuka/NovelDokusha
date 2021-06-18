@@ -97,7 +97,8 @@ class DatabaseBookInfoActivity : BaseActivity()
 							genresIncludeId = ArrayList(data.genres.mapNotNull { databaseGenres.get(it) }),
 							genresExcludeId = arrayListOf()
 						)
-						val intent = DatabaseSearchResultsActivity.IntentData(this@DatabaseBookInfoActivity, viewModel.database.baseUrl, input)
+						val intent =
+							DatabaseSearchResultsActivity.IntentData(this@DatabaseBookInfoActivity, viewModel.database.baseUrl, input)
 						startActivity(intent)
 					}
 				}

@@ -25,8 +25,8 @@ class LightNovelsTranslations : scrubber.source_interface.catalog
 		return doc.selectFirst(".page, .type-page, .status-publish, .hentry")
 			.selectFirst(".entry-content").run {
 				this.select("#textbox").remove()
-				scrubber.getNodeTextTraverse(this)
-			}.joinToString("\n\n")
+				scrubber.getNodeStructuredText(this)
+			}
 	}
 	
 	override suspend fun getChapterList(doc: Document): List<ChapterMetadata>

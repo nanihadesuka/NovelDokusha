@@ -20,7 +20,7 @@ class Wuxia : scrubber.source_interface.catalog
 			it.select(".fa.fa-calendar").remove()
 			it.select("button.btn.btn-default").remove()
 			it.select("div.recently-nav.pull-right").remove()
-		}.let { scrubber.getNodeTextTraverse(it).joinToString("\n\n") }
+		}.let { scrubber.getNodeStructuredText(it) }
 	}
 	
 	override suspend fun getChapterList(doc: Document): List<ChapterMetadata>

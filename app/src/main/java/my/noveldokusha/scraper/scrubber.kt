@@ -113,7 +113,41 @@ object scrubber
 		fun getBookData(doc: Document): BookData
 	}
 	
-	fun getPTraverse(node: Node): String
+	private fun getPTraverse(node: Node): String
+	{
+		val children = node.childNodes()
+		if (children.isEmpty())
+			return ""
+		
+		return children.joinToString(separator = "", postfix = "\n\n") { child ->
+			when
+			{
+				child is TextNode -> child.text().trim()
+				child.nodeName() == "br" -> "\n"
+				else -> getPTraverse(child)
+			}
+		}
+	}
+	
+	private fun getNodeTextTraverse(node: Node): List<String>
+	{
+		val children = node.childNodes()
+		if (children.isEmpty())
+			return listOf()
+		
+		return children.flatMap { child ->
+			when
+			{
+				child is TextNode -> listOf(child.text().trim(), "\n\n")
+				child.nodeName() == "p" -> listOf(getPTraverse(child))
+				child.nodeName() == "br" -> listOf("\n")
+				child.nodeName() == "hr" -> listOf("\n\n")
+				else -> getNodeTextTraverse(child)
+			}
+		}
+	}
+	
+	fun getNodeStructuredText(node: Node): String
 	{
 		val children = node.childNodes()
 		if (children.isEmpty())
@@ -123,27 +157,10 @@ object scrubber
 			when
 			{
 				child is TextNode -> child.text().trim()
-				child.nodeName() == "br" -> "\n"
-				child.nodeName() == "hr" -> "\n"
 				child.nodeName() == "p" -> getPTraverse(child)
+				child.nodeName() == "br" -> "\n"
+				child.nodeName() == "hr" -> "\n\n"
 				else -> getNodeTextTraverse(child).joinToString("")
-			}
-		}
-	}
-	
-	fun getNodeTextTraverse(node: Node): List<String>
-	{
-		val children = node.childNodes()
-		if (children.isEmpty())
-			return listOf()
-		
-		return children.flatMap { child ->
-			when
-			{
-				child is TextNode -> listOf(child.text().trim())
-				child.nodeName() == "p" -> listOf(getPTraverse(child), "")
-				child.nodeName() == "hr" -> listOf("")
-				else -> getNodeTextTraverse(child)
 			}
 		}
 	}
@@ -204,7 +221,7 @@ suspend fun downloadChapter(chapterUrl: String): Response<ChapterDownload>
 		Readability4J(realUrl, fetchDoc(realUrl)).parse().also { article ->
 			val content = article.articleContent ?: return@also
 			val data = ChapterDownload(
-				body = scrubber.getNodeTextTraverse(content).joinToString("\n\n"),
+				body = scrubber.getNodeStructuredText(content),
 				title = article.title
 			)
 			return@tryConnect Response.Success(data)

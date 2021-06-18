@@ -16,7 +16,7 @@ class BestLightNovel : scrubber.source_interface.catalog
 	override suspend fun getChapterText(doc: Document): String
 	{
 		return doc.selectFirst("#vung_doc").let {
-			scrubber.getNodeTextTraverse(it).joinToString("\n\n")
+			scrubber.getNodeStructuredText(it)
 		}
 	}
 	
