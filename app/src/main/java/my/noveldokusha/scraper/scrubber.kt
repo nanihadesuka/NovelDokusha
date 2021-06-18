@@ -155,7 +155,8 @@ object scrubber
 		my.noveldokusha.scraper.sources.NovelUpdates(),
 		Reddit(),
 		AT(),
-		Wuxia()
+		Wuxia(),
+		BestLightNovel(),
 	)
 	
 	val sourcesListCatalog = sourcesList.filterIsInstance<source_interface.catalog>().toSet()
