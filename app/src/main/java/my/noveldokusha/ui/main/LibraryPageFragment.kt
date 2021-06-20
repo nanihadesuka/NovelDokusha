@@ -61,6 +61,7 @@ class LibraryPageFragment : BaseFragment
 		viewModel.updateNotice.observe(viewLifecycleOwner) {
 			if (it.newChapters.isNotEmpty()) notifyUpdated(it.newChapters.joinToString("\n"))
 			if (it.failed.isNotEmpty()) notifyUpdatedFails(it.failed.joinToString("\n"))
+			if (it.newChapters.isEmpty()) toast("No updates found")
 		}
 		
 		return viewHolder.root
@@ -87,9 +88,9 @@ class LibraryPageFragment : BaseFragment
 			.setStyle(NotificationCompat.BigTextStyle().bigText(text))
 			.setPriority(NotificationCompat.PRIORITY_DEFAULT)
 		
-		with(NotificationManagerCompat.from(requireContext())) {
-			notify(notificationId, builder.build())
-		}
+		NotificationManagerCompat
+			.from(requireContext())
+			.notify(notificationId, builder.build())
 	}
 	
 }

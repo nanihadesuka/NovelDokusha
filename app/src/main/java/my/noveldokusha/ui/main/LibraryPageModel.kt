@@ -1,14 +1,14 @@
 package my.noveldokusha.ui.main
 
+import android.util.Log
 import androidx.lifecycle.MutableLiveData
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.launch
 import my.noveldokusha.bookstore
 import my.noveldokusha.scraper.Response
 import my.noveldokusha.scraper.downloadChaptersList
 import my.noveldokusha.ui.BaseViewModel
+import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import kotlin.properties.Delegates
 
 class LibraryPageModel : BaseViewModel()
@@ -26,7 +26,7 @@ class LibraryPageModel : BaseViewModel()
 	private var showCompleted by Delegates.notNull<Boolean>()
 	val refreshing = MutableLiveData(false)
 	
-	data class UpdateNotice(val newChapters: MutableList<String>, val failed: MutableList<String>)
+	data class UpdateNotice(val newChapters: List<String>, val failed: List<String>)
 	
 	val updateNotice = MutableLiveData<UpdateNotice>()
 	
@@ -35,24 +35,35 @@ class LibraryPageModel : BaseViewModel()
 		refreshing.postValue(true)
 		val completed = showCompleted
 		GlobalScope.launch(Dispatchers.IO) {
-			val books = bookstore.bookLibrary.getAll().filter { it.completed == completed }
-			val newChapters = mutableListOf<String>()
-			val failed = mutableListOf<String>()
-			for (book in books)
-			{
-				val oldChaptersList = bookstore.bookChapter.chapters(book.url)
-				when (val res = downloadChaptersList(book.url))
-				{
-					is Response.Success ->
-					{
-						bookstore.bookChapter.merge(res.data, book.url)
-						if (res.data.size > oldChaptersList.size)
-							newChapters.add(book.title)
+			bookstore.bookLibrary.getAllInLibrary()
+				.filter { it.completed == completed }
+				.groupBy { it.url.toHttpUrlOrNull()?.host }
+				.map { (host, books) ->
+					val newChapters = mutableListOf<String>()
+					val failed = mutableListOf<String>()
+					async(Dispatchers.IO) {
+						for (book in books)
+						{
+							Log.e("UPATING", "$host  Title: ${book.title}")
+							val oldChaptersList = bookstore.bookChapter.chapters(book.url)
+							when (val res = downloadChaptersList(book.url))
+							{
+								is Response.Success ->
+								{
+									bookstore.bookChapter.merge(res.data, book.url)
+									if (res.data.size > oldChaptersList.size)
+										newChapters.add(book.title)
+								}
+								is Response.Error -> failed.add(book.title)
+							}
+						}
+						return@async Pair(newChapters, failed)
 					}
-					is Response.Error -> failed.add(book.title)
-				}
-			}
-			updateNotice.postValue(UpdateNotice(newChapters, failed))
+				}.awaitAll()
+				.unzip()
+				.let { (newChapters, failed) -> newChapters.flatten() to failed.flatten() }
+				.let { (newChapters, failed) -> updateNotice.postValue(UpdateNotice(newChapters, failed)) }
+			
 			refreshing.postValue(false)
 		}
 	}

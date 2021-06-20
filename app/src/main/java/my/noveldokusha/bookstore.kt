@@ -57,6 +57,9 @@ object bookstore
 		suspend fun getAll(): List<Book>
 		
 		@Query("SELECT * FROM Book WHERE inLibrary == 1")
+		suspend fun getAllInLibrary(): List<Book>
+		
+		@Query("SELECT * FROM Book WHERE inLibrary == 1")
 		fun booksInLibraryFlow(): Flow<List<Book>>
 		
 		@Insert(onConflict = OnConflictStrategy.IGNORE)
@@ -270,6 +273,7 @@ object bookstore
 			suspend fun update(book: Book) = db.libraryDao().update(book)
 			suspend fun get(url: String) = db.libraryDao().get(url)
 			suspend fun getAll() = db.libraryDao().getAll()
+			suspend fun getAllInLibrary() = db.libraryDao().getAllInLibrary()
 			suspend fun existInLibrary(url: String) = db.libraryDao().existInLibrary(url)
 			suspend fun toggleBookmark(bookMetadata: BookMetadata) = db.withTransaction {
 				val book = get(bookMetadata.url)
