@@ -23,12 +23,12 @@ var SharedPreferences.THEME_ID by PreferenceDelegate_Int(R.style.AppTheme_Light)
 var SharedPreferences.THEME_FOLLOW_SYSTEM by PreferenceDelegate_Boolean(true)
 var SharedPreferences.READER_FONT_SIZE by PreferenceDelegate_Float(14f)
 var SharedPreferences.READER_FONT_FAMILY by PreferenceDelegate_String("sans-serif")
-var SharedPreferences.CHAPTERS_SORT_POSITION by PreferenceDelegate_Enum(CHAPTER_SORT_POSITION_ENUM.descending) { enumValueOf(it) }
+var SharedPreferences.CHAPTERS_SORT_ASCENDING by PreferenceDelegate_Enum(TERNARY_STATE.active) { enumValueOf(it) }
 
-fun SharedPreferences.CHAPTERS_SORT_POSITION_flow() = toFlow(::CHAPTERS_SORT_POSITION.name) { CHAPTERS_SORT_POSITION }
+fun SharedPreferences.CHAPTERS_SORT_ASCENDING_flow() = toFlow(::CHAPTERS_SORT_ASCENDING.name) { CHAPTERS_SORT_ASCENDING }
 
-enum class CHAPTER_SORT_POSITION_ENUM
-{ ascending, descending, none }
+enum class TERNARY_STATE
+{ active, inverse, inactive }
 
 fun Context.appSharedPreferences(): SharedPreferences =
 	applicationContext.getSharedPreferences("${this.packageName}_preferences", Context.MODE_PRIVATE)

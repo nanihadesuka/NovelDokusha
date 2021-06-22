@@ -43,12 +43,12 @@ class ChaptersModel : BaseViewModel()
 					val newTitle = data.chapter.title.removeSurrounding(prefix, suffix).ifBlank { data.chapter.title }
 					data.copy(chapter = data.chapter.copy(title = newTitle))
 				}
-			}.combine(preferences.CHAPTERS_SORT_POSITION_flow()) { chapters, sorted ->
+			}.combine(preferences.CHAPTERS_SORT_ASCENDING_flow()) { chapters, sorted ->
 				when (sorted)
 				{
-					CHAPTER_SORT_POSITION_ENUM.ascending -> chapters.sortedBy { it.chapter.position }
-					CHAPTER_SORT_POSITION_ENUM.descending -> chapters.sortedByDescending { it.chapter.position }
-					CHAPTER_SORT_POSITION_ENUM.none -> chapters
+					TERNARY_STATE.active -> chapters.sortedBy { it.chapter.position }
+					TERNARY_STATE.inverse -> chapters.sortedByDescending { it.chapter.position }
+					TERNARY_STATE.inactive -> chapters
 				}
 			}.asLiveData()
 	}

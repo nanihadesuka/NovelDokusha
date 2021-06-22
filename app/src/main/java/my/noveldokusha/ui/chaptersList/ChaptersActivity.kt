@@ -173,11 +173,11 @@ class ChaptersActivity : BaseActivity()
 		}
 		R.id.action_filter ->
 		{
-			appSharedPreferences().CHAPTERS_SORT_POSITION = when (appSharedPreferences().CHAPTERS_SORT_POSITION)
+			appSharedPreferences().CHAPTERS_SORT_ASCENDING = when (appSharedPreferences().CHAPTERS_SORT_ASCENDING)
 			{
-				CHAPTER_SORT_POSITION_ENUM.ascending -> CHAPTER_SORT_POSITION_ENUM.descending
-				CHAPTER_SORT_POSITION_ENUM.descending -> CHAPTER_SORT_POSITION_ENUM.ascending
-				CHAPTER_SORT_POSITION_ENUM.none -> CHAPTER_SORT_POSITION_ENUM.ascending
+				TERNARY_STATE.active -> TERNARY_STATE.inverse
+				TERNARY_STATE.inverse -> TERNARY_STATE.active
+				TERNARY_STATE.inactive -> TERNARY_STATE.active
 			}
 			true
 		}
