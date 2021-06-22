@@ -45,4 +45,5 @@
 	<string name="search_in_database_for_more_information">Search in databse for more information</string>
 	<string name="sort_ascending_or_descending">Sort ascending or descending</string>
 	<string name="sources">Sources</string>
+	<string name="no_chapters">No chapters</string>
 </resources>

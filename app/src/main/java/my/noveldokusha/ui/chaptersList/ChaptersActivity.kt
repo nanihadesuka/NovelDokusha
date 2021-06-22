@@ -68,6 +68,27 @@ class ChaptersActivity : BaseActivity()
 		
 		setupSelectionModeBar()
 		
+		viewHolder.floatingActionButton.setOnClickListener {
+			val bookUrl = viewModel.bookMetadata.url
+			lifecycleScope.launch(Dispatchers.IO) {
+				val lastReadChapter = bookstore.bookLibrary.get(extras.bookMetadata.url)?.lastReadChapter ?: withContext(Dispatchers.Main) {
+					viewModel.chapters.asSequence().sortedBy { it.chapter.position }.firstOrNull()?.chapter?.url
+				}
+				
+				if (lastReadChapter == null)
+				{
+					toast(R.string.no_chapters.stringRes())
+					return@launch
+				}
+				
+				withContext(Dispatchers.Main) {
+					ReaderActivity
+						.IntentData(this@ChaptersActivity, bookUrl = bookUrl, chapterUrl = lastReadChapter)
+						.let(this@ChaptersActivity::startActivity)
+				}
+			}
+		}
+		
 		supportActionBar!!.let {
 			it.title = "Chapters"
 			it.setDisplayHomeAsUpEnabled(true)

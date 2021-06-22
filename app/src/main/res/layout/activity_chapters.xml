@@ -56,6 +56,18 @@
 			/>
 	</FrameLayout>
 	
+	<com.google.android.material.floatingactionbutton.FloatingActionButton
+		android:id="@+id/floatingActionButton"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:layout_gravity="bottom|end"
+		android:layout_marginEnd="40sp"
+		android:layout_marginBottom="70sp"
+		android:clickable="true"
+		android:contentDescription="Open last read chapter"
+		android:src="@drawable/ic_baseline_play_arrow_24"
+		/>
+	
 	<androidx.constraintlayout.widget.ConstraintLayout
 		android:id="@+id/selectionModeBar"
 		android:layout_width="match_parent"
