@@ -6,6 +6,7 @@ import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import my.noveldokusha.*
 import my.noveldokusha.scraper.Response
@@ -50,7 +51,7 @@ class ChaptersModel : BaseViewModel()
 					TERNARY_STATE.inverse -> chapters.sortedByDescending { it.chapter.position }
 					TERNARY_STATE.inactive -> chapters
 				}
-			}.asLiveData()
+			}.flowOn(Dispatchers.Default).asLiveData()
 	}
 	
 	val preferences = App.instance.appSharedPreferences()

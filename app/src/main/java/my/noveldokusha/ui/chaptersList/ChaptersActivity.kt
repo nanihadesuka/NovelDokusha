@@ -10,10 +10,7 @@ import androidx.activity.viewModels
 import androidx.core.view.isVisible
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.lifecycleScope
-import androidx.recyclerview.widget.ConcatAdapter
-import androidx.recyclerview.widget.DefaultItemAnimator
-import androidx.recyclerview.widget.DiffUtil
-import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.*
 import kotlinx.coroutines.*
 import my.noveldokusha.*
 import my.noveldokusha.databinding.ActivityChaptersBinding
@@ -24,6 +21,7 @@ import my.noveldokusha.ui.databaseSearchResults.DatabaseSearchResultsActivity
 import my.noveldokusha.ui.reader.ReaderActivity
 import my.noveldokusha.uiUtils.*
 import java.util.*
+import kotlin.time.ExperimentalTime
 
 class ChaptersActivity : BaseActivity()
 {
@@ -46,10 +44,11 @@ class ChaptersActivity : BaseActivity()
 	private val viewHolder by lazy { ActivityChaptersBinding.inflate(layoutInflater) }
 	private val viewAdapter = object
 	{
-		val chapters by lazy { ChaptersArrayAdapter(this@ChaptersActivity, viewModel.chapters, viewModel) { selectionModeBarUpdateVisibility() } }
+		val chapters by lazy { ChaptersArrayAdapter(this@ChaptersActivity, viewModel) { selectionModeBarUpdateVisibility() } }
 		val header by lazy { ChaptersHeaderAdapter(this@ChaptersActivity, viewModel) }
 	}
 	
+	@ExperimentalTime
 	override fun onCreate(savedInstanceState: Bundle?)
 	{
 		super.onCreate(savedInstanceState)
@@ -64,6 +63,8 @@ class ChaptersActivity : BaseActivity()
 		viewModel.onFetching.observe(this) { viewHolder.swipeRefreshLayout.isRefreshing = it }
 		viewModel.chaptersWithContextLiveData.observe(this) {
 			viewAdapter.chapters.setList(it)
+			viewModel.chapters.clear()
+			viewModel.chapters.addAll(it)
 		}
 		
 		setupSelectionModeBar()
@@ -132,7 +133,7 @@ class ChaptersActivity : BaseActivity()
 		
 		viewHolder.selectionModeDownload.setOnClickListener {
 			val list = viewModel.selectedChaptersUrl.toList()
-			GlobalScope.launch(Dispatchers.IO) {
+			CoroutineScope(Dispatchers.IO).launch {
 				list.forEach { bookstore.bookChapterBody.fetchBody(it) }
 			}
 		}
@@ -209,35 +210,36 @@ class ChaptersActivity : BaseActivity()
 
 private class ChaptersArrayAdapter(
 	private val context: BaseActivity,
-	private val list: ArrayList<bookstore.ChapterDao.ChapterWithContext>,
 	private val viewModel: ChaptersModel,
 	private val selectionModeBarUpdateVisibility: () -> Unit
-) :
-	RecyclerView.Adapter<ChaptersArrayAdapter.ViewBinder>()
+) : RecyclerView.Adapter<ChaptersArrayAdapter.ViewBinder>()
 {
-	private inner class Diff(private val aNew: List<bookstore.ChapterDao.ChapterWithContext>) : DiffUtil.Callback()
+	private val differCallback = object : DiffUtil.ItemCallback<bookstore.ChapterDao.ChapterWithContext>()
 	{
-		override fun getOldListSize(): Int = list.size
-		override fun getNewListSize(): Int = aNew.size
-		override fun areItemsTheSame(oldPos: Int, newPos: Int): Boolean = list[oldPos].chapter.url == aNew[newPos].chapter.url
-		override fun areContentsTheSame(oldPos: Int, newPos: Int): Boolean = list[oldPos] == aNew[newPos]
+		override fun areItemsTheSame(
+			oldItem: bookstore.ChapterDao.ChapterWithContext,
+			newItem: bookstore.ChapterDao.ChapterWithContext
+		) = oldItem.chapter.url == newItem.chapter.url
+		
+		override fun areContentsTheSame(
+			oldItem: bookstore.ChapterDao.ChapterWithContext,
+			newItem: bookstore.ChapterDao.ChapterWithContext
+		) = oldItem == newItem
 	}
 	
-	fun setList(newList: List<bookstore.ChapterDao.ChapterWithContext>) = DiffUtil.calculateDiff(Diff(newList)).let {
-		val isEmpty = list.isEmpty()
-		list.clear()
-		list.addAll(newList)
-		if (isEmpty) notifyDataSetChanged() else it.dispatchUpdatesTo(this)
-	}
+	private val differ = AsyncListDiffer(this, differCallback)
+	private val list get() = differ.currentList
+	
+	fun setList(newList: List<bookstore.ChapterDao.ChapterWithContext>) = differ.submitList(newList)
 	
 	override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewBinder =
 		ViewBinder(ActivityChaptersListItemBinding.inflate(parent.inflater, parent, false))
 	
-	override fun getItemCount() = this@ChaptersArrayAdapter.list.size
+	override fun getItemCount() = list.size
 	
 	override fun onBindViewHolder(binder: ViewBinder, position: Int)
 	{
-		val itemData = this.list[position]
+		val itemData = list[position]
 		val itemView = binder.viewHolder
 		
 		itemView.title.text = itemData.chapter.title

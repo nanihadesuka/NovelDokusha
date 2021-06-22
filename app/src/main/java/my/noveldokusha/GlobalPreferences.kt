@@ -2,9 +2,13 @@ package my.noveldokusha
 
 import android.content.Context
 import android.content.SharedPreferences
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.onCompletion
+import kotlinx.coroutines.launch
 import kotlin.reflect.KProperty
 
 object globalThemeList
@@ -36,13 +40,17 @@ fun Context.appSharedPreferences(): SharedPreferences =
 fun <T> SharedPreferences.toFlow(key: String, mapper: (String) -> T): Flow<T>
 {
 	val flow = MutableStateFlow(mapper(key))
-	val listener = SharedPreferences.OnSharedPreferenceChangeListener { _, vkey -> if (key == vkey) flow.value = mapper(vkey) }
+	val scope = CoroutineScope(Dispatchers.Default)
+	val listener = SharedPreferences.OnSharedPreferenceChangeListener { _, vkey ->
+		if (key == vkey)
+			scope.launch { flow.value = mapper(vkey) }
+	}
 	App.instance.preferencesChangeListeners.add(listener)
 	registerOnSharedPreferenceChangeListener(listener)
 	return flow.onCompletion {
 		App.instance.preferencesChangeListeners.remove(listener)
 		unregisterOnSharedPreferenceChangeListener(listener)
-	}
+	}.flowOn(Dispatchers.Default)
 }
 
 class PreferenceDelegate_Enum<T : Enum<T>>(val defaultValue: T, val deserializer: (String) -> T)
