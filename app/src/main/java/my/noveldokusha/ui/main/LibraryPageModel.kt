@@ -1,6 +1,5 @@
 package my.noveldokusha.ui.main
 
-import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.map
@@ -44,14 +43,16 @@ class LibraryPageModel : BaseViewModel()
 					async(Dispatchers.IO) {
 						for (book in books)
 						{
-							Log.e("UPATING", "$host  Title: ${book.title}")
-							val oldChaptersList = bookstore.bookChapter.chapters(book.url)
+							val oldChaptersList = async { bookstore.bookChapter.chapters(book.url).map { it.url }.toSet() }
 							when (val res = downloadChaptersList(book.url))
 							{
 								is Response.Success ->
 								{
-									bookstore.bookChapter.merge(res.data, book.url)
-									if (res.data.size > oldChaptersList.size)
+									oldChaptersList.join()
+									launch { bookstore.bookChapter.merge(res.data, book.url) }
+									val existingChapters = oldChaptersList.await()
+									val hasNewChapters = res.data.any { it.url !in existingChapters }
+									if (hasNewChapters)
 										newChapters.add(book.title)
 								}
 								is Response.Error -> failed.add(book.title)
