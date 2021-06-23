@@ -115,6 +115,16 @@ object bookstore
 		@Query("SELECT EXISTS(SELECT * FROM Chapter WHERE Chapter.bookUrl = :bookUrl LIMIT 1)")
 		suspend fun hasChapters(bookUrl: String): Boolean
 		
+		@Query(
+			"""
+			SELECT * FROM Chapter
+			WHERE Chapter.bookUrl = :bookUrl
+			ORDER BY Chapter.position ASC
+			LIMIT 1
+		"""
+		)
+		suspend fun getFirstChapter(bookUrl: String): Chapter?
+		
 		@Query("UPDATE Chapter SET read = 1 WHERE url in (:chaptersUrl)")
 		suspend fun setAsRead(chaptersUrl: List<String>)
 		
@@ -297,6 +307,7 @@ object bookstore
 			suspend fun insert(chapters: List<Chapter>) = db.chapterDao().insert(chapters.filter(::isValid))
 			suspend fun replace(chapters: List<Chapter>) = db.chapterDao().replace(chapters.filter(::isValid))
 			suspend fun chapters(bookUrl: String) = db.chapterDao().chapters(bookUrl)
+			suspend fun getFirstChapter(bookUrl: String) = db.chapterDao().getFirstChapter(bookUrl)
 			fun getChaptersWithContexFlow(bookUrl: String) = db.chapterDao().getChaptersWithContextFlow(bookUrl)
 			suspend fun merge(newChapters: List<Chapter>, bookUrl: String)
 			{

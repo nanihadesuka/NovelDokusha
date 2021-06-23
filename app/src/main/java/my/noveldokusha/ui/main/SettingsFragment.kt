@@ -12,8 +12,8 @@ import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.asLiveData
 import com.google.android.material.radiobutton.MaterialRadioButton
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import my.noveldokusha.*
 import my.noveldokusha.databinding.ActivityMainFragmentSettingsBinding

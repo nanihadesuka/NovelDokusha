@@ -16,6 +16,7 @@ import my.noveldokusha.*
 import my.noveldokusha.databinding.ActivityChaptersBinding
 import my.noveldokusha.databinding.ActivityChaptersListHeaderBinding
 import my.noveldokusha.databinding.ActivityChaptersListItemBinding
+import my.noveldokusha.scraper.scrubber
 import my.noveldokusha.ui.BaseActivity
 import my.noveldokusha.ui.databaseSearchResults.DatabaseSearchResultsActivity
 import my.noveldokusha.ui.reader.ReaderActivity
@@ -63,8 +64,6 @@ class ChaptersActivity : BaseActivity()
 		viewModel.onFetching.observe(this) { viewHolder.swipeRefreshLayout.isRefreshing = it }
 		viewModel.chaptersWithContextLiveData.observe(this) {
 			viewAdapter.chapters.setList(it)
-			viewModel.chapters.clear()
-			viewModel.chapters.addAll(it)
 		}
 		
 		setupSelectionModeBar()
@@ -72,9 +71,8 @@ class ChaptersActivity : BaseActivity()
 		viewHolder.floatingActionButton.setOnClickListener {
 			val bookUrl = viewModel.bookMetadata.url
 			lifecycleScope.launch(Dispatchers.IO) {
-				val lastReadChapter = bookstore.bookLibrary.get(extras.bookMetadata.url)?.lastReadChapter ?: withContext(Dispatchers.Main) {
-					viewModel.chapters.asSequence().sortedBy { it.chapter.position }.firstOrNull()?.chapter?.url
-				}
+				val lastReadChapter = bookstore.bookLibrary.get(extras.bookMetadata.url)?.lastReadChapter
+				                      ?: bookstore.bookChapter.getFirstChapter(extras.bookMetadata.url)?.url
 				
 				if (lastReadChapter == null)
 				{
@@ -109,15 +107,15 @@ class ChaptersActivity : BaseActivity()
 		selectionModeBarUpdateVisibility()
 		
 		viewHolder.selectionSelectAll.setOnClickListener {
-			viewModel.selectedChaptersUrl.addAll(viewModel.chapters.map { it.chapter.url })
+			val chapters = viewModel.chaptersWithContextLiveData.value ?: return@setOnClickListener
+			viewModel.selectedChaptersUrl.addAll(chapters.map { it.chapter.url })
 			viewAdapter.chapters.notifyDataSetChanged()
 		}
 		
 		viewHolder.selectionSelectAllUnderSelected.setOnClickListener {
-			val index = viewModel.chapters.indexOfFirst { viewModel.selectedChaptersUrl.contains(it.chapter.url) }
-			if (index == -1) return@setOnClickListener
-			
-			viewModel.selectedChaptersUrl.addAll(viewModel.chapters.drop(index).map { it.chapter.url })
+			val chapters = viewModel.chaptersWithContextLiveData.value ?: return@setOnClickListener
+			val urls = chapters.dropWhile { !viewModel.selectedChaptersUrl.contains(it.chapter.url) }.map { it.chapter.url }
+			viewModel.selectedChaptersUrl.addAll(urls)
 			viewAdapter.chapters.notifyDataSetChanged()
 		}
 		
@@ -299,7 +297,7 @@ private class ChaptersHeaderAdapter(
 		init
 		{
 			viewHolder.bookTitle.text = viewModel.bookMetadata.title
-			viewHolder.sourceName.text = viewModel.sourceName
+			viewHolder.sourceName.text = scrubber.getCompatibleSource(viewModel.bookMetadata.url)?.name ?: ""
 			
 			viewModel.chaptersWithContextLiveData.observe(context) { list ->
 				viewHolder.numberOfChapters.text = list.size.toString()

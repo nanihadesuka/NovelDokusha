@@ -11,7 +11,6 @@ import kotlinx.coroutines.flow.map
 import my.noveldokusha.*
 import my.noveldokusha.scraper.Response
 import my.noveldokusha.scraper.downloadChaptersList
-import my.noveldokusha.scraper.scrubber
 import my.noveldokusha.ui.BaseViewModel
 import my.noveldokusha.uiUtils.stringRes
 import my.noveldokusha.uiUtils.toast
@@ -55,9 +54,6 @@ class ChaptersModel : BaseViewModel()
 	}
 	
 	val preferences = App.instance.appSharedPreferences()
-	
-	val chapters = ArrayList<bookstore.ChapterDao.ChapterWithContext>()
-	val sourceName by lazy { scrubber.getCompatibleSource(this.bookMetadata.url)?.name ?: "" }
 	val onFetching = MutableLiveData<Boolean>()
 	val onError = MutableLiveData<String>()
 	val onErrorVisibility = MutableLiveData<Int>()
