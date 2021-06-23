@@ -106,7 +106,7 @@ class ChaptersIsReadRoutine
 	private val scope = CoroutineScope(Dispatchers.IO)
 	private val chapterRead = mutableMapOf<String, ChapterReadStatus>()
 	
-	private fun checkLoadStatus(chapterUrl: String, fn: (ChapterReadStatus) -> ChapterReadStatus) = scope.launch(Dispatchers.IO) {
+	private fun checkLoadStatus(chapterUrl: String, fn: (ChapterReadStatus) -> ChapterReadStatus) = scope.launch {
 		
 		val chapter = bookstore.bookChapter.get(chapterUrl) ?: return@launch
 		val oldStatus = chapterRead.getOrPut(chapterUrl) {
