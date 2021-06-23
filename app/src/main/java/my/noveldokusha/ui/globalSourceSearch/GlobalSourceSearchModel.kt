@@ -1,5 +1,6 @@
 package my.noveldokusha.ui.globalSourceSearch
 
+import android.os.Parcelable
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.CoroutineScope
 import my.noveldokusha.BookMetadata
@@ -18,9 +19,7 @@ class GlobalSourceSearchModel : BaseViewModel()
 
 data class SourceResults(val source: scrubber.source_interface.catalog, val searchInput: String, val coroutineScope: CoroutineScope)
 {
-	var positionOffset: Int? = null
-	var position: Int? = null
-	
+	var savedState: Parcelable? = null
 	val list = ArrayList<BookMetadata>()
 	val booksFetchIterator = FetchIterator(coroutineScope, list) { source.getCatalogSearch(it, searchInput) }
 	

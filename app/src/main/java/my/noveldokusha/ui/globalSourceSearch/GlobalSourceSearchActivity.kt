@@ -85,23 +85,12 @@ private class GlobalArrayAdapter(
 		val viewHolder = binder.viewHolder
 		binder.itemData = viewModel
 		
-		viewModel.let {
-			val (pos, offset) = Pair(it.position, it.positionOffset)
-			if (pos != null && offset != null)
-				binder.layoutManager.scrollToPositionWithOffset(pos, offset)
-		}
-		
 		viewHolder.name.text = viewModel.source.name
 		viewHolder.recyclerView.visibility = View.VISIBLE
 		viewHolder.noResultsMessage.visibility = View.GONE
+		viewHolder.recyclerView.layoutManager?.onRestoreInstanceState(viewModel.savedState)
 		
 		viewHolder.recyclerView.setOnScrollChangeListener { _, _, _, _, _ ->
-			
-			binder.layoutManager.findFirstVisibleItemPosition().let {
-				viewModel.position = it
-				viewModel.positionOffset = viewHolder.recyclerView.run { getChildAt(0).left - paddingLeft }
-			}
-			
 			viewModel.booksFetchIterator.fetchTrigger {
 				val pos = binder.layoutManager.findLastVisibleItemPosition()
 				return@fetchTrigger pos >= binder.recyclerViewAdapter.itemCount - 3
@@ -117,6 +106,7 @@ private class GlobalArrayAdapter(
 	) : RecyclerView.ViewHolder(viewHolder.root)
 	{
 		var itemData: SourceResults? by Delegates.observable(null) { _, oldValue, newValue ->
+			oldValue?.savedState = viewHolder.recyclerView.layoutManager?.onSaveInstanceState()
 			onFetching.switchLiveData(oldValue, newValue, ctx) { booksFetchIterator.onFetching }
 			onCompletedEmpty.switchLiveData(oldValue, newValue, ctx) { booksFetchIterator.onCompletedEmpty }
 			onSuccess.switchLiveData(oldValue, newValue, ctx) { booksFetchIterator.onSuccess }
