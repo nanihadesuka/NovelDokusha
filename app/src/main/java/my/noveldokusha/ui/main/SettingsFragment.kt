@@ -138,7 +138,7 @@ class SettingsFragment : BaseFragment()
 						return@activityRequest
 					}
 					
-					GlobalScope.launch(Dispatchers.IO) {
+					CoroutineScope(Dispatchers.IO).launch {
 						bookstore.bookLibrary.insert(backupDatabase.bookLibrary.getAll())
 						bookstore.bookChapter.insert(backupDatabase.bookChapter.getAll())
 						bookstore.bookChapterBody.insert(backupDatabase.bookChapterBody.getAll())

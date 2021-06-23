@@ -33,7 +33,7 @@ class LibraryPageModel : BaseViewModel()
 	{
 		refreshing.postValue(true)
 		val completed = showCompleted
-		GlobalScope.launch(Dispatchers.IO) {
+		CoroutineScope(Dispatchers.IO).launch {
 			bookstore.bookLibrary.getAllInLibrary()
 				.filter { it.completed == completed }
 				.groupBy { it.url.toHttpUrlOrNull()?.host }

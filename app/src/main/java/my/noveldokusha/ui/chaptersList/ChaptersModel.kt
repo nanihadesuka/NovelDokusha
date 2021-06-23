@@ -67,7 +67,7 @@ class ChaptersModel : BaseViewModel()
 	fun updateChaptersList()
 	{
 		if (loadChaptersJob?.isActive == true) return
-		loadChaptersJob = GlobalScope.launch(Dispatchers.Main) {
+		loadChaptersJob = CoroutineScope(Dispatchers.Main).launch {
 			
 			onErrorVisibility.value = View.GONE
 			onFetching.value = true
