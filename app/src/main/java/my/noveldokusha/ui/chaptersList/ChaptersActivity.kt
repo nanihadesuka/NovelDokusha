@@ -212,23 +212,15 @@ private class ChaptersArrayAdapter(
 	private val selectionModeBarUpdateVisibility: () -> Unit
 ) : RecyclerView.Adapter<ChaptersArrayAdapter.ViewBinder>()
 {
-	private val differCallback = object : DiffUtil.ItemCallback<bookstore.ChapterDao.ChapterWithContext>()
+	private val differ = AsyncListDiffer(this, object : DiffUtil.ItemCallback<ChapterWithContext>()
 	{
-		override fun areItemsTheSame(
-			oldItem: bookstore.ChapterDao.ChapterWithContext,
-			newItem: bookstore.ChapterDao.ChapterWithContext
-		) = oldItem.chapter.url == newItem.chapter.url
-		
-		override fun areContentsTheSame(
-			oldItem: bookstore.ChapterDao.ChapterWithContext,
-			newItem: bookstore.ChapterDao.ChapterWithContext
-		) = oldItem == newItem
-	}
+		override fun areItemsTheSame(oldItem: ChapterWithContext, newItem: ChapterWithContext) = oldItem.chapter.url == newItem.chapter.url
+		override fun areContentsTheSame(oldItem: ChapterWithContext, newItem: ChapterWithContext) = oldItem == newItem
+	})
 	
-	private val differ = AsyncListDiffer(this, differCallback)
 	private val list get() = differ.currentList
 	
-	fun setList(newList: List<bookstore.ChapterDao.ChapterWithContext>) = differ.submitList(newList)
+	fun setList(newList: List<ChapterWithContext>) = differ.submitList(newList)
 	
 	override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewBinder =
 		ViewBinder(ActivityChaptersListItemBinding.inflate(parent.inflater, parent, false))
@@ -265,7 +257,7 @@ private class ChaptersArrayAdapter(
 		binder.addBottomMargin { position == list.lastIndex }
 	}
 	
-	fun toggleItemSelection(itemData: bookstore.ChapterDao.ChapterWithContext, view: View)
+	fun toggleItemSelection(itemData: ChapterWithContext, view: View)
 	{
 		fun <T> MutableSet<T>.removeOrAdd(value: T) = contains(value).also { if (it) remove(value) else add(value) }
 		val isRemoved = viewModel.selectedChaptersUrl.removeOrAdd(itemData.chapter.url)

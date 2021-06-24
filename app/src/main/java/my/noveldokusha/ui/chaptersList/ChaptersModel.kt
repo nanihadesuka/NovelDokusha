@@ -25,7 +25,7 @@ class ChaptersModel : BaseViewModel()
 			
 			val book = bookstore.bookLibrary.get(bookMetadata.url)
 			if (book == null)
-				bookstore.bookLibrary.insert(bookstore.Book(title = bookMetadata.title, url = bookMetadata.url))
+				bookstore.bookLibrary.insert(Book(title = bookMetadata.title, url = bookMetadata.url))
 		}
 	}
 	

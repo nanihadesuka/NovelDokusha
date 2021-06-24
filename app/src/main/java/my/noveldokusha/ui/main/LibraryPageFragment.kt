@@ -9,6 +9,7 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
@@ -16,9 +17,7 @@ import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.checkbox.checkBoxPrompt
 import com.afollestad.materialdialogs.checkbox.isCheckPromptChecked
 import kotlinx.coroutines.launch
-import my.noveldokusha.BookMetadata
-import my.noveldokusha.R
-import my.noveldokusha.bookstore
+import my.noveldokusha.*
 import my.noveldokusha.databinding.ActivityMainFragmentLibraryPageBinding
 import my.noveldokusha.databinding.ActivityMainFragmentLibraryPageGridviewItemBinding
 import my.noveldokusha.ui.BaseFragment
@@ -41,7 +40,7 @@ class LibraryPageFragment : BaseFragment
 	
 	private inner class Adapter
 	{
-		val gridView by lazy { NovelItemAdapter(this@LibraryPageFragment, viewModel.booksWithContext) }
+		val gridView by lazy { NovelItemAdapter(this@LibraryPageFragment) }
 	}
 	
 	override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View
@@ -55,7 +54,9 @@ class LibraryPageFragment : BaseFragment
 		viewHolder.gridView.itemAnimator = DefaultItemAnimator()
 		viewHolder.swipeRefreshLayout.setOnRefreshListener { viewModel.update() }
 		
-		viewModel.booksWithContextFlow.asLiveData().observe(viewLifecycleOwner) { viewAdapter.gridView.setList(it) }
+		viewModel.booksWithContextFlow.asLiveData().observe(viewLifecycleOwner) {
+			viewAdapter.gridView.setList(it)
+		}
 		
 		viewModel.refreshing.observe(viewLifecycleOwner) { viewHolder.swipeRefreshLayout.isRefreshing = it }
 		viewModel.updateNotice.observe(viewLifecycleOwner) {
@@ -95,24 +96,17 @@ class LibraryPageFragment : BaseFragment
 	
 }
 
-private class NovelItemAdapter(
-	private val context: BaseFragment,
-	private val list: MutableList<bookstore.LibraryDao.BookWithContext>
-) : RecyclerView.Adapter<NovelItemAdapter.ViewBinder>()
+private class NovelItemAdapter(private val context: BaseFragment) : RecyclerView.Adapter<NovelItemAdapter.ViewBinder>()
 {
-	private inner class Diff(private val new: List<bookstore.LibraryDao.BookWithContext>) : DiffUtil.Callback()
+	private val differ = AsyncListDiffer(this, object : DiffUtil.ItemCallback<BookWithContext>()
 	{
-		override fun getOldListSize(): Int = list.size
-		override fun getNewListSize(): Int = new.size
-		override fun areItemsTheSame(oldPos: Int, newPos: Int): Boolean = list[oldPos].book.url == new[newPos].book.url
-		override fun areContentsTheSame(oldPos: Int, newPos: Int): Boolean = list[oldPos] == new[newPos]
-	}
+		override fun areItemsTheSame(oldItem: BookWithContext, newItem: BookWithContext) = oldItem.book.url == newItem.book.url
+		override fun areContentsTheSame(oldItem: BookWithContext, newItem: BookWithContext) = oldItem == newItem
+	})
 	
-	fun setList(newList: List<bookstore.LibraryDao.BookWithContext>) = DiffUtil.calculateDiff(Diff(newList)).let {
-		list.clear()
-		list.addAll(newList)
-		it.dispatchUpdatesTo(this)
-	}
+	private val list get() = differ.currentList
+	
+	fun setList(newList: List<BookWithContext>) = differ.submitList(newList)
 	
 	override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewBinder
 	{
@@ -146,7 +140,7 @@ private class NovelItemAdapter(
 	inner class ViewBinder(val viewHolder: ActivityMainFragmentLibraryPageGridviewItemBinding) : RecyclerView.ViewHolder(viewHolder.root)
 }
 
-private fun completedDialog(context: BaseFragment, book: bookstore.Book) = MaterialDialog(context.requireActivity()).show {
+private fun completedDialog(context: BaseFragment, book: Book) = MaterialDialog(context.requireActivity()).show {
 	title(text = book.title)
 	checkBoxPrompt(text = "Completed", isCheckedDefault = book.completed) {}
 	negativeButton(text = "Cancel")

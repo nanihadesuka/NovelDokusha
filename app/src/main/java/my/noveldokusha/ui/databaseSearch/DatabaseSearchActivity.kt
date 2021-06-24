@@ -8,6 +8,7 @@ import android.view.MenuItem
 import android.view.ViewGroup
 import androidx.activity.viewModels
 import androidx.appcompat.widget.SearchView
+import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
@@ -61,7 +62,7 @@ class DatabaseSearchActivity : BaseActivity()
 		viewHolder.listView.adapter = viewAdapter.listView
 		viewHolder.listView.itemAnimator = DefaultItemAnimator()
 		viewHolder.searchByGenreButton.setOnClickListener { _ ->
-			val list = viewAdapter.listView.list
+			val list = viewModel.genreListLiveData.value ?: return@setOnClickListener
 			val input = DatabaseSearchResultsActivity.SearchMode.Genres(
 				genresIncludeId = ArrayList(list.filter { it.state == Checkbox3StatesView.STATE.POSITIVE }.map { it.genreId }),
 				genresExcludeId = ArrayList(list.filter { it.state == Checkbox3StatesView.STATE.NEGATIVE }.map { it.genreId })
@@ -118,21 +119,15 @@ class DatabaseSearchActivity : BaseActivity()
 
 private class GenresAdapter() : RecyclerView.Adapter<GenresAdapter.ViewBinder>()
 {
-	val list = arrayListOf<DatabaseSearchModel.Item>()
-	
-	private inner class Diff(private val new: List<DatabaseSearchModel.Item>) : DiffUtil.Callback()
+	private val differ = AsyncListDiffer(this, object : DiffUtil.ItemCallback<DatabaseSearchModel.Item>()
 	{
-		override fun getOldListSize(): Int = list.size
-		override fun getNewListSize(): Int = new.size
-		override fun areItemsTheSame(oldPos: Int, newPos: Int): Boolean = list[oldPos].genreId == new[newPos].genreId
-		override fun areContentsTheSame(oldPos: Int, newPos: Int): Boolean = list[oldPos].state == new[newPos].state
-	}
+		override fun areItemsTheSame(old: DatabaseSearchModel.Item, new: DatabaseSearchModel.Item) = old.genreId == new.genreId
+		override fun areContentsTheSame(old: DatabaseSearchModel.Item, new: DatabaseSearchModel.Item) = old.state == new.state
+	})
 	
-	fun setList(newList: List<DatabaseSearchModel.Item>) = DiffUtil.calculateDiff(Diff(newList)).let {
-		list.clear()
-		list.addAll(newList)
-		it.dispatchUpdatesTo(this)
-	}
+	private val list get() = differ.currentList
+	
+	fun setList(newList: List<DatabaseSearchModel.Item>) = differ.submitList(newList)
 	
 	override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewBinder =
 		ViewBinder(ActivityDatabaseSearchGenreItemBinding.inflate(parent.inflater, parent, false))

@@ -2,6 +2,7 @@ package my.noveldokusha.ui.reader
 
 import androidx.lifecycle.SavedStateHandle
 import kotlinx.coroutines.*
+import my.noveldokusha.Chapter
 import my.noveldokusha.bookstore
 import my.noveldokusha.ui.BaseViewModel
 import my.noveldokusha.uiUtils.ObservableNoInitValue
@@ -36,9 +37,9 @@ class ReaderModel(private val savedState: SavedStateHandle) : BaseViewModel()
 	lateinit var bookUrl: String
 		private set
 	
-	val orderedChapters = mutableListOf<bookstore.Chapter>()
+	val orderedChapters = mutableListOf<Chapter>()
 	
-	data class ChapterStats(val size: Int, val chapter: bookstore.Chapter, val index: Int)
+	data class ChapterStats(val size: Int, val chapter: Chapter, val index: Int)
 	
 	val chaptersStats = mutableMapOf<String, ChapterStats>()
 	val items = ArrayList<ReaderActivity.Item>()
@@ -73,7 +74,7 @@ private fun saveLastReadPositionState(bookUrl: String, chapter: ChapterState)
 	}
 }
 
-suspend fun getChapterInitialPosition(bookUrl: String, chapter: bookstore.Chapter, items: ArrayList<ReaderActivity.Item>): Pair<Int, Int>
+suspend fun getChapterInitialPosition(bookUrl: String, chapter: Chapter, items: ArrayList<ReaderActivity.Item>): Pair<Int, Int>
 {
 	val book = CoroutineScope(Dispatchers.IO).async { bookstore.bookLibrary.get(bookUrl) }
 	val titlePos = CoroutineScope(Dispatchers.Default).async {

@@ -24,31 +24,34 @@ data class ChapterMetadata(val title: String, val url: String)
 	override fun hashCode(): Int = url.hashCode()
 }
 
+@Entity
+data class Book(
+	val title: String,
+	@PrimaryKey val url: String,
+	val completed: Boolean = false,
+	val lastReadChapter: String? = null,
+	val inLibrary: Boolean = false
+)
+
+@Entity
+data class Chapter(
+	val title: String,
+	@PrimaryKey val url: String,
+	val bookUrl: String,
+	val position: Int,
+	val read: Boolean = false,
+	val lastReadPosition: Int = 0,
+	val lastReadOffset: Int = 0
+)
+
+@Entity
+data class ChapterBody(@PrimaryKey val url: String, val body: String)
+
+data class BookWithContext(@Embedded val book: Book, val chaptersCount: Int, val chaptersReadCount: Int)
+data class ChapterWithContext(@Embedded val chapter: Chapter, val downloaded: Boolean, val lastReadChapter: Boolean)
+
 object bookstore
 {
-	
-	@Entity
-	data class Book(
-		val title: String,
-		@PrimaryKey val url: String,
-		val completed: Boolean = false,
-		val lastReadChapter: String? = null,
-		val inLibrary: Boolean = false
-	)
-	
-	@Entity
-	data class Chapter(
-		val title: String,
-		@PrimaryKey val url: String,
-		val bookUrl: String,
-		val position: Int,
-		val read: Boolean = false,
-		val lastReadPosition: Int = 0,
-		val lastReadOffset: Int = 0
-	)
-	
-	@Entity
-	data class ChapterBody(@PrimaryKey val url: String, val body: String)
 	
 	@Dao
 	interface LibraryDao
@@ -82,8 +85,6 @@ object bookstore
 		
 		@Query("SELECT EXISTS(SELECT * FROM Book WHERE url == :url AND inLibrary == 1)")
 		fun existInLibraryFlow(url: String): Flow<Boolean>
-		
-		data class BookWithContext(@Embedded val book: Book, val chaptersCount: Int, val chaptersReadCount: Int)
 		
 		@Query(
 			"""
@@ -148,8 +149,6 @@ object bookstore
 		
 		@Query("DELETE FROM Chapter WHERE Chapter.bookUrl NOT IN (SELECT Book.url FROM Book)")
 		suspend fun removeAllNonLibraryRows()
-		
-		data class ChapterWithContext(@Embedded val chapter: Chapter, val downloaded: Boolean, val lastReadChapter: Boolean)
 		
 		@Query(
 			"""

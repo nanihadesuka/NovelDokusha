@@ -24,7 +24,6 @@ import my.noveldokusha.ui.webView.WebViewActivity
 import my.noveldokusha.uiAdapters.ProgressBarAdapter
 import my.noveldokusha.uiUtils.*
 import java.util.*
-import kotlin.collections.ArrayList
 import kotlin.properties.Delegates
 
 class SourceCatalogActivity : BaseActivity()
@@ -68,7 +67,8 @@ class SourceCatalogActivity : BaseActivity()
 		viewHolder.recyclerView.setOnScrollChangeListener { _, _, _, _, _ ->
 			viewModel.fetchIterator.fetchTrigger {
 				val pos = viewLayoutManager.recyclerView.findLastVisibleItemPosition()
-				pos >= viewModel.list.size - 3
+				val listSize = viewHolder.recyclerView.adapter?.itemCount ?: return@fetchTrigger false
+				pos >= listSize - 3
 			}
 		}
 		
@@ -138,28 +138,15 @@ class SourceCatalogActivity : BaseActivity()
 	
 	class BooksItemAdapter(val ctx: BaseActivity) : RecyclerView.Adapter<BooksItemAdapter.ViewBinder>()
 	{
-		private val list = ArrayList<CatalogItem>()
-		
-		fun addAll(newItems: List<CatalogItem>)
+		private val differ = AsyncListDiffer(this, object : DiffUtil.ItemCallback<CatalogItem>()
 		{
-			val size = list.size
-			list.addAll(newItems)
-			notifyItemRangeInserted(size, newItems.size)
-		}
+			override fun areItemsTheSame(oldItem: CatalogItem, newItem: CatalogItem) = oldItem.bookMetadata.url == newItem.bookMetadata.url
+			override fun areContentsTheSame(oldItem: CatalogItem, newItem: CatalogItem) = oldItem.bookMetadata == newItem.bookMetadata
+		})
 		
-		private inner class Diff(private val new: List<CatalogItem>) : DiffUtil.Callback()
-		{
-			override fun getOldListSize(): Int = list.size
-			override fun getNewListSize(): Int = new.size
-			override fun areItemsTheSame(oldPos: Int, newPos: Int): Boolean = list[oldPos].bookMetadata.url == new[newPos].bookMetadata.url
-			override fun areContentsTheSame(oldPos: Int, newPos: Int): Boolean = list[oldPos].bookMetadata == new[newPos].bookMetadata
-		}
+		private val list get() = differ.currentList
 		
-		fun setList(newList: List<CatalogItem>) = DiffUtil.calculateDiff(Diff(newList)).let {
-			list.clear()
-			list.addAll(newList)
-			it.dispatchUpdatesTo(this)
-		}
+		fun setList(newList: List<CatalogItem>) = differ.submitList(newList)
 		
 		override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewBinder =
 			ViewBinder(BookListItemBinding.inflate(parent.inflater, parent, false))

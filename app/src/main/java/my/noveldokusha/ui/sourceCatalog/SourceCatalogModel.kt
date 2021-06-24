@@ -13,7 +13,7 @@ class SourceCatalogModel : BaseViewModel()
 {
 	fun initialization(source: scrubber.source_interface.catalog) = callOneTime {
 		this.source = source
-		fetchIterator = FetchIterator(viewModelScope, list) { source.getCatalogList(it).transform() }
+		fetchIterator = FetchIterator(viewModelScope) { source.getCatalogList(it).transform() }
 		startCatalogListMode()
 	}
 	
@@ -28,7 +28,6 @@ class SourceCatalogModel : BaseViewModel()
 		val isInLibraryLiveData = bookstore.bookLibrary.existInLibraryFlow(bookMetadata.url).asLiveData()
 	}
 	
-	val list = ArrayList<CatalogItem>()
 	lateinit var source: scrubber.source_interface.catalog
 	lateinit var fetchIterator: FetchIterator<CatalogItem>
 	

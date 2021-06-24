@@ -231,7 +231,7 @@ suspend fun downloadChapter(chapterUrl: String): Response<ChapterDownload>
 	}
 }
 
-suspend fun downloadChaptersList(bookUrl: String): Response<List<bookstore.Chapter>>
+suspend fun downloadChaptersList(bookUrl: String): Response<List<Chapter>>
 {
 	val error by lazy {
 		"""
@@ -248,7 +248,7 @@ suspend fun downloadChaptersList(bookUrl: String): Response<List<bookstore.Chapt
 	return tryConnect {
 		val doc = fetchDoc(bookUrl)
 		scrap.getChapterList(doc)
-			.mapIndexed { index, it -> bookstore.Chapter(title = it.title, url = it.url, bookUrl = bookUrl, position = index) }
+			.mapIndexed { index, it -> Chapter(title = it.title, url = it.url, bookUrl = bookUrl, position = index) }
 			.let { Response.Success(it) }
 	}
 }
@@ -299,7 +299,7 @@ suspend fun fetchDoc(url: Uri.Builder, timeoutMilliseconds: Int = 20 * 1000) = f
 
 class FetchIterator<T>(
 	private val coroutineScope: CoroutineScope,
-	val list: ArrayList<T> = ArrayList(),
+	private val list: ArrayList<T> = ArrayList(listOf()),
 	private var fn: (suspend (index: Int) -> Response<List<T>>)
 )
 {
@@ -328,7 +328,7 @@ class FetchIterator<T>(
 		state = STATE.IDLE
 		index = 0
 		list.clear()
-		onSuccess.value = list
+		onSuccess.value = list.toList()
 		onReset.value = Unit
 	}
 	
@@ -371,7 +371,7 @@ class FetchIterator<T>(
 					{
 						state = STATE.IDLE
 						list.addAll(res.data)
-						onSuccess.value = list
+						onSuccess.value = list.toList()
 					}
 				}
 				is Response.Error ->

@@ -10,7 +10,7 @@ class DatabaseSearchResultsModel : BaseViewModel()
 {
 	fun initialization(database: scrubber.database_interface, input: DatabaseSearchResultsActivity.SearchMode) = callOneTime {
 		this.database = database
-		this.fetchIterator = FetchIterator(viewModelScope, searchResults) { index ->
+		this.fetchIterator = FetchIterator(viewModelScope) { index ->
 			when (input)
 			{
 				is DatabaseSearchResultsActivity.SearchMode.Text -> database.getSearch(index, input.text)
@@ -23,7 +23,6 @@ class DatabaseSearchResultsModel : BaseViewModel()
 	
 	lateinit var fetchIterator: FetchIterator<BookMetadata>
 	lateinit var database: scrubber.database_interface
-	private val searchResults = ArrayList<BookMetadata>()
 }
 
 

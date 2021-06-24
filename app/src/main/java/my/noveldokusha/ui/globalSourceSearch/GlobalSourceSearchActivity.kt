@@ -141,21 +141,15 @@ private class LocalArrayAdapter(
 	private val context: BaseActivity
 ) : RecyclerView.Adapter<LocalArrayAdapter.ViewBinder>()
 {
-	private val list = ArrayList<BookMetadata>()
-	
-	private inner class Diff(private val new: List<BookMetadata>) : DiffUtil.Callback()
+	private val differ = AsyncListDiffer(this, object : DiffUtil.ItemCallback<BookMetadata>()
 	{
-		override fun getOldListSize(): Int = list.size
-		override fun getNewListSize(): Int = new.size
-		override fun areItemsTheSame(oldPos: Int, newPos: Int): Boolean = list[oldPos].url == new[newPos].url
-		override fun areContentsTheSame(oldPos: Int, newPos: Int): Boolean = list[oldPos] == new[newPos]
-	}
+		override fun areItemsTheSame(oldItem: BookMetadata, newItem: BookMetadata) = oldItem.url == newItem.url
+		override fun areContentsTheSame(oldItem: BookMetadata, newItem: BookMetadata) = oldItem == newItem
+	})
 	
-	fun setList(newList: List<BookMetadata>) = DiffUtil.calculateDiff(Diff(newList)).let {
-		list.clear()
-		list.addAll(newList)
-		it.dispatchUpdatesTo(this)
-	}
+	private val list get() = differ.currentList
+	
+	fun setList(newList: List<BookMetadata>) = differ.submitList(newList)
 	
 	override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =
 		ViewBinder(ActivityGlobalSourceSearchResultItemBinding.inflate(parent.inflater, parent, false))
