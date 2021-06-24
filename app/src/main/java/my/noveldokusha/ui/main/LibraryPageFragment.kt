@@ -60,9 +60,9 @@ class LibraryPageFragment : BaseFragment
 		
 		viewModel.refreshing.observe(viewLifecycleOwner) { viewHolder.swipeRefreshLayout.isRefreshing = it }
 		viewModel.updateNotice.observe(viewLifecycleOwner) {
-			if (it.newChapters.isNotEmpty()) notifyUpdated(it.newChapters.joinToString("\n"))
-			if (it.failed.isNotEmpty()) notifyUpdatedFails(it.failed.joinToString("\n"))
-			if (it.newChapters.isEmpty()) toast("No updates found")
+			if (it.hasUpdates.isNotEmpty()) notifyUpdated(it.hasUpdates.joinToString("\n"))
+			if (it.hasFailed.isNotEmpty()) notifyUpdatedFails(it.hasFailed.joinToString("\n"))
+			if (it.hasUpdates.isEmpty()) toast("No updates found")
 		}
 		
 		return viewHolder.root

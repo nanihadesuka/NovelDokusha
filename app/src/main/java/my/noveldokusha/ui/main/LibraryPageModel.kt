@@ -3,6 +3,7 @@ package my.noveldokusha.ui.main
 import androidx.lifecycle.MutableLiveData
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.map
+import my.noveldokusha.Book
 import my.noveldokusha.bookstore
 import my.noveldokusha.scraper.Response
 import my.noveldokusha.scraper.downloadChaptersList
@@ -23,7 +24,7 @@ class LibraryPageModel : BaseViewModel()
 	private var showCompleted by Delegates.notNull<Boolean>()
 	val refreshing = MutableLiveData(false)
 	
-	data class UpdateNotice(val newChapters: List<String>, val failed: List<String>)
+	data class UpdateNotice(val hasUpdates: List<String>, val hasFailed: List<String>)
 	
 	val updateNotice = MutableLiveData<UpdateNotice>()
 	
@@ -35,35 +36,35 @@ class LibraryPageModel : BaseViewModel()
 			bookstore.bookLibrary.getAllInLibrary()
 				.filter { it.completed == completed }
 				.groupBy { it.url.toHttpUrlOrNull()?.host }
-				.map { (host, books) ->
-					val newChapters = mutableListOf<String>()
-					val failed = mutableListOf<String>()
-					async(Dispatchers.IO) {
-						for (book in books)
-						{
-							val oldChaptersList = async { bookstore.bookChapter.chapters(book.url).map { it.url }.toSet() }
-							when (val res = downloadChaptersList(book.url))
-							{
-								is Response.Success ->
-								{
-									oldChaptersList.join()
-									launch { bookstore.bookChapter.merge(res.data, book.url) }
-									val existingChapters = oldChaptersList.await()
-									val hasNewChapters = res.data.any { it.url !in existingChapters }
-									if (hasNewChapters)
-										newChapters.add(book.title)
-								}
-								is Response.Error -> failed.add(book.title)
-							}
-						}
-						return@async Pair(newChapters, failed)
-					}
-				}.awaitAll()
+				.map { (_, books) -> async { updateBooks(books) } }
+				.awaitAll()
 				.unzip()
-				.let { (newChapters, failed) -> newChapters.flatten() to failed.flatten() }
-				.let { (newChapters, failed) -> updateNotice.postValue(UpdateNotice(newChapters, failed)) }
+				.let { (hasUpdates, hasFailed) -> updateNotice.postValue(UpdateNotice(hasUpdates.flatten(), hasFailed.flatten())) }
 			
 			refreshing.postValue(false)
 		}
 	}
+}
+
+private suspend fun updateBooks(books: List<Book>): Pair<List<String>, List<String>> = withContext(Dispatchers.Default)
+{
+	val hasUpdates = mutableListOf<String>()
+	val hasFailed = mutableListOf<String>()
+	for (book in books)
+	{
+		val oldChaptersList = async(Dispatchers.IO) { bookstore.bookChapter.chapters(book.url).map { it.url }.toSet() }
+		when (val res = downloadChaptersList(book.url))
+		{
+			is Response.Success ->
+			{
+				oldChaptersList.join()
+				launch(Dispatchers.IO) { bookstore.bookChapter.merge(res.data, book.url) }
+				val hasNewChapters = res.data.any { it.url !in oldChaptersList.await() }
+				if (hasNewChapters)
+					hasUpdates.add(book.title)
+			}
+			is Response.Error -> hasFailed.add(book.title)
+		}
+	}
+	Pair(hasUpdates, hasFailed)
 }
