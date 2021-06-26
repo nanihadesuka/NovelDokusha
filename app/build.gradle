@@ -81,7 +81,6 @@ dependencies {
     implementation 'org.jsoup:jsoup:1.13.1'
 
     implementation 'org.jetbrains.kotlin:kotlin-script-runtime:1.4.21'
-    implementation "org.jetbrains.kotlin:kotlin-reflect:1.4.21"
 
     implementation 'com.afollestad.material-dialogs:core:3.2.1'
 
