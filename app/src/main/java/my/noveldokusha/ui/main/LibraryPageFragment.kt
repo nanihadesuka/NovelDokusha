@@ -9,9 +9,7 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.lifecycleScope
-import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DefaultItemAnimator
-import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.checkbox.checkBoxPrompt
@@ -22,6 +20,7 @@ import my.noveldokusha.databinding.ActivityMainFragmentLibraryPageBinding
 import my.noveldokusha.databinding.ActivityMainFragmentLibraryPageGridviewItemBinding
 import my.noveldokusha.ui.BaseFragment
 import my.noveldokusha.ui.chaptersList.ChaptersActivity
+import my.noveldokusha.uiAdapters.MyListAdapter
 import my.noveldokusha.uiUtils.*
 
 class LibraryPageFragment : BaseFragment
@@ -55,7 +54,7 @@ class LibraryPageFragment : BaseFragment
 		viewHolder.swipeRefreshLayout.setOnRefreshListener { viewModel.update() }
 		
 		viewModel.booksWithContextFlow.asLiveData().observe(viewLifecycleOwner) {
-			viewAdapter.gridView.setList(it)
+			viewAdapter.gridView.list = it
 		}
 		
 		viewModel.refreshing.observe(viewLifecycleOwner) { viewHolder.swipeRefreshLayout.isRefreshing = it }
@@ -96,28 +95,17 @@ class LibraryPageFragment : BaseFragment
 	
 }
 
-private class NovelItemAdapter(private val context: BaseFragment) : RecyclerView.Adapter<NovelItemAdapter.ViewBinder>()
+private class NovelItemAdapter(private val context: BaseFragment) : MyListAdapter<BookWithContext, NovelItemAdapter.ViewBinder>()
 {
-	private val differ = AsyncListDiffer(this, object : DiffUtil.ItemCallback<BookWithContext>()
-	{
-		override fun areItemsTheSame(oldItem: BookWithContext, newItem: BookWithContext) = oldItem.book.url == newItem.book.url
-		override fun areContentsTheSame(oldItem: BookWithContext, newItem: BookWithContext) = oldItem == newItem
-	})
+	override fun areItemsTheSame(old: BookWithContext, new: BookWithContext) = old.book.url == new.book.url
+	override fun areContentsTheSame(old: BookWithContext, new: BookWithContext) = old == new
 	
-	private val list get() = differ.currentList
-	
-	fun setList(newList: List<BookWithContext>) = differ.submitList(newList)
-	
-	override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewBinder
-	{
-		return ViewBinder(ActivityMainFragmentLibraryPageGridviewItemBinding.inflate(parent.inflater, parent, false))
-	}
-	
-	override fun getItemCount() = list.size
+	override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewBinder =
+		ViewBinder(ActivityMainFragmentLibraryPageGridviewItemBinding.inflate(parent.inflater, parent, false))
 	
 	override fun onBindViewHolder(binder: ViewBinder, position: Int)
 	{
-		val viewModel = this.list[position]
+		val viewModel = list[position]
 		val viewHolder = binder.viewHolder
 		
 		viewHolder.title.text = viewModel.book.title

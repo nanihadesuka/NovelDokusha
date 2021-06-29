@@ -8,9 +8,7 @@ import android.view.MenuItem
 import android.view.ViewGroup
 import androidx.activity.viewModels
 import androidx.appcompat.widget.SearchView
-import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DefaultItemAnimator
-import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import my.noveldokusha.R
 import my.noveldokusha.databinding.ActivityDatabaseSearchBinding
@@ -18,6 +16,7 @@ import my.noveldokusha.databinding.ActivityDatabaseSearchGenreItemBinding
 import my.noveldokusha.scraper.scrubber
 import my.noveldokusha.ui.BaseActivity
 import my.noveldokusha.ui.databaseSearchResults.DatabaseSearchResultsActivity
+import my.noveldokusha.uiAdapters.MyListAdapter
 import my.noveldokusha.uiUtils.Extra_String
 import my.noveldokusha.uiUtils.inflater
 import my.noveldokusha.uiViews.Checkbox3StatesView
@@ -73,7 +72,7 @@ class DatabaseSearchActivity : BaseActivity()
 				.let(this@DatabaseSearchActivity::startActivity)
 		}
 		viewModel.genreListLiveData.observe(this) { list ->
-			viewAdapter.listView.setList(list)
+			viewAdapter.listView.list = list
 		}
 	}
 	
@@ -117,22 +116,13 @@ class DatabaseSearchActivity : BaseActivity()
 	
 }
 
-private class GenresAdapter() : RecyclerView.Adapter<GenresAdapter.ViewBinder>()
+private class GenresAdapter : MyListAdapter<DatabaseSearchModel.Item, GenresAdapter.ViewBinder>()
 {
-	private val differ = AsyncListDiffer(this, object : DiffUtil.ItemCallback<DatabaseSearchModel.Item>()
-	{
-		override fun areItemsTheSame(old: DatabaseSearchModel.Item, new: DatabaseSearchModel.Item) = old.genreId == new.genreId
-		override fun areContentsTheSame(old: DatabaseSearchModel.Item, new: DatabaseSearchModel.Item) = old.state == new.state
-	})
-	
-	private val list get() = differ.currentList
-	
-	fun setList(newList: List<DatabaseSearchModel.Item>) = differ.submitList(newList)
+	override fun areItemsTheSame(old: DatabaseSearchModel.Item, new: DatabaseSearchModel.Item) = old.genreId == new.genreId
+	override fun areContentsTheSame(old: DatabaseSearchModel.Item, new: DatabaseSearchModel.Item) = old.state == new.state
 	
 	override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewBinder =
 		ViewBinder(ActivityDatabaseSearchGenreItemBinding.inflate(parent.inflater, parent, false))
-	
-	override fun getItemCount() = list.size
 	
 	override fun onBindViewHolder(binder: ViewBinder, position: Int)
 	{

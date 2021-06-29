@@ -6,7 +6,6 @@ import android.os.Bundle
 import android.view.*
 import androidx.activity.viewModels
 import androidx.appcompat.widget.SearchView
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.*
@@ -21,6 +20,7 @@ import my.noveldokusha.ui.BaseActivity
 import my.noveldokusha.ui.chaptersList.ChaptersActivity
 import my.noveldokusha.ui.sourceCatalog.SourceCatalogModel.CatalogItem
 import my.noveldokusha.ui.webView.WebViewActivity
+import my.noveldokusha.uiAdapters.MyListAdapter
 import my.noveldokusha.uiAdapters.ProgressBarAdapter
 import my.noveldokusha.uiUtils.*
 import java.util.*
@@ -73,7 +73,7 @@ class SourceCatalogActivity : BaseActivity()
 		}
 		
 		viewModel.fetchIterator.onSuccess.observe(this) {
-			viewAdapter.recyclerView.setList(it)
+			viewAdapter.recyclerView.list = it
 		}
 		viewModel.fetchIterator.onError.observe(this) {
 			viewHolder.errorMessage.visibility = View.VISIBLE
@@ -136,22 +136,13 @@ class SourceCatalogActivity : BaseActivity()
 		return true
 	}
 	
-	class BooksItemAdapter(val ctx: BaseActivity) : RecyclerView.Adapter<BooksItemAdapter.ViewBinder>()
+	class BooksItemAdapter(val ctx: BaseActivity) : MyListAdapter<CatalogItem, BooksItemAdapter.ViewBinder>()
 	{
-		private val differ = AsyncListDiffer(this, object : DiffUtil.ItemCallback<CatalogItem>()
-		{
-			override fun areItemsTheSame(oldItem: CatalogItem, newItem: CatalogItem) = oldItem.bookMetadata.url == newItem.bookMetadata.url
-			override fun areContentsTheSame(oldItem: CatalogItem, newItem: CatalogItem) = oldItem.bookMetadata == newItem.bookMetadata
-		})
-		
-		private val list get() = differ.currentList
-		
-		fun setList(newList: List<CatalogItem>) = differ.submitList(newList)
+		override fun areItemsTheSame(old: CatalogItem, new: CatalogItem) = old.bookMetadata.url == new.bookMetadata.url
+		override fun areContentsTheSame(old: CatalogItem, new: CatalogItem) = old.bookMetadata == new.bookMetadata
 		
 		override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewBinder =
 			ViewBinder(BookListItemBinding.inflate(parent.inflater, parent, false))
-		
-		override fun getItemCount() = list.size
 		
 		override fun onBindViewHolder(binder: ViewBinder, position: Int)
 		{
@@ -179,6 +170,8 @@ class SourceCatalogActivity : BaseActivity()
 			binder.addBottomMargin { position == list.lastIndex }
 		}
 		
+		private val selectedTextColor by lazy { R.attr.colorAccent.colorAttrRes(ctx) }
+		
 		inner class ViewBinder(val viewHolder: BookListItemBinding) : RecyclerView.ViewHolder(viewHolder.root)
 		{
 			var itemData: CatalogItem? by Delegates.observable(null) { _, oldValue, newValue ->
@@ -186,7 +179,6 @@ class SourceCatalogActivity : BaseActivity()
 			}
 			
 			private val unselectedTextColor = viewHolder.title.currentTextColor
-			private val selectedTextColor by lazy { ContextCompat.getColor(ctx, R.color.dark_green) }
 			private val isInLibraryObserver = Observer<Boolean> { isInLibrary ->
 				viewHolder.title.setTextColor(if (isInLibrary) selectedTextColor else unselectedTextColor)
 			}

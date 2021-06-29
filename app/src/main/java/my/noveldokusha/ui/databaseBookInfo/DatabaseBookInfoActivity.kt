@@ -27,6 +27,7 @@ import my.noveldokusha.scraper.scrubber
 import my.noveldokusha.ui.BaseActivity
 import my.noveldokusha.ui.databaseSearchResults.DatabaseSearchResultsActivity
 import my.noveldokusha.ui.globalSourceSearch.GlobalSourceSearchActivity
+import my.noveldokusha.uiAdapters.MyListAdapter
 import my.noveldokusha.uiUtils.Extra_String
 import my.noveldokusha.uiUtils.fadeIn
 import my.noveldokusha.uiUtils.inflater
@@ -56,8 +57,8 @@ class DatabaseBookInfoActivity : BaseActivity()
 	private val viewHolder by lazy { ActivityDatabaseBookInfoBinding.inflate(layoutInflater) }
 	private val viewAdapter = object
 	{
-		val relatedBooks by lazy { BookArrayAdapter(this@DatabaseBookInfoActivity, viewModel.relatedBooks, viewModel.database.baseUrl) }
-		val similarRecommended by lazy { BookArrayAdapter(this@DatabaseBookInfoActivity, viewModel.similarRecommended, viewModel.database.baseUrl) }
+		val relatedBooks by lazy { BookArrayAdapter(this@DatabaseBookInfoActivity, viewModel.database.baseUrl) }
+		val similarRecommended by lazy { BookArrayAdapter(this@DatabaseBookInfoActivity, viewModel.database.baseUrl) }
 	}
 	
 	override fun onCreate(savedInstanceState: Bundle?)
@@ -79,11 +80,6 @@ class DatabaseBookInfoActivity : BaseActivity()
 		
 		viewModel.bookDataLiveData.observe(this) { res ->
 			val data = if (res is Response.Success) res.data else return@observe
-			
-			viewModel.relatedBooks.clear()
-			viewModel.relatedBooks.addAll(data.relatedBooks)
-			viewModel.similarRecommended.clear()
-			viewModel.similarRecommended.addAll(data.similarRecommended)
 			
 			if (data.genres.isNotEmpty())
 			{
@@ -155,12 +151,14 @@ class DatabaseBookInfoActivity : BaseActivity()
 			viewHolder.tags.fadeIn(700)
 			viewHolder.bookType.fadeIn(700)
 			
-			viewModel.relatedBooks.isEmpty().let { empty ->
+			viewAdapter.relatedBooks.list = data.relatedBooks.toList()
+			data.relatedBooks.isEmpty().let { empty ->
 				viewHolder.relatedBooks.visibility = if (empty) View.GONE else View.VISIBLE
 				viewHolder.relatedBooksNoEntries.visibility = if (empty) View.VISIBLE else View.GONE
 			}
 			
-			viewModel.similarRecommended.isEmpty().let { empty ->
+			viewAdapter.similarRecommended.list = data.similarRecommended.toList()
+			data.similarRecommended.isEmpty().let { empty ->
 				viewHolder.similarRecommended.visibility = if (empty) View.GONE else View.VISIBLE
 				viewHolder.similarRecommendedNoEntries.visibility = if (empty) View.VISIBLE else View.GONE
 			}
@@ -189,18 +187,18 @@ class DatabaseBookInfoActivity : BaseActivity()
 
 private class BookArrayAdapter(
 	private val context: BaseActivity,
-	private val list: ArrayList<BookMetadata>,
 	private val databaseUrlBase: String
-) : RecyclerView.Adapter<BookArrayAdapter.ViewBinder>()
+) : MyListAdapter<BookMetadata, BookArrayAdapter.ViewBinder>()
 {
+	override fun areItemsTheSame(old: BookMetadata, new: BookMetadata) = old.url == new.url
+	override fun areContentsTheSame(old: BookMetadata, new: BookMetadata) = old == new
+	
 	override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =
 		ViewBinder(BookListItemBinding.inflate(parent.inflater, parent, false))
 	
-	override fun getItemCount() = this@BookArrayAdapter.list.size
-	
 	override fun onBindViewHolder(binder: ViewBinder, position: Int)
 	{
-		val itemData = this.list[position]
+		val itemData = list[position]
 		val itemHolder = binder.viewHolder
 		itemHolder.title.text = itemData.title
 		itemHolder.title.setOnClickListener {

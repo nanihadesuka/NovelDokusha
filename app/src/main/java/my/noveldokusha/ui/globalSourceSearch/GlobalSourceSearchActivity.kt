@@ -15,6 +15,7 @@ import my.noveldokusha.databinding.ActivityGlobalSourceSearchListItemBinding
 import my.noveldokusha.databinding.ActivityGlobalSourceSearchResultItemBinding
 import my.noveldokusha.ui.BaseActivity
 import my.noveldokusha.ui.chaptersList.ChaptersActivity
+import my.noveldokusha.uiAdapters.MyListAdapter
 import my.noveldokusha.uiAdapters.ProgressBarHorizontalAdapter
 import my.noveldokusha.uiUtils.*
 import kotlin.properties.Delegates
@@ -124,7 +125,7 @@ private class GlobalArrayAdapter(
 		}
 		
 		val onSuccess = Observer<List<BookMetadata>> {
-			recyclerViewAdapter.setList(it)
+			recyclerViewAdapter.list = it
 		}
 		
 		val layoutManager = LinearLayoutManager(ctx, LinearLayoutManager.HORIZONTAL, false)
@@ -137,24 +138,13 @@ private class GlobalArrayAdapter(
 	}
 }
 
-private class LocalArrayAdapter(
-	private val context: BaseActivity
-) : RecyclerView.Adapter<LocalArrayAdapter.ViewBinder>()
+private class LocalArrayAdapter(private val context: BaseActivity) : MyListAdapter<BookMetadata, LocalArrayAdapter.ViewBinder>()
 {
-	private val differ = AsyncListDiffer(this, object : DiffUtil.ItemCallback<BookMetadata>()
-	{
-		override fun areItemsTheSame(oldItem: BookMetadata, newItem: BookMetadata) = oldItem.url == newItem.url
-		override fun areContentsTheSame(oldItem: BookMetadata, newItem: BookMetadata) = oldItem == newItem
-	})
-	
-	private val list get() = differ.currentList
-	
-	fun setList(newList: List<BookMetadata>) = differ.submitList(newList)
+	override fun areItemsTheSame(old: BookMetadata, new: BookMetadata) = old.url == new.url
+	override fun areContentsTheSame(old: BookMetadata, new: BookMetadata) = old == new
 	
 	override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =
 		ViewBinder(ActivityGlobalSourceSearchResultItemBinding.inflate(parent.inflater, parent, false))
-	
-	override fun getItemCount() = this.list.size
 	
 	override fun onBindViewHolder(binder: ViewBinder, position: Int)
 	{

@@ -17,9 +17,6 @@ class DatabaseBookInfoModel : BaseViewModel()
 		this.bookMetadata = bookMetadata
 	}
 	
-	val relatedBooks = ArrayList<BookMetadata>()
-	val similarRecommended = ArrayList<BookMetadata>()
-	
 	lateinit var database: scrubber.database_interface
 	lateinit var bookMetadata: BookMetadata
 	

@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.annotation.AttrRes
 import androidx.annotation.ColorInt
+import androidx.annotation.ColorRes
 import androidx.annotation.StringRes
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.use
@@ -59,7 +60,7 @@ fun @receiver:AttrRes Int.colorAttrRes(ctx: Context): Int = ctx.theme.obtainStyl
 }
 
 @ColorInt
-fun @receiver:AttrRes Int.colorIdRes(ctx: Context): Int = ContextCompat.getColor(ctx, this)
+fun @receiver:ColorRes Int.colorIdRes(ctx: Context): Int = ContextCompat.getColor(ctx, this)
 
 fun @receiver:StringRes Int.stringRes(): String = App.instance.getString(this)
 

@@ -20,6 +20,7 @@ import my.noveldokusha.scraper.scrubber
 import my.noveldokusha.ui.BaseActivity
 import my.noveldokusha.ui.databaseSearchResults.DatabaseSearchResultsActivity
 import my.noveldokusha.ui.reader.ReaderActivity
+import my.noveldokusha.uiAdapters.MyListAdapter
 import my.noveldokusha.uiUtils.*
 import java.util.*
 import kotlin.time.ExperimentalTime
@@ -63,7 +64,7 @@ class ChaptersActivity : BaseActivity()
 		viewHolder.swipeRefreshLayout.setOnRefreshListener { viewModel.updateChaptersList() }
 		viewModel.onFetching.observe(this) { viewHolder.swipeRefreshLayout.isRefreshing = it }
 		viewModel.chaptersWithContextLiveData.observe(this) {
-			viewAdapter.chapters.setList(it)
+			viewAdapter.chapters.list = it
 		}
 		
 		setupSelectionModeBar()
@@ -210,22 +211,13 @@ private class ChaptersArrayAdapter(
 	private val context: BaseActivity,
 	private val viewModel: ChaptersModel,
 	private val selectionModeBarUpdateVisibility: () -> Unit
-) : RecyclerView.Adapter<ChaptersArrayAdapter.ViewBinder>()
+) : MyListAdapter<ChapterWithContext, ChaptersArrayAdapter.ViewBinder>()
 {
-	private val differ = AsyncListDiffer(this, object : DiffUtil.ItemCallback<ChapterWithContext>()
-	{
-		override fun areItemsTheSame(oldItem: ChapterWithContext, newItem: ChapterWithContext) = oldItem.chapter.url == newItem.chapter.url
-		override fun areContentsTheSame(oldItem: ChapterWithContext, newItem: ChapterWithContext) = oldItem == newItem
-	})
-	
-	private val list get() = differ.currentList
-	
-	fun setList(newList: List<ChapterWithContext>) = differ.submitList(newList)
+	override fun areItemsTheSame(old: ChapterWithContext, new: ChapterWithContext) = old.chapter.url == new.chapter.url
+	override fun areContentsTheSame(old: ChapterWithContext, new: ChapterWithContext) = old == new
 	
 	override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewBinder =
 		ViewBinder(ActivityChaptersListItemBinding.inflate(parent.inflater, parent, false))
-	
-	override fun getItemCount() = list.size
 	
 	override fun onBindViewHolder(binder: ViewBinder, position: Int)
 	{

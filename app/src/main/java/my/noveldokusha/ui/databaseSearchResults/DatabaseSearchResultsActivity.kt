@@ -14,6 +14,7 @@ import my.noveldokusha.databinding.BookListItemBinding
 import my.noveldokusha.scraper.scrubber
 import my.noveldokusha.ui.BaseActivity
 import my.noveldokusha.ui.databaseBookInfo.DatabaseBookInfoActivity
+import my.noveldokusha.uiAdapters.MyListAdapter
 import my.noveldokusha.uiAdapters.ProgressBarAdapter
 import my.noveldokusha.uiUtils.*
 import java.io.InvalidObjectException
@@ -112,7 +113,7 @@ class DatabaseSearchResultsActivity : BaseActivity()
 			viewAdapter.progressBar.visible = it
 		}
 		viewModel.fetchIterator.onSuccess.observe(this) {
-			viewAdapter.recyclerView.setList(it)
+			viewAdapter.recyclerView.list = it
 		}
 		
 		supportActionBar!!.let {
@@ -138,22 +139,13 @@ class DatabaseSearchResultsActivity : BaseActivity()
 private class ChaptersArrayAdapter(
 	private val context: BaseActivity,
 	private val databaseUrlBase: String
-) : RecyclerView.Adapter<ChaptersArrayAdapter.ViewBinder>()
+) : MyListAdapter<BookMetadata, ChaptersArrayAdapter.ViewBinder>()
 {
-	private val differ = AsyncListDiffer(this, object : DiffUtil.ItemCallback<BookMetadata>()
-	{
-		override fun areItemsTheSame(oldItem: BookMetadata, newItem: BookMetadata) = oldItem.url == newItem.url
-		override fun areContentsTheSame(oldItem: BookMetadata, newItem: BookMetadata) = oldItem == newItem
-	})
-	
-	private val list get() = differ.currentList
-	
-	fun setList(newList: List<BookMetadata>) = differ.submitList(newList)
+	override fun areItemsTheSame(old: BookMetadata, new: BookMetadata) = old.url == new.url
+	override fun areContentsTheSame(old: BookMetadata, new: BookMetadata) = old == new
 	
 	override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =
 		ViewBinder(BookListItemBinding.inflate(parent.inflater, parent, false))
-	
-	override fun getItemCount() = list.size
 	
 	override fun onBindViewHolder(binder: ViewBinder, position: Int)
 	{
