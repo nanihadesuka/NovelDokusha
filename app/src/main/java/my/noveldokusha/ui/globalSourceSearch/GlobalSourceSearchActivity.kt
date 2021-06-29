@@ -38,7 +38,7 @@ class GlobalSourceSearchActivity : BaseActivity()
 	private val viewHolder by lazy { ActivityGlobalSourceSearchBinding.inflate(layoutInflater) }
 	private val viewAdapter = object
 	{
-		val recyclerView by lazy { GlobalArrayAdapter(this@GlobalSourceSearchActivity, viewModel.globalResults) }
+		val recyclerView by lazy { GlobalArrayAdapter(this@GlobalSourceSearchActivity) }
 	}
 	
 	override fun onCreate(savedInstanceState: Bundle?)
@@ -50,7 +50,7 @@ class GlobalSourceSearchActivity : BaseActivity()
 		
 		viewHolder.recyclerView.adapter = viewAdapter.recyclerView
 		viewHolder.recyclerView.itemAnimator = DefaultItemAnimator()
-		viewAdapter.recyclerView.notifyDataSetChanged()
+		viewAdapter.recyclerView.list = viewModel.globalResults
 		
 		supportActionBar!!.let {
 			it.title = "Global source search"
@@ -70,15 +70,13 @@ class GlobalSourceSearchActivity : BaseActivity()
 	}
 }
 
-private class GlobalArrayAdapter(
-	private val context: BaseActivity,
-	private val list: ArrayList<SourceResults>
-) : RecyclerView.Adapter<GlobalArrayAdapter.ViewBinder>()
+private class GlobalArrayAdapter(private val context: BaseActivity) : MyListAdapter<SourceResults, GlobalArrayAdapter.ViewBinder>()
 {
+	override fun areItemsTheSame(old: SourceResults, new: SourceResults) = old.source == new.source
+	override fun areContentsTheSame(old: SourceResults, new: SourceResults) = false
+	
 	override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =
 		ViewBinder(context, ActivityGlobalSourceSearchListItemBinding.inflate(parent.inflater, parent, false))
-	
-	override fun getItemCount() = this.list.size
 	
 	override fun onBindViewHolder(binder: ViewBinder, position: Int)
 	{
@@ -90,7 +88,6 @@ private class GlobalArrayAdapter(
 		viewHolder.recyclerView.visibility = View.VISIBLE
 		viewHolder.noResultsMessage.visibility = View.GONE
 		viewHolder.recyclerView.layoutManager?.onRestoreInstanceState(viewModel.savedState)
-		
 		viewHolder.recyclerView.setOnScrollChangeListener { _, _, _, _, _ ->
 			viewModel.booksFetchIterator.fetchTrigger {
 				val pos = binder.layoutManager.findLastVisibleItemPosition()
