@@ -5,10 +5,10 @@ import my.noveldokusha.ui.BaseViewModel
 
 class FinderModel : BaseViewModel()
 {
-	var sourcesList = arrayListOf<FinderFragment.Item>(
-		FinderFragment.Item.Header("Databases"),
-		*scrubber.databasesList.map { FinderFragment.Item.Database(it.name, it.baseUrl) }.toTypedArray(),
-		FinderFragment.Item.Header("Sources"),
-		*scrubber.sourcesListCatalog.map { FinderFragment.Item.Source(it.name, it.baseUrl) }.toTypedArray()
+	var sourcesList = arrayListOf<Item>(
+		Item.Header("Databases"),
+		*scrubber.databasesList.map { Item.Database(it.name, it.baseUrl) }.toTypedArray(),
+		Item.Header("Sources"),
+		*scrubber.sourcesListCatalog.map { Item.Source(it.name, it.baseUrl) }.toTypedArray()
 	)
 }

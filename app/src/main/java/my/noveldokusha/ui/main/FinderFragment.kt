@@ -1,5 +1,6 @@
 package my.noveldokusha.ui.main
 
+import android.content.Context
 import android.os.Bundle
 import android.view.*
 import androidx.appcompat.widget.SearchView
@@ -14,6 +15,7 @@ import my.noveldokusha.databinding.BookListItemBinding
 import my.noveldokusha.ui.databaseSearch.DatabaseSearchActivity
 import my.noveldokusha.ui.globalSourceSearch.GlobalSourceSearchActivity
 import my.noveldokusha.ui.sourceCatalog.SourceCatalogActivity
+import my.noveldokusha.uiAdapters.MyListAdapter
 import my.noveldokusha.uiUtils.inflater
 
 class FinderFragment : Fragment()
@@ -24,7 +26,7 @@ class FinderFragment : Fragment()
 	
 	private inner class Adapter
 	{
-		val listView by lazy { ListAdapter(viewModel.sourcesList) }
+		val listView by lazy { ListItemAdapter(requireContext()) }
 	}
 	
 	override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View
@@ -34,6 +36,7 @@ class FinderFragment : Fragment()
 		
 		viewHolder.listView.adapter = viewAdapter.listView
 		viewHolder.listView.itemAnimator = DefaultItemAnimator()
+		viewAdapter.listView.list = viewModel.sourcesList
 		
 		return viewHolder.root
 	}
@@ -41,7 +44,6 @@ class FinderFragment : Fragment()
 	override fun onCreate(savedInstanceState: Bundle?)
 	{
 		super.onCreate(savedInstanceState)
-		
 		setHasOptionsMenu(true)
 	}
 	
@@ -64,71 +66,68 @@ class FinderFragment : Fragment()
 			
 			override fun onQueryTextChange(newText: String?): Boolean = true
 		})
+		
 		super.onCreateOptionsMenu(menu, inflater)
 	}
-	
-	inner class ListAdapter(private val list: ArrayList<Item>) : RecyclerView.Adapter<ItemViewHolder>()
+}
+
+sealed class Item
+{
+	data class Source(val name: String, val baseUrl: String) : Item()
+	data class Database(val name: String, val baseUrl: String) : Item()
+	data class Header(val text: String) : Item()
+}
+
+private class ListItemAdapter(val ctx: Context) : MyListAdapter<Item, ListItemAdapter.ViewHolder>()
+{
+	override fun areItemsTheSame(old: Item, new: Item) = false
+	override fun areContentsTheSame(old: Item, new: Item) = false
+	override fun getItemViewType(position: Int) = when (list[position])
 	{
-		override fun getItemViewType(position: Int) = list[position].id.ordinal
-		
-		override fun getItemCount() = list.size
-		
-		override fun onBindViewHolder(holder: ItemViewHolder, position: Int): Unit = when (val itemData = this.list[position])
-		{
-			is Item.Source -> with(holder as ItemViewHolder.Source)
-			{
-				viewHolder.title.text = itemData.name
-				viewHolder.title.setOnClickListener {
-					SourceCatalogActivity
-						.IntentData(requireContext(), sourceBaseUrl = itemData.baseUrl)
-						.let(requireContext()::startActivity)
-				}
-			}
-			is Item.Database -> with(holder as ItemViewHolder.Database)
-			{
-				viewHolder.title.text = itemData.name
-				viewHolder.title.setOnClickListener {
-					DatabaseSearchActivity
-						.IntentData(requireContext(), databaseBaseUrl = itemData.baseUrl)
-						.let(this@FinderFragment::startActivity)
-				}
-			}
-			is Item.Header -> with(holder as ItemViewHolder.Header)
-			{
-				viewHolder.title.text = itemData.text
-			}
-		}
-		
-		override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) = when (ItemID.getByOrdinal(viewType))
-		{
-			ItemID.Source -> ItemViewHolder.Source(BookListItemBinding.inflate(parent.inflater, parent, false))
-			ItemID.Database -> ItemViewHolder.Database(BookListItemBinding.inflate(parent.inflater, parent, false))
-			ItemID.Header -> ItemViewHolder.Header(ActivityMainFragmentFinderListviewItemHeaderBinding.inflate(parent.inflater, parent, false))
-		}
+		is Item.Source -> 0
+		is Item.Database -> 1
+		is Item.Header -> 2
 	}
 	
-	sealed class ItemViewHolder(view: View) : RecyclerView.ViewHolder(view)
+	override fun onBindViewHolder(holder: ViewHolder, position: Int): Unit = when (val itemData = this.list[position])
 	{
-		class Source(val viewHolder: BookListItemBinding) : ItemViewHolder(viewHolder.root)
-		class Database(val viewHolder: BookListItemBinding) : ItemViewHolder(viewHolder.root)
-		class Header(val viewHolder: ActivityMainFragmentFinderListviewItemHeaderBinding) : ItemViewHolder(viewHolder.root)
-	}
-	
-	enum class ItemID
-	{
-		Source, Database, Header;
-		
-		companion object
+		is Item.Source -> with(holder as ViewHolder.Source)
 		{
-			private val list = values()
-			fun getByOrdinal(ordinal: Int) = list.firstOrNull { it.ordinal == ordinal }!!
+			viewHolder.title.text = itemData.name
+			viewHolder.title.setOnClickListener {
+				SourceCatalogActivity
+					.IntentData(ctx, sourceBaseUrl = itemData.baseUrl)
+					.let(ctx::startActivity)
+			}
+		}
+		is Item.Database -> with(holder as ViewHolder.Database)
+		{
+			viewHolder.title.text = itemData.name
+			viewHolder.title.setOnClickListener {
+				DatabaseSearchActivity
+					.IntentData(ctx, databaseBaseUrl = itemData.baseUrl)
+					.let(ctx::startActivity)
+			}
+		}
+		is Item.Header -> with(holder as ViewHolder.Header)
+		{
+			viewHolder.title.text = itemData.text
 		}
 	}
 	
-	sealed class Item(val id: ItemID)
+	override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) = when (viewType)
 	{
-		data class Source(val name: String, val baseUrl: String) : Item(ItemID.Source)
-		data class Database(val name: String, val baseUrl: String) : Item(ItemID.Database)
-		data class Header(val text: String) : Item(ItemID.Header)
+		0 -> ViewHolder.Source(BookListItemBinding.inflate(parent.inflater, parent, false))
+		1 -> ViewHolder.Database(BookListItemBinding.inflate(parent.inflater, parent, false))
+		2 -> ViewHolder.Header(ActivityMainFragmentFinderListviewItemHeaderBinding.inflate(parent.inflater, parent, false))
+		else -> throw Exception("No view defined for viewType: $viewType")
 	}
+	
+	sealed class ViewHolder(view: View) : RecyclerView.ViewHolder(view)
+	{
+		class Source(val viewHolder: BookListItemBinding) : ViewHolder(viewHolder.root)
+		class Database(val viewHolder: BookListItemBinding) : ViewHolder(viewHolder.root)
+		class Header(val viewHolder: ActivityMainFragmentFinderListviewItemHeaderBinding) : ViewHolder(viewHolder.root)
+	}
+	
 }
