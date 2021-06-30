@@ -35,7 +35,7 @@ class GlobalSourceSearchActivity : BaseActivity()
 	
 	private val extras by lazy { IntentData(intent) }
 	private val viewModel by viewModels<GlobalSourceSearchModel>()
-	private val viewHolder by lazy { ActivityGlobalSourceSearchBinding.inflate(layoutInflater) }
+	private val viewBind by lazy { ActivityGlobalSourceSearchBinding.inflate(layoutInflater) }
 	private val viewAdapter = object
 	{
 		val recyclerView by lazy { GlobalArrayAdapter(this@GlobalSourceSearchActivity) }
@@ -44,12 +44,12 @@ class GlobalSourceSearchActivity : BaseActivity()
 	override fun onCreate(savedInstanceState: Bundle?)
 	{
 		super.onCreate(savedInstanceState)
-		setContentView(viewHolder.root)
-		setSupportActionBar(viewHolder.toolbar)
+		setContentView(viewBind.root)
+		setSupportActionBar(viewBind.toolbar)
 		viewModel.initialization(extras.input)
 		
-		viewHolder.recyclerView.adapter = viewAdapter.recyclerView
-		viewHolder.recyclerView.itemAnimator = DefaultItemAnimator()
+		viewBind.recyclerView.adapter = viewAdapter.recyclerView
+		viewBind.recyclerView.itemAnimator = DefaultItemAnimator()
 		viewAdapter.recyclerView.list = viewModel.globalResults
 		
 		supportActionBar!!.let {
@@ -70,41 +70,41 @@ class GlobalSourceSearchActivity : BaseActivity()
 	}
 }
 
-private class GlobalArrayAdapter(private val context: BaseActivity) : MyListAdapter<SourceResults, GlobalArrayAdapter.ViewBinder>()
+private class GlobalArrayAdapter(private val context: BaseActivity) : MyListAdapter<SourceResults, GlobalArrayAdapter.ViewHolder>()
 {
 	override fun areItemsTheSame(old: SourceResults, new: SourceResults) = old.source == new.source
 	override fun areContentsTheSame(old: SourceResults, new: SourceResults) = false
 	
 	override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =
-		ViewBinder(context, ActivityGlobalSourceSearchListItemBinding.inflate(parent.inflater, parent, false))
+		ViewHolder(context, ActivityGlobalSourceSearchListItemBinding.inflate(parent.inflater, parent, false))
 	
-	override fun onBindViewHolder(binder: ViewBinder, position: Int)
+	override fun onBindViewHolder(viewHolder: ViewHolder, position: Int)
 	{
-		val viewModel = this.list[position]
-		val viewHolder = binder.viewHolder
-		binder.itemData = viewModel
+		val viewData = this.list[position]
+		val viewBind = viewHolder.viewBind
+		viewHolder.itemData = viewData
 		
-		viewHolder.name.text = viewModel.source.name
-		viewHolder.recyclerView.visibility = View.VISIBLE
-		viewHolder.noResultsMessage.visibility = View.GONE
-		viewHolder.recyclerView.layoutManager?.onRestoreInstanceState(viewModel.savedState)
-		viewHolder.recyclerView.setOnScrollChangeListener { _, _, _, _, _ ->
-			viewModel.booksFetchIterator.fetchTrigger {
-				val pos = binder.layoutManager.findLastVisibleItemPosition()
-				return@fetchTrigger pos >= binder.recyclerViewAdapter.itemCount - 3
+		viewBind.name.text = viewData.source.name
+		viewBind.recyclerView.visibility = View.VISIBLE
+		viewBind.noResultsMessage.visibility = View.GONE
+		viewBind.recyclerView.layoutManager?.onRestoreInstanceState(viewData.savedState)
+		viewBind.recyclerView.setOnScrollChangeListener { _, _, _, _, _ ->
+			viewData.booksFetchIterator.fetchTrigger {
+				val pos = viewHolder.layoutManager.findLastVisibleItemPosition()
+				return@fetchTrigger pos >= viewHolder.recyclerViewAdapter.itemCount - 3
 			}
 		}
 		
-		binder.addBottomMargin { position == list.lastIndex }
+		viewHolder.addBottomMargin { position == list.lastIndex }
 	}
 	
-	class ViewBinder(
+	class ViewHolder(
 		val ctx: BaseActivity,
-		val viewHolder: ActivityGlobalSourceSearchListItemBinding
-	) : RecyclerView.ViewHolder(viewHolder.root)
+		val viewBind: ActivityGlobalSourceSearchListItemBinding
+	) : RecyclerView.ViewHolder(viewBind.root)
 	{
 		var itemData: SourceResults? by Delegates.observable(null) { _, oldValue, newValue ->
-			oldValue?.savedState = viewHolder.recyclerView.layoutManager?.onSaveInstanceState()
+			oldValue?.savedState = viewBind.recyclerView.layoutManager?.onSaveInstanceState()
 			onFetching.switchLiveData(oldValue, newValue, ctx) { booksFetchIterator.onFetching }
 			onCompletedEmpty.switchLiveData(oldValue, newValue, ctx) { booksFetchIterator.onCompletedEmpty }
 			onSuccess.switchLiveData(oldValue, newValue, ctx) { booksFetchIterator.onSuccess }
@@ -117,8 +117,8 @@ private class GlobalArrayAdapter(private val context: BaseActivity) : MyListAdap
 			progressBarHorizontalAdapter.visible = it
 		}
 		val onCompletedEmpty = Observer<Unit> {
-			viewHolder.recyclerView.visibility = View.GONE
-			viewHolder.noResultsMessage.visibility = View.VISIBLE
+			viewBind.recyclerView.visibility = View.GONE
+			viewBind.noResultsMessage.visibility = View.VISIBLE
 		}
 		
 		val onSuccess = Observer<List<BookMetadata>> {
@@ -129,34 +129,34 @@ private class GlobalArrayAdapter(private val context: BaseActivity) : MyListAdap
 		
 		init
 		{
-			viewHolder.recyclerView.adapter = ConcatAdapter(recyclerViewAdapter, progressBarHorizontalAdapter)
-			viewHolder.recyclerView.layoutManager = layoutManager
+			viewBind.recyclerView.adapter = ConcatAdapter(recyclerViewAdapter, progressBarHorizontalAdapter)
+			viewBind.recyclerView.layoutManager = layoutManager
 		}
 	}
 }
 
-private class LocalArrayAdapter(private val context: BaseActivity) : MyListAdapter<BookMetadata, LocalArrayAdapter.ViewBinder>()
+private class LocalArrayAdapter(private val context: BaseActivity) : MyListAdapter<BookMetadata, LocalArrayAdapter.ViewHolder>()
 {
 	override fun areItemsTheSame(old: BookMetadata, new: BookMetadata) = old.url == new.url
 	override fun areContentsTheSame(old: BookMetadata, new: BookMetadata) = old == new
 	
 	override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =
-		ViewBinder(ActivityGlobalSourceSearchResultItemBinding.inflate(parent.inflater, parent, false))
+		ViewHolder(ActivityGlobalSourceSearchResultItemBinding.inflate(parent.inflater, parent, false))
 	
-	override fun onBindViewHolder(binder: ViewBinder, position: Int)
+	override fun onBindViewHolder(viewHolder: ViewHolder, position: Int)
 	{
-		val viewModel = this.list[position]
-		val viewHolder = binder.viewHolder
-		viewHolder.name.text = viewModel.title
-		viewHolder.name.setOnClickListener {
+		val viewData = this.list[position]
+		val viewBind = viewHolder.viewBind
+		viewBind.name.text = viewData.title
+		viewBind.name.setOnClickListener {
 			ChaptersActivity.IntentData(
 				context,
-				bookMetadata = BookMetadata(title = viewModel.title, url = viewModel.url)
+				bookMetadata = BookMetadata(title = viewData.title, url = viewData.url)
 			).let(context::startActivity)
 		}
 		
-		binder.addRightMargin(500) { position == list.lastIndex }
+		viewHolder.addRightMargin(500) { position == list.lastIndex }
 	}
 	
-	inner class ViewBinder(val viewHolder: ActivityGlobalSourceSearchResultItemBinding) : RecyclerView.ViewHolder(viewHolder.root)
+	inner class ViewHolder(val viewBind: ActivityGlobalSourceSearchResultItemBinding) : RecyclerView.ViewHolder(viewBind.root)
 }

@@ -54,7 +54,7 @@ class DatabaseBookInfoActivity : BaseActivity()
 	
 	private val extras by lazy { IntentData(intent) }
 	private val viewModel by viewModels<DatabaseBookInfoModel>()
-	private val viewHolder by lazy { ActivityDatabaseBookInfoBinding.inflate(layoutInflater) }
+	private val viewBind by lazy { ActivityDatabaseBookInfoBinding.inflate(layoutInflater) }
 	private val viewAdapter = object
 	{
 		val relatedBooks by lazy { BookArrayAdapter(this@DatabaseBookInfoActivity, viewModel.database.baseUrl) }
@@ -64,14 +64,14 @@ class DatabaseBookInfoActivity : BaseActivity()
 	override fun onCreate(savedInstanceState: Bundle?)
 	{
 		super.onCreate(savedInstanceState)
-		setContentView(viewHolder.root)
-		setSupportActionBar(viewHolder.toolbar)
+		setContentView(viewBind.root)
+		setSupportActionBar(viewBind.toolbar)
 		viewModel.initialization(database = scrubber.getCompatibleDatabase(extras.databaseUrlBase)!!, bookMetadata = extras.bookMetadata)
 		
-		viewHolder.relatedBooks.adapter = viewAdapter.relatedBooks
-		viewHolder.similarRecommended.adapter = viewAdapter.similarRecommended
-		viewHolder.title.text = viewModel.bookMetadata.title
-		viewHolder.globalSourceSearch.setOnClickListener {
+		viewBind.relatedBooks.adapter = viewAdapter.relatedBooks
+		viewBind.similarRecommended.adapter = viewAdapter.similarRecommended
+		viewBind.title.text = viewModel.bookMetadata.title
+		viewBind.globalSourceSearch.setOnClickListener {
 			GlobalSourceSearchActivity.IntentData(
 				this,
 				input = viewModel.bookMetadata.title
@@ -83,9 +83,9 @@ class DatabaseBookInfoActivity : BaseActivity()
 			
 			if (data.genres.isNotEmpty())
 			{
-				viewHolder.genres.text = data.genres.joinToString(" · ")
-				viewHolder.genres.fadeIn(700)
-				viewHolder.genres.setOnClickListener {
+				viewBind.genres.text = data.genres.joinToString(" · ")
+				viewBind.genres.fadeIn(700)
+				viewBind.genres.setOnClickListener {
 					lifecycleScope.launch(Dispatchers.IO) {
 						val databaseGenres = (viewModel.database.getSearchGenres() as? Response.Success ?: return@launch).data
 						if (!isActive) return@launch
@@ -100,22 +100,22 @@ class DatabaseBookInfoActivity : BaseActivity()
 				}
 			}
 			else
-				viewHolder.genres.visibility = View.GONE
+				viewBind.genres.visibility = View.GONE
 			
 			Glide.with(this)
 				.load(data.coverImageUrl)
 				.error(R.drawable.ic_baseline_error_outline_24)
 				.transform(RoundedCorners(32))
 				.transition(DrawableTransitionOptions.withCrossFade())
-				.into(viewHolder.coverImage)
+				.into(viewBind.coverImage)
 			
 			fun Float.spToPx() = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, this, resources.displayMetrics).toInt()
 			
-			viewHolder.linearLayout.layoutTransition.enableTransitionType(LayoutTransition.CHANGING)
+			viewBind.linearLayout.layoutTransition.enableTransitionType(LayoutTransition.CHANGING)
 			var imgFullWidth = false
-			viewHolder.coverImage.setOnClickListener {
+			viewBind.coverImage.setOnClickListener {
 				imgFullWidth = !imgFullWidth
-				viewHolder.coverImage.updateLayoutParams {
+				viewBind.coverImage.updateLayoutParams {
 					width = if (imgFullWidth) ViewGroup.LayoutParams.MATCH_PARENT else ViewGroup.LayoutParams.WRAP_CONTENT
 					height = if (imgFullWidth) ViewGroup.LayoutParams.WRAP_CONTENT else 220f.spToPx()
 				}
@@ -124,10 +124,10 @@ class DatabaseBookInfoActivity : BaseActivity()
 			if (data.authors.isNotEmpty())
 			{
 				val author = data.authors.first()
-				viewHolder.authors.text = author.name
-				viewHolder.authors.fadeIn(700)
+				viewBind.authors.text = author.name
+				viewBind.authors.fadeIn(700)
 				if (author.url != null)
-					viewHolder.authors.setOnClickListener {
+					viewBind.authors.setOnClickListener {
 						lifecycleScope.launch(Dispatchers.IO) {
 							val input = DatabaseSearchResultsActivity.SearchMode.AuthorSeries(
 								authorName = author.name, urlAuthorPage = author.url
@@ -139,28 +139,28 @@ class DatabaseBookInfoActivity : BaseActivity()
 					}
 			}
 			else
-				viewHolder.authors.visibility = View.GONE
+				viewBind.authors.visibility = View.GONE
 			
-			viewHolder.description.text = data.description
-			viewHolder.alternativeTitles.text = data.alternativeTitles.joinToString("\n\n")
-			viewHolder.tags.text = data.tags.joinToString(" · ").ifEmpty { "No tags" }
-			viewHolder.bookType.text = data.bookType
+			viewBind.description.text = data.description
+			viewBind.alternativeTitles.text = data.alternativeTitles.joinToString("\n\n")
+			viewBind.tags.text = data.tags.joinToString(" · ").ifEmpty { "No tags" }
+			viewBind.bookType.text = data.bookType
 			
-			viewHolder.description.fadeIn(700)
-			viewHolder.alternativeTitles.fadeIn(700)
-			viewHolder.tags.fadeIn(700)
-			viewHolder.bookType.fadeIn(700)
+			viewBind.description.fadeIn(700)
+			viewBind.alternativeTitles.fadeIn(700)
+			viewBind.tags.fadeIn(700)
+			viewBind.bookType.fadeIn(700)
 			
 			viewAdapter.relatedBooks.list = data.relatedBooks.toList()
 			data.relatedBooks.isEmpty().let { empty ->
-				viewHolder.relatedBooks.visibility = if (empty) View.GONE else View.VISIBLE
-				viewHolder.relatedBooksNoEntries.visibility = if (empty) View.VISIBLE else View.GONE
+				viewBind.relatedBooks.visibility = if (empty) View.GONE else View.VISIBLE
+				viewBind.relatedBooksNoEntries.visibility = if (empty) View.VISIBLE else View.GONE
 			}
 			
 			viewAdapter.similarRecommended.list = data.similarRecommended.toList()
 			data.similarRecommended.isEmpty().let { empty ->
-				viewHolder.similarRecommended.visibility = if (empty) View.GONE else View.VISIBLE
-				viewHolder.similarRecommendedNoEntries.visibility = if (empty) View.VISIBLE else View.GONE
+				viewBind.similarRecommended.visibility = if (empty) View.GONE else View.VISIBLE
+				viewBind.similarRecommendedNoEntries.visibility = if (empty) View.VISIBLE else View.GONE
 			}
 			
 			viewAdapter.relatedBooks.notifyDataSetChanged()
@@ -188,20 +188,20 @@ class DatabaseBookInfoActivity : BaseActivity()
 private class BookArrayAdapter(
 	private val context: BaseActivity,
 	private val databaseUrlBase: String
-) : MyListAdapter<BookMetadata, BookArrayAdapter.ViewBinder>()
+) : MyListAdapter<BookMetadata, BookArrayAdapter.ViewHolder>()
 {
 	override fun areItemsTheSame(old: BookMetadata, new: BookMetadata) = old.url == new.url
 	override fun areContentsTheSame(old: BookMetadata, new: BookMetadata) = old == new
 	
 	override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =
-		ViewBinder(BookListItemBinding.inflate(parent.inflater, parent, false))
+		ViewHolder(BookListItemBinding.inflate(parent.inflater, parent, false))
 	
-	override fun onBindViewHolder(binder: ViewBinder, position: Int)
+	override fun onBindViewHolder(viewHolder: ViewHolder, position: Int)
 	{
 		val itemData = list[position]
-		val itemHolder = binder.viewHolder
-		itemHolder.title.text = itemData.title
-		itemHolder.title.setOnClickListener {
+		val itemBind = viewHolder.viewBind
+		itemBind.title.text = itemData.title
+		itemBind.title.setOnClickListener {
 			DatabaseBookInfoActivity.IntentData(
 				context,
 				databaseUrlBase = databaseUrlBase,
@@ -210,5 +210,5 @@ private class BookArrayAdapter(
 		}
 	}
 	
-	inner class ViewBinder(val viewHolder: BookListItemBinding) : RecyclerView.ViewHolder(viewHolder.root)
+	inner class ViewHolder(val viewBind: BookListItemBinding) : RecyclerView.ViewHolder(viewBind.root)
 }

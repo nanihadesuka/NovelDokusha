@@ -12,7 +12,7 @@ import my.noveldokusha.databinding.ActivityMainFragmentLibraryBinding
 
 class LibraryFragment : Fragment()
 {
-	private lateinit var viewHolder: ActivityMainFragmentLibraryBinding
+	private lateinit var viewBind: ActivityMainFragmentLibraryBinding
 	private lateinit var viewAdapter: Adapter
 	
 	private inner class Adapter
@@ -22,19 +22,19 @@ class LibraryFragment : Fragment()
 	
 	override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View
 	{
-		viewHolder = ActivityMainFragmentLibraryBinding.inflate(inflater, container, false)
+		viewBind = ActivityMainFragmentLibraryBinding.inflate(inflater, container, false)
 		viewAdapter = Adapter()
 		
-		viewHolder.viewPager.offscreenPageLimit = 3
-		viewHolder.viewPager.adapter = viewAdapter.viewPage
-		TabLayoutMediator(viewHolder.viewPagerTabs, viewHolder.viewPager) { tab, position ->
+		viewBind.viewPager.offscreenPageLimit = 3
+		viewBind.viewPager.adapter = viewAdapter.viewPage
+		TabLayoutMediator(viewBind.viewPagerTabs, viewBind.viewPager) { tab, position ->
 			tab.text = when (position)
 			{
 				0 -> "Default"
 				else -> "Completed"
 			}
 		}.attach()
-		return viewHolder.root
+		return viewBind.root
 	}
 }
 

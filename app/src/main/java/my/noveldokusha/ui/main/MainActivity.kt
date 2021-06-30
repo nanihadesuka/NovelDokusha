@@ -10,20 +10,20 @@ import my.noveldokusha.ui.BaseActivity
 
 open class MainActivity : BaseActivity()
 {
-	private val viewHolder by lazy { ActivityMainBinding.inflate(layoutInflater) }
+	private val viewBind by lazy { ActivityMainBinding.inflate(layoutInflater) }
 	
 	private val bottomNavigationController by lazy { findNavController(R.id.navHostFragment) }
 	
 	override fun onCreate(savedInstanceState: Bundle?)
 	{
 		super.onCreate(savedInstanceState)
-		setContentView(viewHolder.root)
-		setSupportActionBar(viewHolder.toolbar)
+		setContentView(viewBind.root)
+		setSupportActionBar(viewBind.toolbar)
 		
-		viewHolder.bottomNavigationView.setupWithNavController(bottomNavigationController)
+		viewBind.bottomNavigationView.setupWithNavController(bottomNavigationController)
 		
-		viewHolder.bottomNavigationView.setOnNavigationItemSelectedListener { item ->
-			if (viewHolder.bottomNavigationView.selectedItemId == item.itemId)
+		viewBind.bottomNavigationView.setOnNavigationItemSelectedListener { item ->
+			if (viewBind.bottomNavigationView.selectedItemId == item.itemId)
 				return@setOnNavigationItemSelectedListener false
 			NavigationUI.onNavDestinationSelected(item, bottomNavigationController)
 		}

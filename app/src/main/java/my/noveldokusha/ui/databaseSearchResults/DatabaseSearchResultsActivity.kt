@@ -76,7 +76,7 @@ class DatabaseSearchResultsActivity : BaseActivity()
 	}
 	
 	private val viewModel by viewModels<DatabaseSearchResultsModel>()
-	private val viewHolder by lazy { ActivityDatabaseSearchResultsBinding.inflate(layoutInflater) }
+	private val viewBind by lazy { ActivityDatabaseSearchResultsBinding.inflate(layoutInflater) }
 	private val viewAdapter = object
 	{
 		val recyclerView by lazy { ChaptersArrayAdapter(this@DatabaseSearchResultsActivity, viewModel.database.baseUrl) }
@@ -91,15 +91,15 @@ class DatabaseSearchResultsActivity : BaseActivity()
 	{
 		
 		super.onCreate(savedInstanceState)
-		setContentView(viewHolder.root)
-		setSupportActionBar(viewHolder.toolbar)
+		setContentView(viewBind.root)
+		setSupportActionBar(viewBind.toolbar)
 		viewModel.initialization(database = scrubber.getCompatibleDatabase(extras.databaseUrlBase)!!, input = extras.input)
 		
-		viewHolder.recyclerView.adapter = ConcatAdapter(viewAdapter.recyclerView, viewAdapter.progressBar)
-		viewHolder.recyclerView.layoutManager = viewLayoutManager.recyclerView
-		viewHolder.recyclerView.itemAnimator = DefaultItemAnimator()
+		viewBind.recyclerView.adapter = ConcatAdapter(viewAdapter.recyclerView, viewAdapter.progressBar)
+		viewBind.recyclerView.layoutManager = viewLayoutManager.recyclerView
+		viewBind.recyclerView.itemAnimator = DefaultItemAnimator()
 		
-		viewHolder.recyclerView.setOnScrollChangeListener { _, _, _, _, _ ->
+		viewBind.recyclerView.setOnScrollChangeListener { _, _, _, _, _ ->
 			viewModel.fetchIterator.fetchTrigger {
 				val pos = viewLayoutManager.recyclerView.findLastVisibleItemPosition()
 				return@fetchTrigger pos >= viewAdapter.recyclerView.itemCount - 3
@@ -107,7 +107,7 @@ class DatabaseSearchResultsActivity : BaseActivity()
 		}
 		
 		viewModel.fetchIterator.onCompletedEmpty.observe(this) {
-			viewHolder.noResultsMessage.visibility = View.VISIBLE
+			viewBind.noResultsMessage.visibility = View.VISIBLE
 		}
 		viewModel.fetchIterator.onFetching.observe(this) {
 			viewAdapter.progressBar.visible = it
@@ -139,27 +139,27 @@ class DatabaseSearchResultsActivity : BaseActivity()
 private class ChaptersArrayAdapter(
 	private val context: BaseActivity,
 	private val databaseUrlBase: String
-) : MyListAdapter<BookMetadata, ChaptersArrayAdapter.ViewBinder>()
+) : MyListAdapter<BookMetadata, ChaptersArrayAdapter.ViewHolder>()
 {
 	override fun areItemsTheSame(old: BookMetadata, new: BookMetadata) = old.url == new.url
 	override fun areContentsTheSame(old: BookMetadata, new: BookMetadata) = old == new
 	
 	override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =
-		ViewBinder(BookListItemBinding.inflate(parent.inflater, parent, false))
+		ViewHolder(BookListItemBinding.inflate(parent.inflater, parent, false))
 	
-	override fun onBindViewHolder(binder: ViewBinder, position: Int)
+	override fun onBindViewHolder(binder: ViewHolder, position: Int)
 	{
-		val itemModel = this.list[position]
-		val itemHolder = binder.viewHolder
-		itemHolder.title.text = itemModel.title
-		itemHolder.title.setOnClickListener {
+		val itemData = this.list[position]
+		val itemBind = binder.viewBind
+		itemBind.title.text = itemData.title
+		itemBind.title.setOnClickListener {
 			DatabaseBookInfoActivity
-				.IntentData(context, databaseUrlBase = databaseUrlBase, bookMetadata = itemModel)
+				.IntentData(context, databaseUrlBase = databaseUrlBase, bookMetadata = itemData)
 				.let(context::startActivity)
 		}
 		
 		binder.addBottomMargin { position == list.lastIndex }
 	}
 	
-	inner class ViewBinder(val viewHolder: BookListItemBinding) : RecyclerView.ViewHolder(viewHolder.root)
+	inner class ViewHolder(val viewBind: BookListItemBinding) : RecyclerView.ViewHolder(viewBind.root)
 }

@@ -23,7 +23,6 @@ import my.noveldokusha.ui.reader.ReaderActivity
 import my.noveldokusha.uiAdapters.MyListAdapter
 import my.noveldokusha.uiUtils.*
 import java.util.*
-import kotlin.time.ExperimentalTime
 
 class ChaptersActivity : BaseActivity()
 {
@@ -43,33 +42,32 @@ class ChaptersActivity : BaseActivity()
 	
 	private val extras by lazy { IntentData(intent) }
 	private val viewModel by viewModels<ChaptersModel>()
-	private val viewHolder by lazy { ActivityChaptersBinding.inflate(layoutInflater) }
+	private val viewBind by lazy { ActivityChaptersBinding.inflate(layoutInflater) }
 	private val viewAdapter = object
 	{
 		val chapters by lazy { ChaptersArrayAdapter(this@ChaptersActivity, viewModel) { selectionModeBarUpdateVisibility() } }
 		val header by lazy { ChaptersHeaderAdapter(this@ChaptersActivity, viewModel) }
 	}
 	
-	@ExperimentalTime
 	override fun onCreate(savedInstanceState: Bundle?)
 	{
 		super.onCreate(savedInstanceState)
-		setContentView(viewHolder.root)
-		setSupportActionBar(viewHolder.toolbar)
+		setContentView(viewBind.root)
+		setSupportActionBar(viewBind.toolbar)
 		viewModel.initialization(extras.bookMetadata)
 		
-		viewHolder.recyclerView.adapter = ConcatAdapter(viewAdapter.header, viewAdapter.chapters)
-		viewHolder.recyclerView.itemAnimator = DefaultItemAnimator()
-		viewHolder.recyclerView.itemAnimator = null
-		viewHolder.swipeRefreshLayout.setOnRefreshListener { viewModel.updateChaptersList() }
-		viewModel.onFetching.observe(this) { viewHolder.swipeRefreshLayout.isRefreshing = it }
+		viewBind.recyclerView.adapter = ConcatAdapter(viewAdapter.header, viewAdapter.chapters)
+		viewBind.recyclerView.itemAnimator = DefaultItemAnimator()
+		viewBind.recyclerView.itemAnimator = null
+		viewBind.swipeRefreshLayout.setOnRefreshListener { viewModel.updateChaptersList() }
+		viewModel.onFetching.observe(this) { viewBind.swipeRefreshLayout.isRefreshing = it }
 		viewModel.chaptersWithContextLiveData.observe(this) {
 			viewAdapter.chapters.list = it
 		}
 		
 		setupSelectionModeBar()
 		
-		viewHolder.floatingActionButton.setOnClickListener {
+		viewBind.floatingActionButton.setOnClickListener {
 			val bookUrl = viewModel.bookMetadata.url
 			lifecycleScope.launch(Dispatchers.IO) {
 				val lastReadChapter = bookstore.bookLibrary.get(extras.bookMetadata.url)?.lastReadChapter
@@ -97,54 +95,54 @@ class ChaptersActivity : BaseActivity()
 	
 	fun selectionModeBarUpdateVisibility()
 	{
-		if (viewModel.selectedChaptersUrl.isEmpty() && viewHolder.selectionModeBar.isVisible)
-			viewHolder.selectionModeBar.fadeOutVertical(displacement = 200f)
-		else if (viewModel.selectedChaptersUrl.isNotEmpty() && !viewHolder.selectionModeBar.isVisible)
-			viewHolder.selectionModeBar.fadeInVertical(displacement = 200f)
+		if (viewModel.selectedChaptersUrl.isEmpty() && viewBind.selectionModeBar.isVisible)
+			viewBind.selectionModeBar.fadeOutVertical(displacement = 200f)
+		else if (viewModel.selectedChaptersUrl.isNotEmpty() && !viewBind.selectionModeBar.isVisible)
+			viewBind.selectionModeBar.fadeInVertical(displacement = 200f)
 	}
 	
 	fun setupSelectionModeBar()
 	{
 		selectionModeBarUpdateVisibility()
 		
-		viewHolder.selectionSelectAll.setOnClickListener {
+		viewBind.selectionSelectAll.setOnClickListener {
 			val chapters = viewModel.chaptersWithContextLiveData.value ?: return@setOnClickListener
 			viewModel.selectedChaptersUrl.addAll(chapters.map { it.chapter.url })
 			viewAdapter.chapters.notifyDataSetChanged()
 		}
 		
-		viewHolder.selectionSelectAllUnderSelected.setOnClickListener {
+		viewBind.selectionSelectAllUnderSelected.setOnClickListener {
 			val chapters = viewModel.chaptersWithContextLiveData.value ?: return@setOnClickListener
 			val urls = chapters.dropWhile { !viewModel.selectedChaptersUrl.contains(it.chapter.url) }.map { it.chapter.url }
 			viewModel.selectedChaptersUrl.addAll(urls)
 			viewAdapter.chapters.notifyDataSetChanged()
 		}
 		
-		viewHolder.selectionModeSetAsUnread.setOnClickListener {
+		viewBind.selectionModeSetAsUnread.setOnClickListener {
 			val list = viewModel.selectedChaptersUrl.toList()
 			lifecycleScope.launch(Dispatchers.IO) { bookstore.bookChapter.setAsUnread(list) }
 		}
 		
-		viewHolder.selectionModeSetAsRead.setOnClickListener {
+		viewBind.selectionModeSetAsRead.setOnClickListener {
 			val list = viewModel.selectedChaptersUrl.toList()
 			lifecycleScope.launch(Dispatchers.IO) { bookstore.bookChapter.setAsRead(list) }
 		}
 		
-		viewHolder.selectionModeDownload.setOnClickListener {
+		viewBind.selectionModeDownload.setOnClickListener {
 			val list = viewModel.selectedChaptersUrl.toList()
 			CoroutineScope(Dispatchers.IO).launch {
 				list.forEach { bookstore.bookChapterBody.fetchBody(it) }
 			}
 		}
 		
-		viewHolder.selectionModeDeleteDownload.setOnClickListener {
+		viewBind.selectionModeDeleteDownload.setOnClickListener {
 			val list = viewModel.selectedChaptersUrl.toList()
 			lifecycleScope.launch(Dispatchers.IO) {
 				bookstore.bookChapterBody.removeRows(list)
 			}
 		}
 		
-		viewHolder.selectionClose.setOnClickListener {
+		viewBind.selectionClose.setOnClickListener {
 			viewModel.selectedChaptersUrl.clear()
 			selectionModeBarUpdateVisibility()
 			viewAdapter.chapters.notifyDataSetChanged()
@@ -153,7 +151,7 @@ class ChaptersActivity : BaseActivity()
 	
 	override fun onBackPressed() = when
 	{
-		viewHolder.selectionModeBar.isVisible ->
+		viewBind.selectionModeBar.isVisible ->
 		{
 			viewModel.selectedChaptersUrl.clear()
 			selectionModeBarUpdateVisibility()
@@ -211,28 +209,28 @@ private class ChaptersArrayAdapter(
 	private val context: BaseActivity,
 	private val viewModel: ChaptersModel,
 	private val selectionModeBarUpdateVisibility: () -> Unit
-) : MyListAdapter<ChapterWithContext, ChaptersArrayAdapter.ViewBinder>()
+) : MyListAdapter<ChapterWithContext, ChaptersArrayAdapter.ViewHolder>()
 {
 	override fun areItemsTheSame(old: ChapterWithContext, new: ChapterWithContext) = old.chapter.url == new.chapter.url
 	override fun areContentsTheSame(old: ChapterWithContext, new: ChapterWithContext) = old == new
 	
-	override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewBinder =
-		ViewBinder(ActivityChaptersListItemBinding.inflate(parent.inflater, parent, false))
+	override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder =
+		ViewHolder(ActivityChaptersListItemBinding.inflate(parent.inflater, parent, false))
 	
-	override fun onBindViewHolder(binder: ViewBinder, position: Int)
+	override fun onBindViewHolder(viewHolder: ViewHolder, position: Int)
 	{
 		val itemData = list[position]
-		val itemView = binder.viewHolder
+		val itemBind = viewHolder.viewBind
 		
-		itemView.title.text = itemData.chapter.title
-		itemView.title.alpha = if (itemData.chapter.read) 0.5f else 1.0f
-		itemView.downloaded.visibility = if (itemData.downloaded) View.VISIBLE else View.INVISIBLE
-		itemView.currentlyReading.visibility = if (itemData.lastReadChapter) View.VISIBLE else View.INVISIBLE
-		itemView.selected.visibility = if (viewModel.selectedChaptersUrl.contains(itemData.chapter.url)) View.VISIBLE else View.INVISIBLE
+		itemBind.title.text = itemData.chapter.title
+		itemBind.title.alpha = if (itemData.chapter.read) 0.5f else 1.0f
+		itemBind.downloaded.visibility = if (itemData.downloaded) View.VISIBLE else View.INVISIBLE
+		itemBind.currentlyReading.visibility = if (itemData.lastReadChapter) View.VISIBLE else View.INVISIBLE
+		itemBind.selected.visibility = if (viewModel.selectedChaptersUrl.contains(itemData.chapter.url)) View.VISIBLE else View.INVISIBLE
 		
-		itemView.root.setOnClickListener {
+		itemBind.root.setOnClickListener {
 			if (viewModel.selectedChaptersUrl.isNotEmpty())
-				toggleItemSelection(itemData, itemView.selected)
+				toggleItemSelection(itemData, itemBind.selected)
 			else
 			{
 				ReaderActivity
@@ -241,12 +239,12 @@ private class ChaptersArrayAdapter(
 			}
 		}
 		
-		itemView.root.setOnLongClickListener {
-			toggleItemSelection(itemData, itemView.selected)
+		itemBind.root.setOnLongClickListener {
+			toggleItemSelection(itemData, itemBind.selected)
 			true
 		}
 		
-		binder.addBottomMargin { position == list.lastIndex }
+		viewHolder.addBottomMargin { position == list.lastIndex }
 	}
 	
 	fun toggleItemSelection(itemData: ChapterWithContext, view: View)
@@ -257,56 +255,52 @@ private class ChaptersArrayAdapter(
 		selectionModeBarUpdateVisibility()
 	}
 	
-	inner class ViewBinder(val viewHolder: ActivityChaptersListItemBinding) : RecyclerView.ViewHolder(viewHolder.root)
+	inner class ViewHolder(val viewBind: ActivityChaptersListItemBinding) : RecyclerView.ViewHolder(viewBind.root)
 }
 
 private class ChaptersHeaderAdapter(
 	val context: BaseActivity,
 	val viewModel: ChaptersModel
-) : RecyclerView.Adapter<ChaptersHeaderAdapter.ViewBinder>()
+) : RecyclerView.Adapter<ChaptersHeaderAdapter.ViewHolder>()
 {
-	override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewBinder
-	{
-		return ViewBinder(ActivityChaptersListHeaderBinding.inflate(parent.inflater, parent, false))
-	}
+	override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder =
+		ViewHolder(ActivityChaptersListHeaderBinding.inflate(parent.inflater, parent, false))
 	
 	override fun getItemCount() = 1
 	
-	override fun onBindViewHolder(binder: ViewBinder, position: Int)
-	{
-	}
+	override fun onBindViewHolder(binder: ViewHolder, position: Int): Unit = run { }
 	
-	private inner class ViewBinder(val viewHolder: ActivityChaptersListHeaderBinding) : RecyclerView.ViewHolder(viewHolder.root)
+	private inner class ViewHolder(val viewBind: ActivityChaptersListHeaderBinding) : RecyclerView.ViewHolder(viewBind.root)
 	{
 		init
 		{
-			viewHolder.bookTitle.text = viewModel.bookMetadata.title
-			viewHolder.sourceName.text = scrubber.getCompatibleSource(viewModel.bookMetadata.url)?.name ?: ""
+			viewBind.bookTitle.text = viewModel.bookMetadata.title
+			viewBind.sourceName.text = scrubber.getCompatibleSource(viewModel.bookMetadata.url)?.name ?: ""
 			
 			viewModel.chaptersWithContextLiveData.observe(context) { list ->
-				viewHolder.numberOfChapters.text = list.size.toString()
+				viewBind.numberOfChapters.text = list.size.toString()
 			}
-			viewModel.onError.observe(context) { viewHolder.errorMessage.text = it }
+			viewModel.onError.observe(context) { viewBind.errorMessage.text = it }
 			viewModel.onErrorVisibility.observe(context) {
-				viewHolder.errorMessage.visibility = it
+				viewBind.errorMessage.visibility = it
 			}
-			viewHolder.errorMessage.setOnLongClickListener(object : View.OnLongClickListener
+			viewBind.errorMessage.setOnLongClickListener(object : View.OnLongClickListener
 			{
 				private var expand: Boolean = false
 				override fun onLongClick(v: View?): Boolean
 				{
 					expand = !expand
-					viewHolder.errorMessage.maxLines = if (expand) 100 else 10
+					viewBind.errorMessage.maxLines = if (expand) 100 else 10
 					return true
 				}
 			})
-			viewHolder.databaseSearchButton.setOnClickListener {
+			viewBind.databaseSearchButton.setOnClickListener {
 				DatabaseSearchResultsActivity
 					.IntentData(context, "https://www.novelupdates.com/", DatabaseSearchResultsActivity.SearchMode.Text(viewModel.bookMetadata.title))
 					.let(context::startActivity)
 			}
 			
-			viewHolder.webpageOpenButton.setOnClickListener {
+			viewBind.webpageOpenButton.setOnClickListener {
 				Intent(Intent.ACTION_VIEW).also {
 					it.data = Uri.parse(viewModel.bookMetadata.url)
 				}.let(context::startActivity)

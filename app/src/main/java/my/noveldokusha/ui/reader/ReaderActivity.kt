@@ -47,12 +47,12 @@ class ReaderActivity : BaseActivity()
 	private fun fadeIn()
 	{
 		if (fadeInAlready.compareAndSet(false, true))
-			viewHolder.listView.fadeIn()
+			viewBind.listView.fadeIn()
 	}
 	
 	private val extras by lazy { IntentData(intent) }
 	private val viewModel by viewModels<ReaderModel>()
-	private val viewHolder by lazy { ActivityReaderBinding.inflate(layoutInflater) }
+	private val viewBind by lazy { ActivityReaderBinding.inflate(layoutInflater) }
 	private val viewAdapter = object
 	{
 		val listView by lazy { ItemArrayAdapter(this@ReaderActivity, viewModel.items) }
@@ -90,38 +90,38 @@ class ReaderActivity : BaseActivity()
 	override fun onCreate(savedInstanceState: Bundle?)
 	{
 		super.onCreate(savedInstanceState)
-		setContentView(viewHolder.root)
+		setContentView(viewBind.root)
 		
 		viewModel.initialization(bookUrl = extras.bookUrl, selectedChapter = extras.chapterUrl) {
 			loadInitialChapter()
 		}
 		
-		viewHolder.listView.adapter = viewAdapter.listView
+		viewBind.listView.adapter = viewAdapter.listView
 		sharedPreferences.registerOnSharedPreferenceChangeListener(listenerSharedPreferences)
 		
-		viewHolder.settingTextSize.value = sharedPreferences.READER_FONT_SIZE
-		viewHolder.settingTextSize.addOnChangeListener { _, value, _ ->
+		viewBind.settingTextSize.value = sharedPreferences.READER_FONT_SIZE
+		viewBind.settingTextSize.addOnChangeListener { _, value, _ ->
 			sharedPreferences.READER_FONT_SIZE = value
 		}
-		viewHolder.listView.setOnItemLongClickListener { _, _, _, _ ->
-			if (viewHolder.infoContainer.isVisible)
+		viewBind.listView.setOnItemLongClickListener { _, _, _, _ ->
+			if (viewBind.infoContainer.isVisible)
 			{
-				viewHolder.infoContainer.fadeOutVertical(-200f)
-				viewHolder.settingTextFontContainer.fadeOutVertical(200f)
-				viewHolder.settingTextSizeContainer.fadeOutVertical(200f)
+				viewBind.infoContainer.fadeOutVertical(-200f)
+				viewBind.settingTextFontContainer.fadeOutVertical(200f)
+				viewBind.settingTextSizeContainer.fadeOutVertical(200f)
 			}
 			else
 			{
-				viewHolder.infoContainer.fadeInVertical(-200f)
-				viewHolder.settingTextFontContainer.fadeInVertical(200f)
-				viewHolder.settingTextSizeContainer.fadeInVertical(200f)
+				viewBind.infoContainer.fadeInVertical(-200f)
+				viewBind.settingTextFontContainer.fadeInVertical(200f)
+				viewBind.settingTextSizeContainer.fadeInVertical(200f)
 			}
 			true
 		}
 		
-		viewHolder.settingTextFont.adapter = ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, availableFonts)
-		viewHolder.settingTextFont.setSelection(availableFonts.indexOfFirst { it == sharedPreferences.READER_FONT_FAMILY })
-		viewHolder.settingTextFont.onItemSelectedListener = object : AdapterView.OnItemSelectedListener
+		viewBind.settingTextFont.adapter = ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, availableFonts)
+		viewBind.settingTextFont.setSelection(availableFonts.indexOfFirst { it == sharedPreferences.READER_FONT_FAMILY })
+		viewBind.settingTextFont.onItemSelectedListener = object : AdapterView.OnItemSelectedListener
 		{
 			override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long)
 			{
@@ -131,7 +131,7 @@ class ReaderActivity : BaseActivity()
 			override fun onNothingSelected(parent: AdapterView<*>?) = Unit
 		}
 		
-		viewHolder.listView.setOnScrollListener(object : AbsListView.OnScrollListener
+		viewBind.listView.setOnScrollListener(object : AbsListView.OnScrollListener
 		{
 			override fun onScroll(view: AbsListView?, firstVisibleItem: Int, visibleItemCount: Int, totalItemCount: Int)
 			{
@@ -203,7 +203,7 @@ class ReaderActivity : BaseActivity()
 			items = viewModel.items
 		)
 		withContext(Dispatchers.Main) {
-			viewHolder.listView.setSelectionFromTop(index, offset)
+			viewBind.listView.setSelectionFromTop(index, offset)
 			viewModel.state = ReaderModel.State.IDLE
 			fadeIn()
 		}
@@ -211,15 +211,15 @@ class ReaderActivity : BaseActivity()
 	
 	fun updateInfoView()
 	{
-		val lastVisiblePosition = viewHolder.listView.lastVisiblePosition
+		val lastVisiblePosition = viewBind.listView.lastVisiblePosition
 		if (lastVisiblePosition < 0) return
 		val item = viewAdapter.listView.getItem(lastVisiblePosition)
 		if (item !is Item.Position) return
 		
 		val stats = viewModel.chaptersStats.get(item.url) ?: return
-		viewHolder.infoChapterTitle.text = stats.chapter.title
-		viewHolder.infoCurrentChapterFromTotal.text = " ${stats.index + 1}/${viewModel.orderedChapters.size}"
-		viewHolder.infoChapterProgressPercentage.text = " ${ceil((item.pos.toFloat() / stats.size.toFloat()) * 100f).roundToInt()}%"
+		viewBind.infoChapterTitle.text = stats.chapter.title
+		viewBind.infoCurrentChapterFromTotal.text = " ${stats.index + 1}/${viewModel.orderedChapters.size}"
+		viewBind.infoChapterProgressPercentage.text = " ${ceil((item.pos.toFloat() / stats.size.toFloat()) * 100f).roundToInt()}%"
 	}
 	
 	private fun updateCurrentReadingPosSavingState(firstVisibleItem: Int)
@@ -227,7 +227,7 @@ class ReaderActivity : BaseActivity()
 		val item = viewModel.items[firstVisibleItem]
 		if (item is Item.Position)
 		{
-			val offset = viewHolder.listView.run { getChildAt(0).top - paddingTop }
+			val offset = viewBind.listView.run { getChildAt(0).top - paddingTop }
 			viewModel.currentChapter = ChapterState(url = item.url, position = item.pos, offset = offset)
 		}
 	}
@@ -278,12 +278,12 @@ class ReaderActivity : BaseActivity()
 		
 		val maintainLastVisiblePosition = { fn: () -> Unit ->
 			val oldSize = viewAdapter.listView.count
-			val lvp = viewHolder.listView.lastVisiblePosition
-			val ivpView = viewHolder.listView.lastVisiblePosition - viewHolder.listView.firstVisiblePosition
-			val top = viewHolder.listView.getChildAt(ivpView).run { top - paddingTop }
+			val lvp = viewBind.listView.lastVisiblePosition
+			val ivpView = viewBind.listView.lastVisiblePosition - viewBind.listView.firstVisiblePosition
+			val top = viewBind.listView.getChildAt(ivpView).run { top - paddingTop }
 			fn()
 			val displacement = viewAdapter.listView.count - oldSize
-			viewHolder.listView.setSelectionFromTop(lvp + displacement, top)
+			viewBind.listView.setSelectionFromTop(lvp + displacement, top)
 		}
 		
 		val previousIndex = viewModel.chaptersStats[firstItem.url]!!.index - 1
@@ -392,83 +392,83 @@ class ReaderActivity : BaseActivity()
 	{
 		override fun getView(position: Int, convertView: View?, parent: ViewGroup): View
 		{
-			val item = this.getItem(position)!!
-			val itemView = when (convertView)
+			val itemData = this.getItem(position)!!
+			val itemBind = when (convertView)
 			{
 				null -> ActivityReaderListItemBinding.inflate(parent.inflater, parent, false).also { it.root.tag = it }
 				else -> ActivityReaderListItemBinding.bind(convertView)
 			}
 			
-			itemView.progressBar.visibility = View.GONE
-			itemView.divider.visibility = View.GONE
-			itemView.title.visibility = View.GONE
-			itemView.specialTitle.visibility = View.GONE
-			itemView.error.visibility = View.GONE
-			itemView.body.visibility = View.GONE
-			itemView.title.text = ""
-			itemView.specialTitle.text = ""
-			itemView.title.typeface = getFontFamilyBOLD(sharedPreferences.READER_FONT_FAMILY)
-			itemView.specialTitle.typeface = getFontFamilyBOLD(sharedPreferences.READER_FONT_FAMILY)
-			itemView.error.text = ""
-			itemView.body.text = ""
-			itemView.body.textSize = sharedPreferences.READER_FONT_SIZE
-			itemView.body.typeface = getFontFamilyNORMAL(sharedPreferences.READER_FONT_FAMILY)
+			itemBind.progressBar.visibility = View.GONE
+			itemBind.divider.visibility = View.GONE
+			itemBind.title.visibility = View.GONE
+			itemBind.specialTitle.visibility = View.GONE
+			itemBind.error.visibility = View.GONE
+			itemBind.body.visibility = View.GONE
+			itemBind.title.text = ""
+			itemBind.specialTitle.text = ""
+			itemBind.title.typeface = getFontFamilyBOLD(sharedPreferences.READER_FONT_FAMILY)
+			itemBind.specialTitle.typeface = getFontFamilyBOLD(sharedPreferences.READER_FONT_FAMILY)
+			itemBind.error.text = ""
+			itemBind.body.text = ""
+			itemBind.body.textSize = sharedPreferences.READER_FONT_SIZE
+			itemBind.body.typeface = getFontFamilyNORMAL(sharedPreferences.READER_FONT_FAMILY)
 			
-			when (item)
+			when (itemData)
 			{
 				is Item.BODY ->
 				{
-					itemView.body.visibility = View.VISIBLE
-					itemView.body.text = item.text
+					itemBind.body.visibility = View.VISIBLE
+					itemBind.body.text = itemData.text
 				}
 				is Item.BODY_START ->
 				{
-					itemView.body.visibility = View.VISIBLE
-					itemView.body.text = item.text
-					viewModel.readRoutine.setReadStart(item.url)
+					itemBind.body.visibility = View.VISIBLE
+					itemBind.body.text = itemData.text
+					viewModel.readRoutine.setReadStart(itemData.url)
 				}
 				is Item.BODY_END ->
 				{
-					itemView.body.visibility = View.VISIBLE
-					itemView.body.text = item.text
-					viewModel.readRoutine.setReadEnd(item.url)
+					itemBind.body.visibility = View.VISIBLE
+					itemBind.body.text = itemData.text
+					viewModel.readRoutine.setReadEnd(itemData.url)
 				}
 				is Item.PROGRESSBAR ->
 				{
-					itemView.progressBar.visibility = View.VISIBLE
-					itemView.progressBar.addBottomMargin { position == list.lastIndex }
+					itemBind.progressBar.visibility = View.VISIBLE
+					itemBind.progressBar.addBottomMargin { position == list.lastIndex }
 				}
 				is Item.DIVIDER ->
 				{
-					itemView.divider.visibility = View.VISIBLE
-					itemView.title.addTopMargin { position == 0 }
+					itemBind.divider.visibility = View.VISIBLE
+					itemBind.title.addTopMargin { position == 0 }
 				}
 				is Item.TITLE ->
 				{
-					itemView.title.visibility = View.VISIBLE
-					itemView.title.text = item.text
+					itemBind.title.visibility = View.VISIBLE
+					itemBind.title.text = itemData.text
 				}
 				is Item.BOOK_END ->
 				{
-					itemView.specialTitle.visibility = View.VISIBLE
-					itemView.specialTitle.text = getString(R.string.reader_no_more_chapters)
-					itemView.specialTitle.addBottomMargin(800) { position == list.lastIndex }
+					itemBind.specialTitle.visibility = View.VISIBLE
+					itemBind.specialTitle.text = getString(R.string.reader_no_more_chapters)
+					itemBind.specialTitle.addBottomMargin(800) { position == list.lastIndex }
 				}
 				is Item.BOOK_START ->
 				{
-					itemView.specialTitle.visibility = View.VISIBLE
-					itemView.specialTitle.text = getString(R.string.reader_first_chapter)
-					itemView.specialTitle.addTopMargin(500) { position == 0 }
+					itemBind.specialTitle.visibility = View.VISIBLE
+					itemBind.specialTitle.text = getString(R.string.reader_first_chapter)
+					itemBind.specialTitle.addTopMargin(500) { position == 0 }
 				}
 				is Item.ERROR ->
 				{
-					itemView.error.visibility = View.VISIBLE
-					itemView.error.text = item.text
-					itemView.specialTitle.addBottomMargin(800) { position == list.lastIndex }
+					itemBind.error.visibility = View.VISIBLE
+					itemBind.error.text = itemData.text
+					itemBind.specialTitle.addBottomMargin(800) { position == list.lastIndex }
 				}
 			}
 			
-			return itemView.root
+			return itemBind.root
 		}
 	}
 }

@@ -21,7 +21,7 @@ import my.noveldokusha.uiUtils.inflater
 class FinderFragment : Fragment()
 {
 	private val viewModel by viewModels<FinderModel>()
-	private lateinit var viewHolder: ActivityMainFragmentFinderBinding
+	private lateinit var viewBind: ActivityMainFragmentFinderBinding
 	private lateinit var viewAdapter: Adapter
 	
 	private inner class Adapter
@@ -31,14 +31,14 @@ class FinderFragment : Fragment()
 	
 	override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View
 	{
-		viewHolder = ActivityMainFragmentFinderBinding.inflate(inflater, container, false)
+		viewBind = ActivityMainFragmentFinderBinding.inflate(inflater, container, false)
 		viewAdapter = Adapter()
 		
-		viewHolder.listView.adapter = viewAdapter.listView
-		viewHolder.listView.itemAnimator = DefaultItemAnimator()
+		viewBind.listView.adapter = viewAdapter.listView
+		viewBind.listView.itemAnimator = DefaultItemAnimator()
 		viewAdapter.listView.list = viewModel.sourcesList
 		
-		return viewHolder.root
+		return viewBind.root
 	}
 	
 	override fun onCreate(savedInstanceState: Bundle?)
@@ -89,29 +89,29 @@ private class ListItemAdapter(val ctx: Context) : MyListAdapter<Item, ListItemAd
 		is Item.Header -> 2
 	}
 	
-	override fun onBindViewHolder(holder: ViewHolder, position: Int): Unit = when (val itemData = this.list[position])
+	override fun onBindViewHolder(viewHolder: ViewHolder, position: Int): Unit = when (val itemData = this.list[position])
 	{
-		is Item.Source -> with(holder as ViewHolder.Source)
+		is Item.Source -> with(viewHolder as ViewHolder.Source)
 		{
-			viewHolder.title.text = itemData.name
-			viewHolder.title.setOnClickListener {
+			this.viewBind.title.text = itemData.name
+			this.viewBind.title.setOnClickListener {
 				SourceCatalogActivity
 					.IntentData(ctx, sourceBaseUrl = itemData.baseUrl)
 					.let(ctx::startActivity)
 			}
 		}
-		is Item.Database -> with(holder as ViewHolder.Database)
+		is Item.Database -> with(viewHolder as ViewHolder.Database)
 		{
-			viewHolder.title.text = itemData.name
-			viewHolder.title.setOnClickListener {
+			this.viewBind.title.text = itemData.name
+			this.viewBind.title.setOnClickListener {
 				DatabaseSearchActivity
 					.IntentData(ctx, databaseBaseUrl = itemData.baseUrl)
 					.let(ctx::startActivity)
 			}
 		}
-		is Item.Header -> with(holder as ViewHolder.Header)
+		is Item.Header -> with(viewHolder as ViewHolder.Header)
 		{
-			viewHolder.title.text = itemData.text
+			this.viewBind.title.text = itemData.text
 		}
 	}
 	
@@ -125,9 +125,8 @@ private class ListItemAdapter(val ctx: Context) : MyListAdapter<Item, ListItemAd
 	
 	sealed class ViewHolder(view: View) : RecyclerView.ViewHolder(view)
 	{
-		class Source(val viewHolder: BookListItemBinding) : ViewHolder(viewHolder.root)
-		class Database(val viewHolder: BookListItemBinding) : ViewHolder(viewHolder.root)
-		class Header(val viewHolder: ActivityMainFragmentFinderListviewItemHeaderBinding) : ViewHolder(viewHolder.root)
+		class Source(val viewBind: BookListItemBinding) : ViewHolder(viewBind.root)
+		class Database(val viewBind: BookListItemBinding) : ViewHolder(viewBind.root)
+		class Header(val viewBind: ActivityMainFragmentFinderListviewItemHeaderBinding) : ViewHolder(viewBind.root)
 	}
-	
 }

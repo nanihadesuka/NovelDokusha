@@ -39,7 +39,7 @@ class DatabaseSearchActivity : BaseActivity()
 	
 	private val extras by lazy { IntentData(intent) }
 	private val viewModel by viewModels<DatabaseSearchModel>()
-	private val viewHolder by lazy { ActivityDatabaseSearchBinding.inflate(layoutInflater) }
+	private val viewBind by lazy { ActivityDatabaseSearchBinding.inflate(layoutInflater) }
 	private val viewAdapter = object
 	{
 		val listView by lazy { GenresAdapter() }
@@ -48,8 +48,8 @@ class DatabaseSearchActivity : BaseActivity()
 	override fun onCreate(savedInstanceState: Bundle?)
 	{
 		super.onCreate(savedInstanceState)
-		setContentView(viewHolder.root)
-		setSupportActionBar(viewHolder.toolbar)
+		setContentView(viewBind.root)
+		setSupportActionBar(viewBind.toolbar)
 		viewModel.initialization(scrubber.getCompatibleDatabase(extras.databaseBaseUrl)!!)
 		
 		supportActionBar!!.let {
@@ -58,9 +58,9 @@ class DatabaseSearchActivity : BaseActivity()
 			it.setDisplayHomeAsUpEnabled(true)
 		}
 		
-		viewHolder.listView.adapter = viewAdapter.listView
-		viewHolder.listView.itemAnimator = DefaultItemAnimator()
-		viewHolder.searchByGenreButton.setOnClickListener { _ ->
+		viewBind.listView.adapter = viewAdapter.listView
+		viewBind.listView.itemAnimator = DefaultItemAnimator()
+		viewBind.searchByGenreButton.setOnClickListener { _ ->
 			val list = viewModel.genreListLiveData.value ?: return@setOnClickListener
 			val input = DatabaseSearchResultsActivity.SearchMode.Genres(
 				genresIncludeId = ArrayList(list.filter { it.state == Checkbox3StatesView.STATE.POSITIVE }.map { it.genreId }),
@@ -116,22 +116,22 @@ class DatabaseSearchActivity : BaseActivity()
 	
 }
 
-private class GenresAdapter : MyListAdapter<DatabaseSearchModel.Item, GenresAdapter.ViewBinder>()
+private class GenresAdapter : MyListAdapter<DatabaseSearchModel.Item, GenresAdapter.ViewHolder>()
 {
 	override fun areItemsTheSame(old: DatabaseSearchModel.Item, new: DatabaseSearchModel.Item) = old.genreId == new.genreId
 	override fun areContentsTheSame(old: DatabaseSearchModel.Item, new: DatabaseSearchModel.Item) = old.state == new.state
 	
-	override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewBinder =
-		ViewBinder(ActivityDatabaseSearchGenreItemBinding.inflate(parent.inflater, parent, false))
+	override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder =
+		ViewHolder(ActivityDatabaseSearchGenreItemBinding.inflate(parent.inflater, parent, false))
 	
-	override fun onBindViewHolder(binder: ViewBinder, position: Int)
+	override fun onBindViewHolder(viewHolder: ViewHolder, position: Int)
 	{
 		val itemData = list[position]
-		val itemView = binder.viewHolder
-		itemView.item.text = itemData.genre
-		itemView.item.onStateChangeListener = { itemData.state = it }
-		itemView.item.state = itemData.state
+		val itemBind = viewHolder.viewHolder
+		itemBind.item.text = itemData.genre
+		itemBind.item.onStateChangeListener = { itemData.state = it }
+		itemBind.item.state = itemData.state
 	}
 	
-	class ViewBinder(val viewHolder: ActivityDatabaseSearchGenreItemBinding) : RecyclerView.ViewHolder(viewHolder.root)
+	class ViewHolder(val viewHolder: ActivityDatabaseSearchGenreItemBinding) : RecyclerView.ViewHolder(viewHolder.root)
 }

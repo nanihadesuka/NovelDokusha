@@ -28,14 +28,14 @@ import java.util.*
 class SettingsFragment : BaseFragment()
 {
 	private val viewModel by viewModels<SettingsModel>()
-	private lateinit var viewHolder: ActivityMainFragmentSettingsBinding
+	private lateinit var viewBind: ActivityMainFragmentSettingsBinding
 	private lateinit var viewAdapter: Adapter
 	
 	private inner class Adapter
 	
 	override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View
 	{
-		viewHolder = ActivityMainFragmentSettingsBinding.inflate(inflater, container, false)
+		viewBind = ActivityMainFragmentSettingsBinding.inflate(inflater, container, false)
 		viewAdapter = Adapter()
 		
 		settingTheme()
@@ -43,42 +43,42 @@ class SettingsFragment : BaseFragment()
 		settingDatabaseBackup()
 		settingDatabaseRestore()
 		
-		return viewHolder.root
+		return viewBind.root
 	}
 	
 	fun settingTheme()
 	{
-		viewHolder.settingsFollowSystemTheme.isChecked = sharedPreferences.THEME_FOLLOW_SYSTEM
-		viewHolder.settingsFollowSystemTheme.setOnCheckedChangeListener { _, isChecked ->
+		viewBind.settingsFollowSystemTheme.isChecked = sharedPreferences.THEME_FOLLOW_SYSTEM
+		viewBind.settingsFollowSystemTheme.setOnCheckedChangeListener { _, isChecked ->
 			sharedPreferences.THEME_FOLLOW_SYSTEM = isChecked
 		}
 		
 		val themes = (globalThemeList.light + globalThemeList.dark)
 		for ((id, name) in themes)
-			viewHolder.settingsTheme.addView(MaterialRadioButton(requireActivity()).also {
+			viewBind.settingsTheme.addView(MaterialRadioButton(requireActivity()).also {
 				it.id = id
 				it.text = name
 			})
 		
-		viewHolder.settingsTheme.check(sharedPreferences.THEME_ID)
-		viewHolder.settingsTheme.setOnCheckedChangeListener { _, _ ->
-			sharedPreferences.THEME_ID = viewHolder.settingsTheme.checkedRadioButtonId
+		viewBind.settingsTheme.check(sharedPreferences.THEME_ID)
+		viewBind.settingsTheme.setOnCheckedChangeListener { _, _ ->
+			sharedPreferences.THEME_ID = viewBind.settingsTheme.checkedRadioButtonId
 		}
 	}
 	
 	fun settingDatabaseClean()
 	{
-		viewHolder.databaseSize.text = Formatter.formatFileSize(context, bookstore.appDB.getDatabaseSizeBytes())
-		viewHolder.databaseButtonClean.setOnClickListener {
+		viewBind.databaseSize.text = Formatter.formatFileSize(context, bookstore.appDB.getDatabaseSizeBytes())
+		viewBind.databaseButtonClean.setOnClickListener {
 			bookstore.settings.clearNonLibraryDataFlow().asLiveData().observe(viewLifecycleOwner) {
-				viewHolder.databaseSize.text = Formatter.formatFileSize(context, bookstore.appDB.getDatabaseSizeBytes())
+				viewBind.databaseSize.text = Formatter.formatFileSize(context, bookstore.appDB.getDatabaseSizeBytes())
 			}
 		}
 	}
 	
 	fun settingDatabaseBackup()
 	{
-		viewHolder.backupDatabaseButton.setOnClickListener {
+		viewBind.backupDatabaseButton.setOnClickListener {
 			
 			val read = Manifest.permission.READ_EXTERNAL_STORAGE
 			val write = Manifest.permission.WRITE_EXTERNAL_STORAGE
@@ -107,7 +107,7 @@ class SettingsFragment : BaseFragment()
 	
 	fun settingDatabaseRestore()
 	{
-		viewHolder.restoreDatabaseButton.setOnClickListener {
+		viewBind.restoreDatabaseButton.setOnClickListener {
 			
 			val read = Manifest.permission.READ_EXTERNAL_STORAGE
 			permissionRequest(read) {

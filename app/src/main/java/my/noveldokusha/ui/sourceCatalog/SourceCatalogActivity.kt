@@ -41,7 +41,7 @@ class SourceCatalogActivity : BaseActivity()
 	
 	private val extras by lazy { IntentData(intent) }
 	private val viewModel by viewModels<SourceCatalogModel>()
-	private val viewHolder by lazy { ActivitySourceCatalogBinding.inflate(layoutInflater) }
+	private val viewBind by lazy { ActivitySourceCatalogBinding.inflate(layoutInflater) }
 	private val viewAdapter = object
 	{
 		val recyclerView by lazy { BooksItemAdapter(this@SourceCatalogActivity) }
@@ -56,18 +56,18 @@ class SourceCatalogActivity : BaseActivity()
 	override fun onCreate(savedInstanceState: Bundle?)
 	{
 		super.onCreate(savedInstanceState)
-		setContentView(viewHolder.root)
-		setSupportActionBar(viewHolder.toolbar)
+		setContentView(viewBind.root)
+		setSupportActionBar(viewBind.toolbar)
 		viewModel.initialization(scrubber.getCompatibleSourceCatalog(extras.sourceBaseUrl)!!)
 		
-		viewHolder.recyclerView.adapter = ConcatAdapter(viewAdapter.recyclerView, viewAdapter.progressBar)
-		viewHolder.recyclerView.layoutManager = viewLayoutManager.recyclerView
-		viewHolder.recyclerView.itemAnimator = DefaultItemAnimator()
+		viewBind.recyclerView.adapter = ConcatAdapter(viewAdapter.recyclerView, viewAdapter.progressBar)
+		viewBind.recyclerView.layoutManager = viewLayoutManager.recyclerView
+		viewBind.recyclerView.itemAnimator = DefaultItemAnimator()
 		
-		viewHolder.recyclerView.setOnScrollChangeListener { _, _, _, _, _ ->
+		viewBind.recyclerView.setOnScrollChangeListener { _, _, _, _, _ ->
 			viewModel.fetchIterator.fetchTrigger {
 				val pos = viewLayoutManager.recyclerView.findLastVisibleItemPosition()
-				val listSize = viewHolder.recyclerView.adapter?.itemCount ?: return@fetchTrigger false
+				val listSize = viewBind.recyclerView.adapter?.itemCount ?: return@fetchTrigger false
 				pos >= listSize - 3
 			}
 		}
@@ -76,18 +76,18 @@ class SourceCatalogActivity : BaseActivity()
 			viewAdapter.recyclerView.list = it
 		}
 		viewModel.fetchIterator.onError.observe(this) {
-			viewHolder.errorMessage.visibility = View.VISIBLE
-			viewHolder.errorMessage.text = it.message
+			viewBind.errorMessage.visibility = View.VISIBLE
+			viewBind.errorMessage.text = it.message
 		}
 		viewModel.fetchIterator.onCompletedEmpty.observe(this) {
-			viewHolder.noResultsMessage.visibility = View.VISIBLE
+			viewBind.noResultsMessage.visibility = View.VISIBLE
 		}
 		viewModel.fetchIterator.onFetching.observe(this) {
 			viewAdapter.progressBar.visible = it
 		}
 		viewModel.fetchIterator.onReset.observe(this) {
-			viewHolder.errorMessage.visibility = View.GONE
-			viewHolder.noResultsMessage.visibility = View.GONE
+			viewBind.errorMessage.visibility = View.GONE
+			viewBind.noResultsMessage.visibility = View.GONE
 			viewAdapter.recyclerView.notifyDataSetChanged()
 		}
 		
@@ -136,52 +136,53 @@ class SourceCatalogActivity : BaseActivity()
 		return true
 	}
 	
-	class BooksItemAdapter(val ctx: BaseActivity) : MyListAdapter<CatalogItem, BooksItemAdapter.ViewBinder>()
+}
+
+private class BooksItemAdapter(val ctx: BaseActivity) : MyListAdapter<CatalogItem, BooksItemAdapter.ViewHolder>()
+{
+	override fun areItemsTheSame(old: CatalogItem, new: CatalogItem) = old.bookMetadata.url == new.bookMetadata.url
+	override fun areContentsTheSame(old: CatalogItem, new: CatalogItem) = old.bookMetadata == new.bookMetadata
+	
+	override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder =
+		ViewHolder(BookListItemBinding.inflate(parent.inflater, parent, false))
+	
+	override fun onBindViewHolder(viewHolder: ViewHolder, position: Int)
 	{
-		override fun areItemsTheSame(old: CatalogItem, new: CatalogItem) = old.bookMetadata.url == new.bookMetadata.url
-		override fun areContentsTheSame(old: CatalogItem, new: CatalogItem) = old.bookMetadata == new.bookMetadata
+		val itemData = this.list[position]
+		val itemBind = viewHolder.viewBind
+		viewHolder.itemData = itemData
 		
-		override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewBinder =
-			ViewBinder(BookListItemBinding.inflate(parent.inflater, parent, false))
-		
-		override fun onBindViewHolder(binder: ViewBinder, position: Int)
-		{
-			val itemData = this.list[position]
-			val itemView = binder.viewHolder
-			binder.itemData = itemData
-			
-			itemView.title.text = itemData.bookMetadata.title
-			itemView.title.setOnClickListener {
-				ChaptersActivity.IntentData(
-					ctx,
-					bookMetadata = itemData.bookMetadata
-				).let(ctx::startActivity)
+		itemBind.title.text = itemData.bookMetadata.title
+		itemBind.title.setOnClickListener {
+			ChaptersActivity.IntentData(
+				ctx,
+				bookMetadata = itemData.bookMetadata
+			).let(ctx::startActivity)
+		}
+		itemBind.title.setOnLongClickListener {
+			ctx.lifecycleScope.launch(Dispatchers.IO) {
+				bookstore.bookLibrary.toggleBookmark(itemData.bookMetadata)
+				val isInLibrary = bookstore.bookLibrary.existInLibrary(itemData.bookMetadata.url)
+				val res = if (isInLibrary) R.string.added_to_library else R.string.removed_from_library
+				toast(res.stringRes())
 			}
-			itemView.title.setOnLongClickListener {
-				ctx.lifecycleScope.launch(Dispatchers.IO) {
-					bookstore.bookLibrary.toggleBookmark(itemData.bookMetadata)
-					val isInLibrary = bookstore.bookLibrary.existInLibrary(itemData.bookMetadata.url)
-					val res = if (isInLibrary) R.string.added_to_library else R.string.removed_from_library
-					toast(res.stringRes())
-				}
-				true
-			}
-			
-			binder.addBottomMargin { position == list.lastIndex }
+			true
 		}
 		
-		private val selectedTextColor by lazy { R.attr.colorAccent.colorAttrRes(ctx) }
+		viewHolder.addBottomMargin { position == list.lastIndex }
+	}
+	
+	private val selectedTextColor by lazy { R.attr.colorAccent.colorAttrRes(ctx) }
+	
+	inner class ViewHolder(val viewBind: BookListItemBinding) : RecyclerView.ViewHolder(viewBind.root)
+	{
+		var itemData: CatalogItem? by Delegates.observable(null) { _, oldValue, newValue ->
+			isInLibraryObserver.switchLiveData(oldValue, newValue, ctx) { isInLibraryLiveData }
+		}
 		
-		inner class ViewBinder(val viewHolder: BookListItemBinding) : RecyclerView.ViewHolder(viewHolder.root)
-		{
-			var itemData: CatalogItem? by Delegates.observable(null) { _, oldValue, newValue ->
-				isInLibraryObserver.switchLiveData(oldValue, newValue, ctx) { isInLibraryLiveData }
-			}
-			
-			private val unselectedTextColor = viewHolder.title.currentTextColor
-			private val isInLibraryObserver = Observer<Boolean> { isInLibrary ->
-				viewHolder.title.setTextColor(if (isInLibrary) selectedTextColor else unselectedTextColor)
-			}
+		private val unselectedTextColor = viewBind.title.currentTextColor
+		private val isInLibraryObserver = Observer<Boolean> { isInLibrary ->
+			viewBind.title.setTextColor(if (isInLibrary) selectedTextColor else unselectedTextColor)
 		}
 	}
 }

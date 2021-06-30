@@ -34,7 +34,7 @@ class LibraryPageFragment : BaseFragment
 	var showCompleted by Argument_Boolean()
 	
 	private val viewModel by viewModels<LibraryPageModel>()
-	private lateinit var viewHolder: ActivityMainFragmentLibraryPageBinding
+	private lateinit var viewBind: ActivityMainFragmentLibraryPageBinding
 	private lateinit var viewAdapter: Adapter
 	
 	private inner class Adapter
@@ -44,27 +44,27 @@ class LibraryPageFragment : BaseFragment
 	
 	override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View
 	{
-		viewHolder = ActivityMainFragmentLibraryPageBinding.inflate(inflater, container, false)
+		viewBind = ActivityMainFragmentLibraryPageBinding.inflate(inflater, container, false)
 		viewAdapter = Adapter()
 		
 		viewModel.initialization(showCompleted)
 		
-		viewHolder.gridView.adapter = viewAdapter.gridView
-		viewHolder.gridView.itemAnimator = DefaultItemAnimator()
-		viewHolder.swipeRefreshLayout.setOnRefreshListener { viewModel.update() }
+		viewBind.gridView.adapter = viewAdapter.gridView
+		viewBind.gridView.itemAnimator = DefaultItemAnimator()
+		viewBind.swipeRefreshLayout.setOnRefreshListener { viewModel.update() }
 		
 		viewModel.booksWithContextFlow.asLiveData().observe(viewLifecycleOwner) {
 			viewAdapter.gridView.list = it
 		}
 		
-		viewModel.refreshing.observe(viewLifecycleOwner) { viewHolder.swipeRefreshLayout.isRefreshing = it }
+		viewModel.refreshing.observe(viewLifecycleOwner) { viewBind.swipeRefreshLayout.isRefreshing = it }
 		viewModel.updateNotice.observe(viewLifecycleOwner) {
 			if (it.hasUpdates.isNotEmpty()) notifyUpdated(it.hasUpdates.joinToString("\n"))
 			if (it.hasFailed.isNotEmpty()) notifyUpdatedFails(it.hasFailed.joinToString("\n"))
 			if (it.hasUpdates.isEmpty()) toast("No updates found")
 		}
 		
-		return viewHolder.root
+		return viewBind.root
 	}
 	
 	private fun notifyUpdated(text: String)
@@ -95,37 +95,37 @@ class LibraryPageFragment : BaseFragment
 	
 }
 
-private class NovelItemAdapter(private val context: BaseFragment) : MyListAdapter<BookWithContext, NovelItemAdapter.ViewBinder>()
+private class NovelItemAdapter(private val context: BaseFragment) : MyListAdapter<BookWithContext, NovelItemAdapter.ViewHolder>()
 {
 	override fun areItemsTheSame(old: BookWithContext, new: BookWithContext) = old.book.url == new.book.url
 	override fun areContentsTheSame(old: BookWithContext, new: BookWithContext) = old == new
 	
-	override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewBinder =
-		ViewBinder(ActivityMainFragmentLibraryPageGridviewItemBinding.inflate(parent.inflater, parent, false))
+	override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder =
+		ViewHolder(ActivityMainFragmentLibraryPageGridviewItemBinding.inflate(parent.inflater, parent, false))
 	
-	override fun onBindViewHolder(binder: ViewBinder, position: Int)
+	override fun onBindViewHolder(viewHolder: ViewHolder, position: Int)
 	{
-		val viewModel = list[position]
-		val viewHolder = binder.viewHolder
+		val viewData = list[position]
+		val viewBind = viewHolder.viewBind
 		
-		viewHolder.title.text = viewModel.book.title
-		val unreadChaptersCount = viewModel.chaptersCount - viewModel.chaptersReadCount
-		viewHolder.unreadChaptersCounter.visibility = if (unreadChaptersCount == 0) View.INVISIBLE else View.VISIBLE
-		viewHolder.unreadChaptersCounter.text = unreadChaptersCount.toString()
+		viewBind.title.text = viewData.book.title
+		val unreadChaptersCount = viewData.chaptersCount - viewData.chaptersReadCount
+		viewBind.unreadChaptersCounter.visibility = if (unreadChaptersCount == 0) View.INVISIBLE else View.VISIBLE
+		viewBind.unreadChaptersCounter.text = unreadChaptersCount.toString()
 		
-		viewHolder.book.setOnClickListener {
+		viewBind.book.setOnClickListener {
 			ChaptersActivity.IntentData(
 				context.requireContext(),
-				bookMetadata = BookMetadata(url = viewModel.book.url, title = viewModel.book.title)
+				bookMetadata = BookMetadata(url = viewData.book.url, title = viewData.book.title)
 			).let(context::startActivity)
 		}
-		viewHolder.book.setOnLongClickListener {
-			completedDialog(context, viewModel.book)
+		viewBind.book.setOnLongClickListener {
+			completedDialog(context, viewData.book)
 			true
 		}
 	}
 	
-	inner class ViewBinder(val viewHolder: ActivityMainFragmentLibraryPageGridviewItemBinding) : RecyclerView.ViewHolder(viewHolder.root)
+	inner class ViewHolder(val viewBind: ActivityMainFragmentLibraryPageGridviewItemBinding) : RecyclerView.ViewHolder(viewBind.root)
 }
 
 private fun completedDialog(context: BaseFragment, book: Book) = MaterialDialog(context.requireActivity()).show {

@@ -32,7 +32,7 @@ class WebViewActivity : BaseActivity()
 	
 	private val extras by lazy { IntentData(intent) }
 	private val viewModel by viewModels<WebViewModel>()
-	private val viewHolder by lazy { ActivityWebviewBinding.inflate(layoutInflater) }
+	private val viewBind by lazy { ActivityWebviewBinding.inflate(layoutInflater) }
 	private val viewAdapter = object
 	{}
 	private val viewLayoutManager = object
@@ -42,8 +42,8 @@ class WebViewActivity : BaseActivity()
 	override fun onCreate(savedInstanceState: Bundle?)
 	{
 		super.onCreate(savedInstanceState)
-		setContentView(viewHolder.root)
-		setSupportActionBar(viewHolder.toolbar)
+		setContentView(viewBind.root)
+		setSupportActionBar(viewBind.toolbar)
 		viewModel.initialization()
 		
 		if (!packageManager.hasSystemFeature(PackageManager.FEATURE_WEBVIEW))
@@ -59,9 +59,9 @@ class WebViewActivity : BaseActivity()
 			return
 		}
 		
-		viewHolder.webview.settings.javaScriptEnabled = true
+		viewBind.webview.settings.javaScriptEnabled = true
 		
-		viewHolder.webview.webViewClient = object : WebViewClient()
+		viewBind.webview.webViewClient = object : WebViewClient()
 		{
 			
 			override fun onPageFinished(view: WebView?, url: String?)
@@ -86,7 +86,7 @@ class WebViewActivity : BaseActivity()
 			}
 		}
 		
-		viewHolder.webview.loadUrl(extras.url)
+		viewBind.webview.loadUrl(extras.url)
 		
 		supportActionBar!!.let {
 			it.subtitle = extras.url
