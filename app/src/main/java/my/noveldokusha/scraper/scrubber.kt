@@ -115,33 +115,36 @@ object scrubber
 	
 	private fun getPTraverse(node: Node): String
 	{
+		fun innerTraverse(node: Node): String = node.childNodes().joinToString("") { child ->
+			when
+			{
+				child.nodeName() == "br" -> "\n"
+				child is TextNode -> child.text()
+				else -> innerTraverse(child)
+			}
+		}
+		
+		val paragraph = innerTraverse(node).trim()
+		return if (paragraph.isEmpty()) "" else innerTraverse(node).trim() + "\n\n"
+	}
+	
+	private fun getNodeTextTraverse(node: Node): String
+	{
 		val children = node.childNodes()
 		if (children.isEmpty())
 			return ""
 		
-		return children.joinToString(separator = "", postfix = "\n\n") { child ->
+		return children.joinToString("") { child ->
 			when
 			{
-				child is TextNode -> child.text().trim()
+				child.nodeName() == "p" -> getPTraverse(child)
 				child.nodeName() == "br" -> "\n"
-				else -> getPTraverse(child)
-			}
-		}
-	}
-	
-	private fun getNodeTextTraverse(node: Node): List<String>
-	{
-		val children = node.childNodes()
-		if (children.isEmpty())
-			return listOf()
-		
-		return children.flatMap { child ->
-			when
-			{
-				child is TextNode -> listOf(child.text().trim(), "\n\n")
-				child.nodeName() == "p" -> listOf(getPTraverse(child))
-				child.nodeName() == "br" -> listOf("\n")
-				child.nodeName() == "hr" -> listOf("\n\n")
+				child.nodeName() == "hr" -> "\n\n"
+				child is TextNode ->
+				{
+					val text = child.text().trim()
+					if (text.isEmpty()) "" else text + "\n\n"
+				}
 				else -> getNodeTextTraverse(child)
 			}
 		}
@@ -156,11 +159,11 @@ object scrubber
 		return children.joinToString("") { child ->
 			when
 			{
-				child is TextNode -> child.text().trim()
 				child.nodeName() == "p" -> getPTraverse(child)
 				child.nodeName() == "br" -> "\n"
 				child.nodeName() == "hr" -> "\n\n"
-				else -> getNodeTextTraverse(child).joinToString("")
+				child is TextNode -> child.text().trim()
+				else -> getNodeTextTraverse(child)
 			}
 		}
 	}
