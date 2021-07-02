@@ -1,19 +1,23 @@
 package my.noveldokusha.ui.main
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import androidx.core.view.updatePadding
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.asLiveData
-import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DefaultItemAnimator
+import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.checkbox.checkBoxPrompt
 import com.afollestad.materialdialogs.checkbox.isCheckPromptChecked
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import my.noveldokusha.*
 import my.noveldokusha.databinding.ActivityMainFragmentLibraryPageBinding
@@ -36,20 +40,31 @@ class LibraryPageFragment : BaseFragment
 	private val viewModel by viewModels<LibraryPageModel>()
 	private lateinit var viewBind: ActivityMainFragmentLibraryPageBinding
 	private lateinit var viewAdapter: Adapter
+	private lateinit var viewLayout: Layout
 	
 	private inner class Adapter
 	{
-		val gridView by lazy { NovelItemAdapter(this@LibraryPageFragment) }
+		val gridView by lazy { NovelItemAdapter(requireContext()) }
+	}
+	
+	private inner class Layout
+	{
+		val gridView = GridLayoutManager(requireContext(), 2).also {
+			it.spanCount = if (this@LibraryPageFragment.isOnPortraitMode()) 2 else 4
+		}
 	}
 	
 	override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View
 	{
 		viewBind = ActivityMainFragmentLibraryPageBinding.inflate(inflater, container, false)
 		viewAdapter = Adapter()
+		viewLayout = Layout()
 		
 		viewModel.initialization(showCompleted)
 		
 		viewBind.gridView.adapter = viewAdapter.gridView
+		viewBind.gridView.updatePadding(bottom = if (isOnPortraitMode()) spToPx(300f) else spToPx(50f))
+		viewBind.gridView.layoutManager = viewLayout.gridView
 		viewBind.gridView.itemAnimator = DefaultItemAnimator()
 		viewBind.swipeRefreshLayout.setOnRefreshListener { viewModel.update() }
 		
@@ -95,7 +110,7 @@ class LibraryPageFragment : BaseFragment
 	
 }
 
-private class NovelItemAdapter(private val context: BaseFragment) : MyListAdapter<BookWithContext, NovelItemAdapter.ViewHolder>()
+private class NovelItemAdapter(private val ctx: Context) : MyListAdapter<BookWithContext, NovelItemAdapter.ViewHolder>()
 {
 	override fun areItemsTheSame(old: BookWithContext, new: BookWithContext) = old.book.url == new.book.url
 	override fun areContentsTheSame(old: BookWithContext, new: BookWithContext) = old == new
@@ -115,12 +130,12 @@ private class NovelItemAdapter(private val context: BaseFragment) : MyListAdapte
 		
 		viewBind.book.setOnClickListener {
 			ChaptersActivity.IntentData(
-				context.requireContext(),
+				ctx,
 				bookMetadata = BookMetadata(url = viewData.book.url, title = viewData.book.title)
-			).let(context::startActivity)
+			).let(ctx::startActivity)
 		}
 		viewBind.book.setOnLongClickListener {
-			completedDialog(context, viewData.book)
+			completedDialog(ctx, viewData.book)
 			true
 		}
 	}
@@ -128,12 +143,12 @@ private class NovelItemAdapter(private val context: BaseFragment) : MyListAdapte
 	inner class ViewHolder(val viewBind: ActivityMainFragmentLibraryPageGridviewItemBinding) : RecyclerView.ViewHolder(viewBind.root)
 }
 
-private fun completedDialog(context: BaseFragment, book: Book) = MaterialDialog(context.requireActivity()).show {
+private fun completedDialog(ctx: Context, book: Book) = MaterialDialog(ctx).show {
 	title(text = book.title)
 	checkBoxPrompt(text = "Completed", isCheckedDefault = book.completed) {}
 	negativeButton(text = "Cancel")
 	positiveButton(text = "Ok") {
 		val completed = isCheckPromptChecked()
-		context.lifecycleScope.launch { bookstore.bookLibrary.update(book.copy(completed = completed)) }
+		CoroutineScope(Dispatchers.IO).launch { bookstore.bookLibrary.update(book.copy(completed = completed)) }
 	}
 }

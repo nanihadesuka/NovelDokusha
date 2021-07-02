@@ -20,7 +20,6 @@
 			android:layout_width="match_parent"
 			android:layout_height="match_parent"
 			android:clipToPadding="false"
-			android:paddingBottom="300sp"
 			android:scrollbars="vertical"
 			android:splitMotionEvents="false"
 			app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"

@@ -4,7 +4,6 @@ import android.animation.LayoutTransition
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.util.TypedValue
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
@@ -31,6 +30,7 @@ import my.noveldokusha.uiAdapters.MyListAdapter
 import my.noveldokusha.uiUtils.Extra_String
 import my.noveldokusha.uiUtils.fadeIn
 import my.noveldokusha.uiUtils.inflater
+import my.noveldokusha.uiUtils.spToPx
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -109,15 +109,13 @@ class DatabaseBookInfoActivity : BaseActivity()
 				.transition(DrawableTransitionOptions.withCrossFade())
 				.into(viewBind.coverImage)
 			
-			fun Float.spToPx() = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, this, resources.displayMetrics).toInt()
-			
 			viewBind.linearLayout.layoutTransition.enableTransitionType(LayoutTransition.CHANGING)
 			var imgFullWidth = false
 			viewBind.coverImage.setOnClickListener {
 				imgFullWidth = !imgFullWidth
 				viewBind.coverImage.updateLayoutParams {
 					width = if (imgFullWidth) ViewGroup.LayoutParams.MATCH_PARENT else ViewGroup.LayoutParams.WRAP_CONTENT
-					height = if (imgFullWidth) ViewGroup.LayoutParams.WRAP_CONTENT else 220f.spToPx()
+					height = if (imgFullWidth) ViewGroup.LayoutParams.WRAP_CONTENT else spToPx(220f)
 				}
 			}
 			

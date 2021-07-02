@@ -1,7 +1,9 @@
 package my.noveldokusha.uiUtils
 
 import android.content.Context
+import android.content.res.Configuration
 import android.graphics.Color
+import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -20,6 +22,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import my.noveldokusha.App
+import my.noveldokusha.ui.BaseFragment
 
 fun RecyclerView.ViewHolder.addBottomMargin(margin: Int = 1000, condition: () -> Boolean) = itemView.addBottomMargin(margin, condition)
 fun RecyclerView.ViewHolder.addTopMargin(margin: Int = 1000, condition: () -> Boolean) = itemView.addTopMargin(margin, condition)
@@ -75,3 +78,9 @@ fun <T, A> Observer<T>.switchLiveData(old: A?, new: A?, owner: LifecycleOwner, l
 	old?.let { liveData(it).removeObserver(this) }
 	new?.let { liveData(it).observe(owner, this) }
 }
+
+fun Context.isOnPortraitMode() = resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT
+fun BaseFragment.isOnPortraitMode() = requireActivity().isOnPortraitMode()
+
+fun Context.spToPx(value: Float) = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, value, resources.displayMetrics).toInt()
+fun BaseFragment.spToPx(value: Float) = requireActivity().spToPx(value)
