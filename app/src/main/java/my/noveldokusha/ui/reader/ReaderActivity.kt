@@ -219,7 +219,11 @@ class ReaderActivity : BaseActivity()
 		val stats = viewModel.chaptersStats.get(item.url) ?: return
 		viewBind.infoChapterTitle.text = stats.chapter.title
 		viewBind.infoCurrentChapterFromTotal.text = " ${stats.index + 1}/${viewModel.orderedChapters.size}"
-		viewBind.infoChapterProgressPercentage.text = " ${ceil((item.pos.toFloat() / stats.size.toFloat()) * 100f).roundToInt()}%"
+		viewBind.infoChapterProgressPercentage.text = when (stats.size)
+		{
+			0 -> "100%"
+			else -> " ${ceil((item.pos.toFloat() / stats.size.toFloat()) * 100f).roundToInt()}%"
+		}
 	}
 	
 	private fun updateCurrentReadingPosSavingState(firstVisibleItem: Int)
@@ -441,7 +445,6 @@ class ReaderActivity : BaseActivity()
 				is Item.DIVIDER ->
 				{
 					itemBind.divider.visibility = View.VISIBLE
-					itemBind.title.addTopMargin { position == 0 }
 				}
 				is Item.TITLE ->
 				{

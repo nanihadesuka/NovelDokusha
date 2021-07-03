@@ -355,7 +355,7 @@ object bookstore
 		}
 	}
 	
-	fun isValid(book: Book): Boolean = book.url.matches("""^https?://.*""".toRegex())
-	fun isValid(chapter: Chapter): Boolean = chapter.url.matches("""^https?://.*""".toRegex())
+	fun isValid(book: Book): Boolean = book.url.matches("""^(https?|local)://.*""".toRegex())
+	fun isValid(chapter: Chapter): Boolean = chapter.url.matches("""^(https?|local)://.*""".toRegex())
 }
 

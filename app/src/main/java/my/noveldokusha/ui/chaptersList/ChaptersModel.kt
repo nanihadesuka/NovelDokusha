@@ -62,6 +62,13 @@ class ChaptersModel : BaseViewModel()
 	private var loadChaptersJob: Job? = null
 	fun updateChaptersList()
 	{
+		if (bookMetadata.url.startsWith("local://"))
+		{
+			toast(R.string.local_book_nothing_to_update.stringRes())
+			onFetching.postValue(false)
+			return
+		}
+		
 		if (loadChaptersJob?.isActive == true) return
 		loadChaptersJob = CoroutineScope(Dispatchers.Main).launch {
 			

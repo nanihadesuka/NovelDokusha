@@ -33,8 +33,9 @@ class LibraryPageModel : BaseViewModel()
 		refreshing.postValue(true)
 		val completed = showCompleted
 		CoroutineScope(Dispatchers.IO).launch {
-			bookstore.bookLibrary.getAllInLibrary()
+			bookstore.bookLibrary.getAllInLibrary().asSequence()
 				.filter { it.completed == completed }
+				.filter { !it.url.startsWith("local://") }
 				.groupBy { it.url.toHttpUrlOrNull()?.host }
 				.map { (_, books) -> async { updateBooks(books) } }
 				.awaitAll()

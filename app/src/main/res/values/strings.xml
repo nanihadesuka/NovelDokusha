@@ -46,4 +46,8 @@
 	<string name="sort_ascending_or_descending">Sort ascending or descending</string>
 	<string name="sources">Sources</string>
 	<string name="no_chapters">No chapters</string>
+	<string name="import_epub">Import epub</string>
+	<string name="failed_get_file">Failed to get the file</string>
+	<string name="local_book_nothing_to_update">Local book, nothing to update</string>
+	<string name="import_epub_book_from_source_file_to_library">Import a epub book from a source file to the library</string>
 </resources>

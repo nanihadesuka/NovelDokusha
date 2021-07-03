@@ -1,16 +1,27 @@
 package my.noveldokusha.ui.main
 
+import android.Manifest
+import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.util.Log
+import android.view.*
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.google.android.material.tabs.TabLayoutMediator
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import my.noveldokusha.*
 import my.noveldokusha.databinding.ActivityMainFragmentLibraryBinding
+import my.noveldokusha.ui.BaseFragment
+import my.noveldokusha.uiUtils.stringRes
+import my.noveldokusha.uiUtils.toast
+import java.io.PrintWriter
+import java.io.StringWriter
 
-class LibraryFragment : Fragment()
+class LibraryFragment : BaseFragment()
 {
 	private lateinit var viewBind: ActivityMainFragmentLibraryBinding
 	private lateinit var viewAdapter: Adapter
@@ -35,6 +46,75 @@ class LibraryFragment : Fragment()
 			}
 		}.attach()
 		return viewBind.root
+	}
+	
+	override fun onCreate(savedInstanceState: Bundle?)
+	{
+		super.onCreate(savedInstanceState)
+		setHasOptionsMenu(true)
+	}
+	
+	override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater)
+	{
+		inflater.inflate(R.menu.library_menu__appbar, menu)
+		super.onCreateOptionsMenu(menu, inflater)
+	}
+	
+	override fun onOptionsItemSelected(item: MenuItem): Boolean = when (item.itemId)
+	{
+		R.id.import_epub -> openEpubImporter().let { true }
+		else -> super.onOptionsItemSelected(item)
+	}
+	
+	fun openEpubImporter()
+	{
+		val read = Manifest.permission.READ_EXTERNAL_STORAGE
+		permissionRequest(read) {
+			val intent = Intent(Intent.ACTION_GET_CONTENT).also {
+				it.addCategory(Intent.CATEGORY_OPENABLE)
+				it.type = "application/epub+zip"
+			}
+			
+			activityRequest(intent) { resultCode, data ->
+				if (resultCode != Activity.RESULT_OK) return@activityRequest
+				val uri = data?.data ?: return@activityRequest
+				val inputStream = requireActivity().contentResolver.openInputStream(uri)
+				if (inputStream == null)
+				{
+					toast(R.string.failed_get_file.stringRes())
+					return@activityRequest
+				}
+				
+				CoroutineScope(Dispatchers.IO).launch {
+					try
+					{
+						val epub = inputStream.use { epubImport(it) }
+						
+						val book = bookstore.bookLibrary.get(epub.url)
+						if (book == null) bookstore.bookLibrary.insert(Book(title = epub.title, url = epub.url, inLibrary = true))
+						else if (!book.inLibrary) bookstore.bookLibrary.update(book.copy(inLibrary = true))
+						
+						toast("Epub book imported")
+						val maxPos = bookstore.bookChapter.chapters(epub.url).maxOfOrNull { it.position }
+						bookstore.bookChapter.insert(epub.chapters.mapIndexed { i, it ->
+							Chapter(
+								title = it.title,
+								url = it.url,
+								bookUrl = epub.url,
+								position = if (maxPos == null) i else (maxPos + i + 1)
+							)
+						})
+						bookstore.bookChapterBody.insert(epub.chapters.map { ChapterBody(url = it.url, body = it.body) })
+					}
+					catch (e: Exception)
+					{
+						val stacktrace = StringWriter().apply { e.printStackTrace(PrintWriter(this)) }
+						Log.e("ERROR", "Message:\n${e.message}\n\nStacktrace:\n$stacktrace")
+						toast("Failed to import Epub")
+					}
+				}
+			}
+		}
 	}
 }
 
