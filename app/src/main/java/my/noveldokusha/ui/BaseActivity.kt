@@ -1,10 +1,15 @@
 package my.noveldokusha.ui
 
+import android.content.Intent
 import android.content.SharedPreferences
+import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import my.noveldokusha.*
+import my.noveldokusha.uiUtils.stringRes
+import my.noveldokusha.uiUtils.toast
 
 open class BaseActivity : AppCompatActivity()
 {
@@ -34,4 +39,55 @@ open class BaseActivity : AppCompatActivity()
 	}
 	
 	val sharedPreferences: SharedPreferences by lazy { appSharedPreferences() }
+	
+	private var activitiesCallbacksCounter: Int = 0
+	private val activitiesCallbacks = mutableMapOf<Int, (resultCode: Int, data: Intent?) -> Unit>()
+	
+	fun activityRequest(intent: Intent, reply: (resultCode: Int, data: Intent?) -> Unit)
+	{
+		val requestCode = activitiesCallbacksCounter++
+		activitiesCallbacks[requestCode] = reply
+		startActivityForResult(intent, requestCode)
+	}
+	
+	override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?)
+	{
+		super.onActivityResult(requestCode, resultCode, data)
+		activitiesCallbacks.remove(requestCode)?.let { it(resultCode, data) }
+	}
+	
+	private var permissionsCallbacksCounter: Int = 0
+	private val permissionsCallbacks = mutableMapOf<Int, Pair<() -> Unit, (List<String>) -> Unit>>()
+	
+	fun permissionRequest(
+		vararg permissions: String,
+		denied: (deniedPermissions: List<String>) -> Unit = { toast(R.string.permissions_denied.stringRes()) },
+		granted: () -> Unit
+	)
+	{
+		val hasPermissions = permissions.all { permission ->
+			ContextCompat.checkSelfPermission(this, permission) == PackageManager.PERMISSION_GRANTED
+		}
+		
+		if (hasPermissions) granted()
+		else
+		{
+			val requestCode = permissionsCallbacksCounter++
+			permissionsCallbacks[requestCode] = Pair(granted, denied)
+			requestPermissions(permissions, requestCode)
+		}
+	}
+	
+	override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray)
+	{
+		super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+		permissionsCallbacks.remove(requestCode)?.let {
+			when
+			{
+				grantResults.isEmpty() -> it.second(listOf())
+				grantResults.all { result -> result == PackageManager.PERMISSION_GRANTED } -> it.first()
+				else -> it.second(permissions.filterIndexed { index, _ -> grantResults[index] == PackageManager.PERMISSION_DENIED })
+			}
+		}
+	}
 }

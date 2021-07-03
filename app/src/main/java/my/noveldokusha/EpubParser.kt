@@ -1,5 +1,8 @@
 package my.noveldokusha
 
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import my.noveldokusha.scraper.scrubber
 import org.jsoup.Jsoup
 import org.w3c.dom.Document
@@ -28,7 +31,7 @@ data class EpubBook(
 
 private fun ZipInputStream.entries() = generateSequence { nextEntry }
 
-fun epubImport(inputSteam: InputStream): EpubBook
+fun epubReader(inputSteam: InputStream): EpubBook
 {
 	val zipFile = ZipInputStream(inputSteam).use { zipInputStream ->
 		zipInputStream
@@ -45,10 +48,10 @@ fun epubImport(inputSteam: InputStream): EpubBook
 	val manifest = docuemnt.selectFirstTag("manifest") ?: throw Exception(".opf file manifest section missing")
 	val spine = docuemnt.selectFirstTag("spine") ?: throw Exception(".opf file spine section missing")
 	
-	val title = metadata.selectFirstChildTag("dc:title")?.textContent ?: throw Exception(".opf metadata title tag missing")
+	val bookTitle = metadata.selectFirstChildTag("dc:title")?.textContent ?: throw Exception(".opf metadata title tag missing")
 	//	val language = metadata.selectFirstChildTag("dc:language")?.textContent ?: throw Exception(".opf metadata language tag missing")
 	//	val identifier = metadata.selectFirstChildTag("dc:identifier")?.textContent ?: throw Exception(".opf metadata identifier tag missing")
-	val bookUrl = "local://$title"
+	val bookUrl = "local://$bookTitle"
 	
 	val items = manifest.selectChildTag("item").map {
 		EpubManifestItem(
@@ -73,7 +76,7 @@ fun epubImport(inputSteam: InputStream): EpubBook
 			// A full chapter usually is split in multiple sequential entries,
 			// try to merge them and extract the main title of each one.
 			// Is is not perfect but better than dealing with a table of contents
-			val chapterTitle = body.selectFirst("h1, h2, h3, h4, h5, h6")?.text() ?: if (index == 0) title else null
+			val chapterTitle = body.selectFirst("h1, h2, h3, h4, h5, h6")?.text() ?: if (index == 0) bookTitle else null
 			body.selectFirst("h1, h2, h3, h4, h5, h6")?.remove()
 			val text = scrubber.getNodeStructuredText(body)
 			if (chapterTitle != null)
@@ -90,12 +93,43 @@ fun epubImport(inputSteam: InputStream): EpubBook
 		}.map { (_, list) ->
 			EpubChapter(
 				url = list.first().url,
-				title = list.first().title!!,
+				title = "$bookTitle - ${list.first().title!!}",
 				body = list.joinToString("\n\n") { it.body }
 			)
 		}.filter {
 			it.body.isNotBlank()
 		}
 	
-	return EpubBook(url = bookUrl, title = title, chapters = chapters.toList())
+	return EpubBook(url = bookUrl, title = bookTitle, chapters = chapters.toList())
+}
+
+fun importEpubToDatabase(epub: EpubBook) = CoroutineScope(Dispatchers.IO).launch {
+	val book = bookstore.bookLibrary.get(epub.url)
+	if (book == null) bookstore.bookLibrary.insert(Book(title = epub.title, url = epub.url, inLibrary = true))
+	else if (!book.inLibrary) bookstore.bookLibrary.update(book.copy(inLibrary = true))
+	
+	val maxPos = bookstore.bookChapter.chapters(epub.url).maxOfOrNull { it.position }
+	bookstore.bookChapter.insert(epub.chapters.mapIndexed { i, it ->
+		Chapter(
+			title = it.title,
+			url = it.url,
+			bookUrl = epub.url,
+			position = if (maxPos == null) i else (maxPos + i + 1)
+		)
+	})
+	bookstore.bookChapterBody.insert(epub.chapters.map { ChapterBody(url = it.url, body = it.body) })
+}
+
+fun importEpubToDatabaseAppend(epub: EpubBook, bookUrl: String) = CoroutineScope(Dispatchers.IO).launch {
+	val book = bookstore.bookLibrary.get(bookUrl) ?: return@launch
+	val offset = bookstore.bookChapter.chapters(book.url).maxOfOrNull { it.position }
+	bookstore.bookChapter.insert(epub.chapters.mapIndexed { i, it ->
+		Chapter(
+			title = it.title,
+			url = it.url,
+			bookUrl = book.url,
+			position = if (offset == null) i else (offset + i + 1)
+		)
+	})
+	bookstore.bookChapterBody.insert(epub.chapters.map { ChapterBody(url = it.url, body = it.body) })
 }

@@ -4,7 +4,6 @@ import android.Manifest
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.*
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
@@ -18,8 +17,6 @@ import my.noveldokusha.databinding.ActivityMainFragmentLibraryBinding
 import my.noveldokusha.ui.BaseFragment
 import my.noveldokusha.uiUtils.stringRes
 import my.noveldokusha.uiUtils.toast
-import java.io.PrintWriter
-import java.io.StringWriter
 
 class LibraryFragment : BaseFragment()
 {
@@ -88,29 +85,12 @@ class LibraryFragment : BaseFragment()
 				CoroutineScope(Dispatchers.IO).launch {
 					try
 					{
-						val epub = inputStream.use { epubImport(it) }
-						
-						val book = bookstore.bookLibrary.get(epub.url)
-						if (book == null) bookstore.bookLibrary.insert(Book(title = epub.title, url = epub.url, inLibrary = true))
-						else if (!book.inLibrary) bookstore.bookLibrary.update(book.copy(inLibrary = true))
-						
-						toast("Epub book imported")
-						val maxPos = bookstore.bookChapter.chapters(epub.url).maxOfOrNull { it.position }
-						bookstore.bookChapter.insert(epub.chapters.mapIndexed { i, it ->
-							Chapter(
-								title = it.title,
-								url = it.url,
-								bookUrl = epub.url,
-								position = if (maxPos == null) i else (maxPos + i + 1)
-							)
-						})
-						bookstore.bookChapterBody.insert(epub.chapters.map { ChapterBody(url = it.url, body = it.body) })
+						val epub = inputStream.use { epubReader(it) }
+						importEpubToDatabase(epub)
 					}
 					catch (e: Exception)
 					{
-						val stacktrace = StringWriter().apply { e.printStackTrace(PrintWriter(this)) }
-						Log.e("ERROR", "Message:\n${e.message}\n\nStacktrace:\n$stacktrace")
-						toast("Failed to import Epub")
+						toast(R.string.failed_to_import_epub.stringRes())
 					}
 				}
 			}
