@@ -104,32 +104,20 @@ fun epubReader(inputSteam: InputStream): EpubBook
 }
 
 fun importEpubToDatabase(epub: EpubBook) = CoroutineScope(Dispatchers.IO).launch {
-	val book = bookstore.bookLibrary.get(epub.url)
-	if (book == null) bookstore.bookLibrary.insert(Book(title = epub.title, url = epub.url, inLibrary = true))
-	else if (!book.inLibrary) bookstore.bookLibrary.update(book.copy(inLibrary = true))
+	// First clean any previous entries from the book
+	bookstore.bookChapter.chapters(epub.url)
+		.map { it.url }
+		.let { bookstore.bookChapterBody.removeRows(it) }
+	bookstore.bookChapter.removeAllFromBook(epub.url)
+	bookstore.bookLibrary.remove(epub.url)
 	
-	val maxPos = bookstore.bookChapter.chapters(epub.url).maxOfOrNull { it.position }
-	bookstore.bookChapter.insert(epub.chapters.mapIndexed { i, it ->
-		Chapter(
-			title = it.title,
-			url = it.url,
-			bookUrl = epub.url,
-			position = if (maxPos == null) i else (maxPos + i + 1)
-		)
-	})
-	bookstore.bookChapterBody.insert(epub.chapters.map { ChapterBody(url = it.url, body = it.body) })
-}
-
-fun importEpubToDatabaseAppend(epub: EpubBook, bookUrl: String) = CoroutineScope(Dispatchers.IO).launch {
-	val book = bookstore.bookLibrary.get(bookUrl) ?: return@launch
-	val offset = bookstore.bookChapter.chapters(book.url).maxOfOrNull { it.position }
-	bookstore.bookChapter.insert(epub.chapters.mapIndexed { i, it ->
-		Chapter(
-			title = it.title,
-			url = it.url,
-			bookUrl = book.url,
-			position = if (offset == null) i else (offset + i + 1)
-		)
-	})
-	bookstore.bookChapterBody.insert(epub.chapters.map { ChapterBody(url = it.url, body = it.body) })
+	// Insert new book data
+	Book(title = epub.title, url = epub.url, inLibrary = true)
+		.let { bookstore.bookLibrary.insert(it) }
+	epub.chapters
+		.mapIndexed { i, it -> Chapter(title = it.title, url = it.url, bookUrl = epub.url, position = i) }
+		.let { bookstore.bookChapter.insert(it) }
+	epub.chapters
+		.map { ChapterBody(url = it.url, body = it.body) }
+		.let { bookstore.bookChapterBody.insert(it) }
 }

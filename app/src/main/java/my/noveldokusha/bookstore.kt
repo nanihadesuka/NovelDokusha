@@ -74,6 +74,9 @@ object bookstore
 		@Delete
 		suspend fun remove(book: Book)
 		
+		@Query("DELETE FROM Book WHERE Book.url = :bookUrl")
+		suspend fun remove(bookUrl: String)
+		
 		@Update
 		suspend fun update(book: Book)
 		
@@ -146,6 +149,9 @@ object bookstore
 		
 		@Query("SELECT COUNT(*) FROM Chapter WHERE bookUrl = :bookUrl AND read = 0")
 		fun numberOfUnreadChaptersFlow(bookUrl: String): Flow<Int>
+		
+		@Query("DELETE FROM Chapter WHERE Chapter.bookUrl = :bookUrl")
+		suspend fun removeAllFromBook(bookUrl: String)
 		
 		@Query("DELETE FROM Chapter WHERE Chapter.bookUrl NOT IN (SELECT Book.url FROM Book)")
 		suspend fun removeAllNonLibraryRows()
@@ -278,6 +284,7 @@ object bookstore
 			fun existInLibraryFlow(url: String) = db.libraryDao().existInLibraryFlow(url)
 			suspend fun insert(book: Book) = if (isValid(book)) db.libraryDao().insert(book) else Unit
 			suspend fun insert(books: List<Book>) = db.libraryDao().insert(books.filter(::isValid))
+			suspend fun remove(bookUrl: String) = db.libraryDao().remove(bookUrl)
 			suspend fun remove(book: Book) = db.libraryDao().remove(book)
 			suspend fun update(book: Book) = db.libraryDao().update(book)
 			suspend fun get(url: String) = db.libraryDao().get(url)
@@ -305,6 +312,7 @@ object bookstore
 			suspend fun setAsUnread(chaptersUrl: List<String>) = chaptersUrl.chunked(500).forEach { db.chapterDao().setAsUnread(it) }
 			suspend fun insert(chapters: List<Chapter>) = db.chapterDao().insert(chapters.filter(::isValid))
 			suspend fun replace(chapters: List<Chapter>) = db.chapterDao().replace(chapters.filter(::isValid))
+			suspend fun removeAllFromBook(bookUrl: String) = db.chapterDao().removeAllFromBook(bookUrl)
 			suspend fun chapters(bookUrl: String) = db.chapterDao().chapters(bookUrl)
 			suspend fun getFirstChapter(bookUrl: String) = db.chapterDao().getFirstChapter(bookUrl)
 			fun getChaptersWithContexFlow(bookUrl: String) = db.chapterDao().getChaptersWithContextFlow(bookUrl)
