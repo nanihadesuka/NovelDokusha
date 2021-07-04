@@ -17,12 +17,4 @@
 		android:title="@string/library_bookmark"
 		app:showAsAction="always"
 		/>
-	
-	<item
-		android:id="@+id/import_and_append_epub"
-		android:icon="@drawable/ic_baseline_search_24"
-		android:title="@string/import_and_append_epub"
-		android:tooltipText="@string/import_and_append_epub_to_this_book"
-		app:showAsAction="withText|collapseActionView"
-		/>
 </menu>

@@ -1,7 +1,5 @@
 package my.noveldokusha.ui.chaptersList
 
-import android.Manifest
-import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
@@ -174,11 +172,6 @@ class ChaptersActivity : BaseActivity()
 				.asLiveData()
 				.observe(this) { setMenuIconLibraryState(it, menuItem) }
 		}
-		
-		menu.findItem(R.id.import_and_append_epub)!!.also { menuItem ->
-			menuItem.isVisible = extras.bookMetadata.url.startsWith("local://")
-		}
-		
 		return true
 	}
 	
@@ -207,54 +200,8 @@ class ChaptersActivity : BaseActivity()
 			}
 			true
 		}
-		R.id.import_and_append_epub ->
-		{
-			openEpubImporterAppend()
-			true
-		}
 		android.R.id.home -> this.onBackPressed().let { true }
 		else -> super.onOptionsItemSelected(item)
-	}
-	
-	fun openEpubImporterAppend()
-	{
-		if (!viewModel.bookMetadata.url.startsWith("local://"))
-		{
-			toast("Only can append to local books")
-			return
-		}
-		
-		val bookUrl = viewModel.bookMetadata.url
-		val read = Manifest.permission.READ_EXTERNAL_STORAGE
-		permissionRequest(read) {
-			val intent = Intent(Intent.ACTION_GET_CONTENT).also {
-				it.addCategory(Intent.CATEGORY_OPENABLE)
-				it.type = "application/epub+zip"
-			}
-			
-			activityRequest(intent) { resultCode, data ->
-				if (resultCode != Activity.RESULT_OK) return@activityRequest
-				val uri = data?.data ?: return@activityRequest
-				val inputStream = contentResolver.openInputStream(uri)
-				if (inputStream == null)
-				{
-					toast(R.string.failed_get_file.stringRes())
-					return@activityRequest
-				}
-				
-				CoroutineScope(Dispatchers.IO).launch {
-					try
-					{
-						val epub = inputStream.use { epubReader(it) }
-						importEpubToDatabaseAppend(epub, bookUrl)
-					}
-					catch (e: Exception)
-					{
-						toast(R.string.failed_to_import_epub.stringRes())
-					}
-				}
-			}
-		}
 	}
 }
 
