@@ -20,6 +20,7 @@ import my.noveldokusha.databinding.ActivityMainFragmentSettingsBinding
 import my.noveldokusha.ui.BaseFragment
 import my.noveldokusha.uiUtils.stringRes
 import my.noveldokusha.uiUtils.toast
+import okhttp3.internal.closeQuietly
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -92,12 +93,14 @@ class SettingsFragment : BaseFragment()
 					if (resultCode != RESULT_OK) return@activityRequest
 					val uri = data?.data ?: return@activityRequest
 					
-					val inputStream = requireActivity().applicationContext.getDatabasePath(bookstore.appDB.name).inputStream()
-					requireActivity().contentResolver.openOutputStream(uri)?.use { outputStream ->
-						inputStream.copyTo(outputStream)
-						toast(R.string.backup_saved.stringRes())
-					} ?: toast(R.string.failed_to_make_backup.stringRes())
-					inputStream.close()
+					CoroutineScope(Dispatchers.IO).launch {
+						val inputStream = App.instance.applicationContext.getDatabasePath(bookstore.appDB.name).inputStream()
+						App.instance.contentResolver.openOutputStream(uri)?.use { outputStream ->
+							inputStream.copyTo(outputStream)
+							toast(R.string.backup_saved.stringRes())
+						} ?: toast(R.string.failed_to_make_backup.stringRes())
+						inputStream.closeQuietly()
+					}
 				}
 			}
 		}
@@ -117,25 +120,25 @@ class SettingsFragment : BaseFragment()
 				activityRequest(intent) { resultCode, data ->
 					if (resultCode != RESULT_OK) return@activityRequest
 					val uri = data?.data ?: return@activityRequest
-					val inputStream = requireActivity().contentResolver.openInputStream(uri)
-					if (inputStream == null)
-					{
-						toast(R.string.failed_to_restore_cant_access_file.stringRes())
-						return@activityRequest
-					}
-					
-					val backupDatabase = try
-					{
-						bookstore.DBase(requireContext(), "temp_database", inputStream)
-					}
-					catch (e: Exception)
-					{
-						toast(R.string.failed_to_restore_invalid_backup.stringRes())
-						Log.e("ERROR", "Message:\n${e.message}\n\nStacktrace:\n${e.stackTraceToString()}")
-						return@activityRequest
-					}
 					
 					CoroutineScope(Dispatchers.IO).launch {
+						val inputStream = App.instance.contentResolver.openInputStream(uri)
+						if (inputStream == null)
+						{
+							toast(R.string.failed_to_restore_cant_access_file.stringRes())
+							return@launch
+						}
+						
+						val backupDatabase = try
+						{
+							bookstore.DBase(requireContext(), "temp_database", inputStream)
+						}
+						catch (e: Exception)
+						{
+							toast(R.string.failed_to_restore_invalid_backup.stringRes())
+							Log.e("ERROR", "Message:\n${e.message}\n\nStacktrace:\n${e.stackTraceToString()}")
+							return@launch
+						}
 						bookstore.bookLibrary.insert(backupDatabase.bookLibrary.getAll())
 						bookstore.bookChapter.insert(backupDatabase.bookChapter.getAll())
 						bookstore.bookChapterBody.insert(backupDatabase.bookChapterBody.getAll())
