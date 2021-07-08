@@ -10,9 +10,14 @@ import android.widget.AbsListView
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import androidx.activity.viewModels
+import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.view.doOnNextLayout
 import androidx.core.view.isVisible
+import androidx.core.view.updateLayoutParams
 import androidx.lifecycle.lifecycleScope
 import com.afollestad.materialdialogs.MaterialDialog
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -23,6 +28,8 @@ import my.noveldokusha.databinding.ActivityReaderListItemBinding
 import my.noveldokusha.scraper.Response
 import my.noveldokusha.ui.BaseActivity
 import my.noveldokusha.uiUtils.*
+import java.io.File
+import java.nio.file.Paths
 import java.util.*
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.math.ceil
@@ -374,26 +381,37 @@ class ReaderActivity : BaseActivity()
 		}
 	}
 	
-	sealed class Item(open val url: String)
+	interface Item
 	{
+		val url: String
+		
 		interface Position
 		{
 			val pos: Int
 		}
 		
-		data class TITLE(override val url: String, override val pos: Int, val text: String) : Item(url), Position
-		data class BODY_START(override val url: String, override val pos: Int, val text: String) : Item(url), Position
-		data class BODY_END(override val url: String, override val pos: Int, val text: String) : Item(url), Position
-		data class BODY(override val url: String, override val pos: Int, val text: String) : Item(url), Position
-		class PROGRESSBAR(override val url: String) : Item(url)
-		class DIVIDER(override val url: String) : Item(url)
-		class BOOK_END(override val url: String) : Item(url)
-		class BOOK_START(override val url: String) : Item(url)
-		class ERROR(override val url: String, val text: String) : Item(url)
+		interface BaseBody
+		{
+			val text: String
+		}
+		
+		data class TITLE(override val url: String, override val pos: Int, val text: String) : Item, Position
+		data class BODY_START(override val url: String, override val pos: Int, override val text: String) : Item, Position, BaseBody
+		data class BODY_END(override val url: String, override val pos: Int, override val text: String) : Item, Position, BaseBody
+		data class BODY(override val url: String, override val pos: Int, override val text: String) : Item, Position, BaseBody
+		class PROGRESSBAR(override val url: String) : Item
+		class DIVIDER(override val url: String) : Item
+		class BOOK_END(override val url: String) : Item
+		class BOOK_START(override val url: String) : Item
+		class ERROR(override val url: String, val text: String) : Item
 	}
 	
 	inner class ItemArrayAdapter(context: Context, val list: ArrayList<Item>) : ArrayAdapter<Item>(context, 0, list)
 	{
+		val localBookImageBaseDir: File by lazy {
+			Paths.get(App.folderBooks.path, extras.bookUrl.removePrefix("local://")).toFile()
+		}
+		
 		override fun getView(position: Int, convertView: View?, parent: ViewGroup): View
 		{
 			val itemData = this.getItem(position)!!
@@ -409,6 +427,7 @@ class ReaderActivity : BaseActivity()
 			itemBind.specialTitle.visibility = View.GONE
 			itemBind.error.visibility = View.GONE
 			itemBind.body.visibility = View.GONE
+			itemBind.imageContainer.visibility = View.GONE
 			itemBind.title.text = ""
 			itemBind.specialTitle.text = ""
 			itemBind.title.typeface = getFontFamilyBOLD(sharedPreferences.READER_FONT_FAMILY)
@@ -418,23 +437,57 @@ class ReaderActivity : BaseActivity()
 			itemBind.body.textSize = sharedPreferences.READER_FONT_SIZE
 			itemBind.body.typeface = getFontFamilyNORMAL(sharedPreferences.READER_FONT_FAMILY)
 			
+			fun searchAndLoadImage(itemData: Item.BaseBody): Boolean
+			{
+				val imgEntry = EpubXMLFileParser.extractImgEntry(itemData.text) ?: return false
+
+				itemBind.imageContainer.visibility = View.VISIBLE
+				itemBind.image.updateLayoutParams<ConstraintLayout.LayoutParams> {
+					dimensionRatio = "1:${imgEntry.yrel}"
+				}
+				
+				// Glide uses current imageView size to load the bitmap best optimized for it, but current
+				// size corresponds to the last image (different size) and the view layout only updates to
+				// the new values on next redraw. Execute Glide loading call the in next (parent) layout
+				// update to let it get the correct values.
+				// (Avoids getting "blurry" images)
+				itemBind.imageContainer.doOnNextLayout {
+					Glide.with(context)
+						.load(File(localBookImageBaseDir, imgEntry.path))
+						.error(R.drawable.ic_baseline_error_outline_24)
+						.transition(DrawableTransitionOptions.withCrossFade())
+						.into(itemBind.image)
+				}
+				
+				return true
+			}
+			
 			when (itemData)
 			{
 				is Item.BODY ->
 				{
-					itemBind.body.visibility = View.VISIBLE
-					itemBind.body.text = itemData.text
+					if (!searchAndLoadImage(itemData))
+					{
+						itemBind.body.visibility = View.VISIBLE
+						itemBind.body.text = itemData.text
+					}
 				}
 				is Item.BODY_START ->
 				{
-					itemBind.body.visibility = View.VISIBLE
-					itemBind.body.text = itemData.text
+					if (!searchAndLoadImage(itemData))
+					{
+						itemBind.body.visibility = View.VISIBLE
+						itemBind.body.text = itemData.text
+					}
 					viewModel.readRoutine.setReadStart(itemData.url)
 				}
 				is Item.BODY_END ->
 				{
-					itemBind.body.visibility = View.VISIBLE
-					itemBind.body.text = itemData.text
+					if (!searchAndLoadImage(itemData))
+					{
+						itemBind.body.visibility = View.VISIBLE
+						itemBind.body.text = itemData.text
+					}
 					viewModel.readRoutine.setReadEnd(itemData.url)
 				}
 				is Item.PROGRESSBAR ->

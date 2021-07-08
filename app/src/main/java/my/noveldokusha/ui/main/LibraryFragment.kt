@@ -4,6 +4,7 @@ import android.Manifest
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.*
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
@@ -91,6 +92,7 @@ class LibraryFragment : BaseFragment()
 					catch (e: Exception)
 					{
 						toast(R.string.failed_to_import_epub.stringRes())
+						Log.e("EPUB IMPORT FAILED", e.stackTraceToString())
 					}
 				}
 			}

@@ -1,12 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
 	xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:app="http://schemas.android.com/apk/res-auto"
 	xmlns:tools="http://schemas.android.com/tools"
 	android:layout_width="match_parent"
 	android:layout_height="wrap_content"
 	android:clipToPadding="false"
 	android:orientation="vertical"
 	>
+	
+	<androidx.constraintlayout.widget.ConstraintLayout
+		android:id="@+id/imageContainer"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:paddingTop="10sp"
+		android:paddingBottom="25dp"
+		android:visibility="gone"
+		tools:visibility="visible"
+		>
+		
+		<ImageView
+			android:id="@+id/image"
+			android:layout_width="match_parent"
+			android:layout_height="0dp"
+			android:layout_gravity="center"
+			android:adjustViewBounds="true"
+			android:contentDescription="@string/image"
+			app:layout_constraintBottom_toBottomOf="parent"
+			app:layout_constraintDimensionRatio="1:1.45"
+			app:layout_constraintHeight_default="percent"
+			app:layout_constraintLeft_toLeftOf="parent"
+			app:layout_constraintRight_toRightOf="parent"
+			app:layout_constraintTop_toTopOf="parent"
+			tools:src="@mipmap/ic_launcher_logo_round"
+			/>
+	</androidx.constraintlayout.widget.ConstraintLayout>
 	
 	<ProgressBar
 		android:id="@+id/progressBar"
