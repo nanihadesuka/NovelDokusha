@@ -10,17 +10,23 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.asLiveData
+import androidx.lifecycle.lifecycleScope
+import com.bumptech.glide.Glide
 import com.google.android.material.radiobutton.MaterialRadioButton
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.asFlow
+import kotlinx.coroutines.flow.fold
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import my.noveldokusha.*
 import my.noveldokusha.databinding.ActivityMainFragmentSettingsBinding
 import my.noveldokusha.ui.BaseFragment
 import my.noveldokusha.uiUtils.stringRes
 import my.noveldokusha.uiUtils.toast
 import okhttp3.internal.closeQuietly
+import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -41,6 +47,7 @@ class SettingsFragment : BaseFragment()
 		settingDatabaseClean()
 		settingDatabaseBackup()
 		settingDatabaseRestore()
+		settingCleanImagesFolder()
 		
 		return viewBind.root
 	}
@@ -67,12 +74,19 @@ class SettingsFragment : BaseFragment()
 	
 	fun settingDatabaseClean()
 	{
-		viewBind.databaseSize.text = Formatter.formatFileSize(context, bookstore.appDB.getDatabaseSizeBytes())
+		fun updateDatabaseSize() = lifecycleScope.launch {
+			viewBind.databaseSize.text = Formatter.formatFileSize(context, bookstore.appDB.getDatabaseSizeBytes())
+		}
+		
 		viewBind.databaseButtonClean.setOnClickListener {
-			bookstore.settings.clearNonLibraryDataFlow().asLiveData().observe(viewLifecycleOwner) {
-				viewBind.databaseSize.text = Formatter.formatFileSize(context, bookstore.appDB.getDatabaseSizeBytes())
+			lifecycleScope.launch {
+				bookstore.settings.clearNonLibraryData()
+				bookstore.appDB.vacuum()
+				updateDatabaseSize()
 			}
 		}
+		
+		updateDatabaseSize()
 	}
 	
 	fun settingDatabaseBackup()
@@ -149,6 +163,44 @@ class SettingsFragment : BaseFragment()
 				}
 			}
 		}
+	}
+	
+	suspend fun getFileSize(file: File): Long = when
+	{
+		!file.exists() -> 0
+		file.isFile -> file.length()
+		else -> file.listFiles()?.asFlow()?.map {
+			getFileSize(it)
+		}?.fold(0) { a, v -> a?.plus(v) } ?: 0
+	}
+	
+	fun settingCleanImagesFolder()
+	{
+		fun updateFolderSize() = lifecycleScope.launch {
+			val folderSize = withContext(Dispatchers.IO) { getFileSize(App.folderBooks) }
+			viewBind.totalBooksImagesSize.text = Formatter.formatFileSize(context, folderSize)
+		}
+		
+		suspend fun cleanImageFolder() = withContext(Dispatchers.IO) {
+			val libraryFolders = bookstore.bookLibrary.getAllInLibrary()
+				.mapNotNull { """^local://(.+)$""".toRegex().find(it.url)?.destructured?.component1() }
+				.toSet()
+			
+			App.folderBooks.listFiles()?.asSequence()
+				?.filter { it.isDirectory && it.exists() }
+				?.filter { it.name !in libraryFolders }
+				?.forEach { it.deleteRecursively() }
+		}
+		
+		viewBind.booksImagesClear.setOnClickListener {
+			CoroutineScope(Dispatchers.IO).launch {
+				cleanImageFolder()
+				updateFolderSize()
+				Glide.get(App.instance).clearDiskCache()
+			}
+		}
+		
+		updateFolderSize()
 	}
 }
 

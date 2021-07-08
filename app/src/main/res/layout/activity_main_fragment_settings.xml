@@ -30,8 +30,8 @@
 			android:layout_height="wrap_content"
 			android:padding="12sp"
 			android:text="Follow system"
-			android:textSize="16sp"
 			android:textColor="?colorControlNormal"
+			android:textSize="16sp"
 			app:switchPadding="10sp"
 			/>
 		
@@ -102,6 +102,54 @@
 					android:layout_marginStart="8sp"
 					android:alpha="0.7"
 					tools:text="10 MB"
+					/>
+			</LinearLayout>
+		</LinearLayout>
+		
+		<LinearLayout
+			android:id="@+id/books_images_clear"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:background="?android:attr/selectableItemBackground"
+			android:clickable="true"
+			android:orientation="vertical"
+			android:padding="12sp"
+			>
+			
+			<TextView
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:text="Clean images folder"
+				android:textSize="16sp"
+				/>
+			
+			<TextView
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:alpha="0.7"
+				android:text="Preserve only images from library books"
+				/>
+			
+			<LinearLayout
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:orientation="horizontal"
+				>
+				
+				<TextView
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:alpha="0.7"
+					android:text="Images total size"
+					/>
+				
+				<TextView
+					android:id="@+id/total_books_images_size"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_marginStart="8sp"
+					android:alpha="0.7"
+					tools:text="150 MB"
 					/>
 			</LinearLayout>
 		</LinearLayout>

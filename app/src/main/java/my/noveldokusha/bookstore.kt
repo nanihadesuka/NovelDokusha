@@ -6,8 +6,7 @@ import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.withContext
 import my.noveldokusha.scraper.Response
 import my.noveldokusha.scraper.downloadChapter
 import java.io.InputStream
@@ -102,6 +101,7 @@ object bookstore
 		
 		@Query("DELETE FROM Book WHERE inLibrary == 0")
 		suspend fun removeAllNonLibraryRows()
+		
 	}
 	
 	@Dao
@@ -253,28 +253,22 @@ object bookstore
 		val bookChapter = BookChapter()
 		val bookChapterBody = BookChapterBody()
 		
-		fun getDatabaseSizeBytes() = context.getDatabasePath(name).length()
+		suspend fun getDatabaseSizeBytes() = withContext(Dispatchers.IO) { context.getDatabasePath(name).length() }
 		fun close() = db.close()
 		fun delete() = context.deleteDatabase(name)
 		fun clearAllTables() = db.clearAllTables()
+		suspend fun vacuum() = withContext(Dispatchers.IO) { db.openHelper.writableDatabase.execSQL("VACUUM") }
 		
 		suspend fun <T> withTransaction(fn: suspend () -> T) = db.withTransaction(fn)
 		
 		inner class Settings
 		{
-			suspend fun clearNonLibraryData()
+			suspend fun clearNonLibraryData() = withContext(Dispatchers.IO)
 			{
 				db.libraryDao().removeAllNonLibraryRows()
 				db.chapterDao().removeAllNonLibraryRows()
 				db.chapterBodyDao().removeAllNonChapterRows()
 			}
-			
-			fun clearNonLibraryDataFlow() = flow {
-				db.libraryDao().removeAllNonLibraryRows()
-				db.chapterDao().removeAllNonLibraryRows()
-				db.chapterBodyDao().removeAllNonChapterRows()
-				emit(Unit)
-			}.flowOn(Dispatchers.IO)
 		}
 		
 		inner class BookLibrary
