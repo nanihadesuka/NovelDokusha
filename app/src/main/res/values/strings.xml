@@ -54,4 +54,5 @@
 	<string name="import_and_append_epub_to_this_book">Import and append epub to this book</string>
 	<string name="failed_to_import_epub">Failed to import epub</string>
 	<string name="image">image</string>
+	<string name="importing_epub">Importing epub</string>
 </resources>

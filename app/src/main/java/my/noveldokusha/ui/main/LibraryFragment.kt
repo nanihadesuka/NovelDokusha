@@ -76,14 +76,14 @@ class LibraryFragment : BaseFragment()
 			activityRequest(intent) { resultCode, data ->
 				if (resultCode != Activity.RESULT_OK) return@activityRequest
 				val uri = data?.data ?: return@activityRequest
-				val inputStream = requireActivity().contentResolver.openInputStream(uri)
-				if (inputStream == null)
-				{
-					toast(R.string.failed_get_file.stringRes())
-					return@activityRequest
-				}
-				
 				CoroutineScope(Dispatchers.IO).launch {
+					toast(R.string.importing_epub.stringRes())
+					val inputStream = requireActivity().contentResolver.openInputStream(uri)
+					if (inputStream == null)
+					{
+						toast(R.string.failed_get_file.stringRes())
+						return@launch
+					}
 					try
 					{
 						val epub = inputStream.use { epubReader(it) }
