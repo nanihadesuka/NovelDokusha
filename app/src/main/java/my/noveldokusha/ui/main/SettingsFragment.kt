@@ -20,8 +20,6 @@ import my.noveldokusha.databinding.ActivityMainFragmentSettingsBinding
 import my.noveldokusha.ui.BaseFragment
 import my.noveldokusha.uiUtils.stringRes
 import my.noveldokusha.uiUtils.toast
-import java.io.PrintWriter
-import java.io.StringWriter
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -133,8 +131,7 @@ class SettingsFragment : BaseFragment()
 					catch (e: Exception)
 					{
 						toast(R.string.failed_to_restore_invalid_backup.stringRes())
-						val stacktrace = StringWriter().apply { e.printStackTrace(PrintWriter(this)) }
-						Log.e("ERROR", "Message:\n${e.message}\n\nStacktrace:\n$stacktrace")
+						Log.e("ERROR", "Message:\n${e.message}\n\nStacktrace:\n${e.stackTraceToString()}")
 						return@activityRequest
 					}
 					

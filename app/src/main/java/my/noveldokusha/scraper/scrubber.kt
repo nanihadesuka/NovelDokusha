@@ -275,6 +275,7 @@ catch (e: SocketTimeoutException)
 }
 catch (e: Exception)
 {
+	val sst = e.stackTraceToString()
 	val stacktrace = StringWriter().apply { e.printStackTrace(PrintWriter(this)) }
 	val error = """
 		Unknown error.
@@ -286,7 +287,7 @@ catch (e: Exception)
 		${e.message}
 
 		Stacktrace:
-		$stacktrace
+		${e.stackTraceToString()}
 	""".trimIndent()
 	Response.Error(error)
 }
