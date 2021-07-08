@@ -16,19 +16,18 @@ import java.util.zip.ZipEntry
 import java.util.zip.ZipInputStream
 import javax.xml.parsers.DocumentBuilderFactory
 
-val NodeList.elements get() = (0..length).asSequence().mapNotNull { item(it) as? Element }
-val Node.childElements get() = childNodes.elements
-fun Document.selectFirstTag(tag: String): Node? = getElementsByTagName(tag).item(0)
-fun Node.selectFirstChildTag(tag: String) = childElements.find { it.tagName == tag }
-fun Node.selectChildTag(tag: String) = childElements.filter { it.tagName == tag }
-fun Node.getAttributeValue(attribute: String): String? = attributes?.getNamedItem(attribute)?.textContent
-fun parseXMLFile(inputSteam: InputStream): Document? = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(inputSteam)
-fun parseXMLText(text: String): Document? = text.reader().runCatching {
+private val NodeList.elements get() = (0..length).asSequence().mapNotNull { item(it) as? Element }
+private val Node.childElements get() = childNodes.elements
+private fun Document.selectFirstTag(tag: String): Node? = getElementsByTagName(tag).item(0)
+private fun Node.selectFirstChildTag(tag: String) = childElements.find { it.tagName == tag }
+private fun Node.selectChildTag(tag: String) = childElements.filter { it.tagName == tag }
+private fun Node.getAttributeValue(attribute: String): String? = attributes?.getNamedItem(attribute)?.textContent
+private fun parseXMLFile(inputSteam: InputStream): Document? = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(inputSteam)
+private fun parseXMLText(text: String): Document? = text.reader().runCatching {
 	DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(InputSource(this))
 }.getOrNull()
 
-fun parseXMLFile(byteArray: ByteArray): Document? = parseXMLFile(byteArray.inputStream())
-data class EpubManifestItem(val id: String, val href: String, val mediaType: String)
+private fun parseXMLFile(byteArray: ByteArray): Document? = parseXMLFile(byteArray.inputStream())
 
 private fun ZipInputStream.entries() = generateSequence { nextEntry }
 
@@ -69,6 +68,7 @@ fun epubReader(inputStream: InputStream): EpubBook
 	val rootPath = File(opfFilePath).parentFile ?: File("")
 	fun String.absPath() = File(rootPath, this).path.replace("""\""", "/").removePrefix("/")
 	
+	data class EpubManifestItem(val id: String, val href: String, val mediaType: String)
 	val items = manifest.selectChildTag("item").map {
 		EpubManifestItem(
 			id = it.getAttribute("id"),
@@ -82,7 +82,7 @@ fun epubReader(inputStream: InputStream): EpubBook
 	data class TempEpubChapter(val url: String, val title: String?, val body: String, val chapterIndex: Int)
 	
 	var chapterIndex = 0
-	val chapterExtensions = listOf("xhtml", "xml").map { ".$it" }
+	val chapterExtensions = listOf("xhtml", "xml", "html").map { ".$it" }
 	val chapters = idRef
 		.mapNotNull { items.get(it) }
 		.filter { item -> chapterExtensions.any { item.href.endsWith(it, ignoreCase = true) } }
@@ -191,9 +191,12 @@ class EpubXMLFileParser(val fileAbsolutePath: String, val data: ByteArray, val z
 					.removePrefix(absBasePath)
 					.replace("""\""", "/")
 					.removePrefix("/")
-				val bitmap = zipFile[absPath]?.second?.let { imageData ->
-					BitmapFactory.decodeByteArray(imageData, 0, imageData.size)
-				}
+				
+				// Use run catching so it can be run locally without crash
+				val bitmap = zipFile[absPath]?.second?.runCatching {
+					BitmapFactory.decodeByteArray(this, 0, this.size)
+				}?.getOrNull()
+				
 				val heightRelativeToWidth: Float = bitmap?.let { it.height.toFloat() / it.width.toFloat() } ?: 1.45f
 				"""<img yrel="${"%.2f".format(heightRelativeToWidth)}">$absPath</img>"""
 			}
