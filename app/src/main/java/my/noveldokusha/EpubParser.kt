@@ -108,7 +108,7 @@ fun epubReader(inputStream: InputStream): EpubBook
 		}.map { (_, list) ->
 			EpubChapter(
 				url = list.first().url,
-				title = "$bookTitle - ${list.first().title!!}",
+				title = list.first().title!!,
 				body = list.joinToString("\n\n") { it.body }
 			)
 		}.filter {
