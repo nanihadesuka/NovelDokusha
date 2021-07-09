@@ -63,11 +63,11 @@
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
 		android:fontFamily="monospace"
+		android:maxLines="35"
 		android:padding="17sp"
 		android:textColor="@color/colorError"
 		android:textSize="14sp"
 		android:visibility="gone"
-		android:maxLines="35"
 		tools:text="Error:\nError message\n\nReason:\nReason message\n\nError stack:\nCall stack tree "
 		tools:visibility="visible"
 		/>
@@ -115,6 +115,14 @@
 		android:visibility="gone"
 		tools:text="@tools:sample/lorem/random"
 		tools:visibility="visible"
+		/>
+	
+	<View
+		android:id="@+id/padding"
+		style="?attr/myReaderTextStyle"
+		android:layout_width="match_parent"
+		android:layout_height="700sp"
+		android:visibility="gone"
 		/>
 
 </LinearLayout>

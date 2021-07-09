@@ -31,7 +31,7 @@ class ReaderModel(private val savedState: SavedStateHandle) : BaseViewModel()
 	
 	var currentChapter: ChapterState by ObservableNoInitValue { _, old, new ->
 		savedState.set<String>(savedStateChapterUrlID, new.url)
-		if (old.url != new.url) saveLastReadPositionState(bookUrl, new)
+		if (old.url != new.url) saveLastReadPositionState(bookUrl, new, old)
 	}
 	
 	lateinit var bookUrl: String
@@ -59,12 +59,16 @@ class ReaderModel(private val savedState: SavedStateHandle) : BaseViewModel()
 
 data class ChapterState(val url: String, val position: Int, val offset: Int)
 
-private fun saveLastReadPositionState(bookUrl: String, chapter: ChapterState)
+private fun saveLastReadPositionState(bookUrl: String, chapter: ChapterState, oldChapter: ChapterState? = null)
 {
 	CoroutineScope(Dispatchers.IO).launch(Dispatchers.IO) {
 		bookstore.appDB.withTransaction {
 			bookstore.bookLibrary.get(bookUrl)?.let {
 				bookstore.bookLibrary.update(it.copy(lastReadChapter = chapter.url))
+			}
+			
+			if (oldChapter?.url != null) bookstore.bookChapter.get(oldChapter.url)?.let {
+				bookstore.bookChapter.update(it.copy(lastReadPosition = oldChapter.position, lastReadOffset = oldChapter.offset))
 			}
 			
 			bookstore.bookChapter.get(chapter.url)?.let {
