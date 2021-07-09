@@ -69,6 +69,7 @@ fun epubReader(inputStream: InputStream): EpubBook
 	fun String.absPath() = File(rootPath, this).path.replace("""\""", "/").removePrefix("/")
 	
 	data class EpubManifestItem(val id: String, val href: String, val mediaType: String)
+	
 	val items = manifest.selectChildTag("item").map {
 		EpubManifestItem(
 			id = it.getAttribute("id"),
@@ -211,7 +212,7 @@ class EpubXMLFileParser(val fileAbsolutePath: String, val data: ByteArray, val z
 		fun extractImgEntry(text: String): ImgEntry?
 		{
 			// Fast discard filter
-			if (!text.matches("^<img.*>.+</img>\n$".toRegex()))
+			if (!text.matches("""^\W*<img .*>.+</img>\W*$""".toRegex()))
 				return null
 			
 			return parseXMLText(text)?.selectFirstTag("img")?.let {

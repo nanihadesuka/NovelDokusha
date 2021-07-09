@@ -317,7 +317,7 @@ class ReaderActivity : BaseActivity()
 		val paragraphs = text
 			.splitToSequence("\n\n")
 			.filter { it.isNotBlank() }
-			.map { it + "\n" }.withIndex().iterator()
+			.withIndex().iterator()
 		
 		return sequence {
 			for ((index, paragraph) in paragraphs)
@@ -390,15 +390,16 @@ class ReaderActivity : BaseActivity()
 			val pos: Int
 		}
 		
-		interface BaseBody
+		abstract class BaseBody
 		{
-			val text: String
+			abstract val text: String
+			val image by lazy { EpubXMLFileParser.extractImgEntry(text) }
 		}
 		
 		data class TITLE(override val url: String, override val pos: Int, val text: String) : Item, Position
-		data class BODY_START(override val url: String, override val pos: Int, override val text: String) : Item, Position, BaseBody
-		data class BODY_END(override val url: String, override val pos: Int, override val text: String) : Item, Position, BaseBody
-		data class BODY(override val url: String, override val pos: Int, override val text: String) : Item, Position, BaseBody
+		data class BODY_START(override val url: String, override val pos: Int, override val text: String) : Item, Position, BaseBody()
+		data class BODY_END(override val url: String, override val pos: Int, override val text: String) : Item, Position, BaseBody()
+		data class BODY(override val url: String, override val pos: Int, override val text: String) : Item, Position, BaseBody()
 		class PROGRESSBAR(override val url: String) : Item
 		class DIVIDER(override val url: String) : Item
 		class BOOK_END(override val url: String) : Item
@@ -437,10 +438,9 @@ class ReaderActivity : BaseActivity()
 			itemBind.body.textSize = sharedPreferences.READER_FONT_SIZE
 			itemBind.body.typeface = getFontFamilyNORMAL(sharedPreferences.READER_FONT_FAMILY)
 			
-			fun searchAndLoadImage(itemData: Item.BaseBody): Boolean
+			fun searchAndLoadImage(itemData: Item.BaseBody) : Boolean
 			{
-				val imgEntry = EpubXMLFileParser.extractImgEntry(itemData.text) ?: return false
-
+				val imgEntry = itemData.image ?: return false
 				itemBind.imageContainer.visibility = View.VISIBLE
 				itemBind.image.updateLayoutParams<ConstraintLayout.LayoutParams> {
 					dimensionRatio = "1:${imgEntry.yrel}"
@@ -448,7 +448,7 @@ class ReaderActivity : BaseActivity()
 				
 				// Glide uses current imageView size to load the bitmap best optimized for it, but current
 				// size corresponds to the last image (different size) and the view layout only updates to
-				// the new values on next redraw. Execute Glide loading call the in next (parent) layout
+				// the new values on next redraw. Execute Glide loading call in the next (parent) layout
 				// update to let it get the correct values.
 				// (Avoids getting "blurry" images)
 				itemBind.imageContainer.doOnNextLayout {
@@ -462,32 +462,32 @@ class ReaderActivity : BaseActivity()
 				return true
 			}
 			
+			fun paragraphLoader(itemData: Item.BaseBody)
+			{
+				// Check for image
+				if (searchAndLoadImage(itemData))
+				else
+				{
+					val paragraph = itemData.text + "\n"
+					itemBind.body.visibility = View.VISIBLE
+					itemBind.body.text = paragraph
+				}
+			}
+			
 			when (itemData)
 			{
 				is Item.BODY ->
 				{
-					if (!searchAndLoadImage(itemData))
-					{
-						itemBind.body.visibility = View.VISIBLE
-						itemBind.body.text = itemData.text
-					}
+					paragraphLoader(itemData)
 				}
 				is Item.BODY_START ->
 				{
-					if (!searchAndLoadImage(itemData))
-					{
-						itemBind.body.visibility = View.VISIBLE
-						itemBind.body.text = itemData.text
-					}
+					paragraphLoader(itemData)
 					viewModel.readRoutine.setReadStart(itemData.url)
 				}
 				is Item.BODY_END ->
 				{
-					if (!searchAndLoadImage(itemData))
-					{
-						itemBind.body.visibility = View.VISIBLE
-						itemBind.body.text = itemData.text
-					}
+					paragraphLoader(itemData)
 					viewModel.readRoutine.setReadEnd(itemData.url)
 				}
 				is Item.PROGRESSBAR ->
