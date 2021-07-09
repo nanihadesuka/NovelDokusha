@@ -67,6 +67,7 @@
 		android:textColor="@color/colorError"
 		android:textSize="14sp"
 		android:visibility="gone"
+		android:maxLines="35"
 		tools:text="Error:\nError message\n\nReason:\nReason message\n\nError stack:\nCall stack tree "
 		tools:visibility="visible"
 		/>
@@ -78,7 +79,7 @@
 		android:drawableLeft="@drawable/ic_decoration_round"
 		android:drawablePadding="12sp"
 		android:drawableTint="#bbb"
-		android:gravity="left|center_vertical"
+		android:gravity="start|center_vertical"
 		android:padding="17sp"
 		android:textSize="22sp"
 		android:textStyle="bold"

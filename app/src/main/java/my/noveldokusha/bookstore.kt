@@ -340,6 +340,18 @@ object bookstore
 					return@fetchBody Response.Success(it.body)
 				}
 				
+				if (urlChapter.startsWith("local://"))
+				{
+					return Response.Error(
+						"""
+						Unable to load chapter from url:
+						$urlChapter
+						
+						Source is local but chapter content missing.
+					""".trimIndent()
+					)
+				}
+				
 				return when (val res = downloadChapter(urlChapter))
 				{
 					is Response.Success ->

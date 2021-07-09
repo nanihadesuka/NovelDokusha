@@ -324,9 +324,9 @@ class ReaderActivity : BaseActivity()
 			{
 				val item = when
 				{
-					index == 0 -> Item.BODY_START(chapterUrl, index + 1, paragraph)
-					!paragraphs.hasNext() -> Item.BODY_END(chapterUrl, index + 1, paragraph)
-					else -> Item.BODY(chapterUrl, index + 1, paragraph)
+					index == 0 -> Item.BODY(chapterUrl, index + 1, paragraph, Item.LOCATION.FIRST)
+					!paragraphs.hasNext() -> Item.BODY(chapterUrl, index + 1, paragraph, Item.LOCATION.LAST)
+					else -> Item.BODY(chapterUrl, index + 1, paragraph, Item.LOCATION.MIDDLE)
 				}
 				yield(item)
 			}
@@ -356,7 +356,7 @@ class ReaderActivity : BaseActivity()
 				is Response.Success ->
 				{
 					val items = textToItems(chapter.url, res.data)
-					runOnUiThread {
+					withContext(Dispatchers.Main) {
 						viewModel.chaptersStats[chapter.url] = ReaderModel.ChapterStats(size = items.size, chapter = chapter, index = index)
 						maintainPosition {
 							remove(itemProgressBar)
@@ -368,7 +368,7 @@ class ReaderActivity : BaseActivity()
 				}
 				is Response.Error ->
 				{
-					runOnUiThread {
+					withContext(Dispatchers.Main) {
 						viewModel.chaptersStats[chapter.url] = ReaderModel.ChapterStats(size = 1, chapter = chapter, index = index)
 						maintainPosition {
 							remove(itemProgressBar)
@@ -390,16 +390,15 @@ class ReaderActivity : BaseActivity()
 			val pos: Int
 		}
 		
-		abstract class BaseBody
+		enum class LOCATION
+		{ FIRST, MIDDLE, LAST }
+		
+		data class TITLE(override val url: String, override val pos: Int, val text: String) : Item, Position
+		data class BODY(override val url: String, override val pos: Int, val text: String, val location: LOCATION) : Item, Position
 		{
-			abstract val text: String
 			val image by lazy { EpubXMLFileParser.extractImgEntry(text) }
 		}
 		
-		data class TITLE(override val url: String, override val pos: Int, val text: String) : Item, Position
-		data class BODY_START(override val url: String, override val pos: Int, override val text: String) : Item, Position, BaseBody()
-		data class BODY_END(override val url: String, override val pos: Int, override val text: String) : Item, Position, BaseBody()
-		data class BODY(override val url: String, override val pos: Int, override val text: String) : Item, Position, BaseBody()
 		class PROGRESSBAR(override val url: String) : Item
 		class DIVIDER(override val url: String) : Item
 		class BOOK_END(override val url: String) : Item
@@ -438,7 +437,7 @@ class ReaderActivity : BaseActivity()
 			itemBind.body.textSize = sharedPreferences.READER_FONT_SIZE
 			itemBind.body.typeface = getFontFamilyNORMAL(sharedPreferences.READER_FONT_FAMILY)
 			
-			fun searchAndLoadImage(itemData: Item.BaseBody) : Boolean
+			fun searchAndLoadImage(itemData: Item.BODY): Boolean
 			{
 				val imgEntry = itemData.image ?: return false
 				itemBind.imageContainer.visibility = View.VISIBLE
@@ -462,33 +461,26 @@ class ReaderActivity : BaseActivity()
 				return true
 			}
 			
-			fun paragraphLoader(itemData: Item.BaseBody)
-			{
-				// Check for image
-				if (searchAndLoadImage(itemData))
-				else
-				{
-					val paragraph = itemData.text + "\n"
-					itemBind.body.visibility = View.VISIBLE
-					itemBind.body.text = paragraph
-				}
-			}
-			
 			when (itemData)
 			{
 				is Item.BODY ->
 				{
-					paragraphLoader(itemData)
-				}
-				is Item.BODY_START ->
-				{
-					paragraphLoader(itemData)
-					viewModel.readRoutine.setReadStart(itemData.url)
-				}
-				is Item.BODY_END ->
-				{
-					paragraphLoader(itemData)
-					viewModel.readRoutine.setReadEnd(itemData.url)
+					// Check for image
+					val isText = !searchAndLoadImage(itemData)
+					if (isText)
+					{
+						val paragraph = itemData.text + "\n"
+						itemBind.body.visibility = View.VISIBLE
+						itemBind.body.text = paragraph
+					}
+					
+					when (itemData.location)
+					{
+						Item.LOCATION.FIRST -> viewModel.readRoutine.setReadStart(itemData.url)
+						Item.LOCATION.LAST -> viewModel.readRoutine.setReadEnd(itemData.url)
+						else -> run {}
+					}
+					
 				}
 				is Item.PROGRESSBAR ->
 				{
