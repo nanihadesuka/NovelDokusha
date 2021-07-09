@@ -157,8 +157,6 @@ private class ChaptersArrayAdapter(
 				.IntentData(context, databaseUrlBase = databaseUrlBase, bookMetadata = itemData)
 				.let(context::startActivity)
 		}
-		
-		binder.addBottomMargin { position == list.lastIndex }
 	}
 	
 	inner class ViewHolder(val viewBind: BookListItemBinding) : RecyclerView.ViewHolder(viewBind.root)

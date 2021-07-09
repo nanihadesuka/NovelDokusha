@@ -83,12 +83,17 @@ class SourceCatalogActivity : BaseActivity()
 			viewBind.noResultsMessage.visibility = View.VISIBLE
 		}
 		viewModel.fetchIterator.onFetching.observe(this) {
-			viewAdapter.progressBar.visible = it
+			if (it == true) viewAdapter.progressBar.visible = it
 		}
 		viewModel.fetchIterator.onReset.observe(this) {
 			viewBind.errorMessage.visibility = View.GONE
 			viewBind.noResultsMessage.visibility = View.GONE
 			viewAdapter.recyclerView.notifyDataSetChanged()
+		}
+		
+		// Done so it updates at the same frame as the new items are added (avoids modifying current list offset)
+		viewAdapter.recyclerView.listDiffer.addListListener { _, _ ->
+			viewAdapter.progressBar.visible = false
 		}
 		
 		supportActionBar!!.let {
@@ -168,8 +173,6 @@ private class BooksItemAdapter(val ctx: BaseActivity) : MyListAdapter<CatalogIte
 			}
 			true
 		}
-		
-		viewHolder.addBottomMargin { position == list.lastIndex }
 	}
 	
 	private val selectedTextColor by lazy { R.attr.colorAccent.colorAttrRes(ctx) }

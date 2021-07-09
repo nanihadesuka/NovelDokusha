@@ -243,8 +243,6 @@ private class ChaptersArrayAdapter(
 			toggleItemSelection(itemData, itemBind.selected)
 			true
 		}
-		
-		viewHolder.addBottomMargin { position == list.lastIndex }
 	}
 	
 	fun toggleItemSelection(itemData: ChapterWithContext, view: View)

@@ -94,8 +94,6 @@ private class GlobalArrayAdapter(private val context: BaseActivity) : MyListAdap
 				return@fetchTrigger pos >= viewHolder.recyclerViewAdapter.itemCount - 3
 			}
 		}
-		
-		viewHolder.addBottomMargin { position == list.lastIndex }
 	}
 	
 	class ViewHolder(
@@ -154,8 +152,6 @@ private class LocalArrayAdapter(private val context: BaseActivity) : MyListAdapt
 				bookMetadata = BookMetadata(title = viewData.title, url = viewData.url)
 			).let(context::startActivity)
 		}
-		
-		viewHolder.addRightMargin(500) { position == list.lastIndex }
 	}
 	
 	inner class ViewHolder(val viewBind: ActivityGlobalSourceSearchResultItemBinding) : RecyclerView.ViewHolder(viewBind.root)

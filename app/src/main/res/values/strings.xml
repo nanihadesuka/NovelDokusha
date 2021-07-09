@@ -55,4 +55,5 @@
 	<string name="failed_to_import_epub">Failed to import epub</string>
 	<string name="image">image</string>
 	<string name="importing_epub">Importing epub</string>
+	<string name="no_results_found">No results found</string>
 </resources>
