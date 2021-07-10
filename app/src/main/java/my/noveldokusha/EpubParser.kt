@@ -11,6 +11,7 @@ import org.w3c.dom.NodeList
 import org.xml.sax.InputSource
 import java.io.File
 import java.io.InputStream
+import java.net.URLDecoder
 import java.nio.file.Paths
 import java.util.zip.ZipEntry
 import java.util.zip.ZipInputStream
@@ -26,6 +27,9 @@ private fun parseXMLFile(inputSteam: InputStream): Document? = DocumentBuilderFa
 private fun parseXMLText(text: String): Document? = text.reader().runCatching {
 	DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(InputSource(this))
 }.getOrNull()
+
+private val String.decodedURL: String get() = URLDecoder.decode(this, "UTF-8")
+private fun String.asFileName(): String = this.replace("/","_")
 
 private fun parseXMLFile(byteArray: ByteArray): Document? = parseXMLFile(byteArray.inputStream())
 
@@ -53,7 +57,8 @@ fun epubReader(inputStream: InputStream): EpubBook
 	
 	val opfFilePath = parseXMLFile(container.second)
 		                  ?.selectFirstTag("rootfile")
-		                  ?.getAttributeValue("full-path") ?: throw Exception("Invalid container.xml file")
+		                  ?.getAttributeValue("full-path")
+		                  ?.decodedURL ?: throw Exception("Invalid container.xml file")
 	
 	val opfFile = zipFile[opfFilePath] ?: throw Exception(".opf file missing")
 	
@@ -63,7 +68,7 @@ fun epubReader(inputStream: InputStream): EpubBook
 	val spine = docuemnt.selectFirstTag("spine") ?: throw Exception(".opf file spine section missing")
 	
 	val bookTitle = metadata.selectFirstChildTag("dc:title")?.textContent ?: throw Exception(".opf metadata title tag missing")
-	val bookUrl = bookTitle.replace("/", "_")
+	val bookUrl = bookTitle.asFileName()
 	
 	val rootPath = File(opfFilePath).parentFile ?: File("")
 	fun String.absPath() = File(rootPath, this).path.replace("""\""", "/").removePrefix("/")
@@ -73,7 +78,7 @@ fun epubReader(inputStream: InputStream): EpubBook
 	val items = manifest.selectChildTag("item").map {
 		EpubManifestItem(
 			id = it.getAttribute("id"),
-			href = it.getAttribute("href"),
+			href = it.getAttribute("href").decodedURL,
 			mediaType = it.getAttribute("media-type")
 		)
 	}.associateBy { it.id }
@@ -182,13 +187,13 @@ class EpubXMLFileParser(val fileAbsolutePath: String, val data: ByteArray, val z
 		body.selectFirst("h1, h2, h3, h4, h5, h6")?.remove()
 		
 		// Make all local references absolute to the root of the epub for consistent references
-		val imgTag = Regex("""^<img>(.*)</img>$""")
+		val imgTag = Regex("""^\W*<img>(.*)</img>\W*$""")
 		val absBasePath = File("").canonicalPath
 		val text = getNodeStructuredText(body)
 			.splitToSequence("\n\n")
 			.joinToString("\n\n") { text ->
-				val (relPath) = imgTag.find(text)?.destructured ?: return@joinToString text
-				val absPath = File(fileParentFolder, relPath).canonicalPath
+				val (relPathEncoded) = imgTag.find(text)?.destructured ?: return@joinToString text
+				val absPath = File(fileParentFolder, relPathEncoded.decodedURL).canonicalPath
 					.removePrefix(absBasePath)
 					.replace("""\""", "/")
 					.removePrefix("/")
@@ -237,6 +242,7 @@ class EpubXMLFileParser(val fileAbsolutePath: String, val data: ByteArray, val z
 			when
 			{
 				child.nodeName() == "br" -> "\n"
+				child.nodeName() == "img" -> declareImgEntry(child)
 				child is TextNode -> child.text()
 				else -> innerTraverse(child)
 			}
