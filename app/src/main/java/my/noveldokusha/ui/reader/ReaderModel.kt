@@ -42,7 +42,7 @@ class ReaderModel(private val savedState: SavedStateHandle) : BaseViewModel()
 	data class ChapterStats(val size: Int, val chapter: Chapter, val index: Int)
 	
 	val chaptersStats = mutableMapOf<String, ChapterStats>()
-	val items = ArrayList<ReaderActivity.Item>()
+	val items = ArrayList<Item>()
 	val readRoutine = ChaptersIsReadRoutine()
 	
 	var state = State.INITIAL_LOAD
@@ -78,15 +78,15 @@ private fun saveLastReadPositionState(bookUrl: String, chapter: ChapterState, ol
 	}
 }
 
-suspend fun getChapterInitialPosition(bookUrl: String, chapter: Chapter, items: ArrayList<ReaderActivity.Item>): Pair<Int, Int>
+suspend fun getChapterInitialPosition(bookUrl: String, chapter: Chapter, items: ArrayList<Item>): Pair<Int, Int>
 {
-	val book = CoroutineScope(Dispatchers.IO).async { bookstore.bookLibrary.get(bookUrl) }
+	val book = CoroutineScope(Dispatchers.IO).async() { bookstore.bookLibrary.get(bookUrl) }
 	val titlePos = CoroutineScope(Dispatchers.Default).async {
-		items.indexOfFirst { it is ReaderActivity.Item.TITLE }
+		items.indexOfFirst { it is Item.TITLE }
 	}
 	val position = CoroutineScope(Dispatchers.Default).async {
 		items.indexOfFirst {
-			it is ReaderActivity.Item.Position && it.pos == chapter.lastReadPosition
+			it is Item.Position && it.pos == chapter.lastReadPosition
 		}.let { index ->
 			if (index == -1) Pair(titlePos.await(), 0)
 			else Pair(index, chapter.lastReadOffset)
