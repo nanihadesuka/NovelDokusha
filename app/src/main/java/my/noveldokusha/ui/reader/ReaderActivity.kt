@@ -330,27 +330,6 @@ class ReaderActivity : BaseActivity()
 		}
 	}
 	
-	private fun textToItems(chapterUrl: String, text: String): List<Item>
-	{
-		val paragraphs = text
-			.splitToSequence("\n\n")
-			.filter { it.isNotBlank() }
-			.withIndex().iterator()
-		
-		return sequence {
-			for ((index, paragraph) in paragraphs)
-			{
-				val item = when
-				{
-					index == 0 -> Item.BODY(chapterUrl, index + 1, paragraph, Item.LOCATION.FIRST)
-					!paragraphs.hasNext() -> Item.BODY(chapterUrl, index + 1, paragraph, Item.LOCATION.LAST)
-					else -> Item.BODY(chapterUrl, index + 1, paragraph, Item.LOCATION.MIDDLE)
-				}
-				yield(item)
-			}
-		}.toList()
-	}
-	
 	private fun addChapter(
 		index: Int,
 		insert: ((Item) -> Unit),
@@ -425,6 +404,27 @@ interface Item
 	class BOOK_START(override val url: String) : Item
 	class ERROR(override val url: String, val text: String) : Item
 	class PADDING(override val url: String) : Item
+}
+
+private fun textToItems(chapterUrl: String, text: String): List<Item>
+{
+	val paragraphs = text
+		.splitToSequence("\n\n")
+		.filter { it.isNotBlank() }
+		.withIndex().iterator()
+	
+	return sequence {
+		for ((index, paragraph) in paragraphs)
+		{
+			val item = when
+			{
+				index == 0 -> Item.BODY(chapterUrl, index + 1, paragraph, Item.LOCATION.FIRST)
+				!paragraphs.hasNext() -> Item.BODY(chapterUrl, index + 1, paragraph, Item.LOCATION.LAST)
+				else -> Item.BODY(chapterUrl, index + 1, paragraph, Item.LOCATION.MIDDLE)
+			}
+			yield(item)
+		}
+	}.toList()
 }
 
 private class ItemArrayAdapter(
