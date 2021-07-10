@@ -20,8 +20,7 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import kotlinx.coroutines.*
 import my.noveldokusha.*
-import my.noveldokusha.databinding.ActivityReaderBinding
-import my.noveldokusha.databinding.ActivityReaderListItemBinding
+import my.noveldokusha.databinding.*
 import my.noveldokusha.scraper.Response
 import my.noveldokusha.ui.BaseActivity
 import my.noveldokusha.uiUtils.*
@@ -380,9 +379,9 @@ class ReaderActivity : BaseActivity()
 	}
 }
 
-interface Item
+sealed class Item
 {
-	val url: String
+	abstract val url: String
 	
 	interface Position
 	{
@@ -392,18 +391,18 @@ interface Item
 	enum class LOCATION
 	{ FIRST, MIDDLE, LAST }
 	
-	data class TITLE(override val url: String, override val pos: Int, val text: String) : Item, Position
-	data class BODY(override val url: String, override val pos: Int, val text: String, val location: LOCATION) : Item, Position
+	data class TITLE(override val url: String, override val pos: Int, val text: String) : Item(), Position
+	data class BODY(override val url: String, override val pos: Int, val text: String, val location: LOCATION) : Item(), Position
 	{
 		val image by lazy { EpubXMLFileParser.extractImgEntry(text) }
 	}
 	
-	class PROGRESSBAR(override val url: String) : Item
-	class DIVIDER(override val url: String) : Item
-	class BOOK_END(override val url: String) : Item
-	class BOOK_START(override val url: String) : Item
-	class ERROR(override val url: String, val text: String) : Item
-	class PADDING(override val url: String) : Item
+	class PROGRESSBAR(override val url: String) : Item()
+	class DIVIDER(override val url: String) : Item()
+	class BOOK_END(override val url: String) : Item()
+	class BOOK_START(override val url: String) : Item()
+	class ERROR(override val url: String, val text: String) : Item()
+	class PADDING(override val url: String) : Item()
 }
 
 private fun textToItems(chapterUrl: String, text: String): List<Item>
@@ -441,121 +440,170 @@ private class ItemArrayAdapter(
 	}
 	
 	override fun getCount() = super.getCount() + 2
-	override fun getItem(position: Int) = when (position)
+	override fun getItem(position: Int): Item = when (position)
 	{
 		0 -> topPadding
 		this.count - 1 -> bottomPadding
-		else -> super.getItem(position - 1)
+		else -> super.getItem(position - 1)!!
 	}
 	
 	val topPadding = Item.PADDING("")
 	val bottomPadding = Item.PADDING("")
 	
-	override fun getView(position: Int, convertView: View?, parent: ViewGroup): View
+	override fun getViewTypeCount(): Int = 9
+	override fun getItemViewType(position: Int) = when (val item = getItem(position))
 	{
-		val itemData = getItem(position)
-		val itemBind = when (convertView)
+		is Item.BODY -> if (item.image != null) 0 else 1
+		is Item.BOOK_END -> 2
+		is Item.BOOK_START -> 2
+		is Item.DIVIDER -> 3
+		is Item.ERROR -> 4
+		is Item.PADDING -> 5
+		is Item.PROGRESSBAR -> 6
+		is Item.TITLE -> 7
+	}
+	
+	private fun viewBody(item: Item.BODY, convertView: View?, parent: ViewGroup): View
+	{
+		val bind = when (convertView)
 		{
-			null -> ActivityReaderListItemBinding.inflate(parent.inflater, parent, false).also { it.root.tag = it }
-			else -> ActivityReaderListItemBinding.bind(convertView)
+			null -> ActivityReaderListItemBodyBinding.inflate(parent.inflater, parent, false).also { it.root.tag = it }
+			else -> ActivityReaderListItemBodyBinding.bind(convertView)
 		}
 		
-		itemBind.progressBar.visibility = View.GONE
-		itemBind.divider.visibility = View.GONE
-		itemBind.title.visibility = View.GONE
-		itemBind.specialTitle.visibility = View.GONE
-		itemBind.error.visibility = View.GONE
-		itemBind.body.visibility = View.GONE
-		itemBind.imageContainer.visibility = View.GONE
-		itemBind.padding.visibility = View.GONE
-		itemBind.title.text = ""
-		itemBind.specialTitle.text = ""
-		itemBind.title.typeface = activity.run { getFontFamilyBOLD(sharedPreferences.READER_FONT_FAMILY) }
-		itemBind.specialTitle.typeface = activity.run { getFontFamilyBOLD(sharedPreferences.READER_FONT_FAMILY) }
-		itemBind.error.text = ""
-		itemBind.body.text = ""
-		itemBind.body.textSize = activity.run { sharedPreferences.READER_FONT_SIZE }
-		itemBind.body.typeface = activity.run { getFontFamilyNORMAL(sharedPreferences.READER_FONT_FAMILY) }
+		val paragraph = item.text + "\n"
+		bind.body.text = paragraph
+		bind.body.textSize = activity.run { sharedPreferences.READER_FONT_SIZE }
+		bind.body.typeface = activity.run { getFontFamilyNORMAL(sharedPreferences.READER_FONT_FAMILY) }
 		
-		fun searchAndLoadImage(itemData: Item.BODY): Boolean
+		when (item.location)
 		{
-			val imgEntry = itemData.image ?: return false
-			itemBind.imageContainer.visibility = View.VISIBLE
-			itemBind.image.updateLayoutParams<ConstraintLayout.LayoutParams> {
-				dimensionRatio = "1:${imgEntry.yrel}"
-			}
-			
-			// Glide uses current imageView size to load the bitmap best optimized for it, but current
-			// size corresponds to the last image (different size) and the view layout only updates to
-			// the new values on next redraw. Execute Glide loading call in the next (parent) layout
-			// update to let it get the correct values.
-			// (Avoids getting "blurry" images)
-			itemBind.imageContainer.doOnNextLayout {
-				Glide.with(activity)
-					.load(File(localBookImageBaseDir, imgEntry.path))
-					.error(R.drawable.ic_baseline_error_outline_24)
-					.transition(DrawableTransitionOptions.withCrossFade())
-					.into(itemBind.image)
-			}
-			
-			return true
+			Item.LOCATION.FIRST -> viewModel.readRoutine.setReadStart(item.url)
+			Item.LOCATION.LAST -> viewModel.readRoutine.setReadEnd(item.url)
+			else -> run {}
+		}
+		return bind.root
+	}
+	
+	private fun viewImage(item: Item.BODY, convertView: View?, parent: ViewGroup): View
+	{
+		val bind = when (convertView)
+		{
+			null -> ActivityReaderListItemImageBinding.inflate(parent.inflater, parent, false).also { it.root.tag = it }
+			else -> ActivityReaderListItemImageBinding.bind(convertView)
 		}
 		
-		when (itemData)
-		{
-			is Item.BODY ->
-			{
-				// Check for image
-				val isText = !searchAndLoadImage(itemData)
-				if (isText)
-				{
-					val paragraph = itemData.text + "\n"
-					itemBind.body.visibility = View.VISIBLE
-					itemBind.body.text = paragraph
-				}
-				
-				when (itemData.location)
-				{
-					Item.LOCATION.FIRST -> viewModel.readRoutine.setReadStart(itemData.url)
-					Item.LOCATION.LAST -> viewModel.readRoutine.setReadEnd(itemData.url)
-					else -> run {}
-				}
-				
-			}
-			is Item.PROGRESSBAR ->
-			{
-				itemBind.progressBar.visibility = View.VISIBLE
-			}
-			is Item.DIVIDER ->
-			{
-				itemBind.divider.visibility = View.VISIBLE
-			}
-			is Item.TITLE ->
-			{
-				itemBind.title.visibility = View.VISIBLE
-				itemBind.title.text = itemData.text
-			}
-			is Item.BOOK_END ->
-			{
-				itemBind.specialTitle.visibility = View.VISIBLE
-				itemBind.specialTitle.text = R.string.reader_no_more_chapters.stringRes()
-			}
-			is Item.BOOK_START ->
-			{
-				itemBind.specialTitle.visibility = View.VISIBLE
-				itemBind.specialTitle.text = R.string.reader_first_chapter.stringRes()
-			}
-			is Item.ERROR ->
-			{
-				itemBind.error.visibility = View.VISIBLE
-				itemBind.error.text = itemData.text
-			}
-			is Item.PADDING ->
-			{
-				itemBind.padding.visibility = View.VISIBLE
-			}
+		val imgEntry = item.image!!
+		bind.image.updateLayoutParams<ConstraintLayout.LayoutParams> {
+			dimensionRatio = "1:${imgEntry.yrel}"
 		}
 		
-		return itemBind.root
+		// Glide uses current imageView size to load the bitmap best optimized for it, but current
+		// size corresponds to the last image (different size) and the view layout only updates to
+		// the new values on next redraw. Execute Glide loading call in the next (parent) layout
+		// update to let it get the correct values.
+		// (Avoids getting "blurry" images)
+		bind.imageContainer.doOnNextLayout {
+			Glide.with(activity)
+				.load(File(localBookImageBaseDir, imgEntry.path))
+				.error(R.drawable.ic_baseline_error_outline_24)
+				.transition(DrawableTransitionOptions.withCrossFade())
+				.into(bind.image)
+		}
+		
+		return bind.root
+	}
+	
+	private fun viewBookEnd(item: Item.BOOK_END, convertView: View?, parent: ViewGroup): View
+	{
+		val bind = when (convertView)
+		{
+			null -> ActivityReaderListItemSpecialTitleBinding.inflate(parent.inflater, parent, false).also { it.root.tag = it }
+			else -> ActivityReaderListItemSpecialTitleBinding.bind(convertView)
+		}
+		bind.specialTitle.text = R.string.reader_no_more_chapters.stringRes()
+		bind.specialTitle.typeface = activity.run { getFontFamilyBOLD(sharedPreferences.READER_FONT_FAMILY) }
+		return bind.root
+	}
+	
+	private fun viewBookStart(item: Item.BOOK_START, convertView: View?, parent: ViewGroup): View
+	{
+		val bind = when (convertView)
+		{
+			null -> ActivityReaderListItemSpecialTitleBinding.inflate(parent.inflater, parent, false).also { it.root.tag = it }
+			else -> ActivityReaderListItemSpecialTitleBinding.bind(convertView)
+		}
+		bind.specialTitle.text = R.string.reader_first_chapter.stringRes()
+		bind.specialTitle.typeface = activity.run { getFontFamilyBOLD(sharedPreferences.READER_FONT_FAMILY) }
+		return bind.root
+	}
+	
+	private fun viewProgressbar(item: Item.PROGRESSBAR, convertView: View?, parent: ViewGroup): View
+	{
+		val bind = when (convertView)
+		{
+			null -> ActivityReaderListItemProgressBarBinding.inflate(parent.inflater, parent, false).also { it.root.tag = it }
+			else -> ActivityReaderListItemProgressBarBinding.bind(convertView)
+		}
+		return bind.root
+	}
+	
+	private fun viewDivider(item: Item.DIVIDER, convertView: View?, parent: ViewGroup): View
+	{
+		val bind = when (convertView)
+		{
+			null -> ActivityReaderListItemDividerBinding.inflate(parent.inflater, parent, false).also { it.root.tag = it }
+			else -> ActivityReaderListItemDividerBinding.bind(convertView)
+		}
+		return bind.root
+	}
+	
+	private fun viewError(item: Item.ERROR, convertView: View?, parent: ViewGroup): View
+	{
+		val bind = when (convertView)
+		{
+			null -> ActivityReaderListItemErrorBinding.inflate(parent.inflater, parent, false).also { it.root.tag = it }
+			else -> ActivityReaderListItemErrorBinding.bind(convertView)
+		}
+		bind.error.text = item.text
+		return bind.root
+	}
+	
+	private fun viewPadding(item: Item.PADDING, convertView: View?, parent: ViewGroup): View
+	{
+		val bind = when (convertView)
+		{
+			null -> ActivityReaderListItemPaddingBinding.inflate(parent.inflater, parent, false).also { it.root.tag = it }
+			else -> ActivityReaderListItemPaddingBinding.bind(convertView)
+		}
+		return bind.root
+	}
+	
+	private fun viewTitle(item: Item.TITLE, convertView: View?, parent: ViewGroup): View
+	{
+		val bind = when (convertView)
+		{
+			null -> ActivityReaderListItemTitleBinding.inflate(parent.inflater, parent, false).also { it.root.tag = it }
+			else -> ActivityReaderListItemTitleBinding.bind(convertView)
+		}
+		bind.title.text = item.text
+		bind.title.typeface = activity.run { getFontFamilyBOLD(sharedPreferences.READER_FONT_FAMILY) }
+		return bind.root
+	}
+	
+	override fun getView(position: Int, convertView: View?, parent: ViewGroup): View = when (val item = getItem(position))
+	{
+		is Item.BODY -> when (item.image)
+		{
+			null -> viewBody(item, convertView, parent)
+			else -> viewImage(item, convertView, parent)
+		}
+		is Item.BOOK_END -> viewBookEnd(item, convertView, parent)
+		is Item.BOOK_START -> viewBookStart(item, convertView, parent)
+		is Item.DIVIDER -> viewDivider(item, convertView, parent)
+		is Item.ERROR -> viewError(item, convertView, parent)
+		is Item.PADDING -> viewPadding(item, convertView, parent)
+		is Item.PROGRESSBAR -> viewProgressbar(item, convertView, parent)
+		is Item.TITLE -> viewTitle(item, convertView, parent)
 	}
 }
