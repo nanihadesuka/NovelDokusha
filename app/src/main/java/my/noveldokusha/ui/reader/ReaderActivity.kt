@@ -511,6 +511,13 @@ private class ItemArrayAdapter(
 				.into(bind.image)
 		}
 		
+		when (item.location)
+		{
+			Item.LOCATION.FIRST -> viewModel.readRoutine.setReadStart(item.url)
+			Item.LOCATION.LAST -> viewModel.readRoutine.setReadEnd(item.url)
+			else -> run {}
+		}
+		
 		return bind.root
 	}
 	
