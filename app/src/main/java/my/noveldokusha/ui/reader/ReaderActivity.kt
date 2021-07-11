@@ -204,8 +204,10 @@ class ReaderActivity : BaseActivity()
 			viewBind.listView.setSelection(2)
 		}
 		
+		viewBind.listView.isEnabled = false
 		return addChapter(index, insert, insertAll, remove, maintainPosition = maintainStartPosition) {
 			calculateInitialChapterPosition()
+			viewBind.listView.isEnabled = true
 		}
 	}
 	
