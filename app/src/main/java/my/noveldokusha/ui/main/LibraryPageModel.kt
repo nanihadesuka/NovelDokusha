@@ -1,5 +1,6 @@
 package my.noveldokusha.ui.main
 
+import LiveEvent
 import androidx.lifecycle.MutableLiveData
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.map
@@ -26,7 +27,7 @@ class LibraryPageModel : BaseViewModel()
 	
 	data class UpdateNotice(val hasUpdates: List<String>, val hasFailed: List<String>)
 	
-	val updateNotice = MutableLiveData<UpdateNotice>()
+	val updateNotice = LiveEvent<UpdateNotice>()
 	
 	fun update()
 	{
@@ -40,7 +41,7 @@ class LibraryPageModel : BaseViewModel()
 				.map { (_, books) -> async { updateBooks(books) } }
 				.awaitAll()
 				.unzip()
-				.let { (hasUpdates, hasFailed) -> updateNotice.postValue(UpdateNotice(hasUpdates.flatten(), hasFailed.flatten())) }
+				.let { (hasUpdates, hasFailed) -> updateNotice.postValue(LibraryPageModel.UpdateNotice(hasUpdates.flatten(), hasFailed.flatten())) }
 			
 			refreshing.postValue(false)
 		}
