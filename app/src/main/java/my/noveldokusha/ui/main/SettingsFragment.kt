@@ -155,7 +155,7 @@ class SettingsFragment : BaseFragment()
 			permissionRequest(read) {
 				val intent = Intent(Intent.ACTION_GET_CONTENT).also {
 					it.addCategory(Intent.CATEGORY_OPENABLE)
-					it.type = "application/zip"
+					it.type = "application/*"
 				}
 				
 				activityRequest(intent) { resultCode, data ->
