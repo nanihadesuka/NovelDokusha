@@ -22,5 +22,6 @@ class App : Application()
 		val instance get() = _instance
 		val cacheDir: File get() = _instance.cacheDir
 		val folderBooks: File get() = File(App.instance.getExternalFilesDir(null) ?: App.instance.filesDir, "books")
+		fun getDatabasePath(databaseName: String): File = instance.applicationContext.getDatabasePath(databaseName)
 	}
 }

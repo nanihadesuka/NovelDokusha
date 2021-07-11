@@ -171,7 +171,7 @@
 			/>
 		
 		<LinearLayout
-			android:id="@+id/backup_database_button"
+			android:id="@+id/backup_data_button"
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
 			android:background="?android:attr/selectableItemBackground"
@@ -183,7 +183,7 @@
 			<TextView
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
-				android:text="@string/backup_database"
+				android:text="@string/backup_data"
 				android:textSize="16sp"
 				/>
 			
@@ -196,7 +196,7 @@
 		</LinearLayout>
 		
 		<LinearLayout
-			android:id="@+id/restore_database_button"
+			android:id="@+id/restore_data_button"
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
 			android:background="?android:attr/selectableItemBackground"
@@ -208,7 +208,7 @@
 			<TextView
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
-				android:text="@string/restore_database"
+				android:text="@string/restore_data"
 				android:textSize="16sp"
 				/>
 			

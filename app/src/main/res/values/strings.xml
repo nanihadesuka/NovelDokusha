@@ -20,9 +20,9 @@
 	<string name="data">Data</string>
 	<string name="clean_database">Clean database</string>
 	<string name="preserve_only_library_books_data">Preserve only library books data</string>
-	<string name="backup_database">Backup database</string>
+	<string name="backup_data">Backup data</string>
 	<string name="opens_the_file_explorer_to_select_the_backup_saving_location">Opens the file explorer to select the backup saving location</string>
-	<string name="restore_database">Restore database</string>
+	<string name="restore_data">Restore data</string>
 	<string name="opens_the_file_explorer_to_select_the_backup_file">Opens the file explorer to select the backup file</string>
 	<string name="added_to_library">Added to library</string>
 	<string name="removed_from_library">Removed from library</string>

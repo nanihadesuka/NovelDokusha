@@ -15,9 +15,6 @@ import com.bumptech.glide.Glide
 import com.google.android.material.radiobutton.MaterialRadioButton
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.asFlow
-import kotlinx.coroutines.flow.fold
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import my.noveldokusha.*
@@ -27,8 +24,12 @@ import my.noveldokusha.uiUtils.stringRes
 import my.noveldokusha.uiUtils.toast
 import okhttp3.internal.closeQuietly
 import java.io.File
+import java.io.InputStream
 import java.text.SimpleDateFormat
 import java.util.*
+import java.util.zip.ZipEntry
+import java.util.zip.ZipInputStream
+import java.util.zip.ZipOutputStream
 
 class SettingsFragment : BaseFragment()
 {
@@ -45,9 +46,9 @@ class SettingsFragment : BaseFragment()
 		
 		settingTheme()
 		settingDatabaseClean()
-		settingDatabaseBackup()
-		settingDatabaseRestore()
-		settingCleanImagesFolder()
+		settingImagesFolderClean()
+		settingDataBackup()
+		settingDataRestore()
 		
 		return viewBind.root
 	}
@@ -72,12 +73,12 @@ class SettingsFragment : BaseFragment()
 		}
 	}
 	
+	fun updateDatabaseSize() = lifecycleScope.launch {
+		viewBind.databaseSize.text = Formatter.formatFileSize(context, bookstore.appDB.getDatabaseSizeBytes())
+	}
+	
 	fun settingDatabaseClean()
 	{
-		fun updateDatabaseSize() = lifecycleScope.launch {
-			viewBind.databaseSize.text = Formatter.formatFileSize(context, bookstore.appDB.getDatabaseSizeBytes())
-		}
-		
 		viewBind.databaseButtonClean.setOnClickListener {
 			lifecycleScope.launch {
 				bookstore.settings.clearNonLibraryData()
@@ -89,9 +90,9 @@ class SettingsFragment : BaseFragment()
 		updateDatabaseSize()
 	}
 	
-	fun settingDatabaseBackup()
+	fun settingDataBackup()
 	{
-		viewBind.backupDatabaseButton.setOnClickListener {
+		viewBind.backupDataButton.setOnClickListener {
 			
 			val read = Manifest.permission.READ_EXTERNAL_STORAGE
 			val write = Manifest.permission.WRITE_EXTERNAL_STORAGE
@@ -100,7 +101,7 @@ class SettingsFragment : BaseFragment()
 					it.addCategory(Intent.CATEGORY_OPENABLE)
 					it.type = "application/*"
 					val date = SimpleDateFormat("yyyy-MM-dd_HH-mm", Locale.getDefault()).format(Date())
-					it.putExtra(Intent.EXTRA_TITLE, "noveldokusha_$date.sqlite3")
+					it.putExtra(Intent.EXTRA_TITLE, "noveldokusha_backup_$date.zip")
 				}
 				
 				activityRequest(intent) { resultCode, data ->
@@ -108,27 +109,53 @@ class SettingsFragment : BaseFragment()
 					val uri = data?.data ?: return@activityRequest
 					
 					CoroutineScope(Dispatchers.IO).launch {
-						val inputStream = App.instance.applicationContext.getDatabasePath(bookstore.appDB.name).inputStream()
 						App.instance.contentResolver.openOutputStream(uri)?.use { outputStream ->
-							inputStream.copyTo(outputStream)
+							val zip = ZipOutputStream(outputStream)
+							
+							// Save database
+							run {
+								val entry = ZipEntry("database.sqlite3")
+								val file = App.getDatabasePath(bookstore.appDB.name)
+								entry.method = ZipOutputStream.DEFLATED
+								file.inputStream().use {
+									zip.putNextEntry(entry)
+									it.copyTo(zip)
+								}
+							}
+							
+							// Save books extra data (like images)
+							val basePath = App.folderBooks.toPath().parent
+							App.folderBooks
+								.walkBottomUp()
+								.filterNot { it.isDirectory }
+								.forEach { file ->
+									val name = basePath.relativize(file.toPath()).toString()
+									val entry = ZipEntry(name)
+									entry.method = ZipOutputStream.DEFLATED
+									file.inputStream().use { it ->
+										zip.putNextEntry(entry)
+										it.copyTo(zip)
+									}
+								}
+							
+							zip.closeQuietly()
 							toast(R.string.backup_saved.stringRes())
 						} ?: toast(R.string.failed_to_make_backup.stringRes())
-						inputStream.closeQuietly()
 					}
 				}
 			}
 		}
 	}
 	
-	fun settingDatabaseRestore()
+	fun settingDataRestore()
 	{
-		viewBind.restoreDatabaseButton.setOnClickListener {
+		viewBind.restoreDataButton.setOnClickListener {
 			
 			val read = Manifest.permission.READ_EXTERNAL_STORAGE
 			permissionRequest(read) {
 				val intent = Intent(Intent.ACTION_GET_CONTENT).also {
 					it.addCategory(Intent.CATEGORY_OPENABLE)
-					it.type = "application/*"
+					it.type = "application/zip"
 				}
 				
 				activityRequest(intent) { resultCode, data ->
@@ -143,43 +170,73 @@ class SettingsFragment : BaseFragment()
 							return@launch
 						}
 						
-						val backupDatabase = try
+						suspend fun mergeToDatabase(inputStream: InputStream) = withContext(Dispatchers.IO)
 						{
-							bookstore.DBase(requireContext(), "temp_database", inputStream)
+							try
+							{
+								val backupDatabase = inputStream.use { bookstore.DBase(requireContext(), "temp_database", it) }
+								bookstore.bookLibrary.insert(backupDatabase.bookLibrary.getAll())
+								bookstore.bookChapter.insert(backupDatabase.bookChapter.getAll())
+								bookstore.bookChapterBody.insert(backupDatabase.bookChapterBody.getAll())
+								toast(R.string.database_restored.stringRes())
+								backupDatabase.close()
+								backupDatabase.delete()
+							}
+							catch (e: Exception)
+							{
+								toast(R.string.failed_to_restore_invalid_backup.stringRes())
+								Log.e("ERROR", "Message:\n${e.message}\n\nStacktrace:\n${e.stackTraceToString()}")
+							}
 						}
-						catch (e: Exception)
+						
+						suspend fun mergetoBookFolder(entry: ZipEntry, inputStream: InputStream) = withContext(Dispatchers.IO)
 						{
-							toast(R.string.failed_to_restore_invalid_backup.stringRes())
-							Log.e("ERROR", "Message:\n${e.message}\n\nStacktrace:\n${e.stackTraceToString()}")
-							return@launch
+							val file = File(App.folderBooks.parentFile, entry.name)
+							if (file.isDirectory) return@withContext
+							file.parentFile?.mkdirs()
+							if (file.parentFile?.exists() != true) return@withContext
+							file.outputStream().use { output ->
+								inputStream.use { it.copyTo(output) }
+							}
 						}
-						bookstore.bookLibrary.insert(backupDatabase.bookLibrary.getAll())
-						bookstore.bookChapter.insert(backupDatabase.bookChapter.getAll())
-						bookstore.bookChapterBody.insert(backupDatabase.bookChapterBody.getAll())
-						toast(R.string.database_restored.stringRes())
-						backupDatabase.close()
-						backupDatabase.delete()
+						
+						val zipSequence = ZipInputStream(inputStream).let { zipStream ->
+							generateSequence { zipStream.nextEntry }
+								.filterNot { it.isDirectory }
+								.associateWith { zipStream.readBytes() }
+						}
+						
+						for ((entry, file) in zipSequence) when
+						{
+							entry.name == "database.sqlite3" -> mergeToDatabase(file.inputStream())
+							entry.name.startsWith("books/") -> mergetoBookFolder(entry, file.inputStream())
+						}
+						
+						inputStream.closeQuietly()
+						updateDatabaseSize()
+						updateImagesFolderSize()
 					}
 				}
 			}
 		}
 	}
 	
-	suspend fun getFileSize(file: File): Long = when
-	{
-		!file.exists() -> 0
-		file.isFile -> file.length()
-		else -> file.listFiles()?.asFlow()?.map {
-			getFileSize(it)
-		}?.fold(0) { a, v -> a?.plus(v) } ?: 0
+	suspend fun getFolderSize(file: File): Long = withContext(Dispatchers.IO) {
+		when
+		{
+			!file.exists() -> 0
+			file.isFile -> file.length()
+			else -> file.walkBottomUp().sumOf { if (it.isDirectory) 0 else it.length() }
+		}
 	}
 	
-	fun settingCleanImagesFolder()
+	fun updateImagesFolderSize() = lifecycleScope.launch {
+		val folderSize = getFolderSize(App.folderBooks)
+		viewBind.totalBooksImagesSize.text = Formatter.formatFileSize(context, folderSize)
+	}
+	
+	fun settingImagesFolderClean()
 	{
-		fun updateFolderSize() = lifecycleScope.launch {
-			val folderSize = withContext(Dispatchers.IO) { getFileSize(App.folderBooks) }
-			viewBind.totalBooksImagesSize.text = Formatter.formatFileSize(context, folderSize)
-		}
 		
 		suspend fun cleanImageFolder() = withContext(Dispatchers.IO) {
 			val libraryFolders = bookstore.bookLibrary.getAllInLibrary()
@@ -195,12 +252,12 @@ class SettingsFragment : BaseFragment()
 		viewBind.booksImagesClear.setOnClickListener {
 			CoroutineScope(Dispatchers.IO).launch {
 				cleanImageFolder()
-				updateFolderSize()
+				updateImagesFolderSize()
 				Glide.get(App.instance).clearDiskCache()
 			}
 		}
 		
-		updateFolderSize()
+		updateImagesFolderSize()
 	}
 }
 
