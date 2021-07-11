@@ -1,7 +1,6 @@
 package my.noveldokusha.scraper
 
 import android.net.Uri
-import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.MutableLiveData
 import kotlinx.coroutines.*
 import my.noveldokusha.*
@@ -334,13 +333,6 @@ class FetchIterator<T>(
 		list.clear()
 		onSuccess.value = list.toList()
 		onReset.value = Unit
-	}
-	
-	fun removeAllObservers(owner: LifecycleOwner)
-	{
-		listOf(onSuccess, onCompleted, onCompletedEmpty, onError, onFetching).forEach {
-			it.removeObservers(owner)
-		}
 	}
 	
 	fun fetchTrigger(trigger: () -> Boolean)
