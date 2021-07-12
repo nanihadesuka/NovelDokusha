@@ -6,7 +6,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.app.NotificationCompat
-import androidx.core.app.NotificationManagerCompat
 import androidx.core.view.updatePadding
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.asLiveData
@@ -84,7 +83,7 @@ class LibraryPageFragment : BaseFragment
 	
 	private fun notifyUpdated(text: String)
 	{
-		notify("New chapters found", text)
+		notify("New chapters found for:", text)
 	}
 	
 	private fun notifyUpdatedFails(text: String)
@@ -94,18 +93,12 @@ class LibraryPageFragment : BaseFragment
 	
 	private fun notify(title: String, text: String, channel_ID: String = title)
 	{
-		val notificationId = channel_ID.hashCode()
 		
-		val builder = NotificationCompat.Builder(requireContext(), channel_ID)
-			.setSmallIcon(R.drawable.ic_baseline_update_24)
-			.setContentTitle(title)
-			.setContentText(text)
-			.setStyle(NotificationCompat.BigTextStyle().bigText(text))
-			.setPriority(NotificationCompat.PRIORITY_DEFAULT)
-		
-		NotificationManagerCompat
-			.from(requireContext())
-			.notify(notificationId, builder.build())
+		App.showNotification(channel_ID, channel_ID) {
+			this.title = title
+			this.text = text
+			setStyle(NotificationCompat.BigTextStyle().bigText(text))
+		}
 	}
 	
 }
