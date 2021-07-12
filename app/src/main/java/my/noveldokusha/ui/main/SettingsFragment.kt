@@ -11,6 +11,9 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import com.afollestad.materialdialogs.MaterialDialog
+import com.afollestad.materialdialogs.checkbox.checkBoxPrompt
+import com.afollestad.materialdialogs.checkbox.isCheckPromptChecked
 import com.bumptech.glide.Glide
 import com.google.android.material.radiobutton.MaterialRadioButton
 import kotlinx.coroutines.CoroutineScope
@@ -103,44 +106,52 @@ class SettingsFragment : BaseFragment()
 					val date = SimpleDateFormat("yyyy-MM-dd_HH-mm", Locale.getDefault()).format(Date())
 					it.putExtra(Intent.EXTRA_TITLE, "noveldokusha_backup_$date.zip")
 				}
-				
-				activityRequest(intent) { resultCode, data ->
-					if (resultCode != RESULT_OK) return@activityRequest
-					val uri = data?.data ?: return@activityRequest
-					
-					CoroutineScope(Dispatchers.IO).launch {
-						App.instance.contentResolver.openOutputStream(uri)?.use { outputStream ->
-							val zip = ZipOutputStream(outputStream)
+				MaterialDialog(requireContext()).show {
+					title(text = "Backup")
+					val checkImagesFolder =
+						checkBoxPrompt(text = R.string.include_images_folder.stringRes(), isCheckedDefault = true) {}
+					negativeButton()
+					positiveButton() {
+						activityRequest(intent) { resultCode, data ->
+							if (resultCode != RESULT_OK) return@activityRequest
+							val uri = data?.data ?: return@activityRequest
 							
-							// Save database
-							run {
-								val entry = ZipEntry("database.sqlite3")
-								val file = App.getDatabasePath(bookstore.appDB.name)
-								entry.method = ZipOutputStream.DEFLATED
-								file.inputStream().use {
-									zip.putNextEntry(entry)
-									it.copyTo(zip)
-								}
-							}
-							
-							// Save books extra data (like images)
-							val basePath = App.folderBooks.toPath().parent
-							App.folderBooks
-								.walkBottomUp()
-								.filterNot { it.isDirectory }
-								.forEach { file ->
-									val name = basePath.relativize(file.toPath()).toString()
-									val entry = ZipEntry(name)
-									entry.method = ZipOutputStream.DEFLATED
-									file.inputStream().use { it ->
-										zip.putNextEntry(entry)
-										it.copyTo(zip)
+							val includeBookFolder = checkImagesFolder.isCheckPromptChecked()
+							CoroutineScope(Dispatchers.IO).launch {
+								App.instance.contentResolver.openOutputStream(uri)?.use { outputStream ->
+									val zip = ZipOutputStream(outputStream)
+									
+									// Save database
+									run {
+										val entry = ZipEntry("database.sqlite3")
+										val file = App.getDatabasePath(bookstore.appDB.name)
+										entry.method = ZipOutputStream.DEFLATED
+										file.inputStream().use {
+											zip.putNextEntry(entry)
+											it.copyTo(zip)
+										}
 									}
-								}
-							
-							zip.closeQuietly()
-							toast(R.string.backup_saved.stringRes())
-						} ?: toast(R.string.failed_to_make_backup.stringRes())
+									
+									// Save books extra data (like images)
+									if (includeBookFolder)
+									{
+										val basePath = App.folderBooks.toPath().parent
+										App.folderBooks.walkBottomUp().filterNot { it.isDirectory }.forEach { file ->
+											val name = basePath.relativize(file.toPath()).toString()
+											val entry = ZipEntry(name)
+											entry.method = ZipOutputStream.DEFLATED
+											file.inputStream().use {
+												zip.putNextEntry(entry)
+												it.copyTo(zip)
+											}
+										}
+									}
+									
+									zip.closeQuietly()
+									toast(R.string.backup_saved.stringRes())
+								} ?: toast(R.string.failed_to_make_backup.stringRes())
+							}
+						}
 					}
 				}
 			}

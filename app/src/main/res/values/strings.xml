@@ -56,4 +56,5 @@
 	<string name="image">image</string>
 	<string name="importing_epub">Importing epub</string>
 	<string name="no_results_found">No results found</string>
+	<string name="include_images_folder">Include images folder</string>
 </resources>
