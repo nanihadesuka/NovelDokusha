@@ -1,6 +1,5 @@
 package my.noveldokusha.ui.main
 
-import LiveEvent
 import androidx.lifecycle.MutableLiveData
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.map
@@ -9,6 +8,7 @@ import my.noveldokusha.bookstore
 import my.noveldokusha.scraper.Response
 import my.noveldokusha.scraper.downloadChaptersList
 import my.noveldokusha.ui.BaseViewModel
+import my.noveldokusha.uiUtils.LiveEvent
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import kotlin.properties.Delegates
 
