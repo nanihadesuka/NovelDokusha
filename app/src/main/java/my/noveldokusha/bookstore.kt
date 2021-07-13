@@ -70,6 +70,9 @@ object bookstore
 		@Insert(onConflict = OnConflictStrategy.IGNORE)
 		suspend fun insert(book: List<Book>)
 		
+		@Insert(onConflict = OnConflictStrategy.REPLACE)
+		suspend fun insertReplace(book: List<Book>)
+		
 		@Delete
 		suspend fun remove(book: Book)
 		
@@ -142,7 +145,7 @@ object bookstore
 		suspend fun insert(chapters: List<Chapter>)
 		
 		@Insert(onConflict = OnConflictStrategy.REPLACE)
-		suspend fun replace(chapters: List<Chapter>)
+		suspend fun insertReplace(chapters: List<Chapter>)
 		
 		@Query("SELECT * FROM Chapter WHERE url = :url")
 		suspend fun get(url: String): Chapter?
@@ -176,10 +179,10 @@ object bookstore
 		suspend fun getAll(): List<ChapterBody>
 		
 		@Insert(onConflict = OnConflictStrategy.REPLACE)
-		suspend fun insert(chapterBody: ChapterBody)
+		suspend fun insertReplace(chapterBody: ChapterBody)
 		
 		@Insert(onConflict = OnConflictStrategy.REPLACE)
-		suspend fun insert(chapterBody: List<ChapterBody>)
+		suspend fun insertReplace(chapterBody: List<ChapterBody>)
 		
 		@Query("SELECT * FROM ChapterBody WHERE url = :url")
 		suspend fun get(url: String): ChapterBody?
@@ -278,6 +281,7 @@ object bookstore
 			fun existInLibraryFlow(url: String) = db.libraryDao().existInLibraryFlow(url)
 			suspend fun insert(book: Book) = if (isValid(book)) db.libraryDao().insert(book) else Unit
 			suspend fun insert(books: List<Book>) = db.libraryDao().insert(books.filter(::isValid))
+			suspend fun insertReplace(books: List<Book>) = db.libraryDao().insertReplace(books.filter(::isValid))
 			suspend fun remove(bookUrl: String) = db.libraryDao().remove(bookUrl)
 			suspend fun remove(book: Book) = db.libraryDao().remove(book)
 			suspend fun update(book: Book) = db.libraryDao().update(book)
@@ -305,7 +309,7 @@ object bookstore
 			suspend fun setAsRead(chaptersUrl: List<String>) = chaptersUrl.chunked(500).forEach { db.chapterDao().setAsRead(it) }
 			suspend fun setAsUnread(chaptersUrl: List<String>) = chaptersUrl.chunked(500).forEach { db.chapterDao().setAsUnread(it) }
 			suspend fun insert(chapters: List<Chapter>) = db.chapterDao().insert(chapters.filter(::isValid))
-			suspend fun replace(chapters: List<Chapter>) = db.chapterDao().replace(chapters.filter(::isValid))
+			suspend fun insertReplace(chapters: List<Chapter>) = db.chapterDao().insertReplace(chapters.filter(::isValid))
 			suspend fun removeAllFromBook(bookUrl: String) = db.chapterDao().removeAllFromBook(bookUrl)
 			suspend fun chapters(bookUrl: String) = db.chapterDao().chapters(bookUrl)
 			suspend fun getFirstChapter(bookUrl: String) = db.chapterDao().getFirstChapter(bookUrl)
@@ -315,7 +319,7 @@ object bookstore
 				val current = chapters(bookUrl).associateBy { it.url }.toMutableMap()
 				for (chapter in newChapters)
 					current.merge(chapter.url, chapter) { old, new -> old.copy(position = new.position) }
-				replace(current.values.toList())
+				insertReplace(current.values.toList())
 			}
 			
 		}
@@ -323,13 +327,13 @@ object bookstore
 		inner class BookChapterBody
 		{
 			suspend fun getAll() = db.chapterBodyDao().getAll()
-			suspend fun insert(chapterBodies: List<ChapterBody>) = db.chapterBodyDao().insert(chapterBodies)
-			suspend fun insert(chapterBody: ChapterBody) = db.chapterBodyDao().insert(chapterBody)
+			suspend fun insertReplace(chapterBodies: List<ChapterBody>) = db.chapterBodyDao().insertReplace(chapterBodies)
+			suspend fun insertReplace(chapterBody: ChapterBody) = db.chapterBodyDao().insertReplace(chapterBody)
 			suspend fun removeRows(chaptersUrl: List<String>) =
 				chaptersUrl.chunked(500).forEach { db.chapterBodyDao().removeChapterRows(it) }
 			
 			suspend fun insertWithTitle(chapterBody: ChapterBody, title: String?) = db.withTransaction {
-				insert(chapterBody)
+				insertReplace(chapterBody)
 				if (title != null)
 					bookstore.bookChapter.updateTitle(chapterBody.url, title)
 			}

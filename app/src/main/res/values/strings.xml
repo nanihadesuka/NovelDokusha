@@ -32,7 +32,7 @@
 	<string name="backup_saved">Backup saved</string>
 	<string name="failed_to_make_backup">Failed to make backup</string>
 	<string name="failed_to_restore_cant_access_file">Failed to restore, can\'t access file</string>
-	<string name="failed_to_restore_invalid_backup">Failed to restore, invalid backup</string>
+	<string name="failed_to_restore_invalid_backup_database">Failed to restore, invalid backup database</string>
 	<string name="database_restored">Database restored</string>
 	<string name="webview_not_available">Webview not available</string>
 	<string name="invalid_URL">Invalid URL</string>

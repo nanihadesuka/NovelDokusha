@@ -157,7 +157,7 @@ fun importEpubToDatabase(epub: EpubBook) = CoroutineScope(Dispatchers.IO).launch
 	
 	epub.chapters
 		.map { ChapterBody(url = it.url.withLocalPrefix(), body = it.body) }
-		.let { bookstore.bookChapterBody.insert(it) }
+		.let { bookstore.bookChapterBody.insertReplace(it) }
 	
 	epub.images.map {
 		async {
