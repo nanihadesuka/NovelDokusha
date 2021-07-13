@@ -10,7 +10,6 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.google.android.material.tabs.TabLayoutMediator
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import my.noveldokusha.*
@@ -76,7 +75,7 @@ class LibraryFragment : BaseFragment()
 			activityRequest(intent) { resultCode, data ->
 				if (resultCode != Activity.RESULT_OK) return@activityRequest
 				val uri = data?.data ?: return@activityRequest
-				CoroutineScope(Dispatchers.IO).launch {
+				App.scope.launch(Dispatchers.IO) {
 					toast(R.string.importing_epub.stringRes())
 					val inputStream = requireActivity().contentResolver.openInputStream(uri)
 					if (inputStream == null)
