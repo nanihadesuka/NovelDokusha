@@ -74,14 +74,14 @@ class SettingsFragment : BaseFragment()
 		}
 	}
 	
-	fun updateDatabaseSize() = lifecycleScope.launch {
+	fun updateDatabaseSize() = lifecycleScope.launch(Dispatchers.Main) {
 		viewBind.databaseSize.text = Formatter.formatFileSize(context, bookstore.appDB.getDatabaseSizeBytes())
 	}
 	
 	fun settingDatabaseClean()
 	{
 		viewBind.databaseButtonClean.setOnClickListener {
-			lifecycleScope.launch {
+			App.scope.launch(Dispatchers.IO) {
 				bookstore.settings.clearNonLibraryData()
 				bookstore.appDB.vacuum()
 				updateDatabaseSize()
@@ -280,7 +280,7 @@ class SettingsFragment : BaseFragment()
 		}
 	}
 	
-	fun updateImagesFolderSize() = lifecycleScope.launch {
+	fun updateImagesFolderSize() = lifecycleScope.launch(Dispatchers.Main) {
 		val folderSize = getFolderSize(App.folderBooks)
 		viewBind.totalBooksImagesSize.text = Formatter.formatFileSize(context, folderSize)
 	}
