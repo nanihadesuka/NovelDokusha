@@ -39,7 +39,7 @@ class App : Application()
 		val scope get() = instance.scope
 		fun getDatabasePath(databaseName: String): File = instance.applicationContext.getDatabasePath(databaseName)
 		
-		fun showNotification(channel_id: String, channel_name: String = channel_id, builder: NotificationCompat.Builder.() -> Unit) = run {
+		fun buildNotification(channel_id: String, channel_name: String = channel_id, builder: NotificationCompat.Builder.() -> Unit) = run {
 			
 			NotificationCompat.Builder(instance, channel_id).apply {
 				setSmallIcon(R.mipmap.ic_logo)
@@ -52,7 +52,11 @@ class App : Application()
 					val channel = NotificationChannel(channel_id, channel_name, NotificationManager.IMPORTANCE_DEFAULT)
 					manager.createNotificationChannel(channel)
 				}
-				
+			}
+		}
+		
+		fun showNotification(channel_id: String, channel_name: String = channel_id, builder: NotificationCompat.Builder.() -> Unit) = run {
+			buildNotification(channel_id, channel_name, builder).apply {
 				NotificationManagerCompat
 					.from(instance.applicationContext)
 					.notify(channel_id.hashCode(), build())
