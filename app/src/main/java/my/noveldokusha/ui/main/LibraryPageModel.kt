@@ -82,6 +82,7 @@ class LibraryPageModel : BaseViewModel()
 			else count += 1
 			
 			builder.showNotification(update_channel_id) {
+				title = "Updating library ($count/$totalCount)"
 				setProgress(totalCount, count, false)
 			}
 		}
