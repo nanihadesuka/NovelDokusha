@@ -7,6 +7,9 @@ import android.content.pm.PackageManager
 import android.os.Bundle
 import android.webkit.*
 import androidx.activity.viewModels
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import my.noveldokusha.App
 import my.noveldokusha.R
 import my.noveldokusha.cookiesData
 import my.noveldokusha.databinding.ActivityWebviewBinding
@@ -71,7 +74,7 @@ class WebViewActivity : BaseActivity()
 						.split(";")
 						.map { it.split("=") }
 						.associate { it[0].trim() to it[1].trim() }
-					cookiesData.add(url, cookies)
+					App.scope.launch(Dispatchers.Default) { cookiesData.add(url, cookies) }
 					toast(R.string.cookies_saved.stringRes())
 				}
 				
@@ -81,7 +84,7 @@ class WebViewActivity : BaseActivity()
 			override fun shouldInterceptRequest(view: WebView?, request: WebResourceRequest?): WebResourceResponse?
 			{
 				if (request?.url?.authority == authority)
-					headersData.add(request.url.toString(), request.requestHeaders)
+					App.scope.launch(Dispatchers.Default) { headersData.add(request.url.toString(), request.requestHeaders) }
 				return super.shouldInterceptRequest(view, request)
 			}
 		}

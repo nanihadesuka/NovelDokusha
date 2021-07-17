@@ -5,6 +5,9 @@ import com.google.gson.GsonBuilder
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.withContext
 import my.noveldokusha.scraper.toUrl
 import java.io.File
 import java.util.concurrent.ConcurrentHashMap
@@ -16,37 +19,47 @@ class Data(val name: String)
 {
 	private val serializer: Gson = GsonBuilder().setPrettyPrinting().create()
 	private val file = File(App.cacheDir, name)
+	private val data = CHMap()
+	private var loaded = false
+	private var loadMutex = Mutex()
 	
-	private fun fileGet(): CHMap = serializer.fromJson<MM>(file.readText())
-		.mapValues { ConcurrentHashMap(it.value) }
-		.let { ConcurrentHashMap(it) }
-	
-	private fun fileSet(value: CHMap): Unit = value.mapValues { it.value.toMap() }
-		.toMap()
-		.let { file.writeText(serializer.toJson(it)) }
-	
-	private val list = CHMap()
-	private val scope = CoroutineScope(Dispatchers.IO)
-	
-	fun load() = scope.launch {
-		// Here we play with the fact the application will have enough
-		// time to load the data before is actually used, so we don't
-		// worry if loads in another thread.
-		if (file.exists())
-			list.putAll(fileGet())
+	private suspend fun fileGet(): CHMap = withContext(Dispatchers.Default) {
+		val text = withContext(Dispatchers.IO) { file.readText() }
+		serializer.fromJson<MM>(text)
+			.mapValues { ConcurrentHashMap(it.value) }
+			.let { ConcurrentHashMap(it) }
 	}
 	
-	fun add(url: String, values: Map<String, String>)
-	{
-		val domainName = url.toUrl()?.authority ?: return
-		list.getOrPut(domainName) { ConcurrentHashMap() }.putAll(values)
-		scope.launch { fileSet(list) }
+	private suspend fun fileSet(value: CHMap): Unit = withContext(Dispatchers.Default) {
+		val text = value.mapValues { it.value.toMap() }
+			.toMap()
+			.let { serializer.toJson(it) }
+		withContext(Dispatchers.IO) { file.writeText(text) }
 	}
 	
-	fun get(url: String): Map<String, String>
+	private suspend fun load() = withContext(Dispatchers.Default) {
+		loadMutex.withLock {
+			if (loaded) return@withLock
+			
+			if (file.exists())
+				data.putAll(fileGet())
+			loaded = true
+		}
+	}
+	
+	suspend fun add(url: String, values: Map<String, String>) = withContext(Dispatchers.Default)
 	{
-		val domainName = url.toUrl()?.authority ?: return mapOf()
-		return list.get(domainName)?.toMap() ?: mapOf()
+		val domainName = url.toUrl()?.authority ?: return@withContext
+		load()
+		data.getOrPut(domainName) { ConcurrentHashMap() }.putAll(values)
+		CoroutineScope(Dispatchers.IO).launch { fileSet(data) }
+	}
+	
+	suspend fun get(url: String): Map<String, String> = withContext(Dispatchers.Default)
+	{
+		val domainName = url.toUrl()?.authority ?: return@withContext mapOf()
+		load()
+		return@withContext data.get(domainName)?.toMap() ?: mapOf()
 	}
 }
 

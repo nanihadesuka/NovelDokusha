@@ -27,7 +27,7 @@ suspend fun Connection.postIO(): Document = withContext(Dispatchers.IO) { post()
 suspend fun Connection.executeIO(): Connection.Response = withContext(Dispatchers.IO) { execute() }
 suspend fun String.urlEncodeAsync(): String = withContext(Dispatchers.IO) { this@urlEncodeAsync.urlEncode() }
 
-fun connect(url: String): Connection = Jsoup.connect(url).apply {
+suspend fun connect(url: String): Connection = Jsoup.connect(url).apply {
 	referrer("http://www.google.com")
 	userAgent("Mozilla/5.0 (X11; U; Linux i586; en-US; rv:1.7.3) Gecko/20040924 Epiphany/1.4.4 (Ubuntu)")
 	header("Content-Language", "en-US")
