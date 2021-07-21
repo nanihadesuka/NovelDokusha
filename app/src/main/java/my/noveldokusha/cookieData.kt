@@ -2,6 +2,7 @@ package my.noveldokusha
 
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
+import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -25,7 +26,8 @@ class Data(val name: String)
 	
 	private suspend fun fileGet(): CHMap = withContext(Dispatchers.Default) {
 		val text = withContext(Dispatchers.IO) { file.readText() }
-		serializer.fromJson<MM>(text)
+		serializer.fromJson<MM>(text, object : TypeToken<MM>()
+		{}.type)
 			.mapValues { ConcurrentHashMap(it.value) }
 			.let { ConcurrentHashMap(it) }
 	}
