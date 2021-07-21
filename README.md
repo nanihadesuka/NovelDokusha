@@ -5,7 +5,7 @@ Features:
   - Two databases to search for web novels (by title or categories)
   - Multiple sources from where to read
   - Reader
-    - Infnine scroll
+    - Infinite scroll
     - Custom font
     - Custom font size
   - Light and dark themes
