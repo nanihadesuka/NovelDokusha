@@ -7,6 +7,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.view.*
 import androidx.activity.viewModels
+import androidx.appcompat.widget.SearchView
 import androidx.core.view.isVisible
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.lifecycleScope
@@ -71,7 +72,7 @@ class ChaptersActivity : BaseActivity()
 			val bookUrl = viewModel.bookMetadata.url
 			lifecycleScope.launch(Dispatchers.IO) {
 				val lastReadChapter = bookstore.bookLibrary.get(extras.bookMetadata.url)?.lastReadChapter
-				                      ?: bookstore.bookChapter.getFirstChapter(extras.bookMetadata.url)?.url
+						?: bookstore.bookChapter.getFirstChapter(extras.bookMetadata.url)?.url
 				
 				if (lastReadChapter == null)
 				{
@@ -113,7 +114,8 @@ class ChaptersActivity : BaseActivity()
 		
 		viewBind.selectionSelectAllUnderSelected.setOnClickListener {
 			val chapters = viewModel.chaptersWithContextLiveData.value ?: return@setOnClickListener
-			val urls = chapters.dropWhile { !viewModel.selectedChaptersUrl.contains(it.chapter.url) }.map { it.chapter.url }
+			val urls = chapters.dropWhile { !viewModel.selectedChaptersUrl.contains(it.chapter.url) }
+				.map { it.chapter.url }
 			viewModel.selectedChaptersUrl.addAll(urls)
 			viewAdapter.chapters.notifyDataSetChanged()
 		}
@@ -172,6 +174,24 @@ class ChaptersActivity : BaseActivity()
 				.asLiveData()
 				.observe(this) { setMenuIconLibraryState(it, menuItem) }
 		}
+		
+		menu.findItem(R.id.action_search_by_title)!!.also { menuItem ->
+			
+			val searchView = menuItem.actionView as SearchView
+			searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener
+			{
+				override fun onQueryTextSubmit(query: String?): Boolean = true
+				
+				override fun onQueryTextChange(newText: String?): Boolean
+				{
+					lifecycleScope.launch(Dispatchers.Default) {
+						viewModel.chaptersFilterFlow.emit(newText ?: "")
+					}
+					return true
+				}
+			})
+		}
+		
 		return true
 	}
 	
@@ -206,16 +226,18 @@ class ChaptersActivity : BaseActivity()
 }
 
 private class ChaptersArrayAdapter(
-	private val context: BaseActivity,
-	private val viewModel: ChaptersModel,
-	private val selectionModeBarUpdateVisibility: () -> Unit
+		private val context: BaseActivity,
+		private val viewModel: ChaptersModel,
+		private val selectionModeBarUpdateVisibility: () -> Unit
 ) : MyListAdapter<ChapterWithContext, ChaptersArrayAdapter.ViewHolder>()
 {
-	override fun areItemsTheSame(old: ChapterWithContext, new: ChapterWithContext) = old.chapter.url == new.chapter.url
+	override fun areItemsTheSame(old: ChapterWithContext, new: ChapterWithContext) =
+			old.chapter.url == new.chapter.url
+	
 	override fun areContentsTheSame(old: ChapterWithContext, new: ChapterWithContext) = old == new
 	
 	override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder =
-		ViewHolder(ActivityChaptersListItemBinding.inflate(parent.inflater, parent, false))
+			ViewHolder(ActivityChaptersListItemBinding.inflate(parent.inflater, parent, false))
 	
 	override fun onBindViewHolder(viewHolder: ViewHolder, position: Int)
 	{
@@ -247,7 +269,9 @@ private class ChaptersArrayAdapter(
 	
 	fun toggleItemSelection(itemData: ChapterWithContext, view: View)
 	{
-		fun <T> MutableSet<T>.removeOrAdd(value: T) = contains(value).also { if (it) remove(value) else add(value) }
+		fun <T> MutableSet<T>.removeOrAdd(value: T) =
+				contains(value).also { if (it) remove(value) else add(value) }
+		
 		val isRemoved = viewModel.selectedChaptersUrl.removeOrAdd(itemData.chapter.url)
 		view.visibility = if (isRemoved) View.INVISIBLE else View.VISIBLE
 		selectionModeBarUpdateVisibility()
@@ -257,12 +281,12 @@ private class ChaptersArrayAdapter(
 }
 
 private class ChaptersHeaderAdapter(
-	val context: BaseActivity,
-	val viewModel: ChaptersModel
+		val context: BaseActivity,
+		val viewModel: ChaptersModel
 ) : RecyclerView.Adapter<ChaptersHeaderAdapter.ViewHolder>()
 {
 	override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder =
-		ViewHolder(ActivityChaptersListHeaderBinding.inflate(parent.inflater, parent, false))
+			ViewHolder(ActivityChaptersListHeaderBinding.inflate(parent.inflater, parent, false))
 	
 	override fun getItemCount() = 1
 	
@@ -273,7 +297,8 @@ private class ChaptersHeaderAdapter(
 		init
 		{
 			viewBind.bookTitle.text = viewModel.bookMetadata.title
-			viewBind.sourceName.text = scrubber.getCompatibleSource(viewModel.bookMetadata.url)?.name ?: ""
+			viewBind.sourceName.text = scrubber.getCompatibleSource(viewModel.bookMetadata.url)?.name
+					?: ""
 			
 			viewModel.chaptersWithContextLiveData.observe(context) { list ->
 				viewBind.numberOfChapters.text = list.size.toString()

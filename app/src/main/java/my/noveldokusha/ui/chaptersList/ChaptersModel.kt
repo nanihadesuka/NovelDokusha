@@ -5,9 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.*
 import my.noveldokusha.*
 import my.noveldokusha.scraper.Response
 import my.noveldokusha.scraper.downloadChaptersList
@@ -40,7 +38,8 @@ class ChaptersModel : BaseViewModel()
 				val prefix = it.fold(first) { acc, e -> e.chapter.title.commonPrefixWith(acc) }
 				val suffix = it.fold(first) { acc, e -> e.chapter.title.commonSuffixWith(acc) }
 				return@map it.map { data ->
-					val newTitle = data.chapter.title.removeSurrounding(prefix, suffix).ifBlank { data.chapter.title }
+					val newTitle = data.chapter.title.removeSurrounding(prefix, suffix)
+						.ifBlank { data.chapter.title }
 					data.copy(chapter = data.chapter.copy(title = newTitle))
 				}
 			}.combine(preferences.CHAPTERS_SORT_ASCENDING_flow()) { chapters, sorted ->
@@ -50,7 +49,12 @@ class ChaptersModel : BaseViewModel()
 					TERNARY_STATE.inverse -> chapters.sortedByDescending { it.chapter.position }
 					TERNARY_STATE.inactive -> chapters
 				}
-			}.flowOn(Dispatchers.Default).asLiveData()
+			}
+			.combine(chaptersFilterFlow.debounce(50)) { chapters, searchText ->
+				if (searchText.isBlank()) chapters
+				else chapters.filter { it.chapter.title.contains(searchText, ignoreCase = true) }
+			}
+			.flowOn(Dispatchers.Default).asLiveData()
 	}
 	
 	val preferences = App.instance.appSharedPreferences()
@@ -58,6 +62,7 @@ class ChaptersModel : BaseViewModel()
 	val onError = MutableLiveData<String>()
 	val onErrorVisibility = MutableLiveData<Int>()
 	val selectedChaptersUrl = mutableSetOf<String>()
+	val chaptersFilterFlow = MutableStateFlow("")
 	
 	private var loadChaptersJob: Job? = null
 	fun updateChaptersList()
