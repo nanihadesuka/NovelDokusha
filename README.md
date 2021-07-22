@@ -1,5 +1,5 @@
 # NovelDokusha
-Web novel reader
+Android web novel reader
 
 Features:
   - Two databases to search for web novels (by title or categories)
