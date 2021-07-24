@@ -9,6 +9,8 @@ plugins {
 
 android {
 	
+	val isSignBuild = true
+	
 	compileOptions {
 		sourceCompatibility = JavaVersion.VERSION_1_8
 		targetCompatibility = JavaVersion.VERSION_1_8
@@ -26,7 +28,7 @@ android {
 		testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 	}
 	
-	signingConfigs {
+	if (isSignBuild) signingConfigs {
 		create("release") {
 			val properties = Properties().apply {
 				load(file("../local.properties").inputStream())
@@ -40,8 +42,18 @@ android {
 	
 	buildTypes {
 		
-		all {
+		if (isSignBuild) all {
 			signingConfig = signingConfigs["release"]
+		}
+		
+		named("debug") {
+			postprocessing {
+				proguardFile("proguard-rules.pro")
+				isRemoveUnusedCode = true
+				isObfuscate = false
+				isOptimizeCode = true
+				isRemoveUnusedResources = true
+			}
 		}
 		
 		named("release") {
