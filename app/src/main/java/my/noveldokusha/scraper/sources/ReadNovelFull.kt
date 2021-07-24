@@ -1,5 +1,6 @@
 package my.noveldokusha.scraper.sources
 
+import android.util.Log
 import my.noveldokusha.BookMetadata
 import my.noveldokusha.ChapterMetadata
 import my.noveldokusha.scraper.*
@@ -46,7 +47,7 @@ class ReadNovelFull : scrubber.source_interface.catalog
 		
 		return tryConnect {
 			fetchDoc(url)
-				.selectFirst("#list-page")
+				.selectFirst(".col-novel-main.archive")
 				.select(".row")
 				.map { it.selectFirst("a[href]") }
 				.map { BookMetadata(title = it.text(), url = baseUrl + it.attr("href")) }
@@ -66,8 +67,8 @@ class ReadNovelFull : scrubber.source_interface.catalog
 		
 		return tryConnect {
 			fetchDoc(url)
-				.selectFirst(".col-novel-main, .archive")
-				.select(".novel-title")
+				.selectFirst(".col-novel-main.archive")
+				.select(".row")
 				.map { it.selectFirst("a[href]") }
 				.map { BookMetadata(title = it.text(), url = baseUrl + it.attr("href")) }
 				.let { Response.Success(it) }
