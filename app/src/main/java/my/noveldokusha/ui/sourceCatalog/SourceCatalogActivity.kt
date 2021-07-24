@@ -81,7 +81,13 @@ class SourceCatalogActivity : BaseActivity()
 		}
 		viewModel.fetchIterator.onCompletedEmpty.observe(this) {
 			viewBind.noResultsMessage.visibility = View.VISIBLE
+			viewAdapter.progressBar.visible = false
 		}
+		
+		viewModel.fetchIterator.onCompleted.observe(this) {
+			viewAdapter.progressBar.visible = false
+		}
+		
 		viewModel.fetchIterator.onFetching.observe(this) {
 			if (it == true) viewAdapter.progressBar.visible = it
 		}
