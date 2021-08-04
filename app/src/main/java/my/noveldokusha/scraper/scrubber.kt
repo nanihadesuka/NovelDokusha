@@ -63,8 +63,8 @@ object scrubber
 		// Transform current url to preferred url
 		suspend fun transformChapterUrl(url: String): String = url
 		
-		suspend fun getChapterTitle(doc: Document): String?
-		suspend fun getChapterText(doc: Document): String
+		suspend fun getChapterTitle(doc: Document): String? = null
+		suspend fun getChapterText(doc: Document): String? = null
 		
 		interface base : source_interface
 		interface catalog : source_interface
@@ -213,7 +213,7 @@ suspend fun downloadChapter(chapterUrl: String): Response<ChapterDownload>
 		scrubber.getCompatibleSource(realUrl)?.also { source ->
 			val doc = fetchDoc(source.transformChapterUrl(realUrl))
 			val data = ChapterDownload(
-				body = source.getChapterText(doc),
+				body = source.getChapterText(doc) ?: return@also,
 				title = source.getChapterTitle(doc)
 			)
 			return@tryConnect Response.Success(data)
