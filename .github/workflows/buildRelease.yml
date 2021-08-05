@@ -43,7 +43,7 @@ jobs: # A workflow run is made up of one or more jobs that can run sequentially 
       
       - name: Move APK
         run: |
-          mv ${{steps.sign_app.outputs.signedReleaseFile}} NovelDokusha_${{ github.event.inputs.tagName }}.apk
+          mv ${{ steps.sign_app.outputs.signedReleaseFile }} NovelDokusha_${{ github.event.inputs.tagName }}.apk
       
       - name: Create Release
         uses: softprops/action-gh-release@v1
