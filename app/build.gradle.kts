@@ -9,7 +9,8 @@ plugins {
 
 android {
 	
-	val isSignBuild = true
+	val localPropertiesFile = file("../local.properties")
+	val isSignBuild = localPropertiesFile.exists()
 	
 	compileOptions {
 		sourceCompatibility = JavaVersion.VERSION_1_8
@@ -31,7 +32,7 @@ android {
 	if (isSignBuild) signingConfigs {
 		create("release") {
 			val properties = Properties().apply {
-				load(file("../local.properties").inputStream())
+				load(localPropertiesFile.inputStream())
 			}
 			storeFile = file(properties.getProperty("storeFile"))
 			storePassword = properties.getProperty("storePassword")
