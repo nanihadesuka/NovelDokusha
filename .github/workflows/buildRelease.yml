@@ -43,6 +43,7 @@ jobs: # A workflow run is made up of one or more jobs that can run sequentially 
       
       - name: Move APK
         run: |
+          find /app/build/outputs/apk/* -print0
           mv /app/build/outputs/apk/release/app-release.apk NovelDokusha_${{ github.event.inputs.tagName }}.apk
       
       - name: Create Release
