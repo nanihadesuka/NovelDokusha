@@ -35,7 +35,7 @@ jobs: # A workflow run is made up of one or more jobs that can run sequentially 
         id: signArtifact
         uses: r0adkll/sign-android-release@v1.0.1
         with:
-          releaseDirectory: /app/build/outputs/apk/release
+          releaseDirectory: app/build/outputs/apk/release
           signingKeyBase64: ${{ secrets.SIGNING_KEY }}
           alias: ${{ secrets.ALIAS }}
           keyStorePassword: ${{ secrets.KEY_STORE_PASSWORD }}
@@ -43,8 +43,8 @@ jobs: # A workflow run is made up of one or more jobs that can run sequentially 
       
       - name: Move APK
         run: |
-          find /app/build/outputs/apk/* -print0
-          mv /app/build/outputs/apk/release/app-release.apk NovelDokusha_${{ github.event.inputs.tagName }}.apk
+          find app/build/outputs/apk/* -print0
+          mv app/build/outputs/apk/release/app-release.apk NovelDokusha_${{ github.event.inputs.tagName }}.apk
       
       - name: Create Release
         uses: softprops/action-gh-release@v1
