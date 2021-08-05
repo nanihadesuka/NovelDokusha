@@ -32,8 +32,7 @@ jobs: # A workflow run is made up of one or more jobs that can run sequentially 
           gradle-version: current
 
       - name: Sign APK
-        id: sign_app
-        uses: r0adkll/sign-android-release@v1.0.1
+        uses: r0adkll/sign-android-release@v1
         with:
           releaseDirectory: app/build/outputs/apk/release
           signingKeyBase64: ${{ secrets.SIGNING_KEY }}
@@ -43,12 +42,12 @@ jobs: # A workflow run is made up of one or more jobs that can run sequentially 
       
       - name: Move APK
         run: |
-          mv ${{ env.SIGNED_RELEASE_FILE }} NovelDokusha_${{ github.event.inputs.tagName }}.apk
+          cp ${{ env.SIGNED_RELEASE_FILE }} NovelDokusha_${{ github.event.inputs.tagName }}.apk
       
       - name: Create Release
         uses: softprops/action-gh-release@v1
         with:
-          name: NovelDokusha
+          name: NovelDokusha ${{ github.event.inputs.tagName }}
           tag_name: ${{ github.event.inputs.tagName }}
           files: |
             NovelDokusha_${{ github.event.inputs.tagName }}.apk
