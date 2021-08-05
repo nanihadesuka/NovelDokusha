@@ -2,6 +2,10 @@ name: Publish Release
 
 on:
   workflow_dispatch: # Allows you to run this workflow manually from the Actions tab
+    inputs:
+      tagName:
+        description: "Tag name"
+        required: true
 
 jobs: # A workflow run is made up of one or more jobs that can run sequentially or in parallel
   buildRelease: # Job
@@ -41,6 +45,7 @@ jobs: # A workflow run is made up of one or more jobs that can run sequentially 
         uses: softprops/action-gh-release@v1
         with:
           name: NovelDokusha
+          tag_name: ${{ github.event.inputs.tagName }}
           files: |
             app/build/outputs/apk/release/app-release.apk
           
