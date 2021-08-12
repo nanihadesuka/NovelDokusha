@@ -35,10 +35,21 @@ class ChaptersModel : BaseViewModel()
 				// Try removing repetitive title text from chapters
 				if (it.size <= 1) return@map it
 				val first = it.first().chapter.title
-				val prefix = it.fold(first) { acc, e -> e.chapter.title.commonPrefixWith(acc) }
-				val suffix = it.fold(first) { acc, e -> e.chapter.title.commonSuffixWith(acc) }
+				val prefix = it.fold(first) { acc, e -> e.chapter.title.commonPrefixWith(acc, ignoreCase = true) }
+				val suffix = it.fold(first) { acc, e -> e.chapter.title.commonSuffixWith(acc, ignoreCase = true) }
+				
+				// Kotlin Std Lib doesn't have optional ignoreCase parameter
+				fun String.removeSurrounding(prefix: CharSequence, suffix: CharSequence, ignoreCase: Boolean = false): String
+				{
+					if ((length >= prefix.length + suffix.length) && startsWith(prefix, ignoreCase) && endsWith(suffix, ignoreCase))
+					{
+						return substring(prefix.length, length - suffix.length)
+					}
+					return this
+				}
+				
 				return@map it.map { data ->
-					val newTitle = data.chapter.title.removeSurrounding(prefix, suffix)
+					val newTitle = data.chapter.title.removeSurrounding(prefix, suffix, ignoreCase = true)
 						.ifBlank { data.chapter.title }
 					data.copy(chapter = data.chapter.copy(title = newTitle))
 				}
