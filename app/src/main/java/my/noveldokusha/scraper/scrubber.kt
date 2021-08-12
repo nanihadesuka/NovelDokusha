@@ -176,7 +176,8 @@ object scrubber
 		AT(),
 		Wuxia(),
 		BestLightNovel(),
-		_1stKissNovel()
+		_1stKissNovel(),
+		Sousetsuka()
 	)
 	
 	val sourcesListCatalog = sourcesList.filterIsInstance<source_interface.catalog>().toSet()
