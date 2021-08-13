@@ -82,7 +82,6 @@ private class GlobalArrayAdapter(private val context: BaseActivity) : MyListAdap
 	{
 		val viewData = this.list[position]
 		val viewBind = viewHolder.viewBind
-		viewHolder.itemData = viewData
 		
 		viewBind.name.text = viewData.source.name
 		viewBind.recyclerView.visibility = View.VISIBLE
@@ -94,6 +93,8 @@ private class GlobalArrayAdapter(private val context: BaseActivity) : MyListAdap
 				return@fetchTrigger pos >= viewHolder.recyclerViewAdapter.itemCount - 3
 			}
 		}
+		
+		viewHolder.itemData = viewData
 	}
 	
 	class ViewHolder(
