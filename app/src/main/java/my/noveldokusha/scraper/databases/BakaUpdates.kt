@@ -59,7 +59,7 @@ class BakaUpdates : scrubber.database_interface
 		return tryConnect("page: $page\nurl: $url") {
 			fetchDoc(url)
 				.select("div.col-6.py-1.py-md-0.text")
-				.map { it.selectFirst("a[href]") }
+				.mapNotNull { it.selectFirst("a[href]") }
 				.map { BookMetadata(it.text().removeNovelTag(), it.attr("href")) }
 				.let { Response.Success(it) }
 		}
@@ -82,7 +82,7 @@ class BakaUpdates : scrubber.database_interface
 		return tryConnect("page: $page\nurl: $url") {
 			fetchDoc(url)
 				.select("div.col-6.py-1.py-md-0.text")
-				.map { it.selectFirst("a[href]") }
+				.mapNotNull { it.selectFirst("a[href]") }
 				.map { BookMetadata(it.text().removeNovelTag(), it.attr("href")) }
 				.let { Response.Success(it) }
 		}
@@ -90,50 +90,50 @@ class BakaUpdates : scrubber.database_interface
 	
 	override fun getBookData(doc: Document): scrubber.database_interface.BookData
 	{
-		fun entry(header: String) = doc.selectFirst("div.sCat > b:containsOwn($header)").parent().nextElementSibling()
+		fun entry(header: String) = doc.selectFirst("div.sCat > b:containsOwn($header)")!!.parent()!!.nextElementSibling()
 		
 		val relatedBooks = entry("Category Recommendations")
-			.select("a[href]")
+			?.select("a[href]")!!
 			.map { BookMetadata(it.text().removeNovelTag(), "https://www.mangaupdates.com/" + it.attr("href")) }
 			.toList()
 		
 		val similarRecommended = entry("Recommendations")
-			.select("a[href]")
+			?.select("a[href]")!!
 			.map { BookMetadata(it.text().removeNovelTag(), "https://www.mangaupdates.com/" + it.attr("href")) }
 			.toList()
 		
 		val authors = entry("Author\\(s\\)")
-			.select("a[href]")
+			?.select("a[href]")!!
 			.map {
 				if (it.attr("href").startsWith("https://www.mangaupdates.com/authors.html"))
 					return@map scrubber.database_interface.BookAuthor(name = it.text(), url = it.attr("href"))
 				
-				val authorName = it.previousSibling().outerHtml().removeSuffix("&nbsp;[")
+				val authorName = it.previousSibling()!!.outerHtml().removeSuffix("&nbsp;[")
 				return@map scrubber.database_interface.BookAuthor(name = authorName, url = null)
 			}
 		
 		val description = entry("Description").let {
-			it.selectFirst("[id=div_desc_more]") ?: it.selectFirst("div")
+			it?.selectFirst("[id=div_desc_more]") ?: it!!.selectFirst("div")
 		}.also {
-			it.select("a").remove()
-		}.let { getNodeStructuredText(it) }
+			it?.select("a")?.remove()
+		}.let { getNodeStructuredText(it!!) }
 		
 		val tags = entry("Categories")
-			.select("li > a")
+			?.select("li > a")!!
 			.map { it.text() }
 		
 		val coverImageUrl = entry("Image")
-			.selectFirst("img[src]")
-			?.attr("src")
+			?.selectFirst("img[src]")!!
+			.attr("src")
 		
 		return scrubber.database_interface.BookData(
-			title = doc.selectFirst(".releasestitle.tabletitle").text().removeNovelTag(),
+			title = doc.selectFirst(".releasestitle.tabletitle")!!.text().removeNovelTag(),
 			description = description,
-			alternativeTitles = getNodeStructuredText(entry("Associated Names")).split("\n\n"),
+			alternativeTitles = getNodeStructuredText(entry("Associated Names")!!).split("\n\n"),
 			relatedBooks = relatedBooks,
 			similarRecommended = similarRecommended,
-			bookType = entry("Type").text(),
-			genres = entry("Genre").select("a").dropLast(1).map { it.text() },
+			bookType = entry("Type")!!.text(),
+			genres = entry("Genre")!!.select("a").dropLast(1).map { it.text() },
 			tags = tags,
 			authors = authors,
 			coverImageUrl = coverImageUrl

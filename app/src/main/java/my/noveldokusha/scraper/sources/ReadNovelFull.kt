@@ -22,14 +22,14 @@ class ReadNovelFull : scrubber.source_interface.catalog
 	
 	override suspend fun getChapterText(doc: Document): String
 	{
-		doc.selectFirst("#chr-content").let {
+		doc.selectFirst("#chr-content")!!.let {
 			return scrubber.getNodeStructuredText(it)
 		}
 	}
 	
 	override suspend fun getChapterList(doc: Document): List<ChapterMetadata>
 	{
-		val id = doc.selectFirst("#rating").attr("data-novel-id")
+		val id = doc.selectFirst("#rating")!!.attr("data-novel-id")
 		return connect("https://readnovelfull.com/ajax/chapter-archive")
 			.addHeaderRequest()
 			.data("novelId", id)
@@ -47,9 +47,9 @@ class ReadNovelFull : scrubber.source_interface.catalog
 		
 		return tryConnect {
 			fetchDoc(url)
-				.selectFirst(".col-novel-main.archive")
+				.selectFirst(".col-novel-main.archive")!!
 				.select(".row")
-				.map { it.selectFirst("a[href]") }
+				.mapNotNull { it.selectFirst("a[href]") }
 				.map { BookMetadata(title = it.text(), url = baseUrl + it.attr("href")) }
 				.let { Response.Success(it) }
 		}
@@ -67,9 +67,9 @@ class ReadNovelFull : scrubber.source_interface.catalog
 		
 		return tryConnect {
 			fetchDoc(url)
-				.selectFirst(".col-novel-main.archive")
+				.selectFirst(".col-novel-main.archive")!!
 				.select(".row")
-				.map { it.selectFirst("a[href]") }
+				.mapNotNull { it.selectFirst("a[href]") }
 				.map { BookMetadata(title = it.text(), url = baseUrl + it.attr("href")) }
 				.let { Response.Success(it) }
 		}

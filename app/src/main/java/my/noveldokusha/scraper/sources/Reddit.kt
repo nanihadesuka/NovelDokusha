@@ -24,8 +24,8 @@ class Reddit : scrubber.source_interface.base
 	
 	override suspend fun getChapterText(doc: Document): String
 	{
-		return doc.selectFirst(".linklisting")
-			.selectFirst(".usertext-body, .may-blank-within, .md-container")
+		return doc.selectFirst(".linklisting")!!
+			.selectFirst(".usertext-body, .may-blank-within, .md-container")!!
 			.let {
 				it.select("table").remove()
 				it.select("blockquote").remove()

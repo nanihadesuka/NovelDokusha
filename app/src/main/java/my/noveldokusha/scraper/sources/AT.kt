@@ -14,7 +14,7 @@ class AT : scrubber.source_interface.base
 	
 	override suspend fun getChapterText(doc: Document): String
 	{
-		val raw = doc.selectFirst(".text-left style").data()
+		val raw = doc.selectFirst(".text-left style")!!.data()
 		
 		data class CSSData(val id: String, val type: String, val text: String)
 		
@@ -28,7 +28,7 @@ class AT : scrubber.source_interface.base
 				it.id
 			}.mapValues { data -> data.value.associate { it.type to it.text } }
 		
-		return doc.selectFirst("div.text-left")
+		return doc.selectFirst("div.text-left")!!
 			.apply {
 				select("div.code-block.code-block-3").remove()
 			}.select("p")

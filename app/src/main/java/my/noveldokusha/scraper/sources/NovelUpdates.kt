@@ -31,15 +31,15 @@ class NovelUpdates : scrubber.source_interface.catalog
 		return connect("https://www.novelupdates.com/wp-admin/admin-ajax.php")
 			.addHeaderRequest()
 			.data("action", "nd_getchapters")
-			.data("mygrr", doc.selectFirst("#grr_groups").attr("value"))
+			.data("mygrr", doc.selectFirst("#grr_groups")!!.attr("value"))
 			.data("mygroupfilter", "")
-			.data("mypostid", doc.selectFirst("#mypostid").attr("value"))
+			.data("mypostid", doc.selectFirst("#mypostid")!!.attr("value"))
 			.postIO()
 			.select("a[href]")
 			.asSequence()
 			.filter { it.hasAttr("data-id") }
 			.map {
-				val title = it.selectFirst("span").attr("title")
+				val title = it.selectFirst("span")!!.attr("title")
 				val url = "https:" + it.attr("href")
 				ChapterMetadata(title = title, url = url)
 			}.toList().reversed()
@@ -56,7 +56,7 @@ class NovelUpdates : scrubber.source_interface.catalog
 		return tryConnect {
 			fetchDoc(url)
 				.select(".search_title")
-				.map { it.selectFirst("a[href]") }
+				.mapNotNull { it.selectFirst("a[href]") }
 				.map { BookMetadata(title = it.text(), url = it.attr("href")) }
 				.let { Response.Success(it) }
 		}
@@ -74,7 +74,7 @@ class NovelUpdates : scrubber.source_interface.catalog
 		return tryConnect("page: $page\nurl: $url") {
 			fetchDoc(url)
 				.select(".search_title")
-				.map { it.selectFirst("a") }
+				.mapNotNull { it.selectFirst("a") }
 				.map { BookMetadata(it.text(), it.attr("href")) }
 				.let { Response.Success(it) }
 		}

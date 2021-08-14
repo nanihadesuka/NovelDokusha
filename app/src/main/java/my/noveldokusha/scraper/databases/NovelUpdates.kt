@@ -33,7 +33,7 @@ class NovelUpdates : scrubber.database_interface
 			tryConnect {
 				fetchDoc("https://www.novelupdates.com/series-finder/")
 					.select(".genreme")
-					.associate { it.text().trim() to it.attr("genreid")!! }
+					.associate { it.text().trim() to it.attr("genreid") }
 					.let { Response.Success(it) }
 			}
 		}
@@ -51,7 +51,7 @@ class NovelUpdates : scrubber.database_interface
 		return tryConnect("page: $page\nurl: $url") {
 			fetchDoc(url)
 				.select(".search_title")
-				.map { it.selectFirst("a") }
+				.mapNotNull { it.selectFirst("a") }
 				.map { BookMetadata(it.text(), it.attr("href")) }
 				.let { Response.Success(it) }
 		}
@@ -72,7 +72,7 @@ class NovelUpdates : scrubber.database_interface
 		return tryConnect("page: $page\nurl: $url") {
 			fetchDoc(url)
 				.select(".search_title")
-				.map { it.selectFirst("a") }
+				.mapNotNull { it.selectFirst("a") }
 				.map { BookMetadata(it.text(), it.attr("href")) }
 				.let { Response.Success(it) }
 		}
@@ -97,19 +97,19 @@ class NovelUpdates : scrubber.database_interface
 			.map { BookMetadata(it.text(), it.attr("href")) }.toList()
 		
 		val authors = doc
-			.selectFirst("#showauthors")
+			.selectFirst("#showauthors")!!
 			.select("a[href]")
 			.map { scrubber.database_interface.BookAuthor(name = it.text(), url = it.attr("href")) }
 		
 		return scrubber.database_interface.BookData(
-			title = doc.selectFirst(".seriestitlenu").text(),
-			description = getNodeStructuredText(doc.selectFirst("#editdescription")),
-			alternativeTitles = getNodeStructuredText(doc.selectFirst("#editassociated")).split("\n"),
+			title = doc.selectFirst(".seriestitlenu")!!.text(),
+			description = getNodeStructuredText(doc.selectFirst("#editdescription")!!),
+			alternativeTitles = getNodeStructuredText(doc.selectFirst("#editassociated")!!).split("\n"),
 			relatedBooks = relatedBooks,
 			similarRecommended = similarRecommended,
-			bookType = doc.selectFirst(".genre, .type").text(),
-			genres = doc.selectFirst("#seriesgenre").select("a").map { it.text() },
-			tags = doc.selectFirst("#showtags").select("a").map { it.text() },
+			bookType = doc.selectFirst(".genre, .type")!!.text(),
+			genres = doc.selectFirst("#seriesgenre")!!.select("a").map { it.text() },
+			tags = doc.selectFirst("#showtags")!!.select("a").map { it.text() },
 			authors = authors,
 			coverImageUrl = doc.selectFirst("div.seriesimg > img[src]")?.attr("src")
 		)

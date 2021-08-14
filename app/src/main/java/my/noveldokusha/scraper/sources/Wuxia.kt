@@ -15,7 +15,7 @@ class Wuxia : scrubber.source_interface.catalog
 	
 	override suspend fun getChapterText(doc: Document): String
 	{
-		return doc.selectFirst("div.panel-body.article").also {
+		return doc.selectFirst("div.panel-body.article")!!.also {
 			it.select(".pager").remove()
 			it.select(".fa.fa-calendar").remove()
 			it.select("button.btn.btn-default").remove()
@@ -25,7 +25,7 @@ class Wuxia : scrubber.source_interface.catalog
 	
 	override suspend fun getChapterList(doc: Document): List<ChapterMetadata>
 	{
-		val id = doc.selectFirst("#more").attr("data-nid")
+		val id = doc.selectFirst("#more")!!.attr("data-nid")
 		val newChapters = doc.select("#chapters a[href]")
 		val res = tryConnect {
 			connect("https://wuxia.blog/temphtml/_tempChapterList_all_$id.html")

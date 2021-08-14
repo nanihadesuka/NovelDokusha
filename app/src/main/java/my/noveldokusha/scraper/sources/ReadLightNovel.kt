@@ -22,7 +22,7 @@ class ReadLightNovel : scrubber.source_interface.catalog
 	
 	override suspend fun getChapterText(doc: Document): String
 	{
-		doc.selectFirst(".chapter-content3 > .desc").let {
+		doc.selectFirst(".chapter-content3 > .desc")!!.let {
 			it.select("script").remove()
 			it.select("a").remove()
 			it.select(".ads-title").remove()
@@ -48,10 +48,10 @@ class ReadLightNovel : scrubber.source_interface.catalog
 		
 		return tryConnect {
 			fetchDoc(url)
-				.selectFirst(".list-by-word-body")
+				.selectFirst(".list-by-word-body")!!
 				.child(0)
 				.children()
-				.map { it.selectFirst("a[href]") }
+				.mapNotNull { it.selectFirst("a[href]") }
 				.map { BookMetadata(title = it.text(), url = it.attr("href")) }
 				.let { Response.Success(it) }
 		}

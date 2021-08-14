@@ -12,7 +12,7 @@ class Sousetsuka : scrubber.source_interface.base
 	
 	override suspend fun getChapterText(doc: Document): String
 	{
-		return doc.selectFirst(".post-body.entry-content")
+		return doc.selectFirst(".post-body.entry-content")!!
 			.let { scrubber.getNodeStructuredText(it) }
 	}
 }

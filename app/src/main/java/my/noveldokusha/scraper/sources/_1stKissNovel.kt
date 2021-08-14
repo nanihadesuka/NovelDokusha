@@ -14,7 +14,7 @@ class _1stKissNovel : scrubber.source_interface.catalog
 	override suspend fun getChapterList(doc: Document): List<ChapterMetadata>
 	{
 		val url = "https://1stkissnovel.love/wp-admin/admin-ajax.php"
-		val id = doc.selectFirst("input.rating-post-id").attr("value")
+		val id = doc.selectFirst("input.rating-post-id")!!.attr("value")
 		return connect(url).addHeaderRequest()
 			.data("action", "manga_get_chapters")
 			.data("manga", id)

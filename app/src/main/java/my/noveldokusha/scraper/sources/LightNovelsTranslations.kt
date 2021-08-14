@@ -22,9 +22,9 @@ class LightNovelsTranslations : scrubber.source_interface.catalog
 	
 	override suspend fun getChapterText(doc: Document): String
 	{
-		return doc.selectFirst(".page, .type-page, .status-publish, .hentry")
+		return doc.selectFirst(".page, .type-page, .status-publish, .hentry")!!
 			.selectFirst(".entry-content").run {
-				this.select("#textbox").remove()
+				this!!.select("#textbox").remove()
 				scrubber.getNodeStructuredText(this)
 			}
 	}
@@ -52,7 +52,7 @@ class LightNovelsTranslations : scrubber.source_interface.catalog
 		
 		return tryConnect {
 			fetchDoc(catalogUrl)
-				.selectFirst("#prime_nav")
+				.selectFirst("#prime_nav")!!
 				.children()
 				.subList(1, 4)
 				.flatMap { it.select("a[href]") }
@@ -84,7 +84,7 @@ class LightNovelsTranslations : scrubber.source_interface.catalog
 		
 		return tryConnect {
 			fetchDoc(url)
-				.selectFirst(".jetpack-search-filters-widget__filter-list")
+				.selectFirst(".jetpack-search-filters-widget__filter-list")!!
 				.select("a[href]")
 				.map {
 					val (name) = Regex("""^.*category_name=(.*)$""").find(it.attr("href"))!!.destructured

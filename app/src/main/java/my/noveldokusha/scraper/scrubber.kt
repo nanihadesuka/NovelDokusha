@@ -41,7 +41,7 @@ fun String.toUrl(): Uri? = runCatching { Uri.parse(this) }.getOrNull()
 fun String.toUrlBuilder(): Uri.Builder? = toUrl()?.buildUpon()
 fun Uri.Builder.add(key: String, value: Any): Uri.Builder = appendQueryParameter(key, value.toString())
 
-fun Connection.addHeaderRequest() = this.header("X-Requested-With", "XMLHttpRequest")!!
+fun Connection.addHeaderRequest() = this.header("X-Requested-With", "XMLHttpRequest")
 
 sealed class Response<T>
 {
@@ -276,8 +276,6 @@ catch (e: SocketTimeoutException)
 }
 catch (e: Exception)
 {
-	val sst = e.stackTraceToString()
-	val stacktrace = StringWriter().apply { e.printStackTrace(PrintWriter(this)) }
 	val error = """
 		Unknown error.
 		

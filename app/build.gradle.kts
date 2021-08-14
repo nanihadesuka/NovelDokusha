@@ -1,6 +1,5 @@
 import java.util.Properties
 
-
 plugins {
 	id("com.android.application")
 	id("kotlin-android")
@@ -8,6 +7,8 @@ plugins {
 }
 
 android {
+	
+	compileSdk = 30
 	
 	val localPropertiesFile = file("../local.properties")
 	val isSignBuild = localPropertiesFile.exists()
@@ -17,13 +18,20 @@ android {
 		targetCompatibility = JavaVersion.VERSION_1_8
 	}
 	
-	compileSdkVersion(30)
-	buildToolsVersion = "30.0.2"
+	kotlinOptions {
+		jvmTarget = JavaVersion.VERSION_1_8.toString()
+		useIR = true
+	}
+	
+	composeOptions {
+		kotlinCompilerExtensionVersion = "1.0.1"
+		kotlinCompilerVersion = "1.5.10"
+	}
 	
 	defaultConfig {
 		applicationId = "my.noveldokusha"
-		minSdkVersion(26)
-		targetSdkVersion(30)
+		minSdk = 26
+		targetSdk = 30
 		versionCode = 1
 		versionName = "1.0"
 		testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -68,20 +76,17 @@ android {
 		}
 	}
 	
-	kotlinOptions {
-		jvmTarget = JavaVersion.VERSION_1_8.toString()
-	}
-	
 	buildFeatures {
 		viewBinding = true
+		compose = true
 	}
 }
 
 dependencies {
 	
-	implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.0-RC")
+	implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.0")
 	
-	implementation("androidx.appcompat:appcompat:1.3.0")
+	implementation("androidx.appcompat:appcompat:1.3.1")
 	
 	// Room components
 	implementation("androidx.room:room-runtime:2.3.0")
@@ -96,23 +101,23 @@ dependencies {
 	implementation("androidx.coordinatorlayout:coordinatorlayout:1.1.0")
 	
 	// UI
-	implementation("androidx.constraintlayout:constraintlayout:2.0.4")
+	implementation("androidx.constraintlayout:constraintlayout:2.1.0")
 	implementation("com.google.android.material:material:1.4.0")
 	
-	implementation("com.google.code.gson:gson:2.8.6")
+	implementation("com.google.code.gson:gson:2.8.7")
 	
 	implementation("androidx.recyclerview:recyclerview:1.2.1")
 	implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
 	
 	
 	implementation(fileTree("libs") { include("*.jar") })
-	implementation("org.jetbrains.kotlin:kotlin-stdlib:1.5.10")
+	implementation("org.jetbrains.kotlin:kotlin-stdlib:1.5.21")
 	implementation("androidx.core:core-ktx:1.6.0")
 	implementation("androidx.navigation:navigation-fragment-ktx:2.3.5")
 	implementation("androidx.navigation:navigation-ui-ktx:2.3.5")
-	implementation("org.jsoup:jsoup:1.13.1")
+	implementation("org.jsoup:jsoup:1.14.1")
 	
-	implementation("org.jetbrains.kotlin:kotlin-script-runtime:1.4.21")
+	implementation("org.jetbrains.kotlin:kotlin-script-runtime:1.5.30-RC")
 	
 	implementation("com.afollestad.material-dialogs:core:3.2.1")
 	
@@ -124,4 +129,26 @@ dependencies {
 	implementation("net.dankito.readability4j:readability4j:1.0.6")
 	
 	implementation("com.l4digital.fastscroll:fastscroll:2.0.1")
+	
+	// Jetpack compose
+	
+	implementation("androidx.compose.ui:ui:1.0.1")
+	// Tooling support (Previews, etc.)
+	implementation("androidx.compose.ui:ui-tooling:1.0.1")
+	// Foundation (Border, Background, Box, Image, Scroll, shapes, animations, etc.)
+	implementation("androidx.compose.foundation:foundation:1.0.1")
+	// Material Design
+	implementation("androidx.compose.material:material:1.0.1")
+	// Material design icons
+	implementation("androidx.compose.material:material-icons-core:1.0.1")
+	implementation("androidx.compose.material:material-icons-extended:1.0.1")
+	// Integration with activities
+	implementation("androidx.activity:activity-compose:1.3.1")
+	// Integration with ViewModels
+	implementation("androidx.lifecycle:lifecycle-viewmodel-compose:1.0.0-alpha07")
+	// Integration with observables
+	implementation("androidx.compose.runtime:runtime-livedata:1.0.1")
+	implementation("androidx.compose.runtime:runtime-rxjava2:1.0.1")
+	// UI Tests
+	androidTestImplementation("androidx.compose.ui:ui-test-junit4:1.0.1")
 }
