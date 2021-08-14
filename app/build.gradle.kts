@@ -20,12 +20,10 @@ android {
 	
 	kotlinOptions {
 		jvmTarget = JavaVersion.VERSION_1_8.toString()
-		useIR = true
 	}
 	
 	composeOptions {
 		kotlinCompilerExtensionVersion = "1.0.1"
-		kotlinCompilerVersion = "1.5.10"
 	}
 	
 	defaultConfig {
@@ -57,11 +55,10 @@ android {
 		
 		named("debug") {
 			postprocessing {
-				proguardFile("proguard-rules.pro")
-				isRemoveUnusedCode = true
+				isRemoveUnusedCode = false
 				isObfuscate = false
-				isOptimizeCode = true
-				isRemoveUnusedResources = true
+				isOptimizeCode = false
+				isRemoveUnusedResources = false
 			}
 		}
 		
@@ -151,4 +148,6 @@ dependencies {
 	implementation("androidx.compose.runtime:runtime-rxjava2:1.0.1")
 	// UI Tests
 	androidTestImplementation("androidx.compose.ui:ui-test-junit4:1.0.1")
+	
+	implementation("com.google.android.material:compose-theme-adapter:1.0.1")
 }
