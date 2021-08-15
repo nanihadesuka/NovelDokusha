@@ -1,0 +1,224 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:app="http://schemas.android.com/apk/res-auto"
+	xmlns:tools="http://schemas.android.com/tools"
+	android:layout_width="match_parent"
+	android:layout_height="wrap_content"
+	android:orientation="vertical"
+	>
+	
+	<LinearLayout
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:orientation="vertical"
+		>
+		
+		<TextView
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:padding="12sp"
+			android:text="@string/theme"
+			android:textColor="?colorAccent"
+			android:textStyle="bold"
+			/>
+		
+		<androidx.appcompat.widget.SwitchCompat
+			android:id="@+id/settings_follow_system_theme"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:padding="12sp"
+			android:text="@string/follow_system"
+			android:textColor="?colorControlNormal"
+			android:textSize="16sp"
+			app:switchPadding="10sp"
+			/>
+		
+		<RadioGroup
+			android:id="@+id/settings_theme"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:padding="12sp"
+			/>
+	</LinearLayout>
+	
+	<LinearLayout
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:orientation="vertical"
+		>
+		
+		<TextView
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:padding="12sp"
+			android:text="@string/data"
+			android:textColor="?colorAccent"
+			android:textStyle="bold"
+			/>
+		
+		<LinearLayout
+			android:id="@+id/database_button_clean"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:background="?android:attr/selectableItemBackground"
+			android:clickable="true"
+			android:orientation="vertical"
+			android:padding="12sp"
+			>
+			
+			<TextView
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:text="@string/clean_database"
+				android:textSize="16sp"
+				/>
+			
+			<TextView
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:alpha="0.7"
+				android:text="@string/preserve_only_library_books_data"
+				/>
+			
+			<LinearLayout
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:orientation="horizontal"
+				>
+				
+				<TextView
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:alpha="0.7"
+					android:text="@string/database_size"
+					/>
+				
+				<TextView
+					android:id="@+id/database_size"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_marginStart="8sp"
+					android:alpha="0.7"
+					tools:text="10 MB"
+					/>
+			</LinearLayout>
+		</LinearLayout>
+		
+		<LinearLayout
+			android:id="@+id/books_images_clear"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:background="?android:attr/selectableItemBackground"
+			android:clickable="true"
+			android:orientation="vertical"
+			android:padding="12sp"
+			>
+			
+			<TextView
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:text="@string/clean_images_folder"
+				android:textSize="16sp"
+				/>
+			
+			<TextView
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:alpha="0.7"
+				android:text="@string/preserve_only_images_from_library_books"
+				/>
+			
+			<LinearLayout
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:orientation="horizontal"
+				>
+				
+				<TextView
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:alpha="0.7"
+					android:text="@string/images_total_size"
+					/>
+				
+				<TextView
+					android:id="@+id/total_books_images_size"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_marginStart="8sp"
+					android:alpha="0.7"
+					tools:text="150 MB"
+					/>
+			</LinearLayout>
+		</LinearLayout>
+	</LinearLayout>
+	
+	<LinearLayout
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:orientation="vertical"
+		>
+		
+		<TextView
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:padding="12sp"
+			android:text="@string/backup"
+			android:textColor="?colorAccent"
+			android:textStyle="bold"
+			/>
+		
+		<LinearLayout
+			android:id="@+id/backup_data_button"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:background="?android:attr/selectableItemBackground"
+			android:clickable="true"
+			android:orientation="vertical"
+			android:padding="12sp"
+			>
+			
+			<TextView
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:text="@string/backup_data"
+				android:textSize="16sp"
+				/>
+			
+			<TextView
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:alpha="0.7"
+				android:text="@string/opens_the_file_explorer_to_select_the_backup_saving_location"
+				/>
+		</LinearLayout>
+		
+		<LinearLayout
+			android:id="@+id/restore_data_button"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:background="?android:attr/selectableItemBackground"
+			android:clickable="true"
+			android:orientation="vertical"
+			android:padding="12sp"
+			>
+			
+			<TextView
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:text="@string/restore_data"
+				android:textSize="16sp"
+				/>
+			
+			<TextView
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:alpha="0.7"
+				android:text="@string/opens_the_file_explorer_to_select_the_backup_file"
+				/>
+		</LinearLayout>
+	</LinearLayout>
+
+</LinearLayout>
