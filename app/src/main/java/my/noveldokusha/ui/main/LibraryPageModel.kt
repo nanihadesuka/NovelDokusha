@@ -12,19 +12,13 @@ import my.noveldokusha.ui.BaseViewModel
 import my.noveldokusha.uiUtils.LiveEvent
 import my.noveldokusha.uiUtils.stringRes
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
-import kotlin.properties.Delegates
 
-class LibraryPageModel : BaseViewModel()
+class LibraryPageModel(val showCompleted: Boolean) : BaseViewModel()
 {
-	fun initialization(showCompleted: Boolean) = callOneTime {
-		this.showCompleted = showCompleted
-	}
-	
 	val booksWithContextFlow = bookstore.bookLibrary
 		.getBooksInLibraryWithContextFlow
 		.map { it.filter { book -> book.book.completed == showCompleted } }
 	
-	private var showCompleted by Delegates.notNull<Boolean>()
 	val refreshing = MutableLiveData(false)
 	
 	data class UpdateNotice(val hasUpdates: List<String>, val hasFailed: List<String>)
@@ -41,11 +35,10 @@ class LibraryPageModel : BaseViewModel()
 	fun update()
 	{
 		refreshing.postValue(true)
-		val completed = showCompleted
 		
 		App.scope.launch(Dispatchers.IO) {
 			bookstore.bookLibrary.getAllInLibrary()
-				.filter { it.completed == completed }
+				.filter { it.completed == showCompleted }
 				.filter { !it.url.startsWith("local://") }
 				.also { launch(Dispatchers.IO) { updateActorCounter.send(Pair(it.size, true)) } }
 				.groupBy { it.url.toHttpUrlOrNull()?.host }

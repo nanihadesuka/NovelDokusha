@@ -34,12 +34,7 @@ class WebViewActivity : BaseActivity()
 	}
 	
 	private val extras by lazy { IntentData(intent) }
-	private val viewModel by viewModels<WebViewModel>()
 	private val viewBind by lazy { ActivityWebviewBinding.inflate(layoutInflater) }
-	private val viewAdapter = object
-	{}
-	private val viewLayoutManager = object
-	{}
 	
 	@SuppressLint("SetJavaScriptEnabled")
 	override fun onCreate(savedInstanceState: Bundle?)
@@ -47,7 +42,6 @@ class WebViewActivity : BaseActivity()
 		super.onCreate(savedInstanceState)
 		setContentView(viewBind.root)
 		setSupportActionBar(viewBind.toolbar)
-		viewModel.initialization()
 		
 		if (!packageManager.hasSystemFeature(PackageManager.FEATURE_WEBVIEW))
 		{

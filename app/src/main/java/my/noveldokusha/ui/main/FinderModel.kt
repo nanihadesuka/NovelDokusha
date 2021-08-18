@@ -5,7 +5,7 @@ import my.noveldokusha.ui.BaseViewModel
 
 class FinderModel : BaseViewModel()
 {
-	var sourcesList = arrayListOf<Item>(
+	val sourcesList = arrayListOf<Item>(
 		Item.Header("Databases"),
 		*scrubber.databasesList.map { Item.Database(it.name, it.baseUrl) }.toTypedArray(),
 		Item.Header("Sources"),

@@ -4,7 +4,6 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.*
-import androidx.activity.viewModels
 import androidx.appcompat.widget.SearchView
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
@@ -40,7 +39,7 @@ class SourceCatalogActivity : BaseActivity()
 	}
 	
 	private val extras by lazy { IntentData(intent) }
-	private val viewModel by viewModels<SourceCatalogModel>()
+	private val viewModel by viewModelsFactory { SourceCatalogModel(scrubber.getCompatibleSourceCatalog(extras.sourceBaseUrl)!!) }
 	private val viewBind by lazy { ActivitySourceCatalogBinding.inflate(layoutInflater) }
 	private val viewAdapter = object
 	{
@@ -58,7 +57,6 @@ class SourceCatalogActivity : BaseActivity()
 		super.onCreate(savedInstanceState)
 		setContentView(viewBind.root)
 		setSupportActionBar(viewBind.toolbar)
-		viewModel.initialization(scrubber.getCompatibleSourceCatalog(extras.sourceBaseUrl)!!)
 		
 		viewBind.recyclerView.adapter = ConcatAdapter(viewAdapter.recyclerView, viewAdapter.progressBar)
 		viewBind.recyclerView.layoutManager = viewLayoutManager.recyclerView

@@ -7,13 +7,9 @@ import my.noveldokusha.scraper.FetchIterator
 import my.noveldokusha.scraper.scrubber
 import my.noveldokusha.ui.BaseViewModel
 
-class GlobalSourceSearchModel : BaseViewModel()
+class GlobalSourceSearchModel(val input: String) : BaseViewModel()
 {
-	fun initialization(input: String) = callOneTime {
-		globalResults.addAll(scrubber.sourcesListCatalog.map { SourceResults(it, input, viewModelScope) })
-	}
-	
-	val globalResults = ArrayList<SourceResults>()
+	val globalResults = scrubber.sourcesListCatalog.map { SourceResults(it, input, viewModelScope) }
 }
 
 data class SourceResults(val source: scrubber.source_interface.catalog, val searchInput: String, val coroutineScope: CoroutineScope)

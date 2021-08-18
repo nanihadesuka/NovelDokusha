@@ -13,10 +13,10 @@ import my.noveldokusha.ui.BaseViewModel
 import my.noveldokusha.uiUtils.stringRes
 import my.noveldokusha.uiUtils.toast
 
-class ChaptersModel : BaseViewModel()
+class ChaptersModel(val bookMetadata: BookMetadata) : BaseViewModel()
 {
-	fun initialization(bookMetadata: BookMetadata) = callOneTime {
-		this.bookMetadata = bookMetadata
+	init
+	{
 		viewModelScope.launch(Dispatchers.IO) {
 			if (!bookstore.bookChapter.hasChapters(bookMetadata.url))
 				updateChaptersList()
@@ -26,8 +26,6 @@ class ChaptersModel : BaseViewModel()
 				bookstore.bookLibrary.insert(Book(title = bookMetadata.title, url = bookMetadata.url))
 		}
 	}
-	
-	lateinit var bookMetadata: BookMetadata
 	
 	val chaptersWithContextLiveData by lazy {
 		bookstore.bookChapter.getChaptersWithContexFlow(bookMetadata.url)

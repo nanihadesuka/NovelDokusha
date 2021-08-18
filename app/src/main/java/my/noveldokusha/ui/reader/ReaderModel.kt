@@ -1,43 +1,46 @@
 package my.noveldokusha.ui.reader
 
 import androidx.lifecycle.SavedStateHandle
+import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.*
 import my.noveldokusha.Chapter
 import my.noveldokusha.bookstore
 import my.noveldokusha.ui.BaseViewModel
-import my.noveldokusha.uiUtils.ObservableNoInitValue
 import java.util.*
+import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.collections.ArrayList
+import kotlin.properties.Delegates
 
-class ReaderModel(private val savedState: SavedStateHandle) : BaseViewModel()
+class ReaderModel(private val savedState: SavedStateHandle, val bookUrl: String, selectedChapter: String) : BaseViewModel()
 {
 	private val savedStateChapterUrlID = "chapterUrl"
-	
-	fun initialization(bookUrl: String, selectedChapter: String, fn: () -> Unit) = callOneTime {
-		this.bookUrl = bookUrl
-		val url = savedState.get<String>(savedStateChapterUrlID) ?: selectedChapter
-		
-		runBlocking {
-			val chapter = bookstore.bookChapter.get(url)
-			currentChapter = ChapterState(
-				url = url,
-				position = chapter?.lastReadPosition ?: 0,
-				offset = chapter?.lastReadOffset ?: 0
-			)
-			orderedChapters.addAll(bookstore.bookChapter.chapters(bookUrl))
-		}
-		fn()
-	}
-	
-	var currentChapter: ChapterState by ObservableNoInitValue { _, old, new ->
+	val url = savedState.get<String>(savedStateChapterUrlID) ?: selectedChapter
+	var currentChapter: ChapterState by Delegates.observable(ChapterState(url, 0, 0)) { _, old, new ->
 		savedState.set<String>(savedStateChapterUrlID, new.url)
 		if (old.url != new.url) saveLastReadPositionState(bookUrl, new, old)
 	}
+	val orderedChapters: List<Chapter>
 	
-	lateinit var bookUrl: String
-		private set
+	init
+	{
+		val chapter = viewModelScope.async(Dispatchers.IO) { bookstore.bookChapter.get(url) }
+		val bookChapter = viewModelScope.async(Dispatchers.IO) { bookstore.bookChapter.chapters(bookUrl) }
+		
+		runBlocking {
+			currentChapter = ChapterState(
+				url = url,
+				position = chapter.await()?.lastReadPosition ?: 0,
+				offset = chapter.await()?.lastReadOffset ?: 0
+			)
+			this@ReaderModel.orderedChapters = bookChapter.await()
+		}
+	}
 	
-	val orderedChapters = mutableListOf<Chapter>()
+	private val initialLoadDone = AtomicBoolean(false)
+	fun initialLoad(fn: () -> Unit)
+	{
+		if (initialLoadDone.compareAndSet(false, true)) fn()
+	}
 	
 	data class ChapterStats(val size: Int, val chapter: Chapter, val index: Int)
 	

@@ -6,7 +6,6 @@ import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
 import android.view.*
-import androidx.activity.viewModels
 import androidx.appcompat.widget.SearchView
 import androidx.core.view.isVisible
 import androidx.lifecycle.asLiveData
@@ -42,7 +41,7 @@ class ChaptersActivity : BaseActivity()
 	}
 	
 	private val extras by lazy { IntentData(intent) }
-	private val viewModel by viewModels<ChaptersModel>()
+	private val viewModel by viewModelsFactory { ChaptersModel(extras.bookMetadata) }
 	private val viewBind by lazy { ActivityChaptersBinding.inflate(layoutInflater) }
 	private val viewAdapter = object
 	{
@@ -55,7 +54,6 @@ class ChaptersActivity : BaseActivity()
 		super.onCreate(savedInstanceState)
 		setContentView(viewBind.root)
 		setSupportActionBar(viewBind.toolbar)
-		viewModel.initialization(extras.bookMetadata)
 		
 		viewBind.recyclerView.adapter = ConcatAdapter(viewAdapter.header, viewAdapter.chapters)
 		viewBind.recyclerView.itemAnimator = DefaultItemAnimator()
@@ -72,7 +70,7 @@ class ChaptersActivity : BaseActivity()
 			val bookUrl = viewModel.bookMetadata.url
 			lifecycleScope.launch(Dispatchers.IO) {
 				val lastReadChapter = bookstore.bookLibrary.get(extras.bookMetadata.url)?.lastReadChapter
-						?: bookstore.bookChapter.getFirstChapter(extras.bookMetadata.url)?.url
+					?: bookstore.bookChapter.getFirstChapter(extras.bookMetadata.url)?.url
 				
 				if (lastReadChapter == null)
 				{
@@ -226,18 +224,18 @@ class ChaptersActivity : BaseActivity()
 }
 
 private class ChaptersArrayAdapter(
-		private val context: BaseActivity,
-		private val viewModel: ChaptersModel,
-		private val selectionModeBarUpdateVisibility: () -> Unit
+	private val context: BaseActivity,
+	private val viewModel: ChaptersModel,
+	private val selectionModeBarUpdateVisibility: () -> Unit
 ) : MyListAdapter<ChapterWithContext, ChaptersArrayAdapter.ViewHolder>()
 {
 	override fun areItemsTheSame(old: ChapterWithContext, new: ChapterWithContext) =
-			old.chapter.url == new.chapter.url
+		old.chapter.url == new.chapter.url
 	
 	override fun areContentsTheSame(old: ChapterWithContext, new: ChapterWithContext) = old == new
 	
 	override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder =
-			ViewHolder(ActivityChaptersListItemBinding.inflate(parent.inflater, parent, false))
+		ViewHolder(ActivityChaptersListItemBinding.inflate(parent.inflater, parent, false))
 	
 	override fun onBindViewHolder(viewHolder: ViewHolder, position: Int)
 	{
@@ -270,7 +268,7 @@ private class ChaptersArrayAdapter(
 	fun toggleItemSelection(itemData: ChapterWithContext, view: View)
 	{
 		fun <T> MutableSet<T>.removeOrAdd(value: T) =
-				contains(value).also { if (it) remove(value) else add(value) }
+			contains(value).also { if (it) remove(value) else add(value) }
 		
 		val isRemoved = viewModel.selectedChaptersUrl.removeOrAdd(itemData.chapter.url)
 		view.visibility = if (isRemoved) View.INVISIBLE else View.VISIBLE
@@ -281,12 +279,12 @@ private class ChaptersArrayAdapter(
 }
 
 private class ChaptersHeaderAdapter(
-		val context: BaseActivity,
-		val viewModel: ChaptersModel
+	val context: BaseActivity,
+	val viewModel: ChaptersModel
 ) : RecyclerView.Adapter<ChaptersHeaderAdapter.ViewHolder>()
 {
 	override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder =
-			ViewHolder(ActivityChaptersListHeaderBinding.inflate(parent.inflater, parent, false))
+		ViewHolder(ActivityChaptersListHeaderBinding.inflate(parent.inflater, parent, false))
 	
 	override fun getItemCount() = 1
 	
@@ -298,7 +296,7 @@ private class ChaptersHeaderAdapter(
 		{
 			viewBind.bookTitle.text = viewModel.bookMetadata.title
 			viewBind.sourceName.text = scrubber.getCompatibleSource(viewModel.bookMetadata.url)?.name
-					?: ""
+				?: ""
 			
 			viewModel.chaptersWithContextLiveData.observe(context) { list ->
 				viewBind.numberOfChapters.text = list.size.toString()

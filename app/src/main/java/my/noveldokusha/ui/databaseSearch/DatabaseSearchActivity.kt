@@ -6,7 +6,6 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.view.ViewGroup
-import androidx.activity.viewModels
 import androidx.appcompat.widget.SearchView
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.RecyclerView
@@ -19,6 +18,7 @@ import my.noveldokusha.ui.databaseSearchResults.DatabaseSearchResultsActivity
 import my.noveldokusha.uiAdapters.MyListAdapter
 import my.noveldokusha.uiUtils.Extra_String
 import my.noveldokusha.uiUtils.inflater
+import my.noveldokusha.uiUtils.viewModelsFactory
 import my.noveldokusha.uiViews.Checkbox3StatesView
 import java.util.*
 import kotlin.collections.ArrayList
@@ -38,7 +38,7 @@ class DatabaseSearchActivity : BaseActivity()
 	}
 	
 	private val extras by lazy { IntentData(intent) }
-	private val viewModel by viewModels<DatabaseSearchModel>()
+	private val viewModel by viewModelsFactory { DatabaseSearchModel(scrubber.getCompatibleDatabase(extras.databaseBaseUrl)!!) }
 	private val viewBind by lazy { ActivityDatabaseSearchBinding.inflate(layoutInflater) }
 	private val viewAdapter = object
 	{
@@ -50,7 +50,6 @@ class DatabaseSearchActivity : BaseActivity()
 		super.onCreate(savedInstanceState)
 		setContentView(viewBind.root)
 		setSupportActionBar(viewBind.toolbar)
-		viewModel.initialization(scrubber.getCompatibleDatabase(extras.databaseBaseUrl)!!)
 		
 		supportActionBar!!.let {
 			it.title = "Database"

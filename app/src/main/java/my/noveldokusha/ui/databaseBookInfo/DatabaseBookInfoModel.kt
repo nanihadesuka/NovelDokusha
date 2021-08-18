@@ -10,16 +10,8 @@ import my.noveldokusha.scraper.fetchDoc
 import my.noveldokusha.scraper.scrubber
 import my.noveldokusha.ui.BaseViewModel
 
-class DatabaseBookInfoModel : BaseViewModel()
+class DatabaseBookInfoModel(val database: scrubber.database_interface, val bookMetadata: BookMetadata) : BaseViewModel()
 {
-	fun initialization(database: scrubber.database_interface, bookMetadata: BookMetadata) = callOneTime {
-		this.database = database
-		this.bookMetadata = bookMetadata
-	}
-	
-	lateinit var database: scrubber.database_interface
-	lateinit var bookMetadata: BookMetadata
-	
 	val bookDataLiveData by lazy {
 		flow {
 			val doc = fetchDoc(bookMetadata.url)

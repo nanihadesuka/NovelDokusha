@@ -54,7 +54,9 @@ class ReaderActivity : BaseActivity()
 	}
 	
 	private val extras by lazy { IntentData(intent) }
-	private val viewModel by viewModels<ReaderModel>()
+	private val viewModel by viewModelsSavedStateFactory { savedState ->
+		ReaderModel(savedState, bookUrl = extras.bookUrl, selectedChapter = extras.chapterUrl)
+	}
 	private val viewBind by lazy { ActivityReaderBinding.inflate(layoutInflater) }
 	private val viewAdapter = object
 	{
@@ -97,9 +99,7 @@ class ReaderActivity : BaseActivity()
 		
 		viewBind.listView.adapter = viewAdapter.listView
 		
-		viewModel.initialization(bookUrl = extras.bookUrl, selectedChapter = extras.chapterUrl) {
-			loadInitialChapter()
-		}
+		viewModel.initialLoad { loadInitialChapter() }
 		
 		sharedPreferences.registerOnSharedPreferenceChangeListener(listenerSharedPreferences)
 		

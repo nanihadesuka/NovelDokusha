@@ -6,7 +6,6 @@ import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import androidx.activity.viewModels
 import androidx.recyclerview.widget.*
 import my.noveldokusha.BookMetadata
 import my.noveldokusha.databinding.ActivityDatabaseSearchResultsBinding
@@ -75,7 +74,12 @@ class DatabaseSearchResultsActivity : BaseActivity()
 		data class AuthorSeries(val authorName: String, val urlAuthorPage: String) : SearchMode()
 	}
 	
-	private val viewModel by viewModels<DatabaseSearchResultsModel>()
+	private val viewModel by viewModelsFactory {
+		DatabaseSearchResultsModel(
+			database = scrubber.getCompatibleDatabase(extras.databaseUrlBase)!!,
+			input = extras.input
+		)
+	}
 	private val viewBind by lazy { ActivityDatabaseSearchResultsBinding.inflate(layoutInflater) }
 	private val viewAdapter = object
 	{
@@ -89,11 +93,9 @@ class DatabaseSearchResultsActivity : BaseActivity()
 	
 	override fun onCreate(savedInstanceState: Bundle?)
 	{
-		
 		super.onCreate(savedInstanceState)
 		setContentView(viewBind.root)
 		setSupportActionBar(viewBind.toolbar)
-		viewModel.initialization(database = scrubber.getCompatibleDatabase(extras.databaseUrlBase)!!, input = extras.input)
 		
 		viewBind.recyclerView.adapter = ConcatAdapter(viewAdapter.recyclerView, viewAdapter.progressBar)
 		viewBind.recyclerView.layoutManager = viewLayoutManager.recyclerView

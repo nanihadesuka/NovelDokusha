@@ -7,7 +7,6 @@ import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import androidx.activity.viewModels
 import androidx.core.view.updateLayoutParams
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
@@ -27,10 +26,7 @@ import my.noveldokusha.ui.BaseActivity
 import my.noveldokusha.ui.databaseSearchResults.DatabaseSearchResultsActivity
 import my.noveldokusha.ui.globalSourceSearch.GlobalSourceSearchActivity
 import my.noveldokusha.uiAdapters.MyListAdapter
-import my.noveldokusha.uiUtils.Extra_String
-import my.noveldokusha.uiUtils.fadeIn
-import my.noveldokusha.uiUtils.inflater
-import my.noveldokusha.uiUtils.spToPx
+import my.noveldokusha.uiUtils.*
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -53,7 +49,12 @@ class DatabaseBookInfoActivity : BaseActivity()
 	}
 	
 	private val extras by lazy { IntentData(intent) }
-	private val viewModel by viewModels<DatabaseBookInfoModel>()
+	private val viewModel by viewModelsFactory {
+		DatabaseBookInfoModel(
+			database = scrubber.getCompatibleDatabase(extras.databaseUrlBase)!!,
+			bookMetadata = extras.bookMetadata
+		)
+	}
 	private val viewBind by lazy { ActivityDatabaseBookInfoBinding.inflate(layoutInflater) }
 	private val viewAdapter = object
 	{
@@ -66,7 +67,6 @@ class DatabaseBookInfoActivity : BaseActivity()
 		super.onCreate(savedInstanceState)
 		setContentView(viewBind.root)
 		setSupportActionBar(viewBind.toolbar)
-		viewModel.initialization(database = scrubber.getCompatibleDatabase(extras.databaseUrlBase)!!, bookMetadata = extras.bookMetadata)
 		
 		viewBind.relatedBooks.adapter = viewAdapter.relatedBooks
 		viewBind.similarRecommended.adapter = viewAdapter.similarRecommended

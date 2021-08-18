@@ -6,7 +6,6 @@ import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import androidx.activity.viewModels
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.*
 import my.noveldokusha.BookMetadata
@@ -34,7 +33,7 @@ class GlobalSourceSearchActivity : BaseActivity()
 	}
 	
 	private val extras by lazy { IntentData(intent) }
-	private val viewModel by viewModels<GlobalSourceSearchModel>()
+	private val viewModel by viewModelsFactory { GlobalSourceSearchModel(extras.input) }
 	private val viewBind by lazy { ActivityGlobalSourceSearchBinding.inflate(layoutInflater) }
 	private val viewAdapter = object
 	{
@@ -46,7 +45,6 @@ class GlobalSourceSearchActivity : BaseActivity()
 		super.onCreate(savedInstanceState)
 		setContentView(viewBind.root)
 		setSupportActionBar(viewBind.toolbar)
-		viewModel.initialization(extras.input)
 		
 		viewBind.recyclerView.adapter = viewAdapter.recyclerView
 		viewBind.recyclerView.itemAnimator = DefaultItemAnimator()

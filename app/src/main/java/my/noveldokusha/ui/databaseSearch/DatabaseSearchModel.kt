@@ -10,12 +10,11 @@ import my.noveldokusha.scraper.scrubber
 import my.noveldokusha.ui.BaseViewModel
 import my.noveldokusha.uiViews.Checkbox3StatesView
 
-class DatabaseSearchModel : BaseViewModel()
+class DatabaseSearchModel(val database: scrubber.database_interface) : BaseViewModel()
 {
-	fun initialization(database: scrubber.database_interface) = callOneTime {
-		this.database = database
+	init
+	{
 		viewModelScope.launch(Dispatchers.IO) {
-			
 			when (val res = database.getSearchGenres())
 			{
 				is Response.Success ->
@@ -33,6 +32,5 @@ class DatabaseSearchModel : BaseViewModel()
 	
 	data class Item(val genre: String, val genreId: String, var state: Checkbox3StatesView.STATE)
 	
-	lateinit var database: scrubber.database_interface
 	val genreListLiveData = MutableLiveData<List<Item>>()
 }

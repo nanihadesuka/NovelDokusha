@@ -9,11 +9,12 @@ import my.noveldokusha.scraper.Response
 import my.noveldokusha.scraper.scrubber
 import my.noveldokusha.ui.BaseViewModel
 
-class SourceCatalogModel : BaseViewModel()
+class SourceCatalogModel(val source: scrubber.source_interface.catalog) : BaseViewModel()
 {
-	fun initialization(source: scrubber.source_interface.catalog) = callOneTime {
-		this.source = source
-		fetchIterator = FetchIterator(viewModelScope) { source.getCatalogList(it).transform() }
+	val fetchIterator = FetchIterator(viewModelScope) { source.getCatalogList(it).transform() }
+	
+	init
+	{
 		startCatalogListMode()
 	}
 	
@@ -27,9 +28,6 @@ class SourceCatalogModel : BaseViewModel()
 	{
 		val isInLibraryLiveData = bookstore.bookLibrary.existInLibraryFlow(bookMetadata.url).asLiveData()
 	}
-	
-	lateinit var source: scrubber.source_interface.catalog
-	lateinit var fetchIterator: FetchIterator<CatalogItem>
 	
 	fun startCatalogListMode()
 	{

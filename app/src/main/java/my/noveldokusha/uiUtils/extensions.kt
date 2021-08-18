@@ -8,15 +8,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.annotation.AttrRes
-import androidx.annotation.ColorInt
-import androidx.annotation.ColorRes
-import androidx.annotation.StringRes
+import androidx.activity.ComponentActivity
+import androidx.annotation.*
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.use
-import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.Observer
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.createViewModelLazy
+import androidx.lifecycle.*
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -84,3 +82,45 @@ fun BaseFragment.isOnPortraitMode() = requireActivity().isOnPortraitMode()
 
 fun Context.spToPx(value: Float) = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, value, resources.displayMetrics).toInt()
 fun BaseFragment.spToPx(value: Float) = requireActivity().spToPx(value)
+
+@MainThread
+inline fun <reified VM : ViewModel> ComponentActivity.viewModelsFactory(noinline instance: () -> VM): Lazy<VM> =
+	ViewModelLazy(
+		VM::class,
+		{ viewModelStore },
+		{
+			object : ViewModelProvider.Factory
+			{
+				@Suppress("UNCHECKED_CAST")
+				override fun <T : ViewModel?> create(modelClass: Class<T>): T = instance() as T
+			}
+		}
+	)
+
+@MainThread
+inline fun <reified VM : ViewModel> Fragment.viewModelsFactory(noinline instance: () -> VM) =
+	createViewModelLazy(
+		VM::class,
+		{ this.viewModelStore },
+		{
+			object : ViewModelProvider.Factory
+			{
+				@Suppress("UNCHECKED_CAST")
+				override fun <T : ViewModel?> create(modelClass: Class<T>): T = instance() as T
+			}
+		}
+	)
+
+@MainThread
+inline fun <reified VM : ViewModel> ComponentActivity.viewModelsSavedStateFactory(noinline instance: (handle: SavedStateHandle) -> VM): Lazy<VM>
+{
+	val factoryPromise = {
+		object : AbstractSavedStateViewModelFactory(this, intent?.extras)
+		{
+			@Suppress("UNCHECKED_CAST")
+			override fun <T : ViewModel?> create(key: String, modelClass: Class<T>, handle: SavedStateHandle): T = instance(handle) as T
+		}
+	}
+	
+	return ViewModelLazy(VM::class, { viewModelStore }, factoryPromise)
+}

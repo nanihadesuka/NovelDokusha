@@ -8,7 +8,6 @@ import android.text.format.Formatter
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.checkbox.checkBoxPrompt
@@ -34,7 +33,6 @@ import java.util.zip.ZipOutputStream
 
 class SettingsFragment : BaseFragment()
 {
-	private val viewModel by viewModels<SettingsModel>()
 	private lateinit var viewBind: ActivityMainFragmentSettingsBinding
 	private lateinit var viewAdapter: Adapter
 	

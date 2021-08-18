@@ -7,7 +7,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.app.NotificationCompat
 import androidx.core.view.updatePadding
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.asLiveData
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.GridLayoutManager
@@ -36,7 +35,7 @@ class LibraryPageFragment : BaseFragment
 	
 	var showCompleted by Argument_Boolean()
 	
-	private val viewModel by viewModels<LibraryPageModel>()
+	private val viewModel by viewModelsFactory { LibraryPageModel(showCompleted) }
 	private lateinit var viewBind: ActivityMainFragmentLibraryPageBinding
 	private lateinit var viewAdapter: Adapter
 	private lateinit var viewLayout: Layout
@@ -58,8 +57,6 @@ class LibraryPageFragment : BaseFragment
 		viewBind = ActivityMainFragmentLibraryPageBinding.inflate(inflater, container, false)
 		viewAdapter = Adapter()
 		viewLayout = Layout()
-		
-		viewModel.initialization(showCompleted)
 		
 		viewBind.gridView.adapter = viewAdapter.gridView
 		viewBind.gridView.updatePadding(bottom = if (isOnPortraitMode()) spToPx(300f) else spToPx(50f))
