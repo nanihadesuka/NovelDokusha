@@ -15,8 +15,8 @@ class ReadLightNovel : scrubber.source_interface.catalog
 {
 	
 	override val name = "Read Light Novel"
-	override val baseUrl = "https://www.readlightnovel.org"
-	override val catalogUrl = "https://www.readlightnovel.org/novel-list"
+	override val baseUrl = "https://www.readlightnovel.me"
+	override val catalogUrl = "https://www.readlightnovel.me/novel-list"
 	
 	override suspend fun getChapterTitle(doc: Document): String? = doc.selectFirst(".chapter-content3 h4")?.text()
 	
@@ -30,7 +30,7 @@ class ReadLightNovel : scrubber.source_interface.catalog
 			return scrubber.getNodeStructuredText(it)
 		}
 	}
-	
+
 	override suspend fun getChapterList(doc: Document): List<ChapterMetadata>
 	{
 		return doc.select(".chapter-chs").select("a[href]").map { ChapterMetadata(title = it.text(), url = it.attr("href")) }
