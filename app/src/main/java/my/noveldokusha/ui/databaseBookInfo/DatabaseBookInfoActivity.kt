@@ -139,8 +139,8 @@ class DatabaseBookInfoActivity : BaseActivity()
 			else
 				viewBind.authors.visibility = View.GONE
 			
-			viewBind.description.text = data.description
-			viewBind.alternativeTitles.text = data.alternativeTitles.joinToString("\n\n")
+			viewBind.description.text = data.description.trim()
+			viewBind.alternativeTitles.text = data.alternativeTitles.filterNot { it.isBlank() }.joinToString("\n\n")
 			viewBind.tags.text = data.tags.joinToString(" · ").ifEmpty { "No tags" }
 			viewBind.bookType.text = data.bookType
 			
