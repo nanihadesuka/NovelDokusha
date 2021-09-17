@@ -1,8 +1,8 @@
 import os
 import shutil
 
-homeDir = os.path.expanduser("~")
-workDir = os.path.join(homeDir, "github_release")
+mainDir = os.getcwd()
+workDir = os.path.join(mainDir, "github_release")
 
 extension = ".apk"
 apkFile = None
@@ -19,7 +19,7 @@ print(apkFile)
 print(fileName)
 print(version)
 
-shutil.move(os.path.join(workDir,apkFile), homeDir)
+shutil.move(os.path.join(workDir,apkFile), mainDir)
 
 def setEnvValue(key, value):
     print(f"Setting env varaible: {key}={value}")
