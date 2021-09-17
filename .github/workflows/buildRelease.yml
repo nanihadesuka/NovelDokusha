@@ -19,9 +19,9 @@ jobs: # A workflow run is made up of one or more jobs that can run sequentially 
           java-version: 11
 
       - name: Setup Python enviroment
-              uses: actions/setup-python@v2
-              with:
-                python-version: 3.8.5
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8.5
           
       - name: Build app
         uses: eskatos/gradle-command-action@v1.3.3
@@ -54,7 +54,7 @@ jobs: # A workflow run is made up of one or more jobs that can run sequentially 
         uses: softprops/action-gh-release@v1
         with:
           name: NovelDokusha v${{ env.APP_RELEASE_VERSION }}
-          tag_name: ${{ env.APP_RELEASE_VERSION }}
+          tag_name: v${{ env.APP_RELEASE_VERSION }}
           files: |
             ${{ env.APP_RELEASE_FILE }}
           
