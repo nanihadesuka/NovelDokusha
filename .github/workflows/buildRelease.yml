@@ -2,10 +2,6 @@ name: Publish Release
 
 on:
   workflow_dispatch: # Allows you to run this workflow manually from the Actions tab
-    inputs:
-      tagName:
-        description: "Tag name"
-        required: true
 
 jobs: # A workflow run is made up of one or more jobs that can run sequentially or in parallel
   buildRelease: # Job
@@ -21,6 +17,11 @@ jobs: # A workflow run is made up of one or more jobs that can run sequentially 
         uses: actions/setup-java@v1.4.3
         with:
           java-version: 11
+
+      - name: Setup Python enviroment
+              uses: actions/setup-python@v2
+              with:
+                python-version: 3.8.5
           
       - name: Build app
         uses: eskatos/gradle-command-action@v1.3.3
@@ -42,14 +43,19 @@ jobs: # A workflow run is made up of one or more jobs that can run sequentially 
       
       - name: Move APK
         run: |
-          cp ${{ env.SIGNED_RELEASE_FILE }} NovelDokusha_${{ github.event.inputs.tagName }}.apk
+          mkdir ./github_release
+          cp ${{ env.SIGNED_RELEASE_FILE }} ~/github_release/
+
+      - name: Create apk env info entries, move APK
+        run: |
+          python .github/build_scripts/extract_info.py
       
       - name: Create Release
         uses: softprops/action-gh-release@v1
         with:
-          name: NovelDokusha ${{ github.event.inputs.tagName }}
-          tag_name: ${{ github.event.inputs.tagName }}
+          name: NovelDokusha v${{ env.APP_RELEASE_VERSION }}
+          tag_name: ${{ env.APP_RELEASE_VERSION }}
           files: |
-            NovelDokusha_${{ github.event.inputs.tagName }}.apk
+            ${{ env.APP_RELEASE_FILE }}
           
         
