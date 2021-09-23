@@ -108,8 +108,8 @@ sealed class Item
 
 private class ListItemAdapter(val ctx: Context) : MyListAdapter<Item, ListItemAdapter.ViewHolder>()
 {
-    override fun areItemsTheSame(old: Item, new: Item) = false
-    override fun areContentsTheSame(old: Item, new: Item) = false
+    override fun areItemsTheSame(old: Item, new: Item) = old == new
+    override fun areContentsTheSame(old: Item, new: Item) = old == new
     override fun getItemViewType(position: Int) = when (list[position])
     {
         is Item.Source -> 0
