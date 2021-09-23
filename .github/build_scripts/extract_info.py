@@ -16,11 +16,18 @@ name, version = re.match("^(.+)_v(\d+\.\d+\.\d+).*\.apk$",apkFile).groups()
 
 newFileName = f"NovelDokusha_v{version}.apk"
 
+currentPath = os.path.join(workDir,apkFile)
+destinationPath = os.path.join(mainDir,newFileName)
+
 print(f"{name=}")
 print(f"{version=}")
 print(f"{newFileName=}")
 
-shutil.move(os.path.join(workDir,apkFile), os.path.join(workDir,newFileName))
+print("Moving apk")
+print(f"{currentPath=}")
+print(f"{destinationPath=}")
+
+shutil.move(currentPath, destinationPath)
 
 def setEnvValue(key, value):
     print(f"Setting env varaible: {key}={value}")
