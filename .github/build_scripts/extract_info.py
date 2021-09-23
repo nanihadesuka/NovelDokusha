@@ -1,5 +1,6 @@
 import os
 import shutil
+import re
 
 mainDir = os.getcwd()
 workDir = os.path.join(mainDir, "github_release")
