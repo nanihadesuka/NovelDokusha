@@ -6,11 +6,12 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import my.noveldokusha.BookMetadata
 import my.noveldokusha.scraper.Response
+import my.noveldokusha.scraper.database_interface
 import my.noveldokusha.scraper.fetchDoc
 import my.noveldokusha.scraper.scrubber
 import my.noveldokusha.ui.BaseViewModel
 
-class DatabaseBookInfoModel(val database: scrubber.database_interface, val bookMetadata: BookMetadata) : BaseViewModel()
+class DatabaseBookInfoModel(val database: database_interface, val bookMetadata: BookMetadata) : BaseViewModel()
 {
 	val bookDataLiveData by lazy {
 		flow {

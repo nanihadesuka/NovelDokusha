@@ -9,4 +9,10 @@
         app:actionViewClass="androidx.appcompat.widget.SearchView"
         app:showAsAction="ifRoom|collapseActionView"
         />
+    <item
+        android:id="@+id/visible_languages_sources"
+        android:icon="@drawable/ic_baseline_languages_24"
+        android:title="Visible sources languages"
+        app:showAsAction="ifRoom|collapseActionView"
+        />
 </menu>

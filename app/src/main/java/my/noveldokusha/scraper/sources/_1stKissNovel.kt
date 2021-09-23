@@ -5,12 +5,13 @@ import my.noveldokusha.ChapterMetadata
 import my.noveldokusha.scraper.*
 import org.jsoup.nodes.Document
 
-class _1stKissNovel : scrubber.source_interface.catalog
+class _1stKissNovel : source_interface.catalog
 {
 	override val catalogUrl = "https://1stkissnovel.love/novel/?m_orderby=alphabet"
 	override val name = "1stKissNovel"
 	override val baseUrl = "https://1stkissnovel.love/"
-	
+	override val language = "English"
+
 	override suspend fun getChapterList(doc: Document): List<ChapterMetadata>
 	{
 		val url = "https://1stkissnovel.love/wp-admin/admin-ajax.php"

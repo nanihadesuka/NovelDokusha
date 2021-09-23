@@ -6,11 +6,12 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import my.noveldokusha.scraper.Response
+import my.noveldokusha.scraper.database_interface
 import my.noveldokusha.scraper.scrubber
 import my.noveldokusha.ui.BaseViewModel
 import my.noveldokusha.uiViews.Checkbox3StatesView
 
-class DatabaseSearchModel(val database: scrubber.database_interface) : BaseViewModel()
+class DatabaseSearchModel(val database: database_interface) : BaseViewModel()
 {
 	init
 	{

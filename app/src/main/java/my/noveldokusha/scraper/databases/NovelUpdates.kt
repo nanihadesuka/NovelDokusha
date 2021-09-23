@@ -9,7 +9,7 @@ import org.jsoup.nodes.Document
  * Novel main page example:
  * https://www.novelupdates.com/series/mushoku-tensei/
  */
-class NovelUpdates : scrubber.database_interface
+class NovelUpdates : database_interface
 {
 	override val id = "novel_updates"
 	override val name = "Novel Updates"
@@ -78,7 +78,7 @@ class NovelUpdates : scrubber.database_interface
 		}
 	}
 	
-	override fun getBookData(doc: Document): scrubber.database_interface.BookData
+	override fun getBookData(doc: Document): database_interface.BookData
 	{
 		val relatedBooks = doc
 			.select("h5")
@@ -99,9 +99,9 @@ class NovelUpdates : scrubber.database_interface
 		val authors = doc
 			.selectFirst("#showauthors")!!
 			.select("a[href]")
-			.map { scrubber.database_interface.BookAuthor(name = it.text(), url = it.attr("href")) }
+			.map { database_interface.BookAuthor(name = it.text(), url = it.attr("href")) }
 		
-		return scrubber.database_interface.BookData(
+		return database_interface.BookData(
 			title = doc.selectFirst(".seriestitlenu")!!.text(),
 			description = getNodeStructuredText(doc.selectFirst("#editdescription")!!),
 			alternativeTitles = getNodeStructuredText(doc.selectFirst("#editassociated")!!).split("\n"),

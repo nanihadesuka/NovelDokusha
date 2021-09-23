@@ -9,7 +9,7 @@ import org.jsoup.nodes.Document
  * Novel main page example:
  * https://www.novelupdates.com/series/mushoku-tensei/
  */
-class BakaUpdates : scrubber.database_interface
+class BakaUpdates : database_interface
 {
 	override val id = "baka_updates"
 	override val name = "Baka-Updates"
@@ -88,7 +88,7 @@ class BakaUpdates : scrubber.database_interface
 		}
 	}
 	
-	override fun getBookData(doc: Document): scrubber.database_interface.BookData
+	override fun getBookData(doc: Document): database_interface.BookData
 	{
 		fun entry(header: String) = doc.selectFirst("div.sCat > b:containsOwn($header)")!!.parent()!!.nextElementSibling()
 		
@@ -106,10 +106,10 @@ class BakaUpdates : scrubber.database_interface
 			?.select("a[href]")!!
 			.map {
 				if (it.attr("href").startsWith("https://www.mangaupdates.com/authors.html"))
-					return@map scrubber.database_interface.BookAuthor(name = it.text(), url = it.attr("href"))
+					return@map database_interface.BookAuthor(name = it.text(), url = it.attr("href"))
 				
 				val authorName = it.previousSibling()!!.outerHtml().removeSuffix("&nbsp;[")
-				return@map scrubber.database_interface.BookAuthor(name = authorName, url = null)
+				return@map database_interface.BookAuthor(name = authorName, url = null)
 			}
 		
 		val description = entry("Description").let {
@@ -126,7 +126,7 @@ class BakaUpdates : scrubber.database_interface
 			?.selectFirst("img[src]")!!
 			.attr("src")
 		
-		return scrubber.database_interface.BookData(
+		return database_interface.BookData(
 			title = doc.selectFirst(".releasestitle.tabletitle")!!.text().removeNovelTag(),
 			description = description,
 			alternativeTitles = getNodeStructuredText(entry("Associated Names")!!).split("\n\n"),

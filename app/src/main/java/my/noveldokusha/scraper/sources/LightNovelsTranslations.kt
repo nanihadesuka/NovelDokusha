@@ -12,11 +12,12 @@ import java.util.*
  * Chapter url example:
  * https://lightnovelstranslations.com/the-sage-summoned-to-another-world/the-sage-summoned-to-another-world-volume-1-chapter-1/
  */
-class LightNovelsTranslations : scrubber.source_interface.catalog
+class LightNovelsTranslations : source_interface.catalog
 {
 	override val name = "Light Novel Translations"
 	override val baseUrl = "https://lightnovelstranslations.com/"
 	override val catalogUrl = "https://lightnovelstranslations.com/"
+	override val language = "English"
 	
 	override suspend fun getChapterTitle(doc: Document): String? = doc.selectFirst("h1.entry-title")?.text()
 	

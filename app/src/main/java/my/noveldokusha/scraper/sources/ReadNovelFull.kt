@@ -12,11 +12,12 @@ import org.jsoup.nodes.Document
  * Chapter url example:
  * https://readnovelfull.com/i-was-a-sword-when-i-reincarnated.html
  */
-class ReadNovelFull : scrubber.source_interface.catalog
+class ReadNovelFull : source_interface.catalog
 {
 	override val name = "Read Novel Full"
 	override val baseUrl = "https://readnovelfull.com"
 	override val catalogUrl = "https://readnovelfull.com/most-popular-novel"
+	override val language = "English"
 	
 	override suspend fun getChapterTitle(doc: Document): String? = null
 	

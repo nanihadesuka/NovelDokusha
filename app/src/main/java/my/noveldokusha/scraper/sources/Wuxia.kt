@@ -5,11 +5,12 @@ import my.noveldokusha.ChapterMetadata
 import my.noveldokusha.scraper.*
 import org.jsoup.nodes.Document
 
-class Wuxia : scrubber.source_interface.catalog
+class Wuxia : source_interface.catalog
 {
 	override val name = "Wuxia"
 	override val baseUrl = "https://www.wuxia.blog/"
 	override val catalogUrl = "https://www.wuxia.blog/listNovels"
+	override val language = "English"
 	
 	override suspend fun getChapterTitle(doc: Document): String? = null
 	

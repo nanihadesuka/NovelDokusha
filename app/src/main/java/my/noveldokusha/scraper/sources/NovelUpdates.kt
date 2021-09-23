@@ -11,11 +11,12 @@ import org.jsoup.nodes.Document
  * Chapter url example:
  * (redirected url) Doesn't have chapters, assume it redirects to different website
  */
-class NovelUpdates : scrubber.source_interface.catalog
+class NovelUpdates : source_interface.catalog
 {
 	override val name = "Novel Updates"
 	override val baseUrl = "https://www.novelupdates.com/"
 	override val catalogUrl = "https://www.novelupdates.com/novelslisting/?sort=7&order=1&status=1"
+	override val language = "English"
 	
 	override suspend fun getChapterTitle(doc: Document): String? = null
 	

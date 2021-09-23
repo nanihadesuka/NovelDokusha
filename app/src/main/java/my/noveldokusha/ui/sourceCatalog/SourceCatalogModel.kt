@@ -7,9 +7,10 @@ import my.noveldokusha.bookstore
 import my.noveldokusha.scraper.FetchIterator
 import my.noveldokusha.scraper.Response
 import my.noveldokusha.scraper.scrubber
+import my.noveldokusha.scraper.source_interface
 import my.noveldokusha.ui.BaseViewModel
 
-class SourceCatalogModel(val source: scrubber.source_interface.catalog) : BaseViewModel()
+class SourceCatalogModel(val source: source_interface.catalog) : BaseViewModel()
 {
 	val fetchIterator = FetchIterator(viewModelScope) { source.getCatalogList(it).transform() }
 	
