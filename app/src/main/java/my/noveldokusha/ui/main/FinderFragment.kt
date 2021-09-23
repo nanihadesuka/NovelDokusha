@@ -10,12 +10,7 @@ import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.RecyclerView
 import com.afollestad.materialdialogs.MaterialDialog
-import com.afollestad.materialdialogs.checkbox.checkBoxPrompt
-import com.afollestad.materialdialogs.checkbox.isCheckPromptChecked
 import com.afollestad.materialdialogs.list.listItemsMultiChoice
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import my.noveldokusha.*
 import my.noveldokusha.databinding.ActivityMainFragmentFinderBinding
 import my.noveldokusha.databinding.ActivityMainFragmentFinderListviewItemHeaderBinding
@@ -92,11 +87,11 @@ class FinderFragment : Fragment()
             val visibles = scrubber.sourcesLanguages.toList().withIndex().filter { it.value in enabled }.map { it.index }.toIntArray()
 
             MaterialDialog(requireContext()).show {
-                title(R.string.visible_languages)
+                title(R.string.sources_languages)
                 listItemsMultiChoice(items = langs, initialSelection = visibles) { _, _, items ->
                     App.instance.appSharedPreferences().SOURCES_LANGUAGES = items.map { it.toString() }.toSet()
                 }
-                positiveButton(text = "Ok")
+                positiveButton(R.string.save)
             }
             true
         }
