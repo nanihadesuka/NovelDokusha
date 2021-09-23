@@ -8,83 +8,89 @@ import org.jsoup.nodes.TextNode
 
 object scrubber
 {
-	val databasesList = setOf<database_interface>(
-		NovelUpdates(),
-		BakaUpdates()
-	)
+    val databasesList = setOf<database_interface>(
+        NovelUpdates(),
+        BakaUpdates()
+    )
 
-	val sourcesList = setOf<source_interface>(
-		LightNovelsTranslations(),
-		ReadLightNovel(),
-		ReadNovelFull(),
-		my.noveldokusha.scraper.sources.NovelUpdates(),
-		Reddit(),
-		AT(),
-		Wuxia(),
-		BestLightNovel(),
-		_1stKissNovel(),
-		Sousetsuka()
-	)
+    val sourcesList = setOf<source_interface>(
+        LightNovelsTranslations(),
+        ReadLightNovel(),
+        ReadNovelFull(),
+        my.noveldokusha.scraper.sources.NovelUpdates(),
+        Reddit(),
+        AT(),
+        Wuxia(),
+        BestLightNovel(),
+        _1stKissNovel(),
+        Sousetsuka()
+    )
 
-	val sourcesListCatalog = sourcesList.filterIsInstance<source_interface.catalog>().toSet()
-	val sourcesLanguages = sourcesList.filterIsInstance<source_interface.catalog>().map { it.language }.toSortedSet()
+    val sourcesListCatalog = sourcesList.filterIsInstance<source_interface.catalog>().toSet()
+    val sourcesLanguages = sourcesList.filterIsInstance<source_interface.catalog>().map { it.language }.toSortedSet()
 
-	fun getCompatibleSource(url: String): source_interface? = sourcesList.find { url.startsWith(it.baseUrl) }
-	fun getCompatibleSourceCatalog(url: String): source_interface.catalog? = sourcesListCatalog.find { url.startsWith(it.baseUrl) }
-	fun getCompatibleDatabase(url: String): database_interface? = databasesList.find { url.startsWith(it.baseUrl) }
+    private fun String.isCompatibleWithBaseUrl(baseUrl: String): Boolean
+    {
+        val normalizedBaseUrl = if (baseUrl.endsWith("/")) baseUrl else "$baseUrl/"
+        return startsWith(normalizedBaseUrl)
+    }
 
-	fun getNodeStructuredText(node: Node): String
-	{
-		val children = node.childNodes()
-		if (children.isEmpty())
-			return ""
+    fun getCompatibleSource(url: String): source_interface? = sourcesList.find { url.isCompatibleWithBaseUrl(it.baseUrl) }
+    fun getCompatibleSourceCatalog(url: String): source_interface.catalog? = sourcesListCatalog.find { url.isCompatibleWithBaseUrl(it.baseUrl) }
+    fun getCompatibleDatabase(url: String): database_interface? = databasesList.find { url.isCompatibleWithBaseUrl(it.baseUrl)}
 
-		return children.joinToString("") { child ->
-			when
-			{
-				child.nodeName() == "p" -> getPTraverse(child)
-				child.nodeName() == "br" -> "\n"
-				child.nodeName() == "hr" -> "\n\n"
-				child is TextNode -> child.text().trim()
-				else -> getNodeTextTraverse(child)
-			}
-		}
-	}
+    fun getNodeStructuredText(node: Node): String
+    {
+        val children = node.childNodes()
+        if (children.isEmpty())
+            return ""
 
-	private fun getPTraverse(node: Node): String
-	{
-		fun innerTraverse(node: Node): String = node.childNodes().joinToString("") { child ->
-			when
-			{
-				child.nodeName() == "br" -> "\n"
-				child is TextNode -> child.text()
-				else -> innerTraverse(child)
-			}
-		}
+        return children.joinToString("") { child ->
+            when
+            {
+                child.nodeName() == "p" -> getPTraverse(child)
+                child.nodeName() == "br" -> "\n"
+                child.nodeName() == "hr" -> "\n\n"
+                child is TextNode -> child.text().trim()
+                else -> getNodeTextTraverse(child)
+            }
+        }
+    }
 
-		val paragraph = innerTraverse(node).trim()
-		return if (paragraph.isEmpty()) "" else innerTraverse(node).trim() + "\n\n"
-	}
+    private fun getPTraverse(node: Node): String
+    {
+        fun innerTraverse(node: Node): String = node.childNodes().joinToString("") { child ->
+            when
+            {
+                child.nodeName() == "br" -> "\n"
+                child is TextNode -> child.text()
+                else -> innerTraverse(child)
+            }
+        }
 
-	private fun getNodeTextTraverse(node: Node): String
-	{
-		val children = node.childNodes()
-		if (children.isEmpty())
-			return ""
+        val paragraph = innerTraverse(node).trim()
+        return if (paragraph.isEmpty()) "" else innerTraverse(node).trim() + "\n\n"
+    }
 
-		return children.joinToString("") { child ->
-			when
-			{
-				child.nodeName() == "p" -> getPTraverse(child)
-				child.nodeName() == "br" -> "\n"
-				child.nodeName() == "hr" -> "\n\n"
-				child is TextNode ->
-				{
-					val text = child.text().trim()
-					if (text.isEmpty()) "" else text + "\n\n"
-				}
-				else -> getNodeTextTraverse(child)
-			}
-		}
-	}
+    private fun getNodeTextTraverse(node: Node): String
+    {
+        val children = node.childNodes()
+        if (children.isEmpty())
+            return ""
+
+        return children.joinToString("") { child ->
+            when
+            {
+                child.nodeName() == "p" -> getPTraverse(child)
+                child.nodeName() == "br" -> "\n"
+                child.nodeName() == "hr" -> "\n\n"
+                child is TextNode ->
+                {
+                    val text = child.text().trim()
+                    if (text.isEmpty()) "" else text + "\n\n"
+                }
+                else -> getNodeTextTraverse(child)
+            }
+        }
+    }
 }
