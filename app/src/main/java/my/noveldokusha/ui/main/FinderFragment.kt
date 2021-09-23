@@ -91,7 +91,7 @@ class FinderFragment : Fragment()
                 listItemsMultiChoice(items = langs, initialSelection = visibles) { _, _, items ->
                     App.instance.appSharedPreferences().SOURCES_LANGUAGES = items.map { it.toString() }.toSet()
                 }
-                positiveButton(R.string.save)
+                noAutoDismiss()
             }
             true
         }
