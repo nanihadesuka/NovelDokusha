@@ -32,8 +32,9 @@ object scrubber
 
     private fun String.isCompatibleWithBaseUrl(baseUrl: String): Boolean
     {
+        val normalizedUrl = if (this.endsWith("/")) this else "$this/"
         val normalizedBaseUrl = if (baseUrl.endsWith("/")) baseUrl else "$baseUrl/"
-        return startsWith(normalizedBaseUrl)
+        return normalizedUrl.startsWith(normalizedBaseUrl)
     }
 
     fun getCompatibleSource(url: String): source_interface? = sourcesList.find { url.isCompatibleWithBaseUrl(it.baseUrl) }
