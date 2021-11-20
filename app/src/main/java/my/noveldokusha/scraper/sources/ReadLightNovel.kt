@@ -15,7 +15,7 @@ class ReadLightNovel : source_interface.catalog
 {
 	
 	override val name = "Read Light Novel"
-	override val baseUrl = "https://www.readlightnovel.me"
+	override val baseUrl = "https://www.readlightnovel.me/"
 	override val catalogUrl = "https://www.readlightnovel.me/novel-list"
 	override val language = "English"
 	

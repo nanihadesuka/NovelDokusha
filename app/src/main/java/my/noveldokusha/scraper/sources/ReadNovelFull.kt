@@ -15,7 +15,7 @@ import org.jsoup.nodes.Document
 class ReadNovelFull : source_interface.catalog
 {
 	override val name = "Read Novel Full"
-	override val baseUrl = "https://readnovelfull.com"
+	override val baseUrl = "https://readnovelfull.com/"
 	override val catalogUrl = "https://readnovelfull.com/most-popular-novel"
 	override val language = "English"
 	
@@ -36,7 +36,7 @@ class ReadNovelFull : source_interface.catalog
 			.data("novelId", id)
 			.getIO()
 			.select("a[href]")
-			.map { ChapterMetadata(title = it.text(), url = baseUrl + it.attr("href")) }
+			.map { ChapterMetadata(title = it.text(), url = baseUrl + it.attr("href").removePrefix("/")) }
 	}
 	
 	override suspend fun getCatalogList(index: Int): Response<List<BookMetadata>>
@@ -51,7 +51,7 @@ class ReadNovelFull : source_interface.catalog
 				.selectFirst(".col-novel-main.archive")!!
 				.select(".row")
 				.mapNotNull { it.selectFirst("a[href]") }
-				.map { BookMetadata(title = it.text(), url = baseUrl + it.attr("href")) }
+				.map { BookMetadata(title = it.text(), url = baseUrl + it.attr("href").removePrefix("/")) }
 				.let { Response.Success(it) }
 		}
 	}
@@ -71,7 +71,7 @@ class ReadNovelFull : source_interface.catalog
 				.selectFirst(".col-novel-main.archive")!!
 				.select(".row")
 				.mapNotNull { it.selectFirst("a[href]") }
-				.map { BookMetadata(title = it.text(), url = baseUrl + it.attr("href")) }
+				.map { BookMetadata(title = it.text(), url = baseUrl + it.attr("href").removePrefix("/")) }
 				.let { Response.Success(it) }
 		}
 	}
