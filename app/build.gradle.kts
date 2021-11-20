@@ -22,10 +22,6 @@ android {
         jvmTarget = JavaVersion.VERSION_1_8.toString()
     }
 
-    composeOptions {
-        kotlinCompilerExtensionVersion = "1.0.1"
-    }
-
     defaultConfig {
         applicationId = "my.noveldokusha"
         minSdk = 26
@@ -76,7 +72,6 @@ android {
 
     buildFeatures {
         viewBinding = true
-        compose = true
     }
 }
 
@@ -128,27 +123,9 @@ dependencies {
 
     implementation("com.l4digital.fastscroll:fastscroll:2.0.1")
 
-    // Jetpack compose
 
-    implementation("androidx.compose.ui:ui:1.0.1")
-    // Tooling support (Previews, etc.)
-    implementation("androidx.compose.ui:ui-tooling:1.0.1")
-    // Foundation (Border, Background, Box, Image, Scroll, shapes, animations, etc.)
-    implementation("androidx.compose.foundation:foundation:1.0.1")
-    // Material Design
-    implementation("androidx.compose.material:material:1.0.1")
-    // Material design icons
-    implementation("androidx.compose.material:material-icons-core:1.0.1")
-    implementation("androidx.compose.material:material-icons-extended:1.0.1")
-    // Integration with activities
-    implementation("androidx.activity:activity-compose:1.3.1")
-    // Integration with ViewModels
-    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:1.0.0-alpha07")
-    // Integration with observables
-    implementation("androidx.compose.runtime:runtime-livedata:1.0.1")
-    implementation("androidx.compose.runtime:runtime-rxjava2:1.0.1")
-    // UI Tests
-    androidTestImplementation("androidx.compose.ui:ui-test-junit4:1.0.1")
-
-    implementation("com.google.android.material:compose-theme-adapter:1.0.1")
+    // Test
+    testImplementation("junit:junit:4.12")
+    androidTestImplementation("androidx.test.ext:junit:1.1.3")
+    androidTestImplementation("androidx.test.espresso:espresso-core:3.4.0")
 }
