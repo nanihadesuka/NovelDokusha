@@ -1,5 +1,6 @@
 package my.noveldokusha.uiUtils
 
+import android.app.ActivityManager
 import android.content.Context
 import android.content.res.Configuration
 import android.graphics.Color
@@ -123,4 +124,11 @@ inline fun <reified VM : ViewModel> ComponentActivity.viewModelsSavedStateFactor
 	}
 	
 	return ViewModelLazy(VM::class, { viewModelStore }, factoryPromise)
+}
+
+fun Context.isServiceRunning(serviceClass: Class<*>): Boolean {
+	val className = serviceClass.name
+	val manager = getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+	return manager.getRunningServices(Integer.MAX_VALUE)
+		.any { className == it.service.className }
 }

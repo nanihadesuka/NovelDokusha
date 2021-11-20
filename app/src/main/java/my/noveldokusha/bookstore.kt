@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
 import my.noveldokusha.scraper.Response
 import my.noveldokusha.scraper.downloadChapter
+import my.noveldokusha.uiUtils.LiveEvent
 import java.io.InputStream
 
 data class BookMetadata(val title: String, val url: String)
@@ -222,7 +223,9 @@ object bookstore
 	val bookLibrary by lazy { appDB.bookLibrary }
 	val bookChapter by lazy { appDB.bookChapter }
 	val bookChapterBody by lazy { appDB.bookChapterBody }
-	
+
+	val eventDataRestored = LiveEvent<Unit>()
+
 	private fun createRoom(ctx: Context, name: String) = Room
 		.databaseBuilder(ctx, LibraryDatabase::class.java, name)
 		.addMigrations(*migrations())

@@ -5,10 +5,13 @@ import android.app.Activity.RESULT_OK
 import android.content.Intent
 import android.os.Bundle
 import android.text.format.Formatter
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.viewModelScope
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.checkbox.checkBoxPrompt
 import com.afollestad.materialdialogs.checkbox.isCheckPromptChecked
@@ -16,16 +19,13 @@ import com.google.android.material.radiobutton.MaterialRadioButton
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import my.noveldokusha.*
-import my.noveldokusha.backup.backupData
-import my.noveldokusha.backup.restoreData
+import my.noveldokusha.backup.BackupDataService
+import my.noveldokusha.backup.RestoreDataService
 import my.noveldokusha.databinding.ActivityMainFragmentSettingsBinding
 import my.noveldokusha.ui.BaseFragment
 import my.noveldokusha.uiUtils.stringRes
-import okhttp3.internal.closeQuietly
 import java.text.SimpleDateFormat
 import java.util.*
-import java.util.zip.ZipEntry
-import java.util.zip.ZipOutputStream
 
 class SettingsFragment : BaseFragment()
 {
@@ -74,6 +74,10 @@ class SettingsFragment : BaseFragment()
 
     fun settingDatabaseClean()
     {
+        bookstore.eventDataRestored.observe(viewLifecycleOwner){
+            lifecycleScope.launch(Dispatchers.IO) { viewModel.updateDatabaseSize() }
+        }
+
         viewBind.databaseButtonClean.setOnClickListener {
             viewModel.cleanDatabase()
         }
@@ -110,7 +114,11 @@ class SettingsFragment : BaseFragment()
                         activityRequest(intent) { resultCode, data ->
                             if (resultCode != RESULT_OK) return@activityRequest
                             val uri = data?.data ?: return@activityRequest
-                            backupData(uri, backupImages = checkImagesFolder.isCheckPromptChecked())
+                            BackupDataService.start(
+                                ctx =  requireContext(),
+                                uri = uri,
+                                backupImages = checkImagesFolder.isCheckPromptChecked()
+                            )
                         }
                     }
                 }
@@ -133,7 +141,10 @@ class SettingsFragment : BaseFragment()
                 activityRequest(intent) { resultCode, data ->
                     if (resultCode != RESULT_OK) return@activityRequest
                     val uri = data?.data ?: return@activityRequest
-                    restoreData(uri)
+                    RestoreDataService.start(
+                        ctx = requireContext(),
+                        uri = uri
+                    )
                 }
             }
         }
@@ -141,6 +152,11 @@ class SettingsFragment : BaseFragment()
 
     fun settingImagesFolderClean()
     {
+        bookstore.eventDataRestored.observe(viewLifecycleOwner){
+            Log.e("ASDASDASDASDA",">>>>>>>>>")
+            lifecycleScope.launch(Dispatchers.IO) { viewModel.updateImagesFolderSize() }
+        }
+
         viewModel.imagesFolderSizeBytes.observe(viewLifecycleOwner) {
             viewBind.totalBooksImagesSize.text = Formatter.formatFileSize(context, it)
         }

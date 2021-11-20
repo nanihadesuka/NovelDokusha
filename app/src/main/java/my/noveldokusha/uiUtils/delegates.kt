@@ -1,6 +1,7 @@
 package my.noveldokusha.uiUtils
 
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import kotlin.properties.Delegates
@@ -16,6 +17,12 @@ class Extra_String
 {
 	operator fun getValue(thisRef: Intent, property: KProperty<*>) = thisRef.extras!!.getString(property.name)!!
 	operator fun setValue(thisRef: Intent, property: KProperty<*>, value: String) = thisRef.putExtra(property.name, value)
+}
+
+class Extra_Uri
+{
+	operator fun getValue(thisRef: Intent, property: KProperty<*>) = thisRef.extras!!.get(property.name) as Uri
+	operator fun setValue(thisRef: Intent, property: KProperty<*>, value: Uri) = thisRef.putExtra(property.name, value)
 }
 
 class Extra_Int
