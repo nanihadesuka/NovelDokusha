@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.app.NotificationCompat
 import androidx.core.view.updatePadding
 import androidx.lifecycle.asLiveData
 import androidx.recyclerview.widget.DefaultItemAnimator
@@ -20,6 +19,7 @@ import kotlinx.coroutines.launch
 import my.noveldokusha.*
 import my.noveldokusha.databinding.ActivityMainFragmentLibraryPageBinding
 import my.noveldokusha.databinding.ActivityMainFragmentLibraryPageGridviewItemBinding
+import my.noveldokusha.services.LibraryUpdateService
 import my.noveldokusha.ui.BaseFragment
 import my.noveldokusha.ui.chaptersList.ChaptersActivity
 import my.noveldokusha.uiAdapters.MyListAdapter
@@ -62,42 +62,17 @@ class LibraryPageFragment : BaseFragment
 		viewBind.gridView.updatePadding(bottom = if (isOnPortraitMode()) spToPx(300f) else spToPx(50f))
 		viewBind.gridView.layoutManager = viewLayout.gridView
 		viewBind.gridView.itemAnimator = DefaultItemAnimator()
-		viewBind.swipeRefreshLayout.setOnRefreshListener { viewModel.update() }
+		viewBind.swipeRefreshLayout.setOnRefreshListener {
+			LibraryUpdateService.start(requireActivity(), viewModel.showCompleted)
+			viewBind.swipeRefreshLayout.isRefreshing = false
+		}
 		
 		viewModel.booksWithContextFlow.asLiveData().observe(viewLifecycleOwner) {
 			viewAdapter.gridView.list = it
 		}
 		
-		viewModel.refreshing.observe(viewLifecycleOwner) { viewBind.swipeRefreshLayout.isRefreshing = it }
-		viewModel.updateNotice.observe(viewLifecycleOwner) {
-			if (it.hasUpdates.isNotEmpty()) notifyUpdated(it.hasUpdates.joinToString("\n"))
-			if (it.hasFailed.isNotEmpty()) notifyUpdatedFails(it.hasFailed.joinToString("\n"))
-			if (it.hasUpdates.isEmpty()) toast("No updates found")
-		}
-		
 		return viewBind.root
 	}
-	
-	private fun notifyUpdated(text: String)
-	{
-		notify("New chapters found for:", text)
-	}
-	
-	private fun notifyUpdatedFails(text: String)
-	{
-		notify("Update error", text)
-	}
-	
-	private fun notify(title: String, text: String, channel_ID: String = title)
-	{
-		
-		App.showNotification(channel_ID, channel_ID) {
-			this.title = title
-			this.text = text
-			setStyle(NotificationCompat.BigTextStyle().bigText(text))
-		}
-	}
-	
 }
 
 private class NovelItemAdapter(private val ctx: Context) : MyListAdapter<BookWithContext, NovelItemAdapter.ViewHolder>()

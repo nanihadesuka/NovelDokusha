@@ -40,11 +40,15 @@
 		<activity android:name=".ui.webView.WebViewActivity" />
 
 		<service
-			android:name=".backup.BackupDataService"
+			android:name=".services.BackupDataService"
 			android:exported="false"
 			/>
 		<service
-			android:name=".backup.RestoreDataService"
+			android:name=".services.RestoreDataService"
+			android:exported="false"
+			/>
+		<service
+			android:name=".services.LibraryUpdateService"
 			android:exported="false"
 			/>
 	</application>

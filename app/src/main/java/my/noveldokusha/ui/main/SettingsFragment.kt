@@ -5,13 +5,11 @@ import android.app.Activity.RESULT_OK
 import android.content.Intent
 import android.os.Bundle
 import android.text.format.Formatter
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.viewModelScope
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.checkbox.checkBoxPrompt
 import com.afollestad.materialdialogs.checkbox.isCheckPromptChecked
@@ -19,8 +17,8 @@ import com.google.android.material.radiobutton.MaterialRadioButton
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import my.noveldokusha.*
-import my.noveldokusha.backup.BackupDataService
-import my.noveldokusha.backup.RestoreDataService
+import my.noveldokusha.services.BackupDataService
+import my.noveldokusha.services.RestoreDataService
 import my.noveldokusha.databinding.ActivityMainFragmentSettingsBinding
 import my.noveldokusha.ui.BaseFragment
 import my.noveldokusha.uiUtils.stringRes
