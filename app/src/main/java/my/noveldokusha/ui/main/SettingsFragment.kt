@@ -153,7 +153,6 @@ class SettingsFragment : BaseFragment()
     fun settingImagesFolderClean()
     {
         bookstore.eventDataRestored.observe(viewLifecycleOwner){
-            Log.e("ASDASDASDASDA",">>>>>>>>>")
             lifecycleScope.launch(Dispatchers.IO) { viewModel.updateImagesFolderSize() }
         }
 
