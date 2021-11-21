@@ -26,9 +26,14 @@ class ChaptersModel(val bookMetadata: BookMetadata) : BaseViewModel()
 				bookstore.bookLibrary.insert(Book(title = bookMetadata.title, url = bookMetadata.url))
 		}
 	}
-	
-	val chaptersWithContextLiveData by lazy {
-		bookstore.bookChapter.getChaptersWithContexFlow(bookMetadata.url)
+
+	val preferences = App.instance.appSharedPreferences()
+	val onFetching = MutableLiveData<Boolean>()
+	val onError = MutableLiveData<String>()
+	val onErrorVisibility = MutableLiveData<Int>()
+	val selectedChaptersUrl = mutableSetOf<String>()
+	val chaptersFilterFlow = MutableStateFlow("")
+	val chaptersWithContextLiveData = bookstore.bookChapter.getChaptersWithContexFlow(bookMetadata.url)
 			.map {
 				// Try removing repetitive title text from chapters
 				if (it.size <= 1) return@map it
@@ -64,15 +69,7 @@ class ChaptersModel(val bookMetadata: BookMetadata) : BaseViewModel()
 				else chapters.filter { it.chapter.title.contains(searchText, ignoreCase = true) }
 			}
 			.flowOn(Dispatchers.Default).asLiveData()
-	}
-	
-	val preferences = App.instance.appSharedPreferences()
-	val onFetching = MutableLiveData<Boolean>()
-	val onError = MutableLiveData<String>()
-	val onErrorVisibility = MutableLiveData<Int>()
-	val selectedChaptersUrl = mutableSetOf<String>()
-	val chaptersFilterFlow = MutableStateFlow("")
-	
+
 	private var loadChaptersJob: Job? = null
 	fun updateChaptersList()
 	{
