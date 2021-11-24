@@ -3,9 +3,9 @@ package my.noveldokusha.scraper
 import android.net.Uri
 import androidx.lifecycle.MutableLiveData
 import kotlinx.coroutines.*
-import my.noveldokusha.Chapter
-import my.noveldokusha.cookiesData
-import my.noveldokusha.headersData
+import my.noveldokusha.data.cookiesData
+import my.noveldokusha.data.database.tables.Chapter
+import my.noveldokusha.data.headersData
 import net.dankito.readability4j.Readability4J
 import org.jsoup.Connection
 import org.jsoup.Jsoup

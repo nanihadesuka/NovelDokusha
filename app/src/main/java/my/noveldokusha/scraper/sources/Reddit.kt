@@ -1,7 +1,7 @@
 package my.noveldokusha.scraper.sources
 
 import my.noveldokusha.scraper.scrubber
-import my.noveldokusha.scraper.source_interface
+import my.noveldokusha.scraper.SourceInterface
 import my.noveldokusha.scraper.toUrlBuilder
 import org.jsoup.nodes.Document
 
@@ -11,7 +11,7 @@ import org.jsoup.nodes.Document
  * Chapter url example: (redirected)
  * https://www.reddit.com/r/mushokutensei/comments/g50ry7/translation_old_dragons_tale_chapter_1_dragon_and/
  */
-class Reddit : source_interface.base
+class Reddit : SourceInterface.base
 {
 	override val name = "Reddit"
 	override val baseUrl = "https://www.reddit.com/"

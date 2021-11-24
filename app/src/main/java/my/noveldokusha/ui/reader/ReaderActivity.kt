@@ -9,7 +9,6 @@ import android.view.*
 import android.widget.AbsListView
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
-import androidx.activity.viewModels
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.doOnNextLayout
 import androidx.core.view.isVisible
@@ -20,6 +19,7 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import kotlinx.coroutines.*
 import my.noveldokusha.*
+import my.noveldokusha.data.database.bookstore
 import my.noveldokusha.databinding.*
 import my.noveldokusha.scraper.Response
 import my.noveldokusha.ui.BaseActivity

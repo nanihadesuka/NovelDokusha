@@ -1,18 +1,16 @@
 package my.noveldokusha.scraper.sources
 
-import android.util.Log
 import com.google.gson.JsonParser
 import com.google.gson.stream.JsonReader
-import my.noveldokusha.BookMetadata
-import my.noveldokusha.ChapterMetadata
+import my.noveldokusha.data.BookMetadata
+import my.noveldokusha.data.ChapterMetadata
 import my.noveldokusha.scraper.*
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
-import org.jsoup.parser.Parser
 import java.io.StringReader
 import java.net.URL
 
-class Saikai : source_interface.catalog
+class Saikai : SourceInterface.catalog
 {
     override val name = "Saikai"
     override val baseUrl = "https://saikaiscan.com.br/"

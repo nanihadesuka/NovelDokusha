@@ -6,7 +6,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.updatePadding
-import androidx.lifecycle.asLiveData
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -17,6 +16,10 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import my.noveldokusha.*
+import my.noveldokusha.data.database.tables.Book
+import my.noveldokusha.data.BookMetadata
+import my.noveldokusha.data.BookWithContext
+import my.noveldokusha.data.database.bookstore
 import my.noveldokusha.databinding.ActivityMainFragmentLibraryPageBinding
 import my.noveldokusha.databinding.ActivityMainFragmentLibraryPageGridviewItemBinding
 import my.noveldokusha.services.LibraryUpdateService

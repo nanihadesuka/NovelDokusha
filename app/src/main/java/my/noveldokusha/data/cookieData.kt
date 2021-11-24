@@ -1,4 +1,4 @@
-package my.noveldokusha
+package my.noveldokusha.data
 
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
@@ -9,6 +9,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
+import my.noveldokusha.App
 import my.noveldokusha.scraper.toUrl
 import java.io.File
 import java.util.concurrent.ConcurrentHashMap

@@ -1,10 +1,11 @@
-package my.noveldokusha
+package my.noveldokusha.data
 
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import my.noveldokusha.App
 import my.noveldokusha.scraper.Response
 import java.io.File
 

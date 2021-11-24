@@ -1,7 +1,7 @@
 package my.noveldokusha.scraper.sources
 
-import my.noveldokusha.BookMetadata
-import my.noveldokusha.ChapterMetadata
+import my.noveldokusha.data.BookMetadata
+import my.noveldokusha.data.ChapterMetadata
 import my.noveldokusha.scraper.*
 import org.jsoup.nodes.Document
 
@@ -11,7 +11,7 @@ import org.jsoup.nodes.Document
  * Chapter url example:
  * https://www.readlightnovel.org/goat-of-all-ghouls-1/chapter-1
  */
-class ReadLightNovel : source_interface.catalog
+class ReadLightNovel : SourceInterface.catalog
 {
 	
 	override val name = "Read Light Novel"

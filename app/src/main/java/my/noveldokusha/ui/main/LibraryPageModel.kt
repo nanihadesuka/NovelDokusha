@@ -2,7 +2,7 @@ package my.noveldokusha.ui.main
 
 import androidx.lifecycle.asLiveData
 import kotlinx.coroutines.flow.map
-import my.noveldokusha.*
+import my.noveldokusha.data.database.bookstore
 import my.noveldokusha.ui.BaseViewModel
 
 class LibraryPageModel(val showCompleted: Boolean) : BaseViewModel()

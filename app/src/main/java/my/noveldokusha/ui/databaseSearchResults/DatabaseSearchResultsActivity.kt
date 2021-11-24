@@ -7,7 +7,7 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.*
-import my.noveldokusha.BookMetadata
+import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.databinding.ActivityDatabaseSearchResultsBinding
 import my.noveldokusha.databinding.BookListItemBinding
 import my.noveldokusha.scraper.scrubber

@@ -8,11 +8,13 @@ import android.os.Bundle
 import android.view.*
 import androidx.appcompat.widget.SearchView
 import androidx.core.view.isVisible
-import androidx.lifecycle.asLiveData
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.*
 import kotlinx.coroutines.*
 import my.noveldokusha.*
+import my.noveldokusha.data.BookMetadata
+import my.noveldokusha.data.ChapterWithContext
+import my.noveldokusha.data.database.bookstore
 import my.noveldokusha.databinding.ActivityChaptersBinding
 import my.noveldokusha.databinding.ActivityChaptersListHeaderBinding
 import my.noveldokusha.databinding.ActivityChaptersListItemBinding
@@ -287,7 +289,7 @@ private class ChaptersHeaderAdapter(
 	
 	override fun onBindViewHolder(binder: ViewHolder, position: Int): Unit = run { }
 	
-	private inner class ViewHolder(val viewBind: ActivityChaptersListHeaderBinding) : RecyclerView.ViewHolder(viewBind.root)
+	inner class ViewHolder(val viewBind: ActivityChaptersListHeaderBinding) : RecyclerView.ViewHolder(viewBind.root)
 	{
 		init
 		{

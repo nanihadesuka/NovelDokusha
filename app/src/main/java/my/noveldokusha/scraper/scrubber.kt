@@ -8,12 +8,12 @@ import org.jsoup.nodes.TextNode
 
 object scrubber
 {
-    val databasesList = setOf<database_interface>(
+    val databasesList = setOf<DatabaseInterface>(
         NovelUpdates(),
         BakaUpdates()
     )
 
-    val sourcesList = setOf<source_interface>(
+    val sourcesList = setOf<SourceInterface>(
         LightNovelsTranslations(),
         ReadLightNovel(),
         ReadNovelFull(),
@@ -27,8 +27,8 @@ object scrubber
         Saikai(),
     )
 
-    val sourcesListCatalog = sourcesList.filterIsInstance<source_interface.catalog>().toSet()
-    val sourcesLanguages = sourcesList.filterIsInstance<source_interface.catalog>().map { it.language }.toSortedSet()
+    val sourcesListCatalog = sourcesList.filterIsInstance<SourceInterface.catalog>().toSet()
+    val sourcesLanguages = sourcesList.filterIsInstance<SourceInterface.catalog>().map { it.language }.toSortedSet()
 
     private fun String.isCompatibleWithBaseUrl(baseUrl: String): Boolean
     {
@@ -37,9 +37,9 @@ object scrubber
         return normalizedUrl.startsWith(normalizedBaseUrl)
     }
 
-    fun getCompatibleSource(url: String): source_interface? = sourcesList.find { url.isCompatibleWithBaseUrl(it.baseUrl) }
-    fun getCompatibleSourceCatalog(url: String): source_interface.catalog? = sourcesListCatalog.find { url.isCompatibleWithBaseUrl(it.baseUrl) }
-    fun getCompatibleDatabase(url: String): database_interface? = databasesList.find { url.isCompatibleWithBaseUrl(it.baseUrl)}
+    fun getCompatibleSource(url: String): SourceInterface? = sourcesList.find { url.isCompatibleWithBaseUrl(it.baseUrl) }
+    fun getCompatibleSourceCatalog(url: String): SourceInterface.catalog? = sourcesListCatalog.find { url.isCompatibleWithBaseUrl(it.baseUrl) }
+    fun getCompatibleDatabase(url: String): DatabaseInterface? = databasesList.find { url.isCompatibleWithBaseUrl(it.baseUrl)}
 
     fun getNodeStructuredText(node: Node): String
     {

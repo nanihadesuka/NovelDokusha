@@ -1,10 +1,10 @@
 package my.noveldokusha.scraper.sources
 
 import my.noveldokusha.scraper.scrubber
-import my.noveldokusha.scraper.source_interface
+import my.noveldokusha.scraper.SourceInterface
 import org.jsoup.nodes.Document
 
-class Sousetsuka : source_interface.base
+class Sousetsuka : SourceInterface.base
 {
 	override val name = "Sousetsuka"
 	override val baseUrl = "https://www.sousetsuka.com/"

@@ -16,7 +16,7 @@ import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
-import my.noveldokusha.BookMetadata
+import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.R
 import my.noveldokusha.databinding.ActivityDatabaseBookInfoBinding
 import my.noveldokusha.databinding.BookListItemBinding

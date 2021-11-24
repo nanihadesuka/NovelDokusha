@@ -2,15 +2,14 @@ package my.noveldokusha.ui.sourceCatalog
 
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
-import my.noveldokusha.BookMetadata
-import my.noveldokusha.bookstore
+import my.noveldokusha.data.BookMetadata
+import my.noveldokusha.data.database.bookstore
 import my.noveldokusha.scraper.FetchIterator
 import my.noveldokusha.scraper.Response
-import my.noveldokusha.scraper.scrubber
-import my.noveldokusha.scraper.source_interface
+import my.noveldokusha.scraper.SourceInterface
 import my.noveldokusha.ui.BaseViewModel
 
-class SourceCatalogModel(val source: source_interface.catalog) : BaseViewModel()
+class SourceCatalogModel(val source: SourceInterface.catalog) : BaseViewModel()
 {
 	val fetchIterator = FetchIterator(viewModelScope) { source.getCatalogList(it).transform() }
 	

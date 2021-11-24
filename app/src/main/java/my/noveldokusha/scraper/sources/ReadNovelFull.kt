@@ -1,8 +1,7 @@
 package my.noveldokusha.scraper.sources
 
-import android.util.Log
-import my.noveldokusha.BookMetadata
-import my.noveldokusha.ChapterMetadata
+import my.noveldokusha.data.BookMetadata
+import my.noveldokusha.data.ChapterMetadata
 import my.noveldokusha.scraper.*
 import org.jsoup.nodes.Document
 
@@ -12,7 +11,7 @@ import org.jsoup.nodes.Document
  * Chapter url example:
  * https://readnovelfull.com/i-was-a-sword-when-i-reincarnated.html
  */
-class ReadNovelFull : source_interface.catalog
+class ReadNovelFull : SourceInterface.catalog
 {
 	override val name = "Read Novel Full"
 	override val baseUrl = "https://readnovelfull.com/"

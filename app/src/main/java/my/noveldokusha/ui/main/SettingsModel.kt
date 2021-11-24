@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.bumptech.glide.Glide
 import kotlinx.coroutines.*
 import my.noveldokusha.*
+import my.noveldokusha.data.database.bookstore
 import my.noveldokusha.ui.BaseViewModel
 import java.io.File
 

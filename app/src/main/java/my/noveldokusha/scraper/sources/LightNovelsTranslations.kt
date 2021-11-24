@@ -1,6 +1,8 @@
 package my.noveldokusha.scraper.sources
 
 import my.noveldokusha.*
+import my.noveldokusha.data.BookMetadata
+import my.noveldokusha.data.ChapterMetadata
 import my.noveldokusha.scraper.*
 import org.jsoup.nodes.Document
 import java.net.URLDecoder
@@ -12,7 +14,7 @@ import java.util.*
  * Chapter url example:
  * https://lightnovelstranslations.com/the-sage-summoned-to-another-world/the-sage-summoned-to-another-world-volume-1-chapter-1/
  */
-class LightNovelsTranslations : source_interface.catalog
+class LightNovelsTranslations : SourceInterface.catalog
 {
 	override val name = "Light Novel Translations"
 	override val baseUrl = "https://lightnovelstranslations.com/"

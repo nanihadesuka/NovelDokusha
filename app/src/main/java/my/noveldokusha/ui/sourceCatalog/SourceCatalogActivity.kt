@@ -11,7 +11,7 @@ import androidx.recyclerview.widget.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import my.noveldokusha.R
-import my.noveldokusha.bookstore
+import my.noveldokusha.data.database.bookstore
 import my.noveldokusha.databinding.ActivitySourceCatalogBinding
 import my.noveldokusha.databinding.BookListItemBinding
 import my.noveldokusha.scraper.scrubber

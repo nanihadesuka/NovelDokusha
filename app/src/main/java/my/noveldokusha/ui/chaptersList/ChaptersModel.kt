@@ -7,6 +7,9 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import my.noveldokusha.*
+import my.noveldokusha.data.database.tables.Book
+import my.noveldokusha.data.BookMetadata
+import my.noveldokusha.data.database.bookstore
 import my.noveldokusha.scraper.Response
 import my.noveldokusha.scraper.downloadChaptersList
 import my.noveldokusha.ui.BaseViewModel

@@ -1,11 +1,11 @@
 package my.noveldokusha.scraper.sources
 
-import my.noveldokusha.BookMetadata
-import my.noveldokusha.ChapterMetadata
+import my.noveldokusha.data.BookMetadata
+import my.noveldokusha.data.ChapterMetadata
 import my.noveldokusha.scraper.*
 import org.jsoup.nodes.Document
 
-class Wuxia : source_interface.catalog
+class Wuxia : SourceInterface.catalog
 {
 	override val name = "Wuxia"
 	override val baseUrl = "https://www.wuxia.blog/"

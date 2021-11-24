@@ -10,6 +10,9 @@ import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import kotlinx.coroutines.*
 import my.noveldokusha.*
+import my.noveldokusha.data.Repository
+import my.noveldokusha.data.database.AppDatabase
+import my.noveldokusha.data.database.bookstore
 import my.noveldokusha.uiUtils.*
 import okhttp3.internal.closeQuietly
 import java.io.File
@@ -120,7 +123,13 @@ class RestoreDataService : Service()
             try
             {
                 builder.showNotification(channel_id) { text = "Loading database" }
-                val backupDatabase = inputStream.use { bookstore.DBase(bookstore.db_context, "temp_database", it) }
+                val backupDatabase = inputStream.use {
+                    Repository(
+                        db = AppDatabase.createRoomFromStream(bookstore.db_context, "temp_database", it),
+                        context = bookstore.db_context,
+                        name = "temp_database"
+                    )
+                }
                 builder.showNotification(channel_id) { text = "Adding books" }
                 bookstore.bookLibrary.insertReplace(backupDatabase.bookLibrary.getAll())
                 builder.showNotification(channel_id) { text = "Adding chapters" }

@@ -11,9 +11,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import my.noveldokusha.App
 import my.noveldokusha.R
-import my.noveldokusha.cookiesData
+import my.noveldokusha.data.cookiesData
+import my.noveldokusha.data.headersData
 import my.noveldokusha.databinding.ActivityWebviewBinding
-import my.noveldokusha.headersData
 import my.noveldokusha.scraper.toUrl
 import my.noveldokusha.ui.BaseActivity
 import my.noveldokusha.uiUtils.Extra_String

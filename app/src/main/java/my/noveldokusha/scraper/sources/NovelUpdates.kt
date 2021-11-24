@@ -1,7 +1,7 @@
 package my.noveldokusha.scraper.sources
 
-import my.noveldokusha.BookMetadata
-import my.noveldokusha.ChapterMetadata
+import my.noveldokusha.data.BookMetadata
+import my.noveldokusha.data.ChapterMetadata
 import my.noveldokusha.scraper.*
 import org.jsoup.nodes.Document
 
@@ -11,7 +11,7 @@ import org.jsoup.nodes.Document
  * Chapter url example:
  * (redirected url) Doesn't have chapters, assume it redirects to different website
  */
-class NovelUpdates : source_interface.catalog
+class NovelUpdates : SourceInterface.catalog
 {
 	override val name = "Novel Updates"
 	override val baseUrl = "https://www.novelupdates.com/"

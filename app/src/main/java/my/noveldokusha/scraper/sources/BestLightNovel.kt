@@ -1,11 +1,11 @@
 package my.noveldokusha.scraper.sources
 
-import my.noveldokusha.BookMetadata
-import my.noveldokusha.ChapterMetadata
+import my.noveldokusha.data.BookMetadata
+import my.noveldokusha.data.ChapterMetadata
 import my.noveldokusha.scraper.*
 import org.jsoup.nodes.Document
 
-class BestLightNovel : source_interface.catalog
+class BestLightNovel : SourceInterface.catalog
 {
 	override val name = "BestLightNovel"
 	override val baseUrl = "https://bestlightnovel.com/"

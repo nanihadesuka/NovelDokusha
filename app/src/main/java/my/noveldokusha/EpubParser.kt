@@ -2,6 +2,10 @@ package my.noveldokusha
 
 import android.graphics.BitmapFactory
 import kotlinx.coroutines.*
+import my.noveldokusha.data.database.tables.Book
+import my.noveldokusha.data.database.tables.Chapter
+import my.noveldokusha.data.database.tables.ChapterBody
+import my.noveldokusha.data.database.bookstore
 import org.jsoup.Jsoup
 import org.jsoup.nodes.TextNode
 import org.w3c.dom.Document

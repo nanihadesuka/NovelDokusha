@@ -8,7 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.*
-import my.noveldokusha.BookMetadata
+import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.databinding.ActivityGlobalSourceSearchBinding
 import my.noveldokusha.databinding.ActivityGlobalSourceSearchListItemBinding
 import my.noveldokusha.databinding.ActivityGlobalSourceSearchResultItemBinding

@@ -3,8 +3,8 @@ package my.noveldokusha.ui.reader
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.*
-import my.noveldokusha.Chapter
-import my.noveldokusha.bookstore
+import my.noveldokusha.data.database.tables.Chapter
+import my.noveldokusha.data.database.bookstore
 import my.noveldokusha.ui.BaseViewModel
 import java.util.*
 import java.util.concurrent.atomic.AtomicBoolean

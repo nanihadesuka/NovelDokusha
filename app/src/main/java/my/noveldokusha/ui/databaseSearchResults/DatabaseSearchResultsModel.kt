@@ -1,14 +1,13 @@
 package my.noveldokusha.ui.databaseSearchResults
 
 import androidx.lifecycle.viewModelScope
-import my.noveldokusha.BookMetadata
+import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.scraper.FetchIterator
-import my.noveldokusha.scraper.database_interface
-import my.noveldokusha.scraper.scrubber
+import my.noveldokusha.scraper.DatabaseInterface
 import my.noveldokusha.ui.BaseViewModel
 
 class DatabaseSearchResultsModel(
-	val database: database_interface,
+	val database: DatabaseInterface,
 	val input: DatabaseSearchResultsActivity.SearchMode
 ) : BaseViewModel()
 {
