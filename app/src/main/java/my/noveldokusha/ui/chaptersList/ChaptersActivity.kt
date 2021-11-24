@@ -167,10 +167,7 @@ class ChaptersActivity : BaseActivity()
 		menu!!.findItem(R.id.action_library_bookmark)!!.also { menuItem ->
 			val isInLibrary = runBlocking { bookstore.bookLibrary.existInLibrary(viewModel.bookMetadata.url) }
 			setMenuIconLibraryState(isInLibrary, menuItem)
-			bookstore.bookLibrary
-				.existInLibraryFlow(viewModel.bookMetadata.url)
-				.asLiveData()
-				.observe(this) { setMenuIconLibraryState(it, menuItem) }
+			viewModel.isInLibrary.observe(this) { setMenuIconLibraryState(it, menuItem) }
 		}
 		
 		menu.findItem(R.id.action_search_by_title)!!.also { menuItem ->

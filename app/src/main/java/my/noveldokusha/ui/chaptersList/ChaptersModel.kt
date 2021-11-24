@@ -27,6 +27,7 @@ class ChaptersModel(val bookMetadata: BookMetadata) : BaseViewModel()
 		}
 	}
 
+	val isInLibrary = bookstore.bookLibrary.existInLibraryFlow(bookMetadata.url).asLiveData()
 	val preferences = App.instance.appSharedPreferences()
 	val onFetching = MutableLiveData<Boolean>()
 	val onError = MutableLiveData<String>()

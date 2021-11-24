@@ -67,7 +67,7 @@ class LibraryPageFragment : BaseFragment
 			viewBind.swipeRefreshLayout.isRefreshing = false
 		}
 		
-		viewModel.booksWithContextFlow.asLiveData().observe(viewLifecycleOwner) {
+		viewModel.booksWithContext.observe(viewLifecycleOwner) {
 			viewAdapter.gridView.list = it
 		}
 		
