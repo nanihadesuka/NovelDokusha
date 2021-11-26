@@ -90,20 +90,20 @@ class BakaUpdates : DatabaseInterface
 	
 	override fun getBookData(doc: Document): DatabaseInterface.BookData
 	{
-		fun entry(header: String) = doc.selectFirst("div.sCat > b:containsOwn($header)")!!.parent()!!.nextElementSibling()
+		fun entry(header: String) = doc.selectFirst("div.sCat > b:containsOwn($header)")!!.parent()!!.nextElementSibling()!!
 		
 		val relatedBooks = entry("Category Recommendations")
-			?.select("a[href]")!!
+			.select("a[href]")
 			.map { BookMetadata(it.text().removeNovelTag(), "https://www.mangaupdates.com/" + it.attr("href")) }
 			.toList()
 		
 		val similarRecommended = entry("Recommendations")
-			?.select("a[href]")!!
+			.select("a[href]")
 			.map { BookMetadata(it.text().removeNovelTag(), "https://www.mangaupdates.com/" + it.attr("href")) }
 			.toList()
 		
 		val authors = entry("Author\\(s\\)")
-			?.select("a[href]")!!
+			.select("a[href]")
 			.map {
 				if (it.attr("href").startsWith("https://www.mangaupdates.com/authors.html"))
 					return@map DatabaseInterface.BookAuthor(name = it.text(), url = it.attr("href"))
@@ -113,27 +113,27 @@ class BakaUpdates : DatabaseInterface
 			}
 		
 		val description = entry("Description").let {
-			it?.selectFirst("[id=div_desc_more]") ?: it!!.selectFirst("div")
+			it.selectFirst("[id=div_desc_more]") ?: it.selectFirst("div")
 		}.also {
 			it?.select("a")?.remove()
 		}.let { getNodeStructuredText(it!!) }
 		
 		val tags = entry("Categories")
-			?.select("li > a")!!
+			.select("li > a")
 			.map { it.text() }
 		
 		val coverImageUrl = entry("Image")
-			?.selectFirst("img[src]")!!
+			.selectFirst("img[src]")!!
 			.attr("src")
 		
 		return DatabaseInterface.BookData(
 			title = doc.selectFirst(".releasestitle.tabletitle")!!.text().removeNovelTag(),
 			description = description,
-			alternativeTitles = getNodeStructuredText(entry("Associated Names")!!).split("\n\n"),
+			alternativeTitles = getNodeStructuredText(entry("Associated Names")).split("\n\n"),
 			relatedBooks = relatedBooks,
 			similarRecommended = similarRecommended,
-			bookType = entry("Type")!!.text(),
-			genres = entry("Genre")!!.select("a").dropLast(1).map { it.text() },
+			bookType = entry("Type").text(),
+			genres = entry("Genre").select("a").dropLast(1).map { it.text() },
 			tags = tags,
 			authors = authors,
 			coverImageUrl = coverImageUrl
