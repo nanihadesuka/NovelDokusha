@@ -42,7 +42,6 @@ abstract class AppDatabase : RoomDatabase()
             .createFromInputStream { inputStream }
             .build()
     }
-
 }
 
 private fun migrations() = arrayOf(

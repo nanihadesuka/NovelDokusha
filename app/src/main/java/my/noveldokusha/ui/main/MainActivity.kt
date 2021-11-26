@@ -4,10 +4,12 @@ import android.os.Bundle
 import androidx.navigation.findNavController
 import androidx.navigation.ui.NavigationUI
 import androidx.navigation.ui.setupWithNavController
+import dagger.hilt.android.AndroidEntryPoint
 import my.noveldokusha.R
 import my.noveldokusha.databinding.ActivityMainBinding
 import my.noveldokusha.ui.BaseActivity
 
+@AndroidEntryPoint
 open class MainActivity : BaseActivity()
 {
 	private val viewBind by lazy { ActivityMainBinding.inflate(layoutInflater) }
@@ -21,7 +23,7 @@ open class MainActivity : BaseActivity()
 		setSupportActionBar(viewBind.toolbar)
 		
 		viewBind.bottomNavigationView.setupWithNavController(bottomNavigationController)
-		
+
 		viewBind.bottomNavigationView.setOnNavigationItemSelectedListener { item ->
 			if (viewBind.bottomNavigationView.selectedItemId == item.itemId)
 				return@setOnNavigationItemSelectedListener false

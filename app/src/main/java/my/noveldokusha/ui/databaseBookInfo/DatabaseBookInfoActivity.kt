@@ -7,12 +7,14 @@ import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.viewModels
 import androidx.core.view.updateLayoutParams
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
@@ -30,14 +32,14 @@ import my.noveldokusha.uiUtils.*
 import java.util.*
 import kotlin.collections.ArrayList
 
+@AndroidEntryPoint
 class DatabaseBookInfoActivity : BaseActivity()
 {
-	class IntentData : Intent
+	class IntentData : Intent, DatabaseBookInfoStateBundle
 	{
-		val bookMetadata get() = BookMetadata(title = bookTitle, url = bookUrl)
-		var databaseUrlBase by Extra_String()
-		private var bookUrl by Extra_String()
-		private var bookTitle by Extra_String()
+		override var databaseUrlBase by Extra_String()
+		override var bookUrl by Extra_String()
+		override var bookTitle by Extra_String()
 		
 		constructor(intent: Intent) : super(intent)
 		constructor(ctx: Context, databaseUrlBase: String, bookMetadata: BookMetadata) : super(ctx, DatabaseBookInfoActivity::class.java)
@@ -48,13 +50,7 @@ class DatabaseBookInfoActivity : BaseActivity()
 		}
 	}
 	
-	private val extras by lazy { IntentData(intent) }
-	private val viewModel by viewModelsFactory {
-		DatabaseBookInfoModel(
-			database = scrubber.getCompatibleDatabase(extras.databaseUrlBase)!!,
-			bookMetadata = extras.bookMetadata
-		)
-	}
+	private val viewModel by viewModels<DatabaseBookInfoModel>()
 	private val viewBind by lazy { ActivityDatabaseBookInfoBinding.inflate(layoutInflater) }
 	private val viewAdapter = object
 	{

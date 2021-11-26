@@ -8,17 +8,24 @@ import android.os.IBinder
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
+import dagger.hilt.android.AndroidEntryPoint
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.*
 import my.noveldokusha.*
-import my.noveldokusha.data.database.bookstore
+import my.noveldokusha.data.Repository
 import my.noveldokusha.uiUtils.*
 import okhttp3.internal.closeQuietly
 import java.lang.Exception
 import java.util.zip.ZipEntry
 import java.util.zip.ZipOutputStream
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class BackupDataService : Service()
 {
+    @Inject
+    lateinit var repository: Repository
+
     private class IntentData : Intent
     {
         var uri by Extra_Uri()
@@ -37,7 +44,7 @@ class BackupDataService : Service()
         fun start(ctx: Context, uri: Uri, backupImages: Boolean)
         {
             if (!isRunning(ctx))
-                ContextCompat.startForegroundService(ctx, IntentData(ctx, uri, backupImages))
+                ctx.startService(IntentData(ctx, uri, backupImages))
         }
 
         fun isRunning(context: Context): Boolean =
@@ -109,7 +116,7 @@ class BackupDataService : Service()
             // Save database
             run {
                 val entry = ZipEntry("database.sqlite3")
-                val file = application.getDatabasePath(bookstore.appDB.name)
+                val file = application.getDatabasePath(repository.name)
                 entry.method = ZipOutputStream.DEFLATED
                 file.inputStream().use {
                     zip.putNextEntry(entry)

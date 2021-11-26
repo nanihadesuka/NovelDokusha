@@ -7,6 +7,7 @@ import android.content.pm.PackageManager
 import android.os.Bundle
 import android.webkit.*
 import androidx.activity.viewModels
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import my.noveldokusha.App
@@ -20,6 +21,7 @@ import my.noveldokusha.uiUtils.Extra_String
 import my.noveldokusha.uiUtils.stringRes
 import my.noveldokusha.uiUtils.toast
 
+@AndroidEntryPoint
 class WebViewActivity : BaseActivity()
 {
 	class IntentData : Intent

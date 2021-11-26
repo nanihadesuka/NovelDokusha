@@ -7,10 +7,12 @@ import android.content.res.Configuration
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import dagger.hilt.android.AndroidEntryPoint
 import my.noveldokusha.*
 import my.noveldokusha.uiUtils.stringRes
 import my.noveldokusha.uiUtils.toast
 
+@AndroidEntryPoint
 open class BaseActivity : AppCompatActivity()
 {
 	private val sharedPreferencesListener = SharedPreferences.OnSharedPreferenceChangeListener { _, key ->

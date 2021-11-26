@@ -7,18 +7,24 @@ import android.os.IBinder
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.actor
 import my.noveldokusha.*
+import my.noveldokusha.data.Repository
 import my.noveldokusha.data.database.tables.Book
-import my.noveldokusha.data.database.bookstore
 import my.noveldokusha.scraper.Response
 import my.noveldokusha.scraper.downloadChaptersList
 import my.noveldokusha.uiUtils.*
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class LibraryUpdateService : Service()
 {
+    @Inject
+    lateinit var repository: Repository
+
     private class IntentData : Intent
     {
         var completedCategory by Extra_Boolean()
@@ -74,8 +80,7 @@ class LibraryUpdateService : Service()
             {
                 count = 0
                 totalCount = value
-            }
-            else count += 1
+            } else count += 1
 
             notification.showNotification(channel_id) {
                 title = "Updating library ($count/$totalCount)"
@@ -131,7 +136,7 @@ class LibraryUpdateService : Service()
             title = R.string.updaing_library.stringRes()
         }
 
-        bookstore.bookLibrary.getAllInLibrary()
+        repository.bookLibrary.getAllInLibrary()
             .filter { it.completed == completedCategory }
             .filter { !it.url.startsWith("local://") }
             .also { launch(Dispatchers.IO) { updateActorCounter.send(Pair(it.size, true)) } }
@@ -143,13 +148,13 @@ class LibraryUpdateService : Service()
                 val updates = hasUpdates.flatten()
                 val failed = hasFailed.flatten()
 
-                if(updates.isNotEmpty()) notification.showNotification("New chapters found for"){
+                if (updates.isNotEmpty()) notification.showNotification("New chapters found for") {
                     title = "New chapters found for"
                     text = updates.joinToString("\n")
                     setStyle(NotificationCompat.BigTextStyle().bigText(text))
                 }
 
-                if(failed.isNotEmpty()) notification.showNotification("Update error"){
+                if (failed.isNotEmpty()) notification.showNotification("Update error") {
                     title = "Update error"
                     text = failed.joinToString("\n")
                     setStyle(NotificationCompat.BigTextStyle().bigText(text))
@@ -165,7 +170,7 @@ class LibraryUpdateService : Service()
         for (book in books)
         {
             val oldChaptersList = async(Dispatchers.IO) {
-                bookstore.bookChapter.chapters(book.url).map { it.url }.toSet()
+                repository.bookChapter.chapters(book.url).map { it.url }.toSet()
             }
 
             launch(Dispatchers.IO) {
@@ -177,7 +182,9 @@ class LibraryUpdateService : Service()
                 is Response.Success ->
                 {
                     oldChaptersList.join()
-                    launch(Dispatchers.IO) { bookstore.bookChapter.merge(res.data, book.url) }
+                    launch(Dispatchers.IO) {
+                        repository.bookChapter.merge(res.data, book.url)
+                    }
                     val hasNewChapters = res.data.any { it.url !in oldChaptersList.await() }
                     if (hasNewChapters)
                         hasUpdates.add(book.title)

@@ -1,19 +1,26 @@
 package my.noveldokusha.ui.main
 
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ReportFragment
 import androidx.lifecycle.viewModelScope
 import com.bumptech.glide.Glide
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
 import my.noveldokusha.*
-import my.noveldokusha.data.database.bookstore
+import my.noveldokusha.data.Repository
 import my.noveldokusha.ui.BaseViewModel
 import java.io.File
+import javax.inject.Inject
 
-class SettingsModel : BaseViewModel()
+@HiltViewModel
+class SettingsModel @Inject constructor(
+    private val repository: Repository
+) : BaseViewModel()
 {
     val themes = (globalThemeList.light + globalThemeList.dark)
     val databseSizeBytes = MutableLiveData<Long>()
     val imagesFolderSizeBytes = MutableLiveData<Long>()
+    val eventDataRestored = repository.eventDataRestored
 
     init
     {
@@ -21,22 +28,22 @@ class SettingsModel : BaseViewModel()
         viewModelScope.launch(Dispatchers.IO) { updateImagesFolderSize() }
     }
 
-    suspend fun updateDatabaseSize() = withContext(Dispatchers.IO) {
-        databseSizeBytes.postValue(bookstore.appDB.getDatabaseSizeBytes())
+    fun updateDatabaseSize() = viewModelScope.launch(Dispatchers.IO) {
+        databseSizeBytes.postValue(repository.getDatabaseSizeBytes())
     }
 
-    suspend fun updateImagesFolderSize() = withContext(Dispatchers.IO) {
+    fun updateImagesFolderSize() = viewModelScope.launch(Dispatchers.IO) {
         imagesFolderSizeBytes.postValue(getFolderSizeBytes(App.folderBooks))
     }
 
     fun cleanDatabase() = App.scope.launch(Dispatchers.IO) {
-        bookstore.settings.clearNonLibraryData()
-        bookstore.appDB.vacuum()
+        repository.settings.clearNonLibraryData()
+        repository.vacuum()
         updateDatabaseSize()
     }
 
     fun cleanImagesFolder() = App.scope.launch(Dispatchers.IO) {
-        val libraryFolders = bookstore.bookLibrary.getAllInLibrary()
+        val libraryFolders = repository.bookLibrary.getAllInLibrary()
             .mapNotNull { """^local://(.+)$""".toRegex().find(it.url)?.destructured?.component1() }
             .toSet()
 
@@ -49,7 +56,6 @@ class SettingsModel : BaseViewModel()
         Glide.get(App.instance).clearDiskCache()
     }
 }
-
 
 private suspend fun getFolderSizeBytes(file: File): Long = withContext(Dispatchers.IO) {
     when

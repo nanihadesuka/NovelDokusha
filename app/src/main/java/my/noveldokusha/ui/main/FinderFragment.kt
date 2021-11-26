@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.RecyclerView
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.list.listItemsMultiChoice
+import dagger.hilt.android.AndroidEntryPoint
 import my.noveldokusha.*
 import my.noveldokusha.databinding.ActivityMainFragmentFinderBinding
 import my.noveldokusha.databinding.ActivityMainFragmentFinderListviewItemHeaderBinding
@@ -22,6 +23,7 @@ import my.noveldokusha.ui.sourceCatalog.SourceCatalogActivity
 import my.noveldokusha.uiAdapters.MyListAdapter
 import my.noveldokusha.uiUtils.inflater
 
+@AndroidEntryPoint
 class FinderFragment : Fragment()
 {
     private val viewModel by viewModels<FinderModel>()

@@ -2,6 +2,7 @@ package my.noveldokusha.data
 
 import android.content.Context
 import androidx.room.withTransaction
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import my.noveldokusha.data.database.*
@@ -10,17 +11,20 @@ import my.noveldokusha.data.database.tables.Chapter
 import my.noveldokusha.data.database.tables.ChapterBody
 import my.noveldokusha.scraper.Response
 import my.noveldokusha.scraper.downloadChapter
+import my.noveldokusha.uiUtils.LiveEvent
+import javax.inject.Inject
 
-class Repository(
-    private val db : AppDatabase,
-    private val context : Context,
-    val name : String
-    )
+class Repository @Inject constructor(
+    private val db: AppDatabase,
+    @ApplicationContext private val context: Context,
+    val name: String
+)
 {
     val settings = Settings()
     val bookLibrary = BookLibrary()
     val bookChapter = BookChapter()
     val bookChapterBody = BookChapterBody()
+    val eventDataRestored = LiveEvent<Unit>()
 
     suspend fun getDatabaseSizeBytes() = withContext(Dispatchers.IO) { context.getDatabasePath(name).length() }
     fun close() = db.close()

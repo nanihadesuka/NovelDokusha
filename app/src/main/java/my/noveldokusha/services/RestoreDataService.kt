@@ -8,20 +8,30 @@ import android.os.IBinder
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
+import dagger.hilt.android.AndroidEntryPoint
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.*
 import my.noveldokusha.*
 import my.noveldokusha.data.Repository
 import my.noveldokusha.data.database.AppDatabase
-import my.noveldokusha.data.database.bookstore
 import my.noveldokusha.uiUtils.*
 import okhttp3.internal.closeQuietly
 import java.io.File
 import java.io.InputStream
 import java.util.zip.ZipEntry
 import java.util.zip.ZipInputStream
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class RestoreDataService : Service()
 {
+    @Inject
+    @ApplicationContext
+    lateinit var  context: Context
+
+    @Inject
+    lateinit var repository: Repository
+
     private class IntentData : Intent
     {
         var uri by Extra_Uri()
@@ -73,7 +83,7 @@ class RestoreDataService : Service()
             try
             {
                 restoreData(intent.uri)
-                bookstore.eventDataRestored.postValue(Unit)
+                repository.eventDataRestored.postValue(Unit)
             } catch (e: Exception)
             {
                 Log.e(this::class.simpleName, "Failed to start command")
@@ -125,17 +135,17 @@ class RestoreDataService : Service()
                 builder.showNotification(channel_id) { text = "Loading database" }
                 val backupDatabase = inputStream.use {
                     Repository(
-                        db = AppDatabase.createRoomFromStream(bookstore.db_context, "temp_database", it),
-                        context = bookstore.db_context,
+                        db = AppDatabase.createRoomFromStream(context, "temp_database", it),
+                        context = context,
                         name = "temp_database"
                     )
                 }
                 builder.showNotification(channel_id) { text = "Adding books" }
-                bookstore.bookLibrary.insertReplace(backupDatabase.bookLibrary.getAll())
+                repository.bookLibrary.insertReplace(backupDatabase.bookLibrary.getAll())
                 builder.showNotification(channel_id) { text = "Adding chapters" }
-                bookstore.bookChapter.insert(backupDatabase.bookChapter.getAll())
+                repository.bookChapter.insert(backupDatabase.bookChapter.getAll())
                 builder.showNotification(channel_id) { text = "Adding chapters text" }
-                bookstore.bookChapterBody.insertReplace(backupDatabase.bookChapterBody.getAll())
+                repository.bookChapterBody.insertReplace(backupDatabase.bookChapterBody.getAll())
                 toast(R.string.database_restored.stringRes())
                 backupDatabase.close()
                 backupDatabase.delete()

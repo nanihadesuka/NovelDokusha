@@ -1,19 +1,23 @@
 package my.noveldokusha.ui.main
 
+import android.content.Context
+import android.content.SharedPreferences
 import androidx.lifecycle.asLiveData
-import kotlinx.coroutines.flow.Flow
+import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.map
-import my.noveldokusha.App
 import my.noveldokusha.SOURCES_LANGUAGES_flow
 import my.noveldokusha.appSharedPreferences
 import my.noveldokusha.scraper.scrubber
 import my.noveldokusha.ui.BaseViewModel
+import javax.inject.Inject
 
-class FinderModel : BaseViewModel()
+@HiltViewModel
+class FinderModel @Inject constructor(
+    @ApplicationContext private val context: Context,
+    private val preferences : SharedPreferences
+) : BaseViewModel()
 {
-
-    private val preferences = App.instance.appSharedPreferences()
-
     val list = preferences.SOURCES_LANGUAGES_flow().map { activeLangs ->
         val catalogSources = scrubber.sourcesListCatalog.filter { it.language in activeLangs }.map { Item.Source(it.name, it.baseUrl) }
 

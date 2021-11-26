@@ -84,48 +84,6 @@ fun BaseFragment.isOnPortraitMode() = requireActivity().isOnPortraitMode()
 fun Context.spToPx(value: Float) = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, value, resources.displayMetrics).toInt()
 fun BaseFragment.spToPx(value: Float) = requireActivity().spToPx(value)
 
-@MainThread
-inline fun <reified VM : ViewModel> ComponentActivity.viewModelsFactory(noinline instance: () -> VM): Lazy<VM> =
-	ViewModelLazy(
-		VM::class,
-		{ viewModelStore },
-		{
-			object : ViewModelProvider.Factory
-			{
-				@Suppress("UNCHECKED_CAST")
-				override fun <T : ViewModel?> create(modelClass: Class<T>): T = instance() as T
-			}
-		}
-	)
-
-@MainThread
-inline fun <reified VM : ViewModel> Fragment.viewModelsFactory(noinline instance: () -> VM) =
-	createViewModelLazy(
-		VM::class,
-		{ this.viewModelStore },
-		{
-			object : ViewModelProvider.Factory
-			{
-				@Suppress("UNCHECKED_CAST")
-				override fun <T : ViewModel?> create(modelClass: Class<T>): T = instance() as T
-			}
-		}
-	)
-
-@MainThread
-inline fun <reified VM : ViewModel> ComponentActivity.viewModelsSavedStateFactory(noinline instance: (handle: SavedStateHandle) -> VM): Lazy<VM>
-{
-	val factoryPromise = {
-		object : AbstractSavedStateViewModelFactory(this, intent?.extras)
-		{
-			@Suppress("UNCHECKED_CAST")
-			override fun <T : ViewModel?> create(key: String, modelClass: Class<T>, handle: SavedStateHandle): T = instance(handle) as T
-		}
-	}
-	
-	return ViewModelLazy(VM::class, { viewModelStore }, factoryPromise)
-}
-
 fun Context.isServiceRunning(serviceClass: Class<*>): Boolean {
 	val className = serviceClass.name
 	val manager = getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager

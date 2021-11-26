@@ -65,4 +65,6 @@
 	<string name="follow_system">Follow system</string>
 	<string name="sources_languages">Sources languages</string>
 	<string name="save">Save</string>
+	<string name="search_by_author">Search by author</string>
+	<string name="search_by_genre">Search by genre</string>
 </resources>

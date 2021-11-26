@@ -6,8 +6,10 @@ import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.viewModels
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.*
+import dagger.hilt.android.AndroidEntryPoint
 import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.databinding.ActivityGlobalSourceSearchBinding
 import my.noveldokusha.databinding.ActivityGlobalSourceSearchListItemBinding
@@ -19,11 +21,12 @@ import my.noveldokusha.uiAdapters.ProgressBarHorizontalAdapter
 import my.noveldokusha.uiUtils.*
 import kotlin.properties.Delegates
 
+@AndroidEntryPoint
 class GlobalSourceSearchActivity : BaseActivity()
 {
-	class IntentData : Intent
+	class IntentData : Intent, GlobalSourceSearchStateBundle
 	{
-		var input by Extra_String()
+		override var input by Extra_String()
 		
 		constructor(intent: Intent) : super(intent)
 		constructor(ctx: Context, input: String) : super(ctx, GlobalSourceSearchActivity::class.java)
@@ -32,8 +35,7 @@ class GlobalSourceSearchActivity : BaseActivity()
 		}
 	}
 	
-	private val extras by lazy { IntentData(intent) }
-	private val viewModel by viewModelsFactory { GlobalSourceSearchModel(extras.input) }
+	private val viewModel by viewModels<GlobalSourceSearchModel>()
 	private val viewBind by lazy { ActivityGlobalSourceSearchBinding.inflate(layoutInflater) }
 	private val viewAdapter = object
 	{
@@ -52,7 +54,7 @@ class GlobalSourceSearchActivity : BaseActivity()
 		
 		supportActionBar!!.let {
 			it.title = "Global source search"
-			it.subtitle = extras.input
+			it.subtitle = viewModel.input
 			it.setDisplayHomeAsUpEnabled(true)
 		}
 	}

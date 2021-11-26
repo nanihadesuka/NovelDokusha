@@ -1,21 +1,42 @@
 package my.noveldokusha.ui.databaseBookInfo
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.asLiveData
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import my.noveldokusha.data.BookMetadata
-import my.noveldokusha.scraper.Response
-import my.noveldokusha.scraper.DatabaseInterface
-import my.noveldokusha.scraper.fetchDoc
+import my.noveldokusha.scraper.*
 import my.noveldokusha.ui.BaseViewModel
+import my.noveldokusha.uiUtils.Extra_String
+import my.noveldokusha.uiUtils.StateExtra_String
+import javax.inject.Inject
 
-class DatabaseBookInfoModel(val database: DatabaseInterface, val bookMetadata: BookMetadata) : BaseViewModel()
+interface DatabaseBookInfoStateBundle
 {
-	val bookDataLiveData by lazy {
-		flow {
-			val doc = fetchDoc(bookMetadata.url)
-			emit(Response.Success(database.getBookData(doc)))
-		}.flowOn(Dispatchers.IO).asLiveData()
-	}
+    val bookMetadata get() = BookMetadata(title = bookTitle, url = bookUrl)
+    val database get() = scrubber.getCompatibleDatabase(databaseUrlBase)!!
+
+    var databaseUrlBase: String
+    var bookUrl: String
+    var bookTitle: String
+}
+
+@HiltViewModel
+class DatabaseBookInfoModel @Inject constructor(
+    state: SavedStateHandle
+) : BaseViewModel(), DatabaseBookInfoStateBundle
+{
+    override var databaseUrlBase: String by StateExtra_String(state)
+    override var bookUrl: String by StateExtra_String(state)
+    override var bookTitle: String by StateExtra_String(state)
+
+    val bookDataLiveData = flow {
+        val res = tryConnect {
+            val doc = fetchDoc(bookMetadata.url)
+            Response.Success(database.getBookData(doc))
+        }
+        emit(res)
+    }.flowOn(Dispatchers.IO).asLiveData()
 }

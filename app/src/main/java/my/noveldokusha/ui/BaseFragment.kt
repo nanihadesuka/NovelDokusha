@@ -6,11 +6,13 @@ import android.content.pm.PackageManager
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import dagger.hilt.android.AndroidEntryPoint
 import my.noveldokusha.R
 import my.noveldokusha.appSharedPreferences
 import my.noveldokusha.uiUtils.stringRes
 import my.noveldokusha.uiUtils.toast
 
+@AndroidEntryPoint
 open class BaseFragment : Fragment()
 {
 	val sharedPreferences: SharedPreferences get() = requireContext().appSharedPreferences()

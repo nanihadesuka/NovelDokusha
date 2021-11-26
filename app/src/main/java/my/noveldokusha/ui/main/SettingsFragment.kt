@@ -14,10 +14,8 @@ import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.checkbox.checkBoxPrompt
 import com.afollestad.materialdialogs.checkbox.isCheckPromptChecked
 import com.google.android.material.radiobutton.MaterialRadioButton
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import dagger.hilt.android.AndroidEntryPoint
 import my.noveldokusha.*
-import my.noveldokusha.data.database.bookstore
 import my.noveldokusha.services.BackupDataService
 import my.noveldokusha.services.RestoreDataService
 import my.noveldokusha.databinding.ActivityMainFragmentSettingsBinding
@@ -26,6 +24,7 @@ import my.noveldokusha.uiUtils.stringRes
 import java.text.SimpleDateFormat
 import java.util.*
 
+@AndroidEntryPoint
 class SettingsFragment : BaseFragment()
 {
     private val viewModel by viewModels<SettingsModel>()
@@ -73,8 +72,8 @@ class SettingsFragment : BaseFragment()
 
     fun settingDatabaseClean()
     {
-        bookstore.eventDataRestored.observe(viewLifecycleOwner){
-            lifecycleScope.launch(Dispatchers.IO) { viewModel.updateDatabaseSize() }
+        viewModel.eventDataRestored.observe(viewLifecycleOwner){
+            viewModel.updateDatabaseSize()
         }
 
         viewBind.databaseButtonClean.setOnClickListener {
@@ -151,8 +150,8 @@ class SettingsFragment : BaseFragment()
 
     fun settingImagesFolderClean()
     {
-        bookstore.eventDataRestored.observe(viewLifecycleOwner){
-            lifecycleScope.launch(Dispatchers.IO) { viewModel.updateImagesFolderSize() }
+        viewModel.eventDataRestored.observe(viewLifecycleOwner){
+            viewModel.updateImagesFolderSize()
         }
 
         viewModel.imagesFolderSizeBytes.observe(viewLifecycleOwner) {

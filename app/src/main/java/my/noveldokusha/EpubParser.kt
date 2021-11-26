@@ -2,10 +2,10 @@ package my.noveldokusha
 
 import android.graphics.BitmapFactory
 import kotlinx.coroutines.*
+import my.noveldokusha.data.Repository
 import my.noveldokusha.data.database.tables.Book
 import my.noveldokusha.data.database.tables.Chapter
 import my.noveldokusha.data.database.tables.ChapterBody
-import my.noveldokusha.data.database.bookstore
 import org.jsoup.Jsoup
 import org.jsoup.nodes.TextNode
 import org.w3c.dom.Document
@@ -140,28 +140,28 @@ fun epubReader(inputStream: InputStream): EpubBook
 	return EpubBook(fileName = bookUrl, title = bookTitle, chapters = chapters.toList(), images = images.toList())
 }
 
-fun importEpubToDatabase(epub: EpubBook) = CoroutineScope(Dispatchers.IO).launch {
+fun importEpubToRepository(repository: Repository, epub: EpubBook) = CoroutineScope(Dispatchers.IO).launch {
 	// First clean any previous entries from the book
 	fun String.withLocalPrefix() = "local://${this}"
 	
 	val bookUrl = epub.fileName.withLocalPrefix()
-	bookstore.bookChapter.chapters(bookUrl)
+	repository.bookChapter.chapters(bookUrl)
 		.map { it.url }
-		.let { bookstore.bookChapterBody.removeRows(it) }
-	bookstore.bookChapter.removeAllFromBook(bookUrl)
-	bookstore.bookLibrary.remove(bookUrl)
+		.let { repository.bookChapterBody.removeRows(it) }
+	repository.bookChapter.removeAllFromBook(bookUrl)
+	repository.bookLibrary.remove(bookUrl)
 	
 	// Insert new book data
 	Book(title = epub.title, url = bookUrl, inLibrary = true)
-		.let { bookstore.bookLibrary.insert(it) }
+		.let { repository.bookLibrary.insert(it) }
 	
 	epub.chapters
 		.mapIndexed { i, it -> Chapter(title = it.title, url = it.url.withLocalPrefix(), bookUrl = bookUrl, position = i) }
-		.let { bookstore.bookChapter.insert(it) }
+		.let { repository.bookChapter.insert(it) }
 	
 	epub.chapters
 		.map { ChapterBody(url = it.url.withLocalPrefix(), body = it.body) }
-		.let { bookstore.bookChapterBody.insertReplace(it) }
+		.let { repository.bookChapterBody.insertReplace(it) }
 	
 	epub.images.map {
 		async {

@@ -1,29 +1,97 @@
 package my.noveldokusha.ui.databaseSearchResults
 
+import android.content.Context
+import android.content.Intent
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
 import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.scraper.FetchIterator
 import my.noveldokusha.scraper.DatabaseInterface
+import my.noveldokusha.scraper.scrubber
 import my.noveldokusha.ui.BaseViewModel
+import my.noveldokusha.uiUtils.Extra_String
+import my.noveldokusha.uiUtils.Extra_StringArrayList
+import my.noveldokusha.uiUtils.StateExtra_String
+import my.noveldokusha.uiUtils.StateExtra_StringArrayList
+import java.io.InvalidObjectException
+import javax.inject.Inject
 
-class DatabaseSearchResultsModel(
-	val database: DatabaseInterface,
-	val input: DatabaseSearchResultsActivity.SearchMode
-) : BaseViewModel()
+interface DatabaseSearchResultsStateBundle
 {
-	val fetchIterator: FetchIterator<BookMetadata> = FetchIterator(viewModelScope) { index ->
-		when (input)
-		{
-			is DatabaseSearchResultsActivity.SearchMode.Text -> database.getSearch(index, input.text)
-			is DatabaseSearchResultsActivity.SearchMode.Genres -> database.getSearchAdvanced(index, input.genresIncludeId, input.genresExcludeId)
-			is DatabaseSearchResultsActivity.SearchMode.AuthorSeries -> database.getSearchAuthorSeries(index, input.urlAuthorPage)
-		}
-	}
-	
-	init
-	{
-		fetchIterator.fetchNext()
-	}
+    var databaseUrlBase: String
+    var text: String
+    var genresIncludeId: ArrayList<String>
+    var genresExcludeId: ArrayList<String>
+    var searchMode: String
+    var authorName: String
+    var urlAuthorPage: String
+    val input
+        get() = when (this.searchMode)
+        {
+            DatabaseSearchResultsActivity.SearchMode.Text::class.simpleName -> DatabaseSearchResultsActivity.SearchMode.Text(text = text)
+            DatabaseSearchResultsActivity.SearchMode.Genres::class.simpleName -> DatabaseSearchResultsActivity.SearchMode.Genres(
+                genresIncludeId = genresIncludeId,
+                genresExcludeId = genresExcludeId
+            )
+            DatabaseSearchResultsActivity.SearchMode.AuthorSeries::class.simpleName -> DatabaseSearchResultsActivity.SearchMode.AuthorSeries(
+                authorName = authorName,
+                urlAuthorPage = urlAuthorPage
+            )
+            else -> throw InvalidObjectException("Invalid SearchMode subclass: $searchMode")
+        }
+    val database get() = scrubber.getCompatibleDatabase(databaseUrlBase)!!
+
+    fun set(databaseUrlBase: String, input: DatabaseSearchResultsActivity.SearchMode)
+    {
+        this.databaseUrlBase = databaseUrlBase
+        this.searchMode = input::class.simpleName!!
+        when (input)
+        {
+            is DatabaseSearchResultsActivity.SearchMode.Text ->
+            {
+                this.text = input.text
+            }
+            is DatabaseSearchResultsActivity.SearchMode.Genres ->
+            {
+                this.genresIncludeId = input.genresIncludeId
+                this.genresExcludeId = input.genresExcludeId
+            }
+            is DatabaseSearchResultsActivity.SearchMode.AuthorSeries ->
+            {
+                this.authorName = input.authorName
+                this.urlAuthorPage = input.urlAuthorPage
+            }
+        }
+    }
+}
+
+@HiltViewModel
+class DatabaseSearchResultsModel @Inject constructor(
+    val state: SavedStateHandle
+) : BaseViewModel(), DatabaseSearchResultsStateBundle
+{
+    override var databaseUrlBase by StateExtra_String(state)
+    override var text by StateExtra_String(state)
+    override var genresIncludeId by StateExtra_StringArrayList(state)
+    override var genresExcludeId by StateExtra_StringArrayList(state)
+    override var searchMode by StateExtra_String(state)
+    override var authorName by StateExtra_String(state)
+    override var urlAuthorPage by StateExtra_String(state)
+
+    val fetchIterator: FetchIterator<BookMetadata> = FetchIterator(viewModelScope) { index ->
+        when (val input = this.input)
+        {
+            is DatabaseSearchResultsActivity.SearchMode.Text -> database.getSearch(index, input.text)
+            is DatabaseSearchResultsActivity.SearchMode.Genres -> database.getSearchAdvanced(index, input.genresIncludeId, input.genresExcludeId)
+            is DatabaseSearchResultsActivity.SearchMode.AuthorSeries -> database.getSearchAuthorSeries(index, input.urlAuthorPage)
+        }
+    }
+
+    init
+    {
+        fetchIterator.fetchNext()
+    }
 }
 
 
