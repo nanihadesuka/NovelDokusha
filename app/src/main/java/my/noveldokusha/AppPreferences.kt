@@ -48,9 +48,6 @@ class AppPreferences @Inject constructor(
     enum class TERNARY_STATE
     { active, inverse, inactive }
 
-    fun addListener(listener: SharedPreferences.OnSharedPreferenceChangeListener) =
-        preferences.registerOnSharedPreferenceChangeListener(listener)
-
     /**
      * Given a key, returns a flow of values of the mapper if that key preference
      * had any change.
