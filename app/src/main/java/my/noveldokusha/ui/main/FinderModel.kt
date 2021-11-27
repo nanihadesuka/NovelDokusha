@@ -6,7 +6,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.map
 import my.noveldokusha.AppPreferences
-import my.noveldokusha.scraper.scrubber
+import my.noveldokusha.scraper.scraper
 import my.noveldokusha.ui.BaseViewModel
 import javax.inject.Inject
 
@@ -17,11 +17,11 @@ class FinderModel @Inject constructor(
 ) : BaseViewModel()
 {
     val list = appPreferences.SOURCES_LANGUAGES_flow().map { activeLangs ->
-        val catalogSources = scrubber.sourcesListCatalog.filter { it.language in activeLangs }.map { Item.Source(it.name, it.baseUrl) }
+        val catalogSources = scraper.sourcesListCatalog.filter { it.language in activeLangs }.map { Item.Source(it.name, it.baseUrl) }
 
         return@map listOf<Item>(
             Item.Header("Databases"),
-            *scrubber.databasesList.map { Item.Database(it.name, it.baseUrl) }.toTypedArray(),
+            *scraper.databasesList.map { Item.Database(it.name, it.baseUrl) }.toTypedArray(),
             Item.Header("Sources"),
             *catalogSources.toTypedArray()
         )

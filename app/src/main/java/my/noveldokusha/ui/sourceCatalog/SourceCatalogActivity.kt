@@ -7,17 +7,12 @@ import android.view.*
 import androidx.activity.viewModels
 import androidx.appcompat.widget.SearchView
 import androidx.lifecycle.Observer
-import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.*
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import my.noveldokusha.R
 import my.noveldokusha.databinding.ActivitySourceCatalogBinding
 import my.noveldokusha.databinding.BookListItemBinding
-import my.noveldokusha.scraper.scrubber
 import my.noveldokusha.ui.BaseActivity
-import my.noveldokusha.ui.BaseViewModel
 import my.noveldokusha.ui.chaptersList.ChaptersActivity
 import my.noveldokusha.ui.sourceCatalog.SourceCatalogModel.CatalogItem
 import my.noveldokusha.ui.webView.WebViewActivity

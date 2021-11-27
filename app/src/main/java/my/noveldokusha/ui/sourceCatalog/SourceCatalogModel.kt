@@ -4,7 +4,6 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import my.noveldokusha.R
@@ -12,8 +11,7 @@ import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.data.Repository
 import my.noveldokusha.scraper.FetchIterator
 import my.noveldokusha.scraper.Response
-import my.noveldokusha.scraper.SourceInterface
-import my.noveldokusha.scraper.scrubber
+import my.noveldokusha.scraper.scraper
 import my.noveldokusha.ui.BaseViewModel
 import my.noveldokusha.uiUtils.StateExtra_String
 import my.noveldokusha.uiUtils.stringRes
@@ -32,7 +30,7 @@ class SourceCatalogModel @Inject constructor(
 ) : BaseViewModel(), SourceCatalogStateBundle
 {
     override var sourceBaseUrl by StateExtra_String(state)
-    val source = scrubber.getCompatibleSourceCatalog(sourceBaseUrl)!!
+    val source = scraper.getCompatibleSourceCatalog(sourceBaseUrl)!!
 
     val fetchIterator = FetchIterator(viewModelScope) { source.getCatalogList(it).transform() }
 

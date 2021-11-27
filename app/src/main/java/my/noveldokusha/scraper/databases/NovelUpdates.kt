@@ -2,7 +2,6 @@ package my.noveldokusha.scraper.databases
 
 import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.scraper.*
-import my.noveldokusha.scraper.scrubber.getNodeStructuredText
 import org.jsoup.nodes.Document
 
 /**
@@ -103,8 +102,8 @@ class NovelUpdates : DatabaseInterface
 		
 		return DatabaseInterface.BookData(
 			title = doc.selectFirst(".seriestitlenu")!!.text(),
-			description = getNodeStructuredText(doc.selectFirst("#editdescription")!!),
-			alternativeTitles = getNodeStructuredText(doc.selectFirst("#editassociated")!!).split("\n"),
+			description = textExtractor.get(doc.selectFirst("#editdescription")!!),
+			alternativeTitles = textExtractor.get(doc.selectFirst("#editassociated")!!).split("\n"),
 			relatedBooks = relatedBooks,
 			similarRecommended = similarRecommended,
 			bookType = doc.selectFirst(".genre, .type")!!.text(),

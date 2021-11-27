@@ -16,7 +16,7 @@ import my.noveldokusha.*
 import my.noveldokusha.databinding.ActivityMainFragmentFinderBinding
 import my.noveldokusha.databinding.ActivityMainFragmentFinderListviewItemHeaderBinding
 import my.noveldokusha.databinding.BookListItemBinding
-import my.noveldokusha.scraper.scrubber
+import my.noveldokusha.scraper.scraper
 import my.noveldokusha.ui.databaseSearch.DatabaseSearchActivity
 import my.noveldokusha.ui.globalSourceSearch.GlobalSourceSearchActivity
 import my.noveldokusha.ui.sourceCatalog.SourceCatalogActivity
@@ -88,9 +88,9 @@ class FinderFragment : Fragment()
     {
         R.id.visible_languages_sources ->
         {
-            val langs = scrubber.sourcesLanguages.toList()
+            val langs = scraper.sourcesLanguages.toList()
             val enabled = appPreferences.SOURCES_LANGUAGES
-            val visibles = scrubber.sourcesLanguages.toList().withIndex().filter { it.value in enabled }.map { it.index }.toIntArray()
+            val visibles = scraper.sourcesLanguages.toList().withIndex().filter { it.value in enabled }.map { it.index }.toIntArray()
 
             MaterialDialog(requireContext()).show {
                 title(R.string.sources_languages)

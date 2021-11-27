@@ -14,7 +14,6 @@ import dagger.hilt.android.AndroidEntryPoint
 import my.noveldokusha.R
 import my.noveldokusha.databinding.ActivityDatabaseSearchBinding
 import my.noveldokusha.databinding.ActivityDatabaseSearchGenreItemBinding
-import my.noveldokusha.scraper.scrubber
 import my.noveldokusha.ui.BaseActivity
 import my.noveldokusha.ui.databaseSearchResults.DatabaseSearchResultsActivity
 import my.noveldokusha.uiAdapters.MyListAdapter

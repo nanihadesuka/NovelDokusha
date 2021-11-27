@@ -28,7 +28,7 @@ class ReadLightNovel : SourceInterface.catalog
 			it.select("a").remove()
 			it.select(".ads-title").remove()
 			it.select(".hidden").remove()
-			return scrubber.getNodeStructuredText(it)
+			return textExtractor.get(it)
 		}
 	}
 

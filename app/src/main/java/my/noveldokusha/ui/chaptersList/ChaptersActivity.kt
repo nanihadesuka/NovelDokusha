@@ -19,14 +19,13 @@ import my.noveldokusha.data.ChapterWithContext
 import my.noveldokusha.databinding.ActivityChaptersBinding
 import my.noveldokusha.databinding.ActivityChaptersListHeaderBinding
 import my.noveldokusha.databinding.ActivityChaptersListItemBinding
-import my.noveldokusha.scraper.scrubber
+import my.noveldokusha.scraper.scraper
 import my.noveldokusha.ui.BaseActivity
 import my.noveldokusha.ui.databaseSearchResults.DatabaseSearchResultsActivity
 import my.noveldokusha.ui.reader.ReaderActivity
 import my.noveldokusha.uiAdapters.MyListAdapter
 import my.noveldokusha.uiUtils.*
 import java.util.*
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class ChaptersActivity : BaseActivity()
@@ -279,7 +278,7 @@ private class ChaptersHeaderAdapter(
         init
         {
             viewBind.bookTitle.text = viewModel.bookMetadata.title
-            viewBind.sourceName.text = scrubber.getCompatibleSource(viewModel.bookMetadata.url)?.name
+            viewBind.sourceName.text = scraper.getCompatibleSource(viewModel.bookMetadata.url)?.name
                 ?: ""
 
             viewModel.chaptersWithContextLiveData.observe(context) { list ->

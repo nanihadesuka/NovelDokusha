@@ -8,7 +8,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import my.noveldokusha.data.Repository
 import my.noveldokusha.scraper.Response
-import my.noveldokusha.scraper.scrubber
+import my.noveldokusha.scraper.scraper
 import my.noveldokusha.ui.BaseViewModel
 import my.noveldokusha.uiUtils.StateExtra_String
 import my.noveldokusha.uiViews.Checkbox3StatesView
@@ -29,7 +29,7 @@ class DatabaseSearchModel @Inject constructor(
 
     override var databaseBaseUrl by StateExtra_String(state)
     val genreListLiveData = MutableLiveData<List<Item>>()
-    val database = scrubber.getCompatibleDatabase(databaseBaseUrl)!!
+    val database = scraper.getCompatibleDatabase(databaseBaseUrl)!!
 
     init
     {

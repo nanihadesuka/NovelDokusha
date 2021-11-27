@@ -1,7 +1,7 @@
 package my.noveldokusha.scraper.sources
 
-import my.noveldokusha.scraper.scrubber
 import my.noveldokusha.scraper.SourceInterface
+import my.noveldokusha.scraper.textExtractor
 import my.noveldokusha.scraper.toUrlBuilder
 import org.jsoup.nodes.Document
 
@@ -30,7 +30,7 @@ class Reddit : SourceInterface.base
 			.let {
 				it.select("table").remove()
 				it.select("blockquote").remove()
-				scrubber.getNodeStructuredText(it)
+				textExtractor.get(it)
 			}
 	}
 }

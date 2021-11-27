@@ -1,15 +1,13 @@
 package my.noveldokusha.ui.globalSourceSearch
 
-import android.content.Context
 import android.os.Parcelable
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import my.noveldokusha.AppPreferences
 import my.noveldokusha.scraper.FetchIterator
-import my.noveldokusha.scraper.scrubber
+import my.noveldokusha.scraper.scraper
 import my.noveldokusha.scraper.SourceInterface
 import my.noveldokusha.ui.BaseViewModel
 import my.noveldokusha.uiUtils.StateExtra_String
@@ -29,7 +27,7 @@ class GlobalSourceSearchModel @Inject constructor(
     override val input by StateExtra_String(state)
 
     val globalResults = appPreferences.SOURCES_LANGUAGES.let { activeLangs ->
-        scrubber.sourcesListCatalog
+        scraper.sourcesListCatalog
             .filter { it.language in activeLangs }
             .map { SourceResults(it, input, viewModelScope) }
     }

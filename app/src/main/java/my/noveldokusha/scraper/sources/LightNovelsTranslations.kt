@@ -28,7 +28,7 @@ class LightNovelsTranslations : SourceInterface.catalog
 		return doc.selectFirst(".page, .type-page, .status-publish, .hentry")!!
 			.selectFirst(".entry-content").run {
 				this!!.select("#textbox").remove()
-				scrubber.getNodeStructuredText(this)
+				textExtractor.get(this)
 			}
 	}
 	

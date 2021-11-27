@@ -1,6 +1,6 @@
 package my.noveldokusha
 
-import my.noveldokusha.scraper.scrubber
+import my.noveldokusha.scraper.scraper
 import org.junit.Test
 
 import org.junit.Assert.*
@@ -18,14 +18,14 @@ class Scraper
     @Test
     fun databaseList_IsCompatible()
     {
-        for(database in scrubber.databasesList)
-            assertNotNull(scrubber.getCompatibleDatabase(database.baseUrl))
+        for(database in scraper.databasesList)
+            assertNotNull(scraper.getCompatibleDatabase(database.baseUrl))
     }
 
     @Test
     fun databaseList_BaseUrlEndsWithSlash()
     {
-        for(database in scrubber.databasesList)
+        for(database in scraper.databasesList)
             assertTrue(
                 "${database::class.simpleName} baseUrl missing ending slash",
                 database.baseUrl.endsWith("/")
@@ -35,7 +35,7 @@ class Scraper
     @Test
     fun databaseList_CheckUniqueId()
     {
-        val groups = scrubber.databasesList.groupBy { it.id }
+        val groups = scraper.databasesList.groupBy { it.id }
         for(list in groups)
             assertEquals(
                 "${ list.value.joinToString { it::class.simpleName.toString() }}: id can't be the same value for multiple databases",
@@ -47,7 +47,7 @@ class Scraper
     @Test
     fun databaseList_CheckUniqueName()
     {
-        val groups = scrubber.databasesList.groupBy { it.name }
+        val groups = scraper.databasesList.groupBy { it.name }
         for(list in groups)
             assertEquals(
                 "${ list.value.joinToString { it::class.simpleName.toString() }}: name can't be the same value for multiple databases",
@@ -61,14 +61,14 @@ class Scraper
     @Test
     fun sourceList_IsCompatible()
     {
-        for(source in scrubber.sourcesList)
-            assertNotNull(scrubber.getCompatibleSource(source.baseUrl))
+        for(source in scraper.sourcesList)
+            assertNotNull(scraper.getCompatibleSource(source.baseUrl))
     }
 
     @Test
     fun sourceList_BaseUrlEndsWithSlash()
     {
-        for(source in scrubber.sourcesList)
+        for(source in scraper.sourcesList)
             assertTrue(
                 "${source::class.simpleName} baseUrl missing ending slash",
                 source.baseUrl.endsWith("/")
@@ -78,7 +78,7 @@ class Scraper
     @Test
     fun sourceList_CheckUniqueName()
     {
-        val groups = scrubber.sourcesList.groupBy { it.name }
+        val groups = scraper.sourcesList.groupBy { it.name }
         for(list in groups)
             assertEquals(
                 "${ list.value.joinToString { it::class.simpleName.toString() }}: name can't be the same value for multiple sources",

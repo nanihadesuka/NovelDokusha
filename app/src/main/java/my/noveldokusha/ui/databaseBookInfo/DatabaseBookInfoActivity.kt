@@ -23,7 +23,6 @@ import my.noveldokusha.R
 import my.noveldokusha.databinding.ActivityDatabaseBookInfoBinding
 import my.noveldokusha.databinding.BookListItemBinding
 import my.noveldokusha.scraper.Response
-import my.noveldokusha.scraper.scrubber
 import my.noveldokusha.ui.BaseActivity
 import my.noveldokusha.ui.databaseSearchResults.DatabaseSearchResultsActivity
 import my.noveldokusha.ui.globalSourceSearch.GlobalSourceSearchActivity

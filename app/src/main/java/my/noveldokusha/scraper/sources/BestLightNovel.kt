@@ -17,7 +17,7 @@ class BestLightNovel : SourceInterface.catalog
 	override suspend fun getChapterText(doc: Document): String
 	{
 		return doc.selectFirst("#vung_doc")!!.let {
-			scrubber.getNodeStructuredText(it)
+			textExtractor.get(it)
 		}
 	}
 	

@@ -13,13 +13,11 @@ import my.noveldokusha.R
 import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.databinding.ActivityDatabaseSearchResultsBinding
 import my.noveldokusha.databinding.BookListItemBinding
-import my.noveldokusha.scraper.scrubber
 import my.noveldokusha.ui.BaseActivity
 import my.noveldokusha.ui.databaseBookInfo.DatabaseBookInfoActivity
 import my.noveldokusha.uiAdapters.MyListAdapter
 import my.noveldokusha.uiAdapters.ProgressBarAdapter
 import my.noveldokusha.uiUtils.*
-import java.io.InvalidObjectException
 import java.util.*
 
 @AndroidEntryPoint

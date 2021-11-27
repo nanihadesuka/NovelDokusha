@@ -1,17 +1,12 @@
 package my.noveldokusha.ui.databaseSearchResults
 
-import android.content.Context
-import android.content.Intent
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.scraper.FetchIterator
-import my.noveldokusha.scraper.DatabaseInterface
-import my.noveldokusha.scraper.scrubber
+import my.noveldokusha.scraper.scraper
 import my.noveldokusha.ui.BaseViewModel
-import my.noveldokusha.uiUtils.Extra_String
-import my.noveldokusha.uiUtils.Extra_StringArrayList
 import my.noveldokusha.uiUtils.StateExtra_String
 import my.noveldokusha.uiUtils.StateExtra_StringArrayList
 import java.io.InvalidObjectException
@@ -40,7 +35,7 @@ interface DatabaseSearchResultsStateBundle
             )
             else -> throw InvalidObjectException("Invalid SearchMode subclass: $searchMode")
         }
-    val database get() = scrubber.getCompatibleDatabase(databaseUrlBase)!!
+    val database get() = scraper.getCompatibleDatabase(databaseUrlBase)!!
 
     fun set(databaseUrlBase: String, input: DatabaseSearchResultsActivity.SearchMode)
     {
