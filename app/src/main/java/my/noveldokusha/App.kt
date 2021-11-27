@@ -27,8 +27,6 @@ class App @Inject constructor() : Application()
         super.onCreate()
     }
 
-    val preferencesChangeListeners = mutableSetOf<SharedPreferences.OnSharedPreferenceChangeListener>()
-
     val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main + CoroutineName("App"))
 
     companion object

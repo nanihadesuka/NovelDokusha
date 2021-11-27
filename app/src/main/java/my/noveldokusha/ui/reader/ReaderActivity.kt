@@ -14,12 +14,15 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.doOnNextLayout
 import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
+import androidx.lifecycle.asFlow
+import androidx.lifecycle.asLiveData
 import androidx.lifecycle.lifecycleScope
 import com.afollestad.materialdialogs.MaterialDialog
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.drop
 import my.noveldokusha.*
 import my.noveldokusha.databinding.*
 import my.noveldokusha.scraper.Response
@@ -63,14 +66,6 @@ class ReaderActivity : BaseActivity()
         val listView by lazy { ItemArrayAdapter(this@ReaderActivity, viewModel, viewModel.items, viewModel.bookUrl) }
     }
 
-    val listenerSharedPreferences = SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
-        when (key)
-        {
-            sharedPreferences::READER_FONT_SIZE.name -> viewAdapter.listView.notifyDataSetChanged()
-            sharedPreferences::READER_FONT_FAMILY.name -> viewAdapter.listView.notifyDataSetChanged()
-        }
-    }
-
     val availableFonts = listOf(
         "casual",
         "cursive",
@@ -101,11 +96,17 @@ class ReaderActivity : BaseActivity()
 
         viewModel.initialLoad { loadInitialChapter() }
 
-        sharedPreferences.registerOnSharedPreferenceChangeListener(listenerSharedPreferences)
+        viewModel.readerFontSize.asFlow().drop(1).asLiveData().observe(this){
+            viewAdapter.listView.notifyDataSetChanged()
+        }
 
-        viewBind.settingTextSize.value = sharedPreferences.READER_FONT_SIZE
+        viewModel.readerFontFamily.asFlow().drop(1).asLiveData().observe(this){
+            viewAdapter.listView.notifyDataSetChanged()
+        }
+
+        viewBind.settingTextSize.value = appPreferences.READER_FONT_SIZE
         viewBind.settingTextSize.addOnChangeListener { _, value, _ ->
-            sharedPreferences.READER_FONT_SIZE = value
+            appPreferences.READER_FONT_SIZE = value
         }
         viewBind.listView.setOnItemLongClickListener { _, _, _, _ ->
             if (viewBind.infoContainer.isVisible)
@@ -123,12 +124,12 @@ class ReaderActivity : BaseActivity()
         }
 
         viewBind.settingTextFont.adapter = ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, availableFonts)
-        viewBind.settingTextFont.setSelection(availableFonts.indexOfFirst { it == sharedPreferences.READER_FONT_FAMILY })
+        viewBind.settingTextFont.setSelection(availableFonts.indexOfFirst { it == appPreferences.READER_FONT_FAMILY })
         viewBind.settingTextFont.onItemSelectedListener = object : AdapterView.OnItemSelectedListener
         {
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long)
             {
-                sharedPreferences.READER_FONT_FAMILY = availableFonts[position]
+                appPreferences.READER_FONT_FAMILY = availableFonts[position]
             }
 
             override fun onNothingSelected(parent: AdapterView<*>?) = Unit
@@ -470,8 +471,8 @@ private class ItemArrayAdapter(
 
         val paragraph = item.text + "\n"
         bind.body.text = paragraph
-        bind.body.textSize = activity.run { sharedPreferences.READER_FONT_SIZE }
-        bind.body.typeface = activity.run { getFontFamilyNORMAL(sharedPreferences.READER_FONT_FAMILY) }
+        bind.body.textSize = activity.run { appPreferences.READER_FONT_SIZE }
+        bind.body.typeface = activity.run { getFontFamilyNORMAL(appPreferences.READER_FONT_FAMILY) }
 
         when (item.location)
         {
@@ -526,7 +527,7 @@ private class ItemArrayAdapter(
             else -> ActivityReaderListItemSpecialTitleBinding.bind(convertView)
         }
         bind.specialTitle.text = R.string.reader_no_more_chapters.stringRes()
-        bind.specialTitle.typeface = activity.run { getFontFamilyBOLD(sharedPreferences.READER_FONT_FAMILY) }
+        bind.specialTitle.typeface = activity.run { getFontFamilyBOLD(appPreferences.READER_FONT_FAMILY) }
         return bind.root
     }
 
@@ -538,7 +539,7 @@ private class ItemArrayAdapter(
             else -> ActivityReaderListItemSpecialTitleBinding.bind(convertView)
         }
         bind.specialTitle.text = R.string.reader_first_chapter.stringRes()
-        bind.specialTitle.typeface = activity.run { getFontFamilyBOLD(sharedPreferences.READER_FONT_FAMILY) }
+        bind.specialTitle.typeface = activity.run { getFontFamilyBOLD(appPreferences.READER_FONT_FAMILY) }
         return bind.root
     }
 
@@ -591,7 +592,7 @@ private class ItemArrayAdapter(
             else -> ActivityReaderListItemTitleBinding.bind(convertView)
         }
         bind.title.text = item.text
-        bind.title.typeface = activity.run { getFontFamilyBOLD(sharedPreferences.READER_FONT_FAMILY) }
+        bind.title.typeface = activity.run { getFontFamilyBOLD(appPreferences.READER_FONT_FAMILY) }
         return bind.root
     }
 

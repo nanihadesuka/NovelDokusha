@@ -22,10 +22,14 @@ import my.noveldokusha.ui.globalSourceSearch.GlobalSourceSearchActivity
 import my.noveldokusha.ui.sourceCatalog.SourceCatalogActivity
 import my.noveldokusha.uiAdapters.MyListAdapter
 import my.noveldokusha.uiUtils.inflater
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class FinderFragment : Fragment()
 {
+    @Inject
+    lateinit var appPreferences: AppPreferences
+
     private val viewModel by viewModels<FinderModel>()
     private lateinit var viewBind: ActivityMainFragmentFinderBinding
     private lateinit var viewAdapter: Adapter
@@ -85,13 +89,13 @@ class FinderFragment : Fragment()
         R.id.visible_languages_sources ->
         {
             val langs = scrubber.sourcesLanguages.toList()
-            val enabled = App.instance.appSharedPreferences().SOURCES_LANGUAGES
+            val enabled = appPreferences.SOURCES_LANGUAGES
             val visibles = scrubber.sourcesLanguages.toList().withIndex().filter { it.value in enabled }.map { it.index }.toIntArray()
 
             MaterialDialog(requireContext()).show {
                 title(R.string.sources_languages)
                 listItemsMultiChoice(items = langs, initialSelection = visibles) { _, _, items ->
-                    App.instance.appSharedPreferences().SOURCES_LANGUAGES = items.map { it.toString() }.toSet()
+                    appPreferences.SOURCES_LANGUAGES = items.map { it.toString() }.toSet()
                 }
                 noAutoDismiss()
             }

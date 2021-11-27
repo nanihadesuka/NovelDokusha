@@ -49,9 +49,9 @@ class SettingsFragment : BaseFragment()
 
     fun settingTheme()
     {
-        viewBind.settingsFollowSystemTheme.isChecked = sharedPreferences.THEME_FOLLOW_SYSTEM
+        viewBind.settingsFollowSystemTheme.isChecked = appPreferences.THEME_FOLLOW_SYSTEM
         viewBind.settingsFollowSystemTheme.setOnCheckedChangeListener { _, isChecked ->
-            sharedPreferences.THEME_FOLLOW_SYSTEM = isChecked
+            appPreferences.THEME_FOLLOW_SYSTEM = isChecked
         }
 
         val buttons = viewModel.themes.map { (id, name) ->
@@ -64,9 +64,9 @@ class SettingsFragment : BaseFragment()
         for (button in buttons)
             viewBind.settingsTheme.addView(button)
 
-        viewBind.settingsTheme.check(sharedPreferences.THEME_ID)
+        viewBind.settingsTheme.check(appPreferences.THEME_ID)
         viewBind.settingsTheme.setOnCheckedChangeListener { _, _ ->
-            sharedPreferences.THEME_ID = viewBind.settingsTheme.checkedRadioButtonId
+            appPreferences.THEME_ID = viewBind.settingsTheme.checkedRadioButtonId
         }
     }
 

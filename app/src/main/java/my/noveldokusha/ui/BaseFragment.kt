@@ -7,15 +7,17 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import dagger.hilt.android.AndroidEntryPoint
+import my.noveldokusha.AppPreferences
 import my.noveldokusha.R
-import my.noveldokusha.appSharedPreferences
 import my.noveldokusha.uiUtils.stringRes
 import my.noveldokusha.uiUtils.toast
+import javax.inject.Inject
 
 @AndroidEntryPoint
 open class BaseFragment : Fragment()
 {
-	val sharedPreferences: SharedPreferences get() = requireContext().appSharedPreferences()
+	@Inject
+	lateinit var appPreferences: AppPreferences
 	
 	fun permissionsCondition(vararg permissions: String): Boolean
 	{

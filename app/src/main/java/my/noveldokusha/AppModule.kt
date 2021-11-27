@@ -1,17 +1,15 @@
-package my.noveldokusha.data.database
+package my.noveldokusha
 
 import android.content.Context
 import android.content.SharedPreferences
+import androidx.preference.PreferenceManager
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
-import my.noveldokusha.appSharedPreferences
 import my.noveldokusha.data.Repository
-import my.noveldokusha.data.database.DAOs.ChapterBodyDao
-import my.noveldokusha.data.database.DAOs.ChapterDao
-import my.noveldokusha.data.database.DAOs.LibraryDao
+import my.noveldokusha.data.database.AppDatabase
 import javax.inject.Singleton
 
 @InstallIn(SingletonComponent::class)
@@ -36,20 +34,8 @@ object AppModule
 
     @Provides
     @Singleton
-    fun provideLibraryDao(db: AppDatabase): LibraryDao = db.libraryDao()
-
-    @Provides
-    @Singleton
-    fun provideChapterDao(db: AppDatabase): ChapterDao = db.chapterDao()
-
-    @Provides
-    @Singleton
-    fun provideChapterBodyDao(db: AppDatabase): ChapterBodyDao = db.chapterBodyDao()
-
-    @Provides
-    @Singleton
-    fun provideSharedPreferences(@ApplicationContext context: Context): SharedPreferences
+    fun provideAppPreferencies(@ApplicationContext context: Context): AppPreferences
     {
-        return context.appSharedPreferences()
+        return AppPreferences(context)
     }
 }

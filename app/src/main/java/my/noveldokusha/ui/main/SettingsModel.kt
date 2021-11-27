@@ -17,7 +17,7 @@ class SettingsModel @Inject constructor(
     private val repository: Repository
 ) : BaseViewModel()
 {
-    val themes = (globalThemeList.light + globalThemeList.dark)
+    val themes = AppPreferences.let { it.globalThemeListLight + it.globalThemeListDark }
     val databseSizeBytes = MutableLiveData<Long>()
     val imagesFolderSizeBytes = MutableLiveData<Long>()
     val eventDataRestored = repository.eventDataRestored

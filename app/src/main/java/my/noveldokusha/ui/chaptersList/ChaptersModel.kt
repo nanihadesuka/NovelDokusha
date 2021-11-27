@@ -32,7 +32,7 @@ interface ChapterStateBundle
 @HiltViewModel
 class ChaptersModel @Inject constructor(
     private val repository: Repository,
-    preferences: SharedPreferences,
+    appPreferences: AppPreferences,
     state: SavedStateHandle,
 ) : BaseViewModel(), ChapterStateBundle
 {
@@ -95,12 +95,12 @@ class ChaptersModel @Inject constructor(
                     .ifBlank { data.chapter.title }
                 data.copy(chapter = data.chapter.copy(title = newTitle))
             }
-        }.combine(preferences.CHAPTERS_SORT_ASCENDING_flow()) { chapters, sorted ->
+        }.combine(appPreferences.CHAPTERS_SORT_ASCENDING_flow()) { chapters, sorted ->
             when (sorted)
             {
-                TERNARY_STATE.active -> chapters.sortedBy { it.chapter.position }
-                TERNARY_STATE.inverse -> chapters.sortedByDescending { it.chapter.position }
-                TERNARY_STATE.inactive -> chapters
+                AppPreferences.TERNARY_STATE.active -> chapters.sortedBy { it.chapter.position }
+                AppPreferences.TERNARY_STATE.inverse -> chapters.sortedByDescending { it.chapter.position }
+                AppPreferences.TERNARY_STATE.inactive -> chapters
             }
         }
         .combine(chaptersFilterFlow.debounce(50)) { chapters, searchText ->

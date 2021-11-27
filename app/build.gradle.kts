@@ -97,6 +97,9 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-common-java8:2.4.0")
     implementation("androidx.coordinatorlayout:coordinatorlayout:1.1.0")
 
+    // Preferences
+    implementation("androidx.preference:preference-ktx:1.1.1")
+
     // UI
     implementation("androidx.appcompat:appcompat:1.4.0")
     implementation("androidx.core:core-ktx:1.7.0")

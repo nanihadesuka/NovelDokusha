@@ -26,6 +26,7 @@ import my.noveldokusha.ui.reader.ReaderActivity
 import my.noveldokusha.uiAdapters.MyListAdapter
 import my.noveldokusha.uiUtils.*
 import java.util.*
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class ChaptersActivity : BaseActivity()
@@ -194,11 +195,11 @@ class ChaptersActivity : BaseActivity()
         }
         R.id.action_filter ->
         {
-            appSharedPreferences().CHAPTERS_SORT_ASCENDING = when (appSharedPreferences().CHAPTERS_SORT_ASCENDING)
+            appPreferences.CHAPTERS_SORT_ASCENDING = when (appPreferences.CHAPTERS_SORT_ASCENDING)
             {
-                TERNARY_STATE.active -> TERNARY_STATE.inverse
-                TERNARY_STATE.inverse -> TERNARY_STATE.active
-                TERNARY_STATE.inactive -> TERNARY_STATE.active
+                AppPreferences.TERNARY_STATE.active -> AppPreferences.TERNARY_STATE.inverse
+                AppPreferences.TERNARY_STATE.inverse -> AppPreferences.TERNARY_STATE.active
+                AppPreferences.TERNARY_STATE.inactive -> AppPreferences.TERNARY_STATE.active
             }
             true
         }

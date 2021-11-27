@@ -1,13 +1,17 @@
 package my.noveldokusha.ui.reader
 
 import androidx.lifecycle.SavedStateHandle
+import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.drop
+import my.noveldokusha.AppPreferences
 import my.noveldokusha.data.Repository
 import my.noveldokusha.data.database.tables.Chapter
 import my.noveldokusha.ui.BaseViewModel
 import my.noveldokusha.uiUtils.StateExtra_String
+import my.noveldokusha.uiUtils.asLiveEvent
 import java.util.*
 import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
@@ -23,7 +27,8 @@ interface ReaderStateBundle
 @HiltViewModel
 class ReaderModel @Inject constructor(
     val repository: Repository,
-    private val state: SavedStateHandle
+    private val state: SavedStateHandle,
+    val appPreferences: AppPreferences
 ) : BaseViewModel(), ReaderStateBundle
 {
     override var bookUrl by StateExtra_String(state)
@@ -60,6 +65,9 @@ class ReaderModel @Inject constructor(
     }
 
     data class ChapterStats(val size: Int, val chapter: Chapter, val index: Int)
+
+    val readerFontSize = appPreferences.READER_FONT_SIZE_flow().asLiveData()
+    val readerFontFamily = appPreferences.READER_FONT_FAMILY_flow().asLiveData()
 
     val chaptersStats = mutableMapOf<String, ChapterStats>()
     val items = ArrayList<Item>()
