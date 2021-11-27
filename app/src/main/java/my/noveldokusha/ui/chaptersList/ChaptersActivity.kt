@@ -9,10 +9,14 @@ import android.view.*
 import androidx.activity.viewModels
 import androidx.appcompat.widget.SearchView
 import androidx.core.view.isVisible
+import androidx.lifecycle.asFlow
+import androidx.lifecycle.asLiveData
+import androidx.lifecycle.distinctUntilChanged
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.*
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.distinctUntilChanged
 import my.noveldokusha.*
 import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.data.ChapterWithContext
@@ -65,7 +69,7 @@ class ChaptersActivity : BaseActivity()
         viewModel.chaptersWithContextLiveData.observe(this) {
             viewAdapter.chapters.list = it
         }
-        viewModel.selectionModeVisible.observe(this) { visible ->
+        viewModel.selectionModeVisible.distinctUntilChanged().observe(this) { visible ->
             when (visible)
             {
                 true -> viewBind.selectionModeBar.fadeInVertical(displacement = 200f)
