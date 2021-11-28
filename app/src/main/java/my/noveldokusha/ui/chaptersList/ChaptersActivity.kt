@@ -61,6 +61,8 @@ class ChaptersActivity : BaseActivity()
         setContentView(viewBind.root)
         setSupportActionBar(viewBind.toolbar)
 
+        window.statusBarColor = R.attr.colorSurface.colorAttrRes(this)
+
         viewBind.recyclerView.adapter = ConcatAdapter(viewAdapter.header, viewAdapter.chapters)
         viewBind.recyclerView.itemAnimator = DefaultItemAnimator()
         viewBind.recyclerView.itemAnimator = null

@@ -7,12 +7,13 @@
 	android:layout_height="match_parent"
 	android:fitsSystemWindows="true"
 	>
-	
+
 	<com.google.android.material.appbar.AppBarLayout
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
+		android:background="?colorSurface"
 		>
-		
+
 		<com.google.android.material.appbar.MaterialToolbar
 			android:id="@+id/toolbar"
 			android:layout_width="match_parent"
@@ -20,21 +21,21 @@
 			app:layout_scrollFlags="scroll|enterAlways"
 			app:title="@string/app_name"
 			/>
-	
+
 	</com.google.android.material.appbar.AppBarLayout>
-	
+
 	<FrameLayout
 		android:layout_width="match_parent"
 		android:layout_height="match_parent"
 		app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior"
 		>
-		
+
 		<androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 			android:id="@+id/swipeRefreshLayout"
 			android:layout_width="match_parent"
 			android:layout_height="match_parent"
 			>
-			
+
 			<androidx.recyclerview.widget.RecyclerView
 				android:id="@+id/recyclerView"
 				android:layout_width="match_parent"
@@ -46,9 +47,9 @@
 				tools:itemCount="30"
 				tools:listitem="@layout/activity_chapters_list_item"
 				/>
-		
+
 		</androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
-		
+
 		<my.noveldokusha.uiViews.myFastScroll
 			android:id="@+id/recyclerView_fastScroll"
 			android:layout_width="match_parent"
@@ -57,7 +58,7 @@
 			app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior"
 			/>
 	</FrameLayout>
-	
+
 	<com.google.android.material.floatingactionbutton.FloatingActionButton
 		android:id="@+id/floatingActionButton"
 		android:layout_width="wrap_content"
@@ -69,7 +70,7 @@
 		android:contentDescription="Open last read chapter"
 		android:src="@drawable/ic_baseline_play_arrow_24"
 		/>
-	
+
 	<androidx.constraintlayout.widget.ConstraintLayout
 		android:id="@+id/selectionModeBar"
 		android:layout_width="match_parent"
@@ -81,7 +82,7 @@
 		android:visibility="invisible"
 		tools:visibility="visible"
 		>
-		
+
 		<ImageView
 			android:id="@+id/selectionModeDeleteDownload"
 			android:layout_width="wrap_content"
@@ -98,7 +99,7 @@
 			app:layout_constraintWidth_default="spread"
 			tools:visibility="visible"
 			/>
-		
+
 		<ImageView
 			android:id="@+id/selectionModeDownload"
 			android:layout_width="wrap_content"
@@ -113,8 +114,8 @@
 			app:layout_constraintTop_toTopOf="parent"
 			tools:visibility="visible"
 			/>
-		
-		
+
+
 		<ImageView
 			android:id="@+id/selectionModeSetAsRead"
 			android:layout_width="wrap_content"
@@ -128,7 +129,7 @@
 			app:layout_constraintRight_toLeftOf="@id/selectionModeSetAsUnread"
 			app:layout_constraintTop_toTopOf="parent"
 			/>
-		
+
 		<ImageView
 			android:id="@+id/selectionModeSetAsUnread"
 			android:layout_width="wrap_content"
@@ -142,7 +143,7 @@
 			app:layout_constraintRight_toLeftOf="@id/selectionSelectAll"
 			app:layout_constraintTop_toTopOf="parent"
 			/>
-		
+
 		<ImageView
 			android:id="@+id/selectionSelectAll"
 			android:layout_width="wrap_content"
@@ -156,7 +157,7 @@
 			app:layout_constraintRight_toLeftOf="@id/selectionSelectAllUnderSelected"
 			app:layout_constraintTop_toTopOf="parent"
 			/>
-		
+
 		<ImageView
 			android:id="@+id/selectionSelectAllUnderSelected"
 			android:layout_width="wrap_content"
@@ -170,7 +171,7 @@
 			app:layout_constraintRight_toLeftOf="@id/selectionClose"
 			app:layout_constraintTop_toTopOf="parent"
 			/>
-		
+
 		<ImageView
 			android:id="@+id/selectionClose"
 			android:layout_width="wrap_content"
