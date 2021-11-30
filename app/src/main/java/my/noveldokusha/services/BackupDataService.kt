@@ -60,7 +60,7 @@ class BackupDataService : Service()
     override fun onCreate()
     {
         super.onCreate()
-        notificationBuilder = App.showNotification(channel_id) {}
+        notificationBuilder = showNotification(channel_id) {}
         startForeground(channel_id.hashCode(), notificationBuilder.build())
     }
 

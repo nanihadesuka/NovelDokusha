@@ -94,7 +94,7 @@ class LibraryUpdateService : Service()
     override fun onCreate()
     {
         super.onCreate()
-        notification = App.showNotification(channel_id) {}
+        notification = showNotification(channel_id) {}
         startForeground(channel_id.hashCode(), notification.build())
     }
 

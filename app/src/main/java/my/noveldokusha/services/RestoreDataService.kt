@@ -64,7 +64,7 @@ class RestoreDataService : Service()
     override fun onCreate()
     {
         super.onCreate()
-        notificationBuilder = App.showNotification(channel_id) {}
+        notificationBuilder = showNotification(channel_id) {}
         startForeground(channel_id.hashCode(), notificationBuilder.build())
     }
 
@@ -105,7 +105,7 @@ class RestoreDataService : Service()
      */
     suspend fun restoreData(uri: Uri) = withContext(Dispatchers.IO) {
 
-        val builder = App.showNotification(channel_id) {
+        val builder = showNotification(channel_id) {
             title = "Restore data"
             text = "Loading data"
             setProgress(100, 0, true)
