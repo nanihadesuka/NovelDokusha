@@ -152,12 +152,14 @@ class LibraryUpdateService : Service()
                     title = "New chapters found for"
                     text = updates.joinToString("\n")
                     setStyle(NotificationCompat.BigTextStyle().bigText(text))
+                    removeProgressBar()
                 }
 
                 if (failed.isNotEmpty()) notification.showNotification("Update error") {
                     title = "Update error"
                     text = failed.joinToString("\n")
                     setStyle(NotificationCompat.BigTextStyle().bigText(text))
+                    removeProgressBar()
                 }
             }
         notification.close(channel_id)
