@@ -52,6 +52,10 @@
 			android:name=".services.LibraryUpdateService"
 			android:exported="false"
 			/>
+		<service
+			android:name=".services.EpubImportService"
+			android:exported="false"
+			/>
 	</application>
 
 </manifest>

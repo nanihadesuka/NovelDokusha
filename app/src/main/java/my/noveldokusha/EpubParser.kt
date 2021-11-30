@@ -28,14 +28,13 @@ private fun Node.selectFirstChildTag(tag: String) = childElements.find { it.tagN
 private fun Node.selectChildTag(tag: String) = childElements.filter { it.tagName == tag }
 private fun Node.getAttributeValue(attribute: String): String? = attributes?.getNamedItem(attribute)?.textContent
 private fun parseXMLFile(inputSteam: InputStream): Document? = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(inputSteam)
+private fun parseXMLFile(byteArray: ByteArray): Document? = parseXMLFile(byteArray.inputStream())
 private fun parseXMLText(text: String): Document? = text.reader().runCatching {
 	DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(InputSource(this))
 }.getOrNull()
 
 private val String.decodedURL: String get() = URLDecoder.decode(this, "UTF-8")
 private fun String.asFileName(): String = this.replace("/","_")
-
-private fun parseXMLFile(byteArray: ByteArray): Document? = parseXMLFile(byteArray.inputStream())
 
 private fun ZipInputStream.entries() = generateSequence { nextEntry }
 

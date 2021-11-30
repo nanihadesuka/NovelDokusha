@@ -4,31 +4,26 @@ import android.Manifest
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.*
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
+import androidx.fragment.app.viewModels
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.google.android.material.tabs.TabLayoutMediator
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import my.noveldokusha.*
 import my.noveldokusha.data.Repository
 import my.noveldokusha.databinding.ActivityMainFragmentLibraryBinding
+import my.noveldokusha.services.EpubImportService
 import my.noveldokusha.ui.BaseFragment
-import my.noveldokusha.uiUtils.stringRes
-import my.noveldokusha.uiUtils.toast
 import javax.inject.Inject
 
 @AndroidEntryPoint
 class LibraryFragment : BaseFragment()
 {
+    private val viewModel by viewModels<LibraryModel>()
     private lateinit var viewBind: ActivityMainFragmentLibraryBinding
     private lateinit var viewAdapter: Adapter
-
-    @Inject
-    lateinit var repository : Repository
 
     private inner class Adapter
     {
@@ -82,24 +77,7 @@ class LibraryFragment : BaseFragment()
             activityRequest(intent) { resultCode, data ->
                 if (resultCode != Activity.RESULT_OK) return@activityRequest
                 val uri = data?.data ?: return@activityRequest
-                App.scope.launch(Dispatchers.IO) {
-                    toast(R.string.importing_epub.stringRes())
-                    val inputStream = requireActivity().contentResolver.openInputStream(uri)
-                    if (inputStream == null)
-                    {
-                        toast(R.string.failed_get_file.stringRes())
-                        return@launch
-                    }
-                    try
-                    {
-                        val epub = inputStream.use { epubReader(it) }
-                        importEpubToRepository(repository, epub)
-                    } catch (e: Exception)
-                    {
-                        toast(R.string.failed_to_import_epub.stringRes())
-                        Log.e("EPUB IMPORT FAILED", e.stackTraceToString())
-                    }
-                }
+                EpubImportService.start(requireContext(), uri)
             }
         }
     }
