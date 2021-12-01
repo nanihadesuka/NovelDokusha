@@ -8,6 +8,10 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import kotlinx.coroutines.CoroutineName
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import my.noveldokusha.data.Repository
 import my.noveldokusha.data.database.AppDatabase
 import javax.inject.Singleton
@@ -37,5 +41,12 @@ object AppModule
     fun provideAppPreferencies(@ApplicationContext context: Context): AppPreferences
     {
         return AppPreferences(context)
+    }
+
+    @Provides
+    @Singleton
+    fun provideAppCoroutineScope(): CoroutineScope
+    {
+        return CoroutineScope(SupervisorJob() + Dispatchers.Main + CoroutineName("App"))
     }
 }

@@ -114,7 +114,7 @@ class BackupDataService : Service()
             // Save database
             run {
                 val entry = ZipEntry("database.sqlite3")
-                val file = application.getDatabasePath(repository.name)
+                val file = this@BackupDataService.getDatabasePath(repository.name)
                 entry.method = ZipOutputStream.DEFLATED
                 file.inputStream().use {
                     zip.putNextEntry(entry)

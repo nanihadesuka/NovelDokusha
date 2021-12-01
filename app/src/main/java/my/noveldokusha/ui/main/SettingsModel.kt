@@ -14,7 +14,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SettingsModel @Inject constructor(
-    private val repository: Repository
+    private val repository: Repository,
+    private val appScope: CoroutineScope
 ) : BaseViewModel()
 {
     val themes = AppPreferences.let { it.globalThemeListLight + it.globalThemeListDark }
@@ -36,13 +37,13 @@ class SettingsModel @Inject constructor(
         imagesFolderSizeBytes.postValue(getFolderSizeBytes(repository.settings.folderBooks))
     }
 
-    fun cleanDatabase() = App.scope.launch(Dispatchers.IO) {
+    fun cleanDatabase() = appScope.launch(Dispatchers.IO) {
         repository.settings.clearNonLibraryData()
         repository.vacuum()
         updateDatabaseSize()
     }
 
-    fun cleanImagesFolder() = App.scope.launch(Dispatchers.IO) {
+    fun cleanImagesFolder() = appScope.launch(Dispatchers.IO) {
         val libraryFolders = repository.bookLibrary.getAllInLibrary()
             .mapNotNull { """^local://(.+)$""".toRegex().find(it.url)?.destructured?.component1() }
             .toSet()
