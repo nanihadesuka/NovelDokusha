@@ -27,7 +27,7 @@ class RestoreDataService : Service()
 {
     @Inject
     @ApplicationContext
-    lateinit var  context: Context
+    lateinit var context: Context
 
     @Inject
     lateinit var repository: Repository
@@ -64,7 +64,7 @@ class RestoreDataService : Service()
     override fun onCreate()
     {
         super.onCreate()
-        notificationBuilder = showNotification(channel_id) {}
+        notificationBuilder = showNotification(this, channel_id) {}
         startForeground(channel_id.hashCode(), notificationBuilder.build())
     }
 
@@ -77,12 +77,12 @@ class RestoreDataService : Service()
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int
     {
         if (intent == null) return START_NOT_STICKY
-        val intent = IntentData(intent)
+        val intentData = IntentData(intent)
 
         job = CoroutineScope(Dispatchers.IO).launch {
             try
             {
-                restoreData(intent.uri)
+                restoreData(intentData.uri)
                 repository.eventDataRestored.postValue(Unit)
             } catch (e: Exception)
             {
@@ -105,7 +105,7 @@ class RestoreDataService : Service()
      */
     suspend fun restoreData(uri: Uri) = withContext(Dispatchers.IO) {
 
-        val builder = showNotification(channel_id) {
+        val builder = showNotification(this@RestoreDataService, channel_id) {
             title = "Restore data"
             text = "Loading data"
             setProgress(100, 0, true)

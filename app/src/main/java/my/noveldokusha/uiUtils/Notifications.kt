@@ -10,33 +10,34 @@ import my.noveldokusha.App
 import my.noveldokusha.R
 import kotlin.reflect.KProperty
 
-fun buildNotification(channel_id: String, channel_name: String = channel_id, builder: NotificationCompat.Builder.() -> Unit) = run {
-    NotificationCompat.Builder(App.instance, channel_id).apply {
+fun buildNotification(context: Context, channel_id: String, channel_name: String = channel_id, builder: NotificationCompat.Builder.() -> Unit) = run {
+    NotificationCompat.Builder(context, channel_id).apply {
         setSmallIcon(R.mipmap.ic_logo)
         setLargeIcon(R.mipmap.ic_logo)
         priority = NotificationCompat.PRIORITY_DEFAULT
         builder(this)
 
         val channel = NotificationChannel(channel_id, channel_name, NotificationManager.IMPORTANCE_DEFAULT)
-        manager.createNotificationChannel(channel)
+        manager(context).createNotificationChannel(channel)
     }
 }
 
-fun showNotification(channel_id: String, channel_name: String = channel_id, builder: NotificationCompat.Builder.() -> Unit) = run {
-    buildNotification(channel_id, channel_name, builder).apply {
+fun showNotification(context: Context, channel_id: String, channel_name: String = channel_id, builder: NotificationCompat.Builder.() -> Unit) = run {
+    buildNotification(context, channel_id, channel_name, builder).apply {
         NotificationManagerCompat
-            .from(App.instance.applicationContext)
+            .from(context)
             .notify(channel_id.hashCode(), build())
     }
 }
 
 var NotificationCompat.Builder.title: String by NotificationBuilderObserver("") { _, _, n -> setContentTitle(n) }
 var NotificationCompat.Builder.text: String by NotificationBuilderObserver("") { _, _, n -> setContentText(n) }
-val NotificationCompat.Builder.manager get() = App.instance.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+
+fun NotificationCompat.Builder.manager(context: Context) = NotificationManagerCompat.from(context)
 
 fun NotificationCompat.Builder.removeProgressBar() = setProgress(0, 0, false)
 fun NotificationCompat.Builder.setLargeIcon(id: Int) = setLargeIcon(BitmapFactory.decodeResource(App.instance.resources, id))
-fun NotificationCompat.Builder.close(channel_id: String) = manager.cancel(channel_id.hashCode())
+fun NotificationCompat.Builder.close(context: Context, channel_id: String) = manager(context).cancel(channel_id.hashCode())
 
 fun NotificationCompat.Builder.showNotification(channel_id: String, builder: NotificationCompat.Builder.() -> Unit) = run {
     builder(this)

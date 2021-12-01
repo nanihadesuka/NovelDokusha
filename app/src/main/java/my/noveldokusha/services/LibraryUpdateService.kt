@@ -16,7 +16,6 @@ import my.noveldokusha.data.database.tables.Book
 import my.noveldokusha.scraper.Response
 import my.noveldokusha.scraper.downloadChaptersList
 import my.noveldokusha.uiUtils.*
-import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -94,7 +93,7 @@ class LibraryUpdateService : Service()
     override fun onCreate()
     {
         super.onCreate()
-        notification = showNotification(channel_id) {}
+        notification = showNotification(this, channel_id) {}
         startForeground(channel_id.hashCode(), notification.build())
     }
 
@@ -109,12 +108,12 @@ class LibraryUpdateService : Service()
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int
     {
         if (intent == null) return START_NOT_STICKY
-        val intent = IntentData(intent)
+        val intentData = IntentData(intent)
 
         job = CoroutineScope(Dispatchers.IO).launch {
             try
             {
-                updateLibrary(intent.completedCategory)
+                updateLibrary(intentData.completedCategory)
             } catch (e: Exception)
             {
                 Log.e(this::class.simpleName, "Failed to start command")
@@ -162,7 +161,7 @@ class LibraryUpdateService : Service()
                     removeProgressBar()
                 }
             }
-        notification.close(channel_id)
+        notification.close(this@LibraryUpdateService, channel_id)
     }
 
     private suspend fun updateBooks(books: List<Book>): Pair<List<String>, List<String>> = withContext(Dispatchers.Default)

@@ -53,7 +53,7 @@ class EpubImportService : Service()
     override fun onCreate()
     {
         super.onCreate()
-        notificationBuilder = showNotification(channel_id) {}
+        notificationBuilder = showNotification(this,channel_id) {}
         startForeground(channel_id.hashCode(), notificationBuilder.build())
     }
 

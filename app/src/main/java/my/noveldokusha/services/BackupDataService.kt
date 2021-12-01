@@ -7,9 +7,7 @@ import android.net.Uri
 import android.os.IBinder
 import android.util.Log
 import androidx.core.app.NotificationCompat
-import androidx.core.content.ContextCompat
 import dagger.hilt.android.AndroidEntryPoint
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.*
 import my.noveldokusha.*
 import my.noveldokusha.data.Repository
@@ -60,7 +58,7 @@ class BackupDataService : Service()
     override fun onCreate()
     {
         super.onCreate()
-        notificationBuilder = showNotification(channel_id) {}
+        notificationBuilder = showNotification(this, channel_id) {}
         startForeground(channel_id.hashCode(), notificationBuilder.build())
     }
 
@@ -73,12 +71,12 @@ class BackupDataService : Service()
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int
     {
         if (intent == null) return START_NOT_STICKY
-        val intent = IntentData(intent)
+        val intentData = IntentData(intent)
 
         job = CoroutineScope(Dispatchers.IO).launch {
             try
             {
-                backupData(intent.uri, intent.backupImages)
+                backupData(intentData.uri, intentData.backupImages)
             } catch (e: Exception)
             {
                 Log.e(this::class.simpleName, "Failed to start command")
