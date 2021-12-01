@@ -81,9 +81,9 @@ dependencies {
     implementation(fileTree("libs") { include("*.jar") })
 
     // Kotlin
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.0")
-    implementation("org.jetbrains.kotlin:kotlin-script-runtime:1.5.30-RC")
-    implementation("org.jetbrains.kotlin:kotlin-stdlib:1.5.31")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.0-RC")
+    implementation("org.jetbrains.kotlin:kotlin-script-runtime:1.6.0")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib:1.6.0")
 
     // Room components
     implementation("androidx.room:room-runtime:2.3.0")
