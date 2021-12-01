@@ -68,4 +68,5 @@
 	<string name="search_by_author">Search by author</string>
 	<string name="search_by_genre">Search by genre</string>
 	<string name="epub_added_to_library">Epub added to library</string>
+	<string name="invalid_chapter">Invalid chapter</string>
 </resources>

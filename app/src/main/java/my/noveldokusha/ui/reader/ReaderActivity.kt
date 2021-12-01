@@ -60,7 +60,15 @@ class ReaderActivity : BaseActivity()
     private val viewBind by lazy { ActivityReaderBinding.inflate(layoutInflater) }
     private val viewAdapter = object
     {
-        val listView by lazy { ItemArrayAdapter(this@ReaderActivity, viewModel, viewModel.items, viewModel.bookUrl, viewModel.repository.settings.folderBooks) }
+        val listView by lazy {
+            ItemArrayAdapter(
+                this@ReaderActivity,
+                viewModel,
+                viewModel.items,
+                viewModel.bookUrl,
+                viewModel.repository.settings.folderBooks
+            )
+        }
     }
 
     val availableFonts = listOf(
@@ -144,12 +152,13 @@ class ReaderActivity : BaseActivity()
             override fun onScrollStateChanged(view: AbsListView?, scrollState: Int) = run { }
         })
 
-        // Show reader if text hasn't load after 200 ms of waiting
-        lifecycleScope.launch(Dispatchers.Default) {
+        // Show reader if text hasn't loaded after 200 ms of waiting
+        lifecycleScope.launch(Dispatchers.Main) {
             delay(200)
-            withContext(Dispatchers.Main) { fadeIn() }
+            fadeIn()
         }
 
+        // Fullscreen mode and that ignores any cutout, notch etc.
         WindowCompat.setDecorFitsSystemWindows(window, false)
         WindowInsetsControllerCompat(window, window.decorView).let {
             it.hide(WindowInsetsCompat.Type.displayCutout())
@@ -160,11 +169,7 @@ class ReaderActivity : BaseActivity()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P)
             window.attributes.layoutInDisplayCutoutMode = WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES
 
-
-//        @Suppress("DEPRECATION")
-//        window.setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN)
         window.statusBarColor = R.attr.colorSurface.colorAttrRes(this)
-
     }
 
     private fun updateReadingState()
@@ -202,7 +207,7 @@ class ReaderActivity : BaseActivity()
         if (index == -1)
         {
             MaterialDialog(this).show {
-                title(text = "Invalid chapter")
+                title(text = getString(R.string.invalid_chapter))
                 cornerRadius(16f)
             }
             return false

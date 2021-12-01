@@ -5,13 +5,11 @@ import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.drop
 import my.noveldokusha.AppPreferences
 import my.noveldokusha.data.Repository
 import my.noveldokusha.data.database.tables.Chapter
 import my.noveldokusha.ui.BaseViewModel
 import my.noveldokusha.uiUtils.StateExtra_String
-import my.noveldokusha.uiUtils.asLiveEvent
 import java.util.*
 import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
@@ -34,10 +32,8 @@ class ReaderModel @Inject constructor(
     override var bookUrl by StateExtra_String(state)
     override var chapterUrl by StateExtra_String(state)
 
-    private val savedStateChapterUrlID = "chapterUrl"
-    val url = state.get<String>(savedStateChapterUrlID) ?: chapterUrl
-    var currentChapter: ChapterState by Delegates.observable(ChapterState(url, 0, 0)) { _, old, new ->
-        state.set<String>(savedStateChapterUrlID, new.url)
+    var currentChapter: ChapterState by Delegates.observable(ChapterState(chapterUrl, 0, 0)) { _, old, new ->
+        chapterUrl = new.url
         if (old.url != new.url) saveLastReadPositionState(repository, bookUrl, new, old)
     }
 
@@ -45,12 +41,12 @@ class ReaderModel @Inject constructor(
 
     init
     {
-        val chapter = viewModelScope.async(Dispatchers.IO) { repository.bookChapter.get(url) }
+        val chapter = viewModelScope.async(Dispatchers.IO) { repository.bookChapter.get(chapterUrl) }
         val bookChapter = viewModelScope.async(Dispatchers.IO) { repository.bookChapter.chapters(bookUrl) }
 
         runBlocking {
             currentChapter = ChapterState(
-                url = url,
+                url = chapterUrl,
                 position = chapter.await()?.lastReadPosition ?: 0,
                 offset = chapter.await()?.lastReadOffset ?: 0
             )
@@ -125,13 +121,13 @@ suspend fun getChapterInitialPosition(
     bookUrl: String,
     chapter: Chapter,
     items: ArrayList<Item>
-): Pair<Int, Int>
-{
-    val book = CoroutineScope(Dispatchers.IO).async { repository.bookLibrary.get(bookUrl) }
-    val titlePos = CoroutineScope(Dispatchers.Default).async {
+): Pair<Int, Int> = coroutineScope {
+
+    val book = async(Dispatchers.IO) { repository.bookLibrary.get(bookUrl) }
+    val titlePos = async(Dispatchers.Default) {
         items.indexOfFirst { it is Item.TITLE }
     }
-    val position = CoroutineScope(Dispatchers.Default).async {
+    val position = async(Dispatchers.Default) {
         items.indexOfFirst {
             it is Item.Position && it.pos == chapter.lastReadPosition
         }.let { index ->
@@ -140,7 +136,7 @@ suspend fun getChapterInitialPosition(
         }
     }
 
-    return when
+    when
     {
         chapter.url == book.await()?.lastReadChapter -> position.await()
         chapter.read -> Pair(titlePos.await(), 0)
