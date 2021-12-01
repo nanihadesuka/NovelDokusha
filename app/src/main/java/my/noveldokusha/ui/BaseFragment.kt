@@ -9,7 +9,6 @@ import androidx.fragment.app.Fragment
 import dagger.hilt.android.AndroidEntryPoint
 import my.noveldokusha.AppPreferences
 import my.noveldokusha.R
-import my.noveldokusha.uiUtils.stringRes
 import my.noveldokusha.uiUtils.toast
 import javax.inject.Inject
 
@@ -52,7 +51,7 @@ open class BaseFragment : Fragment()
 	
 	fun permissionRequest(
 		vararg permissions: String,
-		denied: (deniedPermissions: List<String>) -> Unit = { toast(R.string.permissions_denied.stringRes()) },
+		denied: (deniedPermissions: List<String>) -> Unit = { toast(getString(R.string.permissions_denied)) },
 		granted: () -> Unit
 	)
 	{

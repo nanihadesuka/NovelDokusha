@@ -116,7 +116,7 @@ class RestoreDataService : Service()
         {
             builder.showNotification(channel_id) {
                 removeProgressBar()
-                text = R.string.failed_to_restore_cant_access_file.stringRes()
+                text = getString(R.string.failed_to_restore_cant_access_file)
             }
             return@withContext
         }
@@ -146,14 +146,14 @@ class RestoreDataService : Service()
                 repository.bookChapter.insert(backupDatabase.bookChapter.getAll())
                 builder.showNotification(channel_id) { text = "Adding chapters text" }
                 repository.bookChapterBody.insertReplace(backupDatabase.bookChapterBody.getAll())
-                toast(R.string.database_restored.stringRes())
+                toast(getString(R.string.database_restored))
                 backupDatabase.close()
                 backupDatabase.delete()
             } catch (e: Exception)
             {
                 builder.showNotification(channel_id) {
                     removeProgressBar()
-                    text = R.string.failed_to_restore_invalid_backup_database.stringRes()
+                    text = getString(R.string.failed_to_restore_invalid_backup_database)
                 }
             }
         }

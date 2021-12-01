@@ -143,11 +143,11 @@ class BackupDataService : Service()
             zip.closeQuietly()
             notificationBuilder.showNotification(channel_id) {
                 removeProgressBar()
-                text = R.string.backup_saved.stringRes()
+                text = getString(R.string.backup_saved)
             }
         } ?: notificationBuilder.showNotification(channel_id) {
             removeProgressBar()
-            text = R.string.failed_to_make_backup.stringRes()
+            text = getString(R.string.failed_to_make_backup)
         }
     }
 }

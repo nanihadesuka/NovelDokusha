@@ -1,7 +1,6 @@
 package my.noveldokusha.ui
 
 import android.content.Intent
-import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.os.Bundle
@@ -10,12 +9,8 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.asLiveData
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.drop
-import kotlinx.coroutines.flow.merge
 import my.noveldokusha.*
-import my.noveldokusha.uiUtils.asLiveEvent
-import my.noveldokusha.uiUtils.stringRes
 import my.noveldokusha.uiUtils.toast
-import javax.inject.Inject
 
 @AndroidEntryPoint
 open class BaseActivity : AppCompatActivity()
@@ -64,7 +59,7 @@ open class BaseActivity : AppCompatActivity()
 
     fun permissionRequest(
         vararg permissions: String,
-        denied: (deniedPermissions: List<String>) -> Unit = { toast(R.string.permissions_denied.stringRes()) },
+        denied: (deniedPermissions: List<String>) -> Unit = { toast(getString(R.string.permissions_denied)) },
         granted: () -> Unit
     )
     {

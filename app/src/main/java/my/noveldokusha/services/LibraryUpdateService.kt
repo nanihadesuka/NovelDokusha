@@ -16,6 +16,7 @@ import my.noveldokusha.data.database.tables.Book
 import my.noveldokusha.scraper.Response
 import my.noveldokusha.scraper.downloadChaptersList
 import my.noveldokusha.uiUtils.*
+import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -132,7 +133,7 @@ class LibraryUpdateService : Service()
 
         notification.showNotification(channel_id) {
             setStyle(NotificationCompat.BigTextStyle())
-            title = R.string.updaing_library.stringRes()
+            title = getString(R.string.updaing_library)
         }
 
         repository.bookLibrary.getAllInLibrary()

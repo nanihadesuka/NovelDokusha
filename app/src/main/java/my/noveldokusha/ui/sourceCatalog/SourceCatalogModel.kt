@@ -1,9 +1,12 @@
 package my.noveldokusha.ui.sourceCatalog
 
+import android.content.Context
+import android.provider.Settings.Global.getString
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import my.noveldokusha.R
@@ -14,7 +17,6 @@ import my.noveldokusha.scraper.Response
 import my.noveldokusha.scraper.scraper
 import my.noveldokusha.ui.BaseViewModel
 import my.noveldokusha.uiUtils.StateExtra_String
-import my.noveldokusha.uiUtils.stringRes
 import my.noveldokusha.uiUtils.toast
 import javax.inject.Inject
 
@@ -26,7 +28,8 @@ interface SourceCatalogStateBundle
 @HiltViewModel
 class SourceCatalogModel @Inject constructor(
     private val repository: Repository,
-    private val state: SavedStateHandle
+    private val state: SavedStateHandle,
+    @ApplicationContext private val context: Context
 ) : BaseViewModel(), SourceCatalogStateBundle
 {
     override var sourceBaseUrl by StateExtra_String(state)
@@ -68,6 +71,6 @@ class SourceCatalogModel @Inject constructor(
         repository.bookLibrary.toggleBookmark(item.bookMetadata)
         val isInLibrary = repository.bookLibrary.existInLibrary(item.bookMetadata.url)
         val res = if (isInLibrary) R.string.added_to_library else R.string.removed_from_library
-        toast(res.stringRes())
+        toast(context.getString(res))
     }
 }

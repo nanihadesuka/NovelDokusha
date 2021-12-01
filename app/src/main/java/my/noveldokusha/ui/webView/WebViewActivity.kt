@@ -18,7 +18,6 @@ import my.noveldokusha.databinding.ActivityWebviewBinding
 import my.noveldokusha.scraper.toUrl
 import my.noveldokusha.ui.BaseActivity
 import my.noveldokusha.uiUtils.Extra_String
-import my.noveldokusha.uiUtils.stringRes
 import my.noveldokusha.uiUtils.toast
 
 @AndroidEntryPoint
@@ -47,13 +46,13 @@ class WebViewActivity : BaseActivity()
 		
 		if (!packageManager.hasSystemFeature(PackageManager.FEATURE_WEBVIEW))
 		{
-			toast(R.string.webview_not_available.stringRes())
+			toast(getString(R.string.webview_not_available))
 			finish()
 			return
 		}
 		
 		val authority = extras.url.toUrl()?.authority ?: run {
-			toast(R.string.invalid_URL.stringRes())
+			toast(getString(R.string.invalid_URL))
 			finish()
 			return
 		}
@@ -71,7 +70,7 @@ class WebViewActivity : BaseActivity()
 						.map { it.split("=") }
 						.associate { it[0].trim() to it[1].trim() }
 					App.scope.launch(Dispatchers.Default) { cookiesData.add(url, cookies) }
-					toast(R.string.cookies_saved.stringRes())
+					toast(getString(R.string.cookies_saved))
 				}
 				
 				super.onPageFinished(view, url)

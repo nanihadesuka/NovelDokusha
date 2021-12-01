@@ -64,8 +64,6 @@ fun @receiver:AttrRes Int.colorAttrRes(ctx: Context): Int = ctx.theme.obtainStyl
 @ColorInt
 fun @receiver:ColorRes Int.colorIdRes(ctx: Context): Int = ContextCompat.getColor(ctx, this)
 
-fun @receiver:StringRes Int.stringRes(): String = App.instance.getString(this)
-
 fun toast(text: String, duration: Int = Toast.LENGTH_SHORT) = CoroutineScope(Dispatchers.Main).launch {
 	Toast.makeText(App.instance, text, duration).show()
 }

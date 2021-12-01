@@ -9,7 +9,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.lifecycleScope
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.checkbox.checkBoxPrompt
 import com.afollestad.materialdialogs.checkbox.isCheckPromptChecked
@@ -20,7 +19,6 @@ import my.noveldokusha.services.BackupDataService
 import my.noveldokusha.services.RestoreDataService
 import my.noveldokusha.databinding.ActivityMainFragmentSettingsBinding
 import my.noveldokusha.ui.BaseFragment
-import my.noveldokusha.uiUtils.stringRes
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -103,7 +101,7 @@ class SettingsFragment : BaseFragment()
                 MaterialDialog(requireContext()).show {
                     title(text = "Backup")
                     val checkImagesFolder = checkBoxPrompt(
-                        text = R.string.include_images_folder.stringRes(),
+                        text = getString(R.string.include_images_folder),
                         isCheckedDefault = true
                     ) {}
 

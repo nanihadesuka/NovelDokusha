@@ -538,7 +538,7 @@ private class ItemArrayAdapter(
             null -> ActivityReaderListItemSpecialTitleBinding.inflate(parent.inflater, parent, false).also { it.root.tag = it }
             else -> ActivityReaderListItemSpecialTitleBinding.bind(convertView)
         }
-        bind.specialTitle.text = R.string.reader_no_more_chapters.stringRes()
+        bind.specialTitle.text = context.getString(R.string.reader_no_more_chapters)
         bind.specialTitle.typeface = activity.run { getFontFamilyBOLD(appPreferences.READER_FONT_FAMILY) }
         return bind.root
     }
@@ -550,7 +550,7 @@ private class ItemArrayAdapter(
             null -> ActivityReaderListItemSpecialTitleBinding.inflate(parent.inflater, parent, false).also { it.root.tag = it }
             else -> ActivityReaderListItemSpecialTitleBinding.bind(convertView)
         }
-        bind.specialTitle.text = R.string.reader_first_chapter.stringRes()
+        bind.specialTitle.text = context.getString(R.string.reader_first_chapter)
         bind.specialTitle.typeface = activity.run { getFontFamilyBOLD(appPreferences.READER_FONT_FAMILY) }
         return bind.root
     }

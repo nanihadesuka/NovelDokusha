@@ -87,7 +87,7 @@ class ChaptersActivity : BaseActivity()
                 val lastReadChapter = viewModel.getLastReadChapter()
                 if (lastReadChapter == null)
                 {
-                    toast(R.string.no_chapters.stringRes())
+                    toast(getString(R.string.no_chapters))
                     return@launch
                 }
 
@@ -194,7 +194,7 @@ class ChaptersActivity : BaseActivity()
         R.id.action_library_bookmark ->
         {
             val msg = if (!item.isChecked) R.string.added_to_library else R.string.removed_from_library
-            toast(msg.stringRes())
+            toast(getString(msg))
             viewModel.toggleBookmark()
             true
         }

@@ -18,7 +18,6 @@ import my.noveldokusha.scraper.downloadChaptersList
 import my.noveldokusha.ui.BaseViewModel
 import my.noveldokusha.uiUtils.Extra_String
 import my.noveldokusha.uiUtils.StateExtra_String
-import my.noveldokusha.uiUtils.stringRes
 import my.noveldokusha.uiUtils.toast
 import javax.inject.Inject
 
@@ -32,6 +31,7 @@ interface ChapterStateBundle
 @HiltViewModel
 class ChaptersModel @Inject constructor(
     private val repository: Repository,
+    @ApplicationContext private val context: Context,
     appPreferences: AppPreferences,
     state: SavedStateHandle,
 ) : BaseViewModel(), ChapterStateBundle
@@ -114,7 +114,7 @@ class ChaptersModel @Inject constructor(
     {
         if (bookMetadata.url.startsWith("local://"))
         {
-            toast(R.string.local_book_nothing_to_update.stringRes())
+            toast(context.getString(R.string.local_book_nothing_to_update))
             onFetching.postValue(false)
             return
         }
@@ -132,7 +132,7 @@ class ChaptersModel @Inject constructor(
                 is Response.Success ->
                 {
                     if (res.data.isEmpty())
-                        toast(R.string.no_chapters_found.stringRes())
+                        toast(context.getString(R.string.no_chapters_found))
 
                     withContext(Dispatchers.IO) {
                         repository.bookChapter.merge(res.data, url)
