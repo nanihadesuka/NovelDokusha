@@ -160,7 +160,7 @@ class RestoreDataService : Service()
 
         suspend fun mergetoBookFolder(entry: ZipEntry, inputStream: InputStream)
         {
-            val file = File(App.folderBooks.parentFile, entry.name)
+            val file = File(repository.settings.folderBooks.parentFile, entry.name)
             if (file.isDirectory) return
             file.parentFile?.mkdirs()
             if (file.parentFile?.exists() != true) return

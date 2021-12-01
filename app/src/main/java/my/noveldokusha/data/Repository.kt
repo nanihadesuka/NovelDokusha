@@ -12,6 +12,7 @@ import my.noveldokusha.data.database.tables.ChapterBody
 import my.noveldokusha.scraper.Response
 import my.noveldokusha.scraper.downloadChapter
 import my.noveldokusha.uiUtils.LiveEvent
+import java.io.File
 import javax.inject.Inject
 
 class Repository @Inject constructor(
@@ -45,6 +46,13 @@ class Repository @Inject constructor(
             db.chapterDao().removeAllNonLibraryRows()
             db.chapterBodyDao().removeAllNonChapterRows()
         }
+
+        /**
+         * Folder where additional book data like images is stored.
+         * Each subfolder must be an unique folder for each book.
+         * Each book folder can have an arbitrary structure internally.
+         */
+        val folderBooks = File(context.filesDir, "books")
     }
 
     inner class BookLibrary

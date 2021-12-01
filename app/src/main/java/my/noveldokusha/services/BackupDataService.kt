@@ -128,8 +128,8 @@ class BackupDataService : Service()
                 notificationBuilder.showNotification(channel_id) {
                     text = "Copying images"
                 }
-                val basePath = App.folderBooks.toPath().parent
-                App.folderBooks.walkBottomUp().filterNot { it.isDirectory }.forEach { file ->
+                val basePath = repository.settings.folderBooks.toPath().parent
+                repository.settings.folderBooks.walkBottomUp().filterNot { it.isDirectory }.forEach { file ->
                     val name = basePath.relativize(file.toPath()).toString()
                     val entry = ZipEntry(name)
                     entry.method = ZipOutputStream.DEFLATED

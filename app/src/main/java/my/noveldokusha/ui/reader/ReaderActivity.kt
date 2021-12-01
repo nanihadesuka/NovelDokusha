@@ -2,7 +2,6 @@ package my.noveldokusha.ui.reader
 
 import android.content.Context
 import android.content.Intent
-import android.content.SharedPreferences
 import android.graphics.Typeface
 import android.os.Build
 import android.os.Bundle
@@ -28,7 +27,6 @@ import my.noveldokusha.scraper.Response
 import my.noveldokusha.ui.BaseActivity
 import my.noveldokusha.uiUtils.*
 import java.io.File
-import java.nio.file.Paths
 import java.util.*
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.math.ceil
@@ -62,7 +60,7 @@ class ReaderActivity : BaseActivity()
     private val viewBind by lazy { ActivityReaderBinding.inflate(layoutInflater) }
     private val viewAdapter = object
     {
-        val listView by lazy { ItemArrayAdapter(this@ReaderActivity, viewModel, viewModel.items, viewModel.bookUrl) }
+        val listView by lazy { ItemArrayAdapter(this@ReaderActivity, viewModel, viewModel.items, viewModel.bookUrl, viewModel.repository.settings.folderBooks) }
     }
 
     val availableFonts = listOf(
@@ -95,11 +93,11 @@ class ReaderActivity : BaseActivity()
 
         viewModel.initialLoad { loadInitialChapter() }
 
-        viewModel.readerFontSize.asFlow().drop(1).asLiveData().observe(this){
+        viewModel.readerFontSize.asFlow().drop(1).asLiveData().observe(this) {
             viewAdapter.listView.notifyDataSetChanged()
         }
 
-        viewModel.readerFontFamily.asFlow().drop(1).asLiveData().observe(this){
+        viewModel.readerFontFamily.asFlow().drop(1).asLiveData().observe(this) {
             viewAdapter.listView.notifyDataSetChanged()
         }
 
@@ -152,8 +150,8 @@ class ReaderActivity : BaseActivity()
             withContext(Dispatchers.Main) { fadeIn() }
         }
 
-        WindowCompat.setDecorFitsSystemWindows(window,false)
-        WindowInsetsControllerCompat(window,window.decorView).let {
+        WindowCompat.setDecorFitsSystemWindows(window, false)
+        WindowInsetsControllerCompat(window, window.decorView).let {
             it.hide(WindowInsetsCompat.Type.displayCutout())
             it.hide(WindowInsetsCompat.Type.systemBars())
             it.systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
@@ -441,13 +439,11 @@ private class ItemArrayAdapter(
     val viewModel: ReaderModel,
     val list: ArrayList<Item>,
     val bookUrl: String,
-
-    ) :
+    val folderBooks: File
+) :
     ArrayAdapter<Item>(activity, 0, list)
 {
-    val localBookImageBaseDir: File by lazy {
-        Paths.get(App.folderBooks.path, bookUrl.removePrefix("local://")).toFile()
-    }
+    val localBookBaseDir = File(folderBooks, bookUrl.removePrefix("local://"))
 
     override fun getCount() = super.getCount() + 2
     override fun getItem(position: Int): Item = when (position)
@@ -515,7 +511,7 @@ private class ItemArrayAdapter(
         // (Avoids getting "blurry" images)
         bind.imageContainer.doOnNextLayout {
             Glide.with(activity)
-                .load(File(localBookImageBaseDir, imgEntry.path))
+                .load(File(localBookBaseDir, imgEntry.path))
                 .error(R.drawable.ic_baseline_error_outline_24)
                 .transition(DrawableTransitionOptions.withCrossFade())
                 .into(bind.image)

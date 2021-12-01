@@ -33,7 +33,7 @@ class SettingsModel @Inject constructor(
     }
 
     fun updateImagesFolderSize() = viewModelScope.launch(Dispatchers.IO) {
-        imagesFolderSizeBytes.postValue(getFolderSizeBytes(App.folderBooks))
+        imagesFolderSizeBytes.postValue(getFolderSizeBytes(repository.settings.folderBooks))
     }
 
     fun cleanDatabase() = App.scope.launch(Dispatchers.IO) {
@@ -47,7 +47,7 @@ class SettingsModel @Inject constructor(
             .mapNotNull { """^local://(.+)$""".toRegex().find(it.url)?.destructured?.component1() }
             .toSet()
 
-        App.folderBooks.listFiles()?.asSequence()
+        repository.settings.folderBooks.listFiles()?.asSequence()
             ?.filter { it.isDirectory && it.exists() }
             ?.filter { it.name !in libraryFolders }
             ?.forEach { it.deleteRecursively() }

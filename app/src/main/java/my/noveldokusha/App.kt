@@ -36,7 +36,6 @@ class App @Inject constructor() : Application()
         private lateinit var _instance: App
         val instance get() = _instance
         val cacheDir: File get() = _instance.cacheDir
-        val folderBooks: File get() = File(App.instance.getExternalFilesDir(null) ?: App.instance.filesDir, "books")
         val scope get() = instance.scope
         fun getDatabasePath(databaseName: String): File = instance.applicationContext.getDatabasePath(databaseName)
     }
