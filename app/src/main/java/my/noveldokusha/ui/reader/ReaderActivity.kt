@@ -226,16 +226,14 @@ class ReaderActivity : BaseActivity()
         }
     }
 
-    private fun calculateInitialChapterPosition() = lifecycleScope.launch(Dispatchers.Default) {
+    private fun calculateInitialChapterPosition() = lifecycleScope.launch(Dispatchers.Main) {
         val (index: Int, offset: Int) = viewModel.getChapterInitialPosition()
 
-        withContext(Dispatchers.Main) {
-            // index + 1 because it doesn't take into account the first padding view
-            viewBind.listView.setSelectionFromTop(index + 1, offset)
-            viewModel.readerState = ReaderModel.ReaderState.IDLE
-            fadeIn()
-            viewBind.listView.doOnNextLayout { updateReadingState() }
-        }
+        // index + 1 because it doesn't take into account the first padding view
+        viewBind.listView.setSelectionFromTop(index + 1, offset)
+        viewModel.readerState = ReaderModel.ReaderState.IDLE
+        fadeIn()
+        viewBind.listView.doOnNextLayout { updateReadingState() }
     }
 
     fun updateInfoView()
