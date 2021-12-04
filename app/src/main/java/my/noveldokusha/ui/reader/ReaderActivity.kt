@@ -2,7 +2,6 @@ package my.noveldokusha.ui.reader
 
 import android.content.Context
 import android.content.Intent
-import android.graphics.Typeface
 import android.os.Build
 import android.os.Bundle
 import android.view.*
@@ -10,14 +9,11 @@ import android.widget.AbsListView
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import androidx.activity.viewModels
-import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.*
 import androidx.lifecycle.asFlow
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.lifecycleScope
 import com.afollestad.materialdialogs.MaterialDialog
-import com.bumptech.glide.Glide
-import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.drop
@@ -26,7 +22,6 @@ import my.noveldokusha.databinding.*
 import my.noveldokusha.scraper.Response
 import my.noveldokusha.ui.BaseActivity
 import my.noveldokusha.uiUtils.*
-import java.io.File
 import java.util.*
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.math.ceil
@@ -61,36 +56,20 @@ class ReaderActivity : BaseActivity()
     private val viewAdapter = object
     {
         val listView by lazy {
-            ItemArrayAdapter(
+            ReaderItemAdapter(
                 this@ReaderActivity,
-                viewModel,
                 viewModel.items,
                 viewModel.bookUrl,
-                viewModel.repository.settings.folderBooks
+                viewModel.repository.settings.folderBooks,
+                fontsLoader,
+                appPreferences,
+                onChapterStartVisible = { url -> viewModel.readRoutine.setReadStart(url) },
+                onChapterEndVisible = { url -> viewModel.readRoutine.setReadEnd(url) },
             )
         }
     }
 
-    val availableFonts = listOf(
-        "casual",
-        "cursive",
-        "monospace",
-        "sans-serif",
-        "sans-serif-black",
-        "sans-serif-condensed",
-        "sans-serif-condensed-light",
-        "sans-serif-light",
-        "sans-serif-medium",
-        "sans-serif-smallcaps",
-        "sans-serif-thin",
-        "serif",
-        "serif-monospace"
-    )
-
-    private val fontFamilyNORMALCache = mutableMapOf<String, Typeface>()
-    private val fontFamilyBOLDCache = mutableMapOf<String, Typeface>()
-    fun getFontFamilyNORMAL(name: String) = fontFamilyNORMALCache.getOrPut(name) { Typeface.create(name, Typeface.NORMAL) }
-    fun getFontFamilyBOLD(name: String) = fontFamilyBOLDCache.getOrPut(name) { Typeface.create(name, Typeface.BOLD) }
+    private val fontsLoader = FontsLoader()
 
     override fun onCreate(savedInstanceState: Bundle?)
     {
@@ -107,6 +86,16 @@ class ReaderActivity : BaseActivity()
 
         viewModel.readerFontFamily.asFlow().drop(1).asLiveData().observe(this) {
             viewAdapter.listView.notifyDataSetChanged()
+        }
+
+        viewModel.readingPosStats.observe(this) { (stats, itemPos) ->
+            viewBind.infoChapterTitle.text = stats.chapter.title
+            viewBind.infoCurrentChapterFromTotal.text = " ${stats.index + 1}/${viewModel.orderedChapters.size}"
+            viewBind.infoChapterProgressPercentage.text = when (stats.itemCount)
+            {
+                0 -> "100%"
+                else -> " ${ceil((itemPos.toFloat() / stats.itemCount.toFloat()) * 100f).roundToInt()}%"
+            }
         }
 
         viewBind.settingTextSize.value = appPreferences.READER_FONT_SIZE
@@ -128,13 +117,13 @@ class ReaderActivity : BaseActivity()
             true
         }
 
-        viewBind.settingTextFont.adapter = ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, availableFonts)
-        viewBind.settingTextFont.setSelection(availableFonts.indexOfFirst { it == appPreferences.READER_FONT_FAMILY })
+        viewBind.settingTextFont.adapter = ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, fontsLoader.availableFonts)
+        viewBind.settingTextFont.setSelection(fontsLoader.availableFonts.indexOfFirst { it == appPreferences.READER_FONT_FAMILY })
         viewBind.settingTextFont.onItemSelectedListener = object : AdapterView.OnItemSelectedListener
         {
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long)
             {
-                appPreferences.READER_FONT_FAMILY = availableFonts[position]
+                appPreferences.READER_FONT_FAMILY = fontsLoader.availableFonts[position]
             }
 
             override fun onNothingSelected(parent: AdapterView<*>?) = Unit
@@ -199,9 +188,9 @@ class ReaderActivity : BaseActivity()
         viewModel.readerState = ReaderModel.ReaderState.INITIAL_LOAD
         viewAdapter.listView.clear()
 
-        val insert = { item: Item -> viewAdapter.listView.add(item) }
-        val insertAll = { items: Collection<Item> -> viewAdapter.listView.addAll(items) }
-        val remove = { item: Item -> viewAdapter.listView.remove(item) }
+        val insert = { item: ReaderItem -> viewAdapter.listView.add(item) }
+        val insertAll = { items: Collection<ReaderItem> -> viewAdapter.listView.addAll(items) }
+        val remove = { item: ReaderItem -> viewAdapter.listView.remove(item) }
 
         val index = viewModel.orderedChapters.indexOfFirst { it.url == viewModel.currentChapter.url }
         if (index == -1)
@@ -227,7 +216,7 @@ class ReaderActivity : BaseActivity()
     }
 
     private fun calculateInitialChapterPosition() = lifecycleScope.launch(Dispatchers.Main) {
-        val (index: Int, offset: Int) = viewModel.getChapterInitialPosition()
+        val (index: Int, offset: Int) = viewModel.getChapterInitialPosition() ?: return@launch
 
         // index + 1 because it doesn't take into account the first padding view
         viewBind.listView.setSelectionFromTop(index + 1, offset)
@@ -241,16 +230,9 @@ class ReaderActivity : BaseActivity()
         val lastVisiblePosition = viewBind.listView.lastVisiblePosition
         if (lastVisiblePosition < 0) return
         val item = viewAdapter.listView.getItem(lastVisiblePosition)
-        if (item !is Item.Position) return
+        if (item !is ReaderItem.Position) return
 
-        val stats = viewModel.chaptersStats.get(item.url) ?: return
-        viewBind.infoChapterTitle.text = stats.chapter.title
-        viewBind.infoCurrentChapterFromTotal.text = " ${stats.index + 1}/${viewModel.orderedChapters.size}"
-        viewBind.infoChapterProgressPercentage.text = when (stats.size)
-        {
-            0 -> "100%"
-            else -> " ${ceil((item.pos.toFloat() / stats.size.toFloat()) * 100f).roundToInt()}%"
-        }
+        viewModel.updateInfoViewTo(item.chapterUrl, item.pos)
     }
 
     override fun onPause()
@@ -262,10 +244,10 @@ class ReaderActivity : BaseActivity()
     private fun updateCurrentReadingPosSavingState(firstVisibleItem: Int)
     {
         val item = viewAdapter.listView.getItem(firstVisibleItem)
-        if (item is Item.Position)
+        if (item is ReaderItem.Position)
         {
             val offset = viewBind.listView.run { getChildAt(0).top - paddingTop }
-            viewModel.currentChapter = ChapterState(url = item.url, position = item.pos, offset = offset)
+            viewModel.currentChapter = ChapterState(url = item.chapterUrl, position = item.pos, offset = offset)
         }
     }
 
@@ -274,21 +256,21 @@ class ReaderActivity : BaseActivity()
         viewModel.readerState = ReaderModel.ReaderState.LOADING
 
         val lastItem = viewModel.items.lastOrNull()!!
-        if (lastItem is Item.BOOK_END)
+        if (lastItem is ReaderItem.BOOK_END)
         {
             viewModel.readerState = ReaderModel.ReaderState.IDLE
             return false
         }
 
-        val insert = { item: Item -> viewAdapter.listView.add(item) }
-        val insertAll = { items: Collection<Item> -> viewAdapter.listView.addAll(items) }
-        val remove = { item: Item -> viewAdapter.listView.remove(item) }
+        val insert = { item: ReaderItem -> viewAdapter.listView.add(item) }
+        val insertAll = { items: Collection<ReaderItem> -> viewAdapter.listView.addAll(items) }
+        val remove = { item: ReaderItem -> viewAdapter.listView.remove(item) }
 
-        val nextIndex = viewModel.chaptersStats[lastItem.url]!!.index + 1
+        val nextIndex = viewModel.getNextChapterIndex(lastItem.chapterUrl)
         if (nextIndex >= viewModel.orderedChapters.size)
         {
             lifecycleScope.launch(Dispatchers.Main) {
-                insert(Item.BOOK_END(lastItem.url))
+                insert(ReaderItem.BOOK_END(lastItem.chapterUrl))
                 viewModel.readerState = ReaderModel.ReaderState.IDLE
             }
             return false
@@ -304,16 +286,16 @@ class ReaderActivity : BaseActivity()
         viewModel.readerState = ReaderModel.ReaderState.LOADING
 
         val firstItem = viewModel.items.firstOrNull()!!
-        if (firstItem is Item.BOOK_START)
+        if (firstItem is ReaderItem.BOOK_START)
         {
             viewModel.readerState = ReaderModel.ReaderState.IDLE
             return false
         }
 
         var list_index = 0
-        val insert = { item: Item -> viewAdapter.listView.insert(item, list_index); list_index += 1 }
-        val insertAll = { items: Collection<Item> -> items.forEach { insert(it) } }
-        val remove = { item: Item -> viewAdapter.listView.remove(item); list_index -= 1 }
+        val insert = { item: ReaderItem -> viewAdapter.listView.insert(item, list_index); list_index += 1 }
+        val insertAll = { items: Collection<ReaderItem> -> items.forEach { insert(it) } }
+        val remove = { item: ReaderItem -> viewAdapter.listView.remove(item); list_index -= 1 }
 
         val maintainLastVisiblePosition = { fn: () -> Unit ->
             val oldSize = viewAdapter.listView.count
@@ -325,11 +307,11 @@ class ReaderActivity : BaseActivity()
             viewBind.listView.setSelectionFromTop(lvp + displacement, top)
         }
 
-        val previousIndex = viewModel.chaptersStats[firstItem.url]!!.index - 1
+        val previousIndex = viewModel.getPreviousChapterIndex(firstItem.chapterUrl)
         if (previousIndex < 0)
         {
             maintainLastVisiblePosition {
-                insert(Item.BOOK_START(firstItem.url))
+                insert(ReaderItem.BOOK_START(firstItem.chapterUrl))
             }
             viewModel.readerState = ReaderModel.ReaderState.IDLE
             return false
@@ -342,18 +324,18 @@ class ReaderActivity : BaseActivity()
 
     private fun addChapter(
         index: Int,
-        insert: ((Item) -> Unit),
-        insertAll: ((Collection<Item>) -> Unit),
-        remove: ((Item) -> Unit),
+        insert: ((ReaderItem) -> Unit),
+        insertAll: ((Collection<ReaderItem>) -> Unit),
+        remove: ((ReaderItem) -> Unit),
         maintainPosition: (() -> Unit) -> Unit = { it() },
         onCompletion: (() -> Unit)
     ): Boolean
     {
         val chapter = viewModel.orderedChapters[index]
-        val itemProgressBar = Item.PROGRESSBAR(chapter.url)
+        val itemProgressBar = ReaderItem.PROGRESSBAR(chapter.url)
         maintainPosition {
-            insert(Item.DIVIDER(chapter.url))
-            insert(Item.TITLE(chapter.url, 0, chapter.title))
+            insert(ReaderItem.DIVIDER(chapter.url))
+            insert(ReaderItem.TITLE(chapter.url, 0, chapter.title))
             insert(itemProgressBar)
         }
 
@@ -362,13 +344,13 @@ class ReaderActivity : BaseActivity()
             {
                 is Response.Success ->
                 {
-                    val items = textToItems(chapter.url, res.data)
+                    val items = textToItemsConverter(chapter.url, res.data)
                     withContext(Dispatchers.Main) {
-                        viewModel.chaptersStats[chapter.url] = ReaderModel.ChapterStats(size = items.size, chapter = chapter, index = index)
+                        viewModel.addChapterStats(chapter, items.size, index)
                         maintainPosition {
                             remove(itemProgressBar)
                             insertAll(items)
-                            insert(Item.DIVIDER(chapter.url))
+                            insert(ReaderItem.DIVIDER(chapter.url))
                         }
                         onCompletion()
                     }
@@ -376,10 +358,10 @@ class ReaderActivity : BaseActivity()
                 is Response.Error ->
                 {
                     withContext(Dispatchers.Main) {
-                        viewModel.chaptersStats[chapter.url] = ReaderModel.ChapterStats(size = 1, chapter = chapter, index = index)
+                        viewModel.addChapterStats(chapter, 1, index)
                         maintainPosition {
                             remove(itemProgressBar)
-                            insert(Item.ERROR(chapter.url, res.message))
+                            insert(ReaderItem.ERROR(chapter.url, res.message))
                         }
                         onCompletion()
                     }
@@ -390,236 +372,4 @@ class ReaderActivity : BaseActivity()
     }
 }
 
-sealed class Item
-{
-    abstract val url: String
 
-    interface Position
-    {
-        val pos: Int
-    }
-
-    enum class LOCATION
-    { FIRST, MIDDLE, LAST }
-
-    data class TITLE(override val url: String, override val pos: Int, val text: String) : Item(), Position
-    data class BODY(override val url: String, override val pos: Int, val text: String, val location: LOCATION) : Item(), Position
-    {
-        val image by lazy { EpubXMLFileParser.extractImgEntry(text) }
-    }
-
-    class PROGRESSBAR(override val url: String) : Item()
-    class DIVIDER(override val url: String) : Item()
-    class BOOK_END(override val url: String) : Item()
-    class BOOK_START(override val url: String) : Item()
-    class ERROR(override val url: String, val text: String) : Item()
-    class PADDING(override val url: String) : Item()
-}
-
-private fun textToItems(chapterUrl: String, text: String): List<Item>
-{
-    val paragraphs = text
-        .splitToSequence("\n\n")
-        .filter { it.isNotBlank() }
-        .withIndex().iterator()
-
-    return sequence {
-        for ((index, paragraph) in paragraphs)
-        {
-            val item = when
-            {
-                index == 0 -> Item.BODY(chapterUrl, index + 1, paragraph, Item.LOCATION.FIRST)
-                !paragraphs.hasNext() -> Item.BODY(chapterUrl, index + 1, paragraph, Item.LOCATION.LAST)
-                else -> Item.BODY(chapterUrl, index + 1, paragraph, Item.LOCATION.MIDDLE)
-            }
-            yield(item)
-        }
-    }.toList()
-}
-
-private class ItemArrayAdapter(
-    val activity: ReaderActivity,
-    val viewModel: ReaderModel,
-    val list: ArrayList<Item>,
-    val bookUrl: String,
-    val folderBooks: File
-) :
-    ArrayAdapter<Item>(activity, 0, list)
-{
-    val localBookBaseDir = File(folderBooks, bookUrl.removePrefix("local://"))
-
-    override fun getCount() = super.getCount() + 2
-    override fun getItem(position: Int): Item = when (position)
-    {
-        0 -> topPadding
-        this.count - 1 -> bottomPadding
-        else -> super.getItem(position - 1)!!
-    }
-
-    val topPadding = Item.PADDING("")
-    val bottomPadding = Item.PADDING("")
-
-    override fun getViewTypeCount(): Int = 9
-    override fun getItemViewType(position: Int) = when (val item = getItem(position))
-    {
-        is Item.BODY -> if (item.image != null) 0 else 1
-        is Item.BOOK_END -> 2
-        is Item.BOOK_START -> 2
-        is Item.DIVIDER -> 3
-        is Item.ERROR -> 4
-        is Item.PADDING -> 5
-        is Item.PROGRESSBAR -> 6
-        is Item.TITLE -> 7
-    }
-
-    private fun viewBody(item: Item.BODY, convertView: View?, parent: ViewGroup): View
-    {
-        val bind = when (convertView)
-        {
-            null -> ActivityReaderListItemBodyBinding.inflate(parent.inflater, parent, false).also { it.root.tag = it }
-            else -> ActivityReaderListItemBodyBinding.bind(convertView)
-        }
-
-        val paragraph = item.text + "\n"
-        bind.body.text = paragraph
-        bind.body.textSize = activity.run { appPreferences.READER_FONT_SIZE }
-        bind.body.typeface = activity.run { getFontFamilyNORMAL(appPreferences.READER_FONT_FAMILY) }
-
-        when (item.location)
-        {
-            Item.LOCATION.FIRST -> viewModel.readRoutine.setReadStart(item.url)
-            Item.LOCATION.LAST -> viewModel.readRoutine.setReadEnd(item.url)
-            else -> run {}
-        }
-        return bind.root
-    }
-
-    private fun viewImage(item: Item.BODY, convertView: View?, parent: ViewGroup): View
-    {
-        val bind = when (convertView)
-        {
-            null -> ActivityReaderListItemImageBinding.inflate(parent.inflater, parent, false).also { it.root.tag = it }
-            else -> ActivityReaderListItemImageBinding.bind(convertView)
-        }
-
-        val imgEntry = item.image!!
-        bind.image.updateLayoutParams<ConstraintLayout.LayoutParams> {
-            dimensionRatio = "1:${imgEntry.yrel}"
-        }
-
-        // Glide uses current imageView size to load the bitmap best optimized for it, but current
-        // size corresponds to the last image (different size) and the view layout only updates to
-        // the new values on next redraw. Execute Glide loading call in the next (parent) layout
-        // update to let it get the correct values.
-        // (Avoids getting "blurry" images)
-        bind.imageContainer.doOnNextLayout {
-            Glide.with(activity)
-                .load(File(localBookBaseDir, imgEntry.path))
-                .error(R.drawable.ic_baseline_error_outline_24)
-                .transition(DrawableTransitionOptions.withCrossFade())
-                .into(bind.image)
-        }
-
-        when (item.location)
-        {
-            Item.LOCATION.FIRST -> viewModel.readRoutine.setReadStart(item.url)
-            Item.LOCATION.LAST -> viewModel.readRoutine.setReadEnd(item.url)
-            else -> run {}
-        }
-
-        return bind.root
-    }
-
-    private fun viewBookEnd(item: Item.BOOK_END, convertView: View?, parent: ViewGroup): View
-    {
-        val bind = when (convertView)
-        {
-            null -> ActivityReaderListItemSpecialTitleBinding.inflate(parent.inflater, parent, false).also { it.root.tag = it }
-            else -> ActivityReaderListItemSpecialTitleBinding.bind(convertView)
-        }
-        bind.specialTitle.text = context.getString(R.string.reader_no_more_chapters)
-        bind.specialTitle.typeface = activity.run { getFontFamilyBOLD(appPreferences.READER_FONT_FAMILY) }
-        return bind.root
-    }
-
-    private fun viewBookStart(item: Item.BOOK_START, convertView: View?, parent: ViewGroup): View
-    {
-        val bind = when (convertView)
-        {
-            null -> ActivityReaderListItemSpecialTitleBinding.inflate(parent.inflater, parent, false).also { it.root.tag = it }
-            else -> ActivityReaderListItemSpecialTitleBinding.bind(convertView)
-        }
-        bind.specialTitle.text = context.getString(R.string.reader_first_chapter)
-        bind.specialTitle.typeface = activity.run { getFontFamilyBOLD(appPreferences.READER_FONT_FAMILY) }
-        return bind.root
-    }
-
-    private fun viewProgressbar(item: Item.PROGRESSBAR, convertView: View?, parent: ViewGroup): View
-    {
-        val bind = when (convertView)
-        {
-            null -> ActivityReaderListItemProgressBarBinding.inflate(parent.inflater, parent, false).also { it.root.tag = it }
-            else -> ActivityReaderListItemProgressBarBinding.bind(convertView)
-        }
-        return bind.root
-    }
-
-    private fun viewDivider(item: Item.DIVIDER, convertView: View?, parent: ViewGroup): View
-    {
-        val bind = when (convertView)
-        {
-            null -> ActivityReaderListItemDividerBinding.inflate(parent.inflater, parent, false).also { it.root.tag = it }
-            else -> ActivityReaderListItemDividerBinding.bind(convertView)
-        }
-        return bind.root
-    }
-
-    private fun viewError(item: Item.ERROR, convertView: View?, parent: ViewGroup): View
-    {
-        val bind = when (convertView)
-        {
-            null -> ActivityReaderListItemErrorBinding.inflate(parent.inflater, parent, false).also { it.root.tag = it }
-            else -> ActivityReaderListItemErrorBinding.bind(convertView)
-        }
-        bind.error.text = item.text
-        return bind.root
-    }
-
-    private fun viewPadding(item: Item.PADDING, convertView: View?, parent: ViewGroup): View
-    {
-        val bind = when (convertView)
-        {
-            null -> ActivityReaderListItemPaddingBinding.inflate(parent.inflater, parent, false).also { it.root.tag = it }
-            else -> ActivityReaderListItemPaddingBinding.bind(convertView)
-        }
-        return bind.root
-    }
-
-    private fun viewTitle(item: Item.TITLE, convertView: View?, parent: ViewGroup): View
-    {
-        val bind = when (convertView)
-        {
-            null -> ActivityReaderListItemTitleBinding.inflate(parent.inflater, parent, false).also { it.root.tag = it }
-            else -> ActivityReaderListItemTitleBinding.bind(convertView)
-        }
-        bind.title.text = item.text
-        bind.title.typeface = activity.run { getFontFamilyBOLD(appPreferences.READER_FONT_FAMILY) }
-        return bind.root
-    }
-
-    override fun getView(position: Int, convertView: View?, parent: ViewGroup): View = when (val item = getItem(position))
-    {
-        is Item.BODY -> when (item.image)
-        {
-            null -> viewBody(item, convertView, parent)
-            else -> viewImage(item, convertView, parent)
-        }
-        is Item.BOOK_END -> viewBookEnd(item, convertView, parent)
-        is Item.BOOK_START -> viewBookStart(item, convertView, parent)
-        is Item.DIVIDER -> viewDivider(item, convertView, parent)
-        is Item.ERROR -> viewError(item, convertView, parent)
-        is Item.PADDING -> viewPadding(item, convertView, parent)
-        is Item.PROGRESSBAR -> viewProgressbar(item, convertView, parent)
-        is Item.TITLE -> viewTitle(item, convertView, parent)
-    }
-}

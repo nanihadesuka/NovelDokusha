@@ -1,8 +1,6 @@
 package my.noveldokusha.ui.reader
 
-import androidx.lifecycle.SavedStateHandle
-import androidx.lifecycle.asLiveData
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
 import my.noveldokusha.AppPreferences
@@ -29,6 +27,11 @@ class ReaderModel @Inject constructor(
     val appPreferences: AppPreferences
 ) : BaseViewModel(), ReaderStateBundle
 {
+    enum class ReaderState
+    { IDLE, LOADING, INITIAL_LOAD }
+
+    data class ChapterStats(val itemCount: Int, val chapter: Chapter, val index: Int)
+
     override var bookUrl by StateExtra_String(state)
     override var chapterUrl by StateExtra_String(state)
 
@@ -39,11 +42,14 @@ class ReaderModel @Inject constructor(
 
     val orderedChapters: List<Chapter>
 
+    val readingPosStats = MutableLiveData<Pair<ChapterStats, Int>>()
+
     init
     {
         val chapter = viewModelScope.async(Dispatchers.IO) { repository.bookChapter.get(chapterUrl) }
         val bookChapter = viewModelScope.async(Dispatchers.IO) { repository.bookChapter.chapters(bookUrl) }
 
+        // Need to fix this somehow
         runBlocking {
             currentChapter = ChapterState(
                 url = chapterUrl,
@@ -54,25 +60,14 @@ class ReaderModel @Inject constructor(
         }
     }
 
-    private val initialLoadDone = AtomicBoolean(false)
-    fun initialLoad(fn: () -> Unit)
-    {
-        if (initialLoadDone.compareAndSet(false, true)) fn()
-    }
-
-    data class ChapterStats(val size: Int, val chapter: Chapter, val index: Int)
-
     val readerFontSize = appPreferences.READER_FONT_SIZE_flow().asLiveData()
     val readerFontFamily = appPreferences.READER_FONT_FAMILY_flow().asLiveData()
-
-    val chaptersStats = mutableMapOf<String, ChapterStats>()
-    val items = ArrayList<Item>()
+    val items = ArrayList<ReaderItem>()
     val readRoutine = ChaptersIsReadRoutine(repository)
-
     var readerState = ReaderState.INITIAL_LOAD
 
-    enum class ReaderState
-    { IDLE, LOADING, INITIAL_LOAD }
+    private val chaptersStats = mutableMapOf<String, ChapterStats>()
+    private val initialLoadDone = AtomicBoolean(false)
 
     override fun onCleared()
     {
@@ -80,14 +75,40 @@ class ReaderModel @Inject constructor(
         super.onCleared()
     }
 
+    fun initialLoad(fn: () -> Unit)
+    {
+        if (initialLoadDone.compareAndSet(false, true)) fn()
+    }
+
+    fun getNextChapterIndex(currentChapterUrl: String) =
+        chaptersStats[currentChapterUrl]!!.index + 1
+
+    fun getPreviousChapterIndex(currentChapterUrl: String) =
+        chaptersStats[currentChapterUrl]!!.index - 1
+
+    fun updateInfoViewTo(chapterUrl: String, itemPos: Int)
+    {
+        val chapter = chaptersStats[chapterUrl] ?: return
+        readingPosStats.postValue(Pair(chapter, itemPos))
+    }
+
+    fun addChapterStats(chapter: Chapter, itemCount: Int, index: Int)
+    {
+        chaptersStats[chapter.url] = ChapterStats(itemCount, chapter, index)
+    }
+
     suspend fun fetchChapterBody(chapterUrl: String) = repository.bookChapterBody.fetchBody(chapterUrl)
 
-    suspend fun getChapterInitialPosition() = getChapterInitialPosition(
-        repository = repository,
-        bookUrl = bookUrl,
-        chapter = chaptersStats[currentChapter.url]!!.chapter,
-        items = items
-    )
+    suspend fun getChapterInitialPosition(): Pair<Int, Int>?
+    {
+        val stats = chaptersStats[currentChapter.url] ?: return null
+        return getChapterInitialPosition(
+            repository = repository,
+            bookUrl = bookUrl,
+            chapter = stats.chapter,
+            items = items
+        )
+    }
 }
 
 data class ChapterState(val url: String, val position: Int, val offset: Int)
@@ -97,21 +118,18 @@ private fun saveLastReadPositionState(
     bookUrl: String,
     chapter: ChapterState,
     oldChapter: ChapterState? = null
-)
-{
-    CoroutineScope(Dispatchers.IO).launch(Dispatchers.IO) {
-        repository.withTransaction {
-            repository.bookLibrary.get(bookUrl)?.let {
-                repository.bookLibrary.update(it.copy(lastReadChapter = chapter.url))
-            }
+) = CoroutineScope(Dispatchers.IO).launch {
+    repository.withTransaction {
+        repository.bookLibrary.get(bookUrl)?.let {
+            repository.bookLibrary.update(it.copy(lastReadChapter = chapter.url))
+        }
 
-            if (oldChapter?.url != null) repository.bookChapter.get(oldChapter.url)?.let {
-                repository.bookChapter.update(it.copy(lastReadPosition = oldChapter.position, lastReadOffset = oldChapter.offset))
-            }
+        if (oldChapter?.url != null) repository.bookChapter.get(oldChapter.url)?.let {
+            repository.bookChapter.update(it.copy(lastReadPosition = oldChapter.position, lastReadOffset = oldChapter.offset))
+        }
 
-            repository.bookChapter.get(chapter.url)?.let {
-                repository.bookChapter.update(it.copy(lastReadPosition = chapter.position, lastReadOffset = chapter.offset))
-            }
+        repository.bookChapter.get(chapter.url)?.let {
+            repository.bookChapter.update(it.copy(lastReadPosition = chapter.position, lastReadOffset = chapter.offset))
         }
     }
 }
@@ -120,16 +138,16 @@ suspend fun getChapterInitialPosition(
     repository: Repository,
     bookUrl: String,
     chapter: Chapter,
-    items: ArrayList<Item>
+    items: ArrayList<ReaderItem>
 ): Pair<Int, Int> = coroutineScope {
 
     val book = async(Dispatchers.IO) { repository.bookLibrary.get(bookUrl) }
     val titlePos = async(Dispatchers.Default) {
-        items.indexOfFirst { it is Item.TITLE }
+        items.indexOfFirst { it is ReaderItem.TITLE }
     }
     val position = async(Dispatchers.Default) {
         items.indexOfFirst {
-            it is Item.Position && it.pos == chapter.lastReadPosition
+            it is ReaderItem.Position && it.pos == chapter.lastReadPosition
         }.let { index ->
             if (index == -1) Pair(titlePos.await(), 0)
             else Pair(index, chapter.lastReadOffset)
@@ -144,29 +162,3 @@ suspend fun getChapterInitialPosition(
     }.let { Pair(it.first.coerceAtLeast(titlePos.await()), it.second) }
 }
 
-class ChaptersIsReadRoutine(val repository: Repository)
-{
-    fun setReadStart(chapterUrl: String) = checkLoadStatus(chapterUrl) { it.copy(startSeen = true) }
-    fun setReadEnd(chapterUrl: String) = checkLoadStatus(chapterUrl) { it.copy(endSeen = true) }
-
-    private data class ChapterReadStatus(val startSeen: Boolean, val endSeen: Boolean)
-
-    private val scope = CoroutineScope(Dispatchers.IO)
-    private val chapterRead = mutableMapOf<String, ChapterReadStatus>()
-
-    private fun checkLoadStatus(chapterUrl: String, fn: (ChapterReadStatus) -> ChapterReadStatus) = scope.launch {
-
-        val chapter = repository.bookChapter.get(chapterUrl) ?: return@launch
-        val oldStatus = chapterRead.getOrPut(chapterUrl) {
-            if (chapter.read) ChapterReadStatus(true, true) else ChapterReadStatus(false, false)
-        }
-
-        if (oldStatus.startSeen && oldStatus.endSeen) return@launch
-
-        val newStatus = fn(oldStatus)
-        if (newStatus.startSeen && newStatus.endSeen)
-            repository.bookChapter.update(chapter.copy(read = true))
-
-        chapterRead[chapterUrl] = newStatus
-    }
-}
