@@ -26,7 +26,7 @@ interface SourceCatalogStateBundle
 }
 
 @HiltViewModel
-class SourceCatalogModel @Inject constructor(
+class SourceCatalogViewModel @Inject constructor(
     private val repository: Repository,
     private val state: SavedStateHandle,
     @ApplicationContext private val context: Context

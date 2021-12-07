@@ -37,7 +37,7 @@ class DatabaseSearchActivity : BaseActivity()
 		}
 	}
 
-	private val viewModel by viewModels<DatabaseSearchModel>()
+	private val viewModel by viewModels<DatabaseSearchViewModel>()
 	private val viewBind by lazy { ActivityDatabaseSearchBinding.inflate(layoutInflater) }
 	private val viewAdapter = object
 	{
@@ -114,10 +114,10 @@ class DatabaseSearchActivity : BaseActivity()
 
 }
 
-private class GenresAdapter : MyListAdapter<DatabaseSearchModel.Item, GenresAdapter.ViewHolder>()
+private class GenresAdapter : MyListAdapter<DatabaseSearchViewModel.Item, GenresAdapter.ViewHolder>()
 {
-	override fun areItemsTheSame(old: DatabaseSearchModel.Item, new: DatabaseSearchModel.Item) = old.genreId == new.genreId
-	override fun areContentsTheSame(old: DatabaseSearchModel.Item, new: DatabaseSearchModel.Item) = old.state == new.state
+	override fun areItemsTheSame(old: DatabaseSearchViewModel.Item, new: DatabaseSearchViewModel.Item) = old.genreId == new.genreId
+	override fun areContentsTheSame(old: DatabaseSearchViewModel.Item, new: DatabaseSearchViewModel.Item) = old.state == new.state
 
 	override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder =
 		ViewHolder(ActivityDatabaseSearchGenreItemBinding.inflate(parent.inflater, parent, false))

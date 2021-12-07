@@ -25,7 +25,7 @@ import java.util.*
 @AndroidEntryPoint
 class SettingsFragment : BaseFragment()
 {
-    private val viewModel by viewModels<SettingsModel>()
+    private val viewModel by viewModels<SettingsViewModel>()
     private lateinit var viewBind: ActivityMainFragmentSettingsBinding
     private lateinit var viewAdapter: Adapter
 

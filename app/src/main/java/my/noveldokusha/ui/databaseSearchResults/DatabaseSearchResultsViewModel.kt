@@ -62,7 +62,7 @@ interface DatabaseSearchResultsStateBundle
 }
 
 @HiltViewModel
-class DatabaseSearchResultsModel @Inject constructor(
+class DatabaseSearchResultsViewModel @Inject constructor(
     val state: SavedStateHandle
 ) : BaseViewModel(), DatabaseSearchResultsStateBundle
 {

@@ -21,7 +21,7 @@ interface ReaderStateBundle
 }
 
 @HiltViewModel
-class ReaderModel @Inject constructor(
+class ReaderViewModel @Inject constructor(
     val repository: Repository,
     private val state: SavedStateHandle,
     val appPreferences: AppPreferences
@@ -56,7 +56,7 @@ class ReaderModel @Inject constructor(
                 position = chapter.await()?.lastReadPosition ?: 0,
                 offset = chapter.await()?.lastReadOffset ?: 0
             )
-            this@ReaderModel.orderedChapters = bookChapter.await()
+            this@ReaderViewModel.orderedChapters = bookChapter.await()
         }
     }
 

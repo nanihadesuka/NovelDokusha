@@ -23,7 +23,7 @@ interface DatabaseBookInfoStateBundle
 }
 
 @HiltViewModel
-class DatabaseBookInfoModel @Inject constructor(
+class DatabaseBookInfoViewModel @Inject constructor(
     state: SavedStateHandle
 ) : BaseViewModel(), DatabaseBookInfoStateBundle
 {

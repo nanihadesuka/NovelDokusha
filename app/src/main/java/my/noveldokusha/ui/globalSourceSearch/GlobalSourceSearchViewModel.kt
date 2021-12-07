@@ -19,7 +19,7 @@ interface GlobalSourceSearchStateBundle
 }
 
 @HiltViewModel
-class GlobalSourceSearchModel @Inject constructor(
+class GlobalSourceSearchViewModel @Inject constructor(
     state: SavedStateHandle,
     val appPreferences: AppPreferences
 ) : BaseViewModel(), GlobalSourceSearchStateBundle

@@ -35,7 +35,7 @@ class GlobalSourceSearchActivity : BaseActivity()
 		}
 	}
 	
-	private val viewModel by viewModels<GlobalSourceSearchModel>()
+	private val viewModel by viewModels<GlobalSourceSearchViewModel>()
 	private val viewBind by lazy { ActivityGlobalSourceSearchBinding.inflate(layoutInflater) }
 	private val viewAdapter = object
 	{

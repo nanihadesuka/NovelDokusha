@@ -37,7 +37,7 @@ class LibraryPageFragment : BaseFragment, LibraryPageStateBundle
 
     override var showCompleted by Argument_Boolean()
 
-    private val viewModel by viewModels<LibraryPageModel>()
+    private val viewModel by viewModels<LibraryPageViewModel>()
     private lateinit var viewBind: ActivityMainFragmentLibraryPageBinding
     private lateinit var viewAdapter: Adapter
     private lateinit var viewLayout: Layout
@@ -79,7 +79,7 @@ class LibraryPageFragment : BaseFragment, LibraryPageStateBundle
 
 private class NovelItemAdapter(
     private val ctx: Context,
-    private val viewModel: LibraryPageModel
+    private val viewModel: LibraryPageViewModel
 ) : MyListAdapter<BookWithContext, NovelItemAdapter.ViewHolder>()
 {
     override fun areItemsTheSame(old: BookWithContext, new: BookWithContext) = old.book.url == new.book.url

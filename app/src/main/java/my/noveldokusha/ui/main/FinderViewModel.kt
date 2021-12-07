@@ -11,7 +11,7 @@ import my.noveldokusha.ui.BaseViewModel
 import javax.inject.Inject
 
 @HiltViewModel
-class FinderModel @Inject constructor(
+class FinderViewModel @Inject constructor(
     @ApplicationContext private val context: Context,
     private val appPreferences: AppPreferences
 ) : BaseViewModel()

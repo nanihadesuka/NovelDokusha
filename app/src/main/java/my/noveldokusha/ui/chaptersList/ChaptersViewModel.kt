@@ -30,7 +30,7 @@ interface ChapterStateBundle
 }
 
 @HiltViewModel
-class ChaptersModel @Inject constructor(
+class ChaptersViewModel @Inject constructor(
     private val repository: Repository,
     private val appScope: CoroutineScope,
     @ApplicationContext private val context: Context,

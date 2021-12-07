@@ -12,16 +12,14 @@ import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.google.android.material.tabs.TabLayoutMediator
 import dagger.hilt.android.AndroidEntryPoint
 import my.noveldokusha.*
-import my.noveldokusha.data.Repository
 import my.noveldokusha.databinding.ActivityMainFragmentLibraryBinding
 import my.noveldokusha.services.EpubImportService
 import my.noveldokusha.ui.BaseFragment
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class LibraryFragment : BaseFragment()
 {
-    private val viewModel by viewModels<LibraryModel>()
+    private val viewModel by viewModels<LibraryViewModel>()
     private lateinit var viewBind: ActivityMainFragmentLibraryBinding
     private lateinit var viewAdapter: Adapter
 

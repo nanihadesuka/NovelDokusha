@@ -6,6 +6,6 @@ import java.io.InputStream
 import javax.inject.Inject
 
 @HiltViewModel
-class LibraryModel @Inject constructor() : BaseViewModel()
+class LibraryViewModel @Inject constructor() : BaseViewModel()
 {
 }

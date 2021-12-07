@@ -13,7 +13,7 @@ import java.io.File
 import javax.inject.Inject
 
 @HiltViewModel
-class SettingsModel @Inject constructor(
+class SettingsViewModel @Inject constructor(
     private val repository: Repository,
     private val appScope: CoroutineScope
 ) : BaseViewModel()

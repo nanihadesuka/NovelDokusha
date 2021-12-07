@@ -49,7 +49,7 @@ class DatabaseBookInfoActivity : BaseActivity()
 		}
 	}
 	
-	private val viewModel by viewModels<DatabaseBookInfoModel>()
+	private val viewModel by viewModels<DatabaseBookInfoViewModel>()
 	private val viewBind by lazy { ActivityDatabaseBookInfoBinding.inflate(layoutInflater) }
 	private val viewAdapter = object
 	{

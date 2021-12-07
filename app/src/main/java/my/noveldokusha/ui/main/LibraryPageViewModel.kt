@@ -19,7 +19,7 @@ interface LibraryPageStateBundle
 }
 
 @HiltViewModel
-class LibraryPageModel @Inject constructor(
+class LibraryPageViewModel @Inject constructor(
     val repository: Repository,
     private val state: SavedStateHandle
 ) : BaseViewModel(), LibraryPageStateBundle

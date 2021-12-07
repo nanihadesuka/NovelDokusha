@@ -30,7 +30,7 @@ class FinderFragment : Fragment()
     @Inject
     lateinit var appPreferences: AppPreferences
 
-    private val viewModel by viewModels<FinderModel>()
+    private val viewModel by viewModels<FinderViewModel>()
     private lateinit var viewBind: ActivityMainFragmentFinderBinding
     private lateinit var viewAdapter: Adapter
 

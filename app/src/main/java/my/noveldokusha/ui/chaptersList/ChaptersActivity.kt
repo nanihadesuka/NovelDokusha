@@ -9,14 +9,11 @@ import android.view.*
 import androidx.activity.viewModels
 import androidx.appcompat.widget.SearchView
 import androidx.core.view.isVisible
-import androidx.lifecycle.asFlow
-import androidx.lifecycle.asLiveData
 import androidx.lifecycle.distinctUntilChanged
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.*
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.distinctUntilChanged
 import my.noveldokusha.*
 import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.data.ChapterWithContext
@@ -47,7 +44,7 @@ class ChaptersActivity : BaseActivity()
         }
     }
 
-    private val viewModel by viewModels<ChaptersModel>()
+    private val viewModel by viewModels<ChaptersViewModel>()
     private val viewBind by lazy { ActivityChaptersBinding.inflate(layoutInflater) }
     private val viewAdapter = object
     {
@@ -215,7 +212,7 @@ class ChaptersActivity : BaseActivity()
 
 private class ChaptersArrayAdapter(
     private val context: BaseActivity,
-    private val viewModel: ChaptersModel
+    private val viewModel: ChaptersViewModel
 ) : MyListAdapter<ChapterWithContext, ChaptersArrayAdapter.ViewHolder>()
 {
     override fun areItemsTheSame(old: ChapterWithContext, new: ChapterWithContext) =
@@ -269,7 +266,7 @@ private class ChaptersArrayAdapter(
 
 private class ChaptersHeaderAdapter(
     val context: BaseActivity,
-    val viewModel: ChaptersModel
+    val viewModel: ChaptersViewModel
 ) : RecyclerView.Adapter<ChaptersHeaderAdapter.ViewHolder>()
 {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder =

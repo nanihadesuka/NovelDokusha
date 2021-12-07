@@ -47,7 +47,7 @@ class DatabaseSearchResultsActivity : BaseActivity()
         data class AuthorSeries(val authorName: String, val urlAuthorPage: String) : SearchMode()
     }
 
-    private val viewModel by viewModels<DatabaseSearchResultsModel>()
+    private val viewModel by viewModels<DatabaseSearchResultsViewModel>()
     private val viewBind by lazy { ActivityDatabaseSearchResultsBinding.inflate(layoutInflater) }
     private val viewAdapter = object
     {

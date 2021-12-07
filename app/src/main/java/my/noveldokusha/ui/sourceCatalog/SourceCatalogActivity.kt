@@ -14,7 +14,7 @@ import my.noveldokusha.databinding.ActivitySourceCatalogBinding
 import my.noveldokusha.databinding.BookListItemBinding
 import my.noveldokusha.ui.BaseActivity
 import my.noveldokusha.ui.chaptersList.ChaptersActivity
-import my.noveldokusha.ui.sourceCatalog.SourceCatalogModel.CatalogItem
+import my.noveldokusha.ui.sourceCatalog.SourceCatalogViewModel.CatalogItem
 import my.noveldokusha.ui.webView.WebViewActivity
 import my.noveldokusha.uiAdapters.MyListAdapter
 import my.noveldokusha.uiAdapters.ProgressBarAdapter
@@ -36,7 +36,7 @@ class SourceCatalogActivity : BaseActivity()
         }
     }
 
-    private val viewModel by viewModels<SourceCatalogModel>()
+    private val viewModel by viewModels<SourceCatalogViewModel>()
     private val viewBind by lazy { ActivitySourceCatalogBinding.inflate(layoutInflater) }
     private val viewAdapter = object
     {
@@ -144,7 +144,7 @@ class SourceCatalogActivity : BaseActivity()
 
 }
 
-private class BooksItemAdapter(val viewModel: SourceCatalogModel, val ctx: BaseActivity) : MyListAdapter<CatalogItem, BooksItemAdapter.ViewHolder>()
+private class BooksItemAdapter(val viewModel: SourceCatalogViewModel, val ctx: BaseActivity) : MyListAdapter<CatalogItem, BooksItemAdapter.ViewHolder>()
 {
     override fun areItemsTheSame(old: CatalogItem, new: CatalogItem) = old.bookMetadata.url == new.bookMetadata.url
     override fun areContentsTheSame(old: CatalogItem, new: CatalogItem) = old.bookMetadata == new.bookMetadata

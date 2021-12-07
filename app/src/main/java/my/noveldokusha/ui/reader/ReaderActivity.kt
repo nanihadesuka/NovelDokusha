@@ -50,7 +50,7 @@ class ReaderActivity : BaseActivity()
             viewBind.listView.fadeIn()
     }
 
-    private val viewModel by viewModels<ReaderModel>()
+    private val viewModel by viewModels<ReaderViewModel>()
 
     private val viewBind by lazy { ActivityReaderBinding.inflate(layoutInflater) }
     private val viewAdapter = object
@@ -173,19 +173,19 @@ class ReaderActivity : BaseActivity()
 
         when (viewModel.readerState)
         {
-            ReaderModel.ReaderState.IDLE -> when
+            ReaderViewModel.ReaderState.IDLE -> when
             {
                 isBottom && loadNextChapter() -> run {}
                 isTop && loadPreviousChapter() -> run {}
             }
-            ReaderModel.ReaderState.LOADING -> run {}
-            ReaderModel.ReaderState.INITIAL_LOAD -> run {}
+            ReaderViewModel.ReaderState.LOADING -> run {}
+            ReaderViewModel.ReaderState.INITIAL_LOAD -> run {}
         }
     }
 
     private fun loadInitialChapter(): Boolean
     {
-        viewModel.readerState = ReaderModel.ReaderState.INITIAL_LOAD
+        viewModel.readerState = ReaderViewModel.ReaderState.INITIAL_LOAD
         viewAdapter.listView.clear()
 
         val insert = { item: ReaderItem -> viewAdapter.listView.add(item) }
@@ -220,7 +220,7 @@ class ReaderActivity : BaseActivity()
 
         // index + 1 because it doesn't take into account the first padding view
         viewBind.listView.setSelectionFromTop(index + 1, offset)
-        viewModel.readerState = ReaderModel.ReaderState.IDLE
+        viewModel.readerState = ReaderViewModel.ReaderState.IDLE
         fadeIn()
         viewBind.listView.doOnNextLayout { updateReadingState() }
     }
@@ -253,12 +253,12 @@ class ReaderActivity : BaseActivity()
 
     fun loadNextChapter(): Boolean
     {
-        viewModel.readerState = ReaderModel.ReaderState.LOADING
+        viewModel.readerState = ReaderViewModel.ReaderState.LOADING
 
         val lastItem = viewModel.items.lastOrNull()!!
         if (lastItem is ReaderItem.BOOK_END)
         {
-            viewModel.readerState = ReaderModel.ReaderState.IDLE
+            viewModel.readerState = ReaderViewModel.ReaderState.IDLE
             return false
         }
 
@@ -271,24 +271,24 @@ class ReaderActivity : BaseActivity()
         {
             lifecycleScope.launch(Dispatchers.Main) {
                 insert(ReaderItem.BOOK_END(lastItem.chapterUrl))
-                viewModel.readerState = ReaderModel.ReaderState.IDLE
+                viewModel.readerState = ReaderViewModel.ReaderState.IDLE
             }
             return false
         }
 
         return addChapter(nextIndex, insert, insertAll, remove) {
-            viewModel.readerState = ReaderModel.ReaderState.IDLE
+            viewModel.readerState = ReaderViewModel.ReaderState.IDLE
         }
     }
 
     fun loadPreviousChapter(): Boolean
     {
-        viewModel.readerState = ReaderModel.ReaderState.LOADING
+        viewModel.readerState = ReaderViewModel.ReaderState.LOADING
 
         val firstItem = viewModel.items.firstOrNull()!!
         if (firstItem is ReaderItem.BOOK_START)
         {
-            viewModel.readerState = ReaderModel.ReaderState.IDLE
+            viewModel.readerState = ReaderViewModel.ReaderState.IDLE
             return false
         }
 
@@ -313,12 +313,12 @@ class ReaderActivity : BaseActivity()
             maintainLastVisiblePosition {
                 insert(ReaderItem.BOOK_START(firstItem.chapterUrl))
             }
-            viewModel.readerState = ReaderModel.ReaderState.IDLE
+            viewModel.readerState = ReaderViewModel.ReaderState.IDLE
             return false
         }
 
         return addChapter(previousIndex, insert, insertAll, remove, maintainLastVisiblePosition) {
-            viewModel.readerState = ReaderModel.ReaderState.IDLE
+            viewModel.readerState = ReaderViewModel.ReaderState.IDLE
         }
     }
 
