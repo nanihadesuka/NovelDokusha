@@ -154,10 +154,10 @@ class ChaptersActivity : BaseActivity()
     {
         menuInflater.inflate(R.menu.chapters_list_menu__appbar, menu)
 
-        menu.findItem(R.id.action_library_bookmark)!!.also { menuItem ->
-            val isInLibrary = runBlocking { viewModel.getIsBookInLibrary() }
-            setMenuIconLibraryState(isInLibrary, menuItem)
-            viewModel.isInLibrary.observe(this) { setMenuIconLibraryState(it, menuItem) }
+        menu.findItem(R.id.action_library_bookmark)!!.also { bookmarkItem ->
+            viewModel.isInLibrary.observe(this) {
+                setMenuIconLibraryState(it, bookmarkItem)
+            }
         }
 
         menu.findItem(R.id.action_search_by_title)!!.also { menuItem ->
