@@ -137,4 +137,7 @@ dependencies {
     implementation("com.chimbori.crux:crux:3.0.1")
     implementation("net.dankito.readability4j:readability4j:1.0.6")
     implementation("org.jsoup:jsoup:1.14.1")
+
+    // Memory leak detector
+    debugImplementation("com.squareup.leakcanary:leakcanary-android:2.7")
 }
