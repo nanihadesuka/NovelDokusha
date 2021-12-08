@@ -59,8 +59,7 @@ class ReaderActivity : BaseActivity()
             ReaderItemAdapter(
                 this@ReaderActivity,
                 viewModel.items,
-                viewModel.bookUrl,
-                viewModel.repository.settings.folderBooks,
+                viewModel.localBookBaseFolder,
                 fontsLoader,
                 appPreferences,
                 onChapterStartVisible = { url -> viewModel.readRoutine.setReadStart(url) },

@@ -21,7 +21,7 @@ interface DatabaseSearchStateBundle
 
 @HiltViewModel
 class DatabaseSearchViewModel @Inject constructor(
-    val repository: Repository,
+    private val repository: Repository,
     state: SavedStateHandle
 ) : BaseViewModel(), DatabaseSearchStateBundle
 {

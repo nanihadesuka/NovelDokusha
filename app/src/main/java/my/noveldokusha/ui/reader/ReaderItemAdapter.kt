@@ -19,8 +19,7 @@ import java.util.ArrayList
 class ReaderItemAdapter(
     val ctx: Context,
     val list: ArrayList<ReaderItem>,
-    val bookUrl: String,
-    val folderBooks: File,
+    val localBookBaseFolder: File,
     val fontsLoader: FontsLoader,
     val appPreferences: AppPreferences,
     val onChapterStartVisible: (chapterUrl: String) -> Unit,
@@ -28,8 +27,6 @@ class ReaderItemAdapter(
 ) :
     ArrayAdapter<ReaderItem>(ctx, 0, list)
 {
-    val localBookBaseDir = File(folderBooks, bookUrl.removePrefix("local://"))
-
     override fun getCount() = super.getCount() + 2
     override fun getItem(position: Int): ReaderItem = when (position)
     {
@@ -97,7 +94,7 @@ class ReaderItemAdapter(
         // (Avoids getting "blurry" images)
         bind.imageContainer.doOnNextLayout {
             Glide.with(ctx)
-                .load(File(localBookBaseDir, imgEntry.path))
+                .load(File(localBookBaseFolder, imgEntry.path))
                 .error(R.drawable.ic_baseline_error_outline_24)
                 .transition(DrawableTransitionOptions.withCrossFade())
                 .into(bind.image)

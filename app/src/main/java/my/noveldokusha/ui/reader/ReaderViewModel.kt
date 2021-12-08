@@ -8,6 +8,7 @@ import my.noveldokusha.data.Repository
 import my.noveldokusha.data.database.tables.Chapter
 import my.noveldokusha.ui.BaseViewModel
 import my.noveldokusha.uiUtils.StateExtra_String
+import java.io.File
 import java.util.*
 import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
@@ -22,7 +23,7 @@ interface ReaderStateBundle
 
 @HiltViewModel
 class ReaderViewModel @Inject constructor(
-    val repository: Repository,
+    private val repository: Repository,
     private val state: SavedStateHandle,
     val appPreferences: AppPreferences
 ) : BaseViewModel(), ReaderStateBundle
@@ -34,6 +35,8 @@ class ReaderViewModel @Inject constructor(
 
     override var bookUrl by StateExtra_String(state)
     override var chapterUrl by StateExtra_String(state)
+
+    val localBookBaseFolder = File(repository.settings.folderBooks, bookUrl.removePrefix("local://"))
 
     var currentChapter: ChapterState by Delegates.observable(ChapterState(chapterUrl, 0, 0)) { _, old, new ->
         chapterUrl = new.url
