@@ -146,7 +146,7 @@ class ReaderActivity : BaseActivity()
             fadeIn()
         }
 
-        // Fullscreen mode and that ignores any cutout, notch etc.
+        // Fullscreen mode that ignores any cutout, notch etc.
         WindowCompat.setDecorFitsSystemWindows(window, false)
         WindowInsetsControllerCompat(window, window.decorView).let {
             it.hide(WindowInsetsCompat.Type.displayCutout())
