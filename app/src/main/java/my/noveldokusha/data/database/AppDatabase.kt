@@ -20,7 +20,7 @@ import java.io.InputStream
         Chapter::class,
         ChapterBody::class
     ],
-    version = 3,
+    version = 4,
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase()
@@ -51,6 +51,10 @@ private fun migrations() = arrayOf(
     migration(2, 3) {
         it.execSQL("ALTER TABLE Book ADD COLUMN inLibrary INTEGER NOT NULL DEFAULT 0")
         it.execSQL("UPDATE Book SET inLibrary = 1")
+    },
+    migration(3,4){
+        it.execSQL("ALTER TABLE Book ADD COLUMN coverImageUrl TEXT NOT NULL DEFAULT ''")
+        it.execSQL("ALTER TABLE Book ADD COLUMN description TEXT NOT NULL DEFAULT ''")
     }
 )
 

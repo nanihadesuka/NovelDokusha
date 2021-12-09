@@ -15,6 +15,8 @@ import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.data.ChapterWithContext
 import my.noveldokusha.data.Repository
 import my.noveldokusha.scraper.Response
+import my.noveldokusha.scraper.downloadBookCoverImageUrl
+import my.noveldokusha.scraper.downloadBookDescription
 import my.noveldokusha.scraper.downloadChaptersList
 import my.noveldokusha.ui.BaseViewModel
 import my.noveldokusha.uiUtils.Extra_String
@@ -62,11 +64,21 @@ class ChaptersViewModel @Inject constructor(
                 updateChaptersList()
 
             val book = repository.bookLibrary.get(bookMetadata.url)
-            if (book == null)
-                repository.bookLibrary.insert(Book(title = bookMetadata.title, url = bookMetadata.url))
+            if (book != null)
+                return@launch
+
+            repository.bookLibrary.insert(
+                Book(
+                    title = bookMetadata.title,
+                    url = bookMetadata.url
+                )
+            )
+            updateCover()
+            updateDescription()
         }
     }
 
+    val book = repository.bookLibrary.getFlow(bookUrl).asLiveData()
     val selectionModeVisible = MutableLiveData(false)
     val isInLibrary = repository.bookLibrary.existInLibraryFlow(bookMetadata.url).asLiveData()
     val onFetching = MutableLiveData<Boolean>()
@@ -93,6 +105,21 @@ class ChaptersViewModel @Inject constructor(
         .flowOn(Dispatchers.Default)
         .asLiveData()
 
+    fun updateCover() = viewModelScope.launch(Dispatchers.IO) {
+        when (val res = downloadBookCoverImageUrl(bookUrl))
+        {
+            is Response.Success -> repository.bookLibrary.updateCover(bookUrl, res.data)
+            else -> run {}
+        }
+    }
+
+    fun updateDescription() = viewModelScope.launch(Dispatchers.IO) {
+        when (val res = downloadBookDescription(bookUrl))
+        {
+            is Response.Success -> repository.bookLibrary.updateDescription(bookUrl, res.data)
+            else -> run {}
+        }
+    }
 
     private var loadChaptersJob: Job? = null
     fun updateChaptersList()

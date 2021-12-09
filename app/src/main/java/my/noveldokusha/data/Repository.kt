@@ -60,12 +60,15 @@ class Repository @Inject constructor(
         val booksInLibraryFlow by lazy { db.libraryDao().booksInLibraryFlow() }
         val getBooksInLibraryWithContextFlow by lazy { db.libraryDao().getBooksInLibraryWithContextFlow() }
         fun existInLibraryFlow(url: String) = db.libraryDao().existInLibraryFlow(url)
+        fun getFlow(url: String) = db.libraryDao().getFlow(url)
         suspend fun insert(book: Book) = if (isValid(book)) db.libraryDao().insert(book) else Unit
         suspend fun insert(books: List<Book>) = db.libraryDao().insert(books.filter(::isValid))
         suspend fun insertReplace(books: List<Book>) = db.libraryDao().insertReplace(books.filter(::isValid))
         suspend fun remove(bookUrl: String) = db.libraryDao().remove(bookUrl)
         suspend fun remove(book: Book) = db.libraryDao().remove(book)
         suspend fun update(book: Book) = db.libraryDao().update(book)
+        suspend fun updateCover(bookUrl: String, coverUrl:String) = db.libraryDao().updateCover(bookUrl,coverUrl)
+        suspend fun updateDescription(bookUrl: String, description:String) = db.libraryDao().updateDescription(bookUrl,description)
         suspend fun get(url: String) = db.libraryDao().get(url)
         suspend fun getAll() = db.libraryDao().getAll()
         suspend fun getAllInLibrary() = db.libraryDao().getAllInLibrary()

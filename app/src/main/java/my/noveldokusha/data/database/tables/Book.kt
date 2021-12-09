@@ -9,5 +9,7 @@ data class Book(
     @PrimaryKey val url: String,
     val completed: Boolean = false,
     val lastReadChapter: String? = null,
-    val inLibrary: Boolean = false
+    val inLibrary: Boolean = false,
+    val coverImageUrl: String = "",
+    val description: String = ""
 )

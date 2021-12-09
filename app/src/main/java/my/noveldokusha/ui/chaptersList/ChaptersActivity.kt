@@ -1,5 +1,7 @@
 package my.noveldokusha.ui.chaptersList
 
+import android.animation.ArgbEvaluator
+import android.animation.ValueAnimator
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
@@ -8,17 +10,24 @@ import android.os.Bundle
 import android.view.*
 import androidx.activity.viewModels
 import androidx.appcompat.widget.SearchView
+import androidx.core.graphics.toColor
+import androidx.core.view.WindowCompat
 import androidx.core.view.isVisible
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.distinctUntilChanged
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.*
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
+import com.bumptech.glide.request.transition.ViewAnimationFactory
+import com.google.android.material.appbar.AppBarLayout
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.*
 import my.noveldokusha.*
 import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.data.ChapterWithContext
 import my.noveldokusha.databinding.ActivityChaptersBinding
-import my.noveldokusha.databinding.ActivityChaptersListHeaderBinding
 import my.noveldokusha.databinding.ActivityChaptersListItemBinding
 import my.noveldokusha.scraper.scraper
 import my.noveldokusha.ui.BaseActivity
@@ -44,12 +53,16 @@ class ChaptersActivity : BaseActivity()
         }
     }
 
-    private val viewModel by viewModels<ChaptersViewModel>()
-    private val viewBind by lazy { ActivityChaptersBinding.inflate(layoutInflater) }
+    val viewModel by viewModels<ChaptersViewModel>()
+    val viewBind by lazy { ActivityChaptersBinding.inflate(layoutInflater) }
     private val viewAdapter = object
     {
         val chapters by lazy { ChaptersArrayAdapter(this@ChaptersActivity, viewModel) }
-        val header by lazy { ChaptersHeaderAdapter(this@ChaptersActivity, viewModel) }
+    }
+
+    val appBarTransparent = MutableLiveData(true)
+    val offsetListener = AppBarLayout.OnOffsetChangedListener { _, verticalOffset ->
+        appBarTransparent.postValue(verticalOffset >= -10)
     }
 
     override fun onCreate(savedInstanceState: Bundle?)
@@ -58,12 +71,14 @@ class ChaptersActivity : BaseActivity()
         setContentView(viewBind.root)
         setSupportActionBar(viewBind.toolbar)
 
-        window.statusBarColor = android.R.attr.colorBackground.colorAttrRes(this)
-
-        viewBind.recyclerView.adapter = ConcatAdapter(viewAdapter.header, viewAdapter.chapters)
+        viewBind.recyclerView.adapter = viewAdapter.chapters
         viewBind.recyclerView.itemAnimator = DefaultItemAnimator()
         viewBind.recyclerView.itemAnimator = null
-        viewBind.swipeRefreshLayout.setOnRefreshListener { viewModel.updateChaptersList() }
+        viewBind.swipeRefreshLayout.setOnRefreshListener {
+            viewModel.updateCover()
+            viewModel.updateDescription()
+            viewModel.updateChaptersList()
+        }
         viewModel.onFetching.observe(this) { viewBind.swipeRefreshLayout.isRefreshing = it }
         viewModel.chaptersWithContextLiveData.observe(this) {
             viewAdapter.chapters.list = it
@@ -76,6 +91,7 @@ class ChaptersActivity : BaseActivity()
             }
         }
 
+        setupBookInfo(this, viewModel)
         setupSelectionModeBar()
 
         viewBind.floatingActionButton.setOnClickListener {
@@ -96,10 +112,32 @@ class ChaptersActivity : BaseActivity()
             }
         }
 
+        // Stored inside a weakReference, needs to be explicitly referenced in the activity
+        viewBind.appBarLayout.addOnOffsetChangedListener(offsetListener)
+
+        appBarTransparent.observe(this) { transparent ->
+            val background = when (transparent)
+            {
+                true -> Color.TRANSPARENT
+                false -> android.R.attr.colorBackground.colorAttrRes(this)
+            }
+
+            ValueAnimator.ofObject(ArgbEvaluator(), window.statusBarColor, background).apply {
+                duration = 150
+                addUpdateListener {
+                    val color = it.animatedValue as Int
+                    window.statusBarColor = color
+                    viewBind.toolbar.setBackgroundColor(color)
+                }
+            }.start()
+        }
+
         supportActionBar!!.let {
             it.title = "Chapters"
             it.setDisplayHomeAsUpEnabled(true)
         }
+
+        WindowCompat.setDecorFitsSystemWindows(window, false)
     }
 
     fun setupSelectionModeBar()
@@ -182,7 +220,7 @@ class ChaptersActivity : BaseActivity()
 
     private fun setMenuIconLibraryState(isInLibrary: Boolean, item: MenuItem)
     {
-        item.icon.setTint(if (isInLibrary) R.color.dark_orange_red.colorIdRes(this) else Color.DKGRAY)
+        item.icon.setTint(if (isInLibrary) R.color.dark_orange_red.colorIdRes(this) else Color.GRAY)
         item.isChecked = isInLibrary
     }
 
@@ -264,55 +302,56 @@ private class ChaptersArrayAdapter(
     inner class ViewHolder(val viewBind: ActivityChaptersListItemBinding) : RecyclerView.ViewHolder(viewBind.root)
 }
 
-private class ChaptersHeaderAdapter(
-    val context: BaseActivity,
-    val viewModel: ChaptersViewModel
-) : RecyclerView.Adapter<ChaptersHeaderAdapter.ViewHolder>()
+private fun setupBookInfo(activity: ChaptersActivity, viewModel: ChaptersViewModel)
 {
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder =
-        ViewHolder(ActivityChaptersListHeaderBinding.inflate(parent.inflater, parent, false))
+    val viewBind = activity.viewBind.header
 
-    override fun getItemCount() = 1
+    viewBind.bookTitle.text = viewModel.bookMetadata.title
+    viewBind.sourceName.text = scraper.getCompatibleSource(viewModel.bookMetadata.url)?.name ?: ""
 
-    override fun onBindViewHolder(binder: ViewHolder, position: Int): Unit = run { }
+    viewModel.book.observe(activity) {
+        val isVisible = it != null && it.description.isNotBlank()
+        viewBind.bookDescription.visibility = if (isVisible) View.VISIBLE else View.GONE
+        viewBind.bookDescription.text = it?.description ?: ""
 
-    inner class ViewHolder(val viewBind: ActivityChaptersListHeaderBinding) : RecyclerView.ViewHolder(viewBind.root)
-    {
-        init
-        {
-            viewBind.bookTitle.text = viewModel.bookMetadata.title
-            viewBind.sourceName.text = scraper.getCompatibleSource(viewModel.bookMetadata.url)?.name
-                ?: ""
-
-            viewModel.chaptersWithContextLiveData.observe(context) { list ->
-                viewBind.numberOfChapters.text = list.size.toString()
-            }
-            viewModel.onError.observe(context) { viewBind.errorMessage.text = it }
-            viewModel.onErrorVisibility.observe(context) {
-                viewBind.errorMessage.visibility = it
-            }
-            viewBind.errorMessage.setOnLongClickListener(object : View.OnLongClickListener
-            {
-                private var expand: Boolean = false
-                override fun onLongClick(v: View?): Boolean
-                {
-                    expand = !expand
-                    viewBind.errorMessage.maxLines = if (expand) 100 else 10
-                    return true
-                }
-            })
-            viewBind.databaseSearchButton.setOnClickListener {
-                DatabaseSearchResultsActivity
-                    .IntentData(context, "https://www.novelupdates.com/", DatabaseSearchResultsActivity.SearchMode.Text(viewModel.bookMetadata.title))
-                    .let(context::startActivity)
-            }
-
-            viewBind.webpageOpenButton.setOnClickListener {
-                Intent(Intent.ACTION_VIEW).also {
-                    it.data = Uri.parse(viewModel.bookMetadata.url)
-                }.let(context::startActivity)
-            }
+        it?.coverImageUrl.let { imgUrl ->
+            Glide.with(activity)
+                .load(imgUrl)
+                .error(R.drawable.md_transparent)
+                .transform(RoundedCorners(32))
+                .transition(DrawableTransitionOptions.withCrossFade())
+                .into(viewBind.coverImageBackground)
         }
+    }
+
+    viewModel.chaptersWithContextLiveData.observe(activity) { list ->
+        viewBind.numberOfChapters.text = list.size.toString()
+    }
+    viewModel.onError.observe(activity) {
+        viewBind.errorMessage.text = it
+    }
+    viewModel.onErrorVisibility.observe(activity) {
+        viewBind.errorMessage.visibility = it
+    }
+    viewBind.errorMessage.setOnLongClickListener(object : View.OnLongClickListener
+    {
+        private var expand: Boolean = false
+        override fun onLongClick(v: View?): Boolean
+        {
+            expand = !expand
+            viewBind.errorMessage.maxLines = if (expand) 100 else 10
+            return true
+        }
+    })
+    viewBind.databaseSearchButton.setOnClickListener {
+        DatabaseSearchResultsActivity
+            .IntentData(activity, "https://www.novelupdates.com/", DatabaseSearchResultsActivity.SearchMode.Text(viewModel.bookMetadata.title))
+            .let(activity::startActivity)
+    }
+    viewBind.webpageOpenButton.setOnClickListener {
+        Intent(Intent.ACTION_VIEW).also {
+            it.data = Uri.parse(viewModel.bookMetadata.url)
+        }.let(activity::startActivity)
     }
 }
 

@@ -4,7 +4,7 @@ import androidx.room.Embedded
 import my.noveldokusha.data.database.tables.Book
 import my.noveldokusha.data.database.tables.Chapter
 
-data class BookMetadata(val title: String, val url: String)
+data class BookMetadata(val title: String, val url: String, val coverImageUrl: String = "", val description: String = "")
 {
     override fun equals(other: Any?): Boolean = if (other is BookMetadata) (url == other.url) else false
     override fun hashCode(): Int = url.hashCode()

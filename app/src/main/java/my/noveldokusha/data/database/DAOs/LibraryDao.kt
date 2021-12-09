@@ -35,8 +35,17 @@ interface LibraryDao
     @Update
     suspend fun update(book: Book)
 
+    @Query("UPDATE Book SET coverImageUrl = :coverUrl WHERE url == :bookUrl")
+    suspend fun updateCover(bookUrl: String, coverUrl: String)
+
+    @Query("UPDATE Book SET description = :description WHERE url == :bookUrl")
+    suspend fun updateDescription(bookUrl: String, description: String)
+
     @Query("SELECT * FROM Book WHERE url = :url")
     suspend fun get(url: String): Book?
+
+    @Query("SELECT * FROM Book WHERE url = :url")
+    fun getFlow(url: String): Flow<Book?>
 
     @Query("SELECT EXISTS(SELECT * FROM Book WHERE url == :url AND inLibrary == 1)")
     suspend fun existInLibrary(url: String): Boolean

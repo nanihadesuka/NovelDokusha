@@ -1,156 +1,209 @@
 <?xml version="1.0" encoding="utf-8"?>
-
-<LinearLayout
+<FrameLayout
 	xmlns:android="http://schemas.android.com/apk/res/android"
 	xmlns:app="http://schemas.android.com/apk/res-auto"
 	xmlns:tools="http://schemas.android.com/tools"
-	android:id="@+id/header"
 	android:layout_width="match_parent"
 	android:layout_height="wrap_content"
-	android:orientation="vertical"
 	>
-	
-	<androidx.constraintlayout.widget.ConstraintLayout
+
+	<FrameLayout
+		android:layout_width="match_parent"
+		android:layout_height="250sp"
+		>
+
+		<ImageView
+			android:id="@+id/coverImageBackground"
+			android:layout_width="match_parent"
+			android:layout_height="249sp"
+			android:alpha="0.20"
+			android:scaleType="centerCrop"
+			tools:src="@mipmap/ic_logo"
+			/>
+
+		<View
+			android:layout_width="match_parent"
+			android:layout_height="match_parent"
+			android:background="@drawable/background_gradient_upwards"
+			/>
+	</FrameLayout>
+
+	<LinearLayout
+
+		android:id="@+id/header"
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
-		android:columnCount="2"
-		android:orientation="horizontal"
+		android:orientation="vertical"
+		android:paddingTop="74dp"
 		>
-		
-		<LinearLayout
-			android:id="@+id/bookInfo"
-			android:layout_width="0dp"
-			android:layout_height="wrap_content"
-			android:animateLayoutChanges="true"
-			android:columnCount="2"
-			android:orientation="vertical"
-			android:padding="12sp"
-			app:layout_constraintLeft_toLeftOf="parent"
-			app:layout_constraintRight_toLeftOf="@id/buttons"
-			app:layout_constraintTop_toTopOf="parent"
-			>
-			
-			<TextView
-				android:id="@+id/bookTitle"
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
-				android:textSize="20sp"
-				android:textStyle="bold"
-				tools:text="Book name"
-				/>
-			
-			<LinearLayout
-				android:layout_width="match_parent"
-				android:layout_height="wrap_content"
-				android:alpha="0.6"
-				>
-				
-				<TextView
-					android:layout_width="wrap_content"
-					android:layout_height="wrap_content"
-					android:paddingEnd="6sp"
-					android:text="@string/source"
-					android:textStyle="bold"
-					/>
-				
-				<TextView
-					android:id="@+id/sourceName"
-					android:layout_width="wrap_content"
-					android:layout_height="wrap_content"
-					tools:text="source name"
-					/>
-			</LinearLayout>
-			
-			<LinearLayout
-				android:layout_width="match_parent"
-				android:layout_height="wrap_content"
-				android:alpha="0.6"
-				>
-				
-				<TextView
-					android:layout_width="wrap_content"
-					android:layout_height="wrap_content"
-					android:paddingEnd="6sp"
-					android:text="@string/chapters"
-					android:textStyle="bold"
-					/>
-				
-				<TextView
-					android:id="@+id/numberOfChapters"
-					android:layout_width="wrap_content"
-					android:layout_height="wrap_content"
-					tools:text="23"
-					/>
-			</LinearLayout>
-		</LinearLayout>
-		
-		<LinearLayout
-			android:id="@+id/buttons"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:orientation="vertical"
-			android:padding="6sp"
-			app:layout_constraintLeft_toRightOf="@id/bookInfo"
-			app:layout_constraintRight_toRightOf="parent"
-			app:layout_constraintTop_toTopOf="parent"
-			>
-			
-			<TextView
-				android:id="@+id/databaseSearchButton"
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
-				android:layout_margin="4sp"
-				android:background="@drawable/book_item_background_borderless"
-				android:clickable="true"
-				android:foreground="@drawable/book_item_foreground_ripple"
-				android:minHeight="32sp"
-				android:padding="8sp"
-				android:text="@string/database"
-				android:textStyle="bold"
-				android:tooltipText="@string/search_in_database_for_more_information"
-				/>
-			
-			<TextView
-				android:id="@+id/webpageOpenButton"
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
-				android:layout_margin="4sp"
-				android:background="@drawable/book_item_background_borderless"
-				android:clickable="true"
-				android:foreground="@drawable/book_item_foreground_ripple"
-				android:minHeight="32sp"
-				android:padding="8sp"
-				android:text="@string/webpage"
-				android:textStyle="bold"
-				android:tooltipText="@string/open_in_browser"
-				/>
-		
-		</LinearLayout>
-	</androidx.constraintlayout.widget.ConstraintLayout>
-	
-	<ScrollView
-		android:layout_width="match_parent"
-		android:layout_height="wrap_content"
-		android:animateLayoutChanges="true"
-		>
-		
-		<TextView
-			android:id="@+id/errorMessage"
+
+		<androidx.constraintlayout.widget.ConstraintLayout
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
-			android:fontFamily="monospace"
-			android:maxLines="10"
-			android:padding="17sp"
-			android:scrollbars="vertical"
-			android:textColor="#EC4427"
-			android:textIsSelectable="true"
-			android:textSize="14sp"
-			android:textStyle=""
-			android:visibility="gone"
-			tools:text="Error:\nError message\n\nReason:\nReason message\n\nError stack:\nCall stack tree "
-			tools:visibility="visible"
+			android:columnCount="2"
+			android:orientation="horizontal"
+			>
+
+			<LinearLayout
+				android:id="@+id/bookInfo"
+				android:layout_width="0dp"
+				android:layout_height="wrap_content"
+				android:animateLayoutChanges="true"
+				android:columnCount="2"
+				android:orientation="vertical"
+				android:padding="12sp"
+				app:layout_constraintLeft_toLeftOf="parent"
+				app:layout_constraintRight_toLeftOf="@id/buttons"
+				app:layout_constraintTop_toTopOf="parent"
+				>
+
+				<TextView
+					android:id="@+id/bookTitle"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:textSize="20sp"
+					android:textStyle="bold"
+					tools:text="Book name"
+					/>
+
+				<LinearLayout
+					android:layout_width="match_parent"
+					android:layout_height="wrap_content"
+					android:alpha="0.6"
+					>
+
+					<TextView
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:paddingEnd="6sp"
+						android:text="@string/source"
+						android:textStyle="bold"
+						/>
+
+					<TextView
+						android:id="@+id/sourceName"
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						tools:text="source name"
+						/>
+				</LinearLayout>
+
+				<LinearLayout
+					android:layout_width="match_parent"
+					android:layout_height="wrap_content"
+					android:alpha="0.6"
+					>
+
+					<TextView
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:paddingEnd="6sp"
+						android:text="@string/chapters"
+						android:textStyle="bold"
+						/>
+
+					<TextView
+						android:id="@+id/numberOfChapters"
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						tools:text="23"
+						/>
+				</LinearLayout>
+			</LinearLayout>
+
+			<LinearLayout
+				android:id="@+id/buttons"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:orientation="vertical"
+				android:padding="6sp"
+				app:layout_constraintLeft_toRightOf="@id/bookInfo"
+				app:layout_constraintRight_toRightOf="parent"
+				app:layout_constraintTop_toTopOf="parent"
+				>
+
+				<TextView
+					android:id="@+id/databaseSearchButton"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_margin="4sp"
+					android:background="@drawable/book_item_background_borderless"
+					android:clickable="true"
+					android:foreground="@drawable/book_item_foreground_ripple"
+					android:minHeight="32sp"
+					android:padding="8sp"
+					android:text="@string/database"
+					android:textStyle="bold"
+					android:tooltipText="@string/search_in_database_for_more_information"
+					/>
+
+				<TextView
+					android:id="@+id/webpageOpenButton"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_margin="4sp"
+					android:background="@drawable/book_item_background_borderless"
+					android:clickable="true"
+					android:foreground="@drawable/book_item_foreground_ripple"
+					android:minHeight="32sp"
+					android:padding="8sp"
+					android:text="@string/webpage"
+					android:textStyle="bold"
+					android:tooltipText="@string/open_in_browser"
+					/>
+
+			</LinearLayout>
+		</androidx.constraintlayout.widget.ConstraintLayout>
+
+		<ScrollView
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:animateLayoutChanges="true"
+			>
+
+			<TextView
+				android:id="@+id/bookDescription"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:maxLines="4"
+				android:padding="12sp"
+				android:scrollbars="vertical"
+				tools:text="This is the book description/synopsis."
+				tools:visibility="visible"
+				/>
+		</ScrollView>
+
+		<ScrollView
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:animateLayoutChanges="true"
+			>
+
+			<TextView
+				android:id="@+id/errorMessage"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:fontFamily="monospace"
+				android:maxLines="10"
+				android:padding="17sp"
+				android:scrollbars="vertical"
+				android:textColor="#EC4427"
+				android:textIsSelectable="true"
+				android:textSize="14sp"
+				android:textStyle=""
+				android:visibility="gone"
+				tools:text="Error:\nError message\n\nReason:\nReason message\n\nError stack:\nCall stack tree "
+				tools:visibility="visible"
+				/>
+		</ScrollView>
+
+		<androidx.constraintlayout.widget.Guideline
+			android:layout_width="match_parent"
+			android:layout_height="2dp"
+			android:paddingHorizontal="30dp"
+			android:paddingVertical="50dp"
+			android:background="#fff"
 			/>
-	</ScrollView>
-</LinearLayout>
+	</LinearLayout>
 
-
+</FrameLayout>

@@ -15,6 +15,9 @@ interface SourceInterface
     suspend fun getChapterTitle(doc: Document): String? = null
     suspend fun getChapterText(doc: Document): String? = null
 
+    suspend fun getBookCoverImageUrl(doc: Document): String? = null
+    suspend fun getBookDescripton(doc: Document): String? = null
+
     interface base : SourceInterface
     interface catalog : SourceInterface
     {
