@@ -11,6 +11,7 @@ import android.view.*
 import androidx.activity.viewModels
 import androidx.appcompat.widget.SearchView
 import androidx.core.graphics.toColor
+import androidx.core.graphics.toColorLong
 import androidx.core.view.WindowCompat
 import androidx.core.view.isVisible
 import androidx.lifecycle.MutableLiveData
@@ -115,11 +116,14 @@ class ChaptersActivity : BaseActivity()
         // Stored inside a weakReference, needs to be explicitly referenced in the activity
         viewBind.appBarLayout.addOnOffsetChangedListener(offsetListener)
 
-        appBarTransparent.observe(this) { transparent ->
+        val barBackgroundColor = android.R.attr.colorBackground.colorAttrRes(this)
+        val barBackgroundColorTransparent = barBackgroundColor.and(0x00FFFFFF)
+
+        appBarTransparent.distinctUntilChanged().observe(this) { transparent ->
             val background = when (transparent)
             {
-                true -> Color.TRANSPARENT
-                false -> android.R.attr.colorBackground.colorAttrRes(this)
+                true -> barBackgroundColorTransparent
+                false -> barBackgroundColor
             }
 
             ValueAnimator.ofObject(ArgbEvaluator(), window.statusBarColor, background).apply {
@@ -132,6 +136,8 @@ class ChaptersActivity : BaseActivity()
             }.start()
         }
 
+        window.statusBarColor = barBackgroundColorTransparent
+        viewBind.toolbar.setBackgroundColor(barBackgroundColorTransparent)
         supportActionBar!!.let {
             it.title = "Chapters"
             it.setDisplayHomeAsUpEnabled(true)
