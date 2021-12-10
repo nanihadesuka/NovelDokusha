@@ -105,7 +105,6 @@ private class NovelItemAdapter(
 
         Glide.with(ctx)
             .load(viewData.book.coverImageUrl)
-//            .error(R.drawable.ic_launcher_logo_foreground)
             .transform(CenterCrop(), RoundedCorners(38))
             .transition(DrawableTransitionOptions.withCrossFade())
             .into(viewBind.coverImage)

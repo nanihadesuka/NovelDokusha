@@ -17,6 +17,7 @@ import androidx.lifecycle.distinctUntilChanged
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.*
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.google.android.material.appbar.AppBarLayout
@@ -331,13 +332,14 @@ private fun setupBookInfo(activity: ChaptersActivity, viewModel: ChaptersViewMod
             Glide.with(activity)
                 .load(imgUrl)
                 .error(R.drawable.md_transparent)
+                .transform(CenterCrop())
                 .transition(DrawableTransitionOptions.withCrossFade())
                 .into(viewBind.coverImageBackground)
 
             Glide.with(activity)
                 .load(imgUrl)
                 .error(R.drawable.ic_launcher_logo_foreground)
-                .transform(RoundedCorners(32))
+                .transform(CenterCrop(), RoundedCorners(32))
                 .transition(DrawableTransitionOptions.withCrossFade())
                 .into(viewBind.coverImage)
         }
