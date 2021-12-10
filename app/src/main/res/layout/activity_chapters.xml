@@ -42,7 +42,8 @@
 					android:layout_width="match_parent"
 					android:layout_height="wrap_content"
 					android:background="?android:colorBackground"
-					android:paddingTop="28dp"
+					android:paddingTop="32dp"
+					android:animateLayoutChanges="true"
 					app:layout_collapseMode="pin"
 					app:title="@string/app_name"
 					/>

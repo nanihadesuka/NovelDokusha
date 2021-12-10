@@ -9,13 +9,13 @@
 
 	<FrameLayout
 		android:layout_width="match_parent"
-		android:layout_height="250sp"
+		android:layout_height="300sp"
 		>
 
 		<ImageView
 			android:id="@+id/coverImageBackground"
 			android:layout_width="match_parent"
-			android:layout_height="249sp"
+			android:layout_height="299sp"
 			android:alpha="0.20"
 			android:scaleType="centerCrop"
 			tools:src="@mipmap/ic_logo"
@@ -44,6 +44,19 @@
 			android:orientation="horizontal"
 			>
 
+			<ImageView
+				android:id="@+id/cover_image"
+				android:layout_width="120dp"
+				android:layout_height="0dp"
+				android:layout_margin="12sp"
+				android:scaleType="centerCrop"
+				app:layout_constraintDimensionRatio="1:1.5"
+				app:layout_constraintLeft_toLeftOf="parent"
+				app:layout_constraintRight_toLeftOf="@id/bookInfo"
+				app:layout_constraintTop_toTopOf="parent"
+				tools:src="@mipmap/ic_logo"
+				/>
+
 			<LinearLayout
 				android:id="@+id/bookInfo"
 				android:layout_width="0dp"
@@ -51,9 +64,10 @@
 				android:animateLayoutChanges="true"
 				android:columnCount="2"
 				android:orientation="vertical"
-				android:padding="12sp"
-				app:layout_constraintLeft_toLeftOf="parent"
-				app:layout_constraintRight_toLeftOf="@id/buttons"
+				android:paddingTop="12sp"
+				android:paddingRight="12sp"
+				app:layout_constraintLeft_toRightOf="@id/cover_image"
+				app:layout_constraintRight_toRightOf="parent"
 				app:layout_constraintTop_toTopOf="parent"
 				>
 
@@ -71,14 +85,6 @@
 					android:layout_height="wrap_content"
 					android:alpha="0.6"
 					>
-
-					<TextView
-						android:layout_width="wrap_content"
-						android:layout_height="wrap_content"
-						android:paddingEnd="6sp"
-						android:text="@string/source"
-						android:textStyle="bold"
-						/>
 
 					<TextView
 						android:id="@+id/sourceName"
@@ -109,49 +115,44 @@
 						tools:text="23"
 						/>
 				</LinearLayout>
-			</LinearLayout>
 
-			<LinearLayout
-				android:id="@+id/buttons"
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
-				android:orientation="vertical"
-				android:padding="6sp"
-				app:layout_constraintLeft_toRightOf="@id/bookInfo"
-				app:layout_constraintRight_toRightOf="parent"
-				app:layout_constraintTop_toTopOf="parent"
-				>
-
-				<TextView
-					android:id="@+id/databaseSearchButton"
-					android:layout_width="wrap_content"
+				<LinearLayout
+					android:layout_width="match_parent"
 					android:layout_height="wrap_content"
-					android:layout_margin="4sp"
-					android:background="@drawable/book_item_background_borderless"
-					android:clickable="true"
-					android:foreground="@drawable/book_item_foreground_ripple"
-					android:minHeight="32sp"
-					android:padding="8sp"
-					android:text="@string/database"
-					android:textStyle="bold"
-					android:tooltipText="@string/search_in_database_for_more_information"
-					/>
+					android:gravity="right"
+					android:orientation="horizontal"
+					>
 
-				<TextView
-					android:id="@+id/webpageOpenButton"
-					android:layout_width="wrap_content"
-					android:layout_height="wrap_content"
-					android:layout_margin="4sp"
-					android:background="@drawable/book_item_background_borderless"
-					android:clickable="true"
-					android:foreground="@drawable/book_item_foreground_ripple"
-					android:minHeight="32sp"
-					android:padding="8sp"
-					android:text="@string/webpage"
-					android:textStyle="bold"
-					android:tooltipText="@string/open_in_browser"
-					/>
+					<TextView
+						android:id="@+id/databaseSearchButton"
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:layout_margin="10sp"
+						android:background="@drawable/book_item_background_borderless"
+						android:clickable="true"
+						android:foreground="@drawable/book_item_foreground_ripple"
+						android:minHeight="32sp"
+						android:padding="10sp"
+						android:text="@string/database"
+						android:textStyle="bold"
+						android:tooltipText="@string/search_in_database_for_more_information"
+						/>
 
+					<TextView
+						android:id="@+id/webpageOpenButton"
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:layout_margin="10sp"
+						android:background="@drawable/book_item_background_borderless"
+						android:clickable="true"
+						android:foreground="@drawable/book_item_foreground_ripple"
+						android:minHeight="32sp"
+						android:padding="10sp"
+						android:text="@string/webpage"
+						android:textStyle="bold"
+						android:tooltipText="@string/open_in_browser"
+						/>
+				</LinearLayout>
 			</LinearLayout>
 		</androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -166,12 +167,26 @@
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
 				android:maxLines="4"
-				android:padding="12sp"
+				android:minLines="1"
+				android:paddingLeft="12sp"
+				android:paddingTop="12sp"
+				android:paddingRight="12sp"
 				android:scrollbars="vertical"
 				tools:text="This is the book description/synopsis."
 				tools:visibility="visible"
+				android:layout_gravity="center_vertical"
+				android:ellipsize="end"
+
 				/>
 		</ScrollView>
+
+		<View
+			android:layout_width="match_parent"
+			android:layout_height="1sp"
+			android:layout_marginVertical="6dp"
+			android:alpha="0.05"
+			android:background="?colorOnPrimary"
+			/>
 
 		<ScrollView
 			android:layout_width="match_parent"
@@ -200,9 +215,9 @@
 		<androidx.constraintlayout.widget.Guideline
 			android:layout_width="match_parent"
 			android:layout_height="2dp"
+			android:background="#fff"
 			android:paddingHorizontal="30dp"
 			android:paddingVertical="50dp"
-			android:background="#fff"
 			/>
 	</LinearLayout>
 

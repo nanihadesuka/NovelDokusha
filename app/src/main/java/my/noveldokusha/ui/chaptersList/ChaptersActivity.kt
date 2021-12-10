@@ -10,8 +10,6 @@ import android.os.Bundle
 import android.view.*
 import androidx.activity.viewModels
 import androidx.appcompat.widget.SearchView
-import androidx.core.graphics.toColor
-import androidx.core.graphics.toColorLong
 import androidx.core.view.WindowCompat
 import androidx.core.view.isVisible
 import androidx.lifecycle.MutableLiveData
@@ -21,7 +19,6 @@ import androidx.recyclerview.widget.*
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
-import com.bumptech.glide.request.transition.ViewAnimationFactory
 import com.google.android.material.appbar.AppBarLayout
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.*
@@ -323,17 +320,26 @@ private fun setupBookInfo(activity: ChaptersActivity, viewModel: ChaptersViewMod
     viewBind.sourceName.text = scraper.getCompatibleSource(viewModel.bookMetadata.url)?.name ?: ""
 
     viewModel.book.observe(activity) {
-        val isVisible = it != null && it.description.isNotBlank()
-        viewBind.bookDescription.visibility = if (isVisible) View.VISIBLE else View.GONE
-        viewBind.bookDescription.text = it?.description ?: ""
+
+        viewBind.bookDescription.text = it?.description?.trim() ?: ""
+        viewBind.bookDescription.setOnLongClickListener {
+            viewBind.bookDescription.maxLines = if (viewBind.bookDescription.maxLines == Integer.MAX_VALUE) 4 else Integer.MAX_VALUE
+            true
+        }
 
         it?.coverImageUrl.let { imgUrl ->
             Glide.with(activity)
                 .load(imgUrl)
                 .error(R.drawable.md_transparent)
-                .transform(RoundedCorners(32))
                 .transition(DrawableTransitionOptions.withCrossFade())
                 .into(viewBind.coverImageBackground)
+
+            Glide.with(activity)
+                .load(imgUrl)
+                .error(R.drawable.ic_launcher_logo_foreground)
+                .transform(RoundedCorners(32))
+                .transition(DrawableTransitionOptions.withCrossFade())
+                .into(viewBind.coverImage)
         }
     }
 
