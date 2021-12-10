@@ -31,6 +31,7 @@ class NovelUpdates : SourceInterface.catalog
     {
         return doc.selectFirst("div.seriesimg > img[src]")
             ?.attr("src")
+            ?.let { if (it == "https://www.novelupdates.com/img/noimagefound.jpg") null else it }
     }
 
     override suspend fun getBookDescripton(doc: Document): String?

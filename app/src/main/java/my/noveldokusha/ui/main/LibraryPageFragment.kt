@@ -13,6 +13,11 @@ import androidx.recyclerview.widget.RecyclerView
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.checkbox.checkBoxPrompt
 import com.afollestad.materialdialogs.checkbox.isCheckPromptChecked
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.bitmap.CenterCrop
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
+import com.bumptech.glide.request.RequestOptions
 import dagger.hilt.android.AndroidEntryPoint
 import my.noveldokusha.*
 import my.noveldokusha.data.database.tables.Book
@@ -97,6 +102,13 @@ private class NovelItemAdapter(
         val unreadChaptersCount = viewData.chaptersCount - viewData.chaptersReadCount
         viewBind.unreadChaptersCounter.visibility = if (unreadChaptersCount == 0) View.INVISIBLE else View.VISIBLE
         viewBind.unreadChaptersCounter.text = unreadChaptersCount.toString()
+
+        Glide.with(ctx)
+            .load(viewData.book.coverImageUrl)
+//            .error(R.drawable.ic_launcher_logo_foreground)
+            .transform(CenterCrop(), RoundedCorners(38))
+            .transition(DrawableTransitionOptions.withCrossFade())
+            .into(viewBind.coverImage)
 
         viewBind.book.setOnClickListener {
             ChaptersActivity.IntentData(
