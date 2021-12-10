@@ -113,6 +113,8 @@ class ChaptersActivity : BaseActivity()
             }
         }
 
+        viewBind.swipeRefreshLayout.isEnabled = false
+
         // Stored inside a weakReference, needs to be explicitly referenced in the activity
         viewBind.appBarLayout.addOnOffsetChangedListener(offsetListener)
 
@@ -137,6 +139,8 @@ class ChaptersActivity : BaseActivity()
 
             // Important: String must not be empty
             supportActionBar?.title = if (transparent) " " else viewModel.bookTitle
+
+            viewBind.swipeRefreshLayout.isEnabled = transparent
         }
 
         window.statusBarColor = barBackgroundColorTransparent
