@@ -15,14 +15,15 @@ interface SourceInterface
     suspend fun getChapterTitle(doc: Document): String? = null
     suspend fun getChapterText(doc: Document): String? = null
 
-    suspend fun getBookCoverImageUrl(doc: Document): String? = null
-    suspend fun getBookDescripton(doc: Document): String? = null
 
     interface base : SourceInterface
     interface catalog : SourceInterface
     {
         val catalogUrl: String
         val language: String
+
+        suspend fun getBookCoverImageUrl(doc: Document): String? = null
+        suspend fun getBookDescripton(doc: Document): String? = null
 
         // The chapter order is ascendent: from 1 ... etc
         suspend fun getChapterList(doc: Document): List<ChapterMetadata>

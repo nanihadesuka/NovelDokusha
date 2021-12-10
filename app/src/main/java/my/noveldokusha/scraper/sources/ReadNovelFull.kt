@@ -13,65 +13,78 @@ import org.jsoup.nodes.Document
  */
 class ReadNovelFull : SourceInterface.catalog
 {
-	override val name = "Read Novel Full"
-	override val baseUrl = "https://readnovelfull.com/"
-	override val catalogUrl = "https://readnovelfull.com/most-popular-novel"
-	override val language = "English"
-	
-	override suspend fun getChapterTitle(doc: Document): String? = null
-	
-	override suspend fun getChapterText(doc: Document): String
-	{
-		doc.selectFirst("#chr-content")!!.let {
-			return textExtractor.get(it)
-		}
-	}
-	
-	override suspend fun getChapterList(doc: Document): List<ChapterMetadata>
-	{
-		val id = doc.selectFirst("#rating")!!.attr("data-novel-id")
-		return connect("https://readnovelfull.com/ajax/chapter-archive")
-			.addHeaderRequest()
-			.data("novelId", id)
-			.getIO()
-			.select("a[href]")
-			.map { ChapterMetadata(title = it.text(), url = baseUrl + it.attr("href").removePrefix("/")) }
-	}
-	
-	override suspend fun getCatalogList(index: Int): Response<List<BookMetadata>>
-	{
-		val page = index + 1
-		val url = catalogUrl.toUrlBuilder()!!.apply {
-			if (page > 1) add("page", page)
-		}
-		
-		return tryConnect {
-			fetchDoc(url)
-				.selectFirst(".col-novel-main.archive")!!
-				.select(".row")
-				.mapNotNull { it.selectFirst("a[href]") }
-				.map { BookMetadata(title = it.text(), url = baseUrl + it.attr("href").removePrefix("/")) }
-				.let { Response.Success(it) }
-		}
-	}
-	
-	override suspend fun getCatalogSearch(index: Int, input: String): Response<List<BookMetadata>>
-	{
-		if (input.isBlank() || index > 0)
-			return Response.Success(listOf())
-		
-		val url = baseUrl.toUrlBuilder()!!.apply {
-			appendPath("search")
-			add("keyword", input)
-		}
-		
-		return tryConnect {
-			fetchDoc(url)
-				.selectFirst(".col-novel-main.archive")!!
-				.select(".row")
-				.mapNotNull { it.selectFirst("a[href]") }
-				.map { BookMetadata(title = it.text(), url = baseUrl + it.attr("href").removePrefix("/")) }
-				.let { Response.Success(it) }
-		}
-	}
+    override val name = "Read Novel Full"
+    override val baseUrl = "https://readnovelfull.com/"
+    override val catalogUrl = "https://readnovelfull.com/most-popular-novel"
+    override val language = "English"
+
+    override suspend fun getChapterTitle(doc: Document): String? = null
+
+    override suspend fun getChapterText(doc: Document): String
+    {
+        doc.selectFirst("#chr-content")!!.let {
+            return textExtractor.get(it)
+        }
+    }
+
+    override suspend fun getBookCoverImageUrl(doc: Document): String?
+    {
+        return doc.selectFirst(".book")
+            ?.select("img[src]")
+            ?.attr("src")
+    }
+
+    override suspend fun getBookDescripton(doc: Document): String?
+    {
+        return doc.selectFirst("#tab-description")
+            ?.let { textExtractor.get(it) }
+    }
+
+    override suspend fun getChapterList(doc: Document): List<ChapterMetadata>
+    {
+        val id = doc.selectFirst("#rating")!!.attr("data-novel-id")
+        return connect("https://readnovelfull.com/ajax/chapter-archive")
+            .addHeaderRequest()
+            .data("novelId", id)
+            .getIO()
+            .select("a[href]")
+            .map { ChapterMetadata(title = it.text(), url = baseUrl + it.attr("href").removePrefix("/")) }
+    }
+
+    override suspend fun getCatalogList(index: Int): Response<List<BookMetadata>>
+    {
+        val page = index + 1
+        val url = catalogUrl.toUrlBuilder()!!.apply {
+            if (page > 1) add("page", page)
+        }
+
+        return tryConnect {
+            fetchDoc(url)
+                .selectFirst(".col-novel-main.archive")!!
+                .select(".row")
+                .mapNotNull { it.selectFirst("a[href]") }
+                .map { BookMetadata(title = it.text(), url = baseUrl + it.attr("href").removePrefix("/")) }
+                .let { Response.Success(it) }
+        }
+    }
+
+    override suspend fun getCatalogSearch(index: Int, input: String): Response<List<BookMetadata>>
+    {
+        if (input.isBlank() || index > 0)
+            return Response.Success(listOf())
+
+        val url = baseUrl.toUrlBuilder()!!.apply {
+            appendPath("search")
+            add("keyword", input)
+        }
+
+        return tryConnect {
+            fetchDoc(url)
+                .selectFirst(".col-novel-main.archive")!!
+                .select(".row")
+                .mapNotNull { it.selectFirst("a[href]") }
+                .map { BookMetadata(title = it.text(), url = baseUrl + it.attr("href").removePrefix("/")) }
+                .let { Response.Success(it) }
+        }
+    }
 }

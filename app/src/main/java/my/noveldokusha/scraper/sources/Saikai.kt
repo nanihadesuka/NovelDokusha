@@ -16,6 +16,19 @@ class Saikai : SourceInterface.catalog
     override val baseUrl = "https://saikaiscan.com.br/"
     override val catalogUrl = "https://saikaiscan.com.br/series"
     override val language = "Brazilian"
+//
+//    override suspend fun getBookCoverImageUrl(doc: Document): String?
+//    {
+//        return doc.selectFirst(".story-header")
+//            ?.selectFirst("img[src]")
+//            ?.attr("src")
+//    }
+//
+//    override suspend fun getBookDescripton(doc: Document): String?
+//    {
+//        return doc.selectFirst("#synopsis-content")
+//            ?.let { textExtractor.get(it) }
+//    }
 
     override suspend fun getChapterList(doc: Document): List<ChapterMetadata>
     {
@@ -92,7 +105,8 @@ class Saikai : SourceInterface.catalog
     override suspend fun getCatalogSearch(index: Int, input: String): Response<List<BookMetadata>>
     {
         val page = index + 1
-        val url = """https://api.saikai.com.br/api/stories?format=1&q=${input.urlEncode()}&status=null&genres=&country=null&sortProperty=title&sortDirection=asc&page=$page&per_page=24&relationships=language,type,format"""
+        val url =
+            """https://api.saikai.com.br/api/stories?format=1&q=${input.urlEncode()}&status=null&genres=&country=null&sortProperty=title&sortDirection=asc&page=$page&per_page=24&relationships=language,type,format"""
 
         return tryConnect {
             val json = connect(url)
