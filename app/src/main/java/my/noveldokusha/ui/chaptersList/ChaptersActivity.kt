@@ -134,12 +134,15 @@ class ChaptersActivity : BaseActivity()
                     viewBind.toolbar.setBackgroundColor(color)
                 }
             }.start()
+
+            // Important: String must not be empty
+            supportActionBar?.title = if (transparent) " " else viewModel.bookTitle
         }
 
         window.statusBarColor = barBackgroundColorTransparent
         viewBind.toolbar.setBackgroundColor(barBackgroundColorTransparent)
         supportActionBar!!.let {
-            it.title = "Chapters"
+            it.title = " "
             it.setDisplayHomeAsUpEnabled(true)
         }
 
