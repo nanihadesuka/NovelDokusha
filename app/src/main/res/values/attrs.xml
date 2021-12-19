@@ -3,4 +3,9 @@
 	<declare-styleable name="myFastScroll">
 		<attr name="attachedRecyclerView" format="reference|enum" />
 	</declare-styleable>
+
+	<declare-styleable name="Checkbox3StatesView">
+		<attr name="android:text" format="string"/>
+	</declare-styleable>
+
 </resources>
