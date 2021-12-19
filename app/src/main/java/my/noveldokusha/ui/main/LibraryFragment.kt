@@ -60,6 +60,7 @@ class LibraryFragment : BaseFragment()
     override fun onOptionsItemSelected(item: MenuItem): Boolean = when (item.itemId)
     {
         R.id.import_epub -> openEpubImporter().let { true }
+        R.id.library_filter_actions -> openLibraryFilterActions().let { true }
         else -> super.onOptionsItemSelected(item)
     }
 
@@ -78,6 +79,15 @@ class LibraryFragment : BaseFragment()
                 EpubImportService.start(requireContext(), uri)
             }
         }
+    }
+
+    fun openLibraryFilterActions()
+    {
+        if (null != parentFragmentManager.findFragmentByTag(LibraryFragmentBottomSheetDialog.tag))
+            return
+
+        LibraryFragmentBottomSheetDialog()
+            .show(parentFragmentManager, LibraryFragmentBottomSheetDialog.tag)
     }
 }
 

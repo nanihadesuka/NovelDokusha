@@ -27,8 +27,8 @@ android {
         applicationId = "my.noveldokusha"
         minSdk = 26
         targetSdk = 31
-        versionCode = 5
-        versionName = "1.3.1"
+        versionCode = 6
+        versionName = "1.4.0"
         setProperty("archivesBaseName", "NovelDokusha_v$versionName")
     }
 

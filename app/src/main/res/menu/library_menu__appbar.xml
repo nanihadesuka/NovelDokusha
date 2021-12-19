@@ -1,12 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    >
-    <item
-        android:id="@+id/import_epub"
-        android:icon="@drawable/ic_baseline_search_24"
-        android:title="@string/import_epub"
-        app:showAsAction="withText|collapseActionView"
-        android:tooltipText="@string/import_epub_book_from_source_file_to_library"
-        />
+<menu
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:app="http://schemas.android.com/apk/res-auto"
+	>
+
+	<item
+		android:id="@+id/library_filter_actions"
+		android:icon="@drawable/ic_baseline_filter_list_24"
+		android:title="@string/options_panel"
+		android:tooltipText="@string/opens_the_library_display_options_panel"
+		app:showAsAction="ifRoom"
+		/>
+
+	<item
+		android:id="@+id/import_epub"
+		android:icon="@drawable/ic_baseline_search_24"
+		android:title="@string/import_epub"
+		android:tooltipText="@string/import_epub_book_from_source_file_to_library"
+		app:showAsAction="withText|collapseActionView"
+		/>
 </menu>

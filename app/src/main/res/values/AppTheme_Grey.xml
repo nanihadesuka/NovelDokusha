@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-	
+
 	<style name="AppTheme.BaseDark.Grey">
 		<item name="colorPrimary">#333</item>
 		<item name="colorPrimaryTransparent">#0333</item>
@@ -11,9 +11,20 @@
 		<item name="colorSurface">#555</item>
 		<item name="colorOnSurface">?colorOnPrimary</item>
 		<item name="colorOnBackground">?colorOnPrimary</item>
-		
+
 		<item name="android:colorBackground">@color/dark_24</item>
-		
+
 		<item name="myColorControlNormalPale">#777</item>
+
+		<item name="bottomSheetDialogTheme">@style/myBottomSheetDialogStyle.BaseDark.Grey</item>
+	</style>
+
+	<style name="myBottomSheetStyle.BaseDark.Grey">
+		<!-- Using tint instead of background color (works for unknown reasons) -->
+		<item name="backgroundTint">#222</item>
+	</style>
+
+	<style name="myBottomSheetDialogStyle.BaseDark.Grey">
+		<item name="bottomSheetStyle">@style/myBottomSheetStyle.BaseDark.Grey</item>
 	</style>
 </resources>

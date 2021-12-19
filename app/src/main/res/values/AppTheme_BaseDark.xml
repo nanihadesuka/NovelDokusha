@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-	
+
 	<style name="AppTheme.BaseDark" parent="Theme.MaterialComponents.NoActionBar.Bridge">
 		<item name="isLightTheme">false</item>
 		<item name="android:windowLightStatusBar">false</item>
 		<item name="android:statusBarColor">?colorPrimary</item>
-		
+
 		<item name="colorAccent">#2A59B6</item>
-		
+
 		<item name="colorPrimary">@color/dark_20</item>
 		<item name="colorPrimaryTransparent">#00202020</item>
 		<item name="colorPrimaryDark">#303030</item>
@@ -17,31 +17,43 @@
 		<item name="colorSurface">@color/dark_18</item>
 		<item name="colorOnSurface">?colorOnPrimary</item>
 		<item name="colorOnBackground">?colorOnPrimary</item>
-		
+
 		<item name="android:colorBackground">@color/dark_18</item>
 		<item name="android:colorEdgeEffect">?colorAccent</item>
-		
+
 		<item name="md_background_color">?colorSurface</item>
 		<item name="md_color_title">?colorOnSurface</item>
 		<item name="md_color_content">?colorOnSurface</item>
 		<item name="md_color_button_text">?colorAccent</item>
-		
+
 		<item name="bottomNavigationStyle">@style/myBottomNavigationStyle</item>
 		<item name="buttonStyle">@style/myButtonStyle</item>
 		<item name="myReaderTextStyle">@style/myReaderTextStyle.BaseDark</item>
 		<item name="tabStyle">@style/myTabLayout</item>
 		<item name="appBarLayoutStyle">@style/myAppBarLayoutStyle</item>
-		
+
 		<item name="noneStateTint">#ddd</item>
 		<item name="positiveStateTint">#71A30E</item>
 		<item name="negativeStateTint">#C81414</item>
 		<item name="myColorControlNormalPale">#666</item>
-		
+
 		<item name="android:scrollbarThumbVertical">@drawable/scrollbar_thumb</item>
-		
+
 		<item name="android:windowAnimationStyle">@style/WindowAnimationStyle</item>
+
+		<item name="bottomSheetDialogTheme">@style/myBottomSheetDialogStyle.BaseDark</item>
 	</style>
-	
+
+
+	<style name="myBottomSheetStyle.BaseDark">
+		<!-- Using tint instead of background color (works for unknown reasons) -->
+		<item name="backgroundTint">@color/dark_18</item>
+	</style>
+
+	<style name="myBottomSheetDialogStyle.BaseDark">
+		<item name="bottomSheetStyle">@style/myBottomSheetStyle.BaseDark</item>
+	</style>
+
 	<style name="myReaderTextStyle.BaseDark">
 		<item name="android:textColor">#ddd</item>
 	</style>

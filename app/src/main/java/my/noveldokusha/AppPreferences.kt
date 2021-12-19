@@ -28,6 +28,7 @@ class AppPreferences @Inject constructor(
             R.style.AppTheme_BaseDark_Black to "Black"
         )
     }
+
     private val preferences = PreferenceManager.getDefaultSharedPreferences(context)
     private val preferencesChangeListeners = mutableSetOf<SharedPreferences.OnSharedPreferenceChangeListener>()
 
@@ -37,6 +38,8 @@ class AppPreferences @Inject constructor(
     var READER_FONT_FAMILY by SharedPreference_String(preferences, "serif")
     var CHAPTERS_SORT_ASCENDING by SharedPreference_Enum(preferences, TERNARY_STATE.active) { enumValueOf(it) }
     var SOURCES_LANGUAGES by SharedPreference_StringSet(preferences, setOf("English"))
+    var LIBRARY_FILTER_READ by SharedPreference_Enum(preferences, TERNARY_STATE.inactive) { enumValueOf(it) }
+    var LIBRARY_SORT_READ by SharedPreference_Enum(preferences, TERNARY_STATE.inverse) { enumValueOf(it) }
 
     fun THEME_ID_flow() = toFlow(::THEME_ID.name) { THEME_ID }
     fun THEME_FOLLOW_SYSTEM_flow() = toFlow(::THEME_FOLLOW_SYSTEM.name) { THEME_FOLLOW_SYSTEM }
@@ -44,6 +47,8 @@ class AppPreferences @Inject constructor(
     fun READER_FONT_FAMILY_flow() = toFlow(::READER_FONT_FAMILY.name) { READER_FONT_FAMILY }
     fun CHAPTERS_SORT_ASCENDING_flow() = toFlow(::CHAPTERS_SORT_ASCENDING.name) { CHAPTERS_SORT_ASCENDING }
     fun SOURCES_LANGUAGES_flow() = toFlow(::SOURCES_LANGUAGES.name) { SOURCES_LANGUAGES }
+    fun LIBRARY_FILTER_READ_flow() = toFlow(::LIBRARY_FILTER_READ.name) { LIBRARY_FILTER_READ }
+    fun LIBRARY_SORT_READ_flow() = toFlow(::LIBRARY_SORT_READ.name) { LIBRARY_SORT_READ }
 
     enum class TERNARY_STATE
     { active, inverse, inactive }

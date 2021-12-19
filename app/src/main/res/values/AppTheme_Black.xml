@@ -1,19 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-	
+
 	<style name="AppTheme.BaseDark.Black">
 		<item name="colorPrimary">#000</item>
 		<item name="colorPrimaryTransparent">#0000</item>
-		<item name="colorPrimaryDark">#303030</item>
+		<item name="colorPrimaryDark">#000</item>
 		<item name="colorOnPrimary">#eee</item>
 		<item name="colorSecondary">?colorPrimary</item>
 		<item name="colorOnSecondary">?colorOnPrimary</item>
 		<item name="colorSurface">?colorPrimary</item>
 		<item name="colorOnSurface">?colorOnPrimary</item>
 		<item name="colorOnBackground">?colorOnPrimary</item>
-		
+
 		<item name="android:colorBackground">?colorPrimary</item>
-		
+
 		<item name="myColorControlNormalPale">#555</item>
+
+		<item name="bottomSheetDialogTheme">@style/myBottomSheetDialogStyle.BaseDark.Black</item>
 	</style>
+
+	<style name="myBottomSheetStyle.BaseDark.Black">
+		<!-- Using tint instead of background color (works for unknown reasons) -->
+		<!-- Having #000 triggers other color (unknown reason), use #010101-->
+		<item name="backgroundTint">#010101</item>
+	</style>
+
+	<style name="myBottomSheetDialogStyle.BaseDark.Black">
+		<item name="bottomSheetStyle">@style/myBottomSheetStyle.BaseDark.Black</item>
+	</style>
+
 </resources>

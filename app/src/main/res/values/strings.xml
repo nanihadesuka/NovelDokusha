@@ -69,4 +69,10 @@
 	<string name="search_by_genre">Search by genre</string>
 	<string name="epub_added_to_library">Epub added to library</string>
 	<string name="invalid_chapter">Invalid chapter</string>
+	<string name="opens_the_library_display_options_panel">Opens the library display options panel</string>
+	<string name="filter">Filter</string>
+	<string name="filter_read">Read</string>
+	<string name="read">Read</string>
+	<string name="sort">Sort</string>
+	<string name="options_panel">Options panel</string>
 </resources>

@@ -1,17 +1,15 @@
 <resources>
-	
+
 	<attr name="myReaderTextStyle" format="reference" />
-	
 	<attr name="colorPrimaryTransparent" format="color|reference" />
-	
-	<style name="myReaderTextStyle" />
-	
+	<attr name="myColorControlNormalPale" format="color|reference" />
+
 	<attr name="noneStateTint" format="color">#fff</attr>
 	<attr name="positiveStateTint" format="color">#71A30E</attr>
 	<attr name="negativeStateTint" format="color">#C81414</attr>
-	
-	<attr name="myColorControlNormalPale" format="color|reference" />
-	
+
+	<style name="myReaderTextStyle" />
+
 	<style name="myTabLayout" parent="Widget.Design.TabLayout">
 		<item name="tabContentStart">20dp</item>
 		<item name="tabUnboundedRipple">true</item>
@@ -20,22 +18,46 @@
 		<item name="tabMode">scrollable</item>
 		<item name="android:background">?attr/colorPrimary</item>
 	</style>
-	
+
 	<style name="myButtonStyle" parent="Widget.AppCompat.Button">
 		<item name="android:backgroundTint">?attr/colorPrimary</item>
 	</style>
-	
+
 	<style name="myBottomNavigationStyle" parent="Widget.MaterialComponents.BottomNavigationView">
 		<item name="itemIconTint">@color/icon_effect</item>
 		<item name="itemTextColor">@color/icon_effect</item>
 		<item name="android:background">?colorPrimary</item>
 		<item name="elevation">0dp</item>
 	</style>
-	
+
+	<!-- Bottom Sheet Dialog -->
+	<style name="myShapeAppearance.LargeComponent" parent="ShapeAppearance.MaterialComponents.LargeComponent">
+		<item name="cornerFamily">rounded</item>
+		<item name="cornerSize">12dp</item>
+	</style>
+
+	<style name="myBottomSheetStyle" parent="Widget.MaterialComponents.BottomSheet.Modal">
+		<!-- Using tint instead of background color (works for unknown reasons) -->
+		<item name="backgroundTint">#000</item>
+		<item name="backgroundColor">#000</item>
+		<item name="android:colorBackground">#000</item>
+		<item name="colorSurface">#000</item>
+		<item name="android:background">#000</item>
+	</style>
+
+	<style name="myBottomSheetDialogStyle" parent="ThemeOverlay.MaterialComponents.BottomSheetDialog">
+		<item name="bottomSheetStyle">@style/myBottomSheetStyle</item>
+		<item name="shapeAppearanceLargeComponent">@style/myShapeAppearance.LargeComponent</item>
+	</style>
+
+
+	<!-- App Bar -->
 	<style name="myAppBarLayoutStyle" parent="Widget.MaterialComponents.AppBarLayout.Primary">
 		<item name="elevation">0dp</item>
 	</style>
-	
+
+
+	<!-- Window Transistion Animation -->
 	<style name="WindowAnimationStyle" parent="android:Animation.Activity">
 		<item name="android:windowEnterAnimation">@android:anim/fade_in</item>
 		<item name="android:windowExitAnimation">@android:anim/fade_out</item>
