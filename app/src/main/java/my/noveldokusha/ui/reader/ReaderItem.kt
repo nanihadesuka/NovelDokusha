@@ -1,6 +1,6 @@
 package my.noveldokusha.ui.reader
 
-import my.noveldokusha.EpubXMLFileParser
+import my.noveldokusha.data.BookTextUtils
 
 sealed class ReaderItem
 {
@@ -27,7 +27,7 @@ sealed class ReaderItem
         val location: LOCATION
     ) : ReaderItem(), Position
     {
-        val image by lazy { EpubXMLFileParser.extractImgEntry(text) }
+        val image by lazy { BookTextUtils.ImgEntry.fromXMLString(text) }
         val isImage by lazy { image != null }
     }
 

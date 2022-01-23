@@ -2,6 +2,7 @@ package my.noveldokusha
 
 import android.graphics.BitmapFactory
 import kotlinx.coroutines.*
+import my.noveldokusha.data.BookTextUtils
 import my.noveldokusha.data.Repository
 import my.noveldokusha.data.database.tables.Book
 import my.noveldokusha.data.database.tables.Chapter
@@ -47,7 +48,7 @@ data class EpubBook(
     val images: List<EpubImage>
 )
 
-fun epubReader(inputStream: InputStream): EpubBook
+fun createEpubBook(inputStream: InputStream): EpubBook
 {
     val zipFile = ZipInputStream(inputStream).use { zipInputStream ->
         zipInputStream
@@ -72,7 +73,6 @@ fun epubReader(inputStream: InputStream): EpubBook
 
     val bookTitle = metadata.selectFirstChildTag("dc:title")?.textContent ?: throw Exception(".opf metadata title tag missing")
     val bookUrl = bookTitle.asFileName()
-
     val rootPath = File(opfFilePath).parentFile ?: File("")
     fun String.absPath() = File(rootPath, this).path.replace("""\""", "/").removePrefix("/")
 
@@ -174,72 +174,51 @@ fun importEpubToRepository(repository: Repository, epub: EpubBook) = CoroutineSc
     }.awaitAll()
 }
 
-class EpubXMLFileParser(val fileAbsolutePath: String, val data: ByteArray, val zipFile: Map<String, Pair<ZipEntry, ByteArray>>)
+private class EpubXMLFileParser(val fileAbsolutePath: String, val data: ByteArray, val zipFile: Map<String, Pair<ZipEntry, ByteArray>>)
 {
-
     data class Output(val title: String?, val body: String)
 
     val fileParentFolder: File = File(fileAbsolutePath).parentFile ?: File("")
 
+    // Make all local references absolute to the root of the epub for consistent references
+    val absBasePath: String = File("").canonicalPath
+
     fun parse(): Output
     {
-        val doc = Jsoup.parse(data.inputStream(), "UTF-8", "")
-        val body = doc.body()
+        val body = Jsoup.parse(data.inputStream(), "UTF-8", "").body()
 
         val title = body.selectFirst("h1, h2, h3, h4, h5, h6")?.text()
         body.selectFirst("h1, h2, h3, h4, h5, h6")?.remove()
 
-        // Make all local references absolute to the root of the epub for consistent references
-        val imgTag = Regex("""^\W*<img>(.*)</img>\W*$""")
-        val absBasePath = File("").canonicalPath
-        val text = getNodeStructuredText(body)
-            .splitToSequence("\n\n")
-            .joinToString("\n\n") { text ->
-                val (relPathEncoded) = imgTag.find(text)?.destructured ?: return@joinToString text
-                val absPath = File(fileParentFolder, relPathEncoded.decodedURL).canonicalPath
-                    .removePrefix(absBasePath)
-                    .replace("""\""", "/")
-                    .removePrefix("/")
-
-                // Use run catching so it can be run locally without crash
-                val bitmap = zipFile[absPath]?.second?.runCatching {
-                    BitmapFactory.decodeByteArray(this, 0, this.size)
-                }?.getOrNull()
-
-                val heightRelativeToWidth: Float = bitmap?.let { it.height.toFloat() / it.width.toFloat() } ?: 1.45f
-                """<img yrel="${"%.2f".format(heightRelativeToWidth)}">$absPath</img>"""
-            }
-
-        return Output(title = title, body = text)
+        return Output(
+            title = title,
+            body = getNodeStructuredText(body)
+        )
     }
 
-    companion object
+    // Rewrites the image node to xml for the next stage.
+    private fun declareImgEntry(node: org.jsoup.nodes.Node): String
     {
-        data class ImgEntry(val path: String, val yrel: Float)
+        val relPathEncoded = (node as? org.jsoup.nodes.Element)?.attr("src") ?: return ""
+        val absPath = File(fileParentFolder, relPathEncoded.decodedURL).canonicalPath
+            .removePrefix(absBasePath)
+            .replace("""\""", "/")
+            .removePrefix("/")
 
-        fun extractImgEntry(text: String): ImgEntry?
-        {
-            // Fast discard filter
-            if (!text.matches("""^\W*<img .*>.+</img>\W*$""".toRegex()))
-                return null
+        // Use run catching so it can be run locally without crash
+        val bitmap = zipFile[absPath]?.second?.runCatching {
+            BitmapFactory.decodeByteArray(this, 0, this.size)
+        }?.getOrNull()
 
-            return parseXMLText(text)?.selectFirstTag("img")?.let {
-                ImgEntry(
-                    path = it.textContent ?: return null,
-                    yrel = it.getAttributeValue("yrel")?.toFloatOrNull() ?: return null
-                )
-            }
-        }
+        val text = BookTextUtils.ImgEntry(
+            path = absPath,
+            yrel = bitmap?.let { it.height.toFloat() / it.width.toFloat() } ?: 1.45f
+        ).toXMLString()
+
+        return "\n\n$text\n\n"
     }
 
-    fun declareImgEntry(node: org.jsoup.nodes.Node): String
-    {
-        return (node as? org.jsoup.nodes.Element)
-            ?.attr("src")
-            ?.let { "\n\n<img>$it</img>\n\n" } ?: ""
-    }
-
-    fun getPTraverse(node: org.jsoup.nodes.Node): String
+    private fun getPTraverse(node: org.jsoup.nodes.Node): String
     {
         fun innerTraverse(node: org.jsoup.nodes.Node): String = node.childNodes().joinToString("") { child ->
             when
@@ -255,7 +234,7 @@ class EpubXMLFileParser(val fileAbsolutePath: String, val data: ByteArray, val z
         return if (paragraph.isEmpty()) "" else innerTraverse(node).trim() + "\n\n"
     }
 
-    fun getNodeTextTraverse(node: org.jsoup.nodes.Node): String
+    private fun getNodeTextTraverse(node: org.jsoup.nodes.Node): String
     {
         val children = node.childNodes()
         if (children.isEmpty())
@@ -278,7 +257,7 @@ class EpubXMLFileParser(val fileAbsolutePath: String, val data: ByteArray, val z
         }
     }
 
-    fun getNodeStructuredText(node: org.jsoup.nodes.Node): String
+    private fun getNodeStructuredText(node: org.jsoup.nodes.Node): String
     {
         val children = node.childNodes()
         if (children.isEmpty())

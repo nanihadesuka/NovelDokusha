@@ -84,7 +84,7 @@ class EpubImportService : Service()
                     }
                     return@launch
                 }
-                val epub = inputStream.use { epubReader(it) }
+                val epub = inputStream.use { createEpubBook(it) }
 
                 notificationBuilder.showNotification(channel_id) {
                     text = getString(R.string.importing_epub)
