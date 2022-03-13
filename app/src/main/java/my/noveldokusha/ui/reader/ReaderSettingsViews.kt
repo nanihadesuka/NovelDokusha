@@ -1,7 +1,5 @@
 package my.noveldokusha.ui.reader
 
-import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.Crossfade
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
@@ -12,7 +10,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.FontDownload
-import androidx.compose.material.icons.twotone.FontDownload
 import androidx.compose.material.icons.twotone.FormatSize
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -59,11 +56,13 @@ private fun CurrentBookInfo(
             .padding(horizontal = 20.dp)
             .padding(top = 35.dp, bottom = 50.dp)
     ) {
-         Text(
+        Text(
             text = chapterTitle,
             style = MaterialTheme.typography.h5,
             fontWeight = FontWeight.Bold,
-            modifier = Modifier.padding().animateContentSize()
+            modifier = Modifier
+                .padding()
+                .animateContentSize()
         )
         Text(
             text = "Chapter: $chapterCurrentNumber/$chaptersTotalSize",
@@ -112,22 +111,7 @@ fun TextSizeSlider(
     onTextSizeChanged: (Float) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Row(
-        modifier
-            .fillMaxWidth()
-            .height(50.dp)
-            .border(
-                width = 1.dp,
-                color = MaterialTheme.colors.onPrimary.copy(alpha = 0.5f),
-                shape = CircleShape
-            )
-            .background(
-                color = MaterialTheme.colors.primary,
-                shape = CircleShape
-            )
-            .clip(CircleShape),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
+    RoundedContentLayout(modifier) {
         Icon(
             imageVector = Icons.TwoTone.FormatSize,
             contentDescription = null,
@@ -160,21 +144,8 @@ fun TextFontDropDown(
     var rowSize by remember { mutableStateOf(Size.Zero) }
     var expanded by remember { mutableStateOf(false) }
     val fontLoader = FontsLoader()
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = modifier
-            .fillMaxWidth()
-            .height(50.dp)
-            .border(
-                width = 1.dp,
-                color = MaterialTheme.colors.onPrimary.copy(alpha = 0.5f),
-                shape = CircleShape
-            )
-            .background(
-                color = MaterialTheme.colors.primary,
-                shape = CircleShape
-            )
-            .clip(CircleShape)
+    RoundedContentLayout(
+        Modifier
             .clickable { expanded = true }
             .onGloballyPositioned { layoutCoordinates ->
                 rowSize = layoutCoordinates.size.toSize()
@@ -218,6 +189,33 @@ fun TextFontDropDown(
                 }
             }
         }
+    }
+}
+
+
+@Composable
+private fun RoundedContentLayout(
+    modifier: Modifier = Modifier,
+    content: @Composable RowScope.() -> Unit
+) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = modifier
+            .fillMaxWidth()
+            .height(50.dp)
+            .border(
+                width = 1.dp,
+                color = MaterialTheme.colors.onPrimary.copy(alpha = 0.5f),
+                shape = CircleShape
+            )
+            .background(
+                color = MaterialTheme.colors.primary,
+                shape = CircleShape
+            )
+            .clip(CircleShape)
+            .then(modifier)
+    ) {
+        content(this)
     }
 }
 
