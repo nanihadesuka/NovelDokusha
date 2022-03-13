@@ -81,8 +81,8 @@ dependencies {
     implementation(fileTree("libs") { include("*.jar") })
 
     // Kotlin
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.0-RC")
-    implementation("org.jetbrains.kotlin:kotlin-script-runtime:1.6.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.0")
+    implementation("org.jetbrains.kotlin:kotlin-script-runtime:1.6.10")
     implementation("org.jetbrains.kotlin:kotlin-stdlib:1.6.10")
 
     // Room components
@@ -115,7 +115,7 @@ dependencies {
     implementation("com.afollestad.material-dialogs:core:3.3.0")
 
     // Glide
-    implementation("com.github.bumptech.glide:glide:4.12.0")
+    implementation("com.github.bumptech.glide:glide:4.13.0")
     kapt("com.github.bumptech.glide:compiler:4.12.0")
 
     // Test

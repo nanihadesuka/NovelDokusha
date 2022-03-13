@@ -25,7 +25,6 @@ import my.noveldokusha.uiUtils.*
 import java.util.*
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.math.ceil
-import kotlin.math.roundToInt
 
 @AndroidEntryPoint
 class ReaderActivity : BaseActivity()

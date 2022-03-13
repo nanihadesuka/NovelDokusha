@@ -9,14 +9,11 @@ import my.noveldokusha.data.database.tables.Chapter
 import my.noveldokusha.ui.BaseViewModel
 import my.noveldokusha.uiUtils.StateExtra_String
 import java.io.File
-import java.util.*
 import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
-import kotlin.collections.ArrayList
 import kotlin.properties.Delegates
 
-interface ReaderStateBundle
-{
+interface ReaderStateBundle {
     var bookUrl: String
     var chapterUrl: String
 }
@@ -26,31 +23,37 @@ class ReaderViewModel @Inject constructor(
     private val repository: Repository,
     private val state: SavedStateHandle,
     val appPreferences: AppPreferences
-) : BaseViewModel(), ReaderStateBundle
-{
-    enum class ReaderState
-    { IDLE, LOADING, INITIAL_LOAD }
+) : BaseViewModel(), ReaderStateBundle {
+    enum class ReaderState { IDLE, LOADING, INITIAL_LOAD }
 
     data class ChapterStats(val itemCount: Int, val chapter: Chapter, val index: Int)
 
     override var bookUrl by StateExtra_String(state)
     override var chapterUrl by StateExtra_String(state)
 
-    val localBookBaseFolder = File(repository.settings.folderBooks, bookUrl.removePrefix("local://"))
+    val localBookBaseFolder =
+        File(repository.settings.folderBooks, bookUrl.removePrefix("local://"))
 
-    var currentChapter: ChapterState by Delegates.observable(ChapterState(chapterUrl, 0, 0)) { _, old, new ->
+    var currentChapter: ChapterState by Delegates.observable(
+        ChapterState(
+            chapterUrl,
+            0,
+            0
+        )
+    ) { _, old, new ->
         chapterUrl = new.url
         if (old.url != new.url) saveLastReadPositionState(repository, bookUrl, new, old)
     }
 
     val orderedChapters: List<Chapter>
 
-    val readingPosStats = MutableLiveData<Pair<ChapterStats, Int>>()
+    val readingPosStats = mutableStateOf<Pair<ChapterStats, Int>?>(null)
 
-    init
-    {
-        val chapter = viewModelScope.async(Dispatchers.IO) { repository.bookChapter.get(chapterUrl) }
-        val bookChapter = viewModelScope.async(Dispatchers.IO) { repository.bookChapter.chapters(bookUrl) }
+    init {
+        val chapter =
+            viewModelScope.async(Dispatchers.IO) { repository.bookChapter.get(chapterUrl) }
+        val bookChapter =
+            viewModelScope.async(Dispatchers.IO) { repository.bookChapter.chapters(bookUrl) }
 
         // Need to fix this somehow
         runBlocking {
@@ -63,23 +66,32 @@ class ReaderViewModel @Inject constructor(
         }
     }
 
-    val readerFontSize = appPreferences.READER_FONT_SIZE_flow().asLiveData()
-    val readerFontFamily = appPreferences.READER_FONT_FAMILY_flow().asLiveData()
-    val items = ArrayList<ReaderItem>()
+    var readerFontSize by mutableStateOf(appPreferences.READER_FONT_SIZE)
+    var readerFontFamily by mutableStateOf(appPreferences.READER_FONT_FAMILY)
+    var readerState by mutableStateOf(ReaderState.INITIAL_LOAD)
+    val items = mutableStateListOf<ReaderItem>()
+    val listState = LazyListState(0, 0)
+
+    init {
+        viewModelScope.launch(Dispatchers.IO) {
+            appPreferences.READER_FONT_SIZE_flow().collect { readerFontSize = it }
+        }
+        viewModelScope.launch(Dispatchers.IO) {
+            appPreferences.READER_FONT_FAMILY_flow().collect { readerFontFamily = it }
+        }
+    }
+
     val readRoutine = ChaptersIsReadRoutine(repository)
-    var readerState = ReaderState.INITIAL_LOAD
 
     private val chaptersStats = mutableMapOf<String, ChapterStats>()
     private val initialLoadDone = AtomicBoolean(false)
 
-    override fun onCleared()
-    {
+    override fun onCleared() {
         saveLastReadPositionState(repository, bookUrl, currentChapter)
         super.onCleared()
     }
 
-    fun initialLoad(fn: () -> Unit)
-    {
+    fun initialLoad(fn: () -> Unit) {
         if (initialLoadDone.compareAndSet(false, true)) fn()
     }
 
@@ -89,21 +101,19 @@ class ReaderViewModel @Inject constructor(
     fun getPreviousChapterIndex(currentChapterUrl: String) =
         chaptersStats[currentChapterUrl]!!.index - 1
 
-    fun updateInfoViewTo(chapterUrl: String, itemPos: Int)
-    {
+    fun updateInfoViewTo(chapterUrl: String, itemPos: Int) {
         val chapter = chaptersStats[chapterUrl] ?: return
-        readingPosStats.postValue(Pair(chapter, itemPos))
+        readingPosStats.value = Pair(chapter, itemPos)
     }
 
-    fun addChapterStats(chapter: Chapter, itemCount: Int, index: Int)
-    {
+    fun addChapterStats(chapter: Chapter, itemCount: Int, index: Int) {
         chaptersStats[chapter.url] = ChapterStats(itemCount, chapter, index)
     }
 
-    suspend fun fetchChapterBody(chapterUrl: String) = repository.bookChapterBody.fetchBody(chapterUrl)
+    suspend fun fetchChapterBody(chapterUrl: String) =
+        repository.bookChapterBody.fetchBody(chapterUrl)
 
-    suspend fun getChapterInitialPosition(): Pair<Int, Int>?
-    {
+    suspend fun getChapterInitialPosition(): Pair<Int, Int>? {
         val stats = chaptersStats[currentChapter.url] ?: return null
         return getChapterInitialPosition(
             repository = repository,
@@ -128,11 +138,21 @@ private fun saveLastReadPositionState(
         }
 
         if (oldChapter?.url != null) repository.bookChapter.get(oldChapter.url)?.let {
-            repository.bookChapter.update(it.copy(lastReadPosition = oldChapter.position, lastReadOffset = oldChapter.offset))
+            repository.bookChapter.update(
+                it.copy(
+                    lastReadPosition = oldChapter.position,
+                    lastReadOffset = oldChapter.offset
+                )
+            )
         }
 
         repository.bookChapter.get(chapter.url)?.let {
-            repository.bookChapter.update(it.copy(lastReadPosition = chapter.position, lastReadOffset = chapter.offset))
+            repository.bookChapter.update(
+                it.copy(
+                    lastReadPosition = chapter.position,
+                    lastReadOffset = chapter.offset
+                )
+            )
         }
     }
 }
@@ -141,7 +161,7 @@ suspend fun getChapterInitialPosition(
     repository: Repository,
     bookUrl: String,
     chapter: Chapter,
-    items: ArrayList<ReaderItem>
+    items: List<ReaderItem>
 ): Pair<Int, Int> = coroutineScope {
 
     val book = async(Dispatchers.IO) { repository.bookLibrary.get(bookUrl) }
@@ -157,8 +177,7 @@ suspend fun getChapterInitialPosition(
         }
     }
 
-    when
-    {
+    when {
         chapter.url == book.await()?.lastReadChapter -> position.await()
         chapter.read -> Pair(titlePos.await(), 0)
         else -> position.await()
