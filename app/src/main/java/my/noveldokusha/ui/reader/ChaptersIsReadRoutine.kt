@@ -19,7 +19,10 @@ class ChaptersIsReadRoutine(val repository: Repository)
 
         val chapter = repository.bookChapter.get(chapterUrl) ?: return@launch
         val oldStatus = chapterRead.getOrPut(chapterUrl) {
-            if (chapter.read) ChapterReadStatus(true, true) else ChapterReadStatus(false, false)
+            when (chapter.read) {
+                true -> ChapterReadStatus(startSeen = true, endSeen = true)
+                false -> ChapterReadStatus(startSeen = false, endSeen = false)
+            }
         }
 
         if (oldStatus.startSeen && oldStatus.endSeen) return@launch
