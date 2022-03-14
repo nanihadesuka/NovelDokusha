@@ -97,11 +97,6 @@ fun ReaderItemView(
             maxLines = 35,
             modifier = Modifier.padding(17.dp)
         )
-        is ReaderItem.PADDING -> Box(
-            modifier = Modifier
-                .height(30.dp)
-                .fillMaxWidth()
-        )
         is ReaderItem.PROGRESSBAR -> Box(
             modifier = Modifier
                 .padding(40.dp)
@@ -151,7 +146,6 @@ class BookItemDataProvider : PreviewParameterProvider<ReaderItem> {
         ReaderItem.ERROR(
             chapterUrl = chapterUrl,
             "Error:\nError message\n\nReason:\nReason message\n\nError stack:\nCall stack tree "
-        ),
-        ReaderItem.PADDING(chapterUrl = chapterUrl),
+        )
     )
 }

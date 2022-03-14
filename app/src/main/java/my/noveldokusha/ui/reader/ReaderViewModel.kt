@@ -29,8 +29,8 @@ class ReaderViewModel @Inject constructor(
     private val state: SavedStateHandle,
     val appPreferences: AppPreferences
 ) : BaseViewModel(), ReaderStateBundle {
-    enum class ReaderState { IDLE, LOADING, INITIAL_LOAD }
 
+    enum class ReaderState { IDLE, LOADING, INITIAL_LOAD }
     data class ChapterStats(val itemCount: Int, val chapter: Chapter, val index: Int)
 
     override var bookUrl by StateExtra_String(state)
@@ -52,7 +52,18 @@ class ReaderViewModel @Inject constructor(
 
     val orderedChapters: List<Chapter>
 
-    val readingPosStats = mutableStateOf<Pair<ChapterStats, Int>?>(null)
+    var readerFontSize by mutableStateOf(appPreferences.READER_FONT_SIZE)
+    var readerFontFamily by mutableStateOf(appPreferences.READER_FONT_FAMILY)
+    var readerState by mutableStateOf(ReaderState.INITIAL_LOAD)
+    var readingPosStats by mutableStateOf<Pair<ChapterStats, Int>?>(null)
+
+    val list = mutableStateListOf<ReaderItem>()
+    val listState = LazyListState(0, 0)
+
+    val readRoutine = ChaptersIsReadRoutine(repository)
+
+    private val chaptersStats = mutableMapOf<String, ChapterStats>()
+    private val initialLoadDone = AtomicBoolean(false)
 
     init {
         val chapter =
@@ -69,15 +80,7 @@ class ReaderViewModel @Inject constructor(
             )
             this@ReaderViewModel.orderedChapters = bookChapter.await()
         }
-    }
 
-    var readerFontSize by mutableStateOf(appPreferences.READER_FONT_SIZE)
-    var readerFontFamily by mutableStateOf(appPreferences.READER_FONT_FAMILY)
-    var readerState by mutableStateOf(ReaderState.INITIAL_LOAD)
-    val items = mutableStateListOf<ReaderItem>()
-    val listState = LazyListState(0, 0)
-
-    init {
         viewModelScope.launch(Dispatchers.IO) {
             appPreferences.READER_FONT_SIZE_flow().collect { readerFontSize = it }
         }
@@ -85,11 +88,6 @@ class ReaderViewModel @Inject constructor(
             appPreferences.READER_FONT_FAMILY_flow().collect { readerFontFamily = it }
         }
     }
-
-    val readRoutine = ChaptersIsReadRoutine(repository)
-
-    private val chaptersStats = mutableMapOf<String, ChapterStats>()
-    private val initialLoadDone = AtomicBoolean(false)
 
     override fun onCleared() {
         saveLastReadPositionState(repository, bookUrl, currentChapter)
@@ -108,7 +106,7 @@ class ReaderViewModel @Inject constructor(
 
     fun updateInfoViewTo(chapterUrl: String, itemPos: Int) {
         val chapter = chaptersStats[chapterUrl] ?: return
-        readingPosStats.value = Pair(chapter, itemPos)
+        readingPosStats = Pair(chapter, itemPos)
     }
 
     fun addChapterStats(chapter: Chapter, itemCount: Int, index: Int) {
@@ -124,7 +122,7 @@ class ReaderViewModel @Inject constructor(
             repository = repository,
             bookUrl = bookUrl,
             chapter = stats.chapter,
-            items = items
+            items = list
         )
     }
 }
