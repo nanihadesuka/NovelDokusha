@@ -116,7 +116,7 @@ fun ReaderItemView(
 )
 @Composable
 private fun BookItemPreview(@PreviewParameter(BookItemDataProvider::class) item: ReaderItem) {
-    InternalTheme(Themes.BLACK) {
+    InternalTheme(theme = Themes.BLACK) {
         ReaderItemView(
             item = item,
             localBookBaseFolder = File(""),

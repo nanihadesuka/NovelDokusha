@@ -4,6 +4,7 @@ import androidx.annotation.StyleRes
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import kotlinx.coroutines.flow.mapNotNull
 import my.noveldokusha.AppPreferences
@@ -93,6 +94,7 @@ enum class Themes {
 @Composable
 fun Theme(
     appPreferences: AppPreferences,
+    modifier: Modifier = Modifier,
     content: @Composable () -> Unit
 ) {
 
@@ -128,13 +130,15 @@ fun Theme(
 
     InternalTheme(
         theme = theme,
-        content = content
+        content = content,
+        modifier = modifier
     )
 }
 
 
 @Composable
 fun InternalTheme(
+    modifier: Modifier = Modifier,
     theme: Themes = if (isSystemInDarkTheme()) Themes.DARK else Themes.LIGHT,
     content: @Composable () -> Unit
 ) {
@@ -149,6 +153,6 @@ fun InternalTheme(
         colors = palette,
         typography = Typography,
         shapes = Shapes,
-        content = { Surface { content() } }
+        content = { Surface(modifier = modifier) { content() } }
     )
 }

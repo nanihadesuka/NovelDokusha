@@ -10,6 +10,8 @@ import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
@@ -52,6 +54,7 @@ class ReaderActivity : ComponentActivity() {
         }
     }
 
+    private val showList = mutableStateOf(false)
 
     @Inject
     lateinit var appPreferences: AppPreferences
@@ -80,7 +83,10 @@ class ReaderActivity : ComponentActivity() {
         window.statusBarColor = R.attr.colorSurface.colorAttrRes(this)
 
         setContent {
-            Theme(appPreferences = appPreferences) {
+            Theme(
+                appPreferences = appPreferences,
+                modifier = Modifier.fillMaxSize()
+            ) {
                 val defaultTextStyle = LocalTextStyle.current
                 val textStyle by derivedStateOf {
                     defaultTextStyle.copy(
@@ -112,8 +118,10 @@ class ReaderActivity : ComponentActivity() {
                     viewModel.listState.layoutInfo.totalItemsCount
                 ) {
                     val items = viewModel.listState.layoutInfo.visibleItemsInfo
-                    val firstItem = viewModel.list.getOrNull(items.first().index)
-                    val lastItem = viewModel.list.getOrNull(items.last().index)
+                    val firstItem =
+                        items.firstOrNull()?.index?.let { viewModel.list.getOrNull(it) }
+                    val lastItem =
+                        items.lastOrNull()?.index?.let { viewModel.list.getOrNull(it) }
 
                     // Update info overlay data
                     if (firstItem is ReaderItem.Position) {
@@ -134,39 +142,45 @@ class ReaderActivity : ComponentActivity() {
                     updateCurrentReadingPosSavingState()
                 }
 
-                LazyColumn(
-                    state = viewModel.listState,
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .pointerInput(Unit) {
-                            detectTapGestures(
-                                onLongPress = { showInfoView = !showInfoView }
+                AnimatedVisibility(
+                    visible = showList.value,
+                    enter = fadeIn(tween(250)),
+                    exit = fadeOut(tween(250))
+                ) {
+                    LazyColumn(
+                        state = viewModel.listState,
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .pointerInput(Unit) {
+                                detectTapGestures(
+                                    onLongPress = { showInfoView = !showInfoView }
+                                )
+                            }
+                    ) {
+                        item(key = "#firstOne#") {
+                            Box(
+                                Modifier
+                                    .fillMaxWidth()
+                                    .height(300.dp)
                             )
                         }
-                ) {
-                    item (key = "#firstOne#"){
-                        Box(
-                            Modifier
-                                .fillMaxWidth()
-                                .height(300.dp)
-                        )
-                    }
-                    items(
-                        items = viewModel.list,
-                        key = { it.key }
-                    ) {
-                        ReaderItemView(
-                            item = it,
-                            localBookBaseFolder = viewModel.localBookBaseFolder,
-                            textStyle = textStyle
-                        )
-                    }
-                    item (key = "#lastOne#"){
-                        Box(
-                            Modifier
-                                .fillMaxWidth()
-                                .height(300.dp)
-                        )
+                        items(
+                            items = viewModel.list,
+                            key = { it.key }
+                        ) {
+                            ReaderItemView(
+                                item = it,
+                                localBookBaseFolder = viewModel.localBookBaseFolder,
+                                textStyle = textStyle
+                            )
+                        }
+                        item(key = "#lastOne#") {
+                            Box(
+                                Modifier
+                                    .fillMaxWidth()
+                                    .height(300.dp)
+                            )
+                        }
                     }
                 }
 
@@ -180,7 +194,7 @@ class ReaderActivity : ComponentActivity() {
 
                 AnimatedVisibility(
                     visible = showInfoView,
-                    enter = androidx.compose.animation.fadeIn(),
+                    enter = fadeIn(),
                     exit = fadeOut()
                 ) {
                     BackHandler(true) { showInfoView = false }
@@ -204,6 +218,12 @@ class ReaderActivity : ComponentActivity() {
     }
 
     private fun loadInitialChapter(): Boolean {
+
+        lifecycleScope.launch {
+            delay(250)
+            showList.value = true
+        }
+
         viewModel.readerState = ReaderViewModel.ReaderState.INITIAL_LOAD
 
         val maintainLastVisiblePosition = { fn: () -> Unit ->
@@ -247,6 +267,7 @@ class ReaderActivity : ComponentActivity() {
             maintainLastVisiblePosition
         ) {
             calculateInitialChapterPosition()
+            showList.value = true
         }
     }
 
