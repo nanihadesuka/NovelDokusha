@@ -23,10 +23,6 @@ android {
         jvmTarget = JavaVersion.VERSION_1_8.toString()
     }
 
-    composeOptions {
-        kotlinCompilerExtensionVersion = "1.1.1"
-    }
-
     defaultConfig {
         applicationId = "my.noveldokusha"
         minSdk = 26
@@ -77,7 +73,6 @@ android {
 
     buildFeatures {
         viewBinding = true
-        compose = true
     }
 }
 
@@ -86,8 +81,8 @@ dependencies {
     implementation(fileTree("libs") { include("*.jar") })
 
     // Kotlin
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.0")
-    implementation("org.jetbrains.kotlin:kotlin-script-runtime:1.6.10")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.0-RC")
+    implementation("org.jetbrains.kotlin:kotlin-script-runtime:1.6.0")
     implementation("org.jetbrains.kotlin:kotlin-stdlib:1.6.10")
 
     // Room components
@@ -120,7 +115,7 @@ dependencies {
     implementation("com.afollestad.material-dialogs:core:3.3.0")
 
     // Glide
-    implementation("com.github.bumptech.glide:glide:4.13.0")
+    implementation("com.github.bumptech.glide:glide:4.12.0")
     kapt("com.github.bumptech.glide:compiler:4.12.0")
 
     // Test
@@ -145,19 +140,4 @@ dependencies {
 
     // Memory leak detector
     debugImplementation("com.squareup.leakcanary:leakcanary-android:2.7")
-
-
-    // Jetpack compose
-    implementation("androidx.activity:activity-compose:1.4.0")
-    implementation("androidx.compose.material:material:1.1.1")
-    implementation("androidx.compose.animation:animation:1.1.1")
-    implementation("androidx.compose.ui:ui-tooling:1.1.1")
-    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.4.1")
-    implementation("androidx.compose.runtime:runtime-livedata:1.1.1")
-    implementation("androidx.constraintlayout:constraintlayout-compose:1.0.0")
-    implementation("androidx.compose.material:material-icons-extended:1.1.1")
-    androidTestImplementation("androidx.compose.ui:ui-test-junit4:1.1.1")
-
-    // Glide for jetpack compose
-    implementation("com.github.skydoves:landscapist-glide:1.4.9")
 }
