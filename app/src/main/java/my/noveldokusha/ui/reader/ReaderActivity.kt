@@ -97,9 +97,9 @@ class ReaderActivity : BaseActivity()
             }
         }
 
-        viewBind.settingTextSize.value = appPreferences.READER_FONT_SIZE
+        viewBind.settingTextSize.value = appPreferences.READER_FONT_SIZE.toInt().toFloat()
         viewBind.settingTextSize.addOnChangeListener { _, value, _ ->
-            appPreferences.READER_FONT_SIZE = value
+            appPreferences.READER_FONT_SIZE = value.toInt().toFloat()
         }
         viewBind.listView.setOnItemLongClickListener { _, _, _, _ ->
             if (viewBind.infoContainer.isVisible)
