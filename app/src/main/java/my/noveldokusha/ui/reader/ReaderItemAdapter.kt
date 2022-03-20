@@ -62,7 +62,7 @@ class ReaderItemAdapter(
         val paragraph = item.text + "\n"
         bind.body.text = paragraph
         bind.body.textSize = appPreferences.READER_FONT_SIZE
-        bind.body.typeface = fontsLoader.getFontFamilyNORMAL(appPreferences.READER_FONT_FAMILY)
+        bind.body.typeface = fontsLoader.getTypeFaceNORMAL(appPreferences.READER_FONT_FAMILY)
 
         when (item.location)
         {
@@ -118,7 +118,7 @@ class ReaderItemAdapter(
             else -> ActivityReaderListItemSpecialTitleBinding.bind(convertView)
         }
         bind.specialTitle.text = ctx.getString(R.string.reader_no_more_chapters)
-        bind.specialTitle.typeface = fontsLoader.getFontFamilyBOLD(appPreferences.READER_FONT_FAMILY)
+        bind.specialTitle.typeface = fontsLoader.getTypeFaceBOLD(appPreferences.READER_FONT_FAMILY)
         return bind.root
     }
 
@@ -130,7 +130,7 @@ class ReaderItemAdapter(
             else -> ActivityReaderListItemSpecialTitleBinding.bind(convertView)
         }
         bind.specialTitle.text = ctx.getString(R.string.reader_first_chapter)
-        bind.specialTitle.typeface = fontsLoader.getFontFamilyBOLD(appPreferences.READER_FONT_FAMILY)
+        bind.specialTitle.typeface = fontsLoader.getTypeFaceBOLD(appPreferences.READER_FONT_FAMILY)
         return bind.root
     }
 
@@ -183,7 +183,7 @@ class ReaderItemAdapter(
             else -> ActivityReaderListItemTitleBinding.bind(convertView)
         }
         bind.title.text = item.text
-        bind.title.typeface = fontsLoader.getFontFamilyBOLD(appPreferences.READER_FONT_FAMILY)
+        bind.title.typeface = fontsLoader.getTypeFaceBOLD(appPreferences.READER_FONT_FAMILY)
         return bind.root
     }
 
