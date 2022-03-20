@@ -6,6 +6,7 @@ import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import kotlinx.coroutines.flow.mapNotNull
 import my.noveldokusha.AppPreferences
 import my.noveldokusha.R
@@ -148,6 +149,12 @@ fun InternalTheme(
         Themes.GREY -> grey_ColorPalette
         Themes.BLACK -> black_ColorPalette
     }
+
+    val systemUiController = rememberSystemUiController()
+    systemUiController.setSystemBarsColor(
+        color = palette.surface,
+        darkIcons = palette.isLight
+    )
 
     MaterialTheme(
         colors = palette,
