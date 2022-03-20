@@ -22,7 +22,7 @@
 		android:scrollbars="none"
 		android:visibility="invisible"
 		tools:visibility="visible"
-		tools:listitem="@layout/activity_reader_list_item"
+		tools:listitem="@layout/activity_reader_list_item_body"
 		/>
 
 	<androidx.constraintlayout.widget.ConstraintLayout
@@ -181,7 +181,6 @@
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
 				android:layout_gravity="center_vertical"
-				android:stepSize="1"
 				android:value="14"
 				android:valueFrom="8"
 				android:valueTo="24"
