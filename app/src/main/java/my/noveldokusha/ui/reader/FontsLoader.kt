@@ -1,6 +1,7 @@
 package my.noveldokusha.ui.reader
 
 import android.graphics.Typeface
+import androidx.compose.ui.text.font.FontFamily
 
 class FontsLoader
 {
@@ -24,6 +25,7 @@ class FontsLoader
     }
     private val typeFaceNORMALCache = mutableMapOf<String, Typeface>()
     private val typeFaceBOLDCache = mutableMapOf<String, Typeface>()
+    private val fontFamilyCache = mutableMapOf<String, FontFamily>()
 
     fun getTypeFaceNORMAL(name: String) = typeFaceNORMALCache.getOrPut(name) {
         Typeface.create(name, Typeface.NORMAL)
@@ -31,5 +33,9 @@ class FontsLoader
 
     fun getTypeFaceBOLD(name: String) = typeFaceBOLDCache.getOrPut(name) {
         Typeface.create(name, Typeface.BOLD)
+    }
+
+    fun getFontFamily(name: String) = fontFamilyCache.getOrPut(name) {
+        FontFamily(getTypeFaceNORMAL(name))
     }
 }

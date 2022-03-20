@@ -1,5 +1,8 @@
 package my.noveldokusha.ui.reader
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
@@ -43,6 +46,7 @@ class ReaderViewModel @Inject constructor(
         if (old.url != new.url) saveLastReadPositionState(repository, bookUrl, new, old)
     }
 
+    var showReaderInfoView by mutableStateOf(false)
     val orderedChapters: List<Chapter>
 
     val readingPosStats = MutableLiveData<Pair<ChapterStats, Int>>()
@@ -63,8 +67,6 @@ class ReaderViewModel @Inject constructor(
         }
     }
 
-    val readerFontSize = appPreferences.READER_FONT_SIZE_flow().asLiveData()
-    val readerFontFamily = appPreferences.READER_FONT_FAMILY_flow().asLiveData()
     val items = ArrayList<ReaderItem>()
     val readRoutine = ChaptersIsReadRoutine(repository)
     var readerState = ReaderState.INITIAL_LOAD
