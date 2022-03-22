@@ -76,4 +76,6 @@
 	<string name="sort">Sort</string>
 	<string name="options_panel">Options panel</string>
 	<string name="search_with_filters">Search with filters</string>
+	<string name="no_cover_found">No cover found</string>
+	<string name="none_found">None found</string>
 </resources>
