@@ -2,6 +2,7 @@ package my.noveldokusha.ui.theme
 
 import androidx.annotation.StyleRes
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -95,7 +96,7 @@ enum class Themes {
 @Composable
 fun Theme(
     appPreferences: AppPreferences,
-    wrapper: @Composable (fn: @Composable () -> @Composable Unit) -> Unit = { fn -> Surface { fn() } },
+    wrapper: @Composable (fn: @Composable () -> @Composable Unit) -> Unit = { fn -> Surface(Modifier.fillMaxSize()) { fn() } },
     content: @Composable () -> @Composable Unit,
 ) {
 
@@ -140,7 +141,7 @@ fun Theme(
 @Composable
 fun InternalTheme(
     theme: Themes = if (isSystemInDarkTheme()) Themes.DARK else Themes.LIGHT,
-    wrapper: @Composable (fn: @Composable () -> Unit) -> Unit = { fn -> Surface { fn() } },
+    wrapper: @Composable (fn: @Composable () -> Unit) -> Unit = { fn -> Surface(Modifier.fillMaxSize()) { fn() } },
     content: @Composable () -> Unit
 ) {
     val palette = when (theme) {
