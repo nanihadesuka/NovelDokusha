@@ -10,6 +10,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.layout.ContentScale
 import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.RequestListener
@@ -18,7 +19,7 @@ import java.io.File
 
 @Composable
 fun GlideImageFadeIn(
-    imageModel: File,
+    imageModel: Any?,
     modifier: Modifier = Modifier,
     fadeInDurationMillis: Int = 250
 ) {
@@ -27,12 +28,13 @@ fun GlideImageFadeIn(
     var showImage by rememberSaveable { mutableStateOf(false) }
     val alpha by animateFloatAsState(
         targetValue = if (showImage) 1f else 0f,
-        animationSpec = tween(if(showImmediatelly) 75 else fadeInDurationMillis)
+        animationSpec = tween(if (showImmediatelly) 75 else fadeInDurationMillis)
     )
 
     GlideImage(
         imageModel = imageModel,
         modifier = modifier.alpha(alpha),
+        contentScale = ContentScale.Fit,
         requestListener = object : RequestListener<Drawable> {
             override fun onLoadFailed(
                 e: GlideException?,
@@ -42,6 +44,7 @@ fun GlideImageFadeIn(
             ): Boolean {
                 return false
             }
+
             override fun onResourceReady(
                 resource: Drawable?,
                 model: Any?,
