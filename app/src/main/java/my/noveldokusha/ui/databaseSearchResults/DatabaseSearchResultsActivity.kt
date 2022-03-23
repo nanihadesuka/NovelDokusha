@@ -3,11 +3,9 @@ package my.noveldokusha.ui.databaseSearchResults
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
-import androidx.compose.runtime.LaunchedEffect
 import dagger.hilt.android.AndroidEntryPoint
 import my.noveldokusha.AppPreferences
 import my.noveldokusha.R
@@ -66,21 +64,15 @@ class DatabaseSearchResultsActivity : ComponentActivity() {
         }
 
         setContent {
-
-            val loadState = viewModel.fetchIterator.state
-
-            LaunchedEffect(loadState.value){
-                Log.e("LOAD STATE MAIN", loadState.value.name)
-            }
-
             Theme(appPreferences = appPreferences) {
                 DatabaseSearchResultsView(
                     title = title,
                     subtitle = subtitle,
                     list = viewModel.fetchIterator.list,
-                    onBookClicked = ::openBook,
+                    error = viewModel.fetchIterator.error,
+                    loadState = viewModel.fetchIterator.state,
                     onLoadNext = { viewModel.fetchIterator.fetchNext() },
-                    loadState = loadState.value
+                    onBookClicked = ::openBook,
                 )
             }
         }

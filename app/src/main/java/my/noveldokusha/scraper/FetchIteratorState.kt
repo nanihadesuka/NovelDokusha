@@ -24,35 +24,28 @@ class FetchIteratorState<T>(
     private var index = 0
     private var job: Job? = null
 
-    val state = mutableStateOf(STATE.IDLE)
-    val error = mutableStateOf<String?>(null)
-
-    fun reset() {
-        job?.cancel()
-        state.value = STATE.IDLE
-        index = 0
-        error.value = null
-        list.clear()
-    }
+    var state by mutableStateOf(STATE.IDLE)
+        private set
+    var error by mutableStateOf<String?>(null)
+        private set
 
     fun fetchNext() {
-        if (state.value != STATE.IDLE) return
-        state.value = STATE.LOADING
+        if (state != STATE.IDLE) return
+        state = STATE.LOADING
 
         job = coroutineScope.launch(Dispatchers.Main) {
             val res = withContext(Dispatchers.IO) { fn(index) }
             if (!isActive) return@launch
-            state.value = when (res) {
+            state = when (res) {
                 is Response.Success -> {
                     list.addAll(res.data)
                     if (res.data.isEmpty()) STATE.CONSUMED else STATE.IDLE
                 }
                 is Response.Error -> {
-                    error.value = res.message
+                    error = res.message
                     STATE.CONSUMED
                 }
             }
-            Log.e("NEW STATE", state.value.name)
             index += 1
         }
     }

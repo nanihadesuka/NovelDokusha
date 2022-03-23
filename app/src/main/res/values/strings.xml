@@ -78,4 +78,5 @@
 	<string name="search_with_filters">Search with filters</string>
 	<string name="no_cover_found">No cover found</string>
 	<string name="none_found">None found</string>
+	<string name="no_more_results">No more results</string>
 </resources>
