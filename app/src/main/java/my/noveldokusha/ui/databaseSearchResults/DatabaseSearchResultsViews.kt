@@ -1,6 +1,8 @@
 package my.noveldokusha.ui.databaseSearchResults
 
 import android.util.Log
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.scrollable
@@ -17,6 +19,7 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Outline
 import androidx.compose.ui.res.stringResource
@@ -32,6 +35,7 @@ import my.noveldokusha.ui.theme.ColorAccent
 import my.noveldokusha.ui.theme.InternalTheme
 import my.noveldokusha.uiViews.MyButton
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun DatabaseSearchResultsView(
     title: String,
@@ -57,13 +61,16 @@ fun DatabaseSearchResultsView(
     LazyColumn(
         state = state,
         modifier = Modifier.fillMaxWidth(),
-        contentPadding = PaddingValues(start = 4.dp, end = 4.dp, top = 16.dp, bottom = 260.dp)
+        contentPadding = PaddingValues(start = 4.dp, end = 4.dp, top = 0.dp, bottom = 260.dp)
     ) {
-        item {
+        stickyHeader {
             Column(
-                Modifier
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier
+                    .background(MaterialTheme.colors.surface)
                     .fillMaxWidth()
                     .padding(8.dp)
+                    .padding(top = 16.dp, bottom = 4.dp)
             ) {
                 Text(
                     text = title,
