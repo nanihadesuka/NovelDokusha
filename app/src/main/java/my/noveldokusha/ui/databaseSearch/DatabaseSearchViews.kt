@@ -26,12 +26,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.state.ToggleableState
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import my.noveldokusha.R
 import my.noveldokusha.ui.theme.ColorAccent
 import my.noveldokusha.ui.theme.InternalTheme
 import my.noveldokusha.ui.theme.Themes
+import my.noveldokusha.uiViews.MyButton
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
@@ -92,14 +94,14 @@ fun SearchGenres(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
-        Button(
-            onClick = onSearchClick,
+        MyButton(
+            text = stringResource(id = R.string.search_with_filters),
             modifier = Modifier
                 .padding(8.dp)
-                .fillMaxWidth()
-        ) {
-            Text(text = stringResource(id = R.string.search_with_filters))
-        }
+                .fillMaxWidth(),
+            onClick = onSearchClick,
+            textAlign = TextAlign.Center
+        )
 
         LazyVerticalGrid(
             cells = GridCells.Fixed(2)

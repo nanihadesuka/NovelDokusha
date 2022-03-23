@@ -164,3 +164,31 @@ fun InternalTheme(
         content = { wrapper { content() } }
     )
 }
+
+// InternalTheme but for theming an object (wont try to fill all space)
+@Composable
+fun InternalThemeObject(
+    theme: Themes = if (isSystemInDarkTheme()) Themes.DARK else Themes.LIGHT,
+    wrapper: @Composable (fn: @Composable () -> Unit) -> Unit = { fn -> Surface { fn() } },
+    content: @Composable () -> Unit
+) {
+    val palette = when (theme) {
+        Themes.LIGHT -> light_ColorPalette
+        Themes.DARK -> dark_ColorPalette
+        Themes.GREY -> grey_ColorPalette
+        Themes.BLACK -> black_ColorPalette
+    }
+
+    val systemUiController = rememberSystemUiController()
+    systemUiController.setSystemBarsColor(
+        color = palette.surface,
+        darkIcons = palette.isLight
+    )
+
+    MaterialTheme(
+        colors = palette,
+        typography = Typography,
+        shapes = Shapes,
+        content = { wrapper { content() } }
+    )
+}

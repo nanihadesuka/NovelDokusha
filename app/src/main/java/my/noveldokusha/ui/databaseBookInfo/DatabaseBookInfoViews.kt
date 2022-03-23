@@ -9,6 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -24,6 +25,7 @@ import my.noveldokusha.ui.theme.ColorAccent
 import my.noveldokusha.ui.theme.InternalTheme
 import my.noveldokusha.uiUtils.ifCase
 import my.noveldokusha.uiViews.GlideImageFadeIn
+import my.noveldokusha.uiViews.MyButton
 
 @Composable
 private fun Title(name: String) {
@@ -34,30 +36,6 @@ private fun Title(name: String) {
         style = MaterialTheme.typography.subtitle1,
         modifier = Modifier.padding(top = 16.dp, bottom = 4.dp),
     )
-}
-
-@OptIn(ExperimentalMaterialApi::class)
-@Composable
-private fun Access(
-    text: String,
-    modifier: Modifier = Modifier,
-    enabled: Boolean = true,
-    animate: Boolean = true,
-    onClick: () -> Unit,
-) {
-    Card(
-        modifier = modifier.animateContentSize(),
-        onClick = onClick,
-        enabled = enabled,
-        role = Role.Button,
-        elevation = 2.dp,
-        shape = RoundedCornerShape(14.dp)
-    ) {
-        Text(
-            text = text,
-            modifier = Modifier.padding(14.dp)
-        )
-    }
 }
 
 @OptIn(ExperimentalAnimationApi::class)
@@ -97,7 +75,7 @@ fun DatabaseBookInfoView(
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.weight(1f),
             )
-            Access(
+            MyButton(
                 text = stringResource(R.string.sources),
                 onClick = onSourcesClick
             )
@@ -140,7 +118,7 @@ fun DatabaseBookInfoView(
 
         Title(stringResource(R.string.authors))
         Row {
-            for (author in data.authors) Access(
+            for (author in data.authors) MyButton(
                 text = author.name,
                 enabled = author.url != null,
                 onClick = { onAuthorsClick(author) },
@@ -152,7 +130,7 @@ fun DatabaseBookInfoView(
         TextAnimated(text = data.tags.joinToString(" · "))
 
         Title(stringResource(R.string.genres))
-        Access(
+        MyButton(
             text = data.genres.joinToString(" · "),
             onClick = { onGenresClick(data.genres) }
         )
@@ -163,7 +141,7 @@ fun DatabaseBookInfoView(
         Title(stringResource(R.string.related_books))
         if (data.relatedBooks.isEmpty())
             TextAnimated(text = stringResource(id = R.string.none_found))
-        for (book in data.relatedBooks) Access(
+        for (book in data.relatedBooks) MyButton(
             text = book.title,
             onClick = { onBookClick(book) },
             modifier = Modifier
@@ -174,7 +152,7 @@ fun DatabaseBookInfoView(
         Title(stringResource(R.string.similar_recommended))
         if (data.similarRecommended.isEmpty())
             TextAnimated(text = stringResource(id = R.string.none_found))
-        for (book in data.similarRecommended) Access(
+        for (book in data.similarRecommended) MyButton(
             text = book.title,
             onClick = { onBookClick(book) },
             modifier = Modifier
