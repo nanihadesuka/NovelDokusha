@@ -1,12 +1,11 @@
 package my.noveldokusha.ui.globalSourceSearch
 
-import android.os.Parcelable
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import my.noveldokusha.AppPreferences
-import my.noveldokusha.scraper.FetchIterator
+import my.noveldokusha.scraper.FetchIteratorState
 import my.noveldokusha.scraper.scraper
 import my.noveldokusha.scraper.SourceInterface
 import my.noveldokusha.ui.BaseViewModel
@@ -26,7 +25,7 @@ class GlobalSourceSearchViewModel @Inject constructor(
 {
     override val input by StateExtra_String(state)
 
-    val globalResults = appPreferences.SOURCES_LANGUAGES.let { activeLangs ->
+    val list = appPreferences.SOURCES_LANGUAGES.let { activeLangs ->
         scraper.sourcesListCatalog
             .filter { it.language in activeLangs }
             .map { SourceResults(it, input, viewModelScope) }
@@ -35,11 +34,10 @@ class GlobalSourceSearchViewModel @Inject constructor(
 
 data class SourceResults(val source: SourceInterface.catalog, val searchInput: String, val coroutineScope: CoroutineScope)
 {
-    var savedState: Parcelable? = null
-    val booksFetchIterator = FetchIterator(coroutineScope) { source.getCatalogSearch(it, searchInput) }
+    val fetchIterator = FetchIteratorState(coroutineScope) { source.getCatalogSearch(it, searchInput) }
 
     init
     {
-        booksFetchIterator.fetchNext()
+        fetchIterator.fetchNext()
     }
 }

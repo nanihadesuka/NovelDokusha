@@ -11,13 +11,11 @@ import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import my.noveldokusha.ui.theme.InternalTheme
 import my.noveldokusha.ui.theme.InternalThemeObject
 import my.noveldokusha.ui.theme.Themes
 import my.noveldokusha.uiUtils.ifCase
@@ -30,9 +28,17 @@ fun MyButton(
     enabled: Boolean = true,
     animate: Boolean = true,
     textAlign: TextAlign = TextAlign.Start,
+    radius: Dp = 12.dp,
     onClick: () -> Unit,
+    content: @Composable () -> Unit = {
+        Text(
+            text = text,
+            modifier = Modifier.padding(radius),
+            textAlign = textAlign
+        )
+    }
 ) {
-    val radius = 12.dp
+
     val shape = RoundedCornerShape(radius)
     // Remainder: only use modifier properties, dont use the parameters (wonky compose bugs?)
     Surface(
@@ -47,11 +53,7 @@ fun MyButton(
             ) { onClick() },
         color = MaterialTheme.colors.onSurface.copy(alpha = 0.02f)
     ) {
-        Text(
-            text = text,
-            modifier = Modifier.padding(radius),
-            textAlign = textAlign
-        )
+        content()
     }
 }
 
