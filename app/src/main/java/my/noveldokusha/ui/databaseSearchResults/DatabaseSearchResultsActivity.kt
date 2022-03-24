@@ -72,13 +72,13 @@ class DatabaseSearchResultsActivity : ComponentActivity() {
                     error = viewModel.fetchIterator.error,
                     loadState = viewModel.fetchIterator.state,
                     onLoadNext = { viewModel.fetchIterator.fetchNext() },
-                    onBookClicked = ::openBook,
+                    onBookClicked = ::openBookInfoPage,
                 )
             }
         }
     }
 
-    fun openBook(book: BookMetadata) {
+    fun openBookInfoPage(book: BookMetadata) {
         DatabaseBookInfoActivity
             .IntentData(this, databaseUrlBase = viewModel.databaseUrlBase, bookMetadata = book)
             .let(::startActivity)

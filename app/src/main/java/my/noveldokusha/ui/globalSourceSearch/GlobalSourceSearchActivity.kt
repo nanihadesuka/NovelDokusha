@@ -3,7 +3,6 @@ package my.noveldokusha.ui.globalSourceSearch
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.view.MenuItem
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
@@ -69,23 +68,17 @@ class GlobalSourceSearchActivity : ComponentActivity() {
 
                     GlobalSourceSearchView(
                         listSources = viewModel.list,
-                        onBookClick = {
-                            ChaptersActivity.IntentData(
-                                this@GlobalSourceSearchActivity,
-                                bookMetadata = BookMetadata(title = it.title, url = it.url)
-                            ).let(::startActivity)
-                        }
+                        onBookClick = ::openBookChaptersPage
                     )
                 }
             }
         }
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean = when (item.itemId) {
-        android.R.id.home -> {
-            this.onBackPressed()
-            true
-        }
-        else -> super.onOptionsItemSelected(item)
+    fun openBookChaptersPage(book: BookMetadata) {
+        ChaptersActivity.IntentData(
+            this@GlobalSourceSearchActivity,
+            bookMetadata = BookMetadata(title = book.title, url = book.url)
+        ).let(::startActivity)
     }
 }

@@ -55,10 +55,10 @@ class DatabaseBookInfoActivity : ComponentActivity() {
                     when (val data = reply) {
                         is Response.Success -> DatabaseBookInfoView(
                             data = data.data,
-                            onSourcesClick = ::openGlobalSearch,
-                            onAuthorsClick = ::openSearchByAuthor,
-                            onGenresClick = ::openSearchByGenres,
-                            onBookClick = ::openSearchByTitle
+                            onSourcesClick = ::openGlobalSearchPage,
+                            onAuthorsClick = ::openSearchPageByAuthor,
+                            onGenresClick = ::openSearchPageByGenres,
+                            onBookClick = ::openSearchPageByTitle
                         )
                         else -> Unit
                     }
@@ -67,14 +67,14 @@ class DatabaseBookInfoActivity : ComponentActivity() {
         }
     }
 
-    fun openGlobalSearch() {
+    fun openGlobalSearchPage() {
         GlobalSourceSearchActivity.IntentData(
             this,
             input = viewModel.bookMetadata.title
         ).let(this@DatabaseBookInfoActivity::startActivity)
     }
 
-    fun openSearchByAuthor(author: DatabaseInterface.BookAuthor) {
+    fun openSearchPageByAuthor(author: DatabaseInterface.BookAuthor) {
         if (author.url == null)
             return
         val input = DatabaseSearchResultsActivity.SearchMode.AuthorSeries(
@@ -88,7 +88,7 @@ class DatabaseBookInfoActivity : ComponentActivity() {
         startActivity(intent)
     }
 
-    fun openSearchByGenres(genres: List<String>) {
+    fun openSearchPageByGenres(genres: List<String>) {
         val input = DatabaseSearchResultsActivity.SearchMode.Genres(
             genresIncludeId = ArrayList(genres),
             genresExcludeId = arrayListOf()
@@ -101,7 +101,7 @@ class DatabaseBookInfoActivity : ComponentActivity() {
         startActivity(intent)
     }
 
-    fun openSearchByTitle(book: BookMetadata) {
+    fun openSearchPageByTitle(book: BookMetadata) {
         val intent = IntentData(
             this@DatabaseBookInfoActivity,
             databaseUrlBase = viewModel.database.baseUrl,

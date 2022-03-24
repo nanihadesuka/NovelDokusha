@@ -48,14 +48,14 @@ class DatabaseSearchActivity : ComponentActivity() {
                     subtitle = viewModel.database.name.capitalize(Locale.ROOT),
                     searchText = viewModel.searchText,
                     genresList = viewModel.genresList,
-                    onTitleSearchClick = { searchByTitle(it) },
-                    onGenreSearchClick = ::searchByGenres
+                    onTitleSearchClick = ::openSearchPageByTitle,
+                    onGenreSearchClick = ::openSearchPageByGenres
                 )
             }
         }
     }
 
-    fun searchByGenres() {
+    fun openSearchPageByGenres() {
         val list = viewModel.genresList
         val input = DatabaseSearchResultsActivity.SearchMode.Genres(
             genresIncludeId = ArrayList(list.filter { it.state == ToggleableState.On }
@@ -73,7 +73,7 @@ class DatabaseSearchActivity : ComponentActivity() {
             .let(this@DatabaseSearchActivity::startActivity)
     }
 
-    fun searchByTitle(text: String) {
+    fun openSearchPageByTitle(text: String) {
         DatabaseSearchResultsActivity
             .IntentData(
                 this@DatabaseSearchActivity,
