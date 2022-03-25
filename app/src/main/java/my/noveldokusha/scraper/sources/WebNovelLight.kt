@@ -9,9 +9,9 @@ import my.noveldokusha.data.ChapterMetadata
 import my.noveldokusha.scraper.*
 import org.jsoup.nodes.Document
 
-class webnovelight : SourceInterface.catalog
+class WebNovelLight : SourceInterface.catalog
 {
-    override val name = "WL"
+    override val name = "Web Novel Light"
     override val baseUrl = "https://webnovellight.com"
     override val catalogUrl = "https://webnovellight.com/series/?m_orderby=alphabet"
     override val language = "English"

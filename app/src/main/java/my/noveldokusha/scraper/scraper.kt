@@ -3,8 +3,6 @@ package my.noveldokusha.scraper
 import my.noveldokusha.scraper.databases.BakaUpdates
 import my.noveldokusha.scraper.databases.NovelUpdates
 import my.noveldokusha.scraper.sources.*
-import org.jsoup.nodes.Node
-import org.jsoup.nodes.TextNode
 
 object scraper
 {
@@ -25,7 +23,7 @@ object scraper
         _1stKissNovel(),
         Sousetsuka(),
         Saikai(),
-        webnovelight()
+        WebNovelLight()
     )
 
     val sourcesListCatalog = sourcesList.filterIsInstance<SourceInterface.catalog>().toSet()
