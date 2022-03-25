@@ -17,6 +17,7 @@ suspend fun Connection.executeIO(): Connection.Response = withContext(Dispatcher
 fun String.urlEncode(): String = URLEncoder.encode(this, "utf-8")
 fun String.toUrl(): Uri? = runCatching { Uri.parse(this) }.getOrNull()
 fun String.toUrlBuilder(): Uri.Builder? = toUrl()?.buildUpon()
+fun Uri.Builder.addPath(path: String): Uri.Builder = appendPath(path)
 fun Uri.Builder.add(key: String, value: Any): Uri.Builder = appendQueryParameter(key, value.toString())
 fun Connection.addHeaderRequest(): Connection = this.header("X-Requested-With", "XMLHttpRequest")
 

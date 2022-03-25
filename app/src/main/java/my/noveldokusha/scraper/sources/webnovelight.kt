@@ -11,17 +11,17 @@ import org.jsoup.nodes.Document
 
 class webnovelight : SourceInterface.catalog
 {
-    override val catalogUrl = "https://webnovellight.com/series/?m_orderby=alphabet"
     override val name = "WL"
     override val baseUrl = "https://webnovellight.com"
+    override val catalogUrl = "https://webnovellight.com/series/?m_orderby=alphabet"
     override val language = "English"
 
 
     override suspend fun getBookCoverImageUrl(doc: Document): String?
     {
         return doc.selectFirst("div.summary_image")
-            ?.selectFirst("img[data-src]")
-            ?.attr("data-src")
+            ?.selectFirst("img[src]")
+            ?.attr("src")
     }
 
     override suspend fun getBookDescripton(doc: Document): String?
@@ -32,11 +32,14 @@ class webnovelight : SourceInterface.catalog
 
     override suspend fun getChapterList(doc: Document): List<ChapterMetadata>
     {
-        val url = "https://webnovellight.com/wp-admin/admin-ajax.php"
-        val id = doc.selectFirst("input.rating-post-id")!!.attr("value")
-        return connect(url).addHeaderRequest()
-            .data("action", "manga_get_chapters")
-            .data("manga", id)
+        val url = doc
+            .location()
+            .toUrlBuilder()
+            ?.addPath("ajax")
+            ?.addPath("chapters")
+
+        return connect(url.toString())
+            .addHeaderRequest()
             .postIO()
             .select(".wp-manga-chapter > a[href]")
             .map { ChapterMetadata(title = it.text(), url = it.attr("href")) }
