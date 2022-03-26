@@ -81,4 +81,6 @@
 	<string name="no_more_results">No more results</string>
 	<string name="global_source_search">Global source search</string>
 	<string name="error_loading">Error loading</string>
+	<string name="open_the_web_view">Open the web view</string>
+	<string name="search_for_title">Search for title</string>
 </resources>

@@ -3,185 +3,109 @@ package my.noveldokusha.ui.sourceCatalog
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.view.*
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
 import androidx.activity.viewModels
-import androidx.appcompat.widget.SearchView
-import androidx.lifecycle.Observer
-import androidx.recyclerview.widget.*
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
 import dagger.hilt.android.AndroidEntryPoint
-import my.noveldokusha.R
-import my.noveldokusha.databinding.ActivitySourceCatalogBinding
-import my.noveldokusha.databinding.BookListItemBinding
-import my.noveldokusha.ui.BaseActivity
+import me.onebone.toolbar.CollapsingToolbarScaffold
+import me.onebone.toolbar.ScrollStrategy
+import me.onebone.toolbar.rememberCollapsingToolbarScaffoldState
+import my.noveldokusha.AppPreferences
+import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.ui.chaptersList.ChaptersActivity
-import my.noveldokusha.ui.sourceCatalog.SourceCatalogViewModel.CatalogItem
+import my.noveldokusha.ui.theme.Theme
 import my.noveldokusha.ui.webView.WebViewActivity
-import my.noveldokusha.uiAdapters.MyListAdapter
-import my.noveldokusha.uiAdapters.ProgressBarAdapter
-import my.noveldokusha.uiUtils.*
+import my.noveldokusha.uiUtils.Extra_String
 import java.util.*
-import kotlin.properties.Delegates
+import javax.inject.Inject
+
 
 @AndroidEntryPoint
-class SourceCatalogActivity : BaseActivity()
-{
-    class IntentData : Intent, SourceCatalogStateBundle
-    {
+class SourceCatalogActivity : ComponentActivity() {
+    class IntentData : Intent, SourceCatalogStateBundle {
         override var sourceBaseUrl by Extra_String()
 
         constructor(intent: Intent) : super(intent)
-        constructor(ctx: Context, sourceBaseUrl: String) : super(ctx, SourceCatalogActivity::class.java)
-        {
+        constructor(ctx: Context, sourceBaseUrl: String) : super(
+            ctx,
+            SourceCatalogActivity::class.java
+        ) {
             this.sourceBaseUrl = sourceBaseUrl
         }
     }
 
     private val viewModel by viewModels<SourceCatalogViewModel>()
-    private val viewBind by lazy { ActivitySourceCatalogBinding.inflate(layoutInflater) }
-    private val viewAdapter = object
-    {
-        val recyclerView by lazy { BooksItemAdapter(viewModel, this@SourceCatalogActivity) }
-        val progressBar by lazy { ProgressBarAdapter() }
-    }
 
-    private val viewLayoutManager = object
-    {
-        val recyclerView by lazy { LinearLayoutManager(this@SourceCatalogActivity) }
-    }
+    @Inject
+    lateinit var appPreferences: AppPreferences
 
-    override fun onCreate(savedInstanceState: Bundle?)
-    {
+    override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(viewBind.root)
-        setSupportActionBar(viewBind.toolbar)
 
-        viewBind.recyclerView.adapter = ConcatAdapter(viewAdapter.recyclerView, viewAdapter.progressBar)
-        viewBind.recyclerView.layoutManager = viewLayoutManager.recyclerView
-        viewBind.recyclerView.itemAnimator = DefaultItemAnimator()
+        setContent {
+            val title = "Catalog"
+            val subtitle = viewModel.source.name.capitalize(Locale.ROOT)
 
-        viewBind.recyclerView.setOnScrollChangeListener { _, _, _, _, _ ->
-            viewModel.fetchIterator.fetchTrigger {
-                val pos = viewLayoutManager.recyclerView.findLastVisibleItemPosition()
-                val listSize = viewBind.recyclerView.adapter?.itemCount ?: return@fetchTrigger false
-                pos >= listSize - 3
+            Theme(appPreferences = appPreferences) {
+                val state = rememberCollapsingToolbarScaffoldState()
+                CollapsingToolbarScaffold(
+                    modifier = Modifier,
+                    state = state,
+                    scrollStrategy = ScrollStrategy.EnterAlwaysCollapsed,
+                    toolbar = {
+                        val searchText = rememberSaveable { mutableStateOf("") }
+                        val focusRequester = remember { FocusRequester() }
+                        val toolbarMode = rememberSaveable { mutableStateOf(ToolbarMode.MAIN) }
+                        when (toolbarMode.value) {
+                            ToolbarMode.MAIN -> MainToolbarMode(
+                                title = title,
+                                subtitle = subtitle,
+                                toolbarMode = toolbarMode,
+                                onOpenSourceWebPage = ::openSourceWebPage
+                            )
+                            ToolbarMode.SEARCH -> SearchToolbarMode(
+                                focusRequester = focusRequester,
+                                searchText = searchText,
+                                onClose = {
+                                    toolbarMode.value = ToolbarMode.MAIN
+                                    viewModel.startCatalogListMode()
+                                },
+                                onTextDone = { viewModel.startCatalogSearchMode(searchText.value) }
+                            )
+                        }
+                    }
+                ) {
+                    SourceCatalogView(
+                        list = viewModel.fetchIterator.list,
+                        error = viewModel.fetchIterator.error,
+                        loadState = viewModel.fetchIterator.state,
+                        onLoadNext = { viewModel.fetchIterator.fetchNext() },
+                        onBookClicked = ::openBookPage,
+                        onBookLongClicked = ::addBookToLibrary
+                    )
+                }
             }
-        }
-
-        viewModel.fetchIterator.onSuccess.observe(this) {
-            viewAdapter.recyclerView.list = it
-        }
-        viewModel.fetchIterator.onError.observe(this) {
-            viewBind.errorMessage.visibility = View.VISIBLE
-            viewBind.errorMessage.text = it.message
-        }
-        viewModel.fetchIterator.onCompletedEmpty.observe(this) {
-            viewBind.noResultsMessage.visibility = View.VISIBLE
-            viewAdapter.progressBar.visible = false
-        }
-
-        viewModel.fetchIterator.onCompleted.observe(this) {
-            viewAdapter.progressBar.visible = false
-        }
-
-        viewModel.fetchIterator.onFetching.observe(this) {
-            if (it == true) viewAdapter.progressBar.visible = it
-        }
-        viewModel.fetchIterator.onReset.observe(this) {
-            viewBind.errorMessage.visibility = View.GONE
-            viewBind.noResultsMessage.visibility = View.GONE
-            viewAdapter.recyclerView.notifyDataSetChanged()
-        }
-
-        // Done so it updates at the same frame as the new items are added (avoids modifying current list offset)
-        viewAdapter.recyclerView.listDiffer.addListListener { _, _ ->
-            viewAdapter.progressBar.visible = false
-        }
-
-        supportActionBar!!.let {
-            it.title = "Source"
-            it.subtitle = viewModel.source.name.capitalize(Locale.ROOT)
         }
     }
 
-    override fun onCreateOptionsMenu(menu: Menu): Boolean
-    {
-        menuInflater.inflate(R.menu.source_catalog_menu__appbar, menu)
-
-        val searchViewItem = menu!!.findItem(R.id.action_search)
-        val searchView = searchViewItem.actionView as SearchView
-        val webViewItem = menu.findItem(R.id.webview)
-
-        searchViewItem.setOnActionExpandListener(object : MenuItem.OnActionExpandListener
-        {
-            override fun onMenuItemActionExpand(item: MenuItem?): Boolean = true
-
-            override fun onMenuItemActionCollapse(item: MenuItem?): Boolean
-            {
-                viewModel.startCatalogListMode()
-                return true
-            }
-        })
-
-        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener
-        {
-            override fun onQueryTextSubmit(query: String?): Boolean
-            {
-                query?.let { viewModel.startCatalogSearchMode(it) }
-                return true
-            }
-
-            override fun onQueryTextChange(newText: String?): Boolean = true
-        })
-
-        webViewItem.setOnMenuItemClickListener {
-            WebViewActivity.IntentData(this, viewModel.sourceBaseUrl).let(::startActivity)
-            true
-        }
-
-
-        return true
+    fun openSourceWebPage() {
+        WebViewActivity.IntentData(this, viewModel.sourceBaseUrl).let(::startActivity)
     }
 
+    fun openBookPage(book: BookMetadata) {
+        ChaptersActivity.IntentData(
+            this,
+            bookMetadata = book
+        ).let(::startActivity)
+    }
+
+    fun addBookToLibrary(book: BookMetadata) {
+        viewModel.addToLibraryToggle(book)
+    }
 }
 
-private class BooksItemAdapter(val viewModel: SourceCatalogViewModel, val ctx: BaseActivity) : MyListAdapter<CatalogItem, BooksItemAdapter.ViewHolder>()
-{
-    override fun areItemsTheSame(old: CatalogItem, new: CatalogItem) = old.bookMetadata.url == new.bookMetadata.url
-    override fun areContentsTheSame(old: CatalogItem, new: CatalogItem) = old.bookMetadata == new.bookMetadata
-
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder =
-        ViewHolder(BookListItemBinding.inflate(parent.inflater, parent, false))
-
-    override fun onBindViewHolder(viewHolder: ViewHolder, position: Int)
-    {
-        val itemData = this.list[position]
-        val itemBind = viewHolder.viewBind
-        viewHolder.itemData = itemData
-
-        itemBind.title.text = itemData.bookMetadata.title
-        itemBind.title.setOnClickListener {
-            ChaptersActivity.IntentData(
-                ctx,
-                bookMetadata = itemData.bookMetadata
-            ).let(ctx::startActivity)
-        }
-        itemBind.title.setOnLongClickListener {
-            viewModel.addToLibraryToggle(itemData)
-            true
-        }
-    }
-
-    private val selectedTextColor by lazy { R.attr.colorAccent.colorAttrRes(ctx) }
-
-    inner class ViewHolder(val viewBind: BookListItemBinding) : RecyclerView.ViewHolder(viewBind.root)
-    {
-        var itemData: CatalogItem? by Delegates.observable(null) { _, oldValue, newValue ->
-            isInLibraryObserver.switchLiveData(oldValue, newValue, ctx) { isInLibraryLiveData }
-        }
-
-        private val unselectedTextColor = viewBind.title.currentTextColor
-        private val isInLibraryObserver = Observer<Boolean> { isInLibrary ->
-            viewBind.title.setTextColor(if (isInLibrary) selectedTextColor else unselectedTextColor)
-        }
-    }
-}

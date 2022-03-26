@@ -159,5 +159,8 @@ dependencies {
     androidTestImplementation("androidx.compose.ui:ui-test-junit4:1.1.1")
 
     // Glide for jetpack compose
-    implementation("com.github.skydoves:landscapist-glide:1.4.9")
+    implementation("com.github.skydoves:landscapist-glide:1.5.0")
+
+    // Compose collapsing toolbar
+    implementation("me.onebone:toolbar-compose:2.2.0")
 }

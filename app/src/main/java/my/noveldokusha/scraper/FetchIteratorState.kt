@@ -29,6 +29,14 @@ class FetchIteratorState<T>(
     var error by mutableStateOf<String?>(null)
         private set
 
+    fun reset() {
+        job?.cancel()
+        list.clear()
+        index = 0
+        state = STATE.IDLE
+        error = null
+    }
+
     fun fetchNext() {
         if (state != STATE.IDLE) return
         state = STATE.LOADING
@@ -48,5 +56,9 @@ class FetchIteratorState<T>(
             }
             index += 1
         }
+    }
+
+    fun setFunction(fn: (suspend (index: Int) -> Response<List<T>>)) {
+            this.fn = fn
     }
 }

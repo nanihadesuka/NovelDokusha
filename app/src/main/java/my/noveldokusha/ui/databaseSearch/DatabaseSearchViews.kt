@@ -217,7 +217,7 @@ fun DatabaseSearchView(
                             }) {
                                 Icon(
                                     Icons.Default.Close,
-                                    contentDescription = "Search by title"
+                                    contentDescription = null
                                 )
                             }
                     }
