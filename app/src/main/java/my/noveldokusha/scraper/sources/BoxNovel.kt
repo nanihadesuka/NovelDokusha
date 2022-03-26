@@ -1,9 +1,6 @@
 
-// getting no Chapter.
-//
 package my.noveldokusha.scraper.sources
 
-import com.chimbori.crux.articles.extractImages
 import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.data.ChapterMetadata
 import my.noveldokusha.scraper.*
@@ -16,6 +13,7 @@ class BoxNovel : SourceInterface.catalog
     override val catalogUrl = "https://boxnovel.com/novel/?m_orderby=alphabet"
     override val language = "English"
 
+    private val baseEndpoint = "https://boxnovel.com/wp-admin/admin-ajax.php"
 
     override suspend fun getBookCoverImageUrl(doc: Document): String?
     {
@@ -48,9 +46,8 @@ class BoxNovel : SourceInterface.catalog
 
     override suspend fun getCatalogList(index: Int): Response<List<BookMetadata>>
     {
-        val url = "https://Boxnovel/wp-admin/admin-ajax.php"
         return tryConnect {
-            connect(url)
+            connect(baseEndpoint)
                 .addHeaderRequest()
                 .data("action", "madara_load_more")
                 .data("page", index.toString())
@@ -74,9 +71,8 @@ class BoxNovel : SourceInterface.catalog
 
     override suspend fun getCatalogSearch(index: Int, input: String): Response<List<BookMetadata>>
     {
-        val url = "https://boxnovel.com/wp-admin/admin-ajax.php"
         return tryConnect {
-            connect(url)
+            connect(baseEndpoint)
                 .addHeaderRequest()
                 .data("action", "madara_load_more")
                 .data("page", index.toString())

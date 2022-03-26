@@ -23,7 +23,7 @@ object scraper
         _1stKissNovel(),
         Sousetsuka(),
         Saikai(),
-        WebNovelLight()
+        WebNovelLight(),
         BoxNovel()
     )
 
