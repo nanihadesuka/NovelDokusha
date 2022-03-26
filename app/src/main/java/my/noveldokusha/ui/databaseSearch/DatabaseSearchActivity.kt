@@ -43,7 +43,6 @@ class DatabaseSearchActivity : ComponentActivity() {
         setContent {
             Theme(appPreferences = appPreferences) {
                 DatabaseSearchView(
-                    onBackStack = { onBackPressed() },
                     title = "Database",
                     subtitle = viewModel.database.name.capitalize(Locale.ROOT),
                     searchText = viewModel.searchText,

@@ -1,19 +1,15 @@
 package my.noveldokusha.ui.databaseSearch
 
-import androidx.activity.compose.BackHandler
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.*
-import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.lazy.GridCells
+import androidx.compose.foundation.lazy.LazyVerticalGrid
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.snapshots.SnapshotStateList
@@ -21,18 +17,19 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.state.ToggleableState
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import my.noveldokusha.R
-import my.noveldokusha.ui.theme.ColorAccent
+import my.noveldokusha.ui.sourceCatalog.ToolbarMode
 import my.noveldokusha.ui.theme.InternalTheme
 import my.noveldokusha.ui.theme.Themes
+import my.noveldokusha.uiToolbars.ToolbarModeSearch
 import my.noveldokusha.uiViews.MyButton
 
 @OptIn(ExperimentalComposeUiApi::class)
@@ -104,7 +101,8 @@ fun SearchGenres(
         )
 
         LazyVerticalGrid(
-            cells = GridCells.Fixed(2)
+            cells = GridCells.Fixed(2),
+            contentPadding = PaddingValues(bottom = 200.dp)
         ) {
             itemsIndexed(list) { index, it ->
                 CheckBoxCategory(
@@ -117,11 +115,50 @@ fun SearchGenres(
     }
 }
 
+@Composable
+private fun ToolbarMain(
+    title: String,
+    subtitle: String,
+    toolbarMode: MutableState<ToolbarMode>
+) {
+    Row(
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp)
+            .padding(top = 16.dp, bottom = 4.dp)
+            .background(MaterialTheme.colors.surface)
+    ) {
+
+        // Fake button to center text
+        IconButton(onClick = { }, enabled = false) {}
+
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.h6,
+                fontWeight = FontWeight.Bold
+            )
+            Text(
+                text = subtitle,
+                style = MaterialTheme.typography.subtitle1
+            )
+        }
+
+        IconButton(onClick = { toolbarMode.value = ToolbarMode.SEARCH }) {
+            Icon(
+                painter = painterResource(id = R.drawable.ic_baseline_search_24),
+                contentDescription = stringResource(R.string.search_for_title)
+            )
+        }
+    }
+}
+
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun DatabaseSearchView(
-    onBackStack: () -> Unit,
     title: String,
     subtitle: String,
     searchText: MutableState<String>,
@@ -129,105 +166,31 @@ fun DatabaseSearchView(
     onTitleSearchClick: (text: String) -> Unit,
     onGenreSearchClick: () -> Unit,
 ) {
-    var showSearch by rememberSaveable { mutableStateOf(false) }
     val focusRequester = remember { FocusRequester() }
-    LaunchedEffect(showSearch) {
-        if (showSearch)
+    val toolbarMode = rememberSaveable { mutableStateOf(ToolbarMode.MAIN) }
+
+    LaunchedEffect(toolbarMode.value) {
+        if (toolbarMode.value == ToolbarMode.SEARCH)
             focusRequester.requestFocus()
     }
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = {
-                    if (showSearch) {
-                        BackHandler { showSearch = false }
-                        BasicTextField(
-                            value = searchText.value,
-                            onValueChange = { searchText.value = it },
-                            singleLine = true,
-                            maxLines = 1,
-                            textStyle = LocalTextStyle.current.copy(
-                                color = MaterialTheme.colors.onPrimary
-                            ),
-                            cursorBrush = SolidColor(ColorAccent),
-                            keyboardActions = KeyboardActions(
-                                onDone = { onTitleSearchClick(searchText.value) }
-                            ),
-                            decorationBox = {
-                                if (searchText.value.isBlank()) Text(
-                                    text = "Search by title",
-                                    color = MaterialTheme.colors.onPrimary.copy(alpha = 0.3f)
-                                ) else it()
-                            },
-                            modifier = Modifier
-                                .focusRequester(focusRequester)
-                                .fillMaxWidth(),
-                        )
-                    } else {
-                        Column {
-                            Text(text = title)
-                            Text(
-                                text = subtitle,
-                                style = MaterialTheme.typography.subtitle1
-                            )
-                        }
-                    }
-                },
-                navigationIcon = {
-                    when {
-                        showSearch ->
-                            Icon(
-                                Icons.Default.Search,
-                                contentDescription = "Search by title",
-                                modifier = Modifier.padding(start = 14.dp)
-                            )
-                        else ->
-                            IconButton(
-                                onClick = when (showSearch) {
-                                    true -> {
-                                        { showSearch = false }
-                                    }
-                                    false -> onBackStack
-                                }
-                            ) {
-                                Icon(
-                                    Icons.Default.ArrowBack,
-                                    contentDescription = "Go back"
-                                )
-                            }
-                    }
-                },
-                elevation = 0.dp,
-                backgroundColor = Color.Transparent,
-                actions = {
-                    when {
-                        !showSearch ->
-                            IconButton(onClick = { showSearch = true }) {
-                                Icon(
-                                    Icons.Default.Search,
-                                    contentDescription = "Search by title"
-                                )
-                            }
-                        else ->
-                            IconButton(onClick = {
-                                if (searchText.value.isBlank())
-                                    showSearch = false
-                                else searchText.value = ""
-                            }) {
-                                Icon(
-                                    Icons.Default.Close,
-                                    contentDescription = null
-                                )
-                            }
-                    }
-                }
+    Column {
+        when (toolbarMode.value) {
+            ToolbarMode.MAIN -> ToolbarMain(
+                title = title,
+                subtitle = subtitle,
+                toolbarMode = toolbarMode
             )
-        },
-        content = {
-            SearchGenres(list = genresList, onSearchClick = onGenreSearchClick)
+            ToolbarMode.SEARCH -> ToolbarModeSearch(
+                focusRequester = focusRequester,
+                searchText = searchText,
+                onClose = { toolbarMode.value = ToolbarMode.MAIN },
+                onTextDone = { onTitleSearchClick(searchText.value) },
+                placeholderText = stringResource(R.string.search_by_title)
+            )
         }
-    )
+        SearchGenres(list = genresList, onSearchClick = onGenreSearchClick)
+    }
 }
 
 @Preview(showBackground = true)
@@ -263,7 +226,6 @@ fun PreviewView() {
 
     InternalTheme(Themes.LIGHT) {
         DatabaseSearchView(
-            onBackStack = { },
             title = "Database",
             subtitle = "Baka-Updates",
             searchText = remember { mutableStateOf("hero") },

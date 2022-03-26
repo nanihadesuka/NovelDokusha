@@ -11,15 +11,18 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.res.stringResource
 import dagger.hilt.android.AndroidEntryPoint
 import me.onebone.toolbar.CollapsingToolbarScaffold
 import me.onebone.toolbar.ScrollStrategy
 import me.onebone.toolbar.rememberCollapsingToolbarScaffoldState
 import my.noveldokusha.AppPreferences
+import my.noveldokusha.R
 import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.ui.chaptersList.ChaptersActivity
 import my.noveldokusha.ui.theme.Theme
 import my.noveldokusha.ui.webView.WebViewActivity
+import my.noveldokusha.uiToolbars.ToolbarModeSearch
 import my.noveldokusha.uiUtils.Extra_String
 import java.util.*
 import javax.inject.Inject
@@ -62,20 +65,21 @@ class SourceCatalogActivity : ComponentActivity() {
                         val focusRequester = remember { FocusRequester() }
                         val toolbarMode = rememberSaveable { mutableStateOf(ToolbarMode.MAIN) }
                         when (toolbarMode.value) {
-                            ToolbarMode.MAIN -> MainToolbarMode(
+                            ToolbarMode.MAIN -> ToolbarMain(
                                 title = title,
                                 subtitle = subtitle,
                                 toolbarMode = toolbarMode,
                                 onOpenSourceWebPage = ::openSourceWebPage
                             )
-                            ToolbarMode.SEARCH -> SearchToolbarMode(
+                            ToolbarMode.SEARCH -> ToolbarModeSearch(
                                 focusRequester = focusRequester,
                                 searchText = searchText,
                                 onClose = {
                                     toolbarMode.value = ToolbarMode.MAIN
                                     viewModel.startCatalogListMode()
                                 },
-                                onTextDone = { viewModel.startCatalogSearchMode(searchText.value) }
+                                onTextDone = { viewModel.startCatalogSearchMode(searchText.value) },
+                                placeholderText = stringResource(R.string.search_by_title)
                             )
                         }
                     }
@@ -108,4 +112,3 @@ class SourceCatalogActivity : ComponentActivity() {
         viewModel.addToLibraryToggle(book)
     }
 }
-

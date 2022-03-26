@@ -162,5 +162,5 @@ dependencies {
     implementation("com.github.skydoves:landscapist-glide:1.5.0")
 
     // Compose collapsing toolbar
-    implementation("me.onebone:toolbar-compose:2.2.0")
+    implementation("me.onebone:toolbar-compose:2.3.3")
 }
