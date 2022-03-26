@@ -9,9 +9,9 @@ import my.noveldokusha.data.ChapterMetadata
 import my.noveldokusha.scraper.*
 import org.jsoup.nodes.Document
 
-class Boxnovel : SourceInterface.catalog
+class BoxNovel : SourceInterface.catalog
 {
-    override val name = "Boxnovel"
+    override val name = "Box Novel"
     override val baseUrl = "https://boxnovel.com/"
     override val catalogUrl = "https://boxnovel.com/novel/?m_orderby=alphabet"
     override val language = "English"
