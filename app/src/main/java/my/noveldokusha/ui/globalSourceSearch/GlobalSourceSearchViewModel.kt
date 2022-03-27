@@ -1,5 +1,6 @@
 package my.noveldokusha.ui.globalSourceSearch
 
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -24,6 +25,9 @@ class GlobalSourceSearchViewModel @Inject constructor(
 ) : BaseViewModel(), GlobalSourceSearchStateBundle
 {
     override val input by StateExtra_String(state)
+
+    // Map<Book url,cover url>
+    val bookCoverUrlCache = mutableStateMapOf<String,String>()
 
     val list = appPreferences.SOURCES_LANGUAGES.let { activeLangs ->
         scraper.sourcesListCatalog

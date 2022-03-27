@@ -68,6 +68,7 @@ class GlobalSourceSearchActivity : ComponentActivity() {
 
                     GlobalSourceSearchView(
                         listSources = viewModel.list,
+                        bookCoverUrlCache = viewModel.bookCoverUrlCache,
                         onBookClick = ::openBookChaptersPage
                     )
                 }

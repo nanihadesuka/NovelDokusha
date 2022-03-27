@@ -1,5 +1,6 @@
 package my.noveldokusha.ui.globalSourceSearch
 
+import android.util.Log
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.border
@@ -14,6 +15,7 @@ import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
+import androidx.compose.runtime.snapshots.SnapshotStateMap
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -34,6 +36,7 @@ import my.noveldokusha.uiViews.GlideImageFadeIn
 @Composable
 fun GlobalSourceSearchView(
     listSources: List<SourceResults>,
+    bookCoverUrlCache: SnapshotStateMap<String, String>,
     onBookClick: (book: BookMetadata) -> Unit
 ) {
     LazyColumn(
@@ -49,6 +52,7 @@ fun GlobalSourceSearchView(
                 list = entry.fetchIterator.list,
                 loadState = entry.fetchIterator.state,
                 error = entry.fetchIterator.error,
+                bookCoverUrlCache = bookCoverUrlCache,
                 onBookClick = onBookClick,
                 onLoadNext = { entry.fetchIterator.fetchNext() },
                 modifier = Modifier.padding(bottom = 20.dp)
@@ -63,6 +67,7 @@ fun SourceListView(
     list: List<BookMetadata>,
     loadState: FetchIteratorState.STATE,
     error: String?,
+    bookCoverUrlCache: SnapshotStateMap<String, String>,
     onBookClick: (book: BookMetadata) -> Unit,
     onLoadNext: () -> Unit,
     modifier: Modifier = Modifier
@@ -99,11 +104,15 @@ fun SourceListView(
 
         items(list) { book ->
 
-            var coverUrl by remember { mutableStateOf(book.coverImageUrl) }
-            if (coverUrl.isEmpty()) LaunchedEffect(Unit) {
-                if (withContext(Dispatchers.Default) { coverUrl.isNotEmpty() }) return@LaunchedEffect
-                coverUrl = downloadBookCoverImageUrl(book.url)
-                    .toSuccessOrNull()?.data ?: return@LaunchedEffect
+            val coverUrl: String? by remember(bookCoverUrlCache) {
+                derivedStateOf {
+                    book.coverImageUrl.ifBlank { bookCoverUrlCache[book.url] }
+                }
+            }
+
+            if (coverUrl == null) LaunchedEffect(Unit) {
+                bookCoverUrlCache[book.url] = downloadBookCoverImageUrl(book.url)
+                    .toSuccessOrNull()?.data ?: ""
             }
 
             Column(
@@ -180,7 +189,9 @@ fun Preview() {
         sr
     }
 
+    val cache = remember { mutableStateMapOf<String, String>() }
+
     InternalTheme {
-        GlobalSourceSearchView(listSources = list, onBookClick = {})
+        GlobalSourceSearchView(listSources = list, onBookClick = {}, bookCoverUrlCache = cache)
     }
 }
