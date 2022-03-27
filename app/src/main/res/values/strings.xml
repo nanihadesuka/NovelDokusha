@@ -84,4 +84,6 @@
 	<string name="open_the_web_view">Open the web view</string>
 	<string name="search_for_title">Search for title</string>
 	<string name="search_here">Search here</string>
+	<string name="database">Database</string>
+	<string name="catalog">Catalog</string>
 </resources>

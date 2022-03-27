@@ -51,7 +51,7 @@ class SourceCatalogActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         setContent {
-            val title = "Catalog"
+            val title = stringResource(R.string.catalog)
             val subtitle = viewModel.source.name.capitalize(Locale.ROOT)
 
             Theme(appPreferences = appPreferences) {

@@ -6,6 +6,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.state.ToggleableState
 import dagger.hilt.android.AndroidEntryPoint
 import my.noveldokusha.AppPreferences
@@ -43,7 +44,7 @@ class DatabaseSearchActivity : ComponentActivity() {
         setContent {
             Theme(appPreferences = appPreferences) {
                 DatabaseSearchView(
-                    title = "Database",
+                    title = stringResource(R.string.database),
                     subtitle = viewModel.database.name.capitalize(Locale.ROOT),
                     searchText = viewModel.searchText,
                     genresList = viewModel.genresList,
