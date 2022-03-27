@@ -1,5 +1,6 @@
 package my.noveldokusha.scraper
 
+import BoxNovel
 import my.noveldokusha.scraper.databases.BakaUpdates
 import my.noveldokusha.scraper.databases.NovelUpdates
 import my.noveldokusha.scraper.sources.*
@@ -23,7 +24,8 @@ object scraper
         _1stKissNovel(),
         Sousetsuka(),
         Saikai(),
-        WebNovelLight()
+        WebNovelLight(),
+        BoxNovel()
     )
 
     val sourcesListCatalog = sourcesList.filterIsInstance<SourceInterface.catalog>().toSet()
