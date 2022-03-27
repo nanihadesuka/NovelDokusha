@@ -59,7 +59,7 @@ class GlobalSourceSearchActivity : ComponentActivity() {
                             .padding(top = 16.dp, bottom = 4.dp)
                     ) {
                         Text(
-                            text = getString(R.string.global_source_search),
+                            text = getString(R.string.global_search),
                             style = MaterialTheme.typography.h6,
                             fontWeight = FontWeight.Bold,
                         )

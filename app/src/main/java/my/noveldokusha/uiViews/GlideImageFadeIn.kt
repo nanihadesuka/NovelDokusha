@@ -10,18 +10,27 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.imageResource
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.vectorResource
 import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.RequestListener
+import com.bumptech.glide.request.RequestOptions
 import com.skydoves.landscapist.glide.GlideImage
+import my.noveldokusha.R
 import java.io.File
 
 @Composable
 fun GlideImageFadeIn(
     imageModel: Any?,
     modifier: Modifier = Modifier,
-    fadeInDurationMillis: Int = 250
+    fadeInDurationMillis: Int = 250,
+    placeHolder: Any? = null,
+    error: Any? = null
 ) {
     val timeNow by rememberSaveable { mutableStateOf(System.currentTimeMillis()) }
     var showImmediatelly by rememberSaveable { mutableStateOf(false) }
@@ -33,8 +42,10 @@ fun GlideImageFadeIn(
 
     GlideImage(
         imageModel = imageModel,
+        placeHolder = placeHolder,
+        error = error,
         modifier = modifier.alpha(alpha),
-        contentScale = ContentScale.Fit,
+        contentScale = ContentScale.FillBounds,
         requestListener = object : RequestListener<Drawable> {
             override fun onLoadFailed(
                 e: GlideException?,

@@ -19,6 +19,7 @@ import androidx.compose.ui.unit.dp
 import my.noveldokusha.ui.theme.InternalThemeObject
 import my.noveldokusha.ui.theme.Themes
 import my.noveldokusha.uiUtils.ifCase
+import org.w3c.dom.Text
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -30,7 +31,7 @@ fun MyButton(
     textAlign: TextAlign = TextAlign.Start,
     radius: Dp = 12.dp,
     onClick: () -> Unit,
-    content: @Composable () -> Unit = {
+    content: @Composable (String, Dp, TextAlign) -> Unit = { text, radius, textAlign ->
         Text(
             text = text,
             modifier = Modifier.padding(radius),
@@ -53,7 +54,7 @@ fun MyButton(
             ) { onClick() },
         color = MaterialTheme.colors.onSurface.copy(alpha = 0.02f)
     ) {
-        content()
+        content(text, radius, textAlign)
     }
 }
 

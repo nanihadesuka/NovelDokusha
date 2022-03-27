@@ -9,11 +9,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -23,7 +21,6 @@ import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.scraper.DatabaseInterface
 import my.noveldokusha.ui.theme.ColorAccent
 import my.noveldokusha.ui.theme.InternalTheme
-import my.noveldokusha.uiUtils.ifCase
 import my.noveldokusha.uiViews.GlideImageFadeIn
 import my.noveldokusha.uiViews.MyButton
 
