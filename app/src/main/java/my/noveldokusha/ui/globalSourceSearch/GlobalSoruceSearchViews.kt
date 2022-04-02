@@ -55,7 +55,7 @@ fun GlobalSourceSearchView(
                 bookCoverUrlCache = bookCoverUrlCache,
                 onBookClick = onBookClick,
                 onLoadNext = { entry.fetchIterator.fetchNext() },
-                modifier = Modifier.padding(bottom = 20.dp)
+                modifier = Modifier.padding(bottom = 4.dp)
             )
         }
     }
@@ -117,7 +117,7 @@ fun SourceListView(
 
             Column(
                 Modifier
-                    .width(140.dp)
+                    .width(130.dp)
                     .padding(end = 8.dp)
             ) {
                 GlideImageFadeIn(
@@ -125,7 +125,7 @@ fun SourceListView(
                     modifier = Modifier
                         .clickable { onBookClick(book) }
                         .fillMaxWidth()
-                        .aspectRatio(2.6f / 4f)
+                        .aspectRatio(1/1.5f)
                         .border(
                             0.dp,
                             MaterialTheme.colors.onSurface.copy(alpha = 0.2f),
