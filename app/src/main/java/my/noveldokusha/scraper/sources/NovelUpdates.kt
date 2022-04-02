@@ -1,5 +1,6 @@
 package my.noveldokusha.scraper.sources
 
+import android.net.Uri
 import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.data.ChapterMetadata
 import my.noveldokusha.scraper.*
@@ -66,14 +67,7 @@ class NovelUpdates : SourceInterface.catalog
             add("st", 1)
             if (page > 1) add("pg", page)
         }
-
-        return tryConnect {
-            fetchDoc(url)
-                .select(".search_title")
-                .mapNotNull { it.selectFirst("a[href]") }
-                .map { BookMetadata(title = it.text(), url = it.attr("href")) }
-                .let { Response.Success(it) }
-        }
+        return getSearchList(page, url)
     }
 
     override suspend fun getCatalogSearch(index: Int, input: String): Response<List<BookMetadata>>
@@ -84,13 +78,23 @@ class NovelUpdates : SourceInterface.catalog
             add("s", input)
             add("post_type", "seriesplans")
         }
+        return getSearchList(page, url)
+    }
 
-        return tryConnect("page: $page\nurl: $url") {
-            fetchDoc(url)
-                .select(".search_title")
-                .mapNotNull { it.selectFirst("a") }
-                .map { BookMetadata(it.text(), it.attr("href")) }
-                .let { Response.Success(it) }
-        }
+    suspend fun getSearchList(page: Int, url: Uri.Builder) = tryConnect(
+        extraErrorInfo = "page: $page\nurl: $url"
+    ) {
+        fetchDoc(url)
+            .select(".search_main_box_nu")
+            .mapNotNull {
+                val title = it.selectFirst(".search_title > a[href]") ?: return@mapNotNull null
+                val image = it.selectFirst(".search_img_nu > img")
+                BookMetadata(
+                    title = title.text(),
+                    url = title.attr("href"),
+                    coverImageUrl = ""
+                )
+            }
+            .let { Response.Success(it) }
     }
 }
