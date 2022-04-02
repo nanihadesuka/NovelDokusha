@@ -90,6 +90,20 @@ enum class Themes {
             R.style.AppTheme_BaseDark_Black -> BLACK
             else -> null
         }
+        fun toIDTheme(theme: Themes) = when (theme) {
+            LIGHT -> R.style.AppTheme_Light
+            DARK -> R.style.AppTheme_BaseDark_Dark
+            GREY -> R.style.AppTheme_BaseDark_Grey
+            BLACK -> R.style.AppTheme_BaseDark_Black
+        }
+
+        val list = listOf(LIGHT,DARK,GREY,BLACK)
+        val pairs = mapOf(
+            LIGHT to "Light",
+            DARK to "Dark",
+            GREY to "Grey",
+            BLACK to "Black"
+        )
     }
 }
 
@@ -136,7 +150,6 @@ fun Theme(
         wrapper = wrapper
     )
 }
-
 
 @Composable
 fun InternalTheme(

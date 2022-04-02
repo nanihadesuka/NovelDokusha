@@ -4,21 +4,23 @@ import android.Manifest
 import android.app.Activity.RESULT_OK
 import android.content.Intent
 import android.os.Bundle
-import android.text.format.Formatter
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.checkbox.checkBoxPrompt
 import com.afollestad.materialdialogs.checkbox.isCheckPromptChecked
-import com.google.android.material.radiobutton.MaterialRadioButton
 import dagger.hilt.android.AndroidEntryPoint
-import my.noveldokusha.*
+import my.noveldokusha.R
 import my.noveldokusha.services.BackupDataService
 import my.noveldokusha.services.RestoreDataService
-import my.noveldokusha.databinding.ActivityMainFragmentSettingsBinding
 import my.noveldokusha.ui.BaseFragment
+import my.noveldokusha.ui.theme.Theme
+import my.noveldokusha.ui.theme.Themes
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -26,137 +28,96 @@ import java.util.*
 class SettingsFragment : BaseFragment()
 {
     private val viewModel by viewModels<SettingsViewModel>()
-    private lateinit var viewBind: ActivityMainFragmentSettingsBinding
-    private lateinit var viewAdapter: Adapter
 
-    private inner class Adapter
-
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View
     {
-        viewBind = ActivityMainFragmentSettingsBinding.inflate(inflater, container, false)
-        viewAdapter = Adapter()
-
-        settingTheme()
-        settingDatabaseClean()
-        settingImagesFolderClean()
-        settingDataBackup()
-        settingDataRestore()
-
-        return viewBind.root
-    }
-
-    fun settingTheme()
-    {
-        viewBind.settingsFollowSystemTheme.isChecked = appPreferences.THEME_FOLLOW_SYSTEM
-        viewBind.settingsFollowSystemTheme.setOnCheckedChangeListener { _, isChecked ->
-            appPreferences.THEME_FOLLOW_SYSTEM = isChecked
-        }
-
-        val buttons = viewModel.themes.map { (id, name) ->
-            MaterialRadioButton(requireActivity()).also {
-                it.id = id
-                it.text = name
+        val view = ComposeView(requireContext())
+        view.setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+        view.setContent {
+            Theme(appPreferences = appPreferences) {
+                SettingsView(
+                    currentFollowSystem = viewModel.followsSystem,
+                    currentTheme = viewModel.theme,
+                    onFollowSystem = { appPreferences.THEME_FOLLOW_SYSTEM = it },
+                    onThemeSelected = { appPreferences.THEME_ID = Themes.toIDTheme(it) },
+                    databaseSize = viewModel.databaseSize,
+                    imagesFolderSize = viewModel.imageFolderSize,
+                    onCleanDatabase = { viewModel.cleanDatabase() },
+                    onCleanImageFolder = { viewModel.cleanImagesFolder() },
+                    onBackupData = { doBackup() },
+                    onRestoreData = { doRestore() }
+                )
             }
         }
-
-        for (button in buttons)
-            viewBind.settingsTheme.addView(button)
-
-        viewBind.settingsTheme.check(appPreferences.THEME_ID)
-        viewBind.settingsTheme.setOnCheckedChangeListener { _, _ ->
-            appPreferences.THEME_ID = viewBind.settingsTheme.checkedRadioButtonId
-        }
+        return view
     }
 
-    fun settingDatabaseClean()
+    fun doBackup()
     {
-        viewModel.eventDataRestored.observe(viewLifecycleOwner){
-            viewModel.updateDatabaseSize()
-        }
+        val read = Manifest.permission.READ_EXTERNAL_STORAGE
+        val write = Manifest.permission.WRITE_EXTERNAL_STORAGE
+        permissionRequest(read, write) {
 
-        viewBind.databaseButtonClean.setOnClickListener {
-            viewModel.cleanDatabase()
-        }
+            val intent = Intent(Intent.ACTION_CREATE_DOCUMENT).also {
+                it.addCategory(Intent.CATEGORY_OPENABLE)
+                it.type = "application/*"
+                val date =
+                    SimpleDateFormat("yyyy-MM-dd_HH-mm", Locale.getDefault()).format(Date())
+                it.putExtra(Intent.EXTRA_TITLE, "noveldokusha_backup_$date.zip")
+            }
 
-        viewModel.databseSizeBytes.observe(viewLifecycleOwner) {
-            viewBind.databaseSize.text = Formatter.formatFileSize(context, it)
-        }
-    }
+            MaterialDialog(requireContext()).show {
+                title(text = "Backup")
+                val checkImagesFolder = checkBoxPrompt(
+                    text = getString(R.string.include_images_folder),
+                    isCheckedDefault = true
+                ) {}
 
-    fun settingDataBackup()
-    {
-        viewBind.backupDataButton.setOnClickListener {
-
-            val read = Manifest.permission.READ_EXTERNAL_STORAGE
-            val write = Manifest.permission.WRITE_EXTERNAL_STORAGE
-            permissionRequest(read, write) {
-
-                val intent = Intent(Intent.ACTION_CREATE_DOCUMENT).also {
-                    it.addCategory(Intent.CATEGORY_OPENABLE)
-                    it.type = "application/*"
-                    val date = SimpleDateFormat("yyyy-MM-dd_HH-mm", Locale.getDefault()).format(Date())
-                    it.putExtra(Intent.EXTRA_TITLE, "noveldokusha_backup_$date.zip")
-                }
-
-                MaterialDialog(requireContext()).show {
-                    title(text = "Backup")
-                    val checkImagesFolder = checkBoxPrompt(
-                        text = getString(R.string.include_images_folder),
-                        isCheckedDefault = true
-                    ) {}
-
-                    negativeButton()
-                    positiveButton {
-                        activityRequest(intent) { resultCode, data ->
-                            if (resultCode != RESULT_OK) return@activityRequest
-                            val uri = data?.data ?: return@activityRequest
-                            BackupDataService.start(
-                                ctx =  requireContext(),
-                                uri = uri,
-                                backupImages = checkImagesFolder.isCheckPromptChecked()
-                            )
-                        }
+                negativeButton()
+                positiveButton {
+                    activityRequest(intent) { resultCode, data ->
+                        if (resultCode != RESULT_OK) return@activityRequest
+                        val uri = data?.data ?: return@activityRequest
+                        BackupDataService.start(
+                            ctx = requireContext(),
+                            uri = uri,
+                            backupImages = checkImagesFolder.isCheckPromptChecked()
+                        )
                     }
                 }
             }
         }
     }
 
-    fun settingDataRestore()
+    fun doRestore()
     {
-        viewBind.restoreDataButton.setOnClickListener {
+        val read = Manifest.permission.READ_EXTERNAL_STORAGE
+        permissionRequest(read) {
 
-            val read = Manifest.permission.READ_EXTERNAL_STORAGE
-            permissionRequest(read) {
+            val intent = Intent(Intent.ACTION_GET_CONTENT).also {
+                it.addCategory(Intent.CATEGORY_OPENABLE)
+                it.type = "application/*"
+            }
 
-                val intent = Intent(Intent.ACTION_GET_CONTENT).also {
-                    it.addCategory(Intent.CATEGORY_OPENABLE)
-                    it.type = "application/*"
-                }
-
-                activityRequest(intent) { resultCode, data ->
-                    if (resultCode != RESULT_OK) return@activityRequest
-                    val uri = data?.data ?: return@activityRequest
-                    RestoreDataService.start(
-                        ctx = requireContext(),
-                        uri = uri
-                    )
-                }
+            activityRequest(intent) { resultCode, data ->
+                if (resultCode != RESULT_OK) return@activityRequest
+                val uri = data?.data ?: return@activityRequest
+                RestoreDataService.start(
+                    ctx = requireContext(),
+                    uri = uri
+                )
             }
         }
     }
 
-    fun settingImagesFolderClean()
+    override fun onResume()
     {
-        viewModel.eventDataRestored.observe(viewLifecycleOwner){
-            viewModel.updateImagesFolderSize()
-        }
-
-        viewModel.imagesFolderSizeBytes.observe(viewLifecycleOwner) {
-            viewBind.totalBooksImagesSize.text = Formatter.formatFileSize(context, it)
-        }
-        viewBind.booksImagesClear.setOnClickListener {
-            viewModel.cleanImagesFolder()
-        }
+        super.onResume()
+        viewModel.updateImagesFolderSize()
+        viewModel.updateDatabaseSize()
     }
 }

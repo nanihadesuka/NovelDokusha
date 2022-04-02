@@ -61,7 +61,7 @@
 	<string name="search_by_title">Search by title</string>
 	<string name="clean_images_folder">Clean images folder</string>
 	<string name="preserve_only_images_from_library_books">Preserve only images from library books</string>
-	<string name="images_total_size">Images total size</string>
+	<string name="images_total_size">Images total size:</string>
 	<string name="follow_system">Follow system</string>
 	<string name="sources_languages">Sources languages</string>
 	<string name="save">Save</string>

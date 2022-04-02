@@ -1,40 +1,75 @@
 package my.noveldokusha.ui.main
 
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ReportFragment
-import androidx.lifecycle.viewModelScope
+import android.text.format.Formatter
+import androidx.compose.runtime.*
+import androidx.compose.runtime.livedata.observeAsState
+import androidx.lifecycle.*
 import com.bumptech.glide.Glide
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.mapNotNull
 import my.noveldokusha.*
 import my.noveldokusha.data.Repository
 import my.noveldokusha.ui.BaseViewModel
+import my.noveldokusha.ui.theme.Themes
 import java.io.File
 import javax.inject.Inject
 
 @HiltViewModel
 class SettingsViewModel @Inject constructor(
     private val repository: Repository,
-    private val appScope: CoroutineScope
+    private val appScope: CoroutineScope,
+    private val appPreferences: AppPreferences
 ) : BaseViewModel()
 {
-    val themes = AppPreferences.let { it.globalThemeListLight + it.globalThemeListDark }
-    val databseSizeBytes = MutableLiveData<Long>()
-    val imagesFolderSizeBytes = MutableLiveData<Long>()
-    val eventDataRestored = repository.eventDataRestored
+    fun <T> stateCreator(theFlow: Flow<T>, initialValue: T): MutableState<T>
+    {
+        val value = mutableStateOf(initialValue)
+        viewModelScope.launch(Dispatchers.IO) {
+            theFlow.collect { withContext(Dispatchers.Main) { value.value = it } }
+        }
+        return value
+    }
+
+    val followsSystem by stateCreator(
+        appPreferences.THEME_FOLLOW_SYSTEM_flow(),
+        appPreferences.THEME_FOLLOW_SYSTEM
+    )
+
+    val theme by stateCreator(
+        appPreferences.THEME_ID_flow().mapNotNull { Themes.fromIDTheme(it) },
+        Themes.fromIDTheme(appPreferences.THEME_ID) ?: Themes.LIGHT
+    )
+
+    var databaseSize by mutableStateOf("")
+    var imageFolderSize by mutableStateOf("")
 
     init
     {
         viewModelScope.launch(Dispatchers.IO) { updateDatabaseSize() }
         viewModelScope.launch(Dispatchers.IO) { updateImagesFolderSize() }
+        viewModelScope.launch(Dispatchers.IO) {
+            repository.eventDataRestored.asFlow().collect {
+                updateDatabaseSize()
+                updateImagesFolderSize()
+            }
+        }
     }
 
     fun updateDatabaseSize() = viewModelScope.launch(Dispatchers.IO) {
-        databseSizeBytes.postValue(repository.getDatabaseSizeBytes())
+        val size = repository.getDatabaseSizeBytes()
+        withContext(Dispatchers.Main) {
+            databaseSize = Formatter.formatFileSize(appPreferences.context, size)
+        }
     }
 
     fun updateImagesFolderSize() = viewModelScope.launch(Dispatchers.IO) {
-        imagesFolderSizeBytes.postValue(getFolderSizeBytes(repository.settings.folderBooks))
+        val size = getFolderSizeBytes(repository.settings.folderBooks)
+        withContext(Dispatchers.Main) {
+            imageFolderSize = Formatter.formatFileSize(appPreferences.context, size)
+        }
     }
 
     fun cleanDatabase() = appScope.launch(Dispatchers.IO) {
