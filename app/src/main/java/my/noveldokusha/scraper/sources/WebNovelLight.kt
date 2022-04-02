@@ -12,7 +12,7 @@ import org.jsoup.nodes.Document
 class WebNovelLight : SourceInterface.catalog
 {
     override val name = "Web Novel Light"
-    override val baseUrl = "https://webnovellight.com"
+    override val baseUrl = "https://webnovellight.com/"
     override val catalogUrl = "https://webnovellight.com/series/?m_orderby=alphabet"
     override val language = "English"
 
