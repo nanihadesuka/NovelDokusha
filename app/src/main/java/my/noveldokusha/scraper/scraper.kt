@@ -25,7 +25,8 @@ object scraper
         Sousetsuka(),
         Saikai(),
         WebNovelLight(),
-        BoxNovel()
+        BoxNovel(),
+        LightNovelWorld()
     )
 
     val sourcesListCatalog = sourcesList.filterIsInstance<SourceInterface.catalog>().toSet()
