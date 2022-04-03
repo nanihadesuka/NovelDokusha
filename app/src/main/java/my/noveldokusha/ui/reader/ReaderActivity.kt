@@ -87,16 +87,7 @@ class ReaderActivity : BaseActivity() {
         viewModel.initialLoad { loadInitialChapter() }
 
         viewBind.settings.setContent {
-            Theme(
-                appPreferences = appPreferences,
-                wrapper = {
-                    // Necessay so that text knows what color it must be given that the
-                    // background is transparent (no Surface parent)
-                    CompositionLocalProvider(
-                        LocalContentColor provides MaterialTheme.colors.onSecondary // replace this with needed color from your pallete
-                    ) { it() }
-                }
-            ) {
+            Theme(appPreferences = appPreferences) {
                 val textFont by remember { appPreferences.READER_FONT_FAMILY_flow() }.collectAsState(
                     viewModel.appPreferences.READER_FONT_FAMILY
                 )
@@ -131,18 +122,24 @@ class ReaderActivity : BaseActivity() {
                     viewModel.showReaderInfoView = false
                 }
 
-                // Reader info
-                ReaderInfoView(
-                    chapterTitle = stats?.run { first.chapter.title } ?: "",
-                    chapterCurrentNumber = stats?.run { first.index + 1 } ?: 0,
-                    chapterPercentageProgress = percetage,
-                    chaptersTotalSize = viewModel.orderedChapters.size,
-                    textFont = textFont,
-                    textSize = textSize,
-                    visible = viewModel.showReaderInfoView,
-                    onTextFontChanged = { appPreferences.READER_FONT_FAMILY = it },
-                    onTextSizeChanged = { appPreferences.READER_FONT_SIZE = it }
-                )
+                // Necessay so that text knows what color it must be given that the
+                // background is transparent (no Surface parent)
+                CompositionLocalProvider(
+                    LocalContentColor provides MaterialTheme.colors.onSecondary // replace this with needed color from your pallete
+                ) {
+                    // Reader info
+                    ReaderInfoView(
+                        chapterTitle = stats?.run { first.chapter.title } ?: "",
+                        chapterCurrentNumber = stats?.run { first.index + 1 } ?: 0,
+                        chapterPercentageProgress = percetage,
+                        chaptersTotalSize = viewModel.orderedChapters.size,
+                        textFont = textFont,
+                        textSize = textSize,
+                        visible = viewModel.showReaderInfoView,
+                        onTextFontChanged = { appPreferences.READER_FONT_FAMILY = it },
+                        onTextSizeChanged = { appPreferences.READER_FONT_SIZE = it }
+                    )
+                }
             }
         }
 

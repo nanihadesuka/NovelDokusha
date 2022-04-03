@@ -6,6 +6,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
+import androidx.compose.foundation.layout.Column
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -29,15 +30,18 @@ import javax.inject.Inject
 
 
 @AndroidEntryPoint
-class SourceCatalogActivity : ComponentActivity() {
-    class IntentData : Intent, SourceCatalogStateBundle {
+class SourceCatalogActivity : ComponentActivity()
+{
+    class IntentData : Intent, SourceCatalogStateBundle
+    {
         override var sourceBaseUrl by Extra_String()
 
         constructor(intent: Intent) : super(intent)
         constructor(ctx: Context, sourceBaseUrl: String) : super(
             ctx,
             SourceCatalogActivity::class.java
-        ) {
+        )
+        {
             this.sourceBaseUrl = sourceBaseUrl
         }
     }
@@ -47,43 +51,39 @@ class SourceCatalogActivity : ComponentActivity() {
     @Inject
     lateinit var appPreferences: AppPreferences
 
-    override fun onCreate(savedInstanceState: Bundle?) {
+    override fun onCreate(savedInstanceState: Bundle?)
+    {
         super.onCreate(savedInstanceState)
 
         setContent {
             val title = stringResource(R.string.catalog)
             val subtitle = viewModel.source.name.capitalize(Locale.ROOT)
 
+            val searchText = rememberSaveable { mutableStateOf("") }
+            val focusRequester = remember { FocusRequester() }
+            val toolbarMode = rememberSaveable { mutableStateOf(ToolbarMode.MAIN) }
+
             Theme(appPreferences = appPreferences) {
-                val state = rememberCollapsingToolbarScaffoldState()
-                CollapsingToolbarScaffold(
-                    modifier = Modifier,
-                    state = state,
-                    scrollStrategy = ScrollStrategy.EnterAlwaysCollapsed,
-                    toolbar = {
-                        val searchText = rememberSaveable { mutableStateOf("") }
-                        val focusRequester = remember { FocusRequester() }
-                        val toolbarMode = rememberSaveable { mutableStateOf(ToolbarMode.MAIN) }
-                        when (toolbarMode.value) {
-                            ToolbarMode.MAIN -> ToolbarMain(
-                                title = title,
-                                subtitle = subtitle,
-                                toolbarMode = toolbarMode,
-                                onOpenSourceWebPage = ::openSourceWebPage
-                            )
-                            ToolbarMode.SEARCH -> ToolbarModeSearch(
-                                focusRequester = focusRequester,
-                                searchText = searchText,
-                                onClose = {
-                                    toolbarMode.value = ToolbarMode.MAIN
-                                    viewModel.startCatalogListMode()
-                                },
-                                onTextDone = { viewModel.startCatalogSearchMode(searchText.value) },
-                                placeholderText = stringResource(R.string.search_by_title)
-                            )
-                        }
+                Column {
+                    when (toolbarMode.value)
+                    {
+                        ToolbarMode.MAIN -> ToolbarMain(
+                            title = title,
+                            subtitle = subtitle,
+                            toolbarMode = toolbarMode,
+                            onOpenSourceWebPage = ::openSourceWebPage
+                        )
+                        ToolbarMode.SEARCH -> ToolbarModeSearch(
+                            focusRequester = focusRequester,
+                            searchText = searchText,
+                            onClose = {
+                                toolbarMode.value = ToolbarMode.MAIN
+                                viewModel.startCatalogListMode()
+                            },
+                            onTextDone = { viewModel.startCatalogSearchMode(searchText.value) },
+                            placeholderText = stringResource(R.string.search_by_title)
+                        )
                     }
-                ) {
                     SourceCatalogView(
                         list = viewModel.fetchIterator.list,
                         error = viewModel.fetchIterator.error,
@@ -97,18 +97,21 @@ class SourceCatalogActivity : ComponentActivity() {
         }
     }
 
-    fun openSourceWebPage() {
+    fun openSourceWebPage()
+    {
         WebViewActivity.IntentData(this, viewModel.sourceBaseUrl).let(::startActivity)
     }
 
-    fun openBookPage(book: BookMetadata) {
+    fun openBookPage(book: BookMetadata)
+    {
         ChaptersActivity.IntentData(
             this,
             bookMetadata = book
         ).let(::startActivity)
     }
 
-    fun addBookToLibrary(book: BookMetadata) {
+    fun addBookToLibrary(book: BookMetadata)
+    {
         viewModel.addToLibraryToggle(book)
     }
 }

@@ -3,6 +3,7 @@ package my.noveldokusha.ui.theme
 import androidx.annotation.StyleRes
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -110,10 +111,8 @@ enum class Themes {
 @Composable
 fun Theme(
     appPreferences: AppPreferences,
-    wrapper: @Composable (fn: @Composable () -> @Composable Unit) -> Unit = { fn -> Surface(Modifier.fillMaxSize()) { fn() } },
     content: @Composable () -> @Composable Unit,
 ) {
-
     // Done so the first load is not undefined (visually annoying)
     val initialThemeFollowSystem by remember {
         mutableStateOf(appPreferences.THEME_FOLLOW_SYSTEM)
@@ -146,15 +145,13 @@ fun Theme(
 
     InternalTheme(
         theme = theme,
-        content = content,
-        wrapper = wrapper
+        content = content
     )
 }
 
 @Composable
 fun InternalTheme(
     theme: Themes = if (isSystemInDarkTheme()) Themes.DARK else Themes.LIGHT,
-    wrapper: @Composable (fn: @Composable () -> Unit) -> Unit = { fn -> Surface(Modifier.fillMaxSize()) { fn() } },
     content: @Composable () -> Unit
 ) {
     val palette = when (theme) {
@@ -174,7 +171,7 @@ fun InternalTheme(
         colors = palette,
         typography = Typography,
         shapes = Shapes,
-        content = { wrapper { content() } }
+        content = { Surface(Modifier.fillMaxSize()) { content() } }
     )
 }
 
@@ -182,7 +179,6 @@ fun InternalTheme(
 @Composable
 fun InternalThemeObject(
     theme: Themes = if (isSystemInDarkTheme()) Themes.DARK else Themes.LIGHT,
-    wrapper: @Composable (fn: @Composable () -> Unit) -> Unit = { fn -> Surface { fn() } },
     content: @Composable () -> Unit
 ) {
     val palette = when (theme) {
@@ -202,6 +198,6 @@ fun InternalThemeObject(
         colors = palette,
         typography = Typography,
         shapes = Shapes,
-        content = { wrapper { content() } }
+        content = { Surface { content() } }
     )
 }
