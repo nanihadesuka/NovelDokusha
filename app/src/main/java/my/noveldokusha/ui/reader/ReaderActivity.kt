@@ -87,7 +87,10 @@ class ReaderActivity : BaseActivity() {
         viewModel.initialLoad { loadInitialChapter() }
 
         viewBind.settings.setContent {
-            Theme(appPreferences = appPreferences) {
+            Theme(
+                appPreferences = appPreferences,
+                backgroundColor = Color.Transparent
+            ) {
                 val textFont by remember { appPreferences.READER_FONT_FAMILY_flow() }.collectAsState(
                     viewModel.appPreferences.READER_FONT_FAMILY
                 )
@@ -125,7 +128,7 @@ class ReaderActivity : BaseActivity() {
                 // Necessay so that text knows what color it must be given that the
                 // background is transparent (no Surface parent)
                 CompositionLocalProvider(
-                    LocalContentColor provides MaterialTheme.colors.onSecondary // replace this with needed color from your pallete
+                    LocalContentColor provides MaterialTheme.colors.onSecondary
                 ) {
                     // Reader info
                     ReaderInfoView(

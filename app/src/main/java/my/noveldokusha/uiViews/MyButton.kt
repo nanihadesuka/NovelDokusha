@@ -54,7 +54,7 @@ fun MyButton(
                 enabled = enabled,
                 role = Role.Button
             ) { onClick() },
-        color = MaterialTheme.colors.onSurface.copy(alpha = 0.02f)
+        color = MaterialTheme.colors.primary
     ) {
         content(text, radius, textAlign)
     }

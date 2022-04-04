@@ -48,11 +48,11 @@ private val dark_ColorPalette = Colors(
 private val grey_ColorPalette = Colors(
     primary = Color(0xFF333333),
     primaryVariant = Color(0xFF333333),
-    secondary = Color(0xFF444444),
-    secondaryVariant = Color(0xFF444444),
-    background = Color(0xFF555555),
-    surface = Color(0xFF555555),
-    error = Color(0xFF555555),
+    secondary = Color(0xFF333333),
+    secondaryVariant = Color(0xFF333333),
+    background = Color(0xFF242424),
+    surface = Color(0xFF242424),
+    error = Color(0xFF242424),
     onPrimary = Color(0xFFEEEEEE),
     onSecondary = Color(0xFFEEEEEE),
     onBackground = Color(0xFFEEEEEE),
@@ -111,6 +111,7 @@ enum class Themes {
 @Composable
 fun Theme(
     appPreferences: AppPreferences,
+    backgroundColor : Color? = null,
     content: @Composable () -> @Composable Unit,
 ) {
     // Done so the first load is not undefined (visually annoying)
@@ -145,6 +146,7 @@ fun Theme(
 
     InternalTheme(
         theme = theme,
+        backgroundColor = backgroundColor,
         content = content
     )
 }
@@ -152,6 +154,7 @@ fun Theme(
 @Composable
 fun InternalTheme(
     theme: Themes = if (isSystemInDarkTheme()) Themes.DARK else Themes.LIGHT,
+    backgroundColor : Color? = null,
     content: @Composable () -> Unit
 ) {
     val palette = when (theme) {
@@ -171,7 +174,10 @@ fun InternalTheme(
         colors = palette,
         typography = Typography,
         shapes = Shapes,
-        content = { Surface(Modifier.fillMaxSize()) { content() } }
+        content = { Surface(
+            modifier = Modifier.fillMaxSize(),
+            color = backgroundColor ?: palette.surface
+        ) { content() } }
     )
 }
 
@@ -179,6 +185,7 @@ fun InternalTheme(
 @Composable
 fun InternalThemeObject(
     theme: Themes = if (isSystemInDarkTheme()) Themes.DARK else Themes.LIGHT,
+    backgroundColor : Color? = null,
     content: @Composable () -> Unit
 ) {
     val palette = when (theme) {
@@ -198,6 +205,8 @@ fun InternalThemeObject(
         colors = palette,
         typography = Typography,
         shapes = Shapes,
-        content = { Surface { content() } }
+        content = { Surface(
+            color = backgroundColor ?: palette.surface
+        ) { content() } }
     )
 }
