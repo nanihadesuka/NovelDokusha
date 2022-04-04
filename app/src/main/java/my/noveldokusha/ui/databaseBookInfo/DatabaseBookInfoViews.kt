@@ -84,8 +84,10 @@ fun DatabaseBookInfoView(
                     contentDescription = stringResource(R.string.no_cover_found),
                     contentScale = ContentScale.FillHeight,
                     modifier = Modifier
-                        .height(125.dp)
+                        .height(240.dp)
                         .align(Alignment.CenterHorizontally)
+                        .padding(top = 8.dp)
+                        .clip(RoundedCornerShape(10.dp))
                 )
                 Text(
                     text = stringResource(R.string.no_cover_found),
@@ -96,11 +98,11 @@ fun DatabaseBookInfoView(
             else -> GlideImageFadeIn(
                 imageModel = data.coverImageUrl,
                 modifier = Modifier
-                    .fillMaxWidth(1f)
-                    .height(300.dp)
+                    .height(340.dp)
                     .align(Alignment.CenterHorizontally)
-                    .padding(top = 8.dp)
-                    .clip(RoundedCornerShape(10.dp))
+                    .padding(top = 12.dp)
+                    .clip(RoundedCornerShape(10.dp)),
+                contentScale = ContentScale.FillHeight,
             )
         }
 

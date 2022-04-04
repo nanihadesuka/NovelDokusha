@@ -30,7 +30,8 @@ fun GlideImageFadeIn(
     modifier: Modifier = Modifier,
     fadeInDurationMillis: Int = 250,
     placeHolder: Any? = null,
-    error: Any? = null
+    error: Any? = null,
+    contentScale: ContentScale = ContentScale.FillBounds
 ) {
     val timeNow by rememberSaveable { mutableStateOf(System.currentTimeMillis()) }
     var showImmediatelly by rememberSaveable { mutableStateOf(false) }
@@ -45,7 +46,7 @@ fun GlideImageFadeIn(
         placeHolder = placeHolder,
         error = error,
         modifier = modifier.alpha(alpha),
-        contentScale = ContentScale.FillBounds,
+        contentScale = contentScale,
         requestListener = object : RequestListener<Drawable> {
             override fun onLoadFailed(
                 e: GlideException?,
