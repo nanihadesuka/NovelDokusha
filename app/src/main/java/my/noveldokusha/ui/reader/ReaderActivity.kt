@@ -4,36 +4,34 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import android.view.WindowManager
 import android.widget.AbsListView
 import androidx.activity.compose.BackHandler
 import androidx.activity.viewModels
-import androidx.compose.animation.*
 import androidx.compose.material.LocalContentColor
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.viewinterop.AndroidView
-import androidx.core.view.*
-import androidx.lifecycle.asFlow
-import androidx.lifecycle.asLiveData
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
+import androidx.core.view.doOnNextLayout
 import androidx.lifecycle.lifecycleScope
 import com.afollestad.materialdialogs.MaterialDialog
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.drop
-import my.noveldokusha.*
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import my.noveldokusha.R
-import my.noveldokusha.databinding.*
+import my.noveldokusha.databinding.ActivityReaderBinding
 import my.noveldokusha.scraper.Response
 import my.noveldokusha.ui.BaseActivity
 import my.noveldokusha.ui.theme.Theme
-import my.noveldokusha.uiUtils.*
+import my.noveldokusha.uiUtils.Extra_String
+import my.noveldokusha.uiUtils.colorAttrRes
+import my.noveldokusha.uiUtils.fadeIn
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.math.ceil
 
@@ -89,7 +87,13 @@ class ReaderActivity : BaseActivity() {
         viewBind.settings.setContent {
             Theme(
                 appPreferences = appPreferences,
-                backgroundColor = Color.Transparent
+                wrapper = {
+                    // Necessay so that text knows what color it must be given that the
+                    // background is transparent (no Surface parent)
+                    CompositionLocalProvider(
+                        LocalContentColor provides MaterialTheme.colors.onSecondary
+                    ) { it() }
+                }
             ) {
                 val textFont by remember { appPreferences.READER_FONT_FAMILY_flow() }.collectAsState(
                     viewModel.appPreferences.READER_FONT_FAMILY
@@ -125,24 +129,19 @@ class ReaderActivity : BaseActivity() {
                     viewModel.showReaderInfoView = false
                 }
 
-                // Necessay so that text knows what color it must be given that the
-                // background is transparent (no Surface parent)
-                CompositionLocalProvider(
-                    LocalContentColor provides MaterialTheme.colors.onSecondary
-                ) {
-                    // Reader info
-                    ReaderInfoView(
-                        chapterTitle = stats?.run { first.chapter.title } ?: "",
-                        chapterCurrentNumber = stats?.run { first.index + 1 } ?: 0,
-                        chapterPercentageProgress = percetage,
-                        chaptersTotalSize = viewModel.orderedChapters.size,
-                        textFont = textFont,
-                        textSize = textSize,
-                        visible = viewModel.showReaderInfoView,
-                        onTextFontChanged = { appPreferences.READER_FONT_FAMILY = it },
-                        onTextSizeChanged = { appPreferences.READER_FONT_SIZE = it }
-                    )
-                }
+
+                // Reader info
+                ReaderInfoView(
+                    chapterTitle = stats?.run { first.chapter.title } ?: "",
+                    chapterCurrentNumber = stats?.run { first.index + 1 } ?: 0,
+                    chapterPercentageProgress = percetage,
+                    chaptersTotalSize = viewModel.orderedChapters.size,
+                    textFont = textFont,
+                    textSize = textSize,
+                    visible = viewModel.showReaderInfoView,
+                    onTextFontChanged = { appPreferences.READER_FONT_FAMILY = it },
+                    onTextSizeChanged = { appPreferences.READER_FONT_SIZE = it }
+                )
             }
         }
 

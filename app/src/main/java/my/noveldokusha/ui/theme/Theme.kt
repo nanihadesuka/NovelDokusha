@@ -12,6 +12,7 @@ import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import kotlinx.coroutines.flow.mapNotNull
 import my.noveldokusha.AppPreferences
 import my.noveldokusha.R
+import java.sql.Wrapper
 
 private val light_ColorPalette = Colors(
     primary = Color(0xFFFBFBFB),
@@ -77,28 +78,33 @@ private val black_ColorPalette = Colors(
     isLight = false
 )
 
-enum class Themes {
+enum class Themes
+{
     LIGHT,
     DARK,
     GREY,
     BLACK;
 
-    companion object {
-        fun fromIDTheme(@StyleRes id: Int) = when (id) {
+    companion object
+    {
+        fun fromIDTheme(@StyleRes id: Int) = when (id)
+        {
             R.style.AppTheme_Light -> LIGHT
             R.style.AppTheme_BaseDark_Dark -> DARK
             R.style.AppTheme_BaseDark_Grey -> GREY
             R.style.AppTheme_BaseDark_Black -> BLACK
             else -> null
         }
-        fun toIDTheme(theme: Themes) = when (theme) {
+
+        fun toIDTheme(theme: Themes) = when (theme)
+        {
             LIGHT -> R.style.AppTheme_Light
             DARK -> R.style.AppTheme_BaseDark_Dark
             GREY -> R.style.AppTheme_BaseDark_Grey
             BLACK -> R.style.AppTheme_BaseDark_Black
         }
 
-        val list = listOf(LIGHT,DARK,GREY,BLACK)
+        val list = listOf(LIGHT, DARK, GREY, BLACK)
         val pairs = mapOf(
             LIGHT to "Light",
             DARK to "Dark",
@@ -111,9 +117,10 @@ enum class Themes {
 @Composable
 fun Theme(
     appPreferences: AppPreferences,
-    backgroundColor : Color? = null,
+    wrapper: @Composable (fn: @Composable () -> @Composable Unit) -> Unit = { fn -> Surface(Modifier.fillMaxSize()) { fn() } },
     content: @Composable () -> @Composable Unit,
-) {
+)
+{
     // Done so the first load is not undefined (visually annoying)
     val initialThemeFollowSystem by remember {
         mutableStateOf(appPreferences.THEME_FOLLOW_SYSTEM)
@@ -135,8 +142,10 @@ fun Theme(
         themeType !in setOf(Themes.DARK, Themes.GREY, Themes.BLACK)
     }
 
-    val theme: Themes = when (themeFollowSystem) {
-        true -> when {
+    val theme: Themes = when (themeFollowSystem)
+    {
+        true -> when
+        {
             isSystemThemeLight && !isThemeLight -> Themes.LIGHT
             !isSystemThemeLight && isThemeLight -> Themes.DARK
             else -> themeType
@@ -146,18 +155,20 @@ fun Theme(
 
     InternalTheme(
         theme = theme,
-        backgroundColor = backgroundColor,
-        content = content
+        content = content,
+        wrapper = wrapper
     )
 }
 
 @Composable
 fun InternalTheme(
     theme: Themes = if (isSystemInDarkTheme()) Themes.DARK else Themes.LIGHT,
-    backgroundColor : Color? = null,
+    wrapper: @Composable (fn: @Composable () -> Unit) -> Unit = { fn -> Surface(Modifier.fillMaxSize()) { fn() } },
     content: @Composable () -> Unit
-) {
-    val palette = when (theme) {
+)
+{
+    val palette = when (theme)
+    {
         Themes.LIGHT -> light_ColorPalette
         Themes.DARK -> dark_ColorPalette
         Themes.GREY -> grey_ColorPalette
@@ -174,10 +185,7 @@ fun InternalTheme(
         colors = palette,
         typography = Typography,
         shapes = Shapes,
-        content = { Surface(
-            modifier = Modifier.fillMaxSize(),
-            color = backgroundColor ?: palette.surface
-        ) { content() } }
+        content = { wrapper { content() } }
     )
 }
 
@@ -185,10 +193,12 @@ fun InternalTheme(
 @Composable
 fun InternalThemeObject(
     theme: Themes = if (isSystemInDarkTheme()) Themes.DARK else Themes.LIGHT,
-    backgroundColor : Color? = null,
+    wrapper: @Composable (fn: @Composable () -> Unit) -> Unit = { fn -> Surface { fn() } },
     content: @Composable () -> Unit
-) {
-    val palette = when (theme) {
+)
+{
+    val palette = when (theme)
+    {
         Themes.LIGHT -> light_ColorPalette
         Themes.DARK -> dark_ColorPalette
         Themes.GREY -> grey_ColorPalette
@@ -205,8 +215,6 @@ fun InternalThemeObject(
         colors = palette,
         typography = Typography,
         shapes = Shapes,
-        content = { Surface(
-            color = backgroundColor ?: palette.surface
-        ) { content() } }
+        content = { wrapper { content() } }
     )
 }
