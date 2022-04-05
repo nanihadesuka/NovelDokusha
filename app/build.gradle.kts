@@ -87,8 +87,8 @@ dependencies {
 
     // Kotlin
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.0")
-    implementation("org.jetbrains.kotlin:kotlin-script-runtime:1.6.20")
-    implementation("org.jetbrains.kotlin:kotlin-stdlib:1.6.20")
+    implementation("org.jetbrains.kotlin:kotlin-script-runtime:1.6.10")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib:1.6.10")
 
     // Room components
     implementation("androidx.room:room-runtime:2.4.2")
@@ -107,7 +107,7 @@ dependencies {
 
     // UI
     implementation("androidx.appcompat:appcompat:1.4.1")
-    implementation("androidx.core:core-ktx:1.9.0-alpha02")
+    implementation("androidx.core:core-ktx:1.7.0")
     implementation("androidx.navigation:navigation-fragment-ktx:2.4.1")
     implementation("androidx.navigation:navigation-ui-ktx:2.4.1")
     implementation("androidx.activity:activity-ktx:1.4.0")
@@ -115,13 +115,13 @@ dependencies {
     implementation("androidx.constraintlayout:constraintlayout:2.1.3")
     implementation("androidx.recyclerview:recyclerview:1.2.1")
     implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
-    implementation("com.google.android.material:material:1.6.0-beta01")
+    implementation("com.google.android.material:material:1.6.0-alpha03")
     implementation("com.l4digital.fastscroll:fastscroll:2.0.1")
     implementation("com.afollestad.material-dialogs:core:3.3.0")
 
     // Glide
-    implementation("com.github.bumptech.glide:glide:4.13.1")
-    kapt("com.github.bumptech.glide:compiler:4.13.1")
+    implementation("com.github.bumptech.glide:glide:4.13.0")
+    kapt("com.github.bumptech.glide:compiler:4.12.0")
 
     // Test
     testImplementation("junit:junit:4.13.2")
@@ -129,22 +129,22 @@ dependencies {
     androidTestImplementation("androidx.test.espresso:espresso-core:3.4.0")
 
     // GSON
-    implementation("com.google.code.gson:gson:2.9.0")
+    implementation("com.google.code.gson:gson:2.8.7")
 
     // Retrofit
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
 
     // Dependency injection
-    implementation("com.google.dagger:hilt-android:2.41")
-    kapt("com.google.dagger:hilt-compiler:2.41")
+    implementation("com.google.dagger:hilt-android:2.38.1")
+    kapt("com.google.dagger:hilt-compiler:2.38.1")
 
     // HTML text extractor
     implementation("com.chimbori.crux:crux:3.0.1")
-    implementation("net.dankito.readability4j:readability4j:1.0.8")
-    implementation("org.jsoup:jsoup:1.14.3")
+    implementation("net.dankito.readability4j:readability4j:1.0.6")
+    implementation("org.jsoup:jsoup:1.14.1")
 
     // Memory leak detector
-    debugImplementation("com.squareup.leakcanary:leakcanary-android:2.8.1")
+    debugImplementation("com.squareup.leakcanary:leakcanary-android:2.7")
 
     // Jetpack compose
     implementation("androidx.activity:activity-compose:1.4.0")
@@ -155,11 +155,11 @@ dependencies {
     implementation("androidx.compose.runtime:runtime-livedata:1.1.1")
     implementation("androidx.constraintlayout:constraintlayout-compose:1.0.0")
     implementation("androidx.compose.material:material-icons-extended:1.1.1")
-    implementation("com.google.accompanist:accompanist-systemuicontroller:0.24.5-alpha")
+    implementation("com.google.accompanist:accompanist-systemuicontroller:0.24.4-alpha")
     androidTestImplementation("androidx.compose.ui:ui-test-junit4:1.1.1")
 
     // Glide for jetpack compose
-    implementation("com.github.skydoves:landscapist-glide:1.5.1")
+    implementation("com.github.skydoves:landscapist-glide:1.5.0")
 
     // Compose collapsing toolbar
     implementation("me.onebone:toolbar-compose:2.3.3")
