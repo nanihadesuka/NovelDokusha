@@ -144,7 +144,7 @@ dependencies {
     implementation("org.jsoup:jsoup:1.14.1")
 
     // Memory leak detector
-    debugImplementation("com.squareup.leakcanary:leakcanary-android:2.7")
+    //debugImplementation("com.squareup.leakcanary:leakcanary-android:2.7")
 
     // Jetpack compose
     implementation("androidx.activity:activity-compose:1.4.0")
