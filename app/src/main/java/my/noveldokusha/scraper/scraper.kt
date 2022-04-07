@@ -16,7 +16,7 @@ object scraper
         LightNovelsTranslations(),
         ReadLightNovel(),
         ReadNovelFull(),
-        my.noveldokusha.scraper.sources.NovelUpdates(),
+       // my.noveldokusha.scraper.sources.NovelUpdates(),
         Reddit(),
         AT(),
         Wuxia(),
@@ -26,7 +26,8 @@ object scraper
         Saikai(),
         WebNovelLight(),
         BoxNovel(),
-        LightNovelWorld()
+        LightNovelWorld(),
+        Readwn()
     )
 
     val sourcesListCatalog = sourcesList.filterIsInstance<SourceInterface.catalog>().toSet()
