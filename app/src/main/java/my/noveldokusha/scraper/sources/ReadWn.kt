@@ -45,7 +45,7 @@ class ReadWn : SourceInterface.catalog
 //            .data("novelId", id)
             .getIO()
             .select(".chapter-list a[href]")
-            .map { ChapterMetadata(title = it.text(), url = baseUrl + it.attr("href")) }
+            .map { ChapterMetadata(title = it.attr("strong"), url = baseUrl + it.attr("href")) }
 
 
 
