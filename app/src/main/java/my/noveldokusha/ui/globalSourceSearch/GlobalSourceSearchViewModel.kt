@@ -26,9 +26,6 @@ class GlobalSourceSearchViewModel @Inject constructor(
 {
     override val input by StateExtra_String(state)
 
-    // Map<Book url,cover url>
-    val bookCoverUrlCache = mutableStateMapOf<String,String>()
-
     val list = appPreferences.SOURCES_LANGUAGES.let { activeLangs ->
         scraper.sourcesListCatalog
             .filter { it.language in activeLangs }

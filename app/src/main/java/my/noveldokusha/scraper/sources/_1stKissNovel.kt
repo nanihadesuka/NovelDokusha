@@ -1,6 +1,5 @@
 package my.noveldokusha.scraper.sources
 
-import com.chimbori.crux.articles.extractImages
 import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.data.ChapterMetadata
 import my.noveldokusha.scraper.*
@@ -31,7 +30,8 @@ class _1stKissNovel : SourceInterface.catalog
     {
         val url = "https://1stkissnovel.love/wp-admin/admin-ajax.php"
         val id = doc.selectFirst("input.rating-post-id")!!.attr("value")
-        return connect(url).addHeaderRequest()
+        return connect(url)
+            .addHeaderRequest()
             .data("action", "manga_get_chapters")
             .data("manga", id)
             .postIO()
@@ -45,11 +45,11 @@ class _1stKissNovel : SourceInterface.catalog
         val page = index + 1
         return tryConnect {
 
-            val url = "https://1stkissnovel.love"
+            val url = baseUrl
                 .toUrlBuilderSafe()
                 .ifCase(page == 1){ addPath("page", page.toString())}
 
-            fetchDoc(url, 10000)
+            fetchDoc(url, 20000)
                 .select(".page-item-detail")
                 .mapNotNull { it.selectFirst("a[href]") }
                 .map {
@@ -69,7 +69,7 @@ class _1stKissNovel : SourceInterface.catalog
         val page = index + 1
         return tryConnect {
 
-            val url = "https://1stkissnovel.love"
+            val url = baseUrl
                 .toUrlBuilderSafe()
                 .ifCase(page == 1){ addPath("page", page.toString())}
                 .add("s",input)
@@ -77,7 +77,7 @@ class _1stKissNovel : SourceInterface.catalog
                 .toString()
                 .plus("&op&author&artist&release&adult&m_orderby")
 
-            fetchDoc(url, 10000)
+            fetchDoc(url, 20000)
                 .select(".row.c-tabs-item__content")
                 .mapNotNull { it.selectFirst("a[href]") }
                 .map {

@@ -48,52 +48,64 @@ class WebNovelLight : SourceInterface.catalog
 
     override suspend fun getCatalogList(index: Int): Response<List<BookMetadata>>
     {
-        val url = "https://webnovellight.com/wp-admin/admin-ajax.php"
+        val page = index + 1
+        if (page > 1)
+            return Response.Success(listOf())
+
         return tryConnect {
-            connect(url)
-                .addHeaderRequest()
-                .data("action", "madara_load_more")
-                .data("page", index.toString())
-                .data("template", "madara-core/content/content-archive")
-                .data("vars[paged]", "1")
-                .data("vars[orderby]", "post_title")
-                .data("vars[template]", "archive")
-                .data("vars[sidebar]", "right")
-                .data("vars[post_type]", "wp-manga")
-                .data("vars[post_status]", "publish")
-                .data("vars[order]", "ASC")
-                .data("vars[meta_query][relation]", "OR")
-                .data("vars[manga_archives_item_layout]", "default")
-                .postIO()
-                .select(".post-title.font-title")
-                .mapNotNull { it.selectFirst("a[href]") }
-                .map { BookMetadata(title = it.text(), url = it.attr("href")) }
+            val url = baseUrl
+                .toUrlBuilderSafe()
+                .addPath("novel")
+                .ifCase(page != 1){ addPath("page",page.toString()) }
+                .add("m_orderby","alphabet")
+
+            fetchDoc(url)
+                .select(".page-item-detail")
+                .mapNotNull {
+                    val link = it.selectFirst("a[href]") ?: return@mapNotNull null
+                    val bookCover = it.selectFirst("img[src]")?.attr("src") ?: ""
+                    BookMetadata(
+                        title = link.attr("title"),
+                        url = link.attr("href"),
+                        coverImageUrl = bookCover
+                    )
+                }
                 .let { Response.Success(it) }
         }
     }
 
     override suspend fun getCatalogSearch(index: Int, input: String): Response<List<BookMetadata>>
     {
-        val url = "https://webnovellight.com/wp-admin/admin-ajax.php"
+        val page = index + 1
+        if (page > 1)
+            return Response.Success(listOf())
+
         return tryConnect {
-            connect(url)
-                .addHeaderRequest()
-                .data("action", "madara_load_more")
-                .data("page", index.toString())
-                .data("template", "madara-core/content/content-search")
-                .data("vars[s]", input)
-                .data("vars[orderby]", "")
-                .data("vars[paged]", "1")
-                .data("vars[template]", "search")
-                .data("vars[meta_query][0][relation]", "AND")
-                .data("vars[meta_query][relation]", "OR")
-                .data("vars[post_type]", "wp-manga")
-                .data("vars[post_status]", "publish")
-                .data("vars[manga_archives_item_layout]", "default")
-                .postIO()
-                .select("div.post-title")
-                .mapNotNull { it.selectFirst("a[href]") }
-                .map { BookMetadata(title = it.text(), url = it.attr("href")) }
+
+            val url = baseUrl
+                .toUrlBuilderSafe()
+                .ifCase(page != 1) { addPath("page", page.toString()) }
+                .add(
+                    "s" to input,
+                    "post_type" to "wp-manga",
+                    "op" to "",
+                    "author" to "",
+                    "artist" to "",
+                    "release" to "",
+                    "adult" to ""
+                )
+
+            fetchDoc(url)
+                .select(".c-tabs-item__content")
+                .mapNotNull {
+                    val link = it.selectFirst("a[href]") ?: return@mapNotNull null
+                    val bookCover = it.selectFirst("img[src]")?.attr("src") ?: ""
+                    BookMetadata(
+                        title = link.attr("title"),
+                        url = link.attr("href"),
+                        coverImageUrl = bookCover
+                    )
+                }
                 .let { Response.Success(it) }
         }
     }

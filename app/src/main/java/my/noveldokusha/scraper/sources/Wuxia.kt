@@ -83,9 +83,16 @@ class Wuxia : SourceInterface.catalog
 
         return tryConnect {
             fetchDoc(url)
-                .select("#table a[href]")
-                .filter { it.text().isNotBlank() }
-                .map { BookMetadata(title = it.text(), url = it.attr("href")) }
+                .select("tbody > tr")
+                .mapNotNull {
+                    val link = it.selectFirst(".xxxx > a[href]") ?: return@mapNotNull  null
+                    val bookCover = it.selectFirst("img[src]")?.attr("src") ?: ""
+                    BookMetadata(
+                        title = link.text(),
+                        url = baseUrl + link.attr("href"),
+                        coverImageUrl =bookCover
+                    )
+                }
                 .let { Response.Success(it) }
         }
     }

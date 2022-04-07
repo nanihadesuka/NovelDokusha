@@ -36,7 +36,6 @@ import my.noveldokusha.uiViews.GlideImageFadeIn
 @Composable
 fun GlobalSourceSearchView(
     listSources: List<SourceResults>,
-    bookCoverUrlCache: SnapshotStateMap<String, String>,
     onBookClick: (book: BookMetadata) -> Unit
 ) {
     LazyColumn(
@@ -52,7 +51,6 @@ fun GlobalSourceSearchView(
                 list = entry.fetchIterator.list,
                 loadState = entry.fetchIterator.state,
                 error = entry.fetchIterator.error,
-                bookCoverUrlCache = bookCoverUrlCache,
                 onBookClick = onBookClick,
                 onLoadNext = { entry.fetchIterator.fetchNext() },
                 modifier = Modifier.padding(bottom = 4.dp)
@@ -67,7 +65,6 @@ fun SourceListView(
     list: List<BookMetadata>,
     loadState: FetchIteratorState.STATE,
     error: String?,
-    bookCoverUrlCache: SnapshotStateMap<String, String>,
     onBookClick: (book: BookMetadata) -> Unit,
     onLoadNext: () -> Unit,
     modifier: Modifier = Modifier
@@ -103,25 +100,13 @@ fun SourceListView(
     ) {
 
         items(list) { book ->
-
-            val coverUrl: String? by remember(bookCoverUrlCache) {
-                derivedStateOf {
-                    book.coverImageUrl.ifBlank { bookCoverUrlCache[book.url] }
-                }
-            }
-
-            if (coverUrl == null) LaunchedEffect(Unit) {
-                bookCoverUrlCache[book.url] = downloadBookCoverImageUrl(book.url)
-                    .toSuccessOrNull()?.data ?: ""
-            }
-
             Column(
                 Modifier
                     .width(130.dp)
                     .padding(end = 8.dp)
             ) {
                 GlideImageFadeIn(
-                    imageModel = coverUrl,
+                    imageModel = book.coverImageUrl,
                     modifier = Modifier
                         .clickable { onBookClick(book) }
                         .fillMaxWidth()
@@ -189,9 +174,7 @@ fun Preview() {
         sr
     }
 
-    val cache = remember { mutableStateMapOf<String, String>() }
-
     InternalTheme {
-        GlobalSourceSearchView(listSources = list, onBookClick = {}, bookCoverUrlCache = cache)
+        GlobalSourceSearchView(listSources = list, onBookClick = {})
     }
 }

@@ -1,9 +1,11 @@
 package my.noveldokusha.scraper.sources
 
+import android.util.Log
 import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.data.ChapterMetadata
 import my.noveldokusha.scraper.*
 import org.jsoup.nodes.Document
+import org.jsoup.select.Selector.selectFirst
 
 /**
  * Novel main page (chapter list) example:
@@ -16,7 +18,7 @@ class ReadLightNovel : SourceInterface.catalog
 
     override val name = "Read Light Novel"
     override val baseUrl = "https://www.readlightnovel.me/"
-    override val catalogUrl = "https://www.readlightnovel.me/novel-list"
+    override val catalogUrl = "https://www.readlightnovel.me/top-novels/new/1"
     override val language = "English"
 
     override suspend fun getChapterTitle(doc: Document): String? = doc.selectFirst(".chapter-content3 h4")?.text()
@@ -51,23 +53,26 @@ class ReadLightNovel : SourceInterface.catalog
         return doc.select(".chapter-chs").select("a[href]").map { ChapterMetadata(title = it.text(), url = it.attr("href")) }
     }
 
-    val catalogIndex by lazy { ("ABCDEFGHIJKLMNOPQRSTUVWXYZ").split("") }
-
     override suspend fun getCatalogList(index: Int): Response<List<BookMetadata>>
     {
-        val url = catalogUrl.toUrlBuilder()!!.apply {
-            if (index == 0) return@apply
-            val letter = catalogIndex.elementAtOrNull(index - 1) ?: return Response.Success(listOf())
-            appendPath(letter)
-        }
-
+        val page = index + 1
         return tryConnect {
+
+            val url = "https://www.readlightnovel.me"
+                .toUrlBuilderSafe()
+                .addPath("top-novels", "new", page.toString())
+
             fetchDoc(url)
-                .selectFirst(".list-by-word-body")!!
-                .child(0)
-                .children()
-                .mapNotNull { it.selectFirst("a[href]") }
-                .map { BookMetadata(title = it.text(), url = it.attr("href")) }
+                .select(".top-novel-block")
+                .mapNotNull {
+                    val link = it.selectFirst("a[href]") ?: return@mapNotNull null
+                    val bookCover = it.selectFirst("img[src]")?.attr("src") ?: ""
+                    BookMetadata(
+                        title = link.text(),
+                        url = link.attr("href"),
+                        coverImageUrl = bookCover
+                    )
+                }
                 .let { Response.Success(it) }
         }
     }
@@ -82,8 +87,17 @@ class ReadLightNovel : SourceInterface.catalog
                 .addHeaderRequest()
                 .data("q", input)
                 .postIO()
-                .select("a[href]")
-                .map { BookMetadata(title = it.text(), url = it.attr("href")) }
+                .child(0)
+                .children()
+                .mapNotNull {
+                    val link = it.selectFirst("a[href]") ?: return@mapNotNull null
+                    val bookCover = it.selectFirst("img[src]")?.attr("src") ?: ""
+                    BookMetadata(
+                        title = link.text(),
+                        url = link.attr("href"),
+                        coverImageUrl = bookCover
+                    )
+                }
                 .let { Response.Success(it) }
         }
     }

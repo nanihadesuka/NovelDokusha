@@ -1,9 +1,11 @@
 package my.noveldokusha.scraper.sources
 
+import android.net.Uri
 import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.data.ChapterMetadata
 import my.noveldokusha.scraper.*
 import org.jsoup.nodes.Document
+import retrofit2.http.Url
 
 class BestLightNovel : SourceInterface.catalog
 {
@@ -45,38 +47,46 @@ class BestLightNovel : SourceInterface.catalog
 
     override suspend fun getCatalogList(index: Int): Response<List<BookMetadata>>
     {
+        val page = index + 1
         return tryConnect {
 
-            val url = catalogUrl.toUrlBuilder()!!.apply {
-                add("type", "topview")
-                add("category", "all")
-                add("state", "all")
-                add("page", index + 1)
-            }
-            fetchDoc(url)
-                .select("h3.nowrap a[href]")
-                .map { BookMetadata(title = it.text(), url = baseUrl + it.attr("href")) }
-                .let { Response.Success(it) }
+            val url = catalogUrl
+                .toUrlBuilderSafe()
+                .ifCase(page != 1) {
+                    add("type", "newest")
+                    add("category", "all")
+                    add("state", "all")
+                    add("page", page)
+                }
+            parseToBooks(url)
         }
     }
 
     override suspend fun getCatalogSearch(index: Int, input: String): Response<List<BookMetadata>>
     {
-        if (input.isBlank() || index > 0)
+        if (input.isBlank())
             return Response.Success(listOf())
 
+        val page = index + 1
         return tryConnect {
-
-            val url = baseUrl.toUrlBuilder()!!.apply {
-                appendPath("search_novels")
-                appendEncodedPath(input.replace(" ", "_"))
-            }
-
-            fetchDoc(url)
-                .select("h3.nowrap a[href]")
-                .filter { it.text().isNotBlank() }
-                .map { BookMetadata(title = it.text(), url = it.attr("href")) }
-                .let { Response.Success(it) }
+            val url = baseUrl
+                .toUrlBuilderSafe()
+                .addPath("search_novels", input.replace(" ", "_"))
+                .ifCase(page != 1) { add("page", page) }
+            parseToBooks(url)
         }
     }
+
+    suspend fun parseToBooks(url: Uri.Builder) = fetchDoc(url)
+        .select(".update_item.list_category")
+        .mapNotNull {
+            val link = it.selectFirst("a[href]") ?: return@mapNotNull null
+            val bookCover = it.selectFirst("img[src]")?.attr("src") ?: ""
+            BookMetadata(
+                title = link.attr("title"),
+                url = baseUrl + link.attr("href"),
+                coverImageUrl = bookCover
+            )
+        }
+        .let { Response.Success(it) }
 }
