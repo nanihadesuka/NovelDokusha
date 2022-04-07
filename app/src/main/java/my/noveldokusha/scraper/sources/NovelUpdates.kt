@@ -88,11 +88,11 @@ class NovelUpdates : SourceInterface.catalog
             .select(".search_main_box_nu")
             .mapNotNull {
                 val title = it.selectFirst(".search_title > a[href]") ?: return@mapNotNull null
-                val image = it.selectFirst(".search_img_nu > img")
+                val image = it.selectFirst(".search_img_nu > img[src]")?.attr("src") ?: ""
                 BookMetadata(
                     title = title.text(),
                     url = title.attr("href"),
-                    coverImageUrl = ""
+                    coverImageUrl = image
                 )
             }
             .let { Response.Success(it) }
