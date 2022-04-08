@@ -30,6 +30,7 @@ import my.noveldokusha.scraper.FetchIteratorState
 import my.noveldokusha.scraper.downloadBookCoverImageUrl
 import my.noveldokusha.scraper.scraper
 import my.noveldokusha.ui.theme.ColorAccent
+import my.noveldokusha.ui.theme.ImageBorderRadius
 import my.noveldokusha.ui.theme.InternalTheme
 import my.noveldokusha.uiViews.GlideImageFadeIn
 
@@ -110,13 +111,13 @@ fun SourceListView(
                     modifier = Modifier
                         .clickable { onBookClick(book) }
                         .fillMaxWidth()
-                        .aspectRatio(1/1.5f)
+                        .aspectRatio(1/1.45f)
                         .border(
                             0.dp,
                             MaterialTheme.colors.onSurface.copy(alpha = 0.2f),
-                            RoundedCornerShape(4.dp)
+                            RoundedCornerShape(ImageBorderRadius)
                         )
-                        .clip(RoundedCornerShape(4.dp))
+                        .clip(RoundedCornerShape(ImageBorderRadius))
                 )
                 Text(
                     text = book.title,

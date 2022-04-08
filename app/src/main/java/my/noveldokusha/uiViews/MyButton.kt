@@ -33,6 +33,7 @@ fun MyButton(
     textAlign: TextAlign = TextAlign.Start,
     outterPadding : Dp = 4.dp,
     radius: Dp = 12.dp,
+    borderWidth: Dp = 1.dp,
     onClick: () -> Unit,
     content: @Composable (String, Dp, TextAlign) -> Unit = { text, radius, textAlign ->
         Text(
@@ -48,7 +49,7 @@ fun MyButton(
         modifier = modifier
             .ifCase(animate) { animateContentSize() }
             .padding(outterPadding)
-            .border(1.dp, MaterialTheme.colors.onSurface.copy(alpha = 0.2f), shape)
+            .border(borderWidth, MaterialTheme.colors.onSurface.copy(alpha = 0.2f), shape)
             .clip(shape)
             .clickable(
                 enabled = enabled,

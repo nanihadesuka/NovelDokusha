@@ -20,6 +20,7 @@ import my.noveldokusha.R
 import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.scraper.DatabaseInterface
 import my.noveldokusha.ui.theme.ColorAccent
+import my.noveldokusha.ui.theme.ImageBorderRadius
 import my.noveldokusha.ui.theme.InternalTheme
 import my.noveldokusha.uiViews.GlideImageFadeIn
 import my.noveldokusha.uiViews.MyButton
@@ -87,7 +88,7 @@ fun DatabaseBookInfoView(
                         .height(240.dp)
                         .align(Alignment.CenterHorizontally)
                         .padding(top = 8.dp)
-                        .clip(RoundedCornerShape(10.dp))
+                        .clip(RoundedCornerShape(ImageBorderRadius))
                 )
                 Text(
                     text = stringResource(R.string.no_cover_found),
@@ -101,7 +102,7 @@ fun DatabaseBookInfoView(
                     .height(340.dp)
                     .align(Alignment.CenterHorizontally)
                     .padding(top = 12.dp)
-                    .clip(RoundedCornerShape(10.dp)),
+                    .clip(RoundedCornerShape(ImageBorderRadius)),
                 contentScale = ContentScale.FillHeight,
             )
         }

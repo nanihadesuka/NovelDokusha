@@ -6,17 +6,15 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.lazy.GridCells
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.res.stringResource
 import dagger.hilt.android.AndroidEntryPoint
-import me.onebone.toolbar.CollapsingToolbarScaffold
-import me.onebone.toolbar.ScrollStrategy
-import me.onebone.toolbar.rememberCollapsingToolbarScaffoldState
 import my.noveldokusha.AppPreferences
 import my.noveldokusha.R
 import my.noveldokusha.data.BookMetadata
@@ -51,6 +49,7 @@ class SourceCatalogActivity : ComponentActivity()
     @Inject
     lateinit var appPreferences: AppPreferences
 
+    @OptIn(ExperimentalFoundationApi::class)
     override fun onCreate(savedInstanceState: Bundle?)
     {
         super.onCreate(savedInstanceState)
@@ -84,7 +83,8 @@ class SourceCatalogActivity : ComponentActivity()
                             placeholderText = stringResource(R.string.search_by_title)
                         )
                     }
-                    SourceCatalogView(
+                    SourceCatalogGridView(
+                        cells = GridCells.Fixed(2),
                         list = viewModel.fetchIterator.list,
                         error = viewModel.fetchIterator.error,
                         loadState = viewModel.fetchIterator.state,

@@ -34,7 +34,6 @@ import my.noveldokusha.ui.databaseSearchResults.DatabaseSearchResultsActivity
 import my.noveldokusha.ui.reader.ReaderActivity
 import my.noveldokusha.uiAdapters.MyListAdapter
 import my.noveldokusha.uiUtils.*
-import java.util.*
 
 @AndroidEntryPoint
 class ChaptersActivity : BaseActivity()
@@ -339,7 +338,7 @@ private fun setupBookInfo(activity: ChaptersActivity, viewModel: ChaptersViewMod
             Glide.with(activity)
                 .load(imgUrl)
                 .error(R.drawable.ic_launcher_logo_foreground)
-                .transform(CenterCrop(), RoundedCorners(32))
+                .transform(CenterCrop(), RoundedCorners(16))
                 .transition(DrawableTransitionOptions.withCrossFade())
                 .into(viewBind.coverImage)
         }
