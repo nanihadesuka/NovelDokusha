@@ -1,22 +1,22 @@
 package my.noveldokusha.ui.sourceCatalog
 
-import androidx.appcompat.content.res.AppCompatResources
-import androidx.compose.foundation.*
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Book
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
@@ -25,14 +25,13 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.skydoves.landscapist.rememberDrawablePainter
 import my.noveldokusha.R
 import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.scraper.FetchIteratorState
 import my.noveldokusha.ui.theme.ColorAccent
 import my.noveldokusha.ui.theme.ImageBorderRadius
 import my.noveldokusha.ui.theme.InternalTheme
-import my.noveldokusha.uiViews.GlideImageFadeIn
+import my.noveldokusha.uiViews.ImageView
 import my.noveldokusha.uiViews.MyButton
 
 enum class ToolbarMode
@@ -191,26 +190,19 @@ fun SourceCatalogGridView(
                         onLongClick = { onBookLongClicked(it) }
                     )
             ) { _, radius, _ ->
-                Box {
-                    when (it.coverImageUrl)
-                    {
-                        "" -> Image(
-                            painterResource(id = R.drawable.ic_launcher_screen_icon),
-                            contentDescription = it.title,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .aspectRatio(1 / 1.45f)
-                                .clip(RoundedCornerShape(radius))
-                        )
-                        else -> GlideImageFadeIn(
-                            imageModel = it.coverImageUrl,
-                            contentDescription = it.title,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .aspectRatio(1 / 1.45f)
-                                .clip(RoundedCornerShape(radius))
-                        )
-                    }
+                Box(
+                    Modifier
+                        .fillMaxWidth()
+                        .aspectRatio(1 / 1.45f)
+                        .clip(RoundedCornerShape(radius))
+                ) {
+                    ImageView(
+                        imageModel = it.coverImageUrl,
+                        contentDescription = it.title,
+                        modifier = Modifier.fillMaxSize(),
+                        error = R.drawable.default_book_cover,
+                    )
+                    Icons.Default.Book
                     Text(
                         text = it.title,
                         textAlign = TextAlign.Center,

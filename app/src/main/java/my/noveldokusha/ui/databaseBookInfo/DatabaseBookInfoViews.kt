@@ -22,7 +22,7 @@ import my.noveldokusha.scraper.DatabaseInterface
 import my.noveldokusha.ui.theme.ColorAccent
 import my.noveldokusha.ui.theme.ImageBorderRadius
 import my.noveldokusha.ui.theme.InternalTheme
-import my.noveldokusha.uiViews.GlideImageFadeIn
+import my.noveldokusha.uiViews.ImageView
 import my.noveldokusha.uiViews.MyButton
 
 @Composable
@@ -96,7 +96,7 @@ fun DatabaseBookInfoView(
                     textAlign = TextAlign.Center
                 )
             }
-            else -> GlideImageFadeIn(
+            else -> ImageView(
                 imageModel = data.coverImageUrl,
                 modifier = Modifier
                     .height(340.dp)

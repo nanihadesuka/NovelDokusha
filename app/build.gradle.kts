@@ -158,8 +158,9 @@ dependencies {
     implementation("com.google.accompanist:accompanist-systemuicontroller:0.24.4-alpha")
     androidTestImplementation("androidx.compose.ui:ui-test-junit4:1.1.1")
 
-    // Glide for jetpack compose
-    implementation("com.github.skydoves:landscapist-glide:1.5.0")
+    // Coil for jetpack compose
+    implementation("io.coil-kt:coil-compose:2.0.0-rc02")
+
 
     // Compose collapsing toolbar
     implementation("me.onebone:toolbar-compose:2.3.3")

@@ -1,6 +1,5 @@
 package my.noveldokusha.ui.globalSourceSearch
 
-import android.util.Log
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.border
@@ -15,24 +14,20 @@ import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
-import androidx.compose.runtime.snapshots.SnapshotStateMap
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import my.noveldokusha.R
 import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.scraper.FetchIteratorState
-import my.noveldokusha.scraper.downloadBookCoverImageUrl
 import my.noveldokusha.scraper.scraper
 import my.noveldokusha.ui.theme.ColorAccent
 import my.noveldokusha.ui.theme.ImageBorderRadius
 import my.noveldokusha.ui.theme.InternalTheme
-import my.noveldokusha.uiViews.GlideImageFadeIn
+import my.noveldokusha.uiViews.ImageView
 
 @Composable
 fun GlobalSourceSearchView(
@@ -100,27 +95,27 @@ fun SourceListView(
             .fillMaxWidth()
     ) {
 
-        items(list) { book ->
+        items(list) {
             Column(
                 Modifier
                     .width(130.dp)
                     .padding(end = 8.dp)
             ) {
-                GlideImageFadeIn(
-                    imageModel = book.coverImageUrl,
+                ImageView(
+                    imageModel = it.coverImageUrl.ifBlank { R.drawable.ic_logo_foreground },
                     modifier = Modifier
-                        .clickable { onBookClick(book) }
+                        .clickable { onBookClick(it) }
                         .fillMaxWidth()
-                        .aspectRatio(1/1.45f)
+                        .aspectRatio(1 / 1.45f)
                         .border(
                             0.dp,
                             MaterialTheme.colors.onSurface.copy(alpha = 0.2f),
                             RoundedCornerShape(ImageBorderRadius)
                         )
-                        .clip(RoundedCornerShape(ImageBorderRadius))
+                        .clip(RoundedCornerShape(ImageBorderRadius)),
                 )
                 Text(
-                    text = book.title,
+                    text = it.title,
                     maxLines = 2,
                     style = MaterialTheme.typography.caption,
                     modifier = Modifier
