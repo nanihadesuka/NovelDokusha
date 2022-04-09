@@ -1,9 +1,6 @@
 package my.noveldokusha.ui.sourceCatalog
 
-import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -11,6 +8,7 @@ import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Book
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -23,14 +21,17 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import my.noveldokusha.AppPreferences
 import my.noveldokusha.R
 import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.scraper.FetchIteratorState
 import my.noveldokusha.ui.theme.ColorAccent
 import my.noveldokusha.ui.theme.ImageBorderRadius
 import my.noveldokusha.ui.theme.InternalTheme
+import my.noveldokusha.uiUtils.ifCase
 import my.noveldokusha.uiViews.ImageView
 import my.noveldokusha.uiViews.MyButton
 
@@ -41,6 +42,7 @@ enum class ToolbarMode
 @Composable
 fun SourceCatalogListView(
     list: List<BookMetadata>,
+    state: LazyListState,
     error: String?,
     loadState: FetchIteratorState.STATE,
     onLoadNext: () -> Unit,
@@ -48,8 +50,6 @@ fun SourceCatalogListView(
     onBookLongClicked: (bookItem: BookMetadata) -> Unit
 )
 {
-    val state = rememberLazyListState()
-
     val isReadyToLoad by derivedStateOf {
         val lastVisibleIndex = (state.layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: 0) + 1
         val isLoadZone = lastVisibleIndex > (state.layoutInfo.totalItemsCount - 3)
@@ -131,6 +131,7 @@ fun SourceCatalogListView(
 @Composable
 fun SourceCatalogGridView(
     list: List<BookMetadata>,
+    state: LazyListState,
     error: String?,
     loadState: FetchIteratorState.STATE,
     cells: GridCells,
@@ -139,8 +140,6 @@ fun SourceCatalogGridView(
     onBookLongClicked: (bookItem: BookMetadata) -> Unit
 )
 {
-    val state = rememberLazyListState()
-
     val isReadyToLoad by derivedStateOf {
         val lastVisibleIndex = (state.layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: 0) + 1
         val isLoadZone = lastVisibleIndex > (state.layoutInfo.totalItemsCount - 3)
@@ -259,10 +258,13 @@ fun ToolbarMain(
     subtitle: String,
     toolbarMode: MutableState<ToolbarMode>,
     onOpenSourceWebPage: () -> Unit,
+    onPressMoreOptions: () -> Unit,
+    optionsDropDownView: @Composable () -> Unit
 )
 {
+
     Row(
-        horizontalArrangement = Arrangement.SpaceBetween,
+        horizontalArrangement = Arrangement.End,
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
             .fillMaxWidth()
@@ -270,14 +272,12 @@ fun ToolbarMain(
             .padding(top = 16.dp, bottom = 4.dp)
             .background(MaterialTheme.colors.surface)
     ) {
-        IconButton(onClick = { onOpenSourceWebPage() }) {
-            Icon(
-                painter = painterResource(id = R.drawable.ic_baseline_public_24),
-                contentDescription = stringResource(R.string.open_the_web_view)
-            )
-        }
-
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        Column(
+            horizontalAlignment = Alignment.Start,
+            modifier = Modifier
+                .weight(1f)
+                .padding(start = 10.dp)
+        ) {
             Text(
                 text = title,
                 style = MaterialTheme.typography.h6,
@@ -288,12 +288,92 @@ fun ToolbarMain(
                 style = MaterialTheme.typography.subtitle1
             )
         }
-
+        IconButton(onClick = { onOpenSourceWebPage() }) {
+            Icon(
+                painter = painterResource(id = R.drawable.ic_baseline_public_24),
+                contentDescription = stringResource(R.string.open_the_web_view)
+            )
+        }
         IconButton(onClick = { toolbarMode.value = ToolbarMode.SEARCH }) {
             Icon(
                 painter = painterResource(id = R.drawable.ic_baseline_search_24),
                 contentDescription = stringResource(R.string.search_for_title)
             )
+        }
+
+        IconButton(onClick = onPressMoreOptions) {
+            Icon(
+                Icons.Default.MoreVert,
+                contentDescription = stringResource(R.string.open_for_more_options)
+            )
+            optionsDropDownView()
+        }
+    }
+}
+
+@Composable
+fun OptionsDropDown(
+    expanded: Boolean,
+    onDismiss: () -> Unit,
+    listLayoutMode: AppPreferences.LIST_LAYOUT_MODE,
+    onSelectListLayout: (mode: AppPreferences.LIST_LAYOUT_MODE) -> Unit
+)
+{
+    DropdownMenu(
+        expanded = expanded,
+        onDismissRequest = onDismiss
+    ) {
+        Column(Modifier.padding(horizontal = 8.dp)) {
+            Text(
+                text = "Books layout",
+                Modifier
+                    .padding(8.dp)
+                    .fillMaxWidth(),
+                textAlign = TextAlign.Center
+            )
+            Row(
+                Modifier
+                    .padding(4.dp)
+                    .border(
+                        Dp.Hairline,
+                        MaterialTheme.colors.onPrimary.copy(alpha = 0.5f),
+                        RoundedCornerShape(8.dp)
+                    )
+                    .clip(RoundedCornerShape(8.dp))
+            ) {
+                Box(
+                    Modifier
+                        .weight(1f)
+                        .ifCase(listLayoutMode == AppPreferences.LIST_LAYOUT_MODE.verticalList) {
+                            background(ColorAccent)
+                        }
+                        .clickable { onSelectListLayout(AppPreferences.LIST_LAYOUT_MODE.verticalList) }
+                ) {
+                    Text(
+                        text = stringResource(R.string.list),
+                        Modifier
+                            .padding(18.dp)
+                            .fillMaxWidth(),
+                        textAlign = TextAlign.Center
+                    )
+                }
+                Box(
+                    Modifier
+                        .weight(1f)
+                        .ifCase(listLayoutMode == AppPreferences.LIST_LAYOUT_MODE.verticalGrid) {
+                            background(ColorAccent)
+                        }
+                        .clickable { onSelectListLayout(AppPreferences.LIST_LAYOUT_MODE.verticalGrid) }
+                ) {
+                    Text(
+                        text = stringResource(R.string.grid),
+                        Modifier
+                            .padding(18.dp)
+                            .fillMaxWidth(),
+                        textAlign = TextAlign.Center
+                    )
+                }
+            }
         }
     }
 }
@@ -302,6 +382,7 @@ fun ToolbarMain(
 @Composable
 fun PreviewList()
 {
+    val state = rememberLazyListState()
     InternalTheme {
         SourceCatalogListView(
             list = (1..10).map { BookMetadata("Book $it", "url") },
@@ -309,7 +390,8 @@ fun PreviewList()
             loadState = FetchIteratorState.STATE.LOADING,
             onLoadNext = {},
             onBookClicked = {},
-            onBookLongClicked = {}
+            onBookLongClicked = {},
+            state = state
         )
     }
 }
@@ -319,6 +401,7 @@ fun PreviewList()
 @Composable
 fun PreviewGrid()
 {
+    val state = rememberLazyListState()
     InternalTheme {
         SourceCatalogGridView(
             cells = GridCells.Fixed(2),
@@ -327,7 +410,8 @@ fun PreviewGrid()
             loadState = FetchIteratorState.STATE.LOADING,
             onLoadNext = {},
             onBookClicked = {},
-            onBookLongClicked = {}
+            onBookLongClicked = {},
+            state = state
         )
     }
 }

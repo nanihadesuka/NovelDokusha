@@ -85,4 +85,7 @@
 	<string name="search_for_title">Search for title</string>
 	<string name="search_here">Search here</string>
 	<string name="catalog">Catalog</string>
+	<string name="open_for_more_options">Open for more options</string>
+	<string name="list">List</string>
+	<string name="grid">Grid</string>
 </resources>

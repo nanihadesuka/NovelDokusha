@@ -9,9 +9,12 @@ import androidx.activity.viewModels
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.lazy.GridCells
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.res.stringResource
 import dagger.hilt.android.AndroidEntryPoint
@@ -61,16 +64,30 @@ class SourceCatalogActivity : ComponentActivity()
             val searchText = rememberSaveable { mutableStateOf("") }
             val focusRequester = remember { FocusRequester() }
             val toolbarMode = rememberSaveable { mutableStateOf(ToolbarMode.MAIN) }
+            val state = rememberLazyListState()
+            var optionsExpanded by remember { mutableStateOf(false) }
 
             Theme(appPreferences = appPreferences) {
                 Column {
+
                     when (toolbarMode.value)
                     {
                         ToolbarMode.MAIN -> ToolbarMain(
                             title = title,
                             subtitle = subtitle,
                             toolbarMode = toolbarMode,
-                            onOpenSourceWebPage = ::openSourceWebPage
+                            onOpenSourceWebPage = ::openSourceWebPage,
+                            onPressMoreOptions = { optionsExpanded = !optionsExpanded },
+                            optionsDropDownView = {
+                                OptionsDropDown(
+                                    expanded = optionsExpanded,
+                                    onDismiss = { optionsExpanded = !optionsExpanded },
+                                    listLayoutMode = appPreferences.BOOKS_LIST_LAYOUT_MODE.value,
+                                    onSelectListLayout = {
+                                        appPreferences.BOOKS_LIST_LAYOUT_MODE.value = it
+                                    }
+                                )
+                            }
                         )
                         ToolbarMode.SEARCH -> ToolbarModeSearch(
                             focusRequester = focusRequester,
@@ -83,15 +100,28 @@ class SourceCatalogActivity : ComponentActivity()
                             placeholderText = stringResource(R.string.search_by_title)
                         )
                     }
-                    SourceCatalogGridView(
-                        cells = GridCells.Fixed(2),
-                        list = viewModel.fetchIterator.list,
-                        error = viewModel.fetchIterator.error,
-                        loadState = viewModel.fetchIterator.state,
-                        onLoadNext = { viewModel.fetchIterator.fetchNext() },
-                        onBookClicked = ::openBookPage,
-                        onBookLongClicked = ::addBookToLibrary
-                    )
+                    when (viewModel.listLayout)
+                    {
+                        AppPreferences.LIST_LAYOUT_MODE.verticalGrid -> SourceCatalogGridView(
+                            cells = GridCells.Fixed(2),
+                            list = viewModel.fetchIterator.list,
+                            state = state,
+                            error = viewModel.fetchIterator.error,
+                            loadState = viewModel.fetchIterator.state,
+                            onLoadNext = { viewModel.fetchIterator.fetchNext() },
+                            onBookClicked = ::openBookPage,
+                            onBookLongClicked = ::addBookToLibrary
+                        )
+                        AppPreferences.LIST_LAYOUT_MODE.verticalList -> SourceCatalogListView(
+                            list = viewModel.fetchIterator.list,
+                            state = state,
+                            error = viewModel.fetchIterator.error,
+                            loadState = viewModel.fetchIterator.state,
+                            onLoadNext = { viewModel.fetchIterator.fetchNext() },
+                            onBookClicked = ::openBookPage,
+                            onBookLongClicked = ::addBookToLibrary
+                        )
+                    }
                 }
             }
         }

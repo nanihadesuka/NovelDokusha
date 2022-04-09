@@ -10,6 +10,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import my.noveldokusha.AppPreferences
 import my.noveldokusha.R
 import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.data.Repository
@@ -31,7 +32,8 @@ enum class Mode { CATALOG, SEARCH }
 class SourceCatalogViewModel @Inject constructor(
     private val repository: Repository,
     private val state: SavedStateHandle,
-    @ApplicationContext private val context: Context
+    @ApplicationContext private val context: Context,
+    private val appPreferences: AppPreferences
 ) : BaseViewModel(), SourceCatalogStateBundle {
 
     override var sourceBaseUrl by StateExtra_String(state)
@@ -44,6 +46,7 @@ class SourceCatalogViewModel @Inject constructor(
     }
 
     var mode by mutableStateOf(Mode.CATALOG)
+    val listLayout by appPreferences.BOOKS_LIST_LAYOUT_MODE.state(viewModelScope)
 
     private fun Response<List<BookMetadata>>.transform() = when (val res = this) {
         is Response.Error -> Response.Error(res.message)

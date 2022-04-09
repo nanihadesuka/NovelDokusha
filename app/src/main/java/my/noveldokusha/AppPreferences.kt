@@ -57,9 +57,15 @@ class AppPreferences @Inject constructor(
     val LIBRARY_SORT_READ = object : Preference<TERNARY_STATE>("LIBRARY_SORT_READ"){
         override var value by SharedPreference_Enum(name,preferences, TERNARY_STATE.inverse) { enumValueOf(it) }
     }
+    val BOOKS_LIST_LAYOUT_MODE = object : Preference<LIST_LAYOUT_MODE>("BOOKS_LIST_LAYOUT_MODE"){
+        override var value by SharedPreference_Enum(name,preferences, LIST_LAYOUT_MODE.verticalGrid) { enumValueOf(it) }
+    }
 
     enum class TERNARY_STATE
     { active, inverse, inactive }
+
+    enum class LIST_LAYOUT_MODE
+    { verticalList, verticalGrid }
 
     abstract inner class Preference<T>(val name: String)
     {
