@@ -33,14 +33,10 @@ class SettingsViewModel @Inject constructor(
         return value
     }
 
-    val followsSystem by stateCreator(
-        appPreferences.THEME_FOLLOW_SYSTEM_flow(),
-        appPreferences.THEME_FOLLOW_SYSTEM
-    )
-
+    val followsSystem by appPreferences.THEME_FOLLOW_SYSTEM.state(viewModelScope)
     val theme by stateCreator(
-        appPreferences.THEME_ID_flow().mapNotNull { Themes.fromIDTheme(it) },
-        Themes.fromIDTheme(appPreferences.THEME_ID) ?: Themes.LIGHT
+        appPreferences.THEME_ID.flow().mapNotNull { Themes.fromIDTheme(it) },
+        Themes.fromIDTheme(appPreferences.THEME_ID.value) ?: Themes.LIGHT
     )
 
     var databaseSize by mutableStateOf("")

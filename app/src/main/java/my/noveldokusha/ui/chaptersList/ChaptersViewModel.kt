@@ -89,7 +89,7 @@ class ChaptersViewModel @Inject constructor(
     val chaptersWithContextLiveData = repository.bookChapter.getChaptersWithContexFlow(bookMetadata.url)
         .map { removeCommonTextFromTitles(it) }
         // Sort the chapters given the order preference
-        .combine(appPreferences.CHAPTERS_SORT_ASCENDING_flow()) { chapters, sorted ->
+        .combine(appPreferences.CHAPTERS_SORT_ASCENDING.flow()) { chapters, sorted ->
             when (sorted)
             {
                 AppPreferences.TERNARY_STATE.active -> chapters.sortedBy { it.chapter.position }

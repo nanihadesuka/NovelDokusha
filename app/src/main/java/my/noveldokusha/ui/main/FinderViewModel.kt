@@ -16,7 +16,7 @@ class FinderViewModel @Inject constructor(
     private val appPreferences: AppPreferences
 ) : BaseViewModel()
 {
-    val list = appPreferences.SOURCES_LANGUAGES_flow().map { activeLangs ->
+    val list = appPreferences.SOURCES_LANGUAGES.flow().map { activeLangs ->
         val catalogSources = scraper.sourcesListCatalog.filter { it.language in activeLangs }.map { Item.Source(it.name, it.baseUrl) }
 
         return@map listOf<Item>(

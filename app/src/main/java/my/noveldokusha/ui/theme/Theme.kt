@@ -123,18 +123,18 @@ fun Theme(
 {
     // Done so the first load is not undefined (visually annoying)
     val initialThemeFollowSystem by remember {
-        mutableStateOf(appPreferences.THEME_FOLLOW_SYSTEM)
+        mutableStateOf(appPreferences.THEME_FOLLOW_SYSTEM.value)
     }
     val initialThemeType by remember {
-        mutableStateOf(Themes.fromIDTheme(appPreferences.THEME_ID) ?: Themes.LIGHT)
+        mutableStateOf(Themes.fromIDTheme(appPreferences.THEME_ID.value) ?: Themes.LIGHT)
     }
 
     val themeFollowSystem by remember {
-        appPreferences.THEME_FOLLOW_SYSTEM_flow()
+        appPreferences.THEME_FOLLOW_SYSTEM.flow()
     }.collectAsState(initialThemeFollowSystem)
 
     val themeType by remember {
-        appPreferences.THEME_ID_flow().mapNotNull(Themes::fromIDTheme)
+        appPreferences.THEME_ID.flow().mapNotNull(Themes::fromIDTheme)
     }.collectAsState(initialThemeType)
 
     val isSystemThemeLight = !isSystemInDarkTheme()

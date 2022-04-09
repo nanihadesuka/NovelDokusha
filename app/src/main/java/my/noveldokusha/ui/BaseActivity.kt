@@ -19,22 +19,22 @@ open class BaseActivity : AppCompatActivity()
 
     private fun getAppTheme(): Int
     {
-        if (!appPreferences.THEME_FOLLOW_SYSTEM)
-            return appPreferences.THEME_ID
+        if (!appPreferences.THEME_FOLLOW_SYSTEM.value)
+            return appPreferences.THEME_ID.value
 
-        val isThemeLight = AppPreferences.globalThemeListLight.contains(appPreferences.THEME_ID)
+        val isThemeLight = AppPreferences.globalThemeListLight.contains(appPreferences.THEME_ID.value)
         val isSystemThemeLight = (resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) != Configuration.UI_MODE_NIGHT_YES
 
         if (isSystemThemeLight && !isThemeLight) return R.style.AppTheme_Light
         if (!isSystemThemeLight && isThemeLight) return R.style.AppTheme_BaseDark_Dark
-        return appPreferences.THEME_ID
+        return appPreferences.THEME_ID.value
     }
 
     override fun onCreate(savedInstanceState: Bundle?)
     {
         setTheme(getAppTheme())
-        appPreferences.THEME_ID_flow().drop(1).asLiveData().observe(this) { recreate() }
-        appPreferences.THEME_FOLLOW_SYSTEM_flow().drop(1).asLiveData().observe(this) { recreate() }
+        appPreferences.THEME_ID.flow().drop(1).asLiveData().observe(this) { recreate() }
+        appPreferences.THEME_FOLLOW_SYSTEM.flow().drop(1).asLiveData().observe(this) { recreate() }
         super.onCreate(savedInstanceState)
     }
 

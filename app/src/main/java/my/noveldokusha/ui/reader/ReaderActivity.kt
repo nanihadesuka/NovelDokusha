@@ -12,6 +12,7 @@ import androidx.compose.material.LocalContentColor
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.ui.platform.LocalContext
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
@@ -95,12 +96,8 @@ class ReaderActivity : BaseActivity() {
                     ) { it() }
                 }
             ) {
-                val textFont by remember { appPreferences.READER_FONT_FAMILY_flow() }.collectAsState(
-                    viewModel.appPreferences.READER_FONT_FAMILY
-                )
-                val textSize by remember { appPreferences.READER_FONT_SIZE_flow() }.collectAsState(
-                    viewModel.appPreferences.READER_FONT_SIZE
-                )
+                val textFont by remember { appPreferences.READER_FONT_FAMILY.state(lifecycleScope) }
+                val textSize by remember { appPreferences.READER_FONT_SIZE.state(lifecycleScope) }
                 val stats by viewModel.readingPosStats.observeAsState()
                 val percetage by remember {
                     derivedStateOf {
@@ -139,8 +136,8 @@ class ReaderActivity : BaseActivity() {
                     textFont = textFont,
                     textSize = textSize,
                     visible = viewModel.showReaderInfoView,
-                    onTextFontChanged = { appPreferences.READER_FONT_FAMILY = it },
-                    onTextSizeChanged = { appPreferences.READER_FONT_SIZE = it }
+                    onTextFontChanged = { appPreferences.READER_FONT_FAMILY.value = it },
+                    onTextSizeChanged = { appPreferences.READER_FONT_SIZE.value = it }
                 )
             }
         }

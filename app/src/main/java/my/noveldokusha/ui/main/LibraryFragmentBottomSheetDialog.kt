@@ -38,7 +38,7 @@ class LibraryFragmentBottomSheetDialog : BottomSheetDialogFragment()
 
     private fun initFilterRead()
     {
-        viewBind.filterRead.state = when (preferences.LIBRARY_FILTER_READ)
+        viewBind.filterRead.state = when (preferences.LIBRARY_FILTER_READ.value)
         {
             AppPreferences.TERNARY_STATE.active -> Checkbox3StatesView.STATE.POSITIVE
             AppPreferences.TERNARY_STATE.inverse -> Checkbox3StatesView.STATE.NEGATIVE
@@ -46,7 +46,7 @@ class LibraryFragmentBottomSheetDialog : BottomSheetDialogFragment()
         }
 
         viewBind.filterRead.onStateChangeListener = {
-            preferences.LIBRARY_FILTER_READ = when (it)
+            preferences.LIBRARY_FILTER_READ.value = when (it)
             {
                 Checkbox3StatesView.STATE.POSITIVE -> AppPreferences.TERNARY_STATE.active
                 Checkbox3StatesView.STATE.NEGATIVE -> AppPreferences.TERNARY_STATE.inverse
@@ -57,7 +57,7 @@ class LibraryFragmentBottomSheetDialog : BottomSheetDialogFragment()
 
     private fun initSortRead()
     {
-        preferences.LIBRARY_SORT_READ_flow().asLiveData().observe(viewLifecycleOwner) {
+        preferences.LIBRARY_SORT_READ.flow().asLiveData().observe(viewLifecycleOwner) {
             if (it == null) return@observe
             val drawableId = when (it)
             {
@@ -69,7 +69,7 @@ class LibraryFragmentBottomSheetDialog : BottomSheetDialogFragment()
         }
 
         viewBind.sortRead.setOnClickListener {
-            preferences.LIBRARY_SORT_READ = when (preferences.LIBRARY_SORT_READ)
+            preferences.LIBRARY_SORT_READ.value = when (preferences.LIBRARY_SORT_READ.value)
             {
                 AppPreferences.TERNARY_STATE.active -> AppPreferences.TERNARY_STATE.inverse
                 AppPreferences.TERNARY_STATE.inverse -> AppPreferences.TERNARY_STATE.inactive

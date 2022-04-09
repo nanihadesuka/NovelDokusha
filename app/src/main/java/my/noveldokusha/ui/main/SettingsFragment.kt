@@ -42,8 +42,8 @@ class SettingsFragment : BaseFragment()
                 SettingsView(
                     currentFollowSystem = viewModel.followsSystem,
                     currentTheme = viewModel.theme,
-                    onFollowSystem = { appPreferences.THEME_FOLLOW_SYSTEM = it },
-                    onThemeSelected = { appPreferences.THEME_ID = Themes.toIDTheme(it) },
+                    onFollowSystem = { appPreferences.THEME_FOLLOW_SYSTEM.value= it },
+                    onThemeSelected = { appPreferences.THEME_ID.value = Themes.toIDTheme(it) },
                     databaseSize = viewModel.databaseSize,
                     imagesFolderSize = viewModel.imageFolderSize,
                     onCleanDatabase = { viewModel.cleanDatabase() },

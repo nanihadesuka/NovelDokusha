@@ -245,7 +245,7 @@ class ChaptersActivity : BaseActivity()
         }
         R.id.action_filter ->
         {
-            appPreferences.CHAPTERS_SORT_ASCENDING = when (appPreferences.CHAPTERS_SORT_ASCENDING)
+            appPreferences.CHAPTERS_SORT_ASCENDING.value = when (appPreferences.CHAPTERS_SORT_ASCENDING.value)
             {
                 AppPreferences.TERNARY_STATE.active -> AppPreferences.TERNARY_STATE.inverse
                 AppPreferences.TERNARY_STATE.inverse -> AppPreferences.TERNARY_STATE.active

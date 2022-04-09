@@ -89,13 +89,13 @@ class FinderFragment : Fragment()
         R.id.visible_languages_sources ->
         {
             val langs = scraper.sourcesLanguages.toList()
-            val enabled = appPreferences.SOURCES_LANGUAGES
+            val enabled = appPreferences.SOURCES_LANGUAGES.value
             val visibles = scraper.sourcesLanguages.toList().withIndex().filter { it.value in enabled }.map { it.index }.toIntArray()
 
             MaterialDialog(requireContext()).show {
                 title(R.string.sources_languages)
                 listItemsMultiChoice(items = langs, initialSelection = visibles) { _, _, items ->
-                    appPreferences.SOURCES_LANGUAGES = items.map { it.toString() }.toSet()
+                    appPreferences.SOURCES_LANGUAGES.value = items.map { it.toString() }.toSet()
                 }
                 noAutoDismiss()
             }

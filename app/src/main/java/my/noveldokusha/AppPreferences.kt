@@ -2,16 +2,17 @@ package my.noveldokusha
 
 import android.content.Context
 import android.content.SharedPreferences
+import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableStateOf
 import androidx.preference.PreferenceManager
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import my.noveldokusha.uiUtils.*
 import javax.inject.Inject
-import javax.inject.Singleton
-import kotlin.reflect.KProperty
 
 class AppPreferences @Inject constructor(
     @ApplicationContext val context: Context
@@ -32,33 +33,47 @@ class AppPreferences @Inject constructor(
     private val preferences = PreferenceManager.getDefaultSharedPreferences(context)
     private val preferencesChangeListeners = mutableSetOf<SharedPreferences.OnSharedPreferenceChangeListener>()
 
-    var THEME_ID by SharedPreference_Int(preferences, R.style.AppTheme_Light)
-    var THEME_FOLLOW_SYSTEM by SharedPreference_Boolean(preferences, true)
-    var READER_FONT_SIZE by SharedPreference_Float(preferences, 14f)
-    var READER_FONT_FAMILY by SharedPreference_String(preferences, "serif")
-    var CHAPTERS_SORT_ASCENDING by SharedPreference_Enum(preferences, TERNARY_STATE.active) { enumValueOf(it) }
-    var SOURCES_LANGUAGES by SharedPreference_StringSet(preferences, setOf("English"))
-    var LIBRARY_FILTER_READ by SharedPreference_Enum(preferences, TERNARY_STATE.inactive) { enumValueOf(it) }
-    var LIBRARY_SORT_READ by SharedPreference_Enum(preferences, TERNARY_STATE.inverse) { enumValueOf(it) }
-
-    fun THEME_ID_flow() = toFlow(::THEME_ID.name) { THEME_ID }
-    fun THEME_FOLLOW_SYSTEM_flow() = toFlow(::THEME_FOLLOW_SYSTEM.name) { THEME_FOLLOW_SYSTEM }
-    fun READER_FONT_SIZE_flow() = toFlow(::READER_FONT_SIZE.name) { READER_FONT_SIZE }
-    fun READER_FONT_FAMILY_flow() = toFlow(::READER_FONT_FAMILY.name) { READER_FONT_FAMILY }
-    fun CHAPTERS_SORT_ASCENDING_flow() = toFlow(::CHAPTERS_SORT_ASCENDING.name) { CHAPTERS_SORT_ASCENDING }
-    fun SOURCES_LANGUAGES_flow() = toFlow(::SOURCES_LANGUAGES.name) { SOURCES_LANGUAGES }
-    fun LIBRARY_FILTER_READ_flow() = toFlow(::LIBRARY_FILTER_READ.name) { LIBRARY_FILTER_READ }
-    fun LIBRARY_SORT_READ_flow() = toFlow(::LIBRARY_SORT_READ.name) { LIBRARY_SORT_READ }
+    val THEME_ID = object: Preference<Int>("THEME_ID") {
+        override var value by SharedPreference_Int(name, preferences, R.style.AppTheme_Light)
+    }
+    val THEME_FOLLOW_SYSTEM = object : Preference<Boolean>("THEME_FOLLOW_SYSTEM"){
+        override var value by SharedPreference_Boolean(name,preferences, true)
+    }
+    val READER_FONT_SIZE = object : Preference<Float>("READER_FONT_SIZE"){
+        override var value by SharedPreference_Float(name,preferences, 14f)
+    }
+    val READER_FONT_FAMILY = object : Preference<String>("READER_FONT_FAMILY"){
+        override var value by SharedPreference_String(name,preferences, "serif")
+    }
+    val CHAPTERS_SORT_ASCENDING = object : Preference<TERNARY_STATE>("CHAPTERS_SORT_ASCENDING"){
+        override var value by SharedPreference_Enum(name,preferences, TERNARY_STATE.active) { enumValueOf(it) }
+    }
+    val SOURCES_LANGUAGES = object : Preference<Set<String>>("SOURCES_LANGUAGES"){
+        override var value by SharedPreference_StringSet(name,preferences, setOf("English"))
+    }
+    val LIBRARY_FILTER_READ = object : Preference<TERNARY_STATE>("LIBRARY_FILTER_READ"){
+        override var value by SharedPreference_Enum(name,preferences, TERNARY_STATE.inactive) { enumValueOf(it) }
+    }
+    val LIBRARY_SORT_READ = object : Preference<TERNARY_STATE>("LIBRARY_SORT_READ"){
+        override var value by SharedPreference_Enum(name,preferences, TERNARY_STATE.inverse) { enumValueOf(it) }
+    }
 
     enum class TERNARY_STATE
     { active, inverse, inactive }
+
+    abstract inner class Preference<T>(val name: String)
+    {
+        abstract var value: T
+        fun flow() = toFlow(name) { value }
+        fun state(scope: CoroutineScope) = toState(scope, name) { value }
+    }
 
     /**
      * Given a key, returns a flow of values of the mapper if that key preference
      * had any change.
      * Notice: will always return an initial value.
      */
-    private fun <T> toFlow(key: String, mapper: (String) -> T): Flow<T>
+    fun <T> toFlow(key: String, mapper: (String) -> T): Flow<T>
     {
         val flow = MutableStateFlow(mapper(key))
         val scope = CoroutineScope(Dispatchers.Default)
@@ -75,5 +90,18 @@ class AppPreferences @Inject constructor(
                 preferencesChangeListeners.remove(listener)
                 preferences.unregisterOnSharedPreferenceChangeListener(listener)
             }.flowOn(Dispatchers.Default)
+    }
+
+    fun <T> toState(scope: CoroutineScope, key:String, mapper: (String) -> T): State<T>
+    {
+        val state = mutableStateOf(mapper(key))
+        scope.launch(Dispatchers.IO) {
+            toFlow(key, mapper).collect {
+                withContext(Dispatchers.Main){
+                    state.value = it
+                }
+            }
+        }
+        return state
     }
 }

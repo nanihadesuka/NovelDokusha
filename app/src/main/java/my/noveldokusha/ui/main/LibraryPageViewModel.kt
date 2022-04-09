@@ -32,14 +32,14 @@ class LibraryPageViewModel @Inject constructor(
     val booksWithContext = repository.bookLibrary
         .getBooksInLibraryWithContextFlow
         .map { it.filter { book -> book.book.completed == showCompleted } }
-        .combine(preferences.LIBRARY_FILTER_READ_flow()) { list, filterRead ->
+        .combine(preferences.LIBRARY_FILTER_READ.flow()) { list, filterRead ->
             when (filterRead)
             {
                 AppPreferences.TERNARY_STATE.active -> list.filter { it.chaptersCount == it.chaptersReadCount }
                 AppPreferences.TERNARY_STATE.inverse -> list.filter { it.chaptersCount != it.chaptersReadCount }
                 AppPreferences.TERNARY_STATE.inactive -> list
             }
-        }.combine(preferences.LIBRARY_SORT_READ_flow()) { list, sortRead ->
+        }.combine(preferences.LIBRARY_SORT_READ.flow()) { list, sortRead ->
             when (sortRead)
             {
                 AppPreferences.TERNARY_STATE.active -> list.sortedBy { it.chaptersCount - it.chaptersReadCount }

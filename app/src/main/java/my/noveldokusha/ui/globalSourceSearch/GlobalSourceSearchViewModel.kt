@@ -26,7 +26,7 @@ class GlobalSourceSearchViewModel @Inject constructor(
 {
     override val input by StateExtra_String(state)
 
-    val list = appPreferences.SOURCES_LANGUAGES.let { activeLangs ->
+    val list = appPreferences.SOURCES_LANGUAGES.value.let { activeLangs ->
         scraper.sourcesListCatalog
             .filter { it.language in activeLangs }
             .map { SourceResults(it, input, viewModelScope) }
