@@ -37,12 +37,11 @@ class ReadWn : SourceInterface.catalog
 
     override suspend fun getChapterList(doc: Document): List<ChapterMetadata>
     {
-        // val doc = doc.select(".pagination a[href]").attr("href")
-
+        
         val id = doc.selectFirst(".pagination a[href]")!!.attr( "href")
         return connect(baseUrl + id)
             .addHeaderRequest()
-//            .data("novelId", id)
+
             .getIO()
             .select(".chapter-list a[href]")
            .map { ChapterMetadata(title = it.attr("strong"), url = baseUrl + it.attr("href")) }
