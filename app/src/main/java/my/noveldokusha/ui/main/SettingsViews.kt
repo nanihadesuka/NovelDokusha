@@ -41,21 +41,22 @@ private fun SettingsTheme(
     onThemeSelected: (Themes) -> Unit,
 )
 {
-    Column(Modifier.padding(horizontal = 12.dp)) {
+    Column(Modifier.padding(horizontal = 8.dp)) {
         Text(
             text = stringResource(id = R.string.theme),
             color = ColorAccent,
             style = MaterialTheme.typography.h6,
             fontWeight = FontWeight.Bold,
-            modifier = Modifier.padding(vertical = 4.dp)
+            modifier = Modifier.padding(vertical = 8.dp)
         )
         Box(
             modifier = Modifier.fillMaxWidth(),
             contentAlignment = Alignment.Center,
         ) {
 
-            val textColor = when(currentFollowSystem){
-                true ->  Color.White
+            val textColor = when (currentFollowSystem)
+            {
+                true -> Color.White
                 false -> MaterialTheme.colors.onPrimary
             }
 
@@ -63,7 +64,7 @@ private fun SettingsTheme(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(4.dp),
                 modifier = Modifier
-                    .padding(8.dp)
+                    .padding(0.dp)
                     .clip(CircleShape)
                     .toggleable(
                         value = currentFollowSystem,
@@ -93,7 +94,7 @@ private fun SettingsTheme(
 
         Column(
             verticalArrangement = Arrangement.spacedBy(8.dp),
-            modifier = Modifier.padding(vertical = 12.dp)
+            modifier = Modifier.padding(vertical = 8.dp)
         ) {
             val lines = Themes.pairs.toList().chunked(2)
             for (line in lines) Row(
@@ -106,8 +107,9 @@ private fun SettingsTheme(
                     modifier = Modifier.weight(1f),
                     outterPadding = 0.dp
                 ) { _, _, _ ->
-                    val textColor = when(currentTheme == theme){
-                        true ->  Color.White
+                    val textColor = when (currentTheme == theme)
+                    {
+                        true -> Color.White
                         false -> MaterialTheme.colors.onPrimary
                     }
                     Text(
@@ -142,7 +144,7 @@ private fun ClickableOption(
             .then(modifier)
             .fillMaxWidth()
             .heightIn(min = 60.dp)
-            .padding(horizontal = 12.dp, vertical = 12.dp),
+            .padding(horizontal = 8.dp, vertical = 8.dp),
         verticalArrangement = Arrangement.Center
     ) {
         Text(
@@ -176,7 +178,7 @@ private fun SettingsData(
             color = ColorAccent,
             style = MaterialTheme.typography.h6,
             fontWeight = FontWeight.Bold,
-            modifier = Modifier.padding(horizontal = 12.dp)
+            modifier = Modifier.padding(horizontal = 8.dp)
         )
         ClickableOption(
             title = stringResource(id = R.string.clean_database),
@@ -205,7 +207,7 @@ private fun SettingsBackup(
             color = ColorAccent,
             style = MaterialTheme.typography.h6,
             fontWeight = FontWeight.Bold,
-            modifier = Modifier.padding(horizontal = 12.dp)
+            modifier = Modifier.padding(horizontal = 8.dp)
         )
         ClickableOption(
             title = stringResource(id = R.string.backup_data),
@@ -237,7 +239,7 @@ fun SettingsView(
     Column(
         Modifier
             .verticalScroll(rememberScrollState())
-            .padding(top = 10.dp)
+            .padding(top = 8.dp)
     ) {
         SettingsTheme(
             currentFollowSystem = currentFollowSystem,
