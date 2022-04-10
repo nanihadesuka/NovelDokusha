@@ -105,7 +105,7 @@ private fun SettingsTheme(
                     textAlign = TextAlign.Center,
                     modifier = Modifier.weight(1f),
                     outterPadding = 0.dp
-                ) { _, radius, _ ->
+                ) { _, _, _ ->
                     val textColor = when(currentTheme == theme){
                         true ->  Color.White
                         false -> MaterialTheme.colors.onPrimary
@@ -113,11 +113,10 @@ private fun SettingsTheme(
                     Text(
                         text = themeName,
                         modifier = Modifier
-                            .clip(RoundedCornerShape(8.dp))
                             .ifCase(currentTheme == theme) {
                                 background(ColorAccent)
                             }
-                            .padding(radius),
+                            .padding(12.dp),
                         textAlign = TextAlign.Center,
                         fontWeight = FontWeight.Bold,
                         color = textColor
