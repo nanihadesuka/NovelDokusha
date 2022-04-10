@@ -56,7 +56,7 @@ class ReadNovelFull : SourceInterface.catalog
     {
         val page = index + 1
         return tryConnect {
-            val url = catalogUrl.toUrlBuilder()!!.apply {
+            val url = catalogUrl.toUrlBuilderSafe().apply {
                 if (page > 1) add("page", page)
             }
             parseToBooks(url)
@@ -69,8 +69,10 @@ class ReadNovelFull : SourceInterface.catalog
             return Response.Success(listOf())
 
         val page = index + 1
+        if (page > 1)
+            return Response.Success(listOf())
         return tryConnect {
-            val url = baseUrl.toUrlBuilder()!!.apply {
+            val url = baseUrl.toUrlBuilderSafe().apply {
                 appendPath("search")
                 add("keyword", input)
                 if (page > 1) add("page", page)
