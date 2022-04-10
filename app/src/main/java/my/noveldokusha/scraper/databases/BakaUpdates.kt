@@ -1,5 +1,6 @@
 package my.noveldokusha.scraper.databases
 
+import android.net.Uri
 import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.scraper.*
 import org.jsoup.nodes.Document
@@ -46,45 +47,46 @@ class BakaUpdates : DatabaseInterface
     override suspend fun getSearch(index: Int, input: String): Response<List<BookMetadata>>
     {
         val page = index + 1
-
-        val url = "https://www.mangaupdates.com/series.html".toUrlBuilder()!!.apply {
+        val url = "https://www.mangaupdates.com/series.html".toUrlBuilderSafe().apply {
             if (page > 1) add("page", page)
-            add("display", "list")
             add("perpage", 50)
             add("type", "novel")
             add("search", input)
         }
 
-        return tryConnect("page: $page\nurl: $url") {
-            fetchDoc(url)
-                .select("div.col-6.py-1.py-md-0.text")
-                .mapNotNull { it.selectFirst("a[href]") }
-                .map { BookMetadata(it.text().removeNovelTag(), it.attr("href")) }
-                .let { Response.Success(it) }
-        }
+        return getSearchList(page, url)
     }
 
     override suspend fun getSearchAdvanced(index: Int, genresIncludedId: List<String>, genresExcludedId: List<String>):
             Response<List<BookMetadata>>
     {
         val page = index + 1
-
-        val url = "https://www.mangaupdates.com/series.html".toUrlBuilder()!!.apply {
+        val url = "https://www.mangaupdates.com/series.html".toUrlBuilderSafe().apply {
             if (page > 1) add("page", page)
-            add("display", "list")
             if (genresIncludedId.isNotEmpty()) add("genre", genresIncludedId.joinToString("_"))
             if (genresExcludedId.isNotEmpty()) add("exclude_genre", genresExcludedId.joinToString("_"))
             add("type", "novel")
             add("perpage", 50)
         }
 
-        return tryConnect("page: $page\nurl: $url") {
-            fetchDoc(url)
-                .select("div.col-6.py-1.py-md-0.text")
-                .mapNotNull { it.selectFirst("a[href]") }
-                .map { BookMetadata(it.text().removeNovelTag(), it.attr("href")) }
-                .let { Response.Success(it) }
-        }
+        return getSearchList(page, url)
+    }
+
+    suspend fun getSearchList(page: Int, url: Uri.Builder) = tryConnect("page: $page\nurl: $url") {
+        fetchDoc(url)
+            .select(".col-12.col-lg-6.p-3.text")
+            .mapNotNull {
+                val link = it.selectFirst("div.text > a[href]") ?: return@mapNotNull null
+                val bookCover = it.selectFirst("img[src]")?.attr("src") ?: ""
+                val description = it.selectFirst("div.text.flex-grow-1")?.text()?.removeNovelTag() ?: ""
+                BookMetadata(
+                    title = link.text().removeNovelTag(),
+                    url = link.attr("href"),
+                    coverImageUrl = bookCover,
+                    description = description
+                )
+            }
+            .let { Response.Success(it) }
     }
 
     override fun getBookData(doc: Document): DatabaseInterface.BookData

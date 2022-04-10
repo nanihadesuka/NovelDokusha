@@ -11,9 +11,9 @@ object textExtractor
      * @return string where each paragrpah is
      * separated by two newlines
      */
-    fun get(node: Node): String
+    fun get(node: Node?): String
     {
-        val children = node.childNodes()
+        val children = node?.childNodes() ?: return ""
         if (children.isEmpty())
             return ""
 

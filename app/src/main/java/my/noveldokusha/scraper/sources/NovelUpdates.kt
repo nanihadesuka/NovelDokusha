@@ -63,7 +63,7 @@ class NovelUpdates : SourceInterface.catalog
     override suspend fun getCatalogList(index: Int): Response<List<BookMetadata>>
     {
         val page = index + 1
-        val url = catalogUrl.toUrlBuilder()!!.apply {
+        val url = catalogUrl.toUrlBuilderSafe().apply {
             add("st", 1)
             if (page > 1) add("pg", page)
         }
@@ -73,7 +73,7 @@ class NovelUpdates : SourceInterface.catalog
     override suspend fun getCatalogSearch(index: Int, input: String): Response<List<BookMetadata>>
     {
         val page = index + 1
-        val url = baseUrl.toUrlBuilder()!!.apply {
+        val url = baseUrl.toUrlBuilderSafe().apply {
             if (page > 1) appendPath("page").appendPath(page.toString())
             add("s", input)
             add("post_type", "seriesplans")
