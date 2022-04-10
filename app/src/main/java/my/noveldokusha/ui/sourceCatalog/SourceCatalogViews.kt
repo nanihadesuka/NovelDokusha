@@ -341,28 +341,32 @@ fun OptionsDropDown(
                     )
                     .clip(RoundedCornerShape(8.dp))
             ) {
+                @Composable
+                fun colorBackground(state: AppPreferences.LIST_LAYOUT_MODE) =
+                    if (listLayoutMode == state) ColorAccent else MaterialTheme.colors.surface
+
+                @Composable
+                fun colorText(state: AppPreferences.LIST_LAYOUT_MODE) =
+                    if (listLayoutMode == state) Color.White else MaterialTheme.colors.onPrimary
                 Box(
                     Modifier
                         .weight(1f)
-                        .ifCase(listLayoutMode == AppPreferences.LIST_LAYOUT_MODE.verticalList) {
-                            background(ColorAccent)
-                        }
+                        .background(colorBackground(AppPreferences.LIST_LAYOUT_MODE.verticalList))
                         .clickable { onSelectListLayout(AppPreferences.LIST_LAYOUT_MODE.verticalList) }
                 ) {
                     Text(
                         text = stringResource(R.string.list),
-                        Modifier
+                        modifier = Modifier
                             .padding(18.dp)
                             .fillMaxWidth(),
-                        textAlign = TextAlign.Center
+                        textAlign = TextAlign.Center,
+                        color = colorText(AppPreferences.LIST_LAYOUT_MODE.verticalList)
                     )
                 }
                 Box(
                     Modifier
                         .weight(1f)
-                        .ifCase(listLayoutMode == AppPreferences.LIST_LAYOUT_MODE.verticalGrid) {
-                            background(ColorAccent)
-                        }
+                        .background(colorBackground(AppPreferences.LIST_LAYOUT_MODE.verticalGrid))
                         .clickable { onSelectListLayout(AppPreferences.LIST_LAYOUT_MODE.verticalGrid) }
                 ) {
                     Text(
@@ -370,7 +374,8 @@ fun OptionsDropDown(
                         Modifier
                             .padding(18.dp)
                             .fillMaxWidth(),
-                        textAlign = TextAlign.Center
+                        textAlign = TextAlign.Center,
+                        color = colorText(AppPreferences.LIST_LAYOUT_MODE.verticalGrid)
                     )
                 }
             }
