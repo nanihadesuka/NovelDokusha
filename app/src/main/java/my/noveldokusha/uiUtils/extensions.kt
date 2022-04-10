@@ -1,6 +1,8 @@
 package my.noveldokusha.uiUtils
 
 import android.app.ActivityManager
+import android.content.ClipData
+import android.content.ClipboardManager
 import android.content.Context
 import android.content.res.Configuration
 import android.graphics.Color
@@ -87,4 +89,10 @@ fun Context.isServiceRunning(serviceClass: Class<*>): Boolean {
 	val manager = getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
 	return manager.getRunningServices(Integer.MAX_VALUE)
 		.any { className == it.service.className }
+}
+
+fun Context.copyToClipboard(text: String)
+{
+    val clipboard = getSystemService(ComponentActivity.CLIPBOARD_SERVICE) as ClipboardManager
+    clipboard.setPrimaryClip(ClipData.newPlainText("error message", text))
 }

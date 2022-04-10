@@ -25,6 +25,7 @@ import my.noveldokusha.ui.theme.Theme
 import my.noveldokusha.ui.webView.WebViewActivity
 import my.noveldokusha.uiToolbars.ToolbarModeSearch
 import my.noveldokusha.uiUtils.Extra_String
+import my.noveldokusha.uiUtils.copyToClipboard
 import my.noveldokusha.uiViews.BooksVerticalView
 import java.util.*
 import javax.inject.Inject
@@ -108,7 +109,9 @@ class SourceCatalogActivity : ComponentActivity()
                         loadState = viewModel.fetchIterator.state,
                         onLoadNext = { viewModel.fetchIterator.fetchNext() },
                         onBookClicked = ::openBookPage,
-                        onBookLongClicked = ::addBookToLibrary
+                        onBookLongClicked = ::addBookToLibrary,
+                        onReload = { viewModel.fetchIterator.reloadFailedLastLoad() },
+                        onCopyError = ::copyToClipboard
                     )
                 }
             }

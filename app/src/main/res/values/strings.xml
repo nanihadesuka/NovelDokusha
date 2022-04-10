@@ -89,4 +89,6 @@
 	<string name="open_for_more_options">Open for more options</string>
 	<string name="list">List</string>
 	<string name="grid">Grid</string>
+	<string name="copy_error">Copy error</string>
+	<string name="reload">Reload</string>
 </resources>

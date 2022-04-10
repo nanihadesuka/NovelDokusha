@@ -1,5 +1,7 @@
 package my.noveldokusha.ui.databaseSearchResults
 
+import android.content.ClipData
+import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -8,6 +10,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.lifecycle.viewmodel.compose.viewModel
 import dagger.hilt.android.AndroidEntryPoint
 import my.noveldokusha.AppPreferences
 import my.noveldokusha.R
@@ -16,6 +19,7 @@ import my.noveldokusha.ui.databaseBookInfo.DatabaseBookInfoActivity
 import my.noveldokusha.ui.theme.Theme
 import my.noveldokusha.uiUtils.Extra_String
 import my.noveldokusha.uiUtils.Extra_StringArrayList
+import my.noveldokusha.uiUtils.copyToClipboard
 import my.noveldokusha.uiViews.BooksVerticalView
 import java.util.*
 import javax.inject.Inject
@@ -78,7 +82,9 @@ class DatabaseSearchResultsActivity : ComponentActivity() {
                         loadState = viewModel.fetchIterator.state,
                         onLoadNext = { viewModel.fetchIterator.fetchNext() },
                         onBookClicked = ::openBookInfoPage,
-                        onBookLongClicked = {}
+                        onBookLongClicked = {},
+                        onReload = { viewModel.fetchIterator.reloadFailedLastLoad() },
+                        onCopyError = ::copyToClipboard
                     )
                 }
             }

@@ -41,7 +41,6 @@ fun ToolbarMain(
     optionsDropDownView: @Composable () -> Unit
 )
 {
-
     Row(
         horizontalArrangement = Arrangement.End,
         verticalAlignment = Alignment.CenterVertically,

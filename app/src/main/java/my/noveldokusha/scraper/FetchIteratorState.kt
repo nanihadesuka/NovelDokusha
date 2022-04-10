@@ -37,6 +37,16 @@ class FetchIteratorState<T>(
         error = null
     }
 
+    fun reloadFailedLastLoad() {
+        if(error == null)
+            return
+        job?.cancel()
+        index = (index-1).coerceAtLeast(0)
+        state = STATE.IDLE
+        error = null
+        fetchNext()
+    }
+
     fun fetchNext() {
         if (state != STATE.IDLE) return
         state = STATE.LOADING

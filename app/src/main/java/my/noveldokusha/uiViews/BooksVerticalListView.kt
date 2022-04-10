@@ -35,7 +35,9 @@ fun BooksVerticalListView(
     loadState: FetchIteratorState.STATE,
     onLoadNext: () -> Unit,
     onBookClicked: (book: BookMetadata) -> Unit,
-    onBookLongClicked: (bookItem: BookMetadata) -> Unit
+    onBookLongClicked: (bookItem: BookMetadata) -> Unit,
+    onReload: () -> Unit = {},
+    onCopyError: (String) -> Unit = {}
 )
 {
     val isReadyToLoad by derivedStateOf {
@@ -53,26 +55,6 @@ fun BooksVerticalListView(
         modifier = Modifier.fillMaxWidth(),
         contentPadding = PaddingValues(start = 4.dp, end = 4.dp, top = 0.dp, bottom = 260.dp)
     ) {
-        if (error != null)
-        {
-            item {
-                SelectionContainer {
-                    Text(
-                        text = error,
-                        fontFamily = FontFamily.Monospace,
-                        fontSize = 12.sp,
-                        letterSpacing = 0.sp,
-                        color = MaterialTheme.colors.onError,
-                        modifier = Modifier
-                            .padding(10.dp)
-                            .border(0.5.dp, Color.Red, RoundedCornerShape(10.dp))
-                            .padding(10.dp),
-                    )
-                }
-            }
-            return@LazyColumn
-        }
-
         items(list) {
             MyButton(
                 text = it.title,
@@ -106,11 +88,13 @@ fun BooksVerticalListView(
                         },
                         color = ColorAccent
                     )
-                    else ->
-                    {
-                    }
+                    else -> Unit
                 }
             }
+        }
+
+        if (error != null) item {
+            ErrorView(error = error, onReload = onReload, onCopyError = onCopyError)
         }
     }
 }
