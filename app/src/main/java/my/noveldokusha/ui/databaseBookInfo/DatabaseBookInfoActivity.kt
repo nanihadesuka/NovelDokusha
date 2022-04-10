@@ -2,9 +2,7 @@ package my.noveldokusha.ui.databaseBookInfo
 
 import android.content.Context
 import android.content.Intent
-import android.os.Build
 import android.os.Bundle
-import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
@@ -56,9 +54,6 @@ class DatabaseBookInfoActivity : ComponentActivity() {
     @Composable
     fun setSystemBarTransparent(alpha : Float)
     {
-        LaunchedEffect(Unit) {
-            WindowCompat.setDecorFitsSystemWindows(window, false)
-        }
         val systemUiController = rememberSystemUiController()
         val useDarkIcons = MaterialTheme.colors.isLight
         val color = MaterialTheme.colors.primary.copy(alpha = alpha)
@@ -73,6 +68,7 @@ class DatabaseBookInfoActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        WindowCompat.setDecorFitsSystemWindows(window, false)
         setContent {
             val reply by viewModel.bookData.collectAsState(initial = null)
             val scrollState = rememberScrollState()

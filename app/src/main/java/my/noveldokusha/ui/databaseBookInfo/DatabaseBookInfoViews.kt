@@ -1,6 +1,9 @@
 package my.noveldokusha.ui.databaseBookInfo
 
+import androidx.annotation.DrawableRes
+import androidx.annotation.IdRes
 import androidx.compose.animation.*
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -55,6 +58,32 @@ private fun TextAnimated(text: String)
     }
 }
 
+@Composable
+private fun ImageViewPreview(
+    coverImageUrl: Any?,
+    @DrawableRes alternative: Int,
+    contentScale: ContentScale,
+    modifier: Modifier = Modifier
+)
+{
+    when (coverImageUrl)
+    {
+        null ->
+            // Used only only because it works with previews
+            Image(
+                painterResource(alternative),
+                contentDescription = null,
+                contentScale = contentScale,
+                modifier = modifier
+            )
+        else -> ImageView(
+            imageModel = coverImageUrl,
+            contentScale = contentScale,
+            modifier = modifier
+        )
+    }
+}
+
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun DatabaseBookInfoView(
@@ -71,27 +100,15 @@ fun DatabaseBookInfoView(
     ) {
         Box {
             Box {
-                when (data.coverImageUrl)
-                {
-                    null ->
-                        Image(
-                            painterResource(R.drawable.ic_launcher_screen_icon),
-                            contentDescription = stringResource(R.string.no_cover_found),
-                            contentScale = ContentScale.FillWidth,
-                            modifier = Modifier
-                                .alpha(0.2f)
-                                .fillMaxWidth()
-                                .height(240.dp)
-                        )
-                    else -> ImageView(
-                        imageModel = data.coverImageUrl,
-                        contentScale = ContentScale.FillWidth,
-                        modifier = Modifier
-                            .alpha(0.2f)
-                            .fillMaxWidth()
-                            .height(340.dp)
-                    )
-                }
+                ImageViewPreview(
+                    coverImageUrl = data.coverImageUrl,
+                    alternative = R.drawable.ic_launcher_screen_icon,
+                    contentScale = ContentScale.FillWidth,
+                    modifier = Modifier
+                        .alpha(0.2f)
+                        .fillMaxWidth()
+                        .height(340.dp)
+                )
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -110,50 +127,29 @@ fun DatabaseBookInfoView(
                     .padding(horizontal = 8.dp)
                     .padding(top = 50.dp)
             ) {
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(20.dp)
-                ) {
-                    Text(
-                        text = data.title,
-                        style = MaterialTheme.typography.h5,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.weight(1f),
-                    )
-                    MyButton(
-                        text = stringResource(R.string.sources),
-                        outterPadding = 0.dp,
-                        onClick = onSourcesClick,
-                    )
-                }
-                when (data.coverImageUrl)
-                {
-                    null -> Column {
-                        Image(
-                            painterResource(R.drawable.ic_launcher_screen_icon),
-                            contentDescription = stringResource(R.string.no_cover_found),
-                            contentScale = ContentScale.FillHeight,
-                            modifier = Modifier
-                                .height(240.dp)
-                                .align(Alignment.CenterHorizontally)
-                                .padding(top = 8.dp)
-                                .clip(RoundedCornerShape(ImageBorderRadius))
-                        )
-                        Text(
-                            text = stringResource(R.string.no_cover_found),
-                            Modifier.fillMaxWidth(1f),
-                            textAlign = TextAlign.Center
-                        )
-                    }
-                    else -> ImageView(
-                        imageModel = data.coverImageUrl,
-                        modifier = Modifier
-                            .height(340.dp)
-                            .align(Alignment.CenterHorizontally)
-                            .padding(top = 12.dp)
-                            .clip(RoundedCornerShape(ImageBorderRadius)),
-                        contentScale = ContentScale.FillHeight,
-                    )
-                }
+                Text(
+                    text = data.title,
+                    style = MaterialTheme.typography.h5,
+                    fontWeight = FontWeight.Bold,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.fillMaxWidth(),
+                )
+                ImageViewPreview(
+                    coverImageUrl = data.coverImageUrl,
+                    alternative = R.drawable.ic_launcher_screen_icon,
+                    contentScale = ContentScale.FillHeight,
+                    modifier = Modifier
+                        .height(340.dp)
+                        .align(Alignment.CenterHorizontally)
+                        .padding(top = 8.dp)
+                        .clip(RoundedCornerShape(ImageBorderRadius))
+                )
+                MyButton(
+                    text = stringResource(R.string.search_for_sources),
+                    onClick = onSourcesClick,
+                    modifier = Modifier.align(Alignment.CenterHorizontally),
+                    outterPadding = 8.dp
+                )
             }
         }
         Column(Modifier.padding(horizontal = 8.dp)) {
