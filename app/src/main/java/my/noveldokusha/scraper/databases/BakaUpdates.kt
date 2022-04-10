@@ -72,7 +72,7 @@ class BakaUpdates : DatabaseInterface
         return getSearchList(page, url)
     }
 
-    suspend fun getSearchList(page: Int, url: Uri.Builder) = tryConnect("page: $page\nurl: $url") {
+    suspend fun getSearchList(page: Int, url: Uri.Builder) = tryConnect("page: $page\n\nurl: $url") {
         fetchDoc(url)
             .select(".col-12.col-lg-6.p-3.text")
             .mapNotNull {

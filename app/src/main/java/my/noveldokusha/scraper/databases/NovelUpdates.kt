@@ -71,7 +71,7 @@ class NovelUpdates : DatabaseInterface
 	}
 
 	suspend fun getSearchList(page: Int, url: Uri.Builder) = tryConnect(
-		extraErrorInfo = "page: $page\nurl: $url"
+		extraErrorInfo = "page: $page\n\nurl: $url"
 	) {
 		fetchDoc(url)
 			.select(".search_main_box_nu")
