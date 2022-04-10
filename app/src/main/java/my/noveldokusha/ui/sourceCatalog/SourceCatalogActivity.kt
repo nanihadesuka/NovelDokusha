@@ -8,7 +8,6 @@ import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.lazy.GridCells
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -26,6 +25,7 @@ import my.noveldokusha.ui.theme.Theme
 import my.noveldokusha.ui.webView.WebViewActivity
 import my.noveldokusha.uiToolbars.ToolbarModeSearch
 import my.noveldokusha.uiUtils.Extra_String
+import my.noveldokusha.uiViews.BooksVerticalView
 import java.util.*
 import javax.inject.Inject
 
@@ -100,28 +100,16 @@ class SourceCatalogActivity : ComponentActivity()
                             placeholderText = stringResource(R.string.search_by_title)
                         )
                     }
-                    when (viewModel.listLayout)
-                    {
-                        AppPreferences.LIST_LAYOUT_MODE.verticalGrid -> SourceCatalogGridView(
-                            cells = GridCells.Fixed(2),
-                            list = viewModel.fetchIterator.list,
-                            state = state,
-                            error = viewModel.fetchIterator.error,
-                            loadState = viewModel.fetchIterator.state,
-                            onLoadNext = { viewModel.fetchIterator.fetchNext() },
-                            onBookClicked = ::openBookPage,
-                            onBookLongClicked = ::addBookToLibrary
-                        )
-                        AppPreferences.LIST_LAYOUT_MODE.verticalList -> SourceCatalogListView(
-                            list = viewModel.fetchIterator.list,
-                            state = state,
-                            error = viewModel.fetchIterator.error,
-                            loadState = viewModel.fetchIterator.state,
-                            onLoadNext = { viewModel.fetchIterator.fetchNext() },
-                            onBookClicked = ::openBookPage,
-                            onBookLongClicked = ::addBookToLibrary
-                        )
-                    }
+                    BooksVerticalView(
+                        layoutMode = viewModel.listLayout,
+                        list = viewModel.fetchIterator.list,
+                        listState = state,
+                        error = viewModel.fetchIterator.error,
+                        loadState = viewModel.fetchIterator.state,
+                        onLoadNext = { viewModel.fetchIterator.fetchNext() },
+                        onBookClicked = ::openBookPage,
+                        onBookLongClicked = ::addBookToLibrary
+                    )
                 }
             }
         }

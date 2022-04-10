@@ -6,6 +6,8 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.lazy.rememberLazyListState
 import dagger.hilt.android.AndroidEntryPoint
 import my.noveldokusha.AppPreferences
 import my.noveldokusha.R
@@ -14,6 +16,7 @@ import my.noveldokusha.ui.databaseBookInfo.DatabaseBookInfoActivity
 import my.noveldokusha.ui.theme.Theme
 import my.noveldokusha.uiUtils.Extra_String
 import my.noveldokusha.uiUtils.Extra_StringArrayList
+import my.noveldokusha.uiViews.BooksVerticalView
 import java.util.*
 import javax.inject.Inject
 
@@ -65,15 +68,19 @@ class DatabaseSearchResultsActivity : ComponentActivity() {
 
         setContent {
             Theme(appPreferences = appPreferences) {
-                DatabaseSearchResultsView(
-                    title = title,
-                    subtitle = subtitle,
-                    list = viewModel.fetchIterator.list,
-                    error = viewModel.fetchIterator.error,
-                    loadState = viewModel.fetchIterator.state,
-                    onLoadNext = { viewModel.fetchIterator.fetchNext() },
-                    onBookClicked = ::openBookInfoPage,
-                )
+                Column {
+                    ToolbarMain(title = title, subtitle = subtitle)
+                    BooksVerticalView(
+                        layoutMode = viewModel.listLayout,
+                        list = viewModel.fetchIterator.list,
+                        listState = rememberLazyListState(),
+                        error = viewModel.fetchIterator.error,
+                        loadState = viewModel.fetchIterator.state,
+                        onLoadNext = { viewModel.fetchIterator.fetchNext() },
+                        onBookClicked = ::openBookInfoPage,
+                        onBookLongClicked = {}
+                    )
+                }
             }
         }
     }

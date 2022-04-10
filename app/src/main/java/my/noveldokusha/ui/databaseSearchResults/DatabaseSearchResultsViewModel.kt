@@ -1,8 +1,10 @@
 package my.noveldokusha.ui.databaseSearchResults
 
+import androidx.compose.runtime.getValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import my.noveldokusha.AppPreferences
 import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.scraper.FetchIteratorState
 import my.noveldokusha.scraper.scraper
@@ -63,7 +65,8 @@ interface DatabaseSearchResultsStateBundle
 
 @HiltViewModel
 class DatabaseSearchResultsViewModel @Inject constructor(
-    val state: SavedStateHandle
+    val state: SavedStateHandle,
+    val appPreferences: AppPreferences
 ) : BaseViewModel(), DatabaseSearchResultsStateBundle
 {
     override var databaseUrlBase by StateExtra_String(state)
@@ -74,7 +77,7 @@ class DatabaseSearchResultsViewModel @Inject constructor(
     override var authorName by StateExtra_String(state)
     override var urlAuthorPage by StateExtra_String(state)
 
-
+    val listLayout by appPreferences.BOOKS_LIST_LAYOUT_MODE.state(viewModelScope)
     val fetchIterator: FetchIteratorState<BookMetadata> = FetchIteratorState(viewModelScope) { index ->
         when (val input = this.input)
         {

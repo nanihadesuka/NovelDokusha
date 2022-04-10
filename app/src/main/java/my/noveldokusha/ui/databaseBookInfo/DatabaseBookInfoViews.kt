@@ -8,7 +8,10 @@ import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -26,7 +29,8 @@ import my.noveldokusha.uiViews.ImageView
 import my.noveldokusha.uiViews.MyButton
 
 @Composable
-private fun Title(name: String) {
+private fun Title(name: String)
+{
     Text(
         text = name,
         fontWeight = FontWeight.Bold,
@@ -38,7 +42,8 @@ private fun Title(name: String) {
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
-private fun TextAnimated(text: String) {
+private fun TextAnimated(text: String)
+{
     AnimatedContent(
         targetState = text,
         transitionSpec = { fadeIn() with fadeOut() }
@@ -58,118 +63,178 @@ fun DatabaseBookInfoView(
     onAuthorsClick: (author: DatabaseInterface.BookAuthor) -> Unit,
     onGenresClick: (genres: List<String>) -> Unit,
     onBookClick: (book: BookMetadata) -> Unit,
-) {
+    scrollState: ScrollState,
+)
+{
     Column(
-        Modifier
-            .padding(10.dp)
-            .verticalScroll(rememberScrollState())
+        Modifier.verticalScroll(scrollState)
     ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = data.title,
-                style = MaterialTheme.typography.h5,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.weight(1f),
-            )
-            MyButton(
-                text = stringResource(R.string.sources),
-                onClick = onSourcesClick
-            )
-        }
-        when (data.coverImageUrl) {
-            null -> Column {
-                Image(
-                    painterResource(R.drawable.ic_launcher_screen_icon),
-                    contentDescription = stringResource(R.string.no_cover_found),
-                    contentScale = ContentScale.FillHeight,
+        Box {
+            Box {
+                when (data.coverImageUrl)
+                {
+                    null ->
+                        Image(
+                            painterResource(R.drawable.ic_launcher_screen_icon),
+                            contentDescription = stringResource(R.string.no_cover_found),
+                            contentScale = ContentScale.FillWidth,
+                            modifier = Modifier
+                                .alpha(0.2f)
+                                .fillMaxWidth()
+                                .height(240.dp)
+                        )
+                    else -> ImageView(
+                        imageModel = data.coverImageUrl,
+                        contentScale = ContentScale.FillWidth,
+                        modifier = Modifier
+                            .alpha(0.2f)
+                            .fillMaxWidth()
+                            .height(340.dp)
+                    )
+                }
+                Box(
                     modifier = Modifier
-                        .height(240.dp)
-                        .align(Alignment.CenterHorizontally)
-                        .padding(top = 8.dp)
-                        .clip(RoundedCornerShape(ImageBorderRadius))
-                )
-                Text(
-                    text = stringResource(R.string.no_cover_found),
-                    Modifier.fillMaxWidth(1f),
-                    textAlign = TextAlign.Center
+                        .fillMaxWidth()
+                        .height(200.dp)
+                        .align(Alignment.BottomCenter)
+                        .background(
+                            Brush.verticalGradient(
+                                0f to MaterialTheme.colors.surface.copy(alpha = 0f),
+                                1f to MaterialTheme.colors.surface,
+                            )
+                        )
                 )
             }
-            else -> ImageView(
-                imageModel = data.coverImageUrl,
-                modifier = Modifier
-                    .height(340.dp)
-                    .align(Alignment.CenterHorizontally)
-                    .padding(top = 12.dp)
-                    .clip(RoundedCornerShape(ImageBorderRadius)),
-                contentScale = ContentScale.FillHeight,
-            )
+            Column(
+                Modifier
+                    .padding(horizontal = 8.dp)
+                    .padding(top = 50.dp)
+            ) {
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(20.dp)
+                ) {
+                    Text(
+                        text = data.title,
+                        style = MaterialTheme.typography.h5,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.weight(1f),
+                    )
+                    MyButton(
+                        text = stringResource(R.string.sources),
+                        outterPadding = 0.dp,
+                        onClick = onSourcesClick,
+                    )
+                }
+                when (data.coverImageUrl)
+                {
+                    null -> Column {
+                        Image(
+                            painterResource(R.drawable.ic_launcher_screen_icon),
+                            contentDescription = stringResource(R.string.no_cover_found),
+                            contentScale = ContentScale.FillHeight,
+                            modifier = Modifier
+                                .height(240.dp)
+                                .align(Alignment.CenterHorizontally)
+                                .padding(top = 8.dp)
+                                .clip(RoundedCornerShape(ImageBorderRadius))
+                        )
+                        Text(
+                            text = stringResource(R.string.no_cover_found),
+                            Modifier.fillMaxWidth(1f),
+                            textAlign = TextAlign.Center
+                        )
+                    }
+                    else -> ImageView(
+                        imageModel = data.coverImageUrl,
+                        modifier = Modifier
+                            .height(340.dp)
+                            .align(Alignment.CenterHorizontally)
+                            .padding(top = 12.dp)
+                            .clip(RoundedCornerShape(ImageBorderRadius)),
+                        contentScale = ContentScale.FillHeight,
+                    )
+                }
+            }
         }
+        Column(Modifier.padding(horizontal = 8.dp)) {
 
-        Title(stringResource(R.string.description))
-        TextAnimated(data.description)
+            Title(stringResource(R.string.description))
+            TextAnimated(data.description)
 
-        Title(stringResource(R.string.alternative_titles))
-        if (data.alternativeTitles.isEmpty())
-            TextAnimated(text = stringResource(R.string.none_found))
-        for (title in data.alternativeTitles)
-            TextAnimated(text = title)
+            Title(stringResource(R.string.alternative_titles))
+            if (data.alternativeTitles.isEmpty())
+                TextAnimated(text = stringResource(R.string.none_found))
+            for (title in data.alternativeTitles)
+                TextAnimated(text = title)
 
-        Title(stringResource(R.string.authors))
-        Row {
-            for (author in data.authors) MyButton(
-                text = author.name,
-                enabled = author.url != null,
-                onClick = { onAuthorsClick(author) },
-                modifier = Modifier.padding(end = 8.dp)
+            Title(stringResource(R.string.authors))
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                for (author in data.authors) MyButton(
+                    text = author.name,
+                    enabled = author.url != null,
+                    outterPadding = 0.dp,
+                    onClick = { onAuthorsClick(author) }
+                )
+            }
+
+            Title(stringResource(R.string.tags))
+            TextAnimated(text = data.tags.joinToString(" · "))
+
+            Title(stringResource(R.string.genres))
+            MyButton(
+                text = data.genres.joinToString(" · "),
+                outterPadding = 0.dp,
+                onClick = { onGenresClick(data.genres) }
             )
+
+            Title(stringResource(R.string.type))
+            TextAnimated(text = data.bookType)
+
+            Title(stringResource(R.string.related_books))
+            if (data.relatedBooks.isEmpty())
+                TextAnimated(text = stringResource(id = R.string.none_found))
+            Column(
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                for (book in data.relatedBooks) MyButton(
+                    text = book.title,
+                    onClick = { onBookClick(book) },
+                    outterPadding = 0.dp,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                )
+            }
+
+            Title(stringResource(R.string.similar_recommended))
+            if (data.similarRecommended.isEmpty())
+                TextAnimated(text = stringResource(id = R.string.none_found))
+            Column(
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                for (book in data.similarRecommended) MyButton(
+                    text = book.title,
+                    onClick = { onBookClick(book) },
+                    outterPadding = 0.dp,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                )
+            }
         }
-
-        Title(stringResource(R.string.tags))
-        TextAnimated(text = data.tags.joinToString(" · "))
-
-        Title(stringResource(R.string.genres))
-        MyButton(
-            text = data.genres.joinToString(" · "),
-            onClick = { onGenresClick(data.genres) }
-        )
-
-        Title(stringResource(R.string.type))
-        TextAnimated(text = data.bookType)
-
-        Title(stringResource(R.string.related_books))
-        if (data.relatedBooks.isEmpty())
-            TextAnimated(text = stringResource(id = R.string.none_found))
-        for (book in data.relatedBooks) MyButton(
-            text = book.title,
-            onClick = { onBookClick(book) },
-            modifier = Modifier
-                .padding(bottom = 4.dp)
-                .fillMaxWidth()
-        )
-
-        Title(stringResource(R.string.similar_recommended))
-        if (data.similarRecommended.isEmpty())
-            TextAnimated(text = stringResource(id = R.string.none_found))
-        for (book in data.similarRecommended) MyButton(
-            text = book.title,
-            onClick = { onBookClick(book) },
-            modifier = Modifier
-                .padding(bottom = 4.dp)
-                .fillMaxWidth()
-        )
+        Spacer(modifier = Modifier.height(200.dp))
     }
 }
 
 
 @Preview
 @Composable
-fun Preview() {
-
+fun Preview()
+{
     InternalTheme {
         DatabaseBookInfoView(
-            DatabaseInterface.BookData(
+            scrollState = rememberScrollState(),
+            data = DatabaseInterface.BookData(
                 title = "Novel title",
                 description = "Novel description goes here and here to and a little more to fill lines",
                 coverImageUrl = null,
@@ -200,5 +265,6 @@ fun Preview() {
             onGenresClick = {},
             onBookClick = {},
         )
+        Spacer(modifier = Modifier.height(200.dp))
     }
 }

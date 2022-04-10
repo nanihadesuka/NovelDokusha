@@ -32,13 +32,13 @@ fun MyButton(
     animate: Boolean = true,
     textAlign: TextAlign = TextAlign.Start,
     outterPadding : Dp = 4.dp,
-    radius: Dp = 12.dp,
+    radius: Dp = 4.dp,
     borderWidth: Dp = 1.dp,
     onClick: () -> Unit,
     content: @Composable (String, Dp, TextAlign) -> Unit = { text, radius, textAlign ->
         Text(
             text = text,
-            modifier = Modifier.padding(radius),
+            modifier = Modifier.padding(12.dp),
             textAlign = textAlign
         )
     }

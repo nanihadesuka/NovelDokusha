@@ -2,14 +2,24 @@ package my.noveldokusha.ui.databaseBookInfo
 
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
+import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.material.MaterialTheme
+import androidx.compose.runtime.*
+import androidx.compose.ui.graphics.Color
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import dagger.hilt.android.AndroidEntryPoint
 import my.noveldokusha.AppPreferences
+import my.noveldokusha.R
 import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.scraper.DatabaseInterface
 import my.noveldokusha.scraper.Response
@@ -43,17 +53,43 @@ class DatabaseBookInfoActivity : ComponentActivity() {
 
     private val viewModel by viewModels<DatabaseBookInfoViewModel>()
 
+    @Composable
+    fun setSystemBarTransparent(alpha : Float)
+    {
+        LaunchedEffect(Unit) {
+            WindowCompat.setDecorFitsSystemWindows(window, false)
+        }
+        val systemUiController = rememberSystemUiController()
+        val useDarkIcons = MaterialTheme.colors.isLight
+        val color = MaterialTheme.colors.primary.copy(alpha = alpha)
+        SideEffect {
+            systemUiController.setSystemBarsColor(
+                color = color,
+                darkIcons = useDarkIcons
+            )
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         setContent {
             val reply by viewModel.bookData.collectAsState(initial = null)
+            val scrollState = rememberScrollState()
+            val alpha by derivedStateOf {
+                val value = (scrollState.value - 50).coerceIn(0,200).toFloat()
+                val maxvalue = (scrollState.maxValue).coerceIn(1,200).toFloat()
+                value/maxvalue
+            }
 
             Theme(appPreferences = appPreferences) {
+
+                setSystemBarTransparent(alpha)
 
                 if (reply != null) {
                     when (val data = reply) {
                         is Response.Success -> DatabaseBookInfoView(
+                            scrollState = scrollState,
                             data = data.data,
                             onSourcesClick = ::openGlobalSearchPage,
                             onAuthorsClick = ::openSearchPageByAuthor,
