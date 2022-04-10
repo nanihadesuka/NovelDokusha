@@ -77,20 +77,23 @@ class Wuxia : SourceInterface.catalog
         if (input.isBlank() || index > 0)
             return Response.Success(listOf())
 
-        val url = baseUrl.toUrlBuilder()!!.apply {
+        val url = baseUrl.toUrlBuilderSafe().apply {
             add("search", input)
         }
 
         return tryConnect {
             fetchDoc(url)
-                .select("tbody > tr")
+                .selectFirst("#table")!!
+                .children()
+                .first()!!
+                .children()
                 .mapNotNull {
-                    val link = it.selectFirst(".xxxx > a[href]") ?: return@mapNotNull  null
+                    val link = it.selectFirst(".xxxx > a[href]") ?: return@mapNotNull null
                     val bookCover = it.selectFirst("img[src]")?.attr("src") ?: ""
                     BookMetadata(
                         title = link.text(),
-                        url = baseUrl + link.attr("href"),
-                        coverImageUrl =bookCover
+                        url = link.attr("href"),
+                        coverImageUrl = bookCover
                     )
                 }
                 .let { Response.Success(it) }
