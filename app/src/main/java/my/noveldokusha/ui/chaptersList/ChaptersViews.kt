@@ -1,0 +1,421 @@
+package my.noveldokusha.ui.chaptersList
+
+import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
+import androidx.compose.animation.*
+import androidx.compose.foundation.*
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.*
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.*
+import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.snapshots.SnapshotStateList
+import androidx.compose.runtime.snapshots.SnapshotStateMap
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import my.noveldokusha.R
+import my.noveldokusha.data.ChapterWithContext
+import my.noveldokusha.data.database.tables.Chapter
+import my.noveldokusha.ui.theme.ImageBorderRadius
+import my.noveldokusha.ui.theme.InternalTheme
+import my.noveldokusha.uiUtils.ifCase
+import my.noveldokusha.uiViews.ImageViewPreview
+
+@Composable
+fun ToolBarMode(
+    bookTitle: String,
+    isBookmarked: Boolean,
+    listState: LazyListState,
+    onClickSortChapters: () -> Unit,
+    onClickBookmark: () -> Unit,
+    onClickMoreSettings: () -> Unit,
+    MoreSettingsView: @Composable () -> Unit
+)
+{
+    val bookmarkColor by animateColorAsState(
+        targetValue = when (isBookmarked)
+        {
+            true -> colorResource(id = R.color.dark_orange_red)
+            false -> Color.Gray
+        }
+    )
+    val alpha by remember {
+        derivedStateOf {
+            if (listState.firstVisibleItemIndex != 0) return@derivedStateOf 1f
+            val first = listState.layoutInfo.visibleItemsInfo.firstOrNull()
+                ?: return@derivedStateOf 0f
+            val value = (-first.offset - 10).coerceIn(0, 150).toFloat()
+            val maxvalue = (first.size).coerceIn(1, 150).toFloat()
+            value / maxvalue
+        }
+    }
+
+    val primary = MaterialTheme.colors.primary
+    val backgroundColor by remember {
+        derivedStateOf { primary.copy(alpha = alpha) }
+    }
+
+    Row(
+        horizontalArrangement = Arrangement.End,
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier
+            .clip(RoundedCornerShape(bottomStart = 32.dp, bottomEnd = 32.dp))
+            .background(backgroundColor)
+            .padding(top = 38.dp, bottom = 6.dp, start = 12.dp, end = 12.dp)
+            .height(56.dp)
+    ) {
+        Text(
+            text = bookTitle,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            style = MaterialTheme.typography.h6,
+            modifier = Modifier
+                .padding(16.dp)
+                .weight(1f),
+            color = MaterialTheme.colors.onPrimary.copy(alpha = alpha)
+        )
+        IconButton(onClick = onClickSortChapters) {
+            Icon(
+                painter = painterResource(id = R.drawable.ic_baseline_filter_list_24),
+                contentDescription = stringResource(id = R.string.sort_ascending_or_descending)
+            )
+        }
+        IconButton(onClick = onClickBookmark) {
+            Icon(
+                painter = painterResource(id = R.drawable.ic_twotone_bookmark_24),
+                contentDescription = stringResource(id = R.string.library_bookmark),
+                tint = bookmarkColor
+            )
+        }
+        IconButton(onClick = onClickMoreSettings) {
+            Icon(
+                painter = painterResource(id = R.drawable.ic_baseline_search_24),
+                contentDescription = stringResource(id = R.string.search_by_title)
+            )
+            MoreSettingsView()
+        }
+    }
+}
+
+@OptIn(ExperimentalAnimationApi::class)
+@Composable
+fun HeaderView(
+    bookTitle: String,
+    sourceName: String,
+    numberOfChapters: Int,
+    bookCover: Any?,
+    description: String,
+    onSearchBookInDatabase: () -> Unit,
+    onOpenInBrowser: () -> Unit
+)
+{
+    Box {
+        Box {
+            ImageViewPreview(
+                coverImageUrl = bookCover,
+                alternative = R.drawable.ic_launcher_screen_icon,
+                contentScale = ContentScale.FillWidth,
+                modifier = Modifier
+                    .alpha(0.2f)
+                    .fillMaxWidth()
+                    .height(200.dp)
+            )
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(200.dp)
+                    .align(Alignment.BottomCenter)
+                    .background(
+                        Brush.verticalGradient(
+                            0f to MaterialTheme.colors.surface.copy(alpha = 0f),
+                            1f to MaterialTheme.colors.surface,
+                        )
+                    )
+            )
+        }
+        Column(modifier = Modifier.padding(top = 58.dp)) {
+            Row {
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier
+                        .padding(horizontal = 8.dp)
+                        .size(160.dp, 230.dp),
+                ) {
+                    ImageViewPreview(
+                        coverImageUrl = bookCover,
+                        alternative = R.drawable.ic_launcher_logo_foreground,
+                        contentScale = ContentScale.FillHeight,
+                        modifier = Modifier
+                            .fillMaxHeight()
+                            .clip(RoundedCornerShape(ImageBorderRadius))
+                    )
+                }
+                Column(Modifier.padding(top = 60.dp, start = 0.dp, end = 8.dp)) {
+                    Text(
+                        text = bookTitle,
+                        style = MaterialTheme.typography.h6,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(bottom = 10.dp)
+                    )
+                    Text(
+                        text = sourceName,
+                        style = MaterialTheme.typography.caption,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(bottom = 2.dp)
+                    )
+                    Text(
+                        text = stringResource(id = R.string.chapters) + " " + numberOfChapters.toString(),
+                        style = MaterialTheme.typography.caption,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Row(
+                        verticalAlignment = Alignment.Bottom,
+                        modifier = Modifier.padding(top = 0.dp)
+                    ) {
+                        IconButton(onClick = onSearchBookInDatabase) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.ic_outline_explore_24),
+                                contentDescription = stringResource(id = R.string.search_in_database_for_more_information)
+                            )
+                        }
+                        IconButton(onClick = onOpenInBrowser) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.ic_outline_website_24),
+                                contentDescription = stringResource(id = R.string.open_in_browser)
+                            )
+                        }
+                    }
+                }
+            }
+            var maxLines by rememberSaveable { mutableStateOf(4) }
+            Text(
+                text = description,
+                maxLines = maxLines,
+                overflow = TextOverflow.Ellipsis,
+                textAlign = TextAlign.Justify,
+                modifier = Modifier
+                    .padding(8.dp)
+                    .ifCase(description.isNotBlank()) { animateContentSize() }
+                    .clickable(
+                        interactionSource = remember { MutableInteractionSource() },
+                        indication = null,
+                        onClick = { maxLines = if (maxLines == 4) Int.MAX_VALUE else 4 }
+                    ),
+            )
+            Divider(Modifier.fillMaxWidth())
+        }
+    }
+}
+
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+fun ChaptersListView(
+    header: @Composable () -> Unit,
+    list: SnapshotStateList<ChapterWithContext>,
+    selectedChapters: SnapshotStateMap<String, Unit>,
+    listState: LazyListState,
+    onClick: (ChapterWithContext) -> Unit,
+    onLongClick: (ChapterWithContext) -> Unit
+)
+{
+    LazyColumn(
+        state = listState,
+        contentPadding = PaddingValues(bottom = 240.dp)
+    ) {
+        item { header() }
+        items(list) {
+            val selected by remember(selectedChapters.size) {
+                derivedStateOf { selectedChapters.containsKey(it.chapter.url) }
+            }
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(16.dp),
+                modifier = Modifier
+                    .combinedClickable(
+                        onClick = { onClick(it) },
+                        onLongClick = { onLongClick(it) }
+                    )
+                    .fillMaxWidth()
+                    .ifCase(selected) {
+                        background(MaterialTheme.colors.onPrimary.copy(alpha = 0.2f))
+                    }
+                    .padding(horizontal = 8.dp, vertical = 16.dp),
+            ) {
+                Text(
+                    text = it.chapter.title,
+                    modifier = Modifier.weight(1f),
+                    color = MaterialTheme.colors.onPrimary.copy(
+                        alpha = if (it.chapter.read) 0.5f else 1f
+                    )
+                )
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_looking_24),
+                    contentDescription = null,
+                    tint = MaterialTheme.colors.onPrimary.copy(
+                        alpha = if (it.chapter.read) 0.5f else 0f
+                    )
+                )
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_outline_cloud_download_24),
+                    contentDescription = null,
+                    tint = MaterialTheme.colors.onPrimary.copy(
+                        alpha = if (it.downloaded) 0.5f else 0f
+                    )
+                )
+            }
+        }
+    }
+}
+
+
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+fun SelectionToolsBar(
+    onDeleteDownload: () -> Unit,
+    onDownload: () -> Unit,
+    onSetRead: () -> Unit,
+    onSetUnread: () -> Unit,
+    onSelectAllChapters: () -> Unit,
+    onSelectAllChaptersAfterSelectedOnes: () -> Unit,
+    onCloseSelectionbar: () -> Unit,
+    modifier: Modifier = Modifier
+)
+{
+    fun LazyGridScope.buttonItem(
+        @DrawableRes id: Int,
+        @StringRes description: Int,
+        onClick: () -> Unit
+    )
+    {
+        item {
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier
+                    .clickable(onClick = onClick)
+                    .padding(12.dp)
+            ) {
+                Icon(
+                    painter = painterResource(id = id),
+                    contentDescription = stringResource(description)
+                )
+            }
+        }
+    }
+
+    LazyVerticalGrid(
+        cells = GridCells.Adaptive(70.dp),
+        modifier = modifier
+            .shadow(24.dp)
+            .background(MaterialTheme.colors.surface)
+    ) {
+        buttonItem(
+            id = R.drawable.ic_outline_delete_24,
+            description = R.string.remove_selected_chapters_dowloads,
+            onClick = onDeleteDownload
+        )
+        buttonItem(
+            id = R.drawable.ic_outline_cloud_download_24,
+            description = R.string.download_selected_chapters,
+            onClick = onDownload
+        )
+        buttonItem(
+            id = R.drawable.ic_looking_24,
+            description = R.string.set_as_read_selected_chapters,
+            onClick = onSetRead
+        )
+        buttonItem(
+            id = R.drawable.ic_not_looking_24,
+            description = R.string.set_as_not_read_selected_chapters,
+            onClick = onSetUnread
+        )
+        buttonItem(
+            id = R.drawable.ic_baseline_select_all_24,
+            description = R.string.select_all_chapters,
+            onClick = onSelectAllChapters
+        )
+        buttonItem(
+            id = R.drawable.ic_baseline_select_all_24_bottom,
+            description = R.string.select_all_chapters_after_currently_selected_ones,
+            onClick = onSelectAllChaptersAfterSelectedOnes
+        )
+        buttonItem(
+            id = R.drawable.ic_baseline_close_24,
+            description = R.string.close_selection_bar,
+            onClick = onCloseSelectionbar
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun Preview()
+{
+    val list = (0..10).map {
+        ChapterWithContext(
+            chapter = Chapter(
+                title = "Title chapter $it",
+                url = "",
+                bookUrl = "",
+                position = it,
+                read = it % 4 == 0,
+                lastReadOffset = 0,
+                lastReadPosition = 0
+            ),
+            downloaded = it % 2 == 0,
+            lastReadChapter = false
+        )
+    }.let { mutableStateListOf<ChapterWithContext>().apply { addAll(it) } }
+
+    val selectedChapters = list
+        .filterIndexed { index, _ -> index % 3 == 0 }
+        .associate { it.chapter.url to Unit }
+        .let { SnapshotStateMap<String, Unit>().apply { this.putAll(it) } }
+
+    InternalTheme {
+        Box {
+            ChaptersListView(
+                header = {
+                    HeaderView(
+                        bookTitle = "Book title",
+                        sourceName = "Novel Web Name",
+                        numberOfChapters = 34,
+                        bookCover = null,
+                        description = "In a very far land, there was a web novel being written.",
+                        onSearchBookInDatabase = { },
+                        onOpenInBrowser = { }
+                    )
+                },
+                list = list,
+                selectedChapters = selectedChapters,
+                listState = rememberLazyListState(),
+                onClick = {},
+                onLongClick = {}
+            )
+            ToolBarMode(
+                bookTitle = "Book title",
+                isBookmarked = true,
+                listState = rememberLazyListState(),
+                onClickBookmark = {},
+                onClickMoreSettings = {},
+                onClickSortChapters = {},
+                MoreSettingsView = {}
+            )
+        }
+    }
+}

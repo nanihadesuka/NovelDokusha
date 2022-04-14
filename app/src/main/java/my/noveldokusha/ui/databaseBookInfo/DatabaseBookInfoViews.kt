@@ -1,9 +1,6 @@
 package my.noveldokusha.ui.databaseBookInfo
 
-import androidx.annotation.DrawableRes
-import androidx.annotation.IdRes
 import androidx.compose.animation.*
-import androidx.compose.animation.core.spring
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -12,11 +9,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -28,7 +23,7 @@ import my.noveldokusha.scraper.DatabaseInterface
 import my.noveldokusha.ui.theme.ColorAccent
 import my.noveldokusha.ui.theme.ImageBorderRadius
 import my.noveldokusha.ui.theme.InternalTheme
-import my.noveldokusha.uiViews.ImageView
+import my.noveldokusha.uiViews.ImageViewPreview
 import my.noveldokusha.uiViews.MyButton
 
 @Composable
@@ -54,32 +49,6 @@ private fun TextAnimated(text: String)
         Text(
             text = target,
             modifier = Modifier.fillMaxWidth()
-        )
-    }
-}
-
-@Composable
-private fun ImageViewPreview(
-    coverImageUrl: Any?,
-    @DrawableRes alternative: Int,
-    contentScale: ContentScale,
-    modifier: Modifier = Modifier
-)
-{
-    when (coverImageUrl)
-    {
-        null ->
-            // Used only only because it works with previews
-            Image(
-                painterResource(alternative),
-                contentDescription = null,
-                contentScale = contentScale,
-                modifier = modifier
-            )
-        else -> ImageView(
-            imageModel = coverImageUrl,
-            contentScale = contentScale,
-            modifier = modifier
         )
     }
 }

@@ -13,6 +13,9 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.annotation.*
+import androidx.compose.runtime.Recomposer
+import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableStateOf
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.use
 import androidx.fragment.app.Fragment
@@ -21,6 +24,8 @@ import androidx.lifecycle.*
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import my.noveldokusha.App
 import my.noveldokusha.ui.BaseFragment
@@ -95,4 +100,14 @@ fun Context.copyToClipboard(text: String)
 {
     val clipboard = getSystemService(ComponentActivity.CLIPBOARD_SERVICE) as ClipboardManager
     clipboard.setPrimaryClip(ClipData.newPlainText("error message", text))
+}
+
+
+fun <T> Flow<T>.toState(scope: CoroutineScope, initialValue: T): State<T>
+{
+	val mutableState = mutableStateOf(initialValue)
+	scope.launch {
+        collect { mutableState.value = it }
+    }
+	return mutableState
 }
