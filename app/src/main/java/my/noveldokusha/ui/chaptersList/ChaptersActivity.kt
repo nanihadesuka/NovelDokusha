@@ -13,6 +13,7 @@ import androidx.compose.animation.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -143,17 +144,37 @@ class ChaptersActivity : ComponentActivity()
                         )
                     }
 
+
+                    val onPrimary = MaterialTheme.colors.onPrimary
+                    val borderColor by remember {
+                        derivedStateOf { onPrimary.copy(alpha = 0.3f) }
+                    }
+
                     when (toolbarMode.value)
                     {
-                        ToolbarMode.MAIN -> MainToolbar(
-                            bookTitle = viewModel.book.title,
-                            isBookmarked = viewModel.book.inLibrary,
-                            listState = listState,
-                            onClickBookmark = ::bookmarkToggle,
-                            onClickSortChapters = viewModel::toggleChapterSort,
-                            onClickChapterTitleSearch = { toolbarMode.value = ToolbarMode.SEARCH },
-
+                        ToolbarMode.MAIN ->
+                        {
+                            val alpha by remember {
+                                derivedStateOf {
+                                    if (listState.firstVisibleItemIndex != 0) return@derivedStateOf 1f
+                                    val first = listState.layoutInfo.visibleItemsInfo.firstOrNull()
+                                        ?: return@derivedStateOf 0f
+                                    val value = (-first.offset - 10).coerceIn(0, 150).toFloat()
+                                    val maxvalue = (first.size).coerceIn(1, 150).toFloat()
+                                    value / maxvalue
+                                }
+                            }
+                            MainToolbar(
+                                bookTitle = viewModel.book.title,
+                                isBookmarked = viewModel.book.inLibrary,
+                                alpha = alpha,
+                                onClickBookmark = ::bookmarkToggle,
+                                onClickSortChapters = viewModel::toggleChapterSort,
+                                onClickChapterTitleSearch = {
+                                    toolbarMode.value = ToolbarMode.SEARCH
+                                }
                             )
+                        }
                         ToolbarMode.SEARCH -> ToolbarModeSearch(
                             focusRequester = focusRequester,
                             searchText = viewModel.textSearch,
@@ -166,7 +187,7 @@ class ChaptersActivity : ComponentActivity()
                                     width = 1.dp,
                                     brush = Brush.verticalGradient(
                                         0f to Color.Transparent,
-                                        1f to MaterialTheme.colors.onPrimary.copy(alpha = 0.3f)
+                                        1f to borderColor
                                     ),
                                     shape = RoundedCornerShape(
                                         bottomStart = 32.dp,

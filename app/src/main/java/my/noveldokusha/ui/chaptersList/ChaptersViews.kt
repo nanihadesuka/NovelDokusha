@@ -42,10 +42,11 @@ enum class ToolbarMode
 { MAIN, SEARCH }
 
 @Composable
+@Stable
 fun MainToolbar(
     bookTitle: String,
     isBookmarked: Boolean,
-    listState: LazyListState,
+    alpha: Float,
     onClickSortChapters: () -> Unit,
     onClickBookmark: () -> Unit,
     onClickChapterTitleSearch: () -> Unit,
@@ -58,21 +59,13 @@ fun MainToolbar(
             false -> Color.Gray
         }
     )
-    val alpha by remember {
-        derivedStateOf {
-            if (listState.firstVisibleItemIndex != 0) return@derivedStateOf 1f
-            val first = listState.layoutInfo.visibleItemsInfo.firstOrNull()
-                ?: return@derivedStateOf 0f
-            val value = (-first.offset - 10).coerceIn(0, 150).toFloat()
-            val maxvalue = (first.size).coerceIn(1, 150).toFloat()
-            value / maxvalue
-        }
-    }
 
     val primary = MaterialTheme.colors.primary
-    val backgroundColor by remember {
-        derivedStateOf { primary.copy(alpha = alpha) }
-    }
+    val onPrimary = MaterialTheme.colors.onPrimary
+
+    val backgroundColor by remember(alpha) { derivedStateOf { primary.copy(alpha = alpha) } }
+    val borderColor by remember(alpha) { derivedStateOf { onPrimary.copy(alpha = alpha * 0.3f) } }
+    val titleColor by remember(alpha) { derivedStateOf { onPrimary.copy(alpha = alpha) } }
 
     Row(
         horizontalArrangement = Arrangement.End,
@@ -83,7 +76,7 @@ fun MainToolbar(
                 width = 1.dp,
                 brush = Brush.verticalGradient(
                     0f to Color.Transparent,
-                    1f to MaterialTheme.colors.onPrimary.copy(alpha = alpha * 0.3f)
+                    1f to borderColor
                 ),
                 shape = RoundedCornerShape(
                     bottomStart = 32.dp,
@@ -102,7 +95,7 @@ fun MainToolbar(
             modifier = Modifier
                 .padding(16.dp)
                 .weight(1f),
-            color = MaterialTheme.colors.onPrimary.copy(alpha = alpha)
+            color = titleColor
         )
         IconButton(onClick = onClickSortChapters) {
             Icon(
@@ -434,7 +427,7 @@ private fun Preview()
             MainToolbar(
                 bookTitle = "Book title",
                 isBookmarked = true,
-                listState = rememberLazyListState(),
+                alpha = 0.5f,
                 onClickBookmark = {},
                 onClickChapterTitleSearch = {},
                 onClickSortChapters = {}
