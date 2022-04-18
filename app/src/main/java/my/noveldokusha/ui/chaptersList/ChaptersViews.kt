@@ -35,6 +35,7 @@ import my.noveldokusha.data.database.tables.Chapter
 import my.noveldokusha.ui.theme.ImageBorderRadius
 import my.noveldokusha.ui.theme.InternalTheme
 import my.noveldokusha.uiUtils.ifCase
+import my.noveldokusha.uiViews.ErrorView
 import my.noveldokusha.uiViews.ImageViewPreview
 
 enum class ToolbarMode
@@ -78,6 +79,17 @@ fun MainToolbar(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
             .clip(RoundedCornerShape(bottomStart = 32.dp, bottomEnd = 32.dp))
+            .border(
+                width = 1.dp,
+                brush = Brush.verticalGradient(
+                    0f to Color.Transparent,
+                    1f to MaterialTheme.colors.onPrimary.copy(alpha = alpha * 0.3f)
+                ),
+                shape = RoundedCornerShape(
+                    bottomStart = 32.dp,
+                    bottomEnd = 32.dp
+                )
+            )
             .background(backgroundColor)
             .padding(top = 38.dp, bottom = 6.dp, start = 12.dp, end = 12.dp)
             .height(56.dp)
@@ -167,7 +179,11 @@ fun HeaderView(
                             .clip(RoundedCornerShape(ImageBorderRadius))
                     )
                 }
-                Column(Modifier.padding(top = 60.dp, start = 0.dp, end = 8.dp)) {
+                Column(
+                    Modifier
+                        .heightIn(min = 230.dp)
+                        .padding(top = 60.dp, start = 0.dp, end = 8.dp)
+                ) {
                     Text(
                         text = bookTitle,
                         style = MaterialTheme.typography.h6,
@@ -183,11 +199,12 @@ fun HeaderView(
                     Text(
                         text = stringResource(id = R.string.chapters) + " " + numberOfChapters.toString(),
                         style = MaterialTheme.typography.caption,
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(bottom = 8.dp)
                     )
                     Row(
                         verticalAlignment = Alignment.Bottom,
-                        modifier = Modifier.padding(top = 0.dp)
+                        modifier = Modifier.height(32.dp)
                     ) {
                         IconButton(onClick = onSearchBookInDatabase) {
                             Icon(
@@ -231,6 +248,7 @@ fun ChaptersListView(
     list: SnapshotStateList<ChapterWithContext>,
     selectedChapters: SnapshotStateMap<String, Unit>,
     listState: LazyListState,
+    error: String,
     onClick: (ChapterWithContext) -> Unit,
     onLongClick: (ChapterWithContext) -> Unit
 )
@@ -280,6 +298,9 @@ fun ChaptersListView(
                     )
                 )
             }
+        }
+        if (error.isNotBlank()) item {
+            ErrorView(error = error)
         }
     }
 }
@@ -406,6 +427,7 @@ private fun Preview()
                 list = list,
                 selectedChapters = selectedChapters,
                 listState = rememberLazyListState(),
+                error = "Error",
                 onClick = {},
                 onLongClick = {}
             )

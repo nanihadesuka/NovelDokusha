@@ -2,7 +2,6 @@ package my.noveldokusha.ui.chaptersList
 
 import android.content.Context
 import android.content.Intent
-import android.content.SharedPreferences
 import android.view.View
 import androidx.compose.runtime.*
 import androidx.lifecycle.*
@@ -89,9 +88,7 @@ class ChaptersViewModel @Inject constructor(
         Book(title = bookTitle, url = bookUrl)
     )
 
-    val onFetching = MutableLiveData<Boolean>()
-    val onError = MutableLiveData<String>()
-    val onErrorVisibility = MutableLiveData<Int>()
+    var error by mutableStateOf("")
     val selectedChaptersUrl = mutableStateMapOf<String, Unit>()
     val chaptersWithContext = mutableStateListOf<ChapterWithContext>()
     var isRefreshing by mutableStateOf(false)
@@ -142,19 +139,15 @@ class ChaptersViewModel @Inject constructor(
 
 
     fun updateCover() = viewModelScope.launch(Dispatchers.IO) {
-        when (val res = downloadBookCoverImageUrl(bookUrl))
-        {
-            is Response.Success -> repository.bookLibrary.updateCover(bookUrl, res.data)
-            else -> run {}
-        }
+        val res = downloadBookCoverImageUrl(bookUrl)
+        if (res is Response.Success)
+            repository.bookLibrary.updateCover(bookUrl, res.data)
     }
 
     fun updateDescription() = viewModelScope.launch(Dispatchers.IO) {
-        when (val res = downloadBookDescription(bookUrl))
-        {
-            is Response.Success -> repository.bookLibrary.updateDescription(bookUrl, res.data)
-            else -> run {}
-        }
+        val res = downloadBookDescription(bookUrl)
+        if (res is Response.Success)
+            repository.bookLibrary.updateDescription(bookUrl, res.data)
     }
 
     private var loadChaptersJob: Job? = null
@@ -163,18 +156,18 @@ class ChaptersViewModel @Inject constructor(
         if (bookMetadata.url.startsWith("local://"))
         {
             toast(context.getString(R.string.local_book_nothing_to_update))
-            onFetching.postValue(false)
+            isRefreshing = false
             return
         }
 
         if (loadChaptersJob?.isActive == true) return
         loadChaptersJob = appScope.launch {
 
-            onErrorVisibility.value = View.GONE
-            onFetching.value = true
+            error = ""
+            isRefreshing = true
             val url = bookMetadata.url
             val res = withContext(Dispatchers.IO) { downloadChaptersList(url) }
-            onFetching.value = false
+            isRefreshing = false
             when (res)
             {
                 is Response.Success ->
@@ -188,8 +181,7 @@ class ChaptersViewModel @Inject constructor(
                 }
                 is Response.Error ->
                 {
-                    onErrorVisibility.value = View.VISIBLE
-                    onError.value = res.message
+                    error = res.message
                 }
             }
         }
@@ -214,10 +206,6 @@ class ChaptersViewModel @Inject constructor(
     suspend fun getLastReadChapter() = withContext(Dispatchers.IO) {
         repository.bookLibrary.get(bookUrl)?.lastReadChapter
             ?: repository.bookChapter.getFirstChapter(bookUrl)?.url
-    }
-
-    suspend fun getIsBookInLibrary() = withContext(Dispatchers.IO) {
-        repository.bookLibrary.existInLibrary(bookUrl)
     }
 
     fun setSelectedAsUnread()

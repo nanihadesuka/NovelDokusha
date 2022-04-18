@@ -4,12 +4,14 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.view.WindowInsets
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.animation.*
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -17,15 +19,13 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.SideEffect
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -38,6 +38,7 @@ import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import my.noveldokusha.AppPreferences
@@ -99,17 +100,24 @@ class ChaptersActivity : ComponentActivity()
                     )
                 }
 
-                LaunchedEffect(viewModel.isRefreshing) {
-                    if (!viewModel.isRefreshing) return@LaunchedEffect
-                    delay(500)
-                    viewModel.isRefreshing = false
+                var isRefreshingDelayed by remember {
+                    mutableStateOf(viewModel.isRefreshing)
+                }
+
+                LaunchedEffect(Unit) {
+                    snapshotFlow { viewModel.isRefreshing }
+                        .distinctUntilChanged()
+                        .collectLatest {
+                            if (it) delay(200)
+                            isRefreshingDelayed = it
+                        }
                 }
 
                 Box {
                     SwipeRefresh(
-                        state = rememberSwipeRefreshState(viewModel.isRefreshing),
+                        state = rememberSwipeRefreshState(isRefreshingDelayed),
                         onRefresh = {
-                            viewModel.isRefreshing = true
+                            isRefreshingDelayed = true
                             toast(getString(R.string.updating_book_info))
                             viewModel.reloadAll()
                         }
@@ -128,9 +136,10 @@ class ChaptersActivity : ComponentActivity()
                             },
                             list = viewModel.chaptersWithContext,
                             selectedChapters = viewModel.selectedChaptersUrl,
+                            error = viewModel.error,
                             listState = listState,
                             onClick = ::onClickChapter,
-                            onLongClick = ::onLongClickChapter
+                            onLongClick = ::onLongClickChapter,
                         )
                     }
 
@@ -143,7 +152,8 @@ class ChaptersActivity : ComponentActivity()
                             onClickBookmark = ::bookmarkToggle,
                             onClickSortChapters = viewModel::toggleChapterSort,
                             onClickChapterTitleSearch = { toolbarMode.value = ToolbarMode.SEARCH },
-                        )
+
+                            )
                         ToolbarMode.SEARCH -> ToolbarModeSearch(
                             focusRequester = focusRequester,
                             searchText = viewModel.textSearch,
@@ -152,6 +162,17 @@ class ChaptersActivity : ComponentActivity()
                             color = MaterialTheme.colors.primary,
                             modifier = Modifier
                                 .clip(RoundedCornerShape(bottomStart = 32.dp, bottomEnd = 32.dp))
+                                .border(
+                                    width = 1.dp,
+                                    brush = Brush.verticalGradient(
+                                        0f to Color.Transparent,
+                                        1f to MaterialTheme.colors.onPrimary.copy(alpha = 0.3f)
+                                    ),
+                                    shape = RoundedCornerShape(
+                                        bottomStart = 32.dp,
+                                        bottomEnd = 32.dp
+                                    )
+                                )
                                 .background(MaterialTheme.colors.primary)
                                 .padding(top = 16.dp)
                         )
@@ -166,7 +187,8 @@ class ChaptersActivity : ComponentActivity()
                     ) {
                         Icon(
                             painter = painterResource(id = R.drawable.ic_baseline_play_arrow_24),
-                            contentDescription = stringResource(id = R.string.open_last_read_chapter)
+                            contentDescription = stringResource(id = R.string.open_last_read_chapter),
+                            tint = MaterialTheme.colors.primary
                         )
                     }
 
@@ -282,78 +304,3 @@ class ChaptersActivity : ComponentActivity()
             .let(::startActivity)
     }
 }
-
-//private class ChaptersArrayAdapter(
-//    private val context: BaseActivity,
-//    private val viewModel: ChaptersViewModel
-//) : MyListAdapter<ChapterWithContext, ChaptersArrayAdapter.ViewHolder>()
-//{
-//    override fun areItemsTheSame(old: ChapterWithContext, new: ChapterWithContext) =
-//        old.chapter.url == new.chapter.url
-//
-//    override fun areContentsTheSame(old: ChapterWithContext, new: ChapterWithContext) = old == new
-//
-//    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder =
-//        ViewHolder(ActivityChaptersListItemBinding.inflate(parent.inflater, parent, false))
-//
-//    override fun onBindViewHolder(viewHolder: ViewHolder, position: Int)
-//    {
-//        val itemData = list[position]
-//        val itemBind = viewHolder.viewBind
-//
-//        itemBind.title.text = itemData.chapter.title
-//        itemBind.title.alpha = if (itemData.chapter.read) 0.5f else 1.0f
-//        itemBind.downloaded.visibility = if (itemData.downloaded) View.VISIBLE else View.INVISIBLE
-//        itemBind.currentlyReading.visibility =
-//            if (itemData.lastReadChapter) View.VISIBLE else View.INVISIBLE
-//        itemBind.selected.visibility =
-//            if (viewModel.selectedChaptersUrl.contains(itemData.chapter.url)) View.VISIBLE else View.INVISIBLE
-//
-//        itemBind.root.setOnClickListener {
-//            if (viewModel.selectedChaptersUrl.isNotEmpty())
-////                toggleItemSelection(itemData, itemBind.selected)
-//            else
-//            {
-//                ReaderActivity
-//                    .IntentData(
-//                        context,
-//                        bookUrl = viewModel.bookMetadata.url,
-//                        chapterUrl = itemData.chapter.url
-//                    )
-//                    .let(context::startActivity)
-//            }
-//        }
-//
-//        itemBind.root.setOnLongClickListener {
-////            toggleItemSelection(itemData, itemBind.selected)
-//            true
-//        }
-//    }
-//
-////    fun toggleItemSelection(itemData: ChapterWithContext, view: View)
-////    {
-////        fun <T> MutableSet<T>.removeOrAdd(value: T) =
-////            contains(value).also { if (it) remove(value) else add(value) }
-////
-////        val isRemoved = viewModel.selectedChaptersUrl.removeOrAdd(itemData.chapter.url)
-////        view.visibility = if (isRemoved) View.INVISIBLE else View.VISIBLE
-////        viewModel.updateSelectionModeBarState()
-////    }
-//
-//    inner class ViewHolder(val viewBind: ActivityChaptersListItemBinding) :
-//        RecyclerView.ViewHolder(viewBind.root)
-//}
-
-//    viewBind.sourceName.text = scraper.getCompatibleSource(viewModel.bookMetadata.url)?.name ?: ""
-
-//    viewBind.databaseSearchButton.setOnClickListener {
-//        DatabaseSearchResultsActivity
-//            .IntentData(activity, "https://www.novelupdates.com/", DatabaseSearchResultsActivity.SearchMode.Text(viewModel.bookMetadata.title))
-//            .let(activity::startActivity)
-//    }
-//    viewBind.webpageOpenButton.setOnClickListener {
-//        Intent(Intent.ACTION_VIEW).also {
-//            it.data = Uri.parse(viewModel.bookMetadata.url)
-//        }.let(activity::startActivity)
-//    }
-
