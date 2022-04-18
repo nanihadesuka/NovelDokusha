@@ -86,9 +86,9 @@ dependencies {
     implementation(fileTree("libs") { include("*.jar") })
 
     // Kotlin
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.0")
-    implementation("org.jetbrains.kotlin:kotlin-script-runtime:1.6.10")
-    implementation("org.jetbrains.kotlin:kotlin-stdlib:1.6.10")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.1-native-mt")
+    implementation("org.jetbrains.kotlin:kotlin-script-runtime:1.6.20")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib:1.6.20")
 
     // Room components
     implementation("androidx.room:room-runtime:2.4.2")
@@ -107,7 +107,7 @@ dependencies {
 
     // UI
     implementation("androidx.appcompat:appcompat:1.4.1")
-    implementation("androidx.core:core-ktx:1.7.0")
+    implementation("androidx.core:core-ktx:1.9.0-alpha02")
     implementation("androidx.navigation:navigation-fragment-ktx:2.4.1")
     implementation("androidx.navigation:navigation-ui-ktx:2.4.1")
     implementation("androidx.activity:activity-ktx:1.4.0")
@@ -120,8 +120,8 @@ dependencies {
     implementation("com.afollestad.material-dialogs:core:3.3.0")
 
     // Glide
-    implementation("com.github.bumptech.glide:glide:4.13.0")
-    kapt("com.github.bumptech.glide:compiler:4.12.0")
+    implementation("com.github.bumptech.glide:glide:4.13.1")
+    kapt("com.github.bumptech.glide:compiler:4.13.1")
 
     // Test
     testImplementation("junit:junit:4.13.2")
@@ -129,19 +129,19 @@ dependencies {
     androidTestImplementation("androidx.test.espresso:espresso-core:3.4.0")
 
     // GSON
-    implementation("com.google.code.gson:gson:2.8.7")
+    implementation("com.google.code.gson:gson:2.9.0")
 
     // Retrofit
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
 
     // Dependency injection
-    implementation("com.google.dagger:hilt-android:2.38.1")
-    kapt("com.google.dagger:hilt-compiler:2.38.1")
+    implementation("com.google.dagger:hilt-android:2.41")
+    kapt("com.google.dagger:hilt-compiler:2.41")
 
     // HTML text extractor
     implementation("com.chimbori.crux:crux:3.0.1")
-    implementation("net.dankito.readability4j:readability4j:1.0.6")
-    implementation("org.jsoup:jsoup:1.14.1")
+    implementation("net.dankito.readability4j:readability4j:1.0.8")
+    implementation("org.jsoup:jsoup:1.14.3")
 
     // Memory leak detector
     //debugImplementation("com.squareup.leakcanary:leakcanary-android:2.7")
@@ -161,7 +161,7 @@ dependencies {
     androidTestImplementation("androidx.compose.ui:ui-test-junit4:1.1.1")
 
     // Coil for jetpack compose
-    implementation("io.coil-kt:coil-compose:2.0.0-rc02")
+    implementation("io.coil-kt:coil-compose:2.0.0-rc03")
 
 
     // Compose collapsing toolbar
