@@ -2,14 +2,15 @@ package my.noveldokusha.ui.chaptersList
 
 import android.content.Context
 import android.content.Intent
-import android.content.SharedPreferences
 import android.view.View
+import androidx.compose.runtime.*
 import androidx.lifecycle.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import my.noveldokusha.*
+import my.noveldokusha.R
 import my.noveldokusha.data.database.tables.Book
 import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.data.ChapterWithContext
@@ -21,6 +22,7 @@ import my.noveldokusha.scraper.downloadChaptersList
 import my.noveldokusha.ui.BaseViewModel
 import my.noveldokusha.uiUtils.Extra_String
 import my.noveldokusha.uiUtils.StateExtra_String
+import my.noveldokusha.uiUtils.toState
 import my.noveldokusha.uiUtils.toast
 import javax.inject.Inject
 
@@ -36,7 +38,7 @@ class ChaptersViewModel @Inject constructor(
     private val repository: Repository,
     private val appScope: CoroutineScope,
     @ApplicationContext private val context: Context,
-    appPreferences: AppPreferences,
+    val appPreferences: AppPreferences,
     state: SavedStateHandle,
 ) : BaseViewModel(), ChapterStateBundle
 {
@@ -50,7 +52,10 @@ class ChaptersViewModel @Inject constructor(
         private var bookTitle by Extra_String()
 
         constructor(intent: Intent) : super(intent)
-        constructor(ctx: Context, bookMetadata: BookMetadata) : super(ctx, ChaptersActivity::class.java)
+        constructor(ctx: Context, bookMetadata: BookMetadata) : super(
+            ctx,
+            ChaptersActivity::class.java
+        )
         {
             this.bookUrl = bookMetadata.url
             this.bookTitle = bookMetadata.title
@@ -78,47 +83,71 @@ class ChaptersViewModel @Inject constructor(
         }
     }
 
-    val book = repository.bookLibrary.getFlow(bookUrl).asLiveData()
-    val selectionModeVisible = MutableLiveData(false)
-    val isInLibrary = repository.bookLibrary.existInLibraryFlow(bookMetadata.url).asLiveData()
-    val onFetching = MutableLiveData<Boolean>()
-    val onError = MutableLiveData<String>()
-    val onErrorVisibility = MutableLiveData<Int>()
-    val selectedChaptersUrl = mutableSetOf<String>()
-    val chaptersFilterFlow = MutableStateFlow("")
-    val chaptersWithContextLiveData = repository.bookChapter.getChaptersWithContexFlow(bookMetadata.url)
-        .map { removeCommonTextFromTitles(it) }
-        // Sort the chapters given the order preference
-        .combine(appPreferences.CHAPTERS_SORT_ASCENDING.flow()) { chapters, sorted ->
-            when (sorted)
-            {
-                AppPreferences.TERNARY_STATE.active -> chapters.sortedBy { it.chapter.position }
-                AppPreferences.TERNARY_STATE.inverse -> chapters.sortedByDescending { it.chapter.position }
-                AppPreferences.TERNARY_STATE.inactive -> chapters
-            }
-        }
-        // Filter the chapters if search is active
-        .combine(chaptersFilterFlow.debounce(50)) { chapters, searchText ->
-            if (searchText.isBlank()) chapters
-            else chapters.filter { it.chapter.title.contains(searchText, ignoreCase = true) }
-        }
-        .flowOn(Dispatchers.Default)
-        .asLiveData()
+    val book by repository.bookLibrary.getFlow(bookUrl).filterNotNull().toState(
+        viewModelScope,
+        Book(title = bookTitle, url = bookUrl)
+    )
 
-    fun updateCover() = viewModelScope.launch(Dispatchers.IO) {
-        when (val res = downloadBookCoverImageUrl(bookUrl))
-        {
-            is Response.Success -> repository.bookLibrary.updateCover(bookUrl, res.data)
-            else -> run {}
+    var error by mutableStateOf("")
+    val selectedChaptersUrl = mutableStateMapOf<String, Unit>()
+    val chaptersWithContext = mutableStateListOf<ChapterWithContext>()
+    var isRefreshing by mutableStateOf(false)
+    val textSearch = mutableStateOf("")
+
+    init
+    {
+        viewModelScope.launch {
+            repository.bookChapter.getChaptersWithContexFlow(bookMetadata.url)
+                .map { removeCommonTextFromTitles(it) }
+                // Sort the chapters given the order preference
+                .combine(appPreferences.CHAPTERS_SORT_ASCENDING.flow()) { chapters, sorted ->
+                    when (sorted)
+                    {
+                        AppPreferences.TERNARY_STATE.active -> chapters.sortedBy { it.chapter.position }
+                        AppPreferences.TERNARY_STATE.inverse -> chapters.sortedByDescending { it.chapter.position }
+                        AppPreferences.TERNARY_STATE.inactive -> chapters
+                    }
+                }
+                // Filter the chapters if search is active
+                .combine(
+                    snapshotFlow { textSearch.value }
+                        .debounce(500)
+                        .flowOn(Dispatchers.Main)
+                ) { chapters, searchText ->
+                    if (searchText.isBlank()) chapters
+                    else chapters.filter {
+                        it.chapter.title.contains(
+                            searchText,
+                            ignoreCase = true
+                        )
+                    }
+                }
+                .flowOn(Dispatchers.Default)
+                .collect {
+                    chaptersWithContext.clear()
+                    chaptersWithContext.addAll(it)
+                }
         }
     }
 
+    fun reloadAll()
+    {
+        updateCover()
+        updateDescription()
+        updateChaptersList()
+    }
+
+
+    fun updateCover() = viewModelScope.launch(Dispatchers.IO) {
+        val res = downloadBookCoverImageUrl(bookUrl)
+        if (res is Response.Success)
+            repository.bookLibrary.updateCover(bookUrl, res.data)
+    }
+
     fun updateDescription() = viewModelScope.launch(Dispatchers.IO) {
-        when (val res = downloadBookDescription(bookUrl))
-        {
-            is Response.Success -> repository.bookLibrary.updateDescription(bookUrl, res.data)
-            else -> run {}
-        }
+        val res = downloadBookDescription(bookUrl)
+        if (res is Response.Success)
+            repository.bookLibrary.updateDescription(bookUrl, res.data)
     }
 
     private var loadChaptersJob: Job? = null
@@ -127,18 +156,18 @@ class ChaptersViewModel @Inject constructor(
         if (bookMetadata.url.startsWith("local://"))
         {
             toast(context.getString(R.string.local_book_nothing_to_update))
-            onFetching.postValue(false)
+            isRefreshing = false
             return
         }
 
         if (loadChaptersJob?.isActive == true) return
         loadChaptersJob = appScope.launch {
 
-            onErrorVisibility.value = View.GONE
-            onFetching.value = true
+            error = ""
+            isRefreshing = true
             val url = bookMetadata.url
             val res = withContext(Dispatchers.IO) { downloadChaptersList(url) }
-            onFetching.value = false
+            isRefreshing = false
             when (res)
             {
                 is Response.Success ->
@@ -152,58 +181,85 @@ class ChaptersViewModel @Inject constructor(
                 }
                 is Response.Error ->
                 {
-                    onErrorVisibility.value = View.VISIBLE
-                    onError.value = res.message
+                    error = res.message
                 }
             }
         }
     }
 
-    fun toggleBookmark() = appScope.launch(Dispatchers.IO) {
+    fun toggleChapterSort()
+    {
+        appPreferences.CHAPTERS_SORT_ASCENDING.value =
+            when (appPreferences.CHAPTERS_SORT_ASCENDING.value)
+            {
+                AppPreferences.TERNARY_STATE.active -> AppPreferences.TERNARY_STATE.inverse
+                AppPreferences.TERNARY_STATE.inverse -> AppPreferences.TERNARY_STATE.active
+                AppPreferences.TERNARY_STATE.inactive -> AppPreferences.TERNARY_STATE.active
+            }
+    }
+
+    suspend fun toggleBookmark() = withContext(Dispatchers.IO) {
         repository.bookLibrary.toggleBookmark(bookMetadata)
+        repository.bookLibrary.get(bookMetadata.url)?.inLibrary ?: false
     }
 
     suspend fun getLastReadChapter() = withContext(Dispatchers.IO) {
-        repository.bookLibrary.get(bookUrl)?.lastReadChapter ?: repository.bookChapter.getFirstChapter(bookUrl)?.url
-    }
-
-    suspend fun getIsBookInLibrary() = withContext(Dispatchers.IO) {
-        repository.bookLibrary.existInLibrary(bookUrl)
+        repository.bookLibrary.get(bookUrl)?.lastReadChapter
+            ?: repository.bookChapter.getFirstChapter(bookUrl)?.url
     }
 
     fun setSelectedAsUnread()
     {
         val list = selectedChaptersUrl.toList()
-        appScope.launch(Dispatchers.IO) { repository.bookChapter.setAsUnread(list) }
+        appScope.launch(Dispatchers.IO) {
+            repository.bookChapter.setAsUnread(list.map { it.first })
+        }
     }
 
     fun setSelectedAsRead()
     {
         val list = selectedChaptersUrl.toList()
-        appScope.launch(Dispatchers.IO) { repository.bookChapter.setAsRead(list) }
+        appScope.launch(Dispatchers.IO) {
+            repository.bookChapter.setAsRead(list.map { it.first })
+        }
     }
 
     fun downloadSelected()
     {
         val list = selectedChaptersUrl.toList()
-        appScope.launch(Dispatchers.IO) { list.forEach { repository.bookChapterBody.fetchBody(it) } }
+        appScope.launch(Dispatchers.IO) {
+            list.forEach { repository.bookChapterBody.fetchBody(it.first) }
+        }
     }
 
     fun deleteDownloadSelected()
     {
         val list = selectedChaptersUrl.toList()
-        appScope.launch(Dispatchers.IO) { repository.bookChapterBody.removeRows(list) }
+        appScope.launch(Dispatchers.IO) {
+            repository.bookChapterBody.removeRows(list.map { it.first })
+        }
     }
 
     fun closeSelectionMode()
     {
         selectedChaptersUrl.clear()
-        updateSelectionModeBarState()
     }
 
-    fun updateSelectionModeBarState()
+    fun selectAll()
     {
-        selectionModeVisible.postValue(selectedChaptersUrl.isNotEmpty())
+        chaptersWithContext
+            .toList()
+            .map { it.chapter.url to Unit }
+            .let { selectedChaptersUrl.putAll(it) }
+    }
+
+    fun selectAllAfterSelectedOnes()
+    {
+        chaptersWithContext
+            .toList()
+            .dropWhile { !selectedChaptersUrl.contains(it.chapter.url) }
+            .map { it.chapter.url to Unit }
+            .let { selectedChaptersUrl.putAll(it) }
     }
 }
 
@@ -212,13 +268,23 @@ private fun removeCommonTextFromTitles(list: List<ChapterWithContext>): List<Cha
     // Try removing repetitive title text from chapters
     if (list.size <= 1) return list
     val first = list.first().chapter.title
-    val prefix = list.fold(first) { acc, e -> e.chapter.title.commonPrefixWith(acc, ignoreCase = true) }
-    val suffix = list.fold(first) { acc, e -> e.chapter.title.commonSuffixWith(acc, ignoreCase = true) }
+    val prefix =
+        list.fold(first) { acc, e -> e.chapter.title.commonPrefixWith(acc, ignoreCase = true) }
+    val suffix =
+        list.fold(first) { acc, e -> e.chapter.title.commonSuffixWith(acc, ignoreCase = true) }
 
     // Kotlin Std Lib doesn't have optional ignoreCase parameter for removeSurrounding
-    fun String.removeSurrounding(prefix: CharSequence, suffix: CharSequence, ignoreCase: Boolean = false): String
+    fun String.removeSurrounding(
+        prefix: CharSequence,
+        suffix: CharSequence,
+        ignoreCase: Boolean = false
+    ): String
     {
-        if ((length >= prefix.length + suffix.length) && startsWith(prefix, ignoreCase) && endsWith(suffix, ignoreCase))
+        if ((length >= prefix.length + suffix.length) && startsWith(prefix, ignoreCase) && endsWith(
+                suffix,
+                ignoreCase
+            )
+        )
         {
             return substring(prefix.length, length - suffix.length)
         }

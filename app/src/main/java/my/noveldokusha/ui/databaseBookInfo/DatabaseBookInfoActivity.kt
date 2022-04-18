@@ -25,6 +25,7 @@ import my.noveldokusha.ui.databaseSearchResults.DatabaseSearchResultsActivity
 import my.noveldokusha.ui.globalSourceSearch.GlobalSourceSearchActivity
 import my.noveldokusha.ui.theme.Theme
 import my.noveldokusha.uiUtils.*
+import my.noveldokusha.uiViews.SetSystemBarTransparent
 import javax.inject.Inject
 import kotlin.collections.ArrayList
 
@@ -51,20 +52,6 @@ class DatabaseBookInfoActivity : ComponentActivity() {
 
     private val viewModel by viewModels<DatabaseBookInfoViewModel>()
 
-    @Composable
-    fun setSystemBarTransparent(alpha : Float)
-    {
-        val systemUiController = rememberSystemUiController()
-        val useDarkIcons = MaterialTheme.colors.isLight
-        val color = MaterialTheme.colors.primary.copy(alpha = alpha)
-        SideEffect {
-            systemUiController.setSystemBarsColor(
-                color = color,
-                darkIcons = useDarkIcons
-            )
-        }
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -80,7 +67,7 @@ class DatabaseBookInfoActivity : ComponentActivity() {
 
             Theme(appPreferences = appPreferences) {
 
-                setSystemBarTransparent(alpha)
+                SetSystemBarTransparent(alpha)
 
                 if (reply != null) {
                     when (val data = reply) {
