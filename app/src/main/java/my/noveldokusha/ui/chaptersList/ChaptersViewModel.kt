@@ -4,16 +4,14 @@ import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.view.View
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.mutableStateMapOf
+import androidx.compose.runtime.*
 import androidx.lifecycle.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import my.noveldokusha.*
+import my.noveldokusha.R
 import my.noveldokusha.data.database.tables.Book
 import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.data.ChapterWithContext
@@ -91,14 +89,13 @@ class ChaptersViewModel @Inject constructor(
         Book(title = bookTitle, url = bookUrl)
     )
 
-    val selectionModeVisible = MutableLiveData(false)
-    val isInLibrary = repository.bookLibrary.existInLibraryFlow(bookMetadata.url).asLiveData()
     val onFetching = MutableLiveData<Boolean>()
     val onError = MutableLiveData<String>()
     val onErrorVisibility = MutableLiveData<Int>()
     val selectedChaptersUrl = mutableStateMapOf<String, Unit>()
-    val chaptersFilterFlow = MutableStateFlow("")
     val chaptersWithContext = mutableStateListOf<ChapterWithContext>()
+    var isRefreshing by mutableStateOf(false)
+    val textSearch = mutableStateOf("")
 
     init
     {
@@ -115,7 +112,11 @@ class ChaptersViewModel @Inject constructor(
                     }
                 }
                 // Filter the chapters if search is active
-                .combine(chaptersFilterFlow.debounce(50)) { chapters, searchText ->
+                .combine(
+                    snapshotFlow { textSearch.value }
+                        .debounce(500)
+                        .flowOn(Dispatchers.Main)
+                ) { chapters, searchText ->
                     if (searchText.isBlank()) chapters
                     else chapters.filter {
                         it.chapter.title.contains(
@@ -130,6 +131,13 @@ class ChaptersViewModel @Inject constructor(
                     chaptersWithContext.addAll(it)
                 }
         }
+    }
+
+    fun reloadAll()
+    {
+        updateCover()
+        updateDescription()
+        updateChaptersList()
     }
 
 

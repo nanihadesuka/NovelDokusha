@@ -21,6 +21,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -34,16 +35,19 @@ fun ToolbarModeSearch(
     searchText: MutableState<String>,
     onClose: () -> Unit,
     onTextDone: (String) -> Unit,
-    placeholderText: String = stringResource(R.string.search_here)
-) {
+    modifier: Modifier = Modifier,
+    color: Color = MaterialTheme.colors.surface,
+    placeholderText: String = stringResource(R.string.search_here),
+)
+{
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween,
-        modifier = Modifier
+        modifier = modifier
+            .background(color)
             .fillMaxWidth()
             .padding(8.dp)
             .padding(top = 16.dp, bottom = 4.dp)
-            .background(MaterialTheme.colors.surface)
     ) {
         LaunchedEffect(Unit) {
             focusRequester.requestFocus()

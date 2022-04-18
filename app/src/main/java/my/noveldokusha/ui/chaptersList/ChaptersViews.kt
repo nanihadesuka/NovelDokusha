@@ -37,15 +37,17 @@ import my.noveldokusha.ui.theme.InternalTheme
 import my.noveldokusha.uiUtils.ifCase
 import my.noveldokusha.uiViews.ImageViewPreview
 
+enum class ToolbarMode
+{ MAIN, SEARCH }
+
 @Composable
-fun ToolBarMode(
+fun MainToolbar(
     bookTitle: String,
     isBookmarked: Boolean,
     listState: LazyListState,
     onClickSortChapters: () -> Unit,
     onClickBookmark: () -> Unit,
-    onClickMoreSettings: () -> Unit,
-    MoreSettingsView: @Composable () -> Unit
+    onClickChapterTitleSearch: () -> Unit,
 )
 {
     val bookmarkColor by animateColorAsState(
@@ -103,12 +105,11 @@ fun ToolBarMode(
                 tint = bookmarkColor
             )
         }
-        IconButton(onClick = onClickMoreSettings) {
+        IconButton(onClick = onClickChapterTitleSearch) {
             Icon(
                 painter = painterResource(id = R.drawable.ic_baseline_search_24),
                 contentDescription = stringResource(id = R.string.search_by_title)
             )
-            MoreSettingsView()
         }
     }
 }
@@ -319,10 +320,11 @@ fun SelectionToolsBar(
     }
 
     LazyVerticalGrid(
-        cells = GridCells.Adaptive(70.dp),
+        cells = GridCells.Fixed(4),
+        horizontalArrangement = Arrangement.Center,
         modifier = modifier
-            .shadow(24.dp)
-            .background(MaterialTheme.colors.surface)
+            .shadow(6.dp)
+            .background(MaterialTheme.colors.primary)
     ) {
         buttonItem(
             id = R.drawable.ic_outline_delete_24,
@@ -407,14 +409,13 @@ private fun Preview()
                 onClick = {},
                 onLongClick = {}
             )
-            ToolBarMode(
+            MainToolbar(
                 bookTitle = "Book title",
                 isBookmarked = true,
                 listState = rememberLazyListState(),
                 onClickBookmark = {},
-                onClickMoreSettings = {},
-                onClickSortChapters = {},
-                MoreSettingsView = {}
+                onClickChapterTitleSearch = {},
+                onClickSortChapters = {}
             )
         }
     }

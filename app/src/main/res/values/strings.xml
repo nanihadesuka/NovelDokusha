@@ -98,4 +98,6 @@
 	<string name="select_all_chapters">Select all chapters</string>
 	<string name="select_all_chapters_after_currently_selected_ones">Select all chapter after currently selected ones</string>
 	<string name="close_selection_bar">Close selection bar</string>
+	<string name="open_last_read_chapter">Open last read chapter</string>
+	<string name="updating_book_info">Updating book info</string>
 </resources>

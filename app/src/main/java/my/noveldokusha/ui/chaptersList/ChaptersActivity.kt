@@ -4,36 +4,55 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
-import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.*
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.FloatingActionButton
+import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
-import androidx.compose.runtime.*
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowCompat
 import androidx.lifecycle.lifecycleScope
+import com.google.accompanist.swiperefresh.SwipeRefresh
+import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.*
-import my.noveldokusha.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import my.noveldokusha.AppPreferences
 import my.noveldokusha.R
 import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.data.ChapterWithContext
 import my.noveldokusha.scraper.scraper
 import my.noveldokusha.ui.databaseSearchResults.DatabaseSearchResultsActivity
 import my.noveldokusha.ui.reader.ReaderActivity
+import my.noveldokusha.ui.theme.ColorAccent
 import my.noveldokusha.ui.theme.Theme
-import my.noveldokusha.uiUtils.*
+import my.noveldokusha.uiToolbars.ToolbarModeSearch
+import my.noveldokusha.uiUtils.Extra_String
+import my.noveldokusha.uiUtils.toast
 import javax.inject.Inject
-import kotlin.system.measureTimeMillis
 
 @AndroidEntryPoint
 class ChaptersActivity : ComponentActivity()
@@ -63,7 +82,12 @@ class ChaptersActivity : ComponentActivity()
         super.onCreate(savedInstanceState)
         WindowCompat.setDecorFitsSystemWindows(window, false)
         setContent {
+            val focusRequester = remember { FocusRequester() }
+            val toolbarMode = rememberSaveable { mutableStateOf(ToolbarMode.MAIN) }
             val listState = rememberLazyListState()
+            val sourceName = remember(viewModel.book.url) {
+                scraper.getCompatibleSource(viewModel.bookUrl)?.name ?: ""
+            }
 
             Theme(appPreferences = appPreferences) {
                 val systemUiController = rememberSystemUiController()
@@ -74,44 +98,87 @@ class ChaptersActivity : ComponentActivity()
                         darkIcons = useDarkIcons
                     )
                 }
-                val sourceName = remember(viewModel.book.url) {
-                    scraper.getCompatibleSource(viewModel.bookUrl)?.name ?: ""
+
+                LaunchedEffect(viewModel.isRefreshing) {
+                    if (!viewModel.isRefreshing) return@LaunchedEffect
+                    delay(500)
+                    viewModel.isRefreshing = false
                 }
 
                 Box {
-                    ChaptersListView(
-                        header = {
-                            HeaderView(
-                                bookTitle = viewModel.bookTitle,
-                                sourceName = sourceName,
-                                numberOfChapters = 34,
-                                bookCover = viewModel.book.coverImageUrl,
-                                description = viewModel.book.description,
-                                onSearchBookInDatabase = ::searchBookInDatabase,
-                                onOpenInBrowser = ::openInBrowser,
-                            )
-                        },
-                        list = viewModel.chaptersWithContext,
-                        selectedChapters = viewModel.selectedChaptersUrl,
-                        listState = listState,
-                        onClick = ::onClickChapter,
-                        onLongClick = ::onLongClickChapter
-                    )
-                    ToolBarMode(
-                        bookTitle = viewModel.book.title,
-                        isBookmarked = viewModel.book.inLibrary,
-                        listState = listState,
-                        onClickBookmark = ::bookmarkToggle,
-                        onClickSortChapters = viewModel::toggleChapterSort,
-                        onClickMoreSettings = { },
-                        MoreSettingsView = {},
-                    )
+                    SwipeRefresh(
+                        state = rememberSwipeRefreshState(viewModel.isRefreshing),
+                        onRefresh = {
+                            viewModel.isRefreshing = true
+                            toast(getString(R.string.updating_book_info))
+                            viewModel.reloadAll()
+                        }
+                    ) {
+                        ChaptersListView(
+                            header = {
+                                HeaderView(
+                                    bookTitle = viewModel.bookTitle,
+                                    sourceName = sourceName,
+                                    numberOfChapters = 34,
+                                    bookCover = viewModel.book.coverImageUrl,
+                                    description = viewModel.book.description,
+                                    onSearchBookInDatabase = ::searchBookInDatabase,
+                                    onOpenInBrowser = ::openInBrowser,
+                                )
+                            },
+                            list = viewModel.chaptersWithContext,
+                            selectedChapters = viewModel.selectedChaptersUrl,
+                            listState = listState,
+                            onClick = ::onClickChapter,
+                            onLongClick = ::onLongClickChapter
+                        )
+                    }
+
+                    when (toolbarMode.value)
+                    {
+                        ToolbarMode.MAIN -> MainToolbar(
+                            bookTitle = viewModel.book.title,
+                            isBookmarked = viewModel.book.inLibrary,
+                            listState = listState,
+                            onClickBookmark = ::bookmarkToggle,
+                            onClickSortChapters = viewModel::toggleChapterSort,
+                            onClickChapterTitleSearch = { toolbarMode.value = ToolbarMode.SEARCH },
+                        )
+                        ToolbarMode.SEARCH -> ToolbarModeSearch(
+                            focusRequester = focusRequester,
+                            searchText = viewModel.textSearch,
+                            onClose = { toolbarMode.value = ToolbarMode.MAIN },
+                            onTextDone = {},
+                            color = MaterialTheme.colors.primary,
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(bottomStart = 32.dp, bottomEnd = 32.dp))
+                                .background(MaterialTheme.colors.primary)
+                                .padding(top = 16.dp)
+                        )
+                    }
+
+                    FloatingActionButton(
+                        onClick = ::onOpenLastActiveChapter,
+                        backgroundColor = ColorAccent,
+                        modifier = Modifier
+                            .align(Alignment.BottomEnd)
+                            .padding(end = 30.dp, bottom = 100.dp)
+                    ) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_baseline_play_arrow_24),
+                            contentDescription = stringResource(id = R.string.open_last_read_chapter)
+                        )
+                    }
+
                     AnimatedVisibility(
                         visible = viewModel.selectedChaptersUrl.isNotEmpty(),
+                        enter = fadeIn() + slideInVertically { it },
+                        exit = fadeOut() + slideOutVertically { it },
                         modifier = Modifier
                             .align(Alignment.BottomCenter)
-                            .padding(bottom = 125.dp),
+                            .padding(bottom = 160.dp),
                     ) {
+                        BackHandler(onBack = viewModel::closeSelectionMode)
                         SelectionToolsBar(
                             onDeleteDownload = viewModel::deleteDownloadSelected,
                             onDownload = viewModel::downloadSelected,
@@ -150,30 +217,29 @@ class ChaptersActivity : ComponentActivity()
         }
     }
 
-//        viewBind.swipeRefreshLayout.setOnRefreshListener {
-//            viewModel.updateCover()
-//            viewModel.updateDescription()
-//            viewModel.updateChaptersList()
-//        }
+    fun onOpenLastActiveChapter()
+    {
+        val bookUrl = viewModel.bookMetadata.url
+        lifecycleScope.launch(Dispatchers.IO) {
+            val lastReadChapter = viewModel.getLastReadChapter()
+            if (lastReadChapter == null)
+            {
+                toast(getString(R.string.no_chapters))
+                return@launch
+            }
 
+            withContext(Dispatchers.Main) {
+                ReaderActivity
+                    .IntentData(
+                        this@ChaptersActivity,
+                        bookUrl = bookUrl,
+                        chapterUrl = lastReadChapter
+                    )
+                    .let(this@ChaptersActivity::startActivity)
+            }
+        }
+    }
 
-//        viewBind.floatingActionButton.setOnClickListener {
-//            val bookUrl = viewModel.bookMetadata.url
-//            lifecycleScope.launch(Dispatchers.IO) {
-//                val lastReadChapter = viewModel.getLastReadChapter()
-//                if (lastReadChapter == null)
-//                {
-//                    toast(getString(R.string.no_chapters))
-//                    return@launch
-//                }
-//
-//                withContext(Dispatchers.Main) {
-//                    ReaderActivity
-//                        .IntentData(this@ChaptersActivity, bookUrl = bookUrl, chapterUrl = lastReadChapter)
-//                        .let(this@ChaptersActivity::startActivity)
-//                }
-//            }
-//        }
 
     fun bookmarkToggle()
     {
