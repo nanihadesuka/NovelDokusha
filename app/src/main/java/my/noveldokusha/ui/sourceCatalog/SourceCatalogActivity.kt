@@ -70,7 +70,6 @@ class SourceCatalogActivity : ComponentActivity()
 
             Theme(appPreferences = appPreferences) {
                 Column {
-
                     when (toolbarMode.value)
                     {
                         ToolbarMode.MAIN -> ToolbarMain(

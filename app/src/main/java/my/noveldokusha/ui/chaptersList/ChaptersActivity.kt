@@ -4,19 +4,14 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.view.WindowInsets
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.animation.*
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
@@ -24,9 +19,7 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -39,7 +32,8 @@ import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import my.noveldokusha.AppPreferences
@@ -172,7 +166,9 @@ class ChaptersActivity : ComponentActivity()
                                 onClickSortChapters = viewModel::toggleChapterSort,
                                 onClickChapterTitleSearch = {
                                     toolbarMode.value = ToolbarMode.SEARCH
-                                }
+                                },
+                                topPadding = 38.dp,
+                                height = 56.dp
                             )
                         }
                         ToolbarMode.SEARCH -> ToolbarModeSearch(
@@ -181,21 +177,9 @@ class ChaptersActivity : ComponentActivity()
                             onClose = { toolbarMode.value = ToolbarMode.MAIN },
                             onTextDone = {},
                             color = MaterialTheme.colors.primary,
-                            modifier = Modifier
-                                .clip(RoundedCornerShape(bottomStart = 32.dp, bottomEnd = 32.dp))
-                                .border(
-                                    width = 1.dp,
-                                    brush = Brush.verticalGradient(
-                                        0f to Color.Transparent,
-                                        1f to borderColor
-                                    ),
-                                    shape = RoundedCornerShape(
-                                        bottomStart = 32.dp,
-                                        bottomEnd = 32.dp
-                                    )
-                                )
-                                .background(MaterialTheme.colors.primary)
-                                .padding(top = 16.dp)
+                            showUnderline = true,
+                            topPadding = 38.dp,
+                            height = 56.dp
                         )
                     }
 

@@ -24,6 +24,7 @@ import androidx.compose.ui.state.ToggleableState
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import my.noveldokusha.R
 import my.noveldokusha.ui.sourceCatalog.ToolbarMode
@@ -39,9 +40,11 @@ fun CheckBoxCategory(
     text: String,
     onStateChanged: (state: ToggleableState) -> Unit,
     modifier: Modifier = Modifier
-) {
+)
+{
     val checkedColor by animateColorAsState(
-        targetValue = when (state) {
+        targetValue = when (state)
+        {
             ToggleableState.Off -> Color.Green
             ToggleableState.On -> Color.Green
             ToggleableState.Indeterminate -> Color.Red
@@ -50,7 +53,8 @@ fun CheckBoxCategory(
     )
 
     val onClick = {
-        val nextState = when (state) {
+        val nextState = when (state)
+        {
             ToggleableState.Off -> ToggleableState.On
             ToggleableState.On -> ToggleableState.Indeterminate
             ToggleableState.Indeterminate -> ToggleableState.Off
@@ -86,7 +90,8 @@ fun CheckBoxCategory(
 fun SearchGenres(
     list: SnapshotStateList<GenreItem>,
     onSearchClick: () -> Unit
-) {
+)
+{
     Column(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -119,16 +124,19 @@ fun SearchGenres(
 private fun ToolbarMain(
     title: String,
     subtitle: String,
-    toolbarMode: MutableState<ToolbarMode>
-) {
+    onSearch: () -> Unit,
+    topPadding: Dp,
+    height: Dp
+)
+{
     Row(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
             .fillMaxWidth()
-            .padding(8.dp)
-            .padding(top = 16.dp, bottom = 4.dp)
             .background(MaterialTheme.colors.surface)
+            .padding(top = topPadding, bottom = 0.dp, start = 12.dp, end = 12.dp)
+            .height(height)
     ) {
 
         // Fake button to center text
@@ -146,7 +154,7 @@ private fun ToolbarMain(
             )
         }
 
-        IconButton(onClick = { toolbarMode.value = ToolbarMode.SEARCH }) {
+        IconButton(onClick = onSearch) {
             Icon(
                 painter = painterResource(id = R.drawable.ic_baseline_search_24),
                 contentDescription = stringResource(R.string.search_for_title)
@@ -165,28 +173,34 @@ fun DatabaseSearchView(
     genresList: SnapshotStateList<GenreItem>,
     onTitleSearchClick: (text: String) -> Unit,
     onGenreSearchClick: () -> Unit,
-) {
+)
+{
     val focusRequester = remember { FocusRequester() }
-    val toolbarMode = rememberSaveable { mutableStateOf(ToolbarMode.MAIN) }
+    var toolbarMode by rememberSaveable { mutableStateOf(ToolbarMode.MAIN) }
 
-    LaunchedEffect(toolbarMode.value) {
-        if (toolbarMode.value == ToolbarMode.SEARCH)
+    LaunchedEffect(toolbarMode) {
+        if (toolbarMode == ToolbarMode.SEARCH)
             focusRequester.requestFocus()
     }
 
     Column {
-        when (toolbarMode.value) {
+        when (toolbarMode)
+        {
             ToolbarMode.MAIN -> ToolbarMain(
                 title = title,
                 subtitle = subtitle,
-                toolbarMode = toolbarMode
+                onSearch = { toolbarMode = ToolbarMode.SEARCH },
+                topPadding = 8.dp,
+                height = 56.dp
             )
             ToolbarMode.SEARCH -> ToolbarModeSearch(
                 focusRequester = focusRequester,
                 searchText = searchText,
-                onClose = { toolbarMode.value = ToolbarMode.MAIN },
+                onClose = { toolbarMode = ToolbarMode.MAIN },
                 onTextDone = { onTitleSearchClick(searchText.value) },
-                placeholderText = stringResource(R.string.search_by_title)
+                placeholderText = stringResource(R.string.search_by_title),
+                topPadding = 8.dp,
+                height = 56.dp
             )
         }
         SearchGenres(list = genresList, onSearchClick = onGenreSearchClick)
@@ -195,7 +209,8 @@ fun DatabaseSearchView(
 
 @Preview(showBackground = true)
 @Composable
-fun PreviewView() {
+fun PreviewView()
+{
     val list = remember {
         mutableStateListOf<GenreItem>(
             GenreItem("Fantasy", "fn", ToggleableState.Off),

@@ -155,7 +155,7 @@ dependencies {
     implementation("androidx.compose.runtime:runtime-livedata:1.1.1")
     implementation("androidx.constraintlayout:constraintlayout-compose:1.0.0")
     implementation("androidx.compose.material:material-icons-extended:1.1.1")
-    implementation("com.google.accompanist:accompanist-systemuicontroller:0.24.4-alpha")
+    implementation("com.google.accompanist:accompanist-systemuicontroller:0.24.6-alpha")
     implementation("com.google.accompanist:accompanist-swiperefresh:0.20.2")
     implementation("com.google.accompanist:accompanist-insets:0.14.0")
     androidTestImplementation("androidx.compose.ui:ui-test-junit4:1.1.1")

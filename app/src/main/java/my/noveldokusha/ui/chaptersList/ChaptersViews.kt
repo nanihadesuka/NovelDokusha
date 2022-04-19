@@ -17,7 +17,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
@@ -28,6 +30,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import my.noveldokusha.R
 import my.noveldokusha.data.ChapterWithContext
@@ -50,6 +53,8 @@ fun MainToolbar(
     onClickSortChapters: () -> Unit,
     onClickBookmark: () -> Unit,
     onClickChapterTitleSearch: () -> Unit,
+    topPadding: Dp,
+    height: Dp
 )
 {
     val bookmarkColor by animateColorAsState(
@@ -71,21 +76,17 @@ fun MainToolbar(
         horizontalArrangement = Arrangement.End,
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
-            .clip(RoundedCornerShape(bottomStart = 32.dp, bottomEnd = 32.dp))
-            .border(
-                width = 1.dp,
-                brush = Brush.verticalGradient(
-                    0f to Color.Transparent,
-                    1f to borderColor
-                ),
-                shape = RoundedCornerShape(
-                    bottomStart = 32.dp,
-                    bottomEnd = 32.dp
-                )
-            )
             .background(backgroundColor)
-            .padding(top = 38.dp, bottom = 6.dp, start = 12.dp, end = 12.dp)
-            .height(56.dp)
+            .fillMaxWidth()
+            .drawBehind {
+                drawLine(
+                    borderColor,
+                    start = Offset(0f, size.height),
+                    end = Offset(size.width, size.height)
+                )
+            }
+            .padding(top = topPadding, bottom = 0.dp, start = 12.dp, end = 12.dp)
+            .height(height)
     ) {
         Text(
             text = bookTitle,
@@ -430,7 +431,9 @@ private fun Preview()
                 alpha = 0.5f,
                 onClickBookmark = {},
                 onClickChapterTitleSearch = {},
-                onClickSortChapters = {}
+                onClickSortChapters = {},
+                topPadding = 38.dp,
+                height = 56.dp
             )
         }
     }

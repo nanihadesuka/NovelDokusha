@@ -45,10 +45,10 @@ fun ToolbarMain(
         horizontalArrangement = Arrangement.End,
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
-            .fillMaxWidth()
-            .padding(8.dp)
-            .padding(top = 16.dp, bottom = 4.dp)
             .background(MaterialTheme.colors.surface)
+            .fillMaxWidth()
+            .padding(top = 8.dp, bottom = 0.dp, start = 12.dp, end = 12.dp)
+            .height(56.dp)
     ) {
         Column(
             horizontalAlignment = Alignment.Start,
