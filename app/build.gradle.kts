@@ -166,4 +166,8 @@ dependencies {
 
     // Compose collapsing toolbar
     implementation("me.onebone:toolbar-compose:2.3.3")
+
+    // Compose scroll bar
+    implementation("com.github.nanihadesuka:LazyColumnScrollbar:1.0.3")
+
 }

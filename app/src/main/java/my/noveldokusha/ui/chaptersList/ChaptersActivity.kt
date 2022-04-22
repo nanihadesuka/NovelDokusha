@@ -10,6 +10,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.animation.*
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.FloatingActionButton
@@ -36,6 +37,7 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import my.nanihadesuka.compose.LazyColumnScrollbar
 import my.noveldokusha.AppPreferences
 import my.noveldokusha.R
 import my.noveldokusha.data.BookMetadata
@@ -138,10 +140,12 @@ class ChaptersActivity : ComponentActivity()
                         )
                     }
 
-
-                    val onPrimary = MaterialTheme.colors.onPrimary
-                    val borderColor by remember {
-                        derivedStateOf { onPrimary.copy(alpha = 0.3f) }
+                    Box(
+                        Modifier
+                            .fillMaxHeight()
+                            .padding(top = 100.dp, bottom = 0.dp)
+                    ) {
+                        LazyColumnScrollbar(listState)
                     }
 
                     when (toolbarMode.value)
