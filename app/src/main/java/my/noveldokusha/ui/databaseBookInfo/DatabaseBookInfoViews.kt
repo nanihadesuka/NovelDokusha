@@ -116,8 +116,10 @@ fun DatabaseBookInfoView(
                 MyButton(
                     text = stringResource(R.string.search_for_sources),
                     onClick = onSourcesClick,
-                    modifier = Modifier.align(Alignment.CenterHorizontally),
-                    outterPadding = 8.dp
+                    modifier = Modifier
+                        .align(Alignment.CenterHorizontally)
+                        .padding(top = 8.dp),
+                    outterPadding = 0.dp
                 )
             }
         }
