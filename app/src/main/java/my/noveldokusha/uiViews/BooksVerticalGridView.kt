@@ -9,10 +9,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Book
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.derivedStateOf
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -42,15 +39,11 @@ fun BooksVerticalGridView(
     onCopyError: (String) -> Unit = {}
 )
 {
-    val isReadyToLoad by derivedStateOf {
-        val lastVisibleIndex = (listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: 0) + 1
-        val isLoadZone = lastVisibleIndex > (listState.layoutInfo.totalItemsCount - 3)
-        val isIDLE = loadState == FetchIteratorState.STATE.IDLE
-        isLoadZone && isIDLE
-    }
-
-    if (isReadyToLoad)
-        LaunchedEffect(Unit) { onLoadNext() }
+    ListLoadWatcher(
+        listState = listState,
+        loadState = loadState,
+        onLoadNext = onLoadNext
+    )
 
     LazyVerticalGrid(
         cells = cells,
