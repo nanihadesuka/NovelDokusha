@@ -220,7 +220,6 @@ fun HeaderView(
                 text = description,
                 maxLines = maxLines,
                 overflow = TextOverflow.Ellipsis,
-                textAlign = TextAlign.Justify,
                 modifier = Modifier
                     .padding(8.dp)
                     .ifCase(description.isNotBlank()) { animateContentSize() }
