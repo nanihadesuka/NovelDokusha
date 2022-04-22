@@ -14,6 +14,7 @@ import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.listSaver
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -28,6 +29,7 @@ import my.noveldokusha.ui.theme.ColorAccent
 import my.noveldokusha.ui.theme.ImageBorderRadius
 import my.noveldokusha.ui.theme.InternalTheme
 import my.noveldokusha.uiViews.ImageView
+import my.noveldokusha.uiViews.ListLoadWatcher
 
 @Composable
 fun GlobalSourceSearchView(
@@ -67,22 +69,13 @@ fun SourceListView(
 ) {
     val state = rememberLazyListState()
 
-    val isReadyToLoad by remember(loadState, state) {
-        derivedStateOf {
-            val lastVisibleIndex = (state.layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: 0) + 1
-            val isLoadZone = lastVisibleIndex > (state.layoutInfo.totalItemsCount - 3)
-            val isIDLE = loadState == FetchIteratorState.STATE.IDLE
-            isLoadZone && isIDLE
-        }
-    }
+    ListLoadWatcher(listState = state, loadState = loadState, onLoadNext = onLoadNext)
 
     val noResults by remember(loadState, list.isEmpty()) {
         derivedStateOf {
             (loadState == FetchIteratorState.STATE.CONSUMED) && list.isEmpty()
         }
     }
-
-    LaunchedEffect(isReadyToLoad) { if (isReadyToLoad) onLoadNext() }
 
     LazyRow(
         state = state,
@@ -94,7 +87,6 @@ fun SourceListView(
             .animateContentSize()
             .fillMaxWidth()
     ) {
-
         items(list) {
             Column(
                 Modifier
@@ -127,7 +119,6 @@ fun SourceListView(
         }
 
         item {
-
             Box(
                 contentAlignment = if (noResults) Alignment.CenterStart else Alignment.Center,
                 modifier = Modifier.width(160.dp)
