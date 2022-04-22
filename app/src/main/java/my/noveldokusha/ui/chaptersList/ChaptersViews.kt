@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
+import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.snapshots.SnapshotStateList
@@ -27,7 +28,6 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
@@ -38,6 +38,7 @@ import my.noveldokusha.data.database.tables.Chapter
 import my.noveldokusha.ui.theme.ImageBorderRadius
 import my.noveldokusha.ui.theme.InternalTheme
 import my.noveldokusha.uiUtils.ifCase
+import my.noveldokusha.uiUtils.mix
 import my.noveldokusha.uiViews.ErrorView
 import my.noveldokusha.uiViews.ImageViewPreview
 
@@ -196,21 +197,28 @@ fun HeaderView(
                         fontWeight = FontWeight.Bold,
                         modifier = Modifier.padding(bottom = 8.dp)
                     )
-                    Row(
-                        verticalAlignment = Alignment.Bottom,
-                        modifier = Modifier.height(32.dp)
+                    Box(
+                        contentAlignment = Alignment.BottomCenter,
+                        modifier = Modifier
+                            .padding(16.dp)
+                            .fillMaxWidth()
                     ) {
-                        IconButton(onClick = onSearchBookInDatabase) {
-                            Icon(
-                                painter = painterResource(id = R.drawable.ic_outline_explore_24),
-                                contentDescription = stringResource(id = R.string.search_in_database_for_more_information)
-                            )
-                        }
-                        IconButton(onClick = onOpenInBrowser) {
-                            Icon(
-                                painter = painterResource(id = R.drawable.ic_outline_website_24),
-                                contentDescription = stringResource(id = R.string.open_in_browser)
-                            )
+                        Row(
+                            verticalAlignment = Alignment.Bottom,
+                            modifier = Modifier.height(32.dp)
+                        ) {
+                            IconButton(onClick = onSearchBookInDatabase) {
+                                Icon(
+                                    painter = painterResource(id = R.drawable.ic_outline_explore_24),
+                                    contentDescription = stringResource(id = R.string.search_in_database_for_more_information)
+                                )
+                            }
+                            IconButton(onClick = onOpenInBrowser) {
+                                Icon(
+                                    painter = painterResource(id = R.drawable.ic_outline_website_24),
+                                    contentDescription = stringResource(id = R.string.open_in_browser)
+                                )
+                            }
                         }
                     }
                 }
@@ -234,7 +242,7 @@ fun HeaderView(
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
+@OptIn(ExperimentalFoundationApi::class, ExperimentalAnimationApi::class)
 @Composable
 fun ChaptersListView(
     header: @Composable () -> Unit,
@@ -255,40 +263,84 @@ fun ChaptersListView(
             val selected by remember(selectedChapters.size) {
                 derivedStateOf { selectedChapters.containsKey(it.chapter.url) }
             }
+
+            val backgroundColor by animateColorAsState(
+                targetValue = when (selected)
+                {
+                    false -> MaterialTheme.colors.surface
+                    true -> MaterialTheme.colors.onPrimary.mix(MaterialTheme.colors.surface, 0.1f)
+                }
+            )
+
+            val indicatorColor = when (selected)
+            {
+                true -> MaterialTheme.colors.surface
+                false -> MaterialTheme.colors.onPrimary.mix(MaterialTheme.colors.surface, 0.5f)
+            }
+
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(16.dp),
                 modifier = Modifier
+                    .background(backgroundColor)
                     .combinedClickable(
+                        interactionSource = remember { MutableInteractionSource() },
+                        indication = rememberRipple(color = indicatorColor),
                         onClick = { onClick(it) },
                         onLongClick = { onLongClick(it) }
                     )
                     .fillMaxWidth()
-                    .ifCase(selected) {
-                        background(MaterialTheme.colors.onPrimary.copy(alpha = 0.2f))
-                    }
                     .padding(horizontal = 8.dp, vertical = 16.dp),
             ) {
-                Text(
-                    text = it.chapter.title,
-                    modifier = Modifier.weight(1f),
-                    color = MaterialTheme.colors.onPrimary.copy(
-                        alpha = if (it.chapter.read) 0.5f else 1f
-                    )
+                val readColorText by animateColorAsState(
+                    targetValue = when (it.chapter.read)
+                    {
+                        true -> MaterialTheme.colors.onPrimary.copy(alpha = 0.5f)
+                        false -> MaterialTheme.colors.onPrimary.copy(alpha = 1f)
+                    }
                 )
+
+                val readColor by animateColorAsState(
+                    targetValue = when (it.chapter.read)
+                    {
+                        true -> MaterialTheme.colors.onPrimary.copy(alpha = 0.5f)
+                        false -> MaterialTheme.colors.onPrimary.copy(alpha = 0f)
+                    }
+                )
+
+                val downloadedColor by animateColorAsState(
+                    targetValue = when (it.downloaded)
+                    {
+                        true -> MaterialTheme.colors.onPrimary.copy(alpha = 0.5f)
+                        false -> MaterialTheme.colors.onPrimary.copy(alpha = 0f)
+                    }
+                )
+
+                AnimatedContent(
+                    targetState = it.chapter.title,
+                    transitionSpec = {
+                        if (targetState.length == initialState.length)
+                            EnterTransition.None with ExitTransition.None
+                        else
+                            fadeIn() with fadeOut()
+                    },
+                    modifier = Modifier.weight(1f),
+                ) { targetText ->
+                    Text(
+                        text = targetText,
+                        modifier = Modifier.fillMaxWidth(),
+                        color = readColorText
+                    )
+                }
                 Icon(
                     painter = painterResource(id = R.drawable.ic_looking_24),
                     contentDescription = null,
-                    tint = MaterialTheme.colors.onPrimary.copy(
-                        alpha = if (it.chapter.read) 0.5f else 0f
-                    )
+                    tint = readColor
                 )
                 Icon(
                     painter = painterResource(id = R.drawable.ic_outline_cloud_download_24),
                     contentDescription = null,
-                    tint = MaterialTheme.colors.onPrimary.copy(
-                        alpha = if (it.downloaded) 0.5f else 0f
-                    )
+                    tint = downloadedColor
                 )
             }
         }

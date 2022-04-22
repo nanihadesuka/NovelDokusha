@@ -13,19 +13,15 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.annotation.*
-import androidx.compose.runtime.Recomposer
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.use
-import androidx.fragment.app.Fragment
-import androidx.fragment.app.createViewModelLazy
 import androidx.lifecycle.*
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import my.noveldokusha.App
 import my.noveldokusha.ui.BaseFragment
@@ -111,3 +107,14 @@ fun <T> Flow<T>.toState(scope: CoroutineScope, initialValue: T): State<T>
     }
 	return mutableState
 }
+
+
+fun androidx.compose.ui.graphics.Color.mix(
+    color: androidx.compose.ui.graphics.Color,
+    fraction: Float,
+) = androidx.compose.ui.graphics.Color(
+    red = red * fraction + color.red * (1f - fraction),
+    green = green * fraction + color.green * (1f - fraction),
+    blue = blue * fraction + color.blue * (1f - fraction),
+    alpha = alpha * fraction + color.alpha * (1f - fraction),
+)
