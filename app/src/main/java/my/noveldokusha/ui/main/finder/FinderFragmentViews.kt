@@ -1,4 +1,4 @@
-package my.noveldokusha.ui.main.Finder
+package my.noveldokusha.ui.main.finder
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border

@@ -1,4 +1,4 @@
-package my.noveldokusha.ui.main.Finder
+package my.noveldokusha.ui.main.finder
 
 import android.os.Bundle
 import android.view.*
@@ -9,13 +9,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.res.stringResource
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import dagger.hilt.android.AndroidEntryPoint
 import my.noveldokusha.*
-import my.noveldokusha.databinding.ActivityMainFragmentFinderBinding
 import my.noveldokusha.scraper.DatabaseInterface
 import my.noveldokusha.scraper.SourceInterface
 import my.noveldokusha.ui.databaseSearch.DatabaseSearchActivity
@@ -33,7 +33,6 @@ class FinderFragment : Fragment()
     lateinit var appPreferences: AppPreferences
 
     private val viewModel by viewModels<FinderViewModel>()
-    private lateinit var viewBind: ActivityMainFragmentFinderBinding
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -41,9 +40,9 @@ class FinderFragment : Fragment()
         savedInstanceState: Bundle?
     ): View
     {
-        viewBind = ActivityMainFragmentFinderBinding.inflate(inflater, container, false)
-        viewBind.composeContainer.setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
-        viewBind.composeContainer.setContent {
+        val view = ComposeView(requireContext())
+        view.setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+        view.setContent {
 
             val title = stringResource(id = R.string.app_name)
             val searchText = rememberSaveable { mutableStateOf("") }
@@ -92,7 +91,7 @@ class FinderFragment : Fragment()
             }
         }
 
-        return viewBind.root
+        return view
     }
 
     private fun toggleSourceLanguage(language: String)

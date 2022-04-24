@@ -15,7 +15,7 @@
 
     <fragment
         android:id="@+id/navigation_finder"
-        android:name="my.noveldokusha.ui.main.Finder.FinderFragment"
+        android:name="my.noveldokusha.ui.main.finder.FinderFragment"
         android:label="@string/title_finder"
         tools:layout="@layout/activity_main_fragment_finder"
         />

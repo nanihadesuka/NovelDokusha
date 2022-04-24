@@ -6,21 +6,17 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.*
+import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
-import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.viewModels
-import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.checkbox.checkBoxPrompt
 import com.afollestad.materialdialogs.checkbox.isCheckPromptChecked
-import com.google.android.material.tabs.TabLayoutMediator
 import dagger.hilt.android.AndroidEntryPoint
 import my.noveldokusha.*
 import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.data.BookWithContext
 import my.noveldokusha.data.database.tables.Book
-import my.noveldokusha.databinding.ActivityMainFragmentLibraryBinding
 import my.noveldokusha.services.EpubImportService
 import my.noveldokusha.ui.BaseFragment
 import my.noveldokusha.ui.chaptersList.ChaptersActivity
@@ -30,7 +26,6 @@ import my.noveldokusha.ui.theme.Theme
 class LibraryFragment : BaseFragment()
 {
     private val viewModel by viewModels<LibraryViewModel>()
-    private lateinit var viewBind: ActivityMainFragmentLibraryBinding
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -38,9 +33,9 @@ class LibraryFragment : BaseFragment()
         savedInstanceState: Bundle?
     ): View
     {
-        viewBind = ActivityMainFragmentLibraryBinding.inflate(inflater, container, false)
-        viewBind.composeView.setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
-        viewBind.composeView.setContent {
+        val view = ComposeView(requireContext())
+        view.setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+        view.setContent {
             Theme(appPreferences = appPreferences) {
                 LibraryBody(
                     tabs = listOf("Default", "Completed"),
@@ -49,7 +44,7 @@ class LibraryFragment : BaseFragment()
                 )
             }
         }
-        return viewBind.root
+        return view
     }
 
     private fun goToBookChaptersPage(book: BookWithContext)
