@@ -158,6 +158,9 @@ dependencies {
     implementation("com.google.accompanist:accompanist-systemuicontroller:0.24.6-alpha")
     implementation("com.google.accompanist:accompanist-swiperefresh:0.20.2")
     implementation("com.google.accompanist:accompanist-insets:0.14.0")
+    implementation("com.google.accompanist:accompanist-pager:0.20.2")
+    implementation("com.google.accompanist:accompanist-pager-indicators:0.20.2")
+
     androidTestImplementation("androidx.compose.ui:ui-test-junit4:1.1.1")
 
     // Coil for jetpack compose

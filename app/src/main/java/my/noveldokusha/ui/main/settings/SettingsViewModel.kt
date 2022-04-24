@@ -1,14 +1,12 @@
-package my.noveldokusha.ui.main
+package my.noveldokusha.ui.main.settings
 
 import android.text.format.Formatter
 import androidx.compose.runtime.*
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.lifecycle.*
 import com.bumptech.glide.Glide
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.mapNotNull
 import my.noveldokusha.*
 import my.noveldokusha.data.Repository

@@ -7,14 +7,13 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
@@ -31,19 +30,22 @@ fun MyButton(
     enabled: Boolean = true,
     animate: Boolean = true,
     textAlign: TextAlign = TextAlign.Start,
-    outterPadding : Dp = 4.dp,
+    outterPadding: Dp = 4.dp,
     radius: Dp = 4.dp,
     borderWidth: Dp = 1.dp,
+    backgroundColor: Color = MaterialTheme.colors.primary,
+    textStyle: TextStyle = LocalTextStyle.current,
     onClick: () -> Unit,
     content: @Composable (String, Dp, TextAlign) -> Unit = { text, radius, textAlign ->
         Text(
             text = text,
             modifier = Modifier.padding(12.dp),
-            textAlign = textAlign
+            textAlign = textAlign,
+            style = textStyle
         )
     }
-) {
-
+)
+{
     val shape = RoundedCornerShape(radius)
     Surface(
         modifier = modifier
@@ -55,7 +57,7 @@ fun MyButton(
                 enabled = enabled,
                 role = Role.Button
             ) { onClick() },
-        color = MaterialTheme.colors.primary
+        color = backgroundColor
     ) {
         content(text, radius, textAlign)
     }
@@ -64,7 +66,8 @@ fun MyButton(
 
 @Preview
 @Composable
-fun Preview() {
+fun Preview()
+{
     Column {
         for (theme in Themes.values()) InternalThemeObject(theme) {
             MyButton(

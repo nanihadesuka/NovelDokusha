@@ -1,48 +1,78 @@
-package my.noveldokusha.ui.main
+package my.noveldokusha.ui.main.library
 
 import android.Manifest
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.*
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.viewModels
 import androidx.viewpager2.adapter.FragmentStateAdapter
+import com.afollestad.materialdialogs.MaterialDialog
+import com.afollestad.materialdialogs.checkbox.checkBoxPrompt
+import com.afollestad.materialdialogs.checkbox.isCheckPromptChecked
 import com.google.android.material.tabs.TabLayoutMediator
 import dagger.hilt.android.AndroidEntryPoint
 import my.noveldokusha.*
+import my.noveldokusha.data.BookMetadata
+import my.noveldokusha.data.BookWithContext
+import my.noveldokusha.data.database.tables.Book
 import my.noveldokusha.databinding.ActivityMainFragmentLibraryBinding
 import my.noveldokusha.services.EpubImportService
 import my.noveldokusha.ui.BaseFragment
+import my.noveldokusha.ui.chaptersList.ChaptersActivity
+import my.noveldokusha.ui.theme.Theme
 
 @AndroidEntryPoint
 class LibraryFragment : BaseFragment()
 {
     private val viewModel by viewModels<LibraryViewModel>()
     private lateinit var viewBind: ActivityMainFragmentLibraryBinding
-    private lateinit var viewAdapter: Adapter
 
-    private inner class Adapter
-    {
-        val viewPage by lazy { LibraryViewPageAdapter(this@LibraryFragment.requireActivity()) }
-    }
-
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View
     {
         viewBind = ActivityMainFragmentLibraryBinding.inflate(inflater, container, false)
-        viewAdapter = Adapter()
-
-        viewBind.viewPager.offscreenPageLimit = 3
-        viewBind.viewPager.adapter = viewAdapter.viewPage
-        TabLayoutMediator(viewBind.viewPagerTabs, viewBind.viewPager) { tab, position ->
-            tab.text = when (position)
-            {
-                0 -> "Default"
-                else -> "Completed"
+        viewBind.composeView.setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+        viewBind.composeView.setContent {
+            Theme(appPreferences = appPreferences) {
+                LibraryBody(
+                    tabs = listOf("Default", "Completed"),
+                    onBookClick = ::goToBookChaptersPage,
+                    onBookLongClick = ::openCompletedDialog
+                )
             }
-        }.attach()
+        }
         return viewBind.root
+    }
+
+    private fun goToBookChaptersPage(book: BookWithContext)
+    {
+        ChaptersActivity.IntentData(
+            requireContext(),
+            bookMetadata = BookMetadata(title = book.book.title, url = book.book.url)
+        ).let(::startActivity)
+    }
+
+    private fun openCompletedDialog(book: BookWithContext)
+    {
+        completedDialog(requireContext(), book.book)
+    }
+
+    private fun completedDialog(ctx: Context, book: Book) = MaterialDialog(ctx).show {
+        title(text = book.title)
+        checkBoxPrompt(text = "Completed", isCheckedDefault = book.completed) {}
+        negativeButton(text = "Cancel")
+        positiveButton(text = "Ok") {
+            val completed = isCheckPromptChecked()
+            viewModel.setBookAsCompleted(book, completed)
+        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?)
@@ -88,16 +118,5 @@ class LibraryFragment : BaseFragment()
 
         LibraryFragmentBottomSheetDialog()
             .show(parentFragmentManager, LibraryFragmentBottomSheetDialog.tag)
-    }
-}
-
-private class LibraryViewPageAdapter(fragmentActivity: FragmentActivity) : FragmentStateAdapter(fragmentActivity)
-{
-    override fun getItemCount(): Int = 2
-
-    override fun createFragment(position: Int): Fragment = when (position)
-    {
-        0 -> LibraryPageFragment(showCompleted = false)
-        else -> LibraryPageFragment(showCompleted = true)
     }
 }

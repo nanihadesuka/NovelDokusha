@@ -1,4 +1,4 @@
-package my.noveldokusha.ui.main
+package my.noveldokusha.ui.main.library
 
 import android.os.Bundle
 import android.view.LayoutInflater

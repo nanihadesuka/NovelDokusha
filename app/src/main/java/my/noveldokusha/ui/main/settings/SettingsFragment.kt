@@ -1,4 +1,4 @@
-package my.noveldokusha.ui.main
+package my.noveldokusha.ui.main.settings
 
 import android.Manifest
 import android.app.Activity.RESULT_OK
@@ -10,7 +10,6 @@ import android.view.ViewGroup
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.checkbox.checkBoxPrompt
 import com.afollestad.materialdialogs.checkbox.isCheckPromptChecked

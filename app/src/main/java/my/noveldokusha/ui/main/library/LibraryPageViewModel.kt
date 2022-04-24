@@ -1,7 +1,9 @@
-package my.noveldokusha.ui.main
+package my.noveldokusha.ui.main.library
 
+import androidx.compose.runtime.getValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.asLiveData
+import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -13,25 +15,22 @@ import my.noveldokusha.data.Repository
 import my.noveldokusha.data.database.tables.Book
 import my.noveldokusha.ui.BaseViewModel
 import my.noveldokusha.uiUtils.StateExtra_Boolean
+import my.noveldokusha.uiUtils.toState
 import javax.inject.Inject
-
-interface LibraryPageStateBundle
-{
-    var showCompleted: Boolean
-}
 
 @HiltViewModel
 class LibraryPageViewModel @Inject constructor(
     private val repository: Repository,
     private val state: SavedStateHandle,
     private val preferences: AppPreferences
-) : BaseViewModel(), LibraryPageStateBundle
+) : BaseViewModel()
 {
-    override var showCompleted by StateExtra_Boolean(state)
+    val listReading by createPageList(isShowCompleted = false)
+    val listCompleted by createPageList(isShowCompleted = true)
 
-    val booksWithContext = repository.bookLibrary
+    private fun createPageList(isShowCompleted: Boolean) = repository.bookLibrary
         .getBooksInLibraryWithContextFlow
-        .map { it.filter { book -> book.book.completed == showCompleted } }
+        .map { it.filter { book -> book.book.completed == isShowCompleted } }
         .combine(preferences.LIBRARY_FILTER_READ.flow()) { list, filterRead ->
             when (filterRead)
             {
@@ -47,9 +46,5 @@ class LibraryPageViewModel @Inject constructor(
                 AppPreferences.TERNARY_STATE.inactive -> list
             }
         }
-        .asLiveData()
-
-    fun setBookAsCompleted(book: Book, completed: Boolean) = CoroutineScope(Dispatchers.IO).launch {
-        repository.bookLibrary.update(book.copy(completed = completed))
-    }
+        .toState(viewModelScope, listOf())
 }

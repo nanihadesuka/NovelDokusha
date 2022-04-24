@@ -8,20 +8,20 @@
 
     <fragment
         android:id="@+id/navigation_library"
-        android:name="my.noveldokusha.ui.main.LibraryFragment"
+        android:name="my.noveldokusha.ui.main.library.LibraryFragment"
         android:label="@string/title_library"
         tools:layout="@layout/activity_main_fragment_library"
         />
 
     <fragment
         android:id="@+id/navigation_finder"
-        android:name="my.noveldokusha.ui.main.FinderFragment"
+        android:name="my.noveldokusha.ui.main.Finder.FinderFragment"
         android:label="@string/title_finder"
         tools:layout="@layout/activity_main_fragment_finder"
         />
     <fragment
         android:id="@+id/navigation_settings"
-        android:name="my.noveldokusha.ui.main.SettingsFragment"
+        android:name="my.noveldokusha.ui.main.settings.SettingsFragment"
         android:label="@string/title_settings"
         />
 </navigation>

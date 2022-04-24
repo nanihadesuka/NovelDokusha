@@ -3,26 +3,17 @@ package my.noveldokusha.uiViews
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.*
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Book
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import my.noveldokusha.R
 import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.scraper.FetchIteratorState
 import my.noveldokusha.ui.theme.ColorAccent
-import my.noveldokusha.ui.theme.ImageBorderRadius
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -52,50 +43,12 @@ fun BooksVerticalGridView(
         contentPadding = PaddingValues(start = 4.dp, end = 4.dp, top = 0.dp, bottom = 260.dp)
     ) {
         items(list) {
-            MyButton(
-                text = it.title,
+            BookImageButtonView(
+                title = it.title,
+                coverImageUrl = it.coverImageUrl,
                 onClick = { onBookClicked(it) },
-                radius = ImageBorderRadius,
-                borderWidth = 0.dp,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .combinedClickable(
-                        onClick = { onBookClicked(it) },
-                        onLongClick = { onBookLongClicked(it) }
-                    )
-            ) { _, radius, _ ->
-                Box(
-                    Modifier
-                        .fillMaxWidth()
-                        .aspectRatio(1 / 1.45f)
-                        .clip(RoundedCornerShape(radius))
-                ) {
-                    ImageView(
-                        imageModel = it.coverImageUrl,
-                        contentDescription = it.title,
-                        modifier = Modifier.fillMaxSize(),
-                        error = R.drawable.default_book_cover,
-                    )
-                    Icons.Default.Book
-                    Text(
-                        text = it.title,
-                        textAlign = TextAlign.Center,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier
-                            .fillMaxWidth(1f)
-                            .align(Alignment.BottomCenter)
-                            .background(
-                                Brush.verticalGradient(
-                                    0f to MaterialTheme.colors.primary.copy(alpha = 0f),
-                                    0.44f to MaterialTheme.colors.primary.copy(alpha = 0.5f),
-                                    1f to MaterialTheme.colors.primary.copy(alpha = 0.85f),
-                                )
-                            )
-                            .padding(top = 30.dp, bottom = 8.dp)
-                            .padding(horizontal = 8.dp)
-                    )
-                }
-            }
+                onLongClick = { onBookLongClicked(it) }
+            )
         }
 
         item(span = { GridItemSpan(maxCurrentLineSpan) }) {
