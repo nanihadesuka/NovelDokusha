@@ -62,7 +62,15 @@ class AppPreferences @Inject constructor(
     }
 
     enum class TERNARY_STATE
-    { active, inverse, inactive }
+    {
+        active, inverse, inactive;
+        fun next() = when (this)
+        {
+            active -> inverse
+            inverse -> inactive
+            inactive -> active
+        }
+    }
 
     enum class LIST_LAYOUT_MODE
     { verticalList, verticalGrid }

@@ -10,9 +10,11 @@ import my.noveldokusha.ui.BaseViewModel
 import my.noveldokusha.uiUtils.toState
 import javax.inject.Inject
 
+data class LanguagesActive(val language: String, val active: Boolean)
+
 @HiltViewModel
 class FinderViewModel @Inject constructor(
-    appPreferences: AppPreferences
+    private val appPreferences: AppPreferences
 ) : BaseViewModel()
 {
     val databaseList = scraper.databasesList.toList()
@@ -32,4 +34,14 @@ class FinderViewModel @Inject constructor(
                 .map { LanguagesActive(it, active = activeLangs.contains(it)) }
         }
         .toState(viewModelScope, listOf())
+
+    fun toggleSourceLanguage(language: String)
+    {
+        val langs = appPreferences.SOURCES_LANGUAGES.value
+        appPreferences.SOURCES_LANGUAGES.value = when (language in langs)
+        {
+            true -> langs.minus(language)
+            false -> langs.plus(language)
+        }
+    }
 }

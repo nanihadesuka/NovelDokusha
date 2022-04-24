@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
@@ -17,6 +18,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -28,6 +30,7 @@ import my.noveldokusha.R
 import my.noveldokusha.ui.theme.ColorAccent
 import my.noveldokusha.ui.theme.InternalTheme
 import my.noveldokusha.ui.theme.Themes
+import my.noveldokusha.uiUtils.drawBottomLine
 import my.noveldokusha.uiUtils.ifCase
 import my.noveldokusha.uiViews.MyButton
 
@@ -129,6 +132,28 @@ private fun SettingsTheme(
 }
 
 @Composable
+fun ToolbarMain(title: String)
+{
+    Row(
+        horizontalArrangement = Arrangement.End,
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier
+            .background(MaterialTheme.colors.surface)
+            .fillMaxWidth()
+            .drawBottomLine()
+            .padding(top = 8.dp, bottom = 0.dp, start = 12.dp, end = 12.dp)
+            .height(56.dp)
+    ) {
+        Text(
+            text = title,
+            style = MaterialTheme.typography.h6,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.weight(1f)
+        )
+    }
+}
+
+@Composable
 private fun ClickableOption(
     title: String,
     subtitle: String,
@@ -222,7 +247,7 @@ private fun SettingsBackup(
 }
 
 @Composable
-fun SettingsView(
+fun SettingsBody(
     currentFollowSystem: Boolean,
     currentTheme: Themes,
     onFollowSystem: (Boolean) -> Unit,
@@ -279,7 +304,7 @@ fun Preview()
 {
     val currentTheme = Themes.DARK
     InternalTheme(currentTheme) {
-        SettingsView(
+        SettingsBody(
             currentFollowSystem = true,
             currentTheme = currentTheme,
             onFollowSystem = { },

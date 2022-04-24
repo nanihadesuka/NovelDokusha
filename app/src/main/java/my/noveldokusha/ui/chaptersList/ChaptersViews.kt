@@ -37,6 +37,7 @@ import my.noveldokusha.data.ChapterWithContext
 import my.noveldokusha.data.database.tables.Chapter
 import my.noveldokusha.ui.theme.ImageBorderRadius
 import my.noveldokusha.ui.theme.InternalTheme
+import my.noveldokusha.uiUtils.drawBottomLine
 import my.noveldokusha.uiUtils.ifCase
 import my.noveldokusha.uiUtils.mix
 import my.noveldokusha.uiViews.ErrorView
@@ -79,13 +80,7 @@ fun MainToolbar(
         modifier = Modifier
             .background(backgroundColor)
             .fillMaxWidth()
-            .drawBehind {
-                drawLine(
-                    borderColor,
-                    start = Offset(0f, size.height),
-                    end = Offset(size.width, size.height)
-                )
-            }
+            .drawBottomLine(borderColor)
             .padding(top = topPadding, bottom = 0.dp, start = 12.dp, end = 12.dp)
             .height(height)
     ) {

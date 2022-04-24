@@ -1,5 +1,6 @@
 package my.noveldokusha.ui.main.finder
 
+import android.content.Context
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -8,10 +9,12 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -20,28 +23,69 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import my.noveldokusha.R
 import my.noveldokusha.scraper.DatabaseInterface
 import my.noveldokusha.scraper.SourceInterface
 import my.noveldokusha.scraper.scraper
+import my.noveldokusha.ui.databaseSearch.DatabaseSearchActivity
+import my.noveldokusha.ui.globalSourceSearch.GlobalSourceSearchActivity
+import my.noveldokusha.ui.sourceCatalog.SourceCatalogActivity
+import my.noveldokusha.ui.sourceCatalog.ToolbarMode
 import my.noveldokusha.ui.theme.ColorAccent
 import my.noveldokusha.ui.theme.InternalTheme
+import my.noveldokusha.uiToolbars.ToolbarModeSearch
+import my.noveldokusha.uiUtils.drawBottomLine
 import my.noveldokusha.uiViews.MyButton
 
 @Composable
-private fun Button(
-    text: String,
-    onClick: () -> Unit,
-)
+fun FinderView(context: Context)
 {
-    MyButton(
-        text = text,
-        onClick = onClick,
-        outterPadding = 0.dp,
-        backgroundColor = MaterialTheme.colors.primary,
-        modifier = Modifier.fillMaxWidth(),
-        textStyle = LocalTextStyle.current.copy(fontWeight = FontWeight.Bold)
-    )
+    val viewModel = viewModel<FinderViewModel>()
+    val title = stringResource(id = R.string.app_name)
+    val searchText = rememberSaveable { mutableStateOf("") }
+    val focusRequester = remember { FocusRequester() }
+    val toolbarMode = rememberSaveable { mutableStateOf(ToolbarMode.MAIN) }
+    var languagesOptionsExpanded by remember { mutableStateOf(false) }
+
+    Column {
+        when (toolbarMode.value)
+        {
+            ToolbarMode.MAIN -> ToolbarMain(
+                title = title,
+                onSearchPress = {
+                    toolbarMode.value = ToolbarMode.SEARCH
+                },
+                onLanguagesOptionsPress = {
+                    languagesOptionsExpanded = !languagesOptionsExpanded
+                },
+                languagesDropDownView = {
+                    LanguagesDropDown(
+                        expanded = languagesOptionsExpanded,
+                        list = viewModel.languagesList,
+                        onDismiss = { languagesOptionsExpanded = false },
+                        onToggleLanguage = { viewModel.toggleSourceLanguage(it.language) }
+                    )
+                }
+            )
+            ToolbarMode.SEARCH -> ToolbarModeSearch(
+                focusRequester = focusRequester,
+                searchText = searchText,
+                onClose = {
+                    toolbarMode.value = ToolbarMode.MAIN
+                },
+                onTextDone = { context.goToGlobalSearch(searchText.value) },
+                placeholderText = stringResource(R.string.global_search),
+                showUnderline = true
+            )
+        }
+        FinderBody(
+            databasesList = viewModel.databaseList,
+            sourcesList = viewModel.sourcesList,
+            onDatabaseClick = context::goToDatabaseSearch,
+            onSourceClick = context::goToSourceCatalog,
+        )
+    }
 }
 
 @Composable
@@ -106,6 +150,7 @@ fun ToolbarMain(
         modifier = Modifier
             .background(MaterialTheme.colors.surface)
             .fillMaxWidth()
+            .drawBottomLine()
             .padding(top = 8.dp, bottom = 0.dp, start = 12.dp, end = 12.dp)
             .height(56.dp)
     ) {
@@ -131,8 +176,6 @@ fun ToolbarMain(
         }
     }
 }
-
-data class LanguagesActive(val language: String, val active: Boolean)
 
 @Composable
 fun LanguagesDropDown(
@@ -193,6 +236,22 @@ fun LanguagesDropDown(
     }
 }
 
+@Composable
+private fun Button(
+    text: String,
+    onClick: () -> Unit,
+)
+{
+    MyButton(
+        text = text,
+        onClick = onClick,
+        outterPadding = 0.dp,
+        backgroundColor = MaterialTheme.colors.primary,
+        modifier = Modifier.fillMaxWidth(),
+        textStyle = LocalTextStyle.current.copy(fontWeight = FontWeight.Bold)
+    )
+}
+
 @Preview
 @Composable
 fun PreviewView()
@@ -207,7 +266,23 @@ fun PreviewView()
     }
 }
 
+private fun Context.goToSourceCatalog(source: SourceInterface.catalog)
+{
+    SourceCatalogActivity
+        .IntentData(this, sourceBaseUrl = source.baseUrl)
+        .let(::startActivity)
+}
 
+private fun Context.goToDatabaseSearch(database: DatabaseInterface)
+{
+    DatabaseSearchActivity
+        .IntentData(this, databaseBaseUrl = database.baseUrl)
+        .let(::startActivity)
+}
 
-
-
+private fun Context.goToGlobalSearch(text: String)
+{
+    GlobalSourceSearchActivity
+        .IntentData(this, text)
+        .let(::startActivity)
+}

@@ -197,7 +197,7 @@ class ChaptersActivity : ComponentActivity()
                         Icon(
                             painter = painterResource(id = R.drawable.ic_baseline_play_arrow_24),
                             contentDescription = stringResource(id = R.string.open_last_read_chapter),
-                            tint = MaterialTheme.colors.primary
+                            tint = Color.White
                         )
                     }
 

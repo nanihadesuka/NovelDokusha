@@ -85,6 +85,15 @@ class SettingsViewModel @Inject constructor(
         updateImagesFolderSize()
         Glide.get(App.instance).clearDiskCache()
     }
+
+    fun onFollowSystem(follow: Boolean)
+    {
+        appPreferences.THEME_FOLLOW_SYSTEM.value = follow
+    }
+
+    fun onThemeSelected(themes:Themes) {
+        appPreferences.THEME_ID.value = Themes.toIDTheme(themes)
+    }
 }
 
 private suspend fun getFolderSizeBytes(file: File): Long = withContext(Dispatchers.IO) {

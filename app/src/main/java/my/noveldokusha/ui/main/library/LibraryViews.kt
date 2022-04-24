@@ -8,18 +8,23 @@ import androidx.compose.foundation.lazy.GridCells
 import androidx.compose.foundation.lazy.LazyVerticalGrid
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Tab
-import androidx.compose.material.TabRow
-import androidx.compose.material.Text
+import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.rememberPagerState
 import kotlinx.coroutines.launch
+import my.noveldokusha.R
 import my.noveldokusha.data.BookWithContext
 import my.noveldokusha.ui.theme.ColorAccent
 import my.noveldokusha.uiViews.BookImageButtonView
@@ -112,6 +117,46 @@ fun LibraryPageBody(
                     )
                 }
             }
+        }
+    }
+}
+
+@Composable
+fun ToolbarMain(
+    title: String,
+    onOpenBottomSheetOptionsPress: () -> Unit,
+    onOptionsDropDownPress: () -> Unit,
+    onOptionsDropDownView: @Composable () -> Unit
+)
+{
+    Row(
+        horizontalArrangement = Arrangement.End,
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier
+            .background(MaterialTheme.colors.surface)
+            .fillMaxWidth()
+            .padding(top = 8.dp, bottom = 0.dp, start = 12.dp, end = 12.dp)
+            .height(56.dp)
+    ) {
+        Text(
+            text = title,
+            style = MaterialTheme.typography.h6,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.weight(1f)
+        )
+        IconButton(onClick = onOpenBottomSheetOptionsPress) {
+            Icon(
+                painter = painterResource(id = R.drawable.ic_baseline_filter_list_24),
+                contentDescription = stringResource(R.string.options_panel)
+            )
+        }
+
+        IconButton(onClick = onOptionsDropDownPress) {
+            Icon(
+                Icons.Default.MoreVert,
+                contentDescription = stringResource(R.string.open_for_more_options)
+            )
+            onOptionsDropDownView()
         }
     }
 }
