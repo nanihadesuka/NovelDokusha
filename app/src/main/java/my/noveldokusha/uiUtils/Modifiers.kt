@@ -22,3 +22,13 @@ fun Modifier.drawBottomLine(color: Color = MaterialTheme.colors.onPrimary.copy(a
             end = Offset(size.width, size.height)
         )
     }
+
+@Composable
+fun Modifier.drawTopLine(color: Color = MaterialTheme.colors.onPrimary.copy(alpha = 0.3f)) =
+    drawBehind {
+        drawLine(
+            color,
+            start = Offset(0f, 0f),
+            end = Offset(size.width, 0f)
+        )
+    }

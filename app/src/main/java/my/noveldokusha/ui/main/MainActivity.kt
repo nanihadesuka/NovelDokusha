@@ -3,29 +3,20 @@ package my.noveldokusha.ui.main
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.animation.animateColorAsState
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowDownward
-import androidx.compose.material.icons.filled.ArrowUpward
-import androidx.compose.material.icons.filled.HorizontalSplit
-import androidx.compose.material.icons.filled.SwapVert
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.state.ToggleableState
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.google.accompanist.insets.navigationBarsPadding
@@ -36,10 +27,9 @@ import my.noveldokusha.ui.main.finder.FinderView
 import my.noveldokusha.ui.main.library.LibraryView
 import my.noveldokusha.ui.main.library.LibraryViewModel
 import my.noveldokusha.ui.main.settings.SettingsView
-import my.noveldokusha.ui.theme.ColorAccent
 import my.noveldokusha.ui.theme.Theme
+import my.noveldokusha.uiUtils.drawTopLine
 import my.noveldokusha.uiUtils.mix
-import my.noveldokusha.uiViews.Checkbox3StatesView
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -72,7 +62,9 @@ open class MainActivity : ComponentActivity()
                         }
                         Row(
                             horizontalArrangement = Arrangement.SpaceEvenly,
-                            modifier = Modifier.background(MaterialTheme.colors.surface)
+                            modifier = Modifier
+                                .background(MaterialTheme.colors.surface)
+                                .drawTopLine()
                         ) {
                             NavItem(
                                 text = stringResource(id = R.string.title_library),
@@ -126,82 +118,6 @@ fun AppPreferences.TERNARY_STATE.toToggleableState() = when (this)
     AppPreferences.TERNARY_STATE.inactive -> ToggleableState.Off
 }
 
-
-@Composable
-fun OptionsSheetLibrary()
-{
-    val model = viewModel<LibraryViewModel>()
-    Column(Modifier.padding(top = 16.dp, bottom = 64.dp)) {
-        Text(
-            text = stringResource(id = R.string.filter),
-            modifier = Modifier
-                .padding(8.dp)
-                .padding(horizontal = 8.dp),
-            color = ColorAccent,
-            fontWeight = FontWeight.Bold
-        )
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier
-                .clickable { model.readFilterToggle() }
-                .fillMaxWidth()
-                .heightIn(min = 40.dp)
-                .padding(8.dp)
-                .padding(horizontal = 8.dp)
-        ) {
-            val checkedColor by animateColorAsState(
-                targetValue = when (model.readFilter.toToggleableState())
-                {
-                    ToggleableState.Off -> Color.Green
-                    ToggleableState.On -> Color.Green
-                    ToggleableState.Indeterminate -> Color.Red
-                },
-                animationSpec = tween(250)
-            )
-            TriStateCheckbox(
-                state = model.readFilter.toToggleableState(),
-                onClick = null,
-                colors = CheckboxDefaults.colors(
-                    checkedColor = checkedColor,
-                    uncheckedColor = MaterialTheme.colors.onPrimary.copy(alpha = 0.5f),
-                    disabledColor = MaterialTheme.colors.onPrimary.copy(alpha = 0.25f),
-                    disabledIndeterminateColor = MaterialTheme.colors.onPrimary.copy(alpha = 0.25f),
-                )
-            )
-            Text(text = "Read", modifier = Modifier.padding(8.dp))
-        }
-
-
-        Text(
-            text = stringResource(id = R.string.sort),
-            modifier = Modifier
-                .padding(8.dp)
-                .padding(horizontal = 8.dp),
-            color = ColorAccent,
-            fontWeight = FontWeight.Bold
-        )
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier
-                .clickable { model.readSortToggle() }
-                .fillMaxWidth()
-                .heightIn(min = 40.dp)
-                .padding(8.dp)
-                .padding(horizontal = 8.dp)
-        ) {
-            Icon(
-                imageVector = when (model.readSort)
-                {
-                    AppPreferences.TERNARY_STATE.active -> Icons.Default.ArrowUpward
-                    AppPreferences.TERNARY_STATE.inverse -> Icons.Default.ArrowDownward
-                    AppPreferences.TERNARY_STATE.inactive -> Icons.Default.SwapVert
-                },
-                contentDescription = null
-            )
-            Text(text = "Read", modifier = Modifier.padding(8.dp))
-        }
-    }
-}
 
 @Composable
 private fun RowScope.NavItem(
