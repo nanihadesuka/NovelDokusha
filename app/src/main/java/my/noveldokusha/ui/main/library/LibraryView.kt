@@ -19,6 +19,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.checkbox.checkBoxPrompt
 import com.afollestad.materialdialogs.checkbox.isCheckPromptChecked
+import com.google.accompanist.swiperefresh.SwipeRefresh
+import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import kotlinx.coroutines.launch
 import my.noveldokusha.*
 import my.noveldokusha.R
@@ -26,7 +28,9 @@ import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.data.BookWithContext
 import my.noveldokusha.data.database.tables.Book
 import my.noveldokusha.services.EpubImportService
+import my.noveldokusha.services.LibraryUpdateService
 import my.noveldokusha.ui.chaptersList.ChaptersActivity
+import my.noveldokusha.uiUtils.toast
 import my.noveldokusha.uiViews.MyButton
 
 @OptIn(ExperimentalMaterialApi::class)

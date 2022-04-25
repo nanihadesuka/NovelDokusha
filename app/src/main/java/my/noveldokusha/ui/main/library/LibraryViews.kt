@@ -15,6 +15,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -23,10 +24,15 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.rememberPagerState
+import com.google.accompanist.swiperefresh.SwipeRefresh
+import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import my.noveldokusha.R
 import my.noveldokusha.data.BookWithContext
+import my.noveldokusha.services.LibraryUpdateService
 import my.noveldokusha.ui.theme.ColorAccent
+import my.noveldokusha.uiUtils.toast
 import my.noveldokusha.uiViews.BookImageButtonView
 
 @OptIn(ExperimentalPagerApi::class)
@@ -43,44 +49,62 @@ fun LibraryBody(
     val pageIndex by remember {
         derivedStateOf { pagerState.targetPage }
     }
-    Column {
-        TabRow(selectedTabIndex = pageIndex) {
-            tabs.forEachIndexed { index, title ->
-                val selected by remember {
-                    derivedStateOf { pageIndex == index }
-                }
-                Tab(
-                    text = { Text(title) },
-                    selected = selected,
-                    onClick = {
-                        scope.launch { pagerState.animateScrollToPage(index) }
+    val context = LocalContext.current
+    val updateCompleted = rememberUpdatedState(newValue = pageIndex)
+    SwipeRefresh(
+        state = viewModel.refreshState,
+        onRefresh = {
+            scope.launch {
+                viewModel.refreshState.isRefreshing = true
+                delay(3000L)
+                viewModel.refreshState.isRefreshing = false
+            }
+            toast(context.getString(R.string.updaing_library))
+            LibraryUpdateService.start(
+                ctx = context,
+                completedCategory = updateCompleted.value == 1
+            )
+        }
+    ) {
+        Column {
+            TabRow(selectedTabIndex = pageIndex) {
+                tabs.forEachIndexed { index, title ->
+                    val selected by remember {
+                        derivedStateOf { pageIndex == index }
                     }
+                    Tab(
+                        text = { Text(title) },
+                        selected = selected,
+                        onClick = {
+                            scope.launch { pagerState.animateScrollToPage(index) }
+                        }
+                    )
+                }
+            }
+            HorizontalPager(
+                count = tabs.size,
+                state = pagerState
+            ) { page ->
+                val showCompleted by remember {
+                    derivedStateOf {
+                        tabs[page] == "Completed"
+                    }
+                }
+                val list: List<BookWithContext> by remember {
+                    derivedStateOf {
+                        when (showCompleted)
+                        {
+                            true -> viewModel.listCompleted
+                            else -> viewModel.listReading
+                        }
+                    }
+                }
+                LibraryPageBody(
+                    list = list,
+                    onClick = onBookClick,
+                    onLongClick = onBookLongClick
                 )
             }
-        }
-        HorizontalPager(
-            count = tabs.size,
-            state = pagerState
-        ) { page ->
-            val showCompleted by remember {
-                derivedStateOf {
-                    tabs[page] == "Completed"
-                }
-            }
-            val list: List<BookWithContext> by remember {
-                derivedStateOf {
-                    when (showCompleted)
-                    {
-                        true -> viewModel.listCompleted
-                        else -> viewModel.listReading
-                    }
-                }
-            }
-            LibraryPageBody(
-                list = list,
-                onClick = onBookClick,
-                onLongClick = onBookLongClick
-            )
         }
     }
 }

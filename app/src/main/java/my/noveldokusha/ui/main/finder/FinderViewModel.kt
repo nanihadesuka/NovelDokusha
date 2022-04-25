@@ -2,6 +2,7 @@ package my.noveldokusha.ui.main.finder
 
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.viewModelScope
+import com.google.accompanist.swiperefresh.SwipeRefreshState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.map
 import my.noveldokusha.AppPreferences
