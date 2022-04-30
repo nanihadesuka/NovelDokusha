@@ -7,31 +7,24 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.*
+import androidx.compose.material.DropdownMenu
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.Text
 import androidx.compose.runtime.*
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.afollestad.materialdialogs.MaterialDialog
-import com.afollestad.materialdialogs.checkbox.checkBoxPrompt
-import com.afollestad.materialdialogs.checkbox.isCheckPromptChecked
-import com.google.accompanist.swiperefresh.SwipeRefresh
-import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
-import my.noveldokusha.*
 import my.noveldokusha.R
 import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.data.BookWithContext
-import my.noveldokusha.data.database.tables.Book
 import my.noveldokusha.services.EpubImportService
-import my.noveldokusha.services.LibraryUpdateService
 import my.noveldokusha.ui.chaptersList.ChaptersActivity
-import my.noveldokusha.uiUtils.toast
-import my.noveldokusha.uiViews.MyButton
+import my.noveldokusha.ui.main.OptionsDialogBookLibrary
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -54,11 +47,30 @@ fun LibraryView(context: Context) = with(context)
         LibraryBody(
             tabs = listOf("Default", "Completed"),
             onBookClick = ::goToBookChaptersPage,
-            onBookLongClick = ::openCompletedDialog
+            onBookLongClick = {
+                libraryModel.optionsBookDialogState = OptionsBookDialogState.Show(it.book)
+            }
         )
     }
+    // Book selected options dialog
+    when (val state = libraryModel.optionsBookDialogState)
+    {
+        is OptionsBookDialogState.Show -> Dialog(
+            onDismissRequest = { libraryModel.optionsBookDialogState = OptionsBookDialogState.Hide },
+            content = {
+                var book by remember { mutableStateOf(state.book) }
+                LaunchedEffect(Unit) {
+                    libraryModel
+                        .getBook(state.book.url)
+                        .filterNotNull()
+                        .collect { book = it }
+                }
+                OptionsDialogBookLibrary(book = book)
+            }
+        )
+        else -> Unit
+    }
 }
-
 
 @Composable
 fun OptionsDropDownView(expanded: MutableState<Boolean>)
@@ -81,22 +93,6 @@ private fun Context.goToBookChaptersPage(book: BookWithContext)
         this,
         bookMetadata = BookMetadata(title = book.book.title, url = book.book.url)
     ).let(::startActivity)
-}
-
-private fun Context.openCompletedDialog(book: BookWithContext)
-{
-    completedDialog(this, book.book)
-}
-
-private fun completedDialog(ctx: Context, book: Book) = MaterialDialog(ctx).show {
-    title(text = book.title)
-    checkBoxPrompt(text = "Completed", isCheckedDefault = book.completed) {}
-    negativeButton(text = "Cancel")
-    positiveButton(text = "Ok") {
-        val completed = isCheckPromptChecked()
-//        TODO()
-//        viewModel.setBookAsCompleted(book, completed)
-    }
 }
 
 @Composable

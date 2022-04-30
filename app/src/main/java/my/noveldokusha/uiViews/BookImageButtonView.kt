@@ -2,13 +2,10 @@ package my.noveldokusha.uiViews
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Book
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -18,7 +15,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import my.noveldokusha.R
-import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.ui.theme.ImageBorderRadius
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -33,14 +29,10 @@ fun BookImageButtonView(
     MyButton(
         text = title,
         onClick = onClick,
+        onLongClick = onLongClick,
         radius = ImageBorderRadius,
         borderWidth = 0.dp,
-        modifier = Modifier
-            .fillMaxWidth()
-            .combinedClickable(
-                onClick = onClick,
-                onLongClick = onLongClick
-            )
+        modifier = Modifier.fillMaxWidth()
     ) { _, radius, _ ->
         Box(
             Modifier

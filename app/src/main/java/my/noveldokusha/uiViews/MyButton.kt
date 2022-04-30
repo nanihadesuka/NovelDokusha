@@ -1,8 +1,9 @@
 package my.noveldokusha.uiViews
 
 import androidx.compose.animation.animateContentSize
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -22,7 +23,7 @@ import my.noveldokusha.ui.theme.InternalThemeObject
 import my.noveldokusha.ui.theme.Themes
 import my.noveldokusha.uiUtils.ifCase
 
-@OptIn(ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterialApi::class, ExperimentalFoundationApi::class)
 @Composable
 fun MyButton(
     text: String,
@@ -36,6 +37,7 @@ fun MyButton(
     backgroundColor: Color = MaterialTheme.colors.primary,
     textStyle: TextStyle = LocalTextStyle.current,
     onClick: () -> Unit,
+    onLongClick: (() -> Unit)? = null,
     content: @Composable (String, Dp, TextAlign) -> Unit = { text, radius, textAlign ->
         Text(
             text = text,
@@ -53,10 +55,12 @@ fun MyButton(
             .padding(outterPadding)
             .border(borderWidth, MaterialTheme.colors.onSurface.copy(alpha = 0.2f), shape)
             .clip(shape)
-            .clickable(
+            .combinedClickable(
                 enabled = enabled,
-                role = Role.Button
-            ) { onClick() },
+                role = Role.Button,
+                onClick = onClick,
+                onLongClick = onLongClick
+            ),
         color = backgroundColor
     ) {
         content(text, radius, textAlign)
