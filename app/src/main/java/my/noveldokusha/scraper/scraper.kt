@@ -27,7 +27,7 @@ object scraper
         WebNovelLight(),
         BoxNovel(),
         LightNovelWorld(),
-        NovelHall
+        NovelHall()
     )
 
     val sourcesListCatalog = sourcesList.filterIsInstance<SourceInterface.catalog>().toSet()
