@@ -27,10 +27,12 @@ Reader |
 
 ## Tech stack
   - Kotlin
+  - Jetpack compose  
   - Coroutines
   - LiveData
   - Room (SQLite)
   - Jsoup
+  - Coil  
   - Gson
 
 ## License
