@@ -79,7 +79,7 @@ fun CheckBoxCategory(
         Text(
             text = text,
             modifier = Modifier
-                .padding(8.dp)
+                .padding(4.dp)
                 .weight(1f)
         )
     }
@@ -99,7 +99,7 @@ fun SearchGenres(
         MyButton(
             text = stringResource(id = R.string.search_with_filters),
             modifier = Modifier
-                .padding(8.dp)
+                .padding(4.dp)
                 .fillMaxWidth(),
             onClick = onSearchClick,
             textAlign = TextAlign.Center

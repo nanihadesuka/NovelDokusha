@@ -136,7 +136,8 @@ fun DatabaseBookInfoView(
 
             Title(stringResource(R.string.authors))
             Row(
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                modifier = Modifier.horizontalScroll(rememberScrollState())
             ) {
                 for (author in data.authors) MyButton(
                     text = author.name,
