@@ -1,12 +1,13 @@
 package my.noveldokusha.ui.main.settings
 
-import android.Manifest
 import android.content.Context
-import androidx.compose.foundation.layout.Column
-import androidx.compose.runtime.Composable
+import androidx.compose.foundation.layout.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.viewmodel.compose.viewModel
 import my.noveldokusha.R
+import my.noveldokusha.composableActions.onDoBackup
+import my.noveldokusha.composableActions.onDoRestore
 
 @Composable
 fun SettingsView(context: Context)
@@ -23,66 +24,9 @@ fun SettingsView(context: Context)
             imagesFolderSize = viewModel.imageFolderSize,
             onCleanDatabase = viewModel::cleanDatabase,
             onCleanImageFolder = viewModel::cleanImagesFolder,
-            onBackupData = { doBackup(context) },
-            onRestoreData = { doRestore(context) },
+            onBackupData = onDoBackup(),
+            onRestoreData = onDoRestore(),
         )
     }
 }
 
-fun doBackup(context: Context) = with(context) {
-    val read = Manifest.permission.READ_EXTERNAL_STORAGE
-    val write = Manifest.permission.WRITE_EXTERNAL_STORAGE
-//    TODO()
-//    permissionRequest(read, write) {
-//
-//        val intent = Intent(Intent.ACTION_CREATE_DOCUMENT).also {
-//            it.addCategory(Intent.CATEGORY_OPENABLE)
-//            it.type = "application/*"
-//            val date =
-//                SimpleDateFormat("yyyy-MM-dd_HH-mm", Locale.getDefault()).format(Date())
-//            it.putExtra(Intent.EXTRA_TITLE, "noveldokusha_backup_$date.zip")
-//        }
-//
-//        MaterialDialog(context).show {
-//            title(text = "Backup")
-//            val checkImagesFolder = checkBoxPrompt(
-//                text = getString(R.string.include_images_folder),
-//                isCheckedDefault = true
-//            ) {}
-//
-//            negativeButton()
-//            positiveButton {
-//                activityRequest(intent) { resultCode, data ->
-//                    if (resultCode != RESULT_OK) return@activityRequest
-//                    val uri = data?.data ?: return@activityRequest
-//                    BackupDataService.start(
-//                        ctx = requireContext(),
-//                        uri = uri,
-//                        backupImages = checkImagesFolder.isCheckPromptChecked()
-//                    )
-//                }
-//            }
-//        }
-//    }
-}
-
-fun doRestore(context: Context) = with(context) {
-    val read = Manifest.permission.READ_EXTERNAL_STORAGE
-//    TODO()
-//    permissionRequest(read) {
-//
-//        val intent = Intent(Intent.ACTION_GET_CONTENT).also {
-//            it.addCategory(Intent.CATEGORY_OPENABLE)
-//            it.type = "application/*"
-//        }
-//
-//        activityRequest(intent) { resultCode, data ->
-//            if (resultCode != RESULT_OK) return@activityRequest
-//            val uri = data?.data ?: return@activityRequest
-//            RestoreDataService.start(
-//                ctx = this,
-//                uri = uri
-//            )
-//        }
-//    }
-}

@@ -100,4 +100,6 @@
 	<string name="close_selection_bar">Close selection bar</string>
 	<string name="open_last_read_chapter">Open last read chapter</string>
 	<string name="updating_book_info">Updating book info</string>
+	<string name="backup_options">Backup options</string>
+	<string name="save_images">Save images</string>
 </resources>
