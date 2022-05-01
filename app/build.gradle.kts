@@ -9,10 +9,10 @@ plugins {
 
 android {
 
-    compileSdk = 31
-
     val localPropertiesFile = file("../local.properties")
     val isSignBuild = localPropertiesFile.exists()
+
+    compileSdk = 31
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
@@ -31,8 +31,8 @@ android {
         applicationId = "my.noveldokusha"
         minSdk = 26
         targetSdk = 31
-        versionCode = 7
-        versionName = "1.5.0"
+        versionCode = 8
+        versionName = "1.6.0"
         setProperty("archivesBaseName", "NovelDokusha_v$versionName")
     }
 
