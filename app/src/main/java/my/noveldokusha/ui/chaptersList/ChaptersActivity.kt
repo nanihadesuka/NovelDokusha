@@ -124,7 +124,7 @@ class ChaptersActivity : ComponentActivity()
                                 HeaderView(
                                     bookTitle = viewModel.bookTitle,
                                     sourceName = sourceName,
-                                    numberOfChapters = 34,
+                                    numberOfChapters = viewModel.chaptersWithContext.size,
                                     bookCover = viewModel.book.coverImageUrl,
                                     description = viewModel.book.description,
                                     onSearchBookInDatabase = ::searchBookInDatabase,
