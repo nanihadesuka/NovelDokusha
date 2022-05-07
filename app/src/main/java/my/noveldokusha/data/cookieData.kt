@@ -17,7 +17,7 @@ import java.util.concurrent.ConcurrentHashMap
 private typealias CHMap = ConcurrentHashMap<String, ConcurrentHashMap<String, String>>
 private typealias MM = MutableMap<String, MutableMap<String, String>>
 
-class Data(val name: String)
+class CookieData(val name: String)
 {
 	private val serializer: Gson = GsonBuilder().setPrettyPrinting().create()
 	private val file = File(App.cacheDir, name)
@@ -66,5 +66,5 @@ class Data(val name: String)
 	}
 }
 
-val cookiesData = Data("webview_cookies")
-val headersData = Data("webview_headers")
+val cookiesData = CookieData("webview_cookies")
+val headersData = CookieData("webview_headers")
