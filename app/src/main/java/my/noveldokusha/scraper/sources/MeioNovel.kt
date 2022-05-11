@@ -9,7 +9,7 @@ class MeioNovel : SourceInterface.catalog
 {
     override val name = "Meio Novel"
     override val baseUrl = "https://meionovel.id/"
-    override val catalogUrl = "https://meionovel.id/novel/?m_orderby=views"
+    override val catalogUrl = "https://meionovel.id/novel/"
     override val language = "Indonesian"
 
     override suspend fun getBookCoverImageUrl(doc: Document): String?
@@ -49,7 +49,7 @@ class MeioNovel : SourceInterface.catalog
                 .toUrlBuilderSafe()
                 .addPath("novel")
                 .ifCase(page != 1){ addPath("page",page.toString()) }
-                .add("m_orderby","views")
+                //.add("m_orderby","views")
 
             fetchDoc(url)
                 .select(".page-item-detail")
