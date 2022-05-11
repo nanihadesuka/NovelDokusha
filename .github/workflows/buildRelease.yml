@@ -17,11 +17,6 @@ jobs: # A workflow run is made up of one or more jobs that can run sequentially 
         uses: actions/setup-java@v1.4.3
         with:
           java-version: 11
-
-      - name: Setup Python enviroment
-        uses: actions/setup-python@v2
-        with:
-          python-version: 3.8.5
           
       - name: Build app
         uses: eskatos/gradle-command-action@v1.3.3
@@ -31,22 +26,14 @@ jobs: # A workflow run is made up of one or more jobs that can run sequentially 
           dependencies-cache-enabled: true
           configuration-cache-enabled: true
           gradle-version: current
-
-      - name: Move APK
-        run: |
-          mkdir ./github_release
-          cp ${{ env.SIGNED_RELEASE_FILE }} ./github_release/
-
-      - name: Create apk env info entries, move APK
-        run: |
-          python .github/build_scripts/extract_info.py
-      
-      - name: Create Release
-        uses: softprops/action-gh-release@v1
-        with:
-          name: NovelDokusha v${{ env.APP_RELEASE_VERSION }}
-          tag_name: v${{ env.APP_RELEASE_VERSION }}
-          files: |
-            ${{ env.APP_RELEASE_FILE }}
-          
-        
+    
+      - name: Rename app
+          run: |
+            cd app/build/outputs/apk/release
+            mv app-release-unsigned.apk NovelD.apk
+    
+      - name: Upload Artifact
+          uses: actions/upload-artifact@v2
+          with:
+            name: NovelID
+            path: app/build/outputs/apk/release/NoveliD.apk
