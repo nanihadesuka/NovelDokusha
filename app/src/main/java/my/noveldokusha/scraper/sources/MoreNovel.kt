@@ -46,7 +46,7 @@ class MoreNovel : SourceInterface.catalog
             .addHeaderRequest()
             .postIO()
             .select(".wp-manga-chapter > a[href]")
-            .map { ChapterMetadata(title = it.text(), url = it.attr("href")) }
+            ?.map { ChapterMetadata(title = it.text(), url = it.attr("href")) }
             .reversed()
     }
 
@@ -62,7 +62,7 @@ class MoreNovel : SourceInterface.catalog
 
             fetchDoc(url)
                 .select(".page-item-detail")
-                .mapNotNull {
+                ?.mapNotNull {
                     val link = it.selectFirst("a[href]") ?: return@mapNotNull null
                     val bookCover = it.selectFirst("img[data-src]")?.attr("data-src") ?: ""
                     BookMetadata(
@@ -95,7 +95,7 @@ class MoreNovel : SourceInterface.catalog
 
             fetchDoc(url)
                 .select(".c-tabs-item__content")
-                .mapNotNull {
+                ?.mapNotNull {
                     val link = it.selectFirst("a[href]") ?: return@mapNotNull null
                     val bookCover = it.selectFirst("img[data-src]")?.attr("data-src") ?: ""
                     BookMetadata(
