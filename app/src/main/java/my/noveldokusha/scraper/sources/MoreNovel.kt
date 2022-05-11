@@ -24,7 +24,16 @@ class MoreNovel : SourceInterface.catalog
         return doc.selectFirst(".summary__content.show-more")
             ?.let { textExtractor.get(it) }
     }
-
+    
+    override suspend fun getChapterText(doc: Document): String
+    {
+        doc.selectFirst("div.text-left")!!.let {
+            val text = textExtractor.get(it)
+            text.replace("iklan", "")
+            return text
+        }
+    }
+    
     override suspend fun getChapterList(doc: Document): List<ChapterMetadata>
     {
         val url = doc
@@ -88,7 +97,7 @@ class MoreNovel : SourceInterface.catalog
                 .select(".c-tabs-item__content")
                 .mapNotNull {
                     val link = it.selectFirst("a[href]") ?: return@mapNotNull null
-                    val bookCover = it.selectFirst("img[src]")?.attr("src") ?: ""
+                    val bookCover = it.selectFirst("img[data-src]")?.attr("data-src") ?: ""
                     BookMetadata(
                         title = link.attr("title"),
                         url = link.attr("href"),
