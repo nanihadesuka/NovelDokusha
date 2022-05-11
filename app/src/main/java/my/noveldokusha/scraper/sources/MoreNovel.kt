@@ -55,7 +55,7 @@ class MoreNovel : SourceInterface.catalog
                 .select(".page-item-detail")
                 .mapNotNull {
                     val link = it.selectFirst("a[href]") ?: return@mapNotNull null
-                    val bookCover = it.selectFirst("img[src]")?.attr("src") ?: ""
+                    val bookCover = it.selectFirst("img[data-src]")?.attr("data-src") ?: ""
                     BookMetadata(
                         title = link.attr("title"),
                         url = link.attr("href"),
