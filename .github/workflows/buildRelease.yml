@@ -32,15 +32,6 @@ jobs: # A workflow run is made up of one or more jobs that can run sequentially 
           configuration-cache-enabled: true
           gradle-version: current
 
-      - name: Sign APK
-        uses: r0adkll/sign-android-release@v1
-        with:
-          releaseDirectory: app/build/outputs/apk/release
-          signingKeyBase64: ${{ secrets.SIGNING_KEY }}
-          alias: ${{ secrets.ALIAS }}
-          keyStorePassword: ${{ secrets.KEY_STORE_PASSWORD }}
-          keyPassword: ${{ secrets.KEY_PASSWORD }}
-      
       - name: Move APK
         run: |
           mkdir ./github_release
