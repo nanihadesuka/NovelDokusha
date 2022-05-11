@@ -27,9 +27,9 @@ jobs: # A workflow run is made up of one or more jobs that can run sequentially 
           gradle-version: current
     
       - name: Rename app
-          run: |
-            cd app/build/outputs/apk/release
-            mv app-release-unsigned.apk NovelD.apk
+        run: |
+          cd app/build/outputs/apk/release
+          mv app-release-unsigned.apk NovelD.apk
     
       - name: Upload Artifact
           uses: actions/upload-artifact@v2
