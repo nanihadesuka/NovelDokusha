@@ -15,7 +15,7 @@ class MeioNovel : SourceInterface.catalog
     override suspend fun getBookCoverImageUrl(doc: Document): String?
     {
         return doc.selectFirst("div.summary_image")
-            ?.selectFirst("img[src]")
+            ?.selectFirst("img[data-src]")
             ?.attr("data-src")
     }
 
@@ -61,8 +61,8 @@ class MeioNovel : SourceInterface.catalog
                 //.add("m_orderby","views")
 
             fetchDoc(url)
-                .select(".page-item-detail")
-                .mapNotNull {
+                ?.select(".page-item-detail")
+                ?.mapNotNull {
                     val link = it.selectFirst("a[href]") ?: return@mapNotNull null
                     val bookCover = it.selectFirst("img[data-src]")?.attr("data-src") ?: ""
                     BookMetadata(
