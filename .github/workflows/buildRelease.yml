@@ -35,4 +35,4 @@ jobs: # A workflow run is made up of one or more jobs that can run sequentially 
         uses: actions/upload-artifact@v2
         with:
           name: NovelID
-          path: app/build/outputs/apk/release/NoveliD.apk
+          path: app/build/outputs/apk/release/NovelD.apk
