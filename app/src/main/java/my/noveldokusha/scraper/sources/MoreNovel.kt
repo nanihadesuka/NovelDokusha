@@ -17,7 +17,7 @@ class MoreNovel : SourceInterface.catalog
         val chapter = doc.selectFirst("div.text-left")
         return if (chapter != null) {
             //chapter.selectFirst("p > b a[href]")?.remove()
-            textExtractor.get(chapter.html())
+            textExtractor.get(chapter)
         } else {
             ""
         }
