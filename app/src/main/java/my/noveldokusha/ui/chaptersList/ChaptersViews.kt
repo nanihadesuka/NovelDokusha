@@ -35,6 +35,7 @@ import androidx.compose.ui.unit.dp
 import my.noveldokusha.R
 import my.noveldokusha.data.ChapterWithContext
 import my.noveldokusha.data.database.tables.Chapter
+import my.noveldokusha.ui.theme.ColorAccent
 import my.noveldokusha.ui.theme.ImageBorderRadius
 import my.noveldokusha.ui.theme.InternalTheme
 import my.noveldokusha.uiUtils.drawBottomLine
@@ -287,27 +288,36 @@ fun ChaptersListView(
                     .fillMaxWidth()
                     .padding(horizontal = 8.dp, vertical = 16.dp),
             ) {
+
+                val tintColor by animateColorAsState(
+                    targetValue = when (it.lastReadChapter)
+                    {
+                        true -> ColorAccent
+                        false -> MaterialTheme.colors.onPrimary
+                    }
+                )
+
                 val readColorText by animateColorAsState(
                     targetValue = when (it.chapter.read)
                     {
-                        true -> MaterialTheme.colors.onPrimary.copy(alpha = 0.5f)
-                        false -> MaterialTheme.colors.onPrimary.copy(alpha = 1f)
+                        true -> tintColor.copy(alpha = 0.5f)
+                        false -> tintColor.copy(alpha = 1f)
                     }
                 )
 
                 val readColor by animateColorAsState(
                     targetValue = when (it.chapter.read)
                     {
-                        true -> MaterialTheme.colors.onPrimary.copy(alpha = 0.5f)
-                        false -> MaterialTheme.colors.onPrimary.copy(alpha = 0f)
+                        true -> tintColor.copy(alpha = 0.5f)
+                        false -> tintColor.copy(alpha = 0f)
                     }
                 )
 
                 val downloadedColor by animateColorAsState(
                     targetValue = when (it.downloaded)
                     {
-                        true -> MaterialTheme.colors.onPrimary.copy(alpha = 0.5f)
-                        false -> MaterialTheme.colors.onPrimary.copy(alpha = 0f)
+                        true -> tintColor.copy(alpha = 0.5f)
+                        false -> tintColor.copy(alpha = 0f)
                     }
                 )
 
