@@ -14,9 +14,9 @@ class MoreNovel : SourceInterface.catalog
     
     override suspend fun getChapterText(doc: Document): String
     {
-        return doc.selectFirst("div.text-left")!!
-            .run {
-                this!!.select("p > b > i > a[href]")?.remove()
+        return doc.selectFirst("div.text-left")
+            ?.run {
+                this.select("p > b a[href]")?.remove()
                 textExtractor.get(this)
             }
     }
@@ -59,7 +59,7 @@ class MoreNovel : SourceInterface.catalog
                 .ifCase(page != 1){ addPath("page",page.toString()) }
                 // .add("m_orderby","alphabet")
 
-            val catalog = connect(url)
+            val catalog = connect(url.toString())
                 .timeout(20000)
                 .executeIO()
 
@@ -101,7 +101,7 @@ class MoreNovel : SourceInterface.catalog
                     "adult" to ""
                 )
 
-            val catalog = connect(url)
+            val catalog = connect(url.toString())
                 .timeout(20000)
                 .executeIO()
             
