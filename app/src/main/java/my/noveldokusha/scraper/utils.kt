@@ -39,6 +39,7 @@ suspend fun connect(url: String): Connection = Jsoup.connect(url).apply {
     header("Accept-Encoding", "gzip,deflate")
     headers(headersData.get(url))
     cookies(cookiesData.get(url))
+    ignoreHttpErrors(true)
 }
 
 suspend fun fetchDoc(url: String, timeoutMilliseconds: Int = 20 * 1000): Document = connect(url).timeout(timeoutMilliseconds).getIO()
