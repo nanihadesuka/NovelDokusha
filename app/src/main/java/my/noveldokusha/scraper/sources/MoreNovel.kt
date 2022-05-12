@@ -16,8 +16,8 @@ class MoreNovel : SourceInterface.catalog
     {
         val chapter = doc.selectFirst("div.text-left")
         return if (chapter != null) {
-            chapter.select("p > b a[href]")?.remove()
-            textExtractor.get(chapter.html())
+            chapter.selectFirst("p > b a[href]")?.remove()
+            textExtractor.get(chapter.outerhtml())
         } else {
             ""
         }
@@ -26,7 +26,8 @@ class MoreNovel : SourceInterface.catalog
     override suspend fun getBookCoverImageUrl(doc: Document): String?
     {
         val cover = doc.selectFirst("div.summary_image")
-        return cover.selectFirst("img[data-src]")!!.attr("data-src") ?: ""
+            ?.selectFirst("img[data-src]")
+        return if (cover != null) cover.attr("data-src") else ""
     }
 
     override suspend fun getBookDescripton(doc: Document): String?
@@ -66,7 +67,7 @@ class MoreNovel : SourceInterface.catalog
                 .timeout(20 * 1000)
                 .executeIO()
 
-            if (res.statusCode() == 200) {
+            if (catalog.statusCode() == 200) {
                 catalog
                     .parse()
                     .select(".page-item-detail")
