@@ -14,11 +14,14 @@ class MoreNovel : SourceInterface.catalog
     
     override suspend fun getChapterText(doc: Document): String
     {
-        return doc.selectFirst("div.text-left")
-            ?.run {
-                this.select("p > b a[href]")?.remove()
-                textExtractor.get(this)
-            }
+        val chapter = doc.selectFirst("div.text-left")
+        return if (chapter != null) {
+            chapter.select("p > b a[href]")?.remove()
+            textExtractor.get(this)
+        } else {
+            ""
+        }
+            
     }
     override suspend fun getBookCoverImageUrl(doc: Document): String?
     {
@@ -60,7 +63,7 @@ class MoreNovel : SourceInterface.catalog
                 // .add("m_orderby","alphabet")
 
             val catalog = connect(url.toString())
-                .timeout(20000)
+                .timeout(20 * 1000)
                 .executeIO()
 
             if (res.statusCode() == 200) {
@@ -102,7 +105,7 @@ class MoreNovel : SourceInterface.catalog
                 )
 
             val catalog = connect(url.toString())
-                .timeout(20000)
+                .timeout(20 * 1000)
                 .executeIO()
             
             if (catalog.statusCode() == 200) {
