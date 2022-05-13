@@ -15,8 +15,10 @@ class MoreNovel : SourceInterface.catalog
     override suspend fun getChapterText(doc: Document): String
     {
         val chapter = doc.selectFirst("div.text-left")
+        chapter?.select("p")?.forEach {
+            if (it.select("a[href]") is Element) it.remove()
+		}
         return if (chapter != null) {
-            //chapter.selectFirst("p > b a[href]")?.remove()
             textExtractor.get(chapter)
         } else {
             ""
