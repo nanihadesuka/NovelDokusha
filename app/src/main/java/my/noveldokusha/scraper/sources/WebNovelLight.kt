@@ -1,9 +1,5 @@
-
-// getting no Chapter.
-//
 package my.noveldokusha.scraper.sources
 
-import com.chimbori.crux.articles.extractImages
 import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.data.ChapterMetadata
 import my.noveldokusha.scraper.*

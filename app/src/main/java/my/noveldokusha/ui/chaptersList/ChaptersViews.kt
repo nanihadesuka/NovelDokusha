@@ -117,7 +117,6 @@ fun MainToolbar(
     }
 }
 
-@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun HeaderView(
     bookTitle: String,
