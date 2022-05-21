@@ -102,4 +102,7 @@
 	<string name="updating_book_info">Updating book info</string>
 	<string name="backup_options">Backup options</string>
 	<string name="save_images">Save images</string>
+	<string name="book_rating_title">Rating</string>
+	<string name="votes">votes</string>
+	<string name="n_of_votes">(%d votes)</string>
 </resources>

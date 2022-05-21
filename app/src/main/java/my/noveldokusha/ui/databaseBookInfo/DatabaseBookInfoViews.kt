@@ -11,12 +11,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import my.noveldokusha.R
 import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.scraper.DatabaseInterface
@@ -25,6 +27,8 @@ import my.noveldokusha.ui.theme.ImageBorderRadius
 import my.noveldokusha.ui.theme.InternalTheme
 import my.noveldokusha.uiViews.ImageViewPreview
 import my.noveldokusha.uiViews.MyButton
+import my.noveldokusha.uiViews.SmoothGraphBars
+import java.util.Collections.max
 
 @Composable
 private fun Title(name: String)
@@ -53,7 +57,6 @@ private fun TextAnimated(text: String)
     }
 }
 
-@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun DatabaseBookInfoView(
     data: DatabaseInterface.BookData,
@@ -123,10 +126,21 @@ fun DatabaseBookInfoView(
                 )
             }
         }
+
         Column(Modifier.padding(horizontal = 8.dp)) {
 
             Title(stringResource(R.string.description))
             TextAnimated(data.description)
+
+            if(data.scoresFromLowtoHighNormalized.isNotEmpty())
+            {
+                Title(stringResource(R.string.book_rating_title))
+                RatingsChart(
+                    scoresFromLowtoHighNormalized = data.scoresFromLowtoHighNormalized,
+                    numberOfVotes = data.numberOfVotes,
+                    ratingOverTen = data.ratingOverTen
+                )
+            }
 
             Title(stringResource(R.string.alternative_titles))
             if (data.alternativeTitles.isEmpty())
@@ -194,11 +208,55 @@ fun DatabaseBookInfoView(
     }
 }
 
+@Composable
+fun RatingsChart(
+    scoresFromLowtoHighNormalized: List<Float>,
+    ratingOverTen: Float,
+    numberOfVotes: Int
+)
+{
+    Row {
+        Text(text = "$ratingOverTen/10", modifier = Modifier.padding(end = 8.dp))
+        Text(text = stringResource(R.string.n_of_votes, numberOfVotes))
+    }
+    SmoothGraphBars(
+        unitaryHeights = scoresFromLowtoHighNormalized,
+        brush = Brush.horizontalGradient(
+            0.2f to Color.Red,
+            0.5f to Color(0xFFFF8800),
+            0.8f to Color.Green
+        ),
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(30.dp)
+    )
+    Row(
+        horizontalArrangement = Arrangement.SpaceAround,
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        for (level in 1..10)
+            Text(
+                text = level.toString(),
+                fontSize = 12.sp,
+                modifier = Modifier.alpha(0.5f)
+            )
+    }
+}
+
 
 @Preview
 @Composable
 fun Preview()
 {
+    val scoresFromLowtoHighNormalized = run {
+        val l = listOf(
+            0.16f, 0.1f, 0.12f, 0.69f, 0.16f, 0.06f, 0.02f, 0.04f, 0.02f, 0.04f
+        )
+        val max = max(l)
+        l.map { it / max }
+    }
+
+
     InternalTheme {
         DatabaseBookInfoView(
             scrollState = rememberScrollState(),
@@ -227,6 +285,9 @@ fun Preview()
                         "novel description $it"
                     )
                 },
+                scoresFromLowtoHighNormalized = scoresFromLowtoHighNormalized,
+                ratingOverTen = 4.5f,
+                numberOfVotes = 324
             ),
             onSourcesClick = {},
             onAuthorsClick = {},

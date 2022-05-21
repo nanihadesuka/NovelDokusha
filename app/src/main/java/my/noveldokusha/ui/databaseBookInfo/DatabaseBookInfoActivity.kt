@@ -9,6 +9,7 @@ import androidx.activity.viewModels
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.graphics.Color
 import androidx.core.view.WindowCompat
@@ -25,6 +26,7 @@ import my.noveldokusha.ui.databaseSearchResults.DatabaseSearchResultsActivity
 import my.noveldokusha.ui.globalSourceSearch.GlobalSourceSearchActivity
 import my.noveldokusha.ui.theme.Theme
 import my.noveldokusha.uiUtils.*
+import my.noveldokusha.uiViews.ErrorView
 import my.noveldokusha.uiViews.SetSystemBarTransparent
 import javax.inject.Inject
 import kotlin.collections.ArrayList
@@ -79,7 +81,7 @@ class DatabaseBookInfoActivity : ComponentActivity() {
                             onGenresClick = ::openSearchPageByGenres,
                             onBookClick = ::openSearchPageByTitle
                         )
-                        else -> Unit
+                        is Response.Error -> ErrorView(error = data.message)
                     }
                 }
             }

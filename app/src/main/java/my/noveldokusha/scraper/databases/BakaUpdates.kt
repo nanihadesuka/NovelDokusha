@@ -4,6 +4,7 @@ import android.net.Uri
 import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.scraper.*
 import org.jsoup.nodes.Document
+import java.util.*
 
 /**
  * Novel main page example:
@@ -91,41 +92,89 @@ class BakaUpdates : DatabaseInterface
 
     override fun getBookData(doc: Document): DatabaseInterface.BookData
     {
-        fun entry(header: String) = doc.selectFirst("div.sCat > b:containsOwn($header)")!!.parent()!!.nextElementSibling()!!
+        fun entry(header: String) = doc.selectFirst("div.sCat > b:containsOwn($header)")!!.parent()!!.nextElementSibling()
 
-        val relatedBooks = entry("Category Recommendations")
+        val relatedBooks = entry("Category Recommendations")!!
             .select("a[href]")
             .map { BookMetadata(it.text().removeNovelTag(), "https://www.mangaupdates.com/" + it.attr("href")) }
             .toList()
 
-        val similarRecommended = entry("Recommendations")
+        val similarRecommended = entry("Recommendations")!!
             .select("a[href]")
             .map { BookMetadata(it.text().removeNovelTag(), "https://www.mangaupdates.com/" + it.attr("href")) }
             .toList()
 
-        val authors = entry("Author\\(s\\)")
+        val authors = entry("Author\\(s\\)")!!
             .select("a[href]")
-            .map {
+            .mapNotNull {
                 if (it.attr("href").startsWith("https://www.mangaupdates.com/authors.html"))
-                    return@map DatabaseInterface.BookAuthor(name = it.text(), url = it.attr("href"))
+                    return@mapNotNull DatabaseInterface.BookAuthor(name = it.text(), url = it.attr("href"))
 
-                val authorName = it.previousSibling()!!.outerHtml().removeSuffix("&nbsp;[")
-                return@map DatabaseInterface.BookAuthor(name = authorName, url = null)
+                val authorName = it.previousSibling()
+                    ?.outerHtml()
+                    ?.removeSuffix("&nbsp;[") ?: return@mapNotNull null
+
+                DatabaseInterface.BookAuthor(name = authorName, url = null)
             }
 
-        val description = entry("Description").let {
+        val description = entry("Description")!!.let {
             it.selectFirst("[id=div_desc_more]") ?: it.selectFirst("div")
         }.also {
             it?.select("a")?.remove()
         }.let { textExtractor.get(it!!) }
 
-        val tags = entry("Categories")
+        val tags = entry("Categories")!!
             .select("li > a")
             .map { it.text() }
 
         val coverImageUrl = entry("Image")
-            .selectFirst("img[src]")!!
-            .attr("src")
+            ?.selectFirst("img[src]")
+            ?.attr("src")
+
+        val ratingEntry = entry("User Rating")
+
+        val numberOfVotes = ratingEntry?.let {
+            """.*10\.0 \(([0-9]+) votes\).*"""
+                .toRegex()
+                .find(it.text())
+                ?.destructured
+                ?.component1()
+                ?.toIntOrNull()
+        } ?: 0
+
+        val averageRating = ratingEntry?.let {
+            """.*Average: (.*) / 10.*"""
+                .toRegex()
+                .find(ratingEntry.text())
+                ?.destructured
+                ?.component1()
+                ?.toFloatOrNull()
+        } ?: 0f
+
+        val scores = ratingEntry
+            ?.select(".col-2.col-sm-2.text.text-right")
+            ?.map {
+                """.*(\d+)%""".toRegex()
+                    .find(it.text())
+                    ?.destructured
+                    ?.component1()
+                    ?.run { toFloat()/100f }
+            }
+            ?.run {
+                if (any { it == null }) null
+                else filterNotNull()
+            }
+            ?.reversed()
+            ?.let {
+                if(it.isEmpty()) return@let it
+                val maxValue = it.maxOf { v -> v }.coerceAtLeast(0.01f)
+                it.map { v -> v/maxValue }
+            } ?: listOf()
+
+        val genres = entry("Genre")
+            ?.select("a")
+            ?.dropLast(1)
+            ?.map { it.text() } ?: listOf()
 
         return DatabaseInterface.BookData(
             title = doc.selectFirst(".releasestitle.tabletitle")!!.text().removeNovelTag(),
@@ -133,11 +182,14 @@ class BakaUpdates : DatabaseInterface
             alternativeTitles = textExtractor.get(entry("Associated Names")).split("\n\n"),
             relatedBooks = relatedBooks,
             similarRecommended = similarRecommended,
-            bookType = entry("Type").text(),
-            genres = entry("Genre").select("a").dropLast(1).map { it.text() },
+            bookType = entry("Type")?.text() ?: "Unknown",
+            genres = genres,
             tags = tags,
             authors = authors,
-            coverImageUrl = coverImageUrl
+            coverImageUrl = coverImageUrl,
+            scoresFromLowtoHighNormalized = scores,
+            numberOfVotes = numberOfVotes,
+            ratingOverTen = averageRating
         )
     }
 }

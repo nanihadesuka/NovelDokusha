@@ -33,7 +33,10 @@ interface DatabaseInterface
         val bookType: String,
         val relatedBooks: List<BookMetadata>,
         val similarRecommended: List<BookMetadata>,
-        val coverImageUrl: String?
+        val coverImageUrl: String?,
+        val scoresFromLowtoHighNormalized : List<Float>,
+        val numberOfVotes : Int,
+        val ratingOverTen : Float
     )
 
     fun getBookData(doc: Document): BookData

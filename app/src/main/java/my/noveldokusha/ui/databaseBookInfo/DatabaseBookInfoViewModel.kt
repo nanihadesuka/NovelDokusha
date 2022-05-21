@@ -47,7 +47,10 @@ class DatabaseBookInfoViewModel @Inject constructor(
                     genres = listOf(),
                     bookType = "",
                     relatedBooks = listOf(),
-                    similarRecommended = listOf()
+                    similarRecommended = listOf(),
+                    ratingOverTen = 5f,
+                    numberOfVotes = 1,
+                    scoresFromLowtoHighNormalized = listOf()
                 )
             )
         )
