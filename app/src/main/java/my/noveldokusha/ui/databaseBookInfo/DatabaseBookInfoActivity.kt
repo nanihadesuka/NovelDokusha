@@ -57,31 +57,24 @@ class DatabaseBookInfoActivity : ComponentActivity() {
 
         WindowCompat.setDecorFitsSystemWindows(window, false)
         setContent {
-            val reply by viewModel.bookData.collectAsState(initial = null)
             val scrollState = rememberScrollState()
             val alpha by derivedStateOf {
-                val value = (scrollState.value - 50).coerceIn(0,200).toFloat()
-                val maxvalue = (scrollState.maxValue).coerceIn(1,200).toFloat()
-                value/maxvalue
+                val value = (scrollState.value - 50).coerceIn(0, 200).toFloat()
+                val maxvalue = (scrollState.maxValue).coerceIn(1, 200).toFloat()
+                value / maxvalue
             }
 
             Theme(appPreferences = appPreferences) {
 
                 SetSystemBarTransparent(alpha)
-
-                if (reply != null) {
-                    when (val data = reply) {
-                        is Response.Success -> DatabaseBookInfoView(
-                            scrollState = scrollState,
-                            data = data.data,
-                            onSourcesClick = ::openGlobalSearchPage,
-                            onAuthorsClick = ::openSearchPageByAuthor,
-                            onGenresClick = ::openSearchPageByGenres,
-                            onBookClick = ::openSearchPageByTitle
-                        )
-                        else -> Unit
-                    }
-                }
+                DatabaseBookInfoView(
+                    scrollState = scrollState,
+                    data = viewModel.bookData,
+                    onSourcesClick = ::openGlobalSearchPage,
+                    onAuthorsClick = ::openSearchPageByAuthor,
+                    onGenresClick = ::openSearchPageByGenres,
+                    onBookClick = ::openSearchPageByTitle
+                )
             }
         }
     }

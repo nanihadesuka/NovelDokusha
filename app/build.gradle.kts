@@ -176,4 +176,7 @@ dependencies {
     // Compose scroll bar
     implementation("com.github.nanihadesuka:LazyColumnScrollbar:1.0.3")
 
+    // Logging
+    implementation("com.jakewharton.timber:timber:5.0.1")
+
 }

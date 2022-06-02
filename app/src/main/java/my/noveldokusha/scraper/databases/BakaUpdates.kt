@@ -9,16 +9,17 @@ import org.jsoup.nodes.Document
  * Novel main page example:
  * https://www.novelupdates.com/series/mushoku-tensei/
  */
-class BakaUpdates : DatabaseInterface
-{
+class BakaUpdates : DatabaseInterface {
     override val id = "baka_updates"
     override val name = "Baka-Updates"
     override val baseUrl = "https://www.mangaupdates.com/"
 
     private fun String.removeNovelTag() = this.removeSuffix("(Novel)").trim()
 
-    override suspend fun getSearchAuthorSeries(index: Int, urlAuthorPage: String): Response<List<BookMetadata>>
-    {
+    override suspend fun getSearchAuthorSeries(
+        index: Int,
+        urlAuthorPage: String
+    ): Response<List<BookMetadata>> {
         if (index > 0) return Response.Success(listOf())
 
         return tryConnect {
@@ -31,8 +32,7 @@ class BakaUpdates : DatabaseInterface
         }
     }
 
-    override suspend fun getSearchGenres(): Response<Map<String, String>>
-    {
+    override suspend fun getSearchGenres(): Response<Map<String, String>> {
         return searchGenresCache.fetch {
             tryConnect {
                 fetchDoc("https://www.mangaupdates.com/series.html?act=genresearch")
@@ -44,8 +44,7 @@ class BakaUpdates : DatabaseInterface
         }
     }
 
-    override suspend fun getSearch(index: Int, input: String): Response<List<BookMetadata>>
-    {
+    override suspend fun getSearch(index: Int, input: String): Response<List<BookMetadata>> {
         val page = index + 1
         val url = "https://www.mangaupdates.com/series.html".toUrlBuilderSafe().apply {
             if (page > 1) add("page", page)
@@ -57,14 +56,20 @@ class BakaUpdates : DatabaseInterface
         return getSearchList(page, url)
     }
 
-    override suspend fun getSearchAdvanced(index: Int, genresIncludedId: List<String>, genresExcludedId: List<String>):
-            Response<List<BookMetadata>>
-    {
+    override suspend fun getSearchAdvanced(
+        index: Int,
+        genresIncludedId: List<String>,
+        genresExcludedId: List<String>
+    ):
+            Response<List<BookMetadata>> {
         val page = index + 1
         val url = "https://www.mangaupdates.com/series.html".toUrlBuilderSafe().apply {
             if (page > 1) add("page", page)
             if (genresIncludedId.isNotEmpty()) add("genre", genresIncludedId.joinToString("_"))
-            if (genresExcludedId.isNotEmpty()) add("exclude_genre", genresExcludedId.joinToString("_"))
+            if (genresExcludedId.isNotEmpty()) add(
+                "exclude_genre",
+                genresExcludedId.joinToString("_")
+            )
             add("type", "novel")
             add("perpage", 50)
         }
@@ -72,45 +77,68 @@ class BakaUpdates : DatabaseInterface
         return getSearchList(page, url)
     }
 
-    suspend fun getSearchList(page: Int, url: Uri.Builder) = tryConnect("page: $page\n\nurl: $url") {
-        fetchDoc(url)
-            .select(".col-12.col-lg-6.p-3.text")
-            .mapNotNull {
-                val link = it.selectFirst("div.text > a[href]") ?: return@mapNotNull null
-                val bookCover = it.selectFirst("img[src]")?.attr("src") ?: ""
-                val description = it.selectFirst("div.text.flex-grow-1")?.text()?.removeNovelTag() ?: ""
-                BookMetadata(
-                    title = link.text().removeNovelTag(),
-                    url = link.attr("href"),
-                    coverImageUrl = bookCover,
-                    description = description
-                )
-            }
-            .let { Response.Success(it) }
-    }
+    suspend fun getSearchList(page: Int, url: Uri.Builder) =
+        tryConnect("page: $page\n\nurl: $url") {
+            fetchDoc(url)
+                .select(".col-12.col-lg-6.p-3.text")
+                .mapNotNull {
+                    val link = it.selectFirst("div.text > a[href]") ?: return@mapNotNull null
+                    val bookCover = it.selectFirst("img[src]")?.attr("src") ?: ""
+                    val description =
+                        it.selectFirst("div.text.flex-grow-1")?.text()?.removeNovelTag() ?: ""
+                    BookMetadata(
+                        title = link.text().removeNovelTag(),
+                        url = link.attr("href"),
+                        coverImageUrl = bookCover,
+                        description = description
+                    )
+                }
+                .let { Response.Success(it) }
+        }
 
-    override fun getBookData(doc: Document): DatabaseInterface.BookData
-    {
-        fun entry(header: String) = doc.selectFirst("div.sCat > b:containsOwn($header)")!!.parent()!!.nextElementSibling()!!
+    override fun getBookData(doc: Document): DatabaseInterface.BookData {
+        fun entry(header: String) =
+            doc.selectFirst("div.sCat > b:containsOwn($header)")!!.parent()!!.nextElementSibling()!!
 
         val relatedBooks = entry("Category Recommendations")
             .select("a[href]")
-            .map { BookMetadata(it.text().removeNovelTag(), "https://www.mangaupdates.com/" + it.attr("href")) }
+            .map {
+                BookMetadata(
+                    it.text().removeNovelTag(),
+                    "https://www.mangaupdates.com/" + it.attr("href")
+                )
+            }
             .toList()
 
         val similarRecommended = entry("Recommendations")
             .select("a[href]")
-            .map { BookMetadata(it.text().removeNovelTag(), "https://www.mangaupdates.com/" + it.attr("href")) }
+            .map {
+                BookMetadata(
+                    it.text().removeNovelTag(),
+                    "https://www.mangaupdates.com/" + it.attr("href")
+                )
+            }
             .toList()
 
         val authors = entry("Author\\(s\\)")
             .select("a[href]")
-            .map {
-                if (it.attr("href").startsWith("https://www.mangaupdates.com/authors.html"))
-                    return@map DatabaseInterface.BookAuthor(name = it.text(), url = it.attr("href"))
+            .mapNotNull {
+                val url = it.attr("href")
+                if (url.startsWith("https://www.mangaupdates.com/author/"))
+                    return@mapNotNull DatabaseInterface.BookAuthor(
+                        name = it.text(),
+                        url = it.attr("href")
+                    )
 
-                val authorName = it.previousSibling()!!.outerHtml().removeSuffix("&nbsp;[")
-                return@map DatabaseInterface.BookAuthor(name = authorName, url = null)
+                if (url.startsWith("https://www.mangaupdates.com/submit.html?act=add_author")) {
+                    val name = url.toUrlBuilderSafe().build().getQueryParameter("author")
+                        ?: return@mapNotNull null
+                    return@mapNotNull DatabaseInterface.BookAuthor(
+                        name = name,
+                        url = null
+                    )
+                }
+                return@mapNotNull null
             }
 
         val description = entry("Description").let {
