@@ -18,7 +18,7 @@ android {
     val isSignBuild = propertiesData.hasProperty("storeFile")
     println("isSignBuild: $isSignBuild")
 
-    compileSdk = 31
+    compileSdk = 32
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
@@ -36,7 +36,7 @@ android {
     defaultConfig {
         applicationId = "my.noveldokusha"
         minSdk = 26
-        targetSdk = 31
+        targetSdk = 32
         versionCode = 8
         versionName = "1.6.0"
         setProperty("archivesBaseName", "NovelDokusha_v$versionName")
@@ -89,7 +89,7 @@ dependencies {
     implementation(fileTree("libs") { include("*.jar") })
 
     // Kotlin
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.1-native-mt")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.1")
     implementation("org.jetbrains.kotlin:kotlin-script-runtime:1.6.20")
     implementation("org.jetbrains.kotlin:kotlin-stdlib:1.6.21")
 
@@ -109,16 +109,16 @@ dependencies {
     implementation("androidx.preference:preference-ktx:1.2.0")
 
     // UI
-    implementation("androidx.appcompat:appcompat:1.4.1")
-    implementation("androidx.core:core-ktx:1.9.0-alpha03")
+    implementation("androidx.appcompat:appcompat:1.4.2")
+    implementation("androidx.core:core-ktx:1.9.0-alpha04")
     implementation("androidx.navigation:navigation-fragment-ktx:2.4.2")
     implementation("androidx.navigation:navigation-ui-ktx:2.4.2")
     implementation("androidx.activity:activity-ktx:1.4.0")
     implementation("androidx.fragment:fragment-ktx:1.4.1")
-    implementation("androidx.constraintlayout:constraintlayout:2.1.3")
+    implementation("androidx.constraintlayout:constraintlayout:2.1.4")
     implementation("androidx.recyclerview:recyclerview:1.2.1")
     implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
-    implementation("com.google.android.material:material:1.7.0-alpha01")
+    implementation("com.google.android.material:material:1.7.0-alpha02")
     implementation("com.l4digital.fastscroll:fastscroll:2.0.1")
     implementation("com.afollestad.material-dialogs:core:3.3.0")
 
@@ -156,7 +156,7 @@ dependencies {
     implementation("androidx.compose.ui:ui-tooling:1.1.1")
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.4.1")
     implementation("androidx.compose.runtime:runtime-livedata:1.1.1")
-    implementation("androidx.constraintlayout:constraintlayout-compose:1.0.0")
+    implementation("androidx.constraintlayout:constraintlayout-compose:1.0.1")
     implementation("androidx.compose.material:material-icons-extended:1.1.1")
     implementation("com.google.accompanist:accompanist-systemuicontroller:0.24.6-alpha")
     implementation("com.google.accompanist:accompanist-swiperefresh:0.20.2")
