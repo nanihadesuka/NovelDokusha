@@ -1,3 +1,4 @@
+import org.jetbrains.kotlin.konan.properties.hasProperty
 import java.util.Properties
 
 plugins {
@@ -10,7 +11,12 @@ plugins {
 android {
 
     val localPropertiesFile = file("../local.properties")
-    val isSignBuild = localPropertiesFile.exists()
+    val propertiesData = Properties().apply {
+        if(localPropertiesFile.exists())
+            load(localPropertiesFile.inputStream())
+    }
+    val isSignBuild = propertiesData.hasProperty("storeFile")
+    println("isSignBuild: $isSignBuild")
 
     compileSdk = 31
 
@@ -38,13 +44,10 @@ android {
 
     if (isSignBuild) signingConfigs {
         create("release") {
-            val properties = Properties().apply {
-                load(localPropertiesFile.inputStream())
-            }
-            storeFile = file(properties.getProperty("storeFile"))
-            storePassword = properties.getProperty("storePassword")
-            keyAlias = properties.getProperty("keyAlias")
-            keyPassword = properties.getProperty("keyPassword")
+            storeFile = file(propertiesData.getProperty("storeFile"))
+            storePassword = propertiesData.getProperty("storePassword")
+            keyAlias = propertiesData.getProperty("keyAlias")
+            keyPassword = propertiesData.getProperty("keyPassword")
         }
     }
 
