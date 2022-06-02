@@ -174,7 +174,7 @@ dependencies {
     implementation("me.onebone:toolbar-compose:2.3.3")
 
     // Compose scroll bar
-    implementation("com.github.nanihadesuka:LazyColumnScrollbar:1.0.3")
+    implementation("com.github.nanihadesuka:LazyColumnScrollbar:1.1.0")
 
     // Logging
     implementation("com.jakewharton.timber:timber:5.0.1")
