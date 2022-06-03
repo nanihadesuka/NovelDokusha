@@ -39,7 +39,11 @@ suspend fun connect(url: String): Connection = Jsoup.connect(url).apply {
     header("Accept-Encoding", "gzip,deflate")
     headers(headersData.get(url))
     cookies(cookiesData.get(url))
+    ignoreHttpErrors(true)
 }
+
+// pasre if connect success or return empty list
+fun connect.parseOrEmpty(): Document? = if (this.statusCode == 200) this.parse() else listOf()
 
 suspend fun fetchDoc(url: String, timeoutMilliseconds: Int = 20 * 1000): Document = connect(url).timeout(timeoutMilliseconds).getIO()
 suspend fun fetchDoc(url: Uri.Builder, timeoutMilliseconds: Int = 20 * 1000) = fetchDoc(url.toString(), timeoutMilliseconds)
@@ -47,8 +51,10 @@ suspend fun fetchDoc(url: Uri.Builder, timeoutMilliseconds: Int = 20 * 1000) = f
 suspend fun <T> tryConnect(extraErrorInfo: String = "", call: suspend () -> Response<T>): Response<T> = try
 {
     call()
-} catch (e: SocketTimeoutException)
-{
+} catch (e: HttpStatusException) {
+	// alternative if ignoreHttpErrors is not implemented
+	Response.success(listOf())
+} catch (e: SocketTimeoutException) {
     val error = listOf(
         "Timeout error.",
         "",
@@ -60,8 +66,7 @@ suspend fun <T> tryConnect(extraErrorInfo: String = "", call: suspend () -> Resp
     ).joinToString("\n")
 
     Response.Error(error)
-} catch (e: Exception)
-{
+} catch (e: Exception) {
     val error = listOf(
         "Unknown error.",
         "",
