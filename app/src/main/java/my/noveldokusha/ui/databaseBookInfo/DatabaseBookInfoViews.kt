@@ -23,7 +23,7 @@ import my.noveldokusha.scraper.DatabaseInterface
 import my.noveldokusha.ui.theme.ColorAccent
 import my.noveldokusha.ui.theme.ImageBorderRadius
 import my.noveldokusha.ui.theme.InternalTheme
-import my.noveldokusha.uiViews.ImageViewPreview
+import my.noveldokusha.uiViews.ImageView
 import my.noveldokusha.uiViews.MyButton
 
 @Composable
@@ -53,7 +53,6 @@ private fun TextAnimated(text: String)
     }
 }
 
-@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun DatabaseBookInfoView(
     data: DatabaseInterface.BookData,
@@ -69,9 +68,8 @@ fun DatabaseBookInfoView(
     ) {
         Box {
             Box {
-                ImageViewPreview(
-                    coverImageUrl = data.coverImageUrl,
-                    alternative = R.drawable.ic_launcher_screen_icon,
+                ImageView(
+                    imageModel = data.coverImageUrl,
                     contentScale = ContentScale.FillWidth,
                     modifier = Modifier
                         .alpha(0.2f)
@@ -103,9 +101,8 @@ fun DatabaseBookInfoView(
                     textAlign = TextAlign.Center,
                     modifier = Modifier.fillMaxWidth(),
                 )
-                ImageViewPreview(
-                    coverImageUrl = data.coverImageUrl,
-                    alternative = R.drawable.ic_launcher_screen_icon,
+                ImageView(
+                    imageModel = data.coverImageUrl,
                     contentScale = ContentScale.FillHeight,
                     modifier = Modifier
                         .height(340.dp)
@@ -205,7 +202,7 @@ fun Preview()
             data = DatabaseInterface.BookData(
                 title = "Novel title",
                 description = "Novel description goes here and here to and a little more to fill lines",
-                coverImageUrl = null,
+                coverImageUrl = "",
                 alternativeTitles = listOf("Title 1", "Title 2", "Title 3"),
                 authors = (1..3).map { DatabaseInterface.BookAuthor("Author $it", "page url") },
                 tags = (1..20).map { "tag $it" },

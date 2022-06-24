@@ -22,12 +22,17 @@ open class BaseActivity : AppCompatActivity()
         if (!appPreferences.THEME_FOLLOW_SYSTEM.value)
             return appPreferences.THEME_ID.value
 
+        val isSystemThemeLight = !isSystemInDarkTheme()
         val isThemeLight = AppPreferences.globalThemeListLight.contains(appPreferences.THEME_ID.value)
-        val isSystemThemeLight = (resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) != Configuration.UI_MODE_NIGHT_YES
 
         if (isSystemThemeLight && !isThemeLight) return R.style.AppTheme_Light
         if (!isSystemThemeLight && isThemeLight) return R.style.AppTheme_BaseDark_Dark
         return appPreferences.THEME_ID.value
+    }
+
+    private fun isSystemInDarkTheme() : Boolean {
+        val uiMode = resources.configuration.uiMode
+        return (uiMode and Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES
     }
 
     override fun onCreate(savedInstanceState: Bundle?)

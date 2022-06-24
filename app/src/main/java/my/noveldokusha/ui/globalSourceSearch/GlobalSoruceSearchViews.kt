@@ -94,7 +94,7 @@ fun SourceListView(
                     .padding(end = 8.dp)
             ) {
                 ImageView(
-                    imageModel = it.coverImageUrl.ifBlank { R.drawable.ic_logo_foreground },
+                    imageModel = it.coverImageUrl,
                     modifier = Modifier
                         .clickable { onBookClick(it) }
                         .fillMaxWidth()

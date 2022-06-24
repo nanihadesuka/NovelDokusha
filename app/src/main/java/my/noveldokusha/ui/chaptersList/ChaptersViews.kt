@@ -40,7 +40,7 @@ import my.noveldokusha.uiUtils.drawBottomLine
 import my.noveldokusha.uiUtils.ifCase
 import my.noveldokusha.uiUtils.mix
 import my.noveldokusha.uiViews.ErrorView
-import my.noveldokusha.uiViews.ImageViewPreview
+import my.noveldokusha.uiViews.ImageView
 
 enum class ToolbarMode
 { MAIN, SEARCH }
@@ -128,9 +128,8 @@ fun HeaderView(
 {
     Box {
         Box {
-            ImageViewPreview(
-                coverImageUrl = bookCover,
-                alternative = R.drawable.ic_launcher_screen_icon,
+            ImageView(
+                imageModel = bookCover,
                 contentScale = ContentScale.FillWidth,
                 modifier = Modifier
                     .alpha(0.2f)
@@ -158,9 +157,8 @@ fun HeaderView(
                         .padding(horizontal = 8.dp)
                         .size(160.dp, 230.dp),
                 ) {
-                    ImageViewPreview(
-                        coverImageUrl = bookCover,
-                        alternative = R.drawable.ic_launcher_logo_foreground,
+                    ImageView(
+                        imageModel = bookCover,
                         contentScale = ContentScale.FillHeight,
                         modifier = Modifier
                             .fillMaxHeight()

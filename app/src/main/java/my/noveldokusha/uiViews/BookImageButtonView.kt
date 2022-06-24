@@ -13,19 +13,19 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import my.noveldokusha.R
 import my.noveldokusha.ui.theme.ImageBorderRadius
+import my.noveldokusha.ui.theme.InternalTheme
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun BookImageButtonView(
     title: String,
     coverImageUrl: String,
     onClick: () -> Unit,
     onLongClick: () -> Unit,
-)
-{
+) {
     MyButton(
         text = title,
         onClick = onClick,
@@ -64,5 +64,18 @@ fun BookImageButtonView(
                     .padding(horizontal = 8.dp)
             )
         }
+    }
+}
+
+@Preview
+@Composable
+private fun PreviewView() {
+    InternalTheme {
+        BookImageButtonView(
+            title = "Hello there",
+            coverImageUrl = "",
+            onClick = { /*TODO*/ },
+            onLongClick = { /*TODO*/ }
+        )
     }
 }

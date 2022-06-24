@@ -167,14 +167,14 @@ dependencies {
     androidTestImplementation("androidx.compose.ui:ui-test-junit4:1.1.1")
 
     // Coil for jetpack compose
-    implementation("io.coil-kt:coil-compose:2.0.0")
+    implementation("io.coil-kt:coil-compose:2.1.0")
 
 
     // Compose collapsing toolbar
     implementation("me.onebone:toolbar-compose:2.3.3")
 
     // Compose scroll bar
-    implementation("com.github.nanihadesuka:LazyColumnScrollbar:1.1.0")
+    implementation("com.github.nanihadesuka:LazyColumnScrollbar:1.3.1")
 
     // Logging
     implementation("com.jakewharton.timber:timber:5.0.1")
