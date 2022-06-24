@@ -1,7 +1,5 @@
 package my.noveldokusha.ui.chaptersList
 
-import androidx.annotation.DrawableRes
-import androidx.annotation.StringRes
 import androidx.compose.animation.*
 import androidx.compose.foundation.*
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -18,9 +16,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
@@ -30,6 +25,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
+import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import my.noveldokusha.R
@@ -38,6 +35,7 @@ import my.noveldokusha.data.database.tables.Chapter
 import my.noveldokusha.ui.theme.ColorAccent
 import my.noveldokusha.ui.theme.ImageBorderRadius
 import my.noveldokusha.ui.theme.InternalTheme
+import my.noveldokusha.ui.theme.Themes
 import my.noveldokusha.uiUtils.drawBottomLine
 import my.noveldokusha.uiUtils.ifCase
 import my.noveldokusha.uiUtils.mix
@@ -255,7 +253,7 @@ fun ChaptersListView(
     ) {
         item { header() }
         items(list) {
-            val selected by remember(selectedChapters.size) {
+            val selected by remember {
                 derivedStateOf { selectedChapters.containsKey(it.chapter.url) }
             }
 
@@ -354,112 +352,36 @@ fun ChaptersListView(
     }
 }
 
-
-@OptIn(ExperimentalFoundationApi::class)
-@Composable
-fun SelectionToolsBar(
-    onDeleteDownload: () -> Unit,
-    onDownload: () -> Unit,
-    onSetRead: () -> Unit,
-    onSetUnread: () -> Unit,
-    onSelectAllChapters: () -> Unit,
-    onSelectAllChaptersAfterSelectedOnes: () -> Unit,
-    onCloseSelectionbar: () -> Unit,
-    modifier: Modifier = Modifier
-)
-{
-    fun LazyGridScope.buttonItem(
-        @DrawableRes id: Int,
-        @StringRes description: Int,
-        onClick: () -> Unit
-    )
-    {
-        item {
-            Box(
-                contentAlignment = Alignment.Center,
-                modifier = Modifier
-                    .clickable(onClick = onClick)
-                    .padding(12.dp)
-            ) {
-                Icon(
-                    painter = painterResource(id = id),
-                    contentDescription = stringResource(description)
-                )
-            }
-        }
-    }
-
-    LazyVerticalGrid(
-        cells = GridCells.Fixed(4),
-        horizontalArrangement = Arrangement.Center,
-        modifier = modifier
-            .shadow(6.dp)
-            .background(MaterialTheme.colors.primary)
-    ) {
-        buttonItem(
-            id = R.drawable.ic_outline_delete_24,
-            description = R.string.remove_selected_chapters_dowloads,
-            onClick = onDeleteDownload
-        )
-        buttonItem(
-            id = R.drawable.ic_outline_cloud_download_24,
-            description = R.string.download_selected_chapters,
-            onClick = onDownload
-        )
-        buttonItem(
-            id = R.drawable.ic_looking_24,
-            description = R.string.set_as_read_selected_chapters,
-            onClick = onSetRead
-        )
-        buttonItem(
-            id = R.drawable.ic_not_looking_24,
-            description = R.string.set_as_not_read_selected_chapters,
-            onClick = onSetUnread
-        )
-        buttonItem(
-            id = R.drawable.ic_baseline_select_all_24,
-            description = R.string.select_all_chapters,
-            onClick = onSelectAllChapters
-        )
-        buttonItem(
-            id = R.drawable.ic_baseline_select_all_24_bottom,
-            description = R.string.select_all_chapters_after_currently_selected_ones,
-            onClick = onSelectAllChaptersAfterSelectedOnes
-        )
-        buttonItem(
-            id = R.drawable.ic_baseline_close_24,
-            description = R.string.close_selection_bar,
-            onClick = onCloseSelectionbar
-        )
-    }
+private class SampleProvider: PreviewParameterProvider<Themes> {
+    override val values = Themes.list.asSequence()
 }
 
 @Preview
 @Composable
-private fun Preview()
+private fun Preview(@PreviewParameter(SampleProvider::class) theme: Themes)
 {
     val list = (0..10).map {
         ChapterWithContext(
             chapter = Chapter(
                 title = "Title chapter $it",
-                url = "",
-                bookUrl = "",
+                url = "chapterUrl_$it",
+                bookUrl = "bookUrl",
                 position = it,
                 read = it % 4 == 0,
                 lastReadOffset = 0,
                 lastReadPosition = 0
             ),
             downloaded = it % 2 == 0,
-            lastReadChapter = false
+            lastReadChapter = it == 0
         )
     }.let { mutableStateListOf<ChapterWithContext>().apply { addAll(it) } }
 
     val selectedChapters = list
-        .filterIndexed { index, _ -> index % 3 == 0 }
+        .filterIndexed { index, _ -> (index % 3) == 0 }
         .associate { it.chapter.url to Unit }
-        .let { SnapshotStateMap<String, Unit>().apply { this.putAll(it) } }
+        .let { SnapshotStateMap<String, Unit>().apply { putAll(it) } }
 
-    InternalTheme {
+    InternalTheme(theme) {
         Box {
             ChaptersListView(
                 header = {
