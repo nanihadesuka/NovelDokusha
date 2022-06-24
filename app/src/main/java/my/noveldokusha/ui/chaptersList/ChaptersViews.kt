@@ -126,10 +126,11 @@ fun HeaderView(
     onOpenInBrowser: () -> Unit
 )
 {
+    val bookCoverImg = bookCover ?: R.drawable.ic_baseline_empty_24
     Box {
         Box {
             ImageView(
-                imageModel = bookCover,
+                imageModel = bookCoverImg,
                 contentScale = ContentScale.FillWidth,
                 modifier = Modifier
                     .alpha(0.2f)
@@ -158,7 +159,7 @@ fun HeaderView(
                         .size(160.dp, 230.dp),
                 ) {
                     ImageView(
-                        imageModel = bookCover,
+                        imageModel = bookCoverImg,
                         contentScale = ContentScale.FillHeight,
                         modifier = Modifier
                             .fillMaxHeight()

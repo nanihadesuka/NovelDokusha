@@ -40,7 +40,7 @@ class DatabaseBookInfoViewModel @Inject constructor(
         DatabaseInterface.BookData(
             title = bookTitle,
             description = "",
-            coverImageUrl = "",
+            coverImageUrl = null,
             alternativeTitles = listOf(),
             authors = listOf(),
             tags = listOf(),

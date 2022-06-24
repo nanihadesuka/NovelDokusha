@@ -63,13 +63,14 @@ fun DatabaseBookInfoView(
     scrollState: ScrollState,
 )
 {
+    val coverImg = data.coverImageUrl ?: R.drawable.ic_baseline_empty_24
     Column(
         Modifier.verticalScroll(scrollState)
     ) {
         Box {
             Box {
                 ImageView(
-                    imageModel = data.coverImageUrl,
+                    imageModel = coverImg,
                     contentScale = ContentScale.FillWidth,
                     modifier = Modifier
                         .alpha(0.2f)
@@ -102,7 +103,7 @@ fun DatabaseBookInfoView(
                     modifier = Modifier.fillMaxWidth(),
                 )
                 ImageView(
-                    imageModel = data.coverImageUrl,
+                    imageModel = coverImg,
                     contentScale = ContentScale.FillHeight,
                     modifier = Modifier
                         .height(340.dp)

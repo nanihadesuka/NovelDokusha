@@ -5,6 +5,7 @@ import android.content.Intent
 import android.view.View
 import androidx.compose.runtime.*
 import androidx.lifecycle.*
+import androidx.room.PrimaryKey
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.*
@@ -26,11 +27,30 @@ import my.noveldokusha.uiUtils.toState
 import my.noveldokusha.uiUtils.toast
 import javax.inject.Inject
 
-interface ChapterStateBundle
-{
+interface ChapterStateBundle {
     val bookMetadata get() = BookMetadata(title = bookTitle, url = bookUrl)
     var bookUrl: String
     var bookTitle: String
+}
+
+data class BookDataView(
+    val title: String,
+    val url: String,
+    val completed: Boolean = false,
+    val lastReadChapter: String? = null,
+    val inLibrary: Boolean = false,
+    val coverImageUrl: String? = null,
+    val description: String = ""
+) {
+    constructor(book: Book) : this(
+        title = book.title,
+        url = book.url,
+        completed = book.completed,
+        lastReadChapter = book.lastReadChapter,
+        inLibrary = book.inLibrary,
+        coverImageUrl = book.coverImageUrl,
+        description = book.description
+    )
 }
 
 @HiltViewModel
@@ -40,13 +60,11 @@ class ChaptersViewModel @Inject constructor(
     @ApplicationContext private val context: Context,
     val appPreferences: AppPreferences,
     state: SavedStateHandle,
-) : BaseViewModel(), ChapterStateBundle
-{
+) : BaseViewModel(), ChapterStateBundle {
     override var bookUrl by StateExtra_String(state)
     override var bookTitle by StateExtra_String(state)
 
-    class IntentData : Intent
-    {
+    class IntentData : Intent {
         val bookMetadata get() = BookMetadata(title = bookTitle, url = bookUrl)
         private var bookUrl by Extra_String()
         private var bookTitle by Extra_String()
@@ -55,15 +73,13 @@ class ChaptersViewModel @Inject constructor(
         constructor(ctx: Context, bookMetadata: BookMetadata) : super(
             ctx,
             ChaptersActivity::class.java
-        )
-        {
+        ) {
             this.bookUrl = bookMetadata.url
             this.bookTitle = bookMetadata.title
         }
     }
 
-    init
-    {
+    init {
         viewModelScope.launch(Dispatchers.IO) {
             if (!repository.bookChapter.hasChapters(bookMetadata.url))
                 updateChaptersList()
@@ -72,21 +88,27 @@ class ChaptersViewModel @Inject constructor(
             if (book != null)
                 return@launch
 
+            val coverUrl = async { downloadBookCoverImageUrl(bookUrl) }
+            val description = async { downloadBookDescription(bookUrl) }
+
             repository.bookLibrary.insert(
                 Book(
                     title = bookMetadata.title,
-                    url = bookMetadata.url
+                    url = bookMetadata.url,
+                    coverImageUrl = coverUrl.await().toSuccessOrNull()?.data ?: "",
+                    description = description.await().toSuccessOrNull()?.data ?: ""
                 )
             )
-            updateCover()
-            updateDescription()
         }
     }
 
-    val book by repository.bookLibrary.getFlow(bookUrl).filterNotNull().toState(
-        viewModelScope,
-        Book(title = bookTitle, url = bookUrl)
-    )
+    val book by repository.bookLibrary.getFlow(bookUrl)
+        .filterNotNull()
+        .map(::BookDataView)
+        .toState(
+            viewModelScope,
+            BookDataView(title = bookTitle, url = bookUrl, coverImageUrl = null)
+        )
 
     var error by mutableStateOf("")
     val selectedChaptersUrl = mutableStateMapOf<String, Unit>()
@@ -94,15 +116,13 @@ class ChaptersViewModel @Inject constructor(
     var isRefreshing by mutableStateOf(false)
     val textSearch = mutableStateOf("")
 
-    init
-    {
+    init {
         viewModelScope.launch {
             repository.bookChapter.getChaptersWithContexFlow(bookMetadata.url)
                 .map { removeCommonTextFromTitles(it) }
                 // Sort the chapters given the order preference
                 .combine(appPreferences.CHAPTERS_SORT_ASCENDING.flow()) { chapters, sorted ->
-                    when (sorted)
-                    {
+                    when (sorted) {
                         AppPreferences.TERNARY_STATE.active -> chapters.sortedBy { it.chapter.position }
                         AppPreferences.TERNARY_STATE.inverse -> chapters.sortedByDescending { it.chapter.position }
                         AppPreferences.TERNARY_STATE.inactive -> chapters
@@ -130,8 +150,7 @@ class ChaptersViewModel @Inject constructor(
         }
     }
 
-    fun reloadAll()
-    {
+    fun reloadAll() {
         updateCover()
         updateDescription()
         updateChaptersList()
@@ -151,10 +170,8 @@ class ChaptersViewModel @Inject constructor(
     }
 
     private var loadChaptersJob: Job? = null
-    fun updateChaptersList()
-    {
-        if (bookMetadata.url.startsWith("local://"))
-        {
+    fun updateChaptersList() {
+        if (bookMetadata.url.startsWith("local://")) {
             toast(context.getString(R.string.local_book_nothing_to_update))
             isRefreshing = false
             return
@@ -168,10 +185,8 @@ class ChaptersViewModel @Inject constructor(
             val url = bookMetadata.url
             val res = withContext(Dispatchers.IO) { downloadChaptersList(url) }
             isRefreshing = false
-            when (res)
-            {
-                is Response.Success ->
-                {
+            when (res) {
+                is Response.Success -> {
                     if (res.data.isEmpty())
                         toast(context.getString(R.string.no_chapters_found))
 
@@ -179,19 +194,16 @@ class ChaptersViewModel @Inject constructor(
                         repository.bookChapter.merge(res.data, url)
                     }
                 }
-                is Response.Error ->
-                {
+                is Response.Error -> {
                     error = res.message
                 }
             }
         }
     }
 
-    fun toggleChapterSort()
-    {
+    fun toggleChapterSort() {
         appPreferences.CHAPTERS_SORT_ASCENDING.value =
-            when (appPreferences.CHAPTERS_SORT_ASCENDING.value)
-            {
+            when (appPreferences.CHAPTERS_SORT_ASCENDING.value) {
                 AppPreferences.TERNARY_STATE.active -> AppPreferences.TERNARY_STATE.inverse
                 AppPreferences.TERNARY_STATE.inverse -> AppPreferences.TERNARY_STATE.active
                 AppPreferences.TERNARY_STATE.inactive -> AppPreferences.TERNARY_STATE.active
@@ -208,53 +220,46 @@ class ChaptersViewModel @Inject constructor(
             ?: repository.bookChapter.getFirstChapter(bookUrl)?.url
     }
 
-    fun setSelectedAsUnread()
-    {
+    fun setSelectedAsUnread() {
         val list = selectedChaptersUrl.toList()
         appScope.launch(Dispatchers.IO) {
             repository.bookChapter.setAsUnread(list.map { it.first })
         }
     }
 
-    fun setSelectedAsRead()
-    {
+    fun setSelectedAsRead() {
         val list = selectedChaptersUrl.toList()
         appScope.launch(Dispatchers.IO) {
             repository.bookChapter.setAsRead(list.map { it.first })
         }
     }
 
-    fun downloadSelected()
-    {
+    fun downloadSelected() {
         val list = selectedChaptersUrl.toList()
         appScope.launch(Dispatchers.IO) {
             list.forEach { repository.bookChapterBody.fetchBody(it.first) }
         }
     }
 
-    fun deleteDownloadSelected()
-    {
+    fun deleteDownloadSelected() {
         val list = selectedChaptersUrl.toList()
         appScope.launch(Dispatchers.IO) {
             repository.bookChapterBody.removeRows(list.map { it.first })
         }
     }
 
-    fun closeSelectionMode()
-    {
+    fun closeSelectionMode() {
         selectedChaptersUrl.clear()
     }
 
-    fun selectAll()
-    {
+    fun selectAll() {
         chaptersWithContext
             .toList()
             .map { it.chapter.url to Unit }
             .let { selectedChaptersUrl.putAll(it) }
     }
 
-    fun selectAllAfterSelectedOnes()
-    {
+    fun selectAllAfterSelectedOnes() {
         chaptersWithContext
             .toList()
             .dropWhile { !selectedChaptersUrl.contains(it.chapter.url) }
@@ -263,8 +268,7 @@ class ChaptersViewModel @Inject constructor(
     }
 }
 
-private fun removeCommonTextFromTitles(list: List<ChapterWithContext>): List<ChapterWithContext>
-{
+private fun removeCommonTextFromTitles(list: List<ChapterWithContext>): List<ChapterWithContext> {
     // Try removing repetitive title text from chapters
     if (list.size <= 1) return list
     val first = list.first().chapter.title
@@ -278,14 +282,12 @@ private fun removeCommonTextFromTitles(list: List<ChapterWithContext>): List<Cha
         prefix: CharSequence,
         suffix: CharSequence,
         ignoreCase: Boolean = false
-    ): String
-    {
+    ): String {
         if ((length >= prefix.length + suffix.length) && startsWith(prefix, ignoreCase) && endsWith(
                 suffix,
                 ignoreCase
             )
-        )
-        {
+        ) {
             return substring(prefix.length, length - suffix.length)
         }
         return this
