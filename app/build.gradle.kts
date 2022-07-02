@@ -100,9 +100,9 @@ dependencies {
     androidTestImplementation("androidx.room:room-testing:2.4.2")
 
     // Lifecycle components
-    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.4.1")
-    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.4.1")
-    implementation("androidx.lifecycle:lifecycle-common-java8:2.4.1")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.5.0")
+    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.5.0")
+    implementation("androidx.lifecycle:lifecycle-common-java8:2.5.0")
     implementation("androidx.coordinatorlayout:coordinatorlayout:1.2.0")
 
     // Preferences
@@ -110,11 +110,11 @@ dependencies {
 
     // UI
     implementation("androidx.appcompat:appcompat:1.4.2")
-    implementation("androidx.core:core-ktx:1.9.0-alpha04")
-    implementation("androidx.navigation:navigation-fragment-ktx:2.4.2")
-    implementation("androidx.navigation:navigation-ui-ktx:2.4.2")
-    implementation("androidx.activity:activity-ktx:1.4.0")
-    implementation("androidx.fragment:fragment-ktx:1.4.1")
+    implementation("androidx.core:core-ktx:1.9.0-alpha05")
+    implementation("androidx.navigation:navigation-fragment-ktx:2.5.0")
+    implementation("androidx.navigation:navigation-ui-ktx:2.5.0")
+    implementation("androidx.activity:activity-ktx:1.5.0")
+    implementation("androidx.fragment:fragment-ktx:1.5.0")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
     implementation("androidx.recyclerview:recyclerview:1.2.1")
     implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
@@ -150,11 +150,11 @@ dependencies {
     //debugImplementation("com.squareup.leakcanary:leakcanary-android:2.7")
 
     // Jetpack compose
-    implementation("androidx.activity:activity-compose:1.4.0")
+    implementation("androidx.activity:activity-compose:1.5.0")
     implementation("androidx.compose.material:material:1.1.1")
     implementation("androidx.compose.animation:animation:1.1.1")
     implementation("androidx.compose.ui:ui-tooling:1.1.1")
-    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.4.1")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.5.0")
     implementation("androidx.compose.runtime:runtime-livedata:1.1.1")
     implementation("androidx.constraintlayout:constraintlayout-compose:1.0.1")
     implementation("androidx.compose.material:material-icons-extended:1.1.1")
