@@ -1,5 +1,7 @@
 package my.noveldokusha.scraper
 
+import my.noveldokusha.data.BookTextUtils
+import org.jsoup.nodes.Element
 import org.jsoup.nodes.Node
 import org.jsoup.nodes.TextNode
 
@@ -8,7 +10,7 @@ object textExtractor
     /**
      * Given an node, extract the text.
      *
-     * @return string where each paragrpah is
+     * @return string where each paragraph is
      * separated by two newlines
      */
     fun get(node: Node?): String
@@ -23,6 +25,7 @@ object textExtractor
                 child.nodeName() == "p" -> getPTraverse(child)
                 child.nodeName() == "br" -> "\n"
                 child.nodeName() == "hr" -> "\n\n"
+                child.nodeName() == "img" -> declareImgEntry(child)
                 child is TextNode -> child.text().trim()
                 else -> getNodeTextTraverse(child)
             }
@@ -36,6 +39,7 @@ object textExtractor
             {
                 child.nodeName() == "br" -> "\n"
                 child is TextNode -> child.text()
+                child.nodeName() == "img" -> declareImgEntry(child)
                 else -> innerTraverse(child)
             }
         }
@@ -56,6 +60,7 @@ object textExtractor
                 child.nodeName() == "p" -> getPTraverse(child)
                 child.nodeName() == "br" -> "\n"
                 child.nodeName() == "hr" -> "\n\n"
+                child.nodeName() == "img" -> declareImgEntry(child)
                 child is TextNode ->
                 {
                     val text = child.text().trim()
@@ -64,5 +69,16 @@ object textExtractor
                 else -> getNodeTextTraverse(child)
             }
         }
+    }
+
+    // Rewrites the image node to xml for the next stage.
+    private fun declareImgEntry(node: Node): String
+    {
+        val relPathEncoded = (node as? Element)?.attr("src") ?: return ""
+        val text = BookTextUtils.ImgEntry(
+            path = relPathEncoded,
+            yrel =  1.45f
+        ).toXMLString()
+        return "\n\n$text\n\n"
     }
 }

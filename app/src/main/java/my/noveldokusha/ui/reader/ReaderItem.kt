@@ -1,6 +1,8 @@
 package my.noveldokusha.ui.reader
 
+import android.util.Log
 import my.noveldokusha.data.BookTextUtils
+import timber.log.Timber
 
 sealed class ReaderItem
 {

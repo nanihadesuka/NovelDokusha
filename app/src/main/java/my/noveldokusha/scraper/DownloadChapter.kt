@@ -1,6 +1,7 @@
 package my.noveldokusha.scraper
 
 import net.dankito.readability4j.Readability4J
+import net.dankito.readability4j.extended.Readability4JExtended
 
 suspend fun downloadChapter(chapterUrl: String): Response<ChapterDownload>
 {
@@ -34,7 +35,7 @@ suspend fun downloadChapter(chapterUrl: String): Response<ChapterDownload>
         }
 
         // If no predefined source is found try extracting text with Readability4J library
-        Readability4J(realUrl, fetchDoc(realUrl)).parse().also { article ->
+        Readability4JExtended(realUrl, fetchDoc(realUrl)).parse().also { article ->
             val content = article.articleContent ?: return@also
             val data = ChapterDownload(
                 body = textExtractor.get(content),

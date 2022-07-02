@@ -23,7 +23,7 @@ class NovelUpdates : SourceInterface.catalog
 
     override suspend fun getChapterText(doc: Document): String
     {
-        // Given novel updates only host the chapters list (they redirect to a diferent webpage) and
+        // Given novel updates only host the chapters list (they redirect to a different webpage) and
         // not the content, it will return nothing.
         return ""
     }

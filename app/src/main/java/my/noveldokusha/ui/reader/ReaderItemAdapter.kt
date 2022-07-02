@@ -87,14 +87,21 @@ class ReaderItemAdapter(
             dimensionRatio = "1:${imgEntry.yrel}"
         }
 
+        val imageModel = when {
+            imgEntry.path.startsWith("http://", ignoreCase = true) -> imgEntry.path
+            imgEntry.path.startsWith("https://", ignoreCase = true) -> imgEntry.path
+            else -> File(localBookBaseFolder, imgEntry.path)
+        }
+            
         // Glide uses current imageView size to load the bitmap best optimized for it, but current
         // size corresponds to the last image (different size) and the view layout only updates to
         // the new values on next redraw. Execute Glide loading call in the next (parent) layout
         // update to let it get the correct values.
         // (Avoids getting "blurry" images)
         bind.imageContainer.doOnNextLayout {
-            Glide.with(ctx)
-                .load(File(localBookBaseFolder, imgEntry.path))
+            val s = Glide.with(ctx)
+                .load(imageModel)
+                .fitCenter()
                 .error(R.drawable.ic_baseline_error_outline_24)
                 .transition(DrawableTransitionOptions.withCrossFade())
                 .into(bind.image)
