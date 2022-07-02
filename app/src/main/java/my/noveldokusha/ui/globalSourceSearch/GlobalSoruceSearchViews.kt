@@ -14,7 +14,6 @@ import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
-import androidx.compose.runtime.saveable.listSaver
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -23,7 +22,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import my.noveldokusha.R
 import my.noveldokusha.data.BookMetadata
-import my.noveldokusha.scraper.FetchIteratorState
+import my.noveldokusha.scraper.IteratorState
 import my.noveldokusha.scraper.scraper
 import my.noveldokusha.ui.theme.ColorAccent
 import my.noveldokusha.ui.theme.ImageBorderRadius
@@ -61,7 +60,7 @@ fun GlobalSourceSearchView(
 @Composable
 fun SourceListView(
     list: List<BookMetadata>,
-    loadState: FetchIteratorState.STATE,
+    loadState: IteratorState,
     error: String?,
     onBookClick: (book: BookMetadata) -> Unit,
     onLoadNext: () -> Unit,
@@ -73,7 +72,7 @@ fun SourceListView(
 
     val noResults by remember(loadState, list.isEmpty()) {
         derivedStateOf {
-            (loadState == FetchIteratorState.STATE.CONSUMED) && list.isEmpty()
+            (loadState == IteratorState.CONSUMED) && list.isEmpty()
         }
     }
 
@@ -124,11 +123,11 @@ fun SourceListView(
                 modifier = Modifier.width(160.dp)
             ) {
                 when (loadState) {
-                    FetchIteratorState.STATE.LOADING -> CircularProgressIndicator(
+                    IteratorState.LOADING -> CircularProgressIndicator(
                         color = ColorAccent,
                         modifier = Modifier.padding(12.dp)
                     )
-                    FetchIteratorState.STATE.CONSUMED -> when {
+                    IteratorState.CONSUMED -> when {
                         error != null -> Text(
                             text = stringResource(R.string.error_loading),
                             color = MaterialTheme.colors.onError,
@@ -142,7 +141,7 @@ fun SourceListView(
                             color = ColorAccent,
                         )
                     }
-                    FetchIteratorState.STATE.IDLE -> {}
+                    IteratorState.IDLE -> {}
                 }
             }
         }

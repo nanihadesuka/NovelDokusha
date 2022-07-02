@@ -19,8 +19,10 @@ class BakaUpdates : DatabaseInterface {
     override suspend fun getSearchAuthorSeries(
         index: Int,
         urlAuthorPage: String
-    ): Response<List<BookMetadata>> {
-        if (index > 0) return Response.Success(listOf())
+    ): Response<PagedList<BookMetadata>> {
+        if (index > 0) return Response.Success(
+            PagedList(list = listOf(), pageIndex = index, isLastPage = true)
+        )
 
         return tryConnect {
             fetchDoc(urlAuthorPage)
@@ -28,7 +30,11 @@ class BakaUpdates : DatabaseInterface {
                 .map { it.select("a[href]")[1] }
                 .filter { it.text().endsWith("(Novel)") }
                 .map { BookMetadata(title = it.text(), url = it.attr("href")) }
-                .let { Response.Success(it) }
+                .let {
+                    Response.Success(
+                        PagedList(list = it, pageIndex = index, isLastPage = true)
+                    )
+                }
         }
     }
 
@@ -44,7 +50,7 @@ class BakaUpdates : DatabaseInterface {
         }
     }
 
-    override suspend fun getSearch(index: Int, input: String): Response<List<BookMetadata>> {
+    override suspend fun getSearch(index: Int, input: String): Response<PagedList<BookMetadata>> {
         val page = index + 1
         val url = "https://www.mangaupdates.com/series.html".toUrlBuilderSafe().apply {
             if (page > 1) add("page", page)
@@ -60,8 +66,7 @@ class BakaUpdates : DatabaseInterface {
         index: Int,
         genresIncludedId: List<String>,
         genresExcludedId: List<String>
-    ):
-            Response<List<BookMetadata>> {
+    ): Response<PagedList<BookMetadata>> {
         val page = index + 1
         val url = "https://www.mangaupdates.com/series.html".toUrlBuilderSafe().apply {
             if (page > 1) add("page", page)
@@ -74,13 +79,13 @@ class BakaUpdates : DatabaseInterface {
             add("perpage", 50)
         }
 
-        return getSearchList(page, url)
+        return getSearchList(index, url)
     }
 
-    suspend fun getSearchList(page: Int, url: Uri.Builder) =
-        tryConnect("page: $page\n\nurl: $url") {
-            fetchDoc(url)
-                .select(".col-12.col-lg-6.p-3.text")
+    private suspend fun getSearchList(index: Int, url: Uri.Builder) =
+        tryConnect("index: $index\n\nurl: $url") {
+            val doc = fetchDoc(url)
+            doc.select(".col-12.col-lg-6.p-3.text")
                 .mapNotNull {
                     val link = it.selectFirst("div.text > a[href]") ?: return@mapNotNull null
                     val bookCover = it.selectFirst("img[src]")?.attr("src") ?: ""
@@ -93,7 +98,15 @@ class BakaUpdates : DatabaseInterface {
                         description = description
                     )
                 }
-                .let { Response.Success(it) }
+                .let {
+                    Response.Success(
+                        PagedList(
+                            list = it,
+                            pageIndex = index,
+                            isLastPage = doc.selectFirst("a[href]:contains(Next Page)") == null
+                        )
+                    )
+                }
         }
 
     override fun getBookData(doc: Document): DatabaseInterface.BookData {

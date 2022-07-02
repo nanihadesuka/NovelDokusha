@@ -22,7 +22,7 @@ import androidx.compose.ui.unit.dp
 import my.noveldokusha.AppPreferences
 import my.noveldokusha.R
 import my.noveldokusha.data.BookMetadata
-import my.noveldokusha.scraper.FetchIteratorState
+import my.noveldokusha.scraper.IteratorState
 import my.noveldokusha.ui.theme.ColorAccent
 import my.noveldokusha.ui.theme.InternalTheme
 import my.noveldokusha.uiViews.BooksVerticalGridView
@@ -170,7 +170,7 @@ fun PreviewList()
         BooksVerticalListView(
             list = (1..10).map { BookMetadata("Book $it", "url") },
             error = null,
-            loadState = FetchIteratorState.STATE.LOADING,
+            loadState = IteratorState.LOADING,
             onLoadNext = {},
             onBookClicked = {},
             onBookLongClicked = {},
@@ -190,7 +190,7 @@ fun PreviewGrid()
             cells = GridCells.Fixed(2),
             list = (1..10).map { BookMetadata("Book $it", "url") },
             error = null,
-            loadState = FetchIteratorState.STATE.LOADING,
+            loadState = IteratorState.LOADING,
             onLoadNext = {},
             onBookClicked = {},
             onBookLongClicked = {},

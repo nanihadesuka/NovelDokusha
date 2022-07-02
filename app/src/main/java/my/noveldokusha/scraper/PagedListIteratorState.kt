@@ -11,12 +11,12 @@ import kotlinx.coroutines.*
  * Used to fetch data that needs multiple request for jetpack compose.
  * e.g: Asking for a list of results that has multiple pages
  *
- * The fetch iteration will be consided finished if a results returns an empty list.
+ * The fetch iteration will be consider finished if a results returns positive hasNoNextPage.
  */
-class FetchIteratorState<T>(
+class PagedListIteratorState<T>(
     private val coroutineScope: CoroutineScope,
     val list: SnapshotStateList<T> = mutableStateListOf(),
-    private var fn: (suspend (index: Int) -> Response<List<T>>)
+    private var fn: (suspend (index: Int) -> Response<PagedList<T>>)
 ) {
     private var index = 0
     private var job: Job? = null
@@ -35,10 +35,10 @@ class FetchIteratorState<T>(
     }
 
     fun reloadFailedLastLoad() {
-        if(error == null)
+        if (error == null)
             return
         job?.cancel()
-        index = (index-1).coerceAtLeast(0)
+        index = (index - 1).coerceAtLeast(0)
         state = IteratorState.IDLE
         error = null
         fetchNext()
@@ -53,8 +53,8 @@ class FetchIteratorState<T>(
             if (!isActive) return@launch
             state = when (res) {
                 is Response.Success -> {
-                    list.addAll(res.data)
-                    if (res.data.isEmpty()) IteratorState.CONSUMED else IteratorState.IDLE
+                    list.addAll(res.data.list)
+                    if (res.data.hasNoNextPage) IteratorState.CONSUMED else IteratorState.IDLE
                 }
                 is Response.Error -> {
                     error = res.message
@@ -65,7 +65,7 @@ class FetchIteratorState<T>(
         }
     }
 
-    fun setFunction(fn: (suspend (index: Int) -> Response<List<T>>)) {
-            this.fn = fn
+    fun setFunction(fn: (suspend (index: Int) -> Response<PagedList<T>>)) {
+        this.fn = fn
     }
 }

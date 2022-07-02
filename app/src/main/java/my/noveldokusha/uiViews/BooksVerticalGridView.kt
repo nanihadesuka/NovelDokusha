@@ -12,7 +12,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import my.noveldokusha.R
 import my.noveldokusha.data.BookMetadata
-import my.noveldokusha.scraper.FetchIteratorState
+import my.noveldokusha.scraper.IteratorState
 import my.noveldokusha.ui.theme.ColorAccent
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -21,7 +21,7 @@ fun BooksVerticalGridView(
     list: List<BookMetadata>,
     listState: LazyListState,
     error: String?,
-    loadState: FetchIteratorState.STATE,
+    loadState: IteratorState,
     cells: GridCells,
     onLoadNext: () -> Unit,
     onBookClicked: (book: BookMetadata) -> Unit,
@@ -60,10 +60,10 @@ fun BooksVerticalGridView(
             ) {
                 when (loadState)
                 {
-                    FetchIteratorState.STATE.LOADING -> CircularProgressIndicator(
+                    IteratorState.LOADING -> CircularProgressIndicator(
                         color = ColorAccent
                     )
-                    FetchIteratorState.STATE.CONSUMED -> Text(
+                    IteratorState.CONSUMED -> Text(
                         text = when
                         {
                             list.isEmpty() -> stringResource(R.string.no_results_found)

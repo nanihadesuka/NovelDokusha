@@ -7,6 +7,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import my.noveldokusha.AppPreferences
 import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.scraper.FetchIteratorState
+import my.noveldokusha.scraper.PagedListIteratorState
 import my.noveldokusha.scraper.scraper
 import my.noveldokusha.ui.BaseViewModel
 import my.noveldokusha.uiUtils.StateExtra_String
@@ -78,7 +79,7 @@ class DatabaseSearchResultsViewModel @Inject constructor(
     override var urlAuthorPage by StateExtra_String(state)
 
     val listLayout by appPreferences.BOOKS_LIST_LAYOUT_MODE.state(viewModelScope)
-    val fetchIterator: FetchIteratorState<BookMetadata> = FetchIteratorState(viewModelScope) { index ->
+    val fetchIterator = PagedListIteratorState(viewModelScope) { index ->
         when (val input = this.input)
         {
             is DatabaseSearchResultsActivity.SearchMode.Text -> database.getSearch(index, input.text)

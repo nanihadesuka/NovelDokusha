@@ -13,14 +13,14 @@ interface DatabaseInterface
 
     val searchGenresCache get() = DataCache_DatabaseSearchGenres(id)
 
-    suspend fun getSearchAuthorSeries(index: Int, urlAuthorPage: String): Response<List<BookMetadata>>
+    suspend fun getSearchAuthorSeries(index: Int, urlAuthorPage: String): Response<PagedList<BookMetadata>>
     suspend fun getSearchGenres(): Response<Map<String, String>>
-    suspend fun getSearch(index: Int, input: String): Response<List<BookMetadata>>
+    suspend fun getSearch(index: Int, input: String): Response<PagedList<BookMetadata>>
     suspend fun getSearchAdvanced(
         index: Int,
         genresIncludedId: List<String>,
         genresExcludedId: List<String>
-    ): Response<List<BookMetadata>>
+    ): Response<PagedList<BookMetadata>>
 
     data class BookAuthor(val name: String, val url: String?)
     data class BookData(

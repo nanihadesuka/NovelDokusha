@@ -11,3 +11,13 @@ sealed class Response<T> {
         is Success -> this
     }
 }
+
+data class PagedList<T>(
+    val list: List<T>,
+    val pageIndex: Int,
+    private val isLastPage: Boolean
+) {
+    val hasNoNextPage = list.isEmpty() || isLastPage
+}
+
+enum class IteratorState { IDLE, LOADING, CONSUMED }
