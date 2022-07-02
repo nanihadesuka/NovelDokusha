@@ -28,7 +28,8 @@ object scraper
         BoxNovel(),
         LightNovelWorld(),
         NovelHall(),
-        MTLNovel()
+        MTLNovel(),
+        WuxiaWorld()
     )
 
     val sourcesListCatalog = sourcesList.filterIsInstance<SourceInterface.catalog>().toSet()
