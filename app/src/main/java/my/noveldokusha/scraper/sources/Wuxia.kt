@@ -5,8 +5,7 @@ import my.noveldokusha.data.ChapterMetadata
 import my.noveldokusha.scraper.*
 import org.jsoup.nodes.Document
 
-class Wuxia : SourceInterface.catalog
-{
+class Wuxia : SourceInterface.Catalog {
     override val name = "Wuxia"
     override val baseUrl = "https://www.wuxia.blog/"
     override val catalogUrl = "https://www.wuxia.blog/listNovels"
@@ -14,8 +13,7 @@ class Wuxia : SourceInterface.catalog
 
     override suspend fun getChapterTitle(doc: Document): String? = null
 
-    override suspend fun getChapterText(doc: Document): String
-    {
+    override suspend fun getChapterText(doc: Document): String {
         return doc.selectFirst("div.panel-body.article")!!.also {
             it.select(".pager").remove()
             it.select(".fa.fa-calendar").remove()
@@ -24,15 +22,13 @@ class Wuxia : SourceInterface.catalog
         }.let { textExtractor.get(it) }
     }
 
-    override suspend fun getBookCoverImageUrl(doc: Document): String?
-    {
+    override suspend fun getBookCoverImageUrl(doc: Document): String? {
         return doc.selectFirst(".imageCover")
             ?.selectFirst("img[src]")
             ?.attr("src")
     }
 
-    override suspend fun getBookDescripton(doc: Document): String?
-    {
+    override suspend fun getBookDescripton(doc: Document): String? {
         return doc.selectFirst("div[itemprop=description]")
             ?.let {
                 it.select("h4").remove()
@@ -40,8 +36,7 @@ class Wuxia : SourceInterface.catalog
             }
     }
 
-    override suspend fun getChapterList(doc: Document): List<ChapterMetadata>
-    {
+    override suspend fun getChapterList(doc: Document): List<ChapterMetadata> {
         val id = doc.selectFirst("#more")!!.attr("data-nid")
         val newChapters = doc.select("#chapters a[href]")
         val res = tryConnect {
@@ -59,23 +54,24 @@ class Wuxia : SourceInterface.catalog
         }
     }
 
-    override suspend fun getCatalogList(index: Int): Response<List<BookMetadata>>
-    {
+    override suspend fun getCatalogList(index: Int): Response<PagedList<BookMetadata>> {
         if (index > 0)
-            return Response.Success(listOf())
+            return Response.Success(PagedList.createEmpty(index = index))
 
         return tryConnect {
             fetchDoc(catalogUrl)
                 .select("td.novel a[href]")
                 .map { BookMetadata(title = it.text(), url = baseUrl + it.attr("href")) }
-                .let { Response.Success(it) }
+                .let { Response.Success(PagedList(list = it, index = index, isLastPage = true)) }
         }
     }
 
-    override suspend fun getCatalogSearch(index: Int, input: String): Response<List<BookMetadata>>
-    {
+    override suspend fun getCatalogSearch(
+        index: Int,
+        input: String
+    ): Response<PagedList<BookMetadata>> {
         if (input.isBlank() || index > 0)
-            return Response.Success(listOf())
+            return Response.Success(PagedList.createEmpty(index = index))
 
         val url = baseUrl.toUrlBuilderSafe().apply {
             add("search", input)
@@ -96,7 +92,7 @@ class Wuxia : SourceInterface.catalog
                         coverImageUrl = bookCover
                     )
                 }
-                .let { Response.Success(it) }
+                .let { Response.Success(PagedList(list = it, index = index, isLastPage = true)) }
         }
     }
 }

@@ -15,9 +15,8 @@ interface SourceInterface
     suspend fun getChapterTitle(doc: Document): String? = null
     suspend fun getChapterText(doc: Document): String? = null
 
-
-    interface base : SourceInterface
-    interface catalog : SourceInterface
+    interface Base : SourceInterface
+    interface Catalog : SourceInterface
     {
         val catalogUrl: String
         val language: String
@@ -25,9 +24,11 @@ interface SourceInterface
         suspend fun getBookCoverImageUrl(doc: Document): String? = null
         suspend fun getBookDescripton(doc: Document): String? = null
 
-        // The chapter order is ascendent: from 1 ... etc
+        /**
+         * Chapters list ordered from first one (oldest) to newest one.
+         */
         suspend fun getChapterList(doc: Document): List<ChapterMetadata>
-        suspend fun getCatalogList(index: Int): Response<List<BookMetadata>>
-        suspend fun getCatalogSearch(index: Int, input: String): Response<List<BookMetadata>>
+        suspend fun getCatalogList(index: Int): Response<PagedList<BookMetadata>>
+        suspend fun getCatalogSearch(index: Int, input: String): Response<PagedList<BookMetadata>>
     }
 }

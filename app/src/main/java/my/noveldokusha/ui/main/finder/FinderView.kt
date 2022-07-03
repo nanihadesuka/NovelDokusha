@@ -91,9 +91,9 @@ fun FinderView(context: Context)
 @Composable
 fun FinderBody(
     databasesList: List<DatabaseInterface>,
-    sourcesList: List<SourceInterface.catalog>,
+    sourcesList: List<SourceInterface.Catalog>,
     onDatabaseClick: (DatabaseInterface) -> Unit,
-    onSourceClick: (SourceInterface.catalog) -> Unit
+    onSourceClick: (SourceInterface.Catalog) -> Unit
 )
 {
     LazyColumn(
@@ -266,7 +266,7 @@ fun PreviewView()
     }
 }
 
-private fun Context.goToSourceCatalog(source: SourceInterface.catalog)
+private fun Context.goToSourceCatalog(source: SourceInterface.Catalog)
 {
     SourceCatalogActivity
         .IntentData(this, sourceBaseUrl = source.baseUrl)

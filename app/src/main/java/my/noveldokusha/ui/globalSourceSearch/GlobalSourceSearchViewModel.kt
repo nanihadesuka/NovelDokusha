@@ -1,12 +1,12 @@
 package my.noveldokusha.ui.globalSourceSearch
 
-import androidx.compose.runtime.mutableStateMapOf
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import my.noveldokusha.AppPreferences
 import my.noveldokusha.scraper.FetchIteratorState
+import my.noveldokusha.scraper.PagedListIteratorState
 import my.noveldokusha.scraper.scraper
 import my.noveldokusha.scraper.SourceInterface
 import my.noveldokusha.ui.BaseViewModel
@@ -33,9 +33,9 @@ class GlobalSourceSearchViewModel @Inject constructor(
     }
 }
 
-data class SourceResults(val source: SourceInterface.catalog, val searchInput: String, val coroutineScope: CoroutineScope)
+data class SourceResults(val source: SourceInterface.Catalog, val searchInput: String, val coroutineScope: CoroutineScope)
 {
-    val fetchIterator = FetchIteratorState(coroutineScope) { source.getCatalogSearch(it, searchInput) }
+    val fetchIterator = PagedListIteratorState(coroutineScope) { source.getCatalogSearch(it, searchInput) }
 
     init
     {

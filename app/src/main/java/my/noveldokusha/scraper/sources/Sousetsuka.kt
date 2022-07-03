@@ -4,7 +4,7 @@ import my.noveldokusha.scraper.SourceInterface
 import my.noveldokusha.scraper.textExtractor
 import org.jsoup.nodes.Document
 
-class Sousetsuka : SourceInterface.base
+class Sousetsuka : SourceInterface.Base
 {
 	override val name = "Sousetsuka"
 	override val baseUrl = "https://www.sousetsuka.com/"

@@ -20,9 +20,8 @@ class BakaUpdates : DatabaseInterface {
         index: Int,
         urlAuthorPage: String
     ): Response<PagedList<BookMetadata>> {
-        if (index > 0) return Response.Success(
-            PagedList(list = listOf(), pageIndex = index, isLastPage = true)
-        )
+        if (index > 0)
+            return Response.Success(PagedList.createEmpty(index = index))
 
         return tryConnect {
             fetchDoc(urlAuthorPage)
@@ -32,7 +31,7 @@ class BakaUpdates : DatabaseInterface {
                 .map { BookMetadata(title = it.text(), url = it.attr("href")) }
                 .let {
                     Response.Success(
-                        PagedList(list = it, pageIndex = index, isLastPage = true)
+                        PagedList(list = it, index = index, isLastPage = true)
                     )
                 }
         }
@@ -102,7 +101,7 @@ class BakaUpdates : DatabaseInterface {
                     Response.Success(
                         PagedList(
                             list = it,
-                            pageIndex = index,
+                            index = index,
                             isLastPage = doc.selectFirst("a[href]:contains(Next Page)") == null
                         )
                     )

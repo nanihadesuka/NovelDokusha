@@ -11,7 +11,7 @@ import org.jsoup.nodes.Document
  * Chapter url example: (redirected)
  * https://www.reddit.com/r/mushokutensei/comments/g50ry7/translation_old_dragons_tale_chapter_1_dragon_and/
  */
-class Reddit : SourceInterface.base
+class Reddit : SourceInterface.Base
 {
 	override val name = "Reddit"
 	override val baseUrl = "https://www.reddit.com/"

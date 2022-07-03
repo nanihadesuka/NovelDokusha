@@ -18,9 +18,8 @@ class NovelUpdates : DatabaseInterface {
         index: Int,
         urlAuthorPage: String
     ): Response<PagedList<BookMetadata>> {
-        if (index > 0) return Response.Success(
-            PagedList(list = listOf(), pageIndex = index, isLastPage = true)
-        )
+        if (index > 0)
+            return Response.Success(PagedList.createEmpty(index = index))
 
         return tryConnect {
             fetchDoc(urlAuthorPage)
@@ -28,7 +27,7 @@ class NovelUpdates : DatabaseInterface {
                 .map { BookMetadata(title = it.text(), url = it.attr("href")) }
                 .let {
                     Response.Success(
-                        PagedList(list = it, pageIndex = index, isLastPage = true)
+                        PagedList(list = it, index = index, isLastPage = true)
                     )
                 }
         }
@@ -97,17 +96,13 @@ class NovelUpdates : DatabaseInterface {
                 )
             }
             .let {
-                val isLastPage = when (val nav = doc.selectFirst("div.nav-links")) {
-                    null -> true
-                    else -> nav.children().last()?.`is`(".current") ?: true
-                }
-                Response.Success(
-                    PagedList(
-                        list = it,
-                        pageIndex = index,
-                        isLastPage = isLastPage
+                    Response.Success(
+                        PagedList(
+                            list = it,
+                            index = index,
+                            isLastPage = isLastPage(doc)
+                        )
                     )
-                )
             }
     }
 
@@ -147,5 +142,10 @@ class NovelUpdates : DatabaseInterface {
             authors = authors,
             coverImageUrl = doc.selectFirst("div.seriesimg > img[src]")?.attr("src")
         )
+    }
+
+    private fun isLastPage(doc: Document) = when (val nav = doc.selectFirst("div.digg_pagination")) {
+        null -> true
+        else -> nav.children().last()?.`is`(".current") ?: true
     }
 }

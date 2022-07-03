@@ -14,9 +14,7 @@ import my.noveldokusha.AppPreferences
 import my.noveldokusha.R
 import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.data.Repository
-import my.noveldokusha.scraper.FetchIteratorState
-import my.noveldokusha.scraper.Response
-import my.noveldokusha.scraper.scraper
+import my.noveldokusha.scraper.*
 import my.noveldokusha.ui.BaseViewModel
 import my.noveldokusha.uiUtils.StateExtra_String
 import my.noveldokusha.uiUtils.toast
@@ -39,7 +37,7 @@ class SourceCatalogViewModel @Inject constructor(
     override var sourceBaseUrl by StateExtra_String(state)
 
     val source = scraper.getCompatibleSourceCatalog(sourceBaseUrl)!!
-    val fetchIterator = FetchIteratorState(viewModelScope) { source.getCatalogList(it).transform() }
+    val fetchIterator = PagedListIteratorState(viewModelScope) { source.getCatalogList(it).transform() }
 
     init {
         startCatalogListMode()
@@ -48,7 +46,7 @@ class SourceCatalogViewModel @Inject constructor(
     var mode by mutableStateOf(Mode.CATALOG)
     val listLayout by appPreferences.BOOKS_LIST_LAYOUT_MODE.state(viewModelScope)
 
-    private fun Response<List<BookMetadata>>.transform() = when (val res = this) {
+    private fun Response<PagedList<BookMetadata>>.transform() = when (val res = this) {
         is Response.Error -> Response.Error(res.message)
         is Response.Success -> Response.Success(res.data)
     }

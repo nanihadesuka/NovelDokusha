@@ -1,7 +1,5 @@
 package my.noveldokusha.scraper.sources
 
-import android.text.TextUtils
-import android.util.Log
 import com.google.gson.JsonParser
 import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.data.ChapterMetadata
@@ -9,8 +7,7 @@ import my.noveldokusha.scraper.*
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 
-class MTLNovel : SourceInterface.catalog
-{
+class MTLNovel : SourceInterface.Catalog {
     override val name = "MTLNovel"
     override val baseUrl = "https://www.mtlnovel.com/"
     override val catalogUrl = "https://www.mtlnovel.com/alltime-rank/"
@@ -18,19 +15,16 @@ class MTLNovel : SourceInterface.catalog
 
     override suspend fun getChapterTitle(doc: Document): String? = null
 
-    override suspend fun getChapterText(doc: Document): String
-    {
+    override suspend fun getChapterText(doc: Document): String {
         return doc.selectFirst(".par.fontsize-16")!!.let { textExtractor.get(it) }
     }
 
-    override suspend fun getBookCoverImageUrl(doc: Document): String?
-    {
+    override suspend fun getBookCoverImageUrl(doc: Document): String? {
         return doc.selectFirst("amp-img.main-tmb[src]")
             ?.attr("src")
     }
 
-    override suspend fun getBookDescripton(doc: Document): String?
-    {
+    override suspend fun getBookDescripton(doc: Document): String? {
         val text = doc.selectFirst(".desc") ?: return null
         val node = text.apply {
             select("h2").remove()
@@ -39,8 +33,7 @@ class MTLNovel : SourceInterface.catalog
         return textExtractor.get(node).trim()
     }
 
-    override suspend fun getChapterList(doc: Document): List<ChapterMetadata>
-    {
+    override suspend fun getChapterList(doc: Document): List<ChapterMetadata> {
         // Needs to add "/" at the end
         val url = doc.location().toUrlBuilderSafe().addPath("chapter-list").toString() + "/"
         return fetchDoc(url)
@@ -54,16 +47,15 @@ class MTLNovel : SourceInterface.catalog
             .reversed()
     }
 
-    override suspend fun getCatalogList(index: Int): Response<List<BookMetadata>>
-    {
+    override suspend fun getCatalogList(index: Int): Response<PagedList<BookMetadata>> {
         val page = index + 1
         val url = catalogUrl.toUrlBuilderSafe().apply {
             if (page != 1) addPath("page", "$page")
         }
 
         return tryConnect {
-            fetchDoc(url)
-                .select(".box.wide")
+            val doc = fetchDoc(url)
+            doc.select(".box.wide")
                 .mapNotNull {
                     val link = it.selectFirst("a.list-title[href]") ?: return@mapNotNull null
                     BookMetadata(
@@ -72,7 +64,18 @@ class MTLNovel : SourceInterface.catalog
                         coverImageUrl = it.selectFirst("amp-img[src]")?.attr("src") ?: ""
                     )
                 }
-                .let { Response.Success(it) }
+                .let {
+                    Response.Success(
+                        PagedList(
+                            list = it,
+                            index = index,
+                            isLastPage = when (val nav = doc.selectFirst("div#pagination")) {
+                                null -> true
+                                else -> nav.children().last()?.`is`("span") ?: true
+                            }
+                        )
+                    )
+                }
         }
     }
 
@@ -97,15 +100,17 @@ class MTLNovel : SourceInterface.catalog
         "user-agent:" to """Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/101.0.4951.54 Safari/537.36"""
     )
 
-    override suspend fun getCatalogSearch(index: Int, input: String): Response<List<BookMetadata>>
-    {
+    override suspend fun getCatalogSearch(
+        index: Int,
+        input: String
+    ): Response<PagedList<BookMetadata>> {
         if (input.isBlank() || index > 0)
-            return Response.Success(listOf())
+            return Response.Success(PagedList.createEmpty(index = index))
 
         val url = """https://www.mtlnovel.com/wp-admin/admin-ajax.php""".toUrlBuilderSafe().apply {
-            add("action","autosuggest")
-            add("q",input)
-            add("__amp_source_origin","https://www.mtlnovel.com")
+            add("action", "autosuggest")
+            add("q", input)
+            add("__amp_source_origin", "https://www.mtlnovel.com")
         }.toString()
 
         return tryConnect {
@@ -130,8 +135,15 @@ class MTLNovel : SourceInterface.catalog
                         coverImageUrl = it["thumbnail"].asString
                     )
                 }
-                .let { Response.Success(it) }
-
+                .let {
+                    Response.Success(
+                        PagedList(
+                            list = it,
+                            index = index,
+                            isLastPage = true
+                        )
+                    )
+                }
         }
     }
 }

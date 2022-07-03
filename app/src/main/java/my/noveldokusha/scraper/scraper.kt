@@ -31,8 +31,8 @@ object scraper
         MTLNovel()
     )
 
-    val sourcesListCatalog = sourcesList.filterIsInstance<SourceInterface.catalog>().toSet()
-    val sourcesLanguages = sourcesList.filterIsInstance<SourceInterface.catalog>().map { it.language }.toSortedSet()
+    val sourcesListCatalog = sourcesList.filterIsInstance<SourceInterface.Catalog>().toSet()
+    val sourcesLanguages = sourcesList.filterIsInstance<SourceInterface.Catalog>().map { it.language }.toSortedSet()
 
     private fun String.isCompatibleWithBaseUrl(baseUrl: String): Boolean
     {
@@ -42,6 +42,6 @@ object scraper
     }
 
     fun getCompatibleSource(url: String): SourceInterface? = sourcesList.find { url.isCompatibleWithBaseUrl(it.baseUrl) }
-    fun getCompatibleSourceCatalog(url: String): SourceInterface.catalog? = sourcesListCatalog.find { url.isCompatibleWithBaseUrl(it.baseUrl) }
+    fun getCompatibleSourceCatalog(url: String): SourceInterface.Catalog? = sourcesListCatalog.find { url.isCompatibleWithBaseUrl(it.baseUrl) }
     fun getCompatibleDatabase(url: String): DatabaseInterface? = databasesList.find { url.isCompatibleWithBaseUrl(it.baseUrl)}
 }
