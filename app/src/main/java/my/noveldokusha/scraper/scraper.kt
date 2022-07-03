@@ -1,5 +1,6 @@
 package my.noveldokusha.scraper
 
+import WuxiaWorld
 import BoxNovel
 import my.noveldokusha.scraper.databases.BakaUpdates
 import my.noveldokusha.scraper.databases.NovelUpdates
