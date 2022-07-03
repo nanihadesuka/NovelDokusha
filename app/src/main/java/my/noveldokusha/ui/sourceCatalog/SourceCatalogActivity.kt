@@ -6,15 +6,14 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import dagger.hilt.android.AndroidEntryPoint
 import my.noveldokusha.AppPreferences
@@ -26,24 +25,22 @@ import my.noveldokusha.ui.webView.WebViewActivity
 import my.noveldokusha.uiToolbars.ToolbarModeSearch
 import my.noveldokusha.uiUtils.Extra_String
 import my.noveldokusha.uiUtils.copyToClipboard
+import my.noveldokusha.uiViews.AnimatedTransition
 import my.noveldokusha.uiViews.BooksVerticalView
 import java.util.*
 import javax.inject.Inject
 
 
 @AndroidEntryPoint
-class SourceCatalogActivity : ComponentActivity()
-{
-    class IntentData : Intent, SourceCatalogStateBundle
-    {
+class SourceCatalogActivity : ComponentActivity() {
+    class IntentData : Intent, SourceCatalogStateBundle {
         override var sourceBaseUrl by Extra_String()
 
         constructor(intent: Intent) : super(intent)
         constructor(ctx: Context, sourceBaseUrl: String) : super(
             ctx,
             SourceCatalogActivity::class.java
-        )
-        {
+        ) {
             this.sourceBaseUrl = sourceBaseUrl
         }
     }
@@ -53,52 +50,51 @@ class SourceCatalogActivity : ComponentActivity()
     @Inject
     lateinit var appPreferences: AppPreferences
 
-    @OptIn(ExperimentalFoundationApi::class)
-    override fun onCreate(savedInstanceState: Bundle?)
-    {
+    @OptIn(ExperimentalAnimationApi::class)
+    override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         setContent {
-            val title = stringResource(R.string.catalog)
-            val subtitle = viewModel.source.name.capitalize(Locale.ROOT)
-
             val searchText = rememberSaveable { mutableStateOf("") }
             val focusRequester = remember { FocusRequester() }
-            val toolbarMode = rememberSaveable { mutableStateOf(ToolbarMode.MAIN) }
+            val focusManager by rememberUpdatedState(newValue = LocalFocusManager.current)
+            var toolbarMode by rememberSaveable { mutableStateOf(ToolbarMode.MAIN) }
             val state = rememberLazyListState()
             var optionsExpanded by remember { mutableStateOf(false) }
 
             Theme(appPreferences = appPreferences) {
                 Column {
-                    when (toolbarMode.value)
-                    {
-                        ToolbarMode.MAIN -> ToolbarMain(
-                            title = title,
-                            subtitle = subtitle,
-                            toolbarMode = toolbarMode,
-                            onOpenSourceWebPage = ::openSourceWebPage,
-                            onPressMoreOptions = { optionsExpanded = !optionsExpanded },
-                            optionsDropDownView = {
-                                OptionsDropDown(
-                                    expanded = optionsExpanded,
-                                    onDismiss = { optionsExpanded = !optionsExpanded },
-                                    listLayoutMode = appPreferences.BOOKS_LIST_LAYOUT_MODE.value,
-                                    onSelectListLayout = {
-                                        appPreferences.BOOKS_LIST_LAYOUT_MODE.value = it
-                                    }
-                                )
-                            }
-                        )
-                        ToolbarMode.SEARCH -> ToolbarModeSearch(
-                            focusRequester = focusRequester,
-                            searchText = searchText,
-                            onClose = {
-                                toolbarMode.value = ToolbarMode.MAIN
-                                viewModel.startCatalogListMode()
-                            },
-                            onTextDone = { viewModel.startCatalogSearchMode(searchText.value) },
-                            placeholderText = stringResource(R.string.search_by_title)
-                        )
+                    AnimatedTransition(targetState = toolbarMode) { target ->
+                        when (target) {
+                            ToolbarMode.MAIN -> ToolbarMain(
+                                title = stringResource(R.string.catalog),
+                                subtitle = viewModel.source.name.capitalize(Locale.ROOT),
+                                onOpenSourceWebPage = ::openSourceWebPage,
+                                onPressMoreOptions = { optionsExpanded = !optionsExpanded },
+                                onPressSearchForTitle = { toolbarMode = ToolbarMode.SEARCH },
+                                optionsDropDownView = {
+                                    OptionsDropDown(
+                                        expanded = optionsExpanded,
+                                        onDismiss = { optionsExpanded = !optionsExpanded },
+                                        listLayoutMode = appPreferences.BOOKS_LIST_LAYOUT_MODE.value,
+                                        onSelectListLayout = {
+                                            appPreferences.BOOKS_LIST_LAYOUT_MODE.value = it
+                                        }
+                                    )
+                                }
+                            )
+                            ToolbarMode.SEARCH -> ToolbarModeSearch(
+                                focusRequester = focusRequester,
+                                searchText = searchText,
+                                onClose = {
+                                    focusManager.clearFocus()
+                                    toolbarMode = ToolbarMode.MAIN
+                                    viewModel.startCatalogListMode()
+                                },
+                                onTextDone = { viewModel.startCatalogSearchMode(searchText.value) },
+                                placeholderText = stringResource(R.string.search_by_title)
+                            )
+                        }
                     }
                     BooksVerticalView(
                         layoutMode = viewModel.listLayout,
@@ -117,21 +113,18 @@ class SourceCatalogActivity : ComponentActivity()
         }
     }
 
-    fun openSourceWebPage()
-    {
+    fun openSourceWebPage() {
         WebViewActivity.IntentData(this, viewModel.sourceBaseUrl).let(::startActivity)
     }
 
-    fun openBookPage(book: BookMetadata)
-    {
+    fun openBookPage(book: BookMetadata) {
         ChaptersActivity.IntentData(
             this,
             bookMetadata = book
         ).let(::startActivity)
     }
 
-    fun addBookToLibrary(book: BookMetadata)
-    {
+    fun addBookToLibrary(book: BookMetadata) {
         viewModel.addToLibraryToggle(book)
     }
 }

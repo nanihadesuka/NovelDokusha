@@ -1,5 +1,7 @@
 package my.noveldokusha.ui.databaseSearch
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -18,6 +20,7 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.state.ToggleableState
@@ -31,6 +34,7 @@ import my.noveldokusha.ui.sourceCatalog.ToolbarMode
 import my.noveldokusha.ui.theme.InternalTheme
 import my.noveldokusha.ui.theme.Themes
 import my.noveldokusha.uiToolbars.ToolbarModeSearch
+import my.noveldokusha.uiViews.AnimatedTransition
 import my.noveldokusha.uiViews.MyButton
 
 @OptIn(ExperimentalComposeUiApi::class)
@@ -40,11 +44,9 @@ fun CheckBoxCategory(
     text: String,
     onStateChanged: (state: ToggleableState) -> Unit,
     modifier: Modifier = Modifier
-)
-{
+) {
     val checkedColor by animateColorAsState(
-        targetValue = when (state)
-        {
+        targetValue = when (state) {
             ToggleableState.Off -> Color.Green
             ToggleableState.On -> Color.Green
             ToggleableState.Indeterminate -> Color.Red
@@ -53,8 +55,7 @@ fun CheckBoxCategory(
     )
 
     val onClick = {
-        val nextState = when (state)
-        {
+        val nextState = when (state) {
             ToggleableState.Off -> ToggleableState.On
             ToggleableState.On -> ToggleableState.Indeterminate
             ToggleableState.Indeterminate -> ToggleableState.Off
@@ -90,8 +91,7 @@ fun CheckBoxCategory(
 fun SearchGenres(
     list: SnapshotStateList<GenreItem>,
     onSearchClick: () -> Unit
-)
-{
+) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -127,8 +127,7 @@ private fun ToolbarMain(
     onSearch: () -> Unit,
     topPadding: Dp,
     height: Dp
-)
-{
+) {
     Row(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
@@ -164,7 +163,7 @@ private fun ToolbarMain(
 }
 
 
-@OptIn(ExperimentalComposeUiApi::class)
+@OptIn(ExperimentalComposeUiApi::class, ExperimentalAnimationApi::class)
 @Composable
 fun DatabaseSearchView(
     title: String,
@@ -173,35 +172,34 @@ fun DatabaseSearchView(
     genresList: SnapshotStateList<GenreItem>,
     onTitleSearchClick: (text: String) -> Unit,
     onGenreSearchClick: () -> Unit,
-)
-{
+) {
+    val focusManager by rememberUpdatedState(newValue = LocalFocusManager.current)
     val focusRequester = remember { FocusRequester() }
     var toolbarMode by rememberSaveable { mutableStateOf(ToolbarMode.MAIN) }
 
-    LaunchedEffect(toolbarMode) {
-        if (toolbarMode == ToolbarMode.SEARCH)
-            focusRequester.requestFocus()
-    }
-
     Column {
-        when (toolbarMode)
-        {
-            ToolbarMode.MAIN -> ToolbarMain(
-                title = title,
-                subtitle = subtitle,
-                onSearch = { toolbarMode = ToolbarMode.SEARCH },
-                topPadding = 8.dp,
-                height = 56.dp
-            )
-            ToolbarMode.SEARCH -> ToolbarModeSearch(
-                focusRequester = focusRequester,
-                searchText = searchText,
-                onClose = { toolbarMode = ToolbarMode.MAIN },
-                onTextDone = { onTitleSearchClick(searchText.value) },
-                placeholderText = stringResource(R.string.search_by_title),
-                topPadding = 8.dp,
-                height = 56.dp
-            )
+        AnimatedTransition(targetState = toolbarMode) { target ->
+            when (target) {
+                ToolbarMode.MAIN -> ToolbarMain(
+                    title = title,
+                    subtitle = subtitle,
+                    onSearch = { toolbarMode = ToolbarMode.SEARCH },
+                    topPadding = 8.dp,
+                    height = 56.dp
+                )
+                ToolbarMode.SEARCH -> ToolbarModeSearch(
+                    focusRequester = focusRequester,
+                    searchText = searchText,
+                    onClose = {
+                        focusManager.clearFocus()
+                        toolbarMode = ToolbarMode.MAIN
+                    },
+                    onTextDone = { onTitleSearchClick(searchText.value) },
+                    placeholderText = stringResource(R.string.search_by_title),
+                    topPadding = 8.dp,
+                    height = 56.dp
+                )
+            }
         }
         SearchGenres(list = genresList, onSearchClick = onGenreSearchClick)
     }
@@ -209,8 +207,7 @@ fun DatabaseSearchView(
 
 @Preview(showBackground = true)
 @Composable
-fun PreviewView()
-{
+fun PreviewView() {
     val list = remember {
         mutableStateListOf<GenreItem>(
             GenreItem("Fantasy", "fn", ToggleableState.Off),

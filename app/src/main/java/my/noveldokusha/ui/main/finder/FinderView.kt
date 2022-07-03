@@ -16,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -47,6 +48,7 @@ fun FinderView(context: Context)
     val focusRequester = remember { FocusRequester() }
     val toolbarMode = rememberSaveable { mutableStateOf(ToolbarMode.MAIN) }
     var languagesOptionsExpanded by remember { mutableStateOf(false) }
+    val focusManager by rememberUpdatedState(newValue = LocalFocusManager.current)
 
     Column {
         when (toolbarMode.value)
@@ -72,6 +74,7 @@ fun FinderView(context: Context)
                 focusRequester = focusRequester,
                 searchText = searchText,
                 onClose = {
+                    focusManager.clearFocus()
                     toolbarMode.value = ToolbarMode.MAIN
                 },
                 onTextDone = { context.goToGlobalSearch(searchText.value) },
@@ -166,7 +169,6 @@ fun ToolbarMain(
                 contentDescription = stringResource(R.string.search_for_title)
             )
         }
-
         IconButton(onClick = onLanguagesOptionsPress) {
             Icon(
                 painter = painterResource(id = R.drawable.ic_baseline_languages_24),

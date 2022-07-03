@@ -28,19 +28,17 @@ import my.noveldokusha.ui.theme.InternalTheme
 import my.noveldokusha.uiViews.BooksVerticalGridView
 import my.noveldokusha.uiViews.BooksVerticalListView
 
-enum class ToolbarMode
-{ MAIN, SEARCH }
+enum class ToolbarMode { MAIN, SEARCH }
 
 @Composable
 fun ToolbarMain(
     title: String,
     subtitle: String,
-    toolbarMode: MutableState<ToolbarMode>,
     onOpenSourceWebPage: () -> Unit,
     onPressMoreOptions: () -> Unit,
+    onPressSearchForTitle: () -> Unit,
     optionsDropDownView: @Composable () -> Unit
-)
-{
+) {
     Row(
         horizontalArrangement = Arrangement.End,
         verticalAlignment = Alignment.CenterVertically,
@@ -72,7 +70,7 @@ fun ToolbarMain(
                 contentDescription = stringResource(R.string.open_the_web_view)
             )
         }
-        IconButton(onClick = { toolbarMode.value = ToolbarMode.SEARCH }) {
+        IconButton(onClick = { onPressSearchForTitle() }) {
             Icon(
                 painter = painterResource(id = R.drawable.ic_baseline_search_24),
                 contentDescription = stringResource(R.string.search_for_title)
@@ -95,8 +93,7 @@ fun OptionsDropDown(
     onDismiss: () -> Unit,
     listLayoutMode: AppPreferences.LIST_LAYOUT_MODE,
     onSelectListLayout: (mode: AppPreferences.LIST_LAYOUT_MODE) -> Unit
-)
-{
+) {
     DropdownMenu(
         expanded = expanded,
         onDismissRequest = onDismiss
@@ -163,8 +160,7 @@ fun OptionsDropDown(
 
 @Preview
 @Composable
-fun PreviewList()
-{
+fun PreviewList() {
     val state = rememberLazyListState()
     InternalTheme {
         BooksVerticalListView(
@@ -182,8 +178,7 @@ fun PreviewList()
 @OptIn(ExperimentalFoundationApi::class)
 @Preview
 @Composable
-fun PreviewGrid()
-{
+fun PreviewGrid() {
     val state = rememberLazyListState()
     InternalTheme {
         BooksVerticalGridView(
