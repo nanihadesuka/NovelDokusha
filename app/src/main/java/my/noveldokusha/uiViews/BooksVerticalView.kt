@@ -6,7 +6,7 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.runtime.Composable
 import my.noveldokusha.AppPreferences
 import my.noveldokusha.data.BookMetadata
-import my.noveldokusha.scraper.FetchIteratorState
+import my.noveldokusha.scraper.IteratorState
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -15,7 +15,7 @@ fun BooksVerticalView(
     list: List<BookMetadata>,
     listState: LazyListState,
     error: String?,
-    loadState: FetchIteratorState.STATE,
+    loadState: IteratorState,
     onLoadNext: () -> Unit,
     onBookClicked: (book: BookMetadata) -> Unit,
     onBookLongClicked: (bookItem: BookMetadata) -> Unit,

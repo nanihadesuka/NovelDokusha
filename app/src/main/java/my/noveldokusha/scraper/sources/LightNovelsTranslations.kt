@@ -1,6 +1,5 @@
 package my.noveldokusha.scraper.sources
 
-import my.noveldokusha.*
 import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.data.ChapterMetadata
 import my.noveldokusha.scraper.*
@@ -14,17 +13,16 @@ import java.util.*
  * Chapter url example:
  * https://lightnovelstranslations.com/the-sage-summoned-to-another-world/the-sage-summoned-to-another-world-volume-1-chapter-1/
  */
-class LightNovelsTranslations : SourceInterface.catalog
-{
+class LightNovelsTranslations : SourceInterface.Catalog {
     override val name = "Light Novel Translations"
     override val baseUrl = "https://lightnovelstranslations.com/"
     override val catalogUrl = "https://lightnovelstranslations.com/"
     override val language = "English"
 
-    override suspend fun getChapterTitle(doc: Document): String? = doc.selectFirst("h1.entry-title")?.text()
+    override suspend fun getChapterTitle(doc: Document): String? =
+        doc.selectFirst("h1.entry-title")?.text()
 
-    override suspend fun getChapterText(doc: Document): String
-    {
+    override suspend fun getChapterText(doc: Document): String {
         return doc.selectFirst(".page, .type-page, .status-publish, .hentry")!!
             .selectFirst(".entry-content").run {
                 this!!.select("#textbox").remove()
@@ -32,16 +30,14 @@ class LightNovelsTranslations : SourceInterface.catalog
             }
     }
 
-    override suspend fun getBookCoverImageUrl(doc: Document): String?
-    {
+    override suspend fun getBookCoverImageUrl(doc: Document): String? {
         return doc.selectFirst("div.entry-content")
             ?.selectFirst("img[src]")
             ?.attr("src")
             ?.replace("&#038;", "")
     }
 
-    override suspend fun getBookDescripton(doc: Document): String?
-    {
+    override suspend fun getBookDescripton(doc: Document): String? {
         return doc.selectFirst("div.entry-content")
             ?.select("p")
             ?.find { it.text().startsWith("Synopsis", ignoreCase = true) }
@@ -50,8 +46,7 @@ class LightNovelsTranslations : SourceInterface.catalog
             ?.joinToString("\n\n") { it.text() }
     }
 
-    override suspend fun getChapterList(doc: Document): List<ChapterMetadata>
-    {
+    override suspend fun getChapterList(doc: Document): List<ChapterMetadata> {
         return doc
             .select(".su-spoiler-content.su-u-clearfix.su-u-trim a[href]")
             .map {
@@ -65,11 +60,10 @@ class LightNovelsTranslations : SourceInterface.catalog
             }
     }
 
-    override suspend fun getCatalogList(index: Int): Response<List<BookMetadata>>
-    {
+    override suspend fun getCatalogList(index: Int): Response<PagedList<BookMetadata>> {
         val page = index + 1
         if (page > 1)
-            return Response.Success(listOf())
+            return Response.Success(PagedList.createEmpty(index = index))
 
         return tryConnect {
             fetchDoc(catalogUrl)
@@ -88,14 +82,24 @@ class LightNovelsTranslations : SourceInterface.catalog
                             text != "Novels Illustrations"
                 }
                 .map { BookMetadata(title = it.text(), url = it.attr("href")) }
-                .let { Response.Success(it) }
+                .let {
+                    Response.Success(
+                        PagedList(
+                            list = it,
+                            index = index,
+                            isLastPage = true
+                        )
+                    )
+                }
         }
     }
 
-    override suspend fun getCatalogSearch(index: Int, input: String): Response<List<BookMetadata>>
-    {
+    override suspend fun getCatalogSearch(
+        index: Int,
+        input: String
+    ): Response<PagedList<BookMetadata>> {
         if (input.isBlank() || index > 0)
-            return Response.Success(listOf())
+            return Response.Success(PagedList.createEmpty(index = index))
 
         val url = baseUrl.toUrlBuilder()!!.apply {
             add("order", "DESC")
@@ -104,13 +108,24 @@ class LightNovelsTranslations : SourceInterface.catalog
         }
 
         return tryConnect {
-            fetchDoc(url)
-                .selectFirst(".jetpack-search-filters-widget__filter-list")!!
+            val doc = fetchDoc(url)
+            doc.selectFirst(".jetpack-search-filters-widget__filter-list")!!
                 .select("a[href]")
                 .map {
                     val (name) = Regex("""^.*category_name=(.*)$""").find(it.attr("href"))!!.destructured
-                    BookMetadata(title = it.text(), url = "https://lightnovelstranslations.com/${name}/")
-                }.let { Response.Success(it) }
+                    BookMetadata(
+                        title = it.text(),
+                        url = "https://lightnovelstranslations.com/${name}/"
+                    )
+                }.let {
+                    Response.Success(
+                        PagedList(
+                            list = it,
+                            index = index,
+                            isLastPage = true
+                        )
+                    )
+                }
         }
     }
 }

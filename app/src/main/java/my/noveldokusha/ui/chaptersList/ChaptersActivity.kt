@@ -22,6 +22,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -50,13 +51,12 @@ import my.noveldokusha.ui.theme.Theme
 import my.noveldokusha.uiToolbars.ToolbarModeSearch
 import my.noveldokusha.uiUtils.Extra_String
 import my.noveldokusha.uiUtils.toast
+import my.noveldokusha.uiViews.AnimatedTransition
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class ChaptersActivity : ComponentActivity()
-{
-    class IntentData : Intent, ChapterStateBundle
-    {
+class ChaptersActivity : ComponentActivity() {
+    class IntentData : Intent, ChapterStateBundle {
         override var bookUrl by Extra_String()
         override var bookTitle by Extra_String()
 
@@ -64,8 +64,7 @@ class ChaptersActivity : ComponentActivity()
         constructor(ctx: Context, bookMetadata: BookMetadata) : super(
             ctx,
             ChaptersActivity::class.java
-        )
-        {
+        ) {
             this.bookUrl = bookMetadata.url
             this.bookTitle = bookMetadata.title
         }
@@ -75,13 +74,14 @@ class ChaptersActivity : ComponentActivity()
     lateinit var appPreferences: AppPreferences
     val viewModel by viewModels<ChaptersViewModel>()
 
-    override fun onCreate(savedInstanceState: Bundle?)
-    {
+    @OptIn(ExperimentalAnimationApi::class)
+    override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         WindowCompat.setDecorFitsSystemWindows(window, false)
         setContent {
+            val focusManager by rememberUpdatedState(newValue = LocalFocusManager.current)
             val focusRequester = remember { FocusRequester() }
-            val toolbarMode = rememberSaveable { mutableStateOf(ToolbarMode.MAIN) }
+            var toolbarMode by rememberSaveable { mutableStateOf(ToolbarMode.MAIN) }
             val listState = rememberLazyListState()
             val sourceName = remember(viewModel.book.url) {
                 scraper.getCompatibleSource(viewModel.bookUrl)?.name ?: ""
@@ -148,43 +148,48 @@ class ChaptersActivity : ComponentActivity()
                         LazyColumnScrollbar(listState)
                     }
 
-                    when (toolbarMode.value)
-                    {
-                        ToolbarMode.MAIN ->
-                        {
-                            val alpha by remember {
-                                derivedStateOf {
-                                    if (listState.firstVisibleItemIndex != 0) return@derivedStateOf 1f
-                                    val first = listState.layoutInfo.visibleItemsInfo.firstOrNull()
-                                        ?: return@derivedStateOf 0f
-                                    val value = (-first.offset - 10).coerceIn(0, 150).toFloat()
-                                    val maxvalue = (first.size).coerceIn(1, 150).toFloat()
-                                    value / maxvalue
+                    AnimatedTransition(targetState = toolbarMode) { target ->
+                        when (target) {
+                            ToolbarMode.MAIN -> {
+                                val alpha by remember {
+                                    derivedStateOf {
+                                        if (listState.firstVisibleItemIndex != 0) return@derivedStateOf 1f
+                                        val first =
+                                            listState.layoutInfo.visibleItemsInfo.firstOrNull()
+                                                ?: return@derivedStateOf 0f
+                                        val value = (-first.offset - 10).coerceIn(0, 150).toFloat()
+                                        val maxvalue = (first.size).coerceIn(1, 150).toFloat()
+                                        value / maxvalue
+                                    }
                                 }
+                                MainToolbar(
+                                    bookTitle = viewModel.book.title,
+                                    isBookmarked = viewModel.book.inLibrary,
+                                    alpha = alpha,
+                                    onClickBookmark = ::bookmarkToggle,
+                                    onClickSortChapters = viewModel::toggleChapterSort,
+                                    onClickChapterTitleSearch = {
+                                        toolbarMode = ToolbarMode.SEARCH
+                                    },
+                                    topPadding = 38.dp,
+                                    height = 56.dp
+                                )
                             }
-                            MainToolbar(
-                                bookTitle = viewModel.book.title,
-                                isBookmarked = viewModel.book.inLibrary,
-                                alpha = alpha,
-                                onClickBookmark = ::bookmarkToggle,
-                                onClickSortChapters = viewModel::toggleChapterSort,
-                                onClickChapterTitleSearch = {
-                                    toolbarMode.value = ToolbarMode.SEARCH
+                            ToolbarMode.SEARCH -> ToolbarModeSearch(
+                                focusRequester = focusRequester,
+                                searchText = viewModel.textSearch,
+                                onClose = {
+                                    focusManager.clearFocus()
+                                    toolbarMode = ToolbarMode.MAIN
                                 },
+                                onTextDone = {},
+                                color = MaterialTheme.colors.primary,
+                                showUnderline = true,
                                 topPadding = 38.dp,
-                                height = 56.dp
+                                height = 56.dp,
+                                placeholderText = stringResource(id = R.string.search_chapter_title)
                             )
                         }
-                        ToolbarMode.SEARCH -> ToolbarModeSearch(
-                            focusRequester = focusRequester,
-                            searchText = viewModel.textSearch,
-                            onClose = { toolbarMode.value = ToolbarMode.MAIN },
-                            onTextDone = {},
-                            color = MaterialTheme.colors.primary,
-                            showUnderline = true,
-                            topPadding = 38.dp,
-                            height = 56.dp
-                        )
                     }
 
                     FloatingActionButton(
@@ -225,10 +230,8 @@ class ChaptersActivity : ComponentActivity()
         }
     }
 
-    fun onClickChapter(chapter: ChapterWithContext)
-    {
-        when
-        {
+    fun onClickChapter(chapter: ChapterWithContext) {
+        when {
             viewModel.selectedChaptersUrl.containsKey(chapter.chapter.url) ->
                 viewModel.selectedChaptersUrl.remove(chapter.chapter.url)
             viewModel.selectedChaptersUrl.isNotEmpty() ->
@@ -237,10 +240,8 @@ class ChaptersActivity : ComponentActivity()
         }
     }
 
-    fun onLongClickChapter(chapter: ChapterWithContext)
-    {
-        when
-        {
+    fun onLongClickChapter(chapter: ChapterWithContext) {
+        when {
             viewModel.selectedChaptersUrl.containsKey(chapter.chapter.url) ->
                 viewModel.selectedChaptersUrl.remove(chapter.chapter.url)
             else ->
@@ -248,13 +249,11 @@ class ChaptersActivity : ComponentActivity()
         }
     }
 
-    fun onOpenLastActiveChapter()
-    {
+    fun onOpenLastActiveChapter() {
         val bookUrl = viewModel.bookMetadata.url
         lifecycleScope.launch(Dispatchers.IO) {
             val lastReadChapter = viewModel.getLastReadChapter()
-            if (lastReadChapter == null)
-            {
+            if (lastReadChapter == null) {
                 toast(getString(R.string.no_chapters))
                 return@launch
             }
@@ -272,8 +271,7 @@ class ChaptersActivity : ComponentActivity()
     }
 
 
-    fun bookmarkToggle()
-    {
+    fun bookmarkToggle() {
         lifecycleScope.launch {
             val isBookmarked = viewModel.toggleBookmark()
             val msg = if (isBookmarked) R.string.added_to_library else R.string.removed_from_library
@@ -283,8 +281,7 @@ class ChaptersActivity : ComponentActivity()
         }
     }
 
-    fun searchBookInDatabase()
-    {
+    fun searchBookInDatabase() {
         DatabaseSearchResultsActivity
             .IntentData(
                 this,
@@ -294,16 +291,14 @@ class ChaptersActivity : ComponentActivity()
             .let(this::startActivity)
     }
 
-    fun openInBrowser()
-    {
+    fun openInBrowser() {
         Intent(Intent.ACTION_VIEW).also {
             it.data = Uri.parse(viewModel.bookMetadata.url)
         }.let(this::startActivity)
     }
 
 
-    fun openBookAtChapter(chapterUrl: String)
-    {
+    fun openBookAtChapter(chapterUrl: String) {
         ReaderActivity
             .IntentData(
                 this,

@@ -4,12 +4,12 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.runtime.*
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.filter
-import my.noveldokusha.scraper.FetchIteratorState
+import my.noveldokusha.scraper.IteratorState
 
 @Composable
 fun ListLoadWatcher(
     listState: LazyListState,
-    loadState: FetchIteratorState.STATE,
+    loadState: IteratorState,
     onLoadNext: () -> Unit,
     debounceMilliseconds: Long = 100L
 )
@@ -21,7 +21,7 @@ fun ListLoadWatcher(
             val lastVisibleIndex =
                 (listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: 0) + 1
             val isLoadZone = lastVisibleIndex > (listState.layoutInfo.totalItemsCount - 3)
-            val isIDLE = loadStateUpdated == FetchIteratorState.STATE.IDLE
+            val isIDLE = loadStateUpdated == IteratorState.IDLE
             val state = isLoadZone && isIDLE
             state
         }

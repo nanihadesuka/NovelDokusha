@@ -10,8 +10,7 @@ import org.jsoup.nodes.Document
 import java.io.StringReader
 import java.net.URL
 
-class Saikai : SourceInterface.catalog
-{
+class Saikai : SourceInterface.Catalog {
     override val name = "Saikai"
     override val baseUrl = "https://saikaiscan.com.br/"
     override val catalogUrl = "https://saikaiscan.com.br/series"
@@ -30,8 +29,7 @@ class Saikai : SourceInterface.catalog
 //            ?.let { textExtractor.get(it) }
 //    }
 
-    override suspend fun getChapterList(doc: Document): List<ChapterMetadata>
-    {
+    override suspend fun getChapterList(doc: Document): List<ChapterMetadata> {
         val url = "${doc.location()}?tab=capitulos"
 
         // no  cookies, header !! but works
@@ -49,7 +47,8 @@ class Saikai : SourceInterface.catalog
         val initialVal = dispUrl.toInt()
 
         val preList = let {
-            val script = chaptersDoc.select("script").find { it.data().startsWith("window.__NUXT__") }!!
+            val script =
+                chaptersDoc.select("script").find { it.data().startsWith("window.__NUXT__") }!!
             val head = "{return "
             val start = "{layout:"
             start + script.data().split(head + start).last()
@@ -66,7 +65,8 @@ class Saikai : SourceInterface.catalog
                 volume.asJsonObject["releases"]
                     .asJsonArray.map { it.asJsonObject }
                     .mapNotNull {
-                        it["chapter"].asNumber.runCatching { toInt() }.getOrNull() ?: return@mapNotNull null
+                        it["chapter"].asNumber.runCatching { toInt() }.getOrNull()
+                            ?: return@mapNotNull null
                         ChapterMetadata(url = it["slug"].asString, title = it["title"].asString)
                     }
             }
@@ -80,8 +80,7 @@ class Saikai : SourceInterface.catalog
         }
     }
 
-    override suspend fun getCatalogList(index: Int): Response<List<BookMetadata>>
-    {
+    override suspend fun getCatalogList(index: Int): Response<PagedList<BookMetadata>> {
         val page = index + 1
         val url =
             """https://api.saikai.com.br/api/stories?format=1&q=&status=null&genres=&country=null&sortProperty=title&sortDirection=asc&page=$page&per_page=24&relationships=language,type,format"""
@@ -97,13 +96,28 @@ class Saikai : SourceInterface.catalog
                 .asJsonObject["data"]
                 .asJsonArray
                 .map { it.asJsonObject }
-                .map { BookMetadata(title = it["title"].asString, url = "https://saikaiscan.com.br/series/${it["slug"].asString}") }
-                .let { Response.Success(it) }
+                .map {
+                    BookMetadata(
+                        title = it["title"].asString,
+                        url = "https://saikaiscan.com.br/series/${it["slug"].asString}"
+                    )
+                }
+                .let {
+                    Response.Success(
+                        PagedList(
+                            list = it,
+                            index = index,
+                            isLastPage = false
+                        )
+                    )
+                }
         }
     }
 
-    override suspend fun getCatalogSearch(index: Int, input: String): Response<List<BookMetadata>>
-    {
+    override suspend fun getCatalogSearch(
+        index: Int,
+        input: String
+    ): Response<PagedList<BookMetadata>> {
         val page = index + 1
         val url =
             """https://api.saikai.com.br/api/stories?format=1&q=${input.urlEncode()}&status=null&genres=&country=null&sortProperty=title&sortDirection=asc&page=$page&per_page=24&relationships=language,type,format"""
@@ -120,8 +134,21 @@ class Saikai : SourceInterface.catalog
                 .asJsonObject["data"]
                 .asJsonArray
                 .map { it.asJsonObject }
-                .map { BookMetadata(title = it["title"].asString, url = "https://saikaiscan.com.br/series/${it["slug"].asString}") }
-                .let { Response.Success(it) }
+                .map {
+                    BookMetadata(
+                        title = it["title"].asString,
+                        url = "https://saikaiscan.com.br/series/${it["slug"].asString}"
+                    )
+                }
+                .let {
+                    Response.Success(
+                        PagedList(
+                            list = it,
+                            index = index,
+                            isLastPage = false
+                        )
+                    )
+                }
         }
     }
 }

@@ -3,15 +3,13 @@ package my.noveldokusha.scraper.sources
 import my.noveldokusha.scraper.SourceInterface
 import org.jsoup.nodes.Document
 
-class AT : SourceInterface.base
+class AT : SourceInterface.Base
 {
 	override val name = "AT"
 	override val baseUrl = "https://a-t.nu/"
 	
 	override suspend fun getChapterTitle(doc: Document): String? = doc.title().ifBlank { null }
-	
-	
-	
+
 	override suspend fun getChapterText(doc: Document): String
 	{
 		val raw = doc.selectFirst(".text-left style")!!.data()
