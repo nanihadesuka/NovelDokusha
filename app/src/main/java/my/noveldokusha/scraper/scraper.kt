@@ -24,7 +24,6 @@ object scraper
         _1stKissNovel(),
         Sousetsuka(),
         Saikai(),
-        WebNovelLight(),
         BoxNovel(),
         LightNovelWorld(),
         NovelHall(),
