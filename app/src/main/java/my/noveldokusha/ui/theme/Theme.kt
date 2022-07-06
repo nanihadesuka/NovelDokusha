@@ -16,9 +16,9 @@ import java.sql.Wrapper
 
 private val light_ColorPalette = Colors(
     primary = Color(0xFFFBFBFB),
-    primaryVariant = Color(0xFFFBFBFB),
-    secondary = Color(0xFFFBFBFB),
-    secondaryVariant = Color(0xFFFBFBFB),
+    primaryVariant = Color(0xFFF0F0F0),
+    secondary = Color(0xFFE0E0E0),
+    secondaryVariant = Color(0xFFD0D0D0),
     background = Color(0xFFFBFBFB),
     surface = Color(0xFFFBFBFB),
     error = Color(0xFFFBFBFB),
@@ -48,9 +48,9 @@ private val dark_ColorPalette = Colors(
 
 private val grey_ColorPalette = Colors(
     primary = Color(0xFF333333),
-    primaryVariant = Color(0xFF333333),
-    secondary = Color(0xFF333333),
-    secondaryVariant = Color(0xFF333333),
+    primaryVariant = Color(0xFF303030),
+    secondary = Color(0xFF252525),
+    secondaryVariant = Color(0xFF202020),
     background = Color(0xFF242424),
     surface = Color(0xFF242424),
     error = Color(0xFF242424),
@@ -64,9 +64,9 @@ private val grey_ColorPalette = Colors(
 
 private val black_ColorPalette = Colors(
     primary = Color.Black,
-    primaryVariant = Color.Black,
-    secondary = Color.Black,
-    secondaryVariant = Color.Black,
+    primaryVariant = Color(0xFF080808),
+    secondary = Color(0xFF151515),
+    secondaryVariant = Color(0xFF202020),
     background = Color.Black,
     surface = Color.Black,
     error = Color.Black,

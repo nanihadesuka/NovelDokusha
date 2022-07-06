@@ -158,6 +158,7 @@ fun OptionsDropDown(
     }
 }
 
+@ExperimentalFoundationApi
 @Preview
 @Composable
 fun PreviewList() {
@@ -175,7 +176,7 @@ fun PreviewList() {
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
+@ExperimentalFoundationApi
 @Preview
 @Composable
 fun PreviewGrid() {
