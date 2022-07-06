@@ -1,4 +1,4 @@
-package my.noveldokusha.uiUtils
+package my.noveldokusha.utils
 
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable

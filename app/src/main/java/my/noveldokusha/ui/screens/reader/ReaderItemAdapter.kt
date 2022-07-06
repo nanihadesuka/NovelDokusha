@@ -12,7 +12,7 @@ import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import my.noveldokusha.AppPreferences
 import my.noveldokusha.R
 import my.noveldokusha.databinding.*
-import my.noveldokusha.uiUtils.inflater
+import my.noveldokusha.utils.inflater
 import java.io.File
 import java.util.ArrayList
 

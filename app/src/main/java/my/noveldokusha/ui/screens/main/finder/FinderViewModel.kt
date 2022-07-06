@@ -2,13 +2,12 @@ package my.noveldokusha.ui.screens.main.finder
 
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.viewModelScope
-import com.google.accompanist.swiperefresh.SwipeRefreshState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.map
 import my.noveldokusha.AppPreferences
 import my.noveldokusha.scraper.scraper
 import my.noveldokusha.ui.BaseViewModel
-import my.noveldokusha.uiUtils.toState
+import my.noveldokusha.utils.toState
 import javax.inject.Inject
 
 data class LanguagesActive(val language: String, val active: Boolean)

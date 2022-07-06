@@ -13,7 +13,7 @@ import my.noveldokusha.data.Repository
 import my.noveldokusha.scraper.Response
 import my.noveldokusha.scraper.scraper
 import my.noveldokusha.ui.BaseViewModel
-import my.noveldokusha.uiUtils.StateExtra_String
+import my.noveldokusha.utils.StateExtra_String
 import javax.inject.Inject
 
 interface DatabaseSearchStateBundle {

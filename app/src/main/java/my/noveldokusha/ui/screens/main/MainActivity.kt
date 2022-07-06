@@ -28,8 +28,8 @@ import my.noveldokusha.ui.screens.main.library.LibraryView
 import my.noveldokusha.ui.screens.main.library.LibraryViewModel
 import my.noveldokusha.ui.screens.main.settings.SettingsView
 import my.noveldokusha.ui.theme.Theme
-import my.noveldokusha.uiUtils.drawTopLine
-import my.noveldokusha.uiUtils.mix
+import my.noveldokusha.utils.drawTopLine
+import my.noveldokusha.utils.mix
 import javax.inject.Inject
 
 @AndroidEntryPoint

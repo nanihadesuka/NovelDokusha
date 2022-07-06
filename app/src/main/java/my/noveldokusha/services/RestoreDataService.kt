@@ -14,7 +14,7 @@ import kotlinx.coroutines.*
 import my.noveldokusha.*
 import my.noveldokusha.data.Repository
 import my.noveldokusha.data.database.AppDatabase
-import my.noveldokusha.uiUtils.*
+import my.noveldokusha.utils.*
 import okhttp3.internal.closeQuietly
 import java.io.File
 import java.io.InputStream

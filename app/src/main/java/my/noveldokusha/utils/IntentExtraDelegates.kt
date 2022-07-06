@@ -1,4 +1,4 @@
-package my.noveldokusha.uiUtils
+package my.noveldokusha.utils
 
 import android.content.Intent
 import android.net.Uri

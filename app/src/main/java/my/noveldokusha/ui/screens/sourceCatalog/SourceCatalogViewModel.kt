@@ -16,8 +16,8 @@ import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.data.Repository
 import my.noveldokusha.scraper.*
 import my.noveldokusha.ui.BaseViewModel
-import my.noveldokusha.uiUtils.StateExtra_String
-import my.noveldokusha.uiUtils.toast
+import my.noveldokusha.utils.StateExtra_String
+import my.noveldokusha.utils.toast
 import javax.inject.Inject
 
 interface SourceCatalogStateBundle {

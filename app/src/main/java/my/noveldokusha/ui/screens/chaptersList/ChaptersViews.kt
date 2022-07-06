@@ -36,9 +36,9 @@ import my.noveldokusha.ui.theme.ColorAccent
 import my.noveldokusha.ui.theme.ImageBorderRadius
 import my.noveldokusha.ui.theme.InternalTheme
 import my.noveldokusha.ui.theme.Themes
-import my.noveldokusha.uiUtils.drawBottomLine
-import my.noveldokusha.uiUtils.ifCase
-import my.noveldokusha.uiUtils.mix
+import my.noveldokusha.utils.drawBottomLine
+import my.noveldokusha.utils.ifCase
+import my.noveldokusha.utils.mix
 import my.noveldokusha.uiViews.ErrorView
 import my.noveldokusha.uiViews.ImageView
 

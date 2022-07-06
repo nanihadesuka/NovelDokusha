@@ -5,12 +5,11 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import my.noveldokusha.AppPreferences
-import my.noveldokusha.scraper.FetchIteratorState
 import my.noveldokusha.scraper.PagedListIteratorState
 import my.noveldokusha.scraper.scraper
 import my.noveldokusha.scraper.SourceInterface
 import my.noveldokusha.ui.BaseViewModel
-import my.noveldokusha.uiUtils.StateExtra_String
+import my.noveldokusha.utils.StateExtra_String
 import javax.inject.Inject
 
 interface GlobalSourceSearchStateBundle

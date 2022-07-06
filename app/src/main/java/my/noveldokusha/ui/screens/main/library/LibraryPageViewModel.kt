@@ -2,21 +2,15 @@ package my.noveldokusha.ui.screens.main.library
 
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.SavedStateHandle
-import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.google.accompanist.swiperefresh.SwipeRefreshState
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.launch
 import my.noveldokusha.AppPreferences
 import my.noveldokusha.data.Repository
-import my.noveldokusha.data.database.tables.Book
 import my.noveldokusha.ui.BaseViewModel
-import my.noveldokusha.uiUtils.StateExtra_Boolean
-import my.noveldokusha.uiUtils.toState
+import my.noveldokusha.utils.toState
 import javax.inject.Inject
 
 @HiltViewModel

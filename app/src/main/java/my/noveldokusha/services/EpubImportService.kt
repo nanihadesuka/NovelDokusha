@@ -12,7 +12,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.*
 import my.noveldokusha.*
 import my.noveldokusha.data.Repository
-import my.noveldokusha.uiUtils.*
+import my.noveldokusha.utils.*
 import javax.inject.Inject
 
 @AndroidEntryPoint

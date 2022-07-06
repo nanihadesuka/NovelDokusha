@@ -2,10 +2,8 @@ package my.noveldokusha.ui.screens.chaptersList
 
 import android.content.Context
 import android.content.Intent
-import android.view.View
 import androidx.compose.runtime.*
 import androidx.lifecycle.*
-import androidx.room.PrimaryKey
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.*
@@ -21,10 +19,10 @@ import my.noveldokusha.scraper.downloadBookCoverImageUrl
 import my.noveldokusha.scraper.downloadBookDescription
 import my.noveldokusha.scraper.downloadChaptersList
 import my.noveldokusha.ui.BaseViewModel
-import my.noveldokusha.uiUtils.Extra_String
-import my.noveldokusha.uiUtils.StateExtra_String
-import my.noveldokusha.uiUtils.toState
-import my.noveldokusha.uiUtils.toast
+import my.noveldokusha.utils.Extra_String
+import my.noveldokusha.utils.StateExtra_String
+import my.noveldokusha.utils.toState
+import my.noveldokusha.utils.toast
 import javax.inject.Inject
 
 interface ChapterStateBundle {

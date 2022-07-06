@@ -74,8 +74,8 @@ private fun PreviewView() {
         BookImageButtonView(
             title = "Hello there",
             coverImageUrl = "",
-            onClick = { /*TODO*/ },
-            onLongClick = { /*TODO*/ }
+            onClick = { },
+            onLongClick = { }
         )
     }
 }

@@ -15,7 +15,7 @@ import my.noveldokusha.data.Repository
 import my.noveldokusha.data.database.tables.Book
 import my.noveldokusha.scraper.Response
 import my.noveldokusha.scraper.downloadChaptersList
-import my.noveldokusha.uiUtils.*
+import my.noveldokusha.utils.*
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import javax.inject.Inject
 

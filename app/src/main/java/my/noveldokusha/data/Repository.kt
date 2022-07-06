@@ -11,7 +11,7 @@ import my.noveldokusha.data.database.tables.Chapter
 import my.noveldokusha.data.database.tables.ChapterBody
 import my.noveldokusha.scraper.Response
 import my.noveldokusha.scraper.downloadChapter
-import my.noveldokusha.uiUtils.LiveEvent
+import my.noveldokusha.utils.LiveEvent
 import java.io.File
 import javax.inject.Inject
 

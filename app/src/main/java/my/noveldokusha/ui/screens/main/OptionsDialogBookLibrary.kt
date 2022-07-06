@@ -20,7 +20,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import my.noveldokusha.R
 import my.noveldokusha.data.database.tables.Book
 import my.noveldokusha.ui.screens.main.library.LibraryViewModel
-import my.noveldokusha.uiUtils.drawBottomLine
+import my.noveldokusha.utils.drawBottomLine
 import my.noveldokusha.uiViews.ImageView
 
 @Composable

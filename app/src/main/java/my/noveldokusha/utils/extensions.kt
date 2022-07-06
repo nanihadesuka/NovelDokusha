@@ -1,4 +1,4 @@
-package my.noveldokusha.uiUtils
+package my.noveldokusha.utils
 
 import android.app.ActivityManager
 import android.content.ClipData
@@ -31,28 +31,28 @@ fun RecyclerView.ViewHolder.addTopMargin(margin: Int = 1000, condition: () -> Bo
 fun RecyclerView.ViewHolder.addRightMargin(margin: Int = 1000, condition: () -> Boolean) = itemView.addRightMargin(margin, condition)
 fun RecyclerView.ViewHolder.addLeftMargin(margin: Int = 1000, condition: () -> Boolean) = itemView.addLeftMargin(margin, condition)
 
-fun View.addLeftMargin(margin: Int = 1000, condition: () -> Boolean): Unit
+fun View.addLeftMargin(margin: Int = 1000, condition: () -> Boolean)
 {
 	layoutParams = (layoutParams as ViewGroup.MarginLayoutParams).also {
 		it.leftMargin = if (condition()) margin else 0
 	}
 }
 
-fun View.addRightMargin(margin: Int = 1000, condition: () -> Boolean): Unit
+fun View.addRightMargin(margin: Int = 1000, condition: () -> Boolean)
 {
 	layoutParams = (layoutParams as ViewGroup.MarginLayoutParams).also {
 		it.rightMargin = if (condition()) margin else 0
 	}
 }
 
-fun View.addTopMargin(margin: Int = 1000, condition: () -> Boolean): Unit
+fun View.addTopMargin(margin: Int = 1000, condition: () -> Boolean)
 {
 	layoutParams = (layoutParams as ViewGroup.MarginLayoutParams).also {
 		it.topMargin = if (condition()) margin else 0
 	}
 }
 
-fun View.addBottomMargin(margin: Int = 1000, condition: () -> Boolean): Unit
+fun View.addBottomMargin(margin: Int = 1000, condition: () -> Boolean)
 {
 	layoutParams = (layoutParams as ViewGroup.MarginLayoutParams).also {
 		it.bottomMargin = if (condition()) margin else 0

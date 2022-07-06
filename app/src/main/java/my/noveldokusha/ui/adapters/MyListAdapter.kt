@@ -1,4 +1,4 @@
-package my.noveldokusha.uiAdapters
+package my.noveldokusha.ui.adapters
 
 import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil

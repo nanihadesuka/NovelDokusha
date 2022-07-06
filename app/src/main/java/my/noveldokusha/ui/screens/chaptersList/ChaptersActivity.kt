@@ -49,8 +49,8 @@ import my.noveldokusha.ui.screens.reader.ReaderActivity
 import my.noveldokusha.ui.theme.ColorAccent
 import my.noveldokusha.ui.theme.Theme
 import my.noveldokusha.uiToolbars.ToolbarModeSearch
-import my.noveldokusha.uiUtils.Extra_String
-import my.noveldokusha.uiUtils.toast
+import my.noveldokusha.utils.Extra_String
+import my.noveldokusha.utils.toast
 import my.noveldokusha.uiViews.AnimatedTransition
 import javax.inject.Inject
 

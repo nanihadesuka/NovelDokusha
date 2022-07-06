@@ -10,9 +10,8 @@ import my.noveldokusha.AppPreferences
 import my.noveldokusha.data.Repository
 import my.noveldokusha.data.database.tables.Chapter
 import my.noveldokusha.ui.BaseViewModel
-import my.noveldokusha.uiUtils.StateExtra_String
+import my.noveldokusha.utils.StateExtra_String
 import java.io.File
-import java.util.*
 import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
 import kotlin.collections.ArrayList

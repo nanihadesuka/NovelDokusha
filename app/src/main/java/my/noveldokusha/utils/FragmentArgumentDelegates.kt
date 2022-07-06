@@ -1,10 +1,7 @@
-package my.noveldokusha.uiUtils
+package my.noveldokusha.utils
 
-import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import androidx.fragment.app.Fragment
-import kotlin.properties.Delegates
 import kotlin.reflect.KProperty
 
 

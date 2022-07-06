@@ -1,4 +1,4 @@
-package my.noveldokusha.uiUtils
+package my.noveldokusha.utils
 
 import androidx.annotation.MainThread
 import androidx.lifecycle.LifecycleOwner

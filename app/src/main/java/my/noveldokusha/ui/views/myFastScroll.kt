@@ -1,4 +1,4 @@
-package my.noveldokusha.uiViews
+package my.noveldokusha.ui.views
 
 import android.content.Context
 import android.util.AttributeSet

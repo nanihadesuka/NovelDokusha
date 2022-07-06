@@ -1,4 +1,4 @@
-package my.noveldokusha.uiViews
+package my.noveldokusha.ui.views
 
 import android.content.Context
 import android.content.res.ColorStateList
@@ -8,7 +8,7 @@ import android.widget.FrameLayout
 import androidx.core.content.ContextCompat
 import my.noveldokusha.R
 import my.noveldokusha.databinding.ViewCheckboxBinding
-import my.noveldokusha.uiUtils.inflater
+import my.noveldokusha.utils.inflater
 
 class Checkbox3StatesView : FrameLayout
 {

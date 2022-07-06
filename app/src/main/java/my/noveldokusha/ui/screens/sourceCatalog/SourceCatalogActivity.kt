@@ -22,8 +22,8 @@ import my.noveldokusha.ui.screens.chaptersList.ChaptersActivity
 import my.noveldokusha.ui.screens.webView.WebViewActivity
 import my.noveldokusha.ui.theme.Theme
 import my.noveldokusha.uiToolbars.ToolbarModeSearch
-import my.noveldokusha.uiUtils.Extra_String
-import my.noveldokusha.uiUtils.copyToClipboard
+import my.noveldokusha.utils.Extra_String
+import my.noveldokusha.utils.copyToClipboard
 import my.noveldokusha.uiViews.AnimatedTransition
 import my.noveldokusha.uiViews.BooksVerticalView
 import java.util.*

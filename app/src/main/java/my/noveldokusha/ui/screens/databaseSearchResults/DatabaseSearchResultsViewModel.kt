@@ -5,13 +5,11 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import my.noveldokusha.AppPreferences
-import my.noveldokusha.data.BookMetadata
-import my.noveldokusha.scraper.FetchIteratorState
 import my.noveldokusha.scraper.PagedListIteratorState
 import my.noveldokusha.scraper.scraper
 import my.noveldokusha.ui.BaseViewModel
-import my.noveldokusha.uiUtils.StateExtra_String
-import my.noveldokusha.uiUtils.StateExtra_StringArrayList
+import my.noveldokusha.utils.StateExtra_String
+import my.noveldokusha.utils.StateExtra_StringArrayList
 import java.io.InvalidObjectException
 import javax.inject.Inject
 

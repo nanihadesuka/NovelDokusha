@@ -11,7 +11,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import my.noveldokusha.uiUtils.*
+import my.noveldokusha.utils.*
 import javax.inject.Inject
 
 class AppPreferences @Inject constructor(

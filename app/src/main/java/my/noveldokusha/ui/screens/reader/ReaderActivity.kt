@@ -12,7 +12,6 @@ import androidx.compose.material.LocalContentColor
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.ui.platform.LocalContext
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
@@ -30,9 +29,9 @@ import my.noveldokusha.databinding.ActivityReaderBinding
 import my.noveldokusha.scraper.Response
 import my.noveldokusha.ui.BaseActivity
 import my.noveldokusha.ui.theme.Theme
-import my.noveldokusha.uiUtils.Extra_String
-import my.noveldokusha.uiUtils.colorAttrRes
-import my.noveldokusha.uiUtils.fadeIn
+import my.noveldokusha.utils.Extra_String
+import my.noveldokusha.utils.colorAttrRes
+import my.noveldokusha.utils.fadeIn
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.math.ceil
 

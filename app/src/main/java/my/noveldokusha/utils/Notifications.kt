@@ -1,4 +1,4 @@
-package my.noveldokusha.uiUtils
+package my.noveldokusha.utils
 
 import android.app.NotificationChannel
 import android.app.NotificationManager

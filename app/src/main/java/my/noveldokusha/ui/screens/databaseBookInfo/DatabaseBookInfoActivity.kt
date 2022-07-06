@@ -17,7 +17,7 @@ import my.noveldokusha.scraper.DatabaseInterface
 import my.noveldokusha.ui.screens.databaseSearchResults.DatabaseSearchResultsActivity
 import my.noveldokusha.ui.screens.globalSourceSearch.GlobalSourceSearchActivity
 import my.noveldokusha.ui.theme.Theme
-import my.noveldokusha.uiUtils.Extra_String
+import my.noveldokusha.utils.Extra_String
 import my.noveldokusha.uiViews.SetSystemBarTransparent
 import javax.inject.Inject
 

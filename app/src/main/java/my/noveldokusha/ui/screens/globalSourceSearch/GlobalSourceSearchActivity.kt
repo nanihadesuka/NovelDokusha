@@ -22,7 +22,7 @@ import my.noveldokusha.R
 import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.ui.screens.chaptersList.ChaptersActivity
 import my.noveldokusha.ui.theme.Theme
-import my.noveldokusha.uiUtils.Extra_String
+import my.noveldokusha.utils.Extra_String
 import javax.inject.Inject
 
 @AndroidEntryPoint

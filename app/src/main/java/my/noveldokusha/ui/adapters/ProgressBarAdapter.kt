@@ -1,10 +1,10 @@
-package my.noveldokusha.uiAdapters
+package my.noveldokusha.ui.adapters
 
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import my.noveldokusha.databinding.ProgressBarBinding
 import my.noveldokusha.databinding.ProgressBarHorizontalBinding
-import my.noveldokusha.uiUtils.inflater
+import my.noveldokusha.utils.inflater
 import kotlin.properties.Delegates
 
 class ProgressBarAdapter : RecyclerView.Adapter<ProgressBarAdapter.ViewBinder>()

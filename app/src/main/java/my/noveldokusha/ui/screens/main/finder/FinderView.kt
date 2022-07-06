@@ -36,7 +36,7 @@ import my.noveldokusha.ui.screens.sourceCatalog.ToolbarMode
 import my.noveldokusha.ui.theme.ColorAccent
 import my.noveldokusha.ui.theme.InternalTheme
 import my.noveldokusha.uiToolbars.ToolbarModeSearch
-import my.noveldokusha.uiUtils.drawBottomLine
+import my.noveldokusha.utils.drawBottomLine
 import my.noveldokusha.uiViews.MyButton
 
 @Composable

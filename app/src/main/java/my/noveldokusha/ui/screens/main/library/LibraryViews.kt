@@ -25,14 +25,13 @@ import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.rememberPagerState
 import com.google.accompanist.swiperefresh.SwipeRefresh
-import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import my.noveldokusha.R
 import my.noveldokusha.data.BookWithContext
 import my.noveldokusha.services.LibraryUpdateService
 import my.noveldokusha.ui.theme.ColorAccent
-import my.noveldokusha.uiUtils.toast
+import my.noveldokusha.utils.toast
 import my.noveldokusha.uiViews.BookImageButtonView
 
 @OptIn(ExperimentalPagerApi::class)
