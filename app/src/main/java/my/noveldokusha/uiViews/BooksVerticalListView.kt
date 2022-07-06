@@ -16,7 +16,7 @@ import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.scraper.IteratorState
 import my.noveldokusha.ui.theme.ColorAccent
 
-@OptIn(ExperimentalFoundationApi::class)
+@ExperimentalFoundationApi
 @Composable
 fun BooksVerticalListView(
     list: List<BookMetadata>,

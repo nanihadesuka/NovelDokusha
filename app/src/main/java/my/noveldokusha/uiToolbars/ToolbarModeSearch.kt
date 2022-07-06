@@ -43,7 +43,6 @@ fun ToolbarModeSearch(
     height: Dp = 56.dp
 )
 {
-    val focusManager by rememberUpdatedState(newValue = LocalFocusManager.current)
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween,
