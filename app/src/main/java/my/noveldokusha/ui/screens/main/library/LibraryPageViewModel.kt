@@ -5,8 +5,10 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.google.accompanist.swiperefresh.SwipeRefreshState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 import my.noveldokusha.AppPreferences
 import my.noveldokusha.data.Repository
 import my.noveldokusha.ui.BaseViewModel
@@ -43,4 +45,14 @@ class LibraryPageViewModel @Inject constructor(
             }
         }
         .toState(viewModelScope, listOf())
+
+
+    fun showLoadingSpinner() {
+        viewModelScope.launch {
+            // Keep for 3 seconds so the user can notice the refresh has been triggered.
+            refreshState.isRefreshing = true
+            delay(3000L)
+            refreshState.isRefreshing = false
+        }
+    }
 }

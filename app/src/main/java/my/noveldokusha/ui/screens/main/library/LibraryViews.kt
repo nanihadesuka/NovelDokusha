@@ -25,7 +25,6 @@ import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.rememberPagerState
 import com.google.accompanist.swiperefresh.SwipeRefresh
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import my.noveldokusha.R
 import my.noveldokusha.data.BookWithContext
@@ -53,11 +52,7 @@ fun LibraryBody(
     SwipeRefresh(
         state = viewModel.refreshState,
         onRefresh = {
-            scope.launch {
-                viewModel.refreshState.isRefreshing = true
-                delay(3000L)
-                viewModel.refreshState.isRefreshing = false
-            }
+            viewModel.showLoadingSpinner()
             toast(context.getString(R.string.updaing_library))
             LibraryUpdateService.start(
                 ctx = context,
