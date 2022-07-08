@@ -35,7 +35,7 @@ import my.noveldokusha.ui.screens.sourceCatalog.SourceCatalogActivity
 import my.noveldokusha.ui.screens.sourceCatalog.ToolbarMode
 import my.noveldokusha.ui.theme.ColorAccent
 import my.noveldokusha.ui.theme.InternalTheme
-import my.noveldokusha.uiToolbars.ToolbarModeSearch
+import my.noveldokusha.ui.composeViews.ToolbarModeSearch
 import my.noveldokusha.utils.drawBottomLine
 import my.noveldokusha.uiViews.MyButton
 

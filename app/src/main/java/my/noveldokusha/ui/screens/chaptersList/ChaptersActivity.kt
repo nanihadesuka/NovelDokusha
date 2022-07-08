@@ -48,10 +48,9 @@ import my.noveldokusha.ui.screens.databaseSearchResults.DatabaseSearchResultsAct
 import my.noveldokusha.ui.screens.reader.ReaderActivity
 import my.noveldokusha.ui.theme.ColorAccent
 import my.noveldokusha.ui.theme.Theme
-import my.noveldokusha.uiToolbars.ToolbarModeSearch
+import my.noveldokusha.ui.composeViews.ToolbarModeSearch
 import my.noveldokusha.utils.Extra_String
 import my.noveldokusha.utils.toast
-import my.noveldokusha.uiViews.AnimatedTransition
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -74,7 +73,6 @@ class ChaptersActivity : ComponentActivity() {
     lateinit var appPreferences: AppPreferences
     val viewModel by viewModels<ChaptersViewModel>()
 
-    @OptIn(ExperimentalAnimationApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         WindowCompat.setDecorFitsSystemWindows(window, false)
@@ -148,48 +146,46 @@ class ChaptersActivity : ComponentActivity() {
                         LazyColumnScrollbar(listState)
                     }
 
-                    AnimatedTransition(targetState = toolbarMode) { target ->
-                        when (target) {
-                            ToolbarMode.MAIN -> {
-                                val alpha by remember {
-                                    derivedStateOf {
-                                        if (listState.firstVisibleItemIndex != 0) return@derivedStateOf 1f
-                                        val first =
-                                            listState.layoutInfo.visibleItemsInfo.firstOrNull()
-                                                ?: return@derivedStateOf 0f
-                                        val value = (-first.offset - 10).coerceIn(0, 150).toFloat()
-                                        val maxvalue = (first.size).coerceIn(1, 150).toFloat()
-                                        value / maxvalue
-                                    }
+                    when (toolbarMode) {
+                        ToolbarMode.MAIN -> {
+                            val alpha by remember {
+                                derivedStateOf {
+                                    if (listState.firstVisibleItemIndex != 0) return@derivedStateOf 1f
+                                    val first =
+                                        listState.layoutInfo.visibleItemsInfo.firstOrNull()
+                                            ?: return@derivedStateOf 0f
+                                    val value = (-first.offset - 10).coerceIn(0, 150).toFloat()
+                                    val maxvalue = (first.size).coerceIn(1, 150).toFloat()
+                                    value / maxvalue
                                 }
-                                MainToolbar(
-                                    bookTitle = viewModel.book.title,
-                                    isBookmarked = viewModel.book.inLibrary,
-                                    alpha = alpha,
-                                    onClickBookmark = ::bookmarkToggle,
-                                    onClickSortChapters = viewModel::toggleChapterSort,
-                                    onClickChapterTitleSearch = {
-                                        toolbarMode = ToolbarMode.SEARCH
-                                    },
-                                    topPadding = 38.dp,
-                                    height = 56.dp
-                                )
                             }
-                            ToolbarMode.SEARCH -> ToolbarModeSearch(
-                                focusRequester = focusRequester,
-                                searchText = viewModel.textSearch,
-                                onClose = {
-                                    focusManager.clearFocus()
-                                    toolbarMode = ToolbarMode.MAIN
+                            MainToolbar(
+                                bookTitle = viewModel.book.title,
+                                isBookmarked = viewModel.book.inLibrary,
+                                alpha = alpha,
+                                onClickBookmark = ::bookmarkToggle,
+                                onClickSortChapters = viewModel::toggleChapterSort,
+                                onClickChapterTitleSearch = {
+                                    toolbarMode = ToolbarMode.SEARCH
                                 },
-                                onTextDone = {},
-                                color = MaterialTheme.colors.primary,
-                                showUnderline = true,
                                 topPadding = 38.dp,
-                                height = 56.dp,
-                                placeholderText = stringResource(id = R.string.search_chapter_title)
+                                height = 56.dp
                             )
                         }
+                        ToolbarMode.SEARCH -> ToolbarModeSearch(
+                            focusRequester = focusRequester,
+                            searchText = viewModel.textSearch,
+                            onClose = {
+                                focusManager.clearFocus()
+                                toolbarMode = ToolbarMode.MAIN
+                            },
+                            onTextDone = {},
+                            color = MaterialTheme.colors.primary,
+                            showUnderline = true,
+                            topPadding = 38.dp,
+                            height = 56.dp,
+                            placeholderText = stringResource(id = R.string.search_chapter_title)
+                        )
                     }
 
                     FloatingActionButton(

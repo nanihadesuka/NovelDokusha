@@ -32,7 +32,7 @@ import my.noveldokusha.R
 import my.noveldokusha.ui.screens.sourceCatalog.ToolbarMode
 import my.noveldokusha.ui.theme.InternalTheme
 import my.noveldokusha.ui.theme.Themes
-import my.noveldokusha.uiToolbars.ToolbarModeSearch
+import my.noveldokusha.ui.composeViews.ToolbarModeSearch
 import my.noveldokusha.uiViews.AnimatedTransition
 import my.noveldokusha.uiViews.MyButton
 

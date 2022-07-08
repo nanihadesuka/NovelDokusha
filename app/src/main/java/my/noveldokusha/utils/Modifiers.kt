@@ -6,10 +6,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 
 @Composable
-fun Modifier.ifCase(condition: Boolean, fn: @Composable Modifier.() -> Modifier): Modifier
-{
+fun Modifier.ifCase(condition: Boolean, fn: @Composable Modifier.() -> Modifier): Modifier {
     return if (condition) fn(this) else this
 }
 
@@ -32,3 +32,10 @@ fun Modifier.drawTopLine(color: Color = MaterialTheme.colors.onPrimary.copy(alph
             end = Offset(size.width, 0f)
         )
     }
+
+
+/**
+ * Blocks any input from passing this composable down the event tree.
+ * Effectively acts as a surface.
+ */
+fun Modifier.blockInteraction() = this.pointerInput(Unit) {}

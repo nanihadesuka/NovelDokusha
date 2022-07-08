@@ -1,14 +1,11 @@
-package my.noveldokusha.uiToolbars
+package my.noveldokusha.ui.composeViews
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.runtime.*
@@ -26,6 +23,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import my.noveldokusha.R
 import my.noveldokusha.ui.theme.ColorAccent
+import my.noveldokusha.utils.blockInteraction
 import my.noveldokusha.utils.ifCase
 
 @Composable
@@ -40,12 +38,12 @@ fun ToolbarModeSearch(
     showUnderline: Boolean = false,
     topPadding: Dp = 8.dp,
     height: Dp = 56.dp
-)
-{
+) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween,
         modifier = Modifier
+            .blockInteraction()
             .background(color)
             .fillMaxWidth()
             .ifCase(showUnderline) {
