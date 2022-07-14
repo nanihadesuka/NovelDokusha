@@ -9,9 +9,12 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CloudDownload
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.outlined.Cancel
 import androidx.compose.material.icons.outlined.CheckCircle
-import androidx.compose.runtime.Composable
+import androidx.compose.material.icons.outlined.Done
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -24,9 +27,11 @@ import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import my.noveldokusha.R
+import my.noveldokusha.tools.TranslationModelState
 import my.noveldokusha.ui.theme.ColorAccent
 import my.noveldokusha.ui.theme.InternalTheme
 import my.noveldokusha.ui.theme.Themes
+import my.noveldokusha.uiViews.AnimatedTransition
 import my.noveldokusha.utils.drawBottomLine
 import my.noveldokusha.utils.ifCase
 import my.noveldokusha.uiViews.MyButton
@@ -223,6 +228,78 @@ private fun SettingsBackup(
 }
 
 @Composable
+private fun SettingsTranslationModels(
+    translationModelsStates: List<TranslationModelState>,
+    onDownloadTranslationModel: (lang: String) -> Unit,
+    onRemoveTranslationModel: (lang: String) -> Unit,
+) {
+    Section(title = stringResource(R.string.settings_title_translation_models)) {
+        Column(
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.padding(horizontal = 4.dp)
+        ) {
+            Spacer(modifier = Modifier.height(0.dp))
+            Text(
+                text = stringResource(R.string.settings_translations_models_main_description),
+                modifier = Modifier.width(260.dp),
+                textAlign = TextAlign.Center
+            )
+            translationModelsStates.forEach {
+                Row(
+                    modifier = Modifier.padding(4.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = it.locale.displayLanguage,
+                        modifier = Modifier.weight(1f)
+                    )
+                    Box(
+                        contentAlignment = Alignment.Center,
+                        modifier = Modifier
+                            .widthIn(min = 22.dp)
+                            .height(22.dp)
+                    ) {
+                        when {
+                            it.model != null -> {
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Icon(
+                                        Icons.Outlined.Done,
+                                        contentDescription = null,
+                                        tint = MaterialTheme.colors.onPrimary
+                                    )
+                                    IconButton(
+                                        onClick = { onRemoveTranslationModel(it.language) }) {
+                                        Icon(
+                                            Icons.Default.Delete,
+                                            contentDescription = null,
+                                            tint = MaterialTheme.colors.onPrimary
+                                        )
+                                    }
+                                }
+                            }
+                            it.downloading -> CircularProgressIndicator(
+                                modifier = Modifier.padding(2.dp),
+                                color = MaterialTheme.colors.onPrimary
+                            )
+                            else -> IconButton(
+                                onClick = { onDownloadTranslationModel(it.language) }) {
+                                Icon(
+                                    Icons.Default.CloudDownload,
+                                    contentDescription = null,
+                                    tint = if (it.downloadingFailed) Color.Red else MaterialTheme.colors.onPrimary
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+            Spacer(modifier = Modifier.height(0.dp))
+        }
+    }
+}
+
+@Composable
 fun SettingsBody(
     currentFollowSystem: Boolean,
     currentTheme: Themes,
@@ -230,10 +307,13 @@ fun SettingsBody(
     onThemeSelected: (Themes) -> Unit,
     databaseSize: String,
     imagesFolderSize: String,
+    translationModelsStates: List<TranslationModelState>,
     onCleanDatabase: () -> Unit,
     onCleanImageFolder: () -> Unit,
     onBackupData: () -> Unit,
-    onRestoreData: () -> Unit
+    onRestoreData: () -> Unit,
+    onDownloadTranslationModel: (lang: String) -> Unit,
+    onRemoveTranslationModel: (lang: String) -> Unit,
 ) {
     Column(
         verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -257,6 +337,11 @@ fun SettingsBody(
         SettingsBackup(
             onBackupData = onBackupData,
             onRestoreData = onRestoreData
+        )
+        SettingsTranslationModels(
+            translationModelsStates = translationModelsStates,
+            onDownloadTranslationModel = onDownloadTranslationModel,
+            onRemoveTranslationModel = onRemoveTranslationModel
         )
         Spacer(modifier = Modifier.height(500.dp))
         Text(
@@ -304,9 +389,7 @@ private fun Section(
     }
 }
 
-@Preview(
-    device = Devices.PIXEL_4_XL
-)
+@Preview(device = Devices.PIXEL_4_XL)
 @Composable
 private fun Preview() {
     val currentTheme = Themes.DARK
@@ -318,10 +401,13 @@ private fun Preview() {
             onThemeSelected = { },
             databaseSize = "1 MB",
             imagesFolderSize = "10 MB",
+            translationModelsStates = listOf(),
             onCleanDatabase = { },
             onCleanImageFolder = { },
             onBackupData = { },
-            onRestoreData = { }
+            onRestoreData = { },
+            onDownloadTranslationModel = {},
+            onRemoveTranslationModel = {},
         )
     }
 }
