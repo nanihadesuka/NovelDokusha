@@ -248,7 +248,7 @@ private fun SettingsTranslationModels(
             translationModelsStates.forEach {
                 Row(
                     modifier = Modifier.padding(4.dp),
-                    verticalAlignment = Alignment.CenterVertically
+                    verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Text(
                         text = it.locale.displayLanguage,
@@ -278,10 +278,12 @@ private fun SettingsTranslationModels(
                                     }
                                 }
                             }
-                            it.downloading -> CircularProgressIndicator(
-                                modifier = Modifier.padding(2.dp),
-                                color = MaterialTheme.colors.onPrimary
-                            )
+                            it.downloading -> IconButton(onClick = { }, enabled = false) {
+                                CircularProgressIndicator(
+                                    modifier = Modifier.size(22.dp),
+                                    color = MaterialTheme.colors.onPrimary
+                                )
+                            }
                             else -> IconButton(
                                 onClick = { onDownloadTranslationModel(it.language) }) {
                                 Icon(
