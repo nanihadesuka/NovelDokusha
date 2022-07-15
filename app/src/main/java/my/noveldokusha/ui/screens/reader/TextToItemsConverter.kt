@@ -1,22 +1,65 @@
 package my.noveldokusha.ui.screens.reader
 
-fun textToItemsConverter(chapterUrl: String, text: String): List<ReaderItem>
-{
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.withContext
+import my.noveldokusha.data.BookTextUtils
+
+suspend fun textToItemsConverter(
+    chapterUrl: String,
+    text: String
+): List<ReaderItem> = withContext(Dispatchers.Default) {
     val paragraphs = text
         .splitToSequence("\n\n")
         .filter { it.isNotBlank() }
-        .withIndex().iterator()
+        .toList()
 
-    return sequence {
-        for ((index, paragraph) in paragraphs)
-        {
-            val item = when
-            {
-                index == 0 -> ReaderItem.BODY(chapterUrl, index + 1, paragraph, ReaderItem.LOCATION.FIRST)
-                !paragraphs.hasNext() -> ReaderItem.BODY(chapterUrl, index + 1, paragraph, ReaderItem.LOCATION.LAST)
-                else -> ReaderItem.BODY(chapterUrl, index + 1, paragraph, ReaderItem.LOCATION.MIDDLE)
+    return@withContext paragraphs
+        .mapIndexed { index, paragraph ->
+            async {
+                when (index) {
+                    0 -> generateITEM(
+                        chapterUrl,
+                        index + 1,
+                        paragraph,
+                        ReaderItem.LOCATION.FIRST
+                    )
+                    paragraphs.lastIndex -> generateITEM(
+                        chapterUrl,
+                        index + 1,
+                        paragraph,
+                        ReaderItem.LOCATION.LAST
+                    )
+                    else -> generateITEM(
+                        chapterUrl,
+                        index + 1,
+                        paragraph,
+                        ReaderItem.LOCATION.MIDDLE
+                    )
+                }
             }
-            yield(item)
         }
-    }.toList()
+        .awaitAll()
+}
+
+private fun generateITEM(
+    chapterUrl: String,
+    pos: Int,
+    text: String,
+    location: ReaderItem.LOCATION
+): ReaderItem = when (val imgEntry = BookTextUtils.ImgEntry.fromXMLString(text)) {
+    null -> ReaderItem.BODY(
+        chapterUrl = chapterUrl,
+        pos = pos,
+        text = text,
+        location = location
+    )
+    else -> ReaderItem.BODY_IMAGE(
+        chapterUrl = chapterUrl,
+        pos = pos,
+        text = text,
+        location = location,
+        image = imgEntry
+    )
 }

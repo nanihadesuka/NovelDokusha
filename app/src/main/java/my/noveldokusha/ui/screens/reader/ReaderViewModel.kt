@@ -1,17 +1,23 @@
 package my.noveldokusha.ui.screens.reader
 
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.*
+import com.google.mlkit.nl.translate.TranslateLanguage
+import com.google.mlkit.nl.translate.Translator
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
 import my.noveldokusha.AppPreferences
 import my.noveldokusha.data.Repository
 import my.noveldokusha.data.database.tables.Chapter
+import my.noveldokusha.tools.TranslationManager
+import my.noveldokusha.tools.TranslatorState
 import my.noveldokusha.ui.BaseViewModel
 import my.noveldokusha.utils.StateExtra_String
 import java.io.File
+import java.util.Locale
 import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
 import kotlin.collections.ArrayList
@@ -27,7 +33,8 @@ interface ReaderStateBundle
 class ReaderViewModel @Inject constructor(
     private val repository: Repository,
     private val state: SavedStateHandle,
-    val appPreferences: AppPreferences
+    val appPreferences: AppPreferences,
+    private val translationManager: TranslationManager
 ) : BaseViewModel(), ReaderStateBundle
 {
     enum class ReaderState
@@ -37,6 +44,11 @@ class ReaderViewModel @Inject constructor(
 
     override var bookUrl by StateExtra_String(state)
     override var chapterUrl by StateExtra_String(state)
+
+    var translator: TranslatorState? = translationManager.getTranslator(
+        source = TranslateLanguage.ENGLISH,
+        target = TranslateLanguage.CATALAN,
+    )
 
     val localBookBaseFolder = File(repository.settings.folderBooks, bookUrl.removePrefix("local://"))
 
@@ -77,6 +89,11 @@ class ReaderViewModel @Inject constructor(
     {
         saveLastReadPositionState(repository, bookUrl, currentChapter)
         super.onCleared()
+    }
+
+    fun reloadReader() {
+        readerState = ReaderState.INITIAL_LOAD
+        items.clear()
     }
 
     fun initialLoad(fn: () -> Unit)

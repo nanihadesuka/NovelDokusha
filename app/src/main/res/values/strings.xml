@@ -105,4 +105,5 @@
 	<string name="search_chapter_title">Search chapter title</string>
     <string name="settings_translations_models_main_description">Download the desired languages models to translate novels on the fly</string>
 	<string name="settings_title_translation_models">Live Translation Models</string>
+    <string name="translating_from_lang_a_to_lang_b">Translating from %s to %s</string>
 </resources>

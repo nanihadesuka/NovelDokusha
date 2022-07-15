@@ -30,6 +30,7 @@ import androidx.compose.ui.unit.toSize
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import my.noveldokusha.ui.theme.InternalTheme
+import my.noveldokusha.uiViews.MyButton
 import kotlin.math.roundToInt
 
 @OptIn(ExperimentalAnimationApi::class)
@@ -87,6 +88,7 @@ private fun Settings(
     modifier: Modifier = Modifier,
     onTextFontChanged: (String) -> Unit,
     onTextSizeChanged: (Float) -> Unit,
+    onTranslationLanguageChanged: () -> Unit,
 ) {
     Column(
         modifier
@@ -102,6 +104,7 @@ private fun Settings(
             textFont,
             onTextFontChanged
         )
+        MyButton(text = "RESTART", onClick = onTranslationLanguageChanged)
     }
 }
 
@@ -232,6 +235,7 @@ fun ReaderInfoView(
     textSize: Float,
     onTextFontChanged: (String) -> Unit,
     onTextSizeChanged: (Float) -> Unit,
+    onTranslationLanguageChanged: () -> Unit,
     visible: Boolean,
     modifier: Modifier = Modifier
 ) {
@@ -270,6 +274,7 @@ fun ReaderInfoView(
                 textSize = textSize,
                 onTextFontChanged = onTextFontChanged,
                 onTextSizeChanged = onTextSizeChanged,
+                onTranslationLanguageChanged = onTranslationLanguageChanged
             )
         }
     }
@@ -291,7 +296,8 @@ private fun ViewsPreview() {
             textSize = 15f,
             onTextSizeChanged = {},
             onTextFontChanged = {},
-            visible = true
+            visible = true,
+            onTranslationLanguageChanged = {}
         )
     }
 }

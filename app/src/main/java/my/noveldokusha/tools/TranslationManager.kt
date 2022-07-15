@@ -3,8 +3,7 @@ package my.noveldokusha.tools
 import androidx.compose.runtime.mutableStateListOf
 import com.google.mlkit.common.model.DownloadConditions
 import com.google.mlkit.common.model.RemoteModelManager
-import com.google.mlkit.nl.translate.TranslateLanguage
-import com.google.mlkit.nl.translate.TranslateRemoteModel
+import com.google.mlkit.nl.translate.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -19,6 +18,16 @@ data class TranslationModelState(
     val downloadingFailed: Boolean
 ) {
     val locale = Locale(language)
+}
+
+data class TranslatorState(
+    val translator: Translator,
+    val source: String,
+    var target: String
+) {
+    val sourceLocale = Locale(source)
+    val targetLocale = Locale(target)
+    fun translate(input: String) = translator.translate(input)
 }
 
 class TranslationManager(
@@ -50,6 +59,26 @@ class TranslationManager(
             .getInstance()
             .getDownloadedModels(TranslateRemoteModel::class.java)
             .await()
+    }
+
+    /**
+     * @param source [TranslateLanguage]
+     * @param target [TranslateLanguage]
+     */
+    fun getTranslator(
+        source: String,
+        target: String
+    ): TranslatorState {
+        val option = TranslatorOptions.Builder()
+            .setSourceLanguage(source)
+            .setTargetLanguage(target)
+            .build()
+
+        return TranslatorState(
+            translator = Translation.getClient(option),
+            source = source,
+            target = target,
+        )
     }
 
     fun downloadModel(language: String) = coroutineScope.launch {
