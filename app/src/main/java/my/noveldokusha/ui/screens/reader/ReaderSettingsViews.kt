@@ -114,6 +114,7 @@ private fun Settings(
             textFont,
             onTextFontChanged
         )
+        Box(Modifier.height(10.dp))
         LiveTranslationSetting(
             enable = liveTranslationSettingData.enable.value,
             listOfAvailableModels = liveTranslationSettingData.listOfAvailableModels,
@@ -156,7 +157,6 @@ fun LiveTranslationSetting(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(8.dp)
             .onGloballyPositioned { layoutCoordinates ->
                 rowSize = layoutCoordinates.size.toSize()
             },
