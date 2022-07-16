@@ -6,14 +6,10 @@ import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.CloudDownload
-import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.outlined.Cancel
 import androidx.compose.material.icons.outlined.CheckCircle
-import androidx.compose.material.icons.outlined.Done
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -28,10 +24,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import my.noveldokusha.R
 import my.noveldokusha.tools.TranslationModelState
+import my.noveldokusha.ui.composeViews.Section
+import my.noveldokusha.ui.composeViews.SettingsTranslationModels
 import my.noveldokusha.ui.theme.ColorAccent
 import my.noveldokusha.ui.theme.InternalTheme
 import my.noveldokusha.ui.theme.Themes
-import my.noveldokusha.uiViews.AnimatedTransition
 import my.noveldokusha.utils.drawBottomLine
 import my.noveldokusha.utils.ifCase
 import my.noveldokusha.uiViews.MyButton
@@ -228,81 +225,6 @@ private fun SettingsBackup(
 }
 
 @Composable
-private fun SettingsTranslationModels(
-    translationModelsStates: List<TranslationModelState>,
-    onDownloadTranslationModel: (lang: String) -> Unit,
-    onRemoveTranslationModel: (lang: String) -> Unit,
-) {
-    Section(title = stringResource(R.string.settings_title_translation_models)) {
-        Column(
-            verticalArrangement = Arrangement.spacedBy(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.padding(horizontal = 4.dp)
-        ) {
-            Spacer(modifier = Modifier.height(0.dp))
-            Text(
-                text = stringResource(R.string.settings_translations_models_main_description),
-                modifier = Modifier.width(260.dp),
-                textAlign = TextAlign.Center
-            )
-            translationModelsStates.forEach {
-                Row(
-                    modifier = Modifier.padding(4.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Text(
-                        text = it.locale.displayLanguage,
-                        modifier = Modifier.weight(1f)
-                    )
-                    Box(
-                        contentAlignment = Alignment.Center,
-                        modifier = Modifier
-                            .widthIn(min = 22.dp)
-                            .height(22.dp)
-                    ) {
-                        when {
-                            it.model != null -> {
-                                Row(verticalAlignment = Alignment.CenterVertically) {
-                                    Icon(
-                                        Icons.Outlined.Done,
-                                        contentDescription = null
-                                    )
-                                    IconButton(
-                                        onClick = { onRemoveTranslationModel(it.language) },
-                                        enabled = it.language != "en"
-                                    ) {
-                                        Icon(
-                                            Icons.Default.Delete,
-                                            contentDescription = null,
-                                        )
-                                    }
-                                }
-                            }
-                            it.downloading -> IconButton(onClick = { }, enabled = false) {
-                                CircularProgressIndicator(
-                                    modifier = Modifier.size(22.dp),
-                                    color = MaterialTheme.colors.onPrimary
-                                )
-                            }
-                            else -> IconButton(
-                                onClick = { onDownloadTranslationModel(it.language) }) {
-                                Icon(
-                                    Icons.Default.CloudDownload,
-                                    contentDescription = null,
-                                    tint = if (it.downloadingFailed) Color.Red
-                                    else LocalContentColor.current.copy(alpha = LocalContentAlpha.current)
-                                )
-                            }
-                        }
-                    }
-                }
-            }
-            Spacer(modifier = Modifier.height(0.dp))
-        }
-    }
-}
-
-@Composable
 fun SettingsBody(
     currentFollowSystem: Boolean,
     currentTheme: Themes,
@@ -358,37 +280,6 @@ fun SettingsBody(
             textAlign = TextAlign.Center
         )
         Spacer(modifier = Modifier.height(120.dp))
-    }
-}
-
-@Composable
-private fun Section(
-    title: String,
-    modifier: Modifier = Modifier,
-    content: @Composable () -> Unit
-) {
-    Surface(
-        color = MaterialTheme.colors.primaryVariant,
-        modifier = modifier
-            .clip(RoundedCornerShape(16.dp))
-    ) {
-        Column(
-            modifier = Modifier.padding(vertical = 16.dp)
-        ) {
-            Text(
-                text = title,
-                style = MaterialTheme.typography.subtitle1,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 8.dp)
-                    .padding(bottom = 16.dp),
-                color = ColorAccent,
-                textAlign = TextAlign.Center,
-            )
-            Divider(color = MaterialTheme.colors.secondary)
-            content()
-        }
     }
 }
 
