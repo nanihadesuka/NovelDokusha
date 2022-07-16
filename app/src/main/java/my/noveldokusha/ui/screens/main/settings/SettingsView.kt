@@ -22,10 +22,13 @@ fun SettingsView(context: Context)
             onThemeSelected = viewModel::onThemeSelected,
             databaseSize = viewModel.databaseSize,
             imagesFolderSize = viewModel.imageFolderSize,
+            translationModelsStates = viewModel.translationManager.models,
             onCleanDatabase = viewModel::cleanDatabase,
             onCleanImageFolder = viewModel::cleanImagesFolder,
             onBackupData = onDoBackup(),
             onRestoreData = onDoRestore(),
+            onDownloadTranslationModel = viewModel.translationManager::downloadModel,
+            onRemoveTranslationModel = viewModel.translationManager::removeModel
         )
     }
 }

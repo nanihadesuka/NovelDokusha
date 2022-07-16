@@ -15,7 +15,7 @@ import my.noveldokusha.utils.toast
 @AndroidEntryPoint
 open class BaseActivity : AppCompatActivity()
 {
-    val appPreferences: AppPreferences by lazy { AppModule.provideAppPreferencies(applicationContext) }
+    val appPreferences: AppPreferences by lazy { AppModule.provideAppPreferences(applicationContext) }
 
     private fun getAppTheme(): Int
     {

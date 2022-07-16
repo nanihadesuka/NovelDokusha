@@ -2,10 +2,6 @@ package my.noveldokusha
 
 import android.app.Application
 import dagger.hilt.android.HiltAndroidApp
-import kotlinx.coroutines.CoroutineName
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
 import java.io.File
 import javax.inject.Inject
 

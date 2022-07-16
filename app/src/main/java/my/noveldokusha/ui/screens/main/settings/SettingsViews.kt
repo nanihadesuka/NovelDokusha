@@ -6,12 +6,11 @@ import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Cancel
 import androidx.compose.material.icons.outlined.CheckCircle
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -24,6 +23,9 @@ import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import my.noveldokusha.R
+import my.noveldokusha.tools.TranslationModelState
+import my.noveldokusha.ui.composeViews.Section
+import my.noveldokusha.ui.composeViews.SettingsTranslationModels
 import my.noveldokusha.ui.theme.ColorAccent
 import my.noveldokusha.ui.theme.InternalTheme
 import my.noveldokusha.ui.theme.Themes
@@ -230,10 +232,13 @@ fun SettingsBody(
     onThemeSelected: (Themes) -> Unit,
     databaseSize: String,
     imagesFolderSize: String,
+    translationModelsStates: List<TranslationModelState>,
     onCleanDatabase: () -> Unit,
     onCleanImageFolder: () -> Unit,
     onBackupData: () -> Unit,
-    onRestoreData: () -> Unit
+    onRestoreData: () -> Unit,
+    onDownloadTranslationModel: (lang: String) -> Unit,
+    onRemoveTranslationModel: (lang: String) -> Unit,
 ) {
     Column(
         verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -258,6 +263,11 @@ fun SettingsBody(
             onBackupData = onBackupData,
             onRestoreData = onRestoreData
         )
+        SettingsTranslationModels(
+            translationModelsStates = translationModelsStates,
+            onDownloadTranslationModel = onDownloadTranslationModel,
+            onRemoveTranslationModel = onRemoveTranslationModel
+        )
         Spacer(modifier = Modifier.height(500.dp))
         Text(
             text = "(°.°)",
@@ -273,40 +283,7 @@ fun SettingsBody(
     }
 }
 
-@Composable
-private fun Section(
-    title: String,
-    modifier: Modifier = Modifier,
-    content: @Composable () -> Unit
-) {
-    Surface(
-        color = MaterialTheme.colors.primaryVariant,
-        modifier = modifier
-            .clip(RoundedCornerShape(16.dp))
-    ) {
-        Column(
-            modifier = Modifier.padding(vertical = 16.dp)
-        ) {
-            Text(
-                text = title,
-                style = MaterialTheme.typography.subtitle1,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 8.dp)
-                    .padding(bottom = 16.dp),
-                color = ColorAccent,
-                textAlign = TextAlign.Center,
-            )
-            Divider(color = MaterialTheme.colors.secondary)
-            content()
-        }
-    }
-}
-
-@Preview(
-    device = Devices.PIXEL_4_XL
-)
+@Preview(device = Devices.PIXEL_4_XL)
 @Composable
 private fun Preview() {
     val currentTheme = Themes.DARK
@@ -318,10 +295,13 @@ private fun Preview() {
             onThemeSelected = { },
             databaseSize = "1 MB",
             imagesFolderSize = "10 MB",
+            translationModelsStates = listOf(),
             onCleanDatabase = { },
             onCleanImageFolder = { },
             onBackupData = { },
-            onRestoreData = { }
+            onRestoreData = { },
+            onDownloadTranslationModel = {},
+            onRemoveTranslationModel = {},
         )
     }
 }

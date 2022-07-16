@@ -89,9 +89,13 @@ dependencies {
     implementation(fileTree("libs") { include("*.jar") })
 
     // Kotlin
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.1")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
     implementation("org.jetbrains.kotlin:kotlin-script-runtime:1.6.20")
     implementation("org.jetbrains.kotlin:kotlin-stdlib:1.6.21")
+
+    // Needed to have the Task -> await extension.
+    implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.6.2")
+
 
     // Room components
     implementation("androidx.room:room-runtime:2.4.2")
@@ -169,12 +173,14 @@ dependencies {
     // Coil for jetpack compose
     implementation("io.coil-kt:coil-compose:2.1.0")
 
-
     // Compose collapsing toolbar
     implementation("me.onebone:toolbar-compose:2.3.3")
 
     // Compose scroll bar
     implementation("com.github.nanihadesuka:LazyColumnScrollbar:1.3.1")
+
+    // Android ML Translation Kit
+    implementation("com.google.mlkit:translate:17.0.0")
 
     // Logging
     implementation("com.jakewharton.timber:timber:5.0.1")
