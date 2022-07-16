@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.WindowManager
 import android.widget.AbsListView
 import androidx.activity.compose.BackHandler
@@ -108,12 +109,9 @@ class ReaderActivity : BaseActivity() {
                     ) { it() }
                 }
             ) {
-                val textFont by remember { appPreferences.READER_FONT_FAMILY.state(lifecycleScope) }
-                val textSize by remember { appPreferences.READER_FONT_SIZE.state(lifecycleScope) }
-                val stats by viewModel.readingPosStats.observeAsState()
                 val percentage by remember {
                     derivedStateOf {
-                        val (info, itemPos) = stats ?: return@derivedStateOf 0f
+                        val (info, itemPos) = viewModel.readingPosStats ?: return@derivedStateOf 0f
                         when (info.itemCount) {
                             0 -> 100f
                             else -> ceil((itemPos.toFloat() / info.itemCount.toFloat()) * 100f)
@@ -123,14 +121,18 @@ class ReaderActivity : BaseActivity() {
 
                 // Notify manually text font changed for list view
                 LaunchedEffect(true) {
-                    snapshotFlow { textFont }.drop(1)
-                        .collect { viewAdapter.listView.notifyDataSetChanged() }
+                    snapshotFlow { viewModel.textFont }.drop(1)
+                        .collect {
+                            viewAdapter.listView.notifyDataSetChanged()
+                        }
                 }
 
                 // Notify manually text size changed for list view
                 LaunchedEffect(true) {
-                    snapshotFlow { textSize }.drop(1)
-                        .collect { viewAdapter.listView.notifyDataSetChanged() }
+                    snapshotFlow { viewModel.textSize }.drop(1)
+                        .collect {
+                            viewAdapter.listView.notifyDataSetChanged()
+                        }
                 }
 
                 // Capture back action when viewing info
@@ -138,15 +140,14 @@ class ReaderActivity : BaseActivity() {
                     viewModel.showReaderInfoView = false
                 }
 
-
                 // Reader info
                 ReaderInfoView(
-                    chapterTitle = stats?.run { first.chapter.title } ?: "",
-                    chapterCurrentNumber = stats?.run { first.index + 1 } ?: 0,
+                    chapterTitle = viewModel.readingPosStats?.run { first.chapter.title } ?: "",
+                    chapterCurrentNumber = viewModel.readingPosStats?.run { first.index + 1 } ?: 0,
                     chapterPercentageProgress = percentage,
                     chaptersTotalSize = viewModel.orderedChapters.size,
-                    textFont = textFont,
-                    textSize = textSize,
+                    textFont = viewModel.textFont,
+                    textSize = viewModel.textSize,
                     visible = viewModel.showReaderInfoView,
                     onTextFontChanged = { appPreferences.READER_FONT_FAMILY.value = it },
                     onTextSizeChanged = { appPreferences.READER_FONT_SIZE.value = it },
@@ -254,7 +255,7 @@ class ReaderActivity : BaseActivity() {
             maintainPosition = maintainStartPosition
         ) {
             setInitialChapterPosition(
-                index = chapterLastState.position,
+                position = chapterLastState.position,
                 offset = chapterLastState.offset
             )
             viewBind.listView.isEnabled = true
@@ -295,17 +296,21 @@ class ReaderActivity : BaseActivity() {
             maintainPosition = maintainStartPosition
         ) {
             lifecycleScope.launch(Dispatchers.Main) {
-                val (itemIndex: Int, offset: Int) = viewModel.getChapterInitialPosition()
+                val (position: Int, offset: Int) = viewModel.getChapterInitialPosition()
                     ?: return@launch
-                setInitialChapterPosition(index = itemIndex, offset = offset)
+                setInitialChapterPosition(position = position, offset = offset)
             }
             viewBind.listView.isEnabled = true
         }
     }
 
-    private fun setInitialChapterPosition(index: Int, offset: Int) {
-        // index + 1 because it doesn't take into account the first padding view
-        viewBind.listView.setSelectionFromTop(index + 1, offset)
+    private fun setInitialChapterPosition(position: Int, offset: Int) {
+        val index = viewAdapter.listView.list.indexOfFirst {
+            it is ReaderItem.Position && it.pos == position
+        }
+        if (index != -1) {
+            viewBind.listView.setSelectionFromTop(index, offset)
+        }
         viewModel.readerState = ReaderViewModel.ReaderState.IDLE
         fadeInText()
         viewBind.listView.doOnNextLayout { updateReadingState() }

@@ -46,6 +46,9 @@ class ReaderViewModel @Inject constructor(
 
     var onTranslatorStateChanged: (() -> Unit)? = null
 
+    val textFont by appPreferences.READER_FONT_FAMILY.state(viewModelScope)
+    val textSize by appPreferences.READER_FONT_SIZE.state(viewModelScope)
+
     var translator: TranslatorState? = null
 
     val liveTranslationSettingData = LiveTranslationSettingData(
@@ -120,7 +123,7 @@ class ReaderViewModel @Inject constructor(
     var showReaderInfoView by mutableStateOf(false)
     val orderedChapters: List<Chapter>
 
-    val readingPosStats = MutableLiveData<Pair<ChapterStats, Int>>()
+    var readingPosStats by mutableStateOf<Pair<ChapterStats, Int>?>(null)
 
     init {
         val chapter =
@@ -168,7 +171,7 @@ class ReaderViewModel @Inject constructor(
 
     fun updateInfoViewTo(chapterUrl: String, itemPos: Int) {
         val chapter = chaptersStats[chapterUrl] ?: return
-        readingPosStats.postValue(Pair(chapter, itemPos))
+        readingPosStats = Pair(chapter, itemPos)
     }
 
     fun addChapterStats(chapter: Chapter, itemCount: Int, index: Int) {

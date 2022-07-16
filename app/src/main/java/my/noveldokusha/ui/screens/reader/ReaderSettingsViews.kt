@@ -25,6 +25,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -33,13 +34,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.toSize
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
+import my.noveldokusha.R
 import my.noveldokusha.tools.TranslationModelState
 import my.noveldokusha.ui.screens.reader.tools.FontsLoader
 import my.noveldokusha.ui.theme.ColorAccent
 import my.noveldokusha.ui.theme.InternalTheme
+import my.noveldokusha.utils.blockInteraction
 import my.noveldokusha.utils.ifCase
 import my.noveldokusha.utils.mix
-import my.noveldokusha.utils.unboundedIndicatorClickable
+import my.noveldokusha.utils.clickableWithUnboundedIndicator
 
 @Composable
 private fun CurrentBookInfo(
@@ -161,7 +164,9 @@ fun LiveTranslationSetting(
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Row(
-            modifier = Modifier.roundedOutline(),
+            modifier = Modifier
+                .roundedOutline()
+                .blockInteraction(),
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically,
         ) {
@@ -184,30 +189,32 @@ fun LiveTranslationSetting(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier.padding(horizontal = 16.dp)
                 ) {
-                    Surface(
+                    Box(
                         modifier = Modifier
-                            .unboundedIndicatorClickable {
+                            .clickableWithUnboundedIndicator {
                                 modelSelectorExpanded = !modelSelectorExpanded
                                 modelSelectorExpandedForTarget = false
                             }
                     ) {
                         Text(
-                            text = source?.locale?.displayLanguage ?: "Source",
+                            text = source?.locale?.displayLanguage
+                                ?: stringResource(R.string.language_source_empty_text),
                             modifier = Modifier
                                 .padding(6.dp)
                                 .ifCase(source == null) { alpha(0.5f) },
                         )
                     }
                     Icon(Icons.Default.ArrowRightAlt, contentDescription = null)
-                    Surface(
+                    Box(
                         modifier = Modifier
-                            .unboundedIndicatorClickable {
+                            .clickableWithUnboundedIndicator {
                                 modelSelectorExpanded = !modelSelectorExpanded
                                 modelSelectorExpandedForTarget = true
                             }
                     ) {
                         Text(
-                            text = target?.locale?.displayLanguage ?: "Target",
+                            text = target?.locale?.displayLanguage
+                                ?: stringResource(R.string.language_target_empty_text),
                             modifier = Modifier
                                 .padding(6.dp)
                                 .ifCase(target == null) { alpha(0.5f) },
@@ -225,6 +232,26 @@ fun LiveTranslationSetting(
                 .heightIn(max = 300.dp)
                 .width(with(LocalDensity.current) { rowSize.width.toDp() })
         ) {
+
+            DropdownMenuItem(
+                onClick = {
+                    if (modelSelectorExpandedForTarget) onTargetChange(null)
+                    else onSourceChange(null)
+                }
+            ) {
+                Box(Modifier.weight(1f)) {
+                    Text(
+                        text = stringResource(R.string.language_clear_selection),
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier
+                            .padding(4.dp)
+                            .background(MaterialTheme.colors.secondary, CircleShape)
+                            .padding(8.dp)
+                            .align(Alignment.Center)
+                    )
+                }
+            }
+
             listOfAvailableModels.forEach { item ->
                 val isAvailable = item.model != null
                 val isAlreadySelected =
@@ -277,7 +304,6 @@ fun LiveTranslationSetting(
             }
         }
     }
-
 }
 
 @Composable
