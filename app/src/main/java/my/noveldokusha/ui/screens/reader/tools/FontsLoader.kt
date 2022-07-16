@@ -1,4 +1,4 @@
-package my.noveldokusha.ui.screens.reader
+package my.noveldokusha.ui.screens.reader.tools
 
 import android.graphics.Typeface
 import androidx.compose.ui.text.font.FontFamily

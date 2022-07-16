@@ -1,4 +1,4 @@
-package my.noveldokusha.ui.screens.reader
+package my.noveldokusha.ui.screens.reader.tools
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

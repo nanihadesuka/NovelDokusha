@@ -4,7 +4,6 @@ import android.content.Context
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
-import androidx.annotation.RequiresPermission.Read
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.doOnNextLayout
 import androidx.core.view.updateLayoutParams
@@ -13,7 +12,7 @@ import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import my.noveldokusha.AppPreferences
 import my.noveldokusha.R
 import my.noveldokusha.databinding.*
-import my.noveldokusha.tools.TranslationManager
+import my.noveldokusha.ui.screens.reader.tools.FontsLoader
 import my.noveldokusha.utils.inflater
 import java.io.File
 import java.util.ArrayList

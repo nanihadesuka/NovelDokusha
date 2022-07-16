@@ -4,7 +4,6 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import android.view.WindowManager
 import android.widget.AbsListView
 import androidx.activity.compose.BackHandler
@@ -13,7 +12,6 @@ import androidx.compose.material.LocalContentColor
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.ui.geometry.Offset
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
@@ -28,6 +26,7 @@ import my.noveldokusha.R
 import my.noveldokusha.databinding.ActivityReaderBinding
 import my.noveldokusha.scraper.Response
 import my.noveldokusha.ui.BaseActivity
+import my.noveldokusha.ui.screens.reader.tools.FontsLoader
 import my.noveldokusha.ui.theme.Theme
 import my.noveldokusha.utils.Extra_String
 import my.noveldokusha.utils.colorAttrRes
@@ -219,7 +218,7 @@ class ReaderActivity : BaseActivity() {
         }
     }
 
-    private fun loadRestartedInitialChapter(chapterLastState: ChapterState): Boolean {
+    private fun loadRestartedInitialChapter(chapterLastState: ReaderViewModel.ChapterState): Boolean {
         viewModel.readerState = ReaderViewModel.ReaderState.INITIAL_LOAD
         viewAdapter.listView.clear()
 
@@ -328,8 +327,11 @@ class ReaderActivity : BaseActivity() {
         val item = viewAdapter.listView.getItem(firstVisibleItem)
         if (item is ReaderItem.Position) {
             val offset = viewBind.listView.run { getChildAt(0).top - paddingTop }
-            viewModel.currentChapter =
-                ChapterState(url = item.chapterUrl, position = item.pos, offset = offset)
+            viewModel.currentChapter = ReaderViewModel.ChapterState(
+                url = item.chapterUrl,
+                position = item.pos,
+                offset = offset
+            )
         }
     }
 
@@ -488,5 +490,3 @@ class ReaderActivity : BaseActivity() {
         return true
     }
 }
-
-
