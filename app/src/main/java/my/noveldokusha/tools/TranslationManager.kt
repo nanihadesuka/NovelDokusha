@@ -112,6 +112,10 @@ class TranslationManager(
     }
 
     fun removeModel(language: String) = coroutineScope.launch {
+
+        // English can't be removed.
+        if(language == "en") return@launch
+
         val index = models.indexOfFirst { it.language == language }
         if (index == -1) return@launch
         val model = models[index].model ?: return@launch

@@ -265,15 +265,15 @@ private fun SettingsTranslationModels(
                                 Row(verticalAlignment = Alignment.CenterVertically) {
                                     Icon(
                                         Icons.Outlined.Done,
-                                        contentDescription = null,
-                                        tint = MaterialTheme.colors.onPrimary
+                                        contentDescription = null
                                     )
                                     IconButton(
-                                        onClick = { onRemoveTranslationModel(it.language) }) {
+                                        onClick = { onRemoveTranslationModel(it.language) },
+                                        enabled = it.language != "en"
+                                    ) {
                                         Icon(
                                             Icons.Default.Delete,
                                             contentDescription = null,
-                                            tint = MaterialTheme.colors.onPrimary
                                         )
                                     }
                                 }
@@ -289,7 +289,8 @@ private fun SettingsTranslationModels(
                                 Icon(
                                     Icons.Default.CloudDownload,
                                     contentDescription = null,
-                                    tint = if (it.downloadingFailed) Color.Red else MaterialTheme.colors.onPrimary
+                                    tint = if (it.downloadingFailed) Color.Red
+                                    else LocalContentColor.current.copy(alpha = LocalContentAlpha.current)
                                 )
                             }
                         }
