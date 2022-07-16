@@ -103,4 +103,10 @@
 	<string name="backup_options">Backup options</string>
 	<string name="save_images">Save images</string>
 	<string name="search_chapter_title">Search chapter title</string>
+    <string name="settings_translations_models_main_description">Download the desired languages models to translate novels on the fly</string>
+	<string name="settings_title_translation_models">Live Translation Models</string>
+    <string name="translating_from_lang_a_to_lang_b">Translating from %s to %s</string>
+    <string name="language_source_empty_text">Source</string>
+	<string name="language_target_empty_text">Target</string>
+    <string name="language_clear_selection">Clear selection</string>
 </resources>

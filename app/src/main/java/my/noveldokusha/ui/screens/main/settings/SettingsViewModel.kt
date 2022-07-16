@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.mapNotNull
 import my.noveldokusha.*
 import my.noveldokusha.data.Repository
+import my.noveldokusha.tools.TranslationManager
 import my.noveldokusha.ui.BaseViewModel
 import my.noveldokusha.ui.theme.Themes
 import java.io.File
@@ -19,7 +20,8 @@ import javax.inject.Inject
 class SettingsViewModel @Inject constructor(
     private val repository: Repository,
     private val appScope: CoroutineScope,
-    private val appPreferences: AppPreferences
+    private val appPreferences: AppPreferences,
+    val translationManager: TranslationManager,
 ) : BaseViewModel()
 {
     fun <T> stateCreator(theFlow: Flow<T>, initialValue: T): MutableState<T>
