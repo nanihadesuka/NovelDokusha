@@ -10,12 +10,12 @@ import androidx.lifecycle.asLiveData
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.drop
 import my.noveldokusha.*
-import my.noveldokusha.uiUtils.toast
+import my.noveldokusha.utils.toast
 
 @AndroidEntryPoint
 open class BaseActivity : AppCompatActivity()
 {
-    val appPreferences: AppPreferences by lazy { AppModule.provideAppPreferencies(applicationContext) }
+    val appPreferences: AppPreferences by lazy { AppModule.provideAppPreferences(applicationContext) }
 
     private fun getAppTheme(): Int
     {

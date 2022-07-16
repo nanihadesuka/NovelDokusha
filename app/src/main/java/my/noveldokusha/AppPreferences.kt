@@ -11,7 +11,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import my.noveldokusha.uiUtils.*
+import my.noveldokusha.utils.*
 import javax.inject.Inject
 
 class AppPreferences @Inject constructor(
@@ -59,6 +59,15 @@ class AppPreferences @Inject constructor(
     }
     val BOOKS_LIST_LAYOUT_MODE = object : Preference<LIST_LAYOUT_MODE>("BOOKS_LIST_LAYOUT_MODE"){
         override var value by SharedPreference_Enum(name,preferences, LIST_LAYOUT_MODE.verticalGrid) { enumValueOf(it) }
+    }
+    val GLOBAL_TRANSLATIOR_ENABLED = object : Preference<Boolean>("GLOBAL_TRANSLATION_ENABLED"){
+        override var value by SharedPreference_Boolean(name,preferences, false)
+    }
+    val GLOBAL_TRANSLATIOR_PREFERRED_SOURCE = object : Preference<String>("GLOBAL_TRANSLATIOR_PREFERRED_SOURCE"){
+        override var value by SharedPreference_String(name,preferences, "en")
+    }
+    val GLOBAL_TRANSLATIOR_PREFERRED_TARGET = object : Preference<String>("GLOBAL_TRANSLATION_PREFERRED_TARGET"){
+        override var value by SharedPreference_String(name,preferences, "")
     }
 
     enum class TERNARY_STATE

@@ -22,7 +22,7 @@
 		android:usesCleartextTraffic="true"
 		>
 		<activity
-			android:name=".ui.main.MainActivity"
+			android:name=".ui.screens.main.MainActivity"
 			android:theme="@style/AppTheme.Launcher"
 			android:exported="true"
 			>
@@ -31,14 +31,14 @@
 				<category android:name="android.intent.category.LAUNCHER" />
 			</intent-filter>
 		</activity>
-		<activity android:name=".ui.sourceCatalog.SourceCatalogActivity" />
-		<activity android:name=".ui.chaptersList.ChaptersActivity" />
-		<activity android:name=".ui.reader.ReaderActivity" />
-		<activity android:name=".ui.databaseSearch.DatabaseSearchActivity" />
-		<activity android:name=".ui.databaseSearchResults.DatabaseSearchResultsActivity" />
-		<activity android:name=".ui.databaseBookInfo.DatabaseBookInfoActivity" />
-		<activity android:name=".ui.globalSourceSearch.GlobalSourceSearchActivity" />
-		<activity android:name=".ui.webView.WebViewActivity" />
+		<activity android:name=".ui.screens.sourceCatalog.SourceCatalogActivity" />
+		<activity android:name=".ui.screens.chaptersList.ChaptersActivity" />
+		<activity android:name=".ui.screens.reader.ReaderActivity" />
+		<activity android:name=".ui.screens.databaseSearch.DatabaseSearchActivity" />
+		<activity android:name=".ui.screens.databaseSearchResults.DatabaseSearchResultsActivity" />
+		<activity android:name=".ui.screens.databaseBookInfo.DatabaseBookInfoActivity" />
+		<activity android:name=".ui.screens.globalSourceSearch.GlobalSourceSearchActivity" />
+		<activity android:name=".ui.screens.webView.WebViewActivity" />
 
 		<service
 			android:name=".services.BackupDataService"

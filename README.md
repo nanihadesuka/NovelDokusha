@@ -9,6 +9,7 @@ Search from a large catalog of content, open your pick and just enjoy.
     - Infinite scroll
     - Custom font
     - Custom font size
+    - Live translation to more than 40 languages
   - Light and dark themes
   - Epubs importer (format won't be preserved)
   - Easy backup and restore (zip file of a database + images folder)
@@ -34,6 +35,7 @@ Reader |
   - Jsoup
   - Coil  
   - Gson
+  - Google MLKit for translation
 
 ## License
   - GPL-3 FOSS

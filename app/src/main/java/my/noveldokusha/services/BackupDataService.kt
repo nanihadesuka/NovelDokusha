@@ -11,7 +11,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.*
 import my.noveldokusha.*
 import my.noveldokusha.data.Repository
-import my.noveldokusha.uiUtils.*
+import my.noveldokusha.utils.*
 import okhttp3.internal.closeQuietly
 import java.lang.Exception
 import java.util.zip.ZipEntry

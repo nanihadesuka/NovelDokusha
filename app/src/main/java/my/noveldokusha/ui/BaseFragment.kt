@@ -1,7 +1,6 @@
 package my.noveldokusha.ui
 
 import android.content.Intent
-import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -9,7 +8,7 @@ import androidx.fragment.app.Fragment
 import dagger.hilt.android.AndroidEntryPoint
 import my.noveldokusha.AppPreferences
 import my.noveldokusha.R
-import my.noveldokusha.uiUtils.toast
+import my.noveldokusha.utils.toast
 import javax.inject.Inject
 
 @AndroidEntryPoint
