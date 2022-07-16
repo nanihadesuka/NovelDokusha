@@ -32,7 +32,6 @@ import my.noveldokusha.ui.theme.Theme
 import my.noveldokusha.utils.Extra_String
 import my.noveldokusha.utils.colorAttrRes
 import my.noveldokusha.utils.fadeIn
-import java.util.*
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.math.ceil
 
@@ -433,8 +432,9 @@ class ReaderActivity : BaseActivity() {
 
             when (val res = viewModel.fetchChapterBody(chapter.url)) {
                 is Response.Success -> {
-
+                    // Split chapter text into items
                     val itemsOriginal = textToItemsConverter(chapter.url, res.data)
+
                     val itemTranslation = viewModel.translator?.let {
                         ReaderItem.TRANSLATING(
                             chapterUrl = chapter.url,
@@ -451,14 +451,13 @@ class ReaderActivity : BaseActivity() {
                         }
                     }
 
+                    // Translate if necessary
                     val items = viewModel.translator?.let { translator ->
                         itemsOriginal.map {
-                            async {
-                                if (it is ReaderItem.BODY) {
-                                    it.copy(textTranslated = translator.translate(it.text).await())
-                                } else it
-                            }
-                        }.awaitAll()
+                            if (it is ReaderItem.BODY) {
+                                it.copy(textTranslated = translator.translate(it.text).await())
+                            } else it
+                        }
                     } ?: itemsOriginal
 
                     withContext(Dispatchers.Main) {
