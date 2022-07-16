@@ -8,16 +8,21 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowRightAlt
+import androidx.compose.material.icons.filled.CloudDownload
 import androidx.compose.material.icons.filled.FontDownload
 import androidx.compose.material.icons.twotone.FormatSize
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.composed
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
@@ -28,11 +33,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.toSize
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
+import my.noveldokusha.tools.TranslationModelState
 import my.noveldokusha.ui.screens.reader.tools.FontsLoader
+import my.noveldokusha.ui.theme.ColorAccent
 import my.noveldokusha.ui.theme.InternalTheme
-import my.noveldokusha.uiViews.MyButton
+import my.noveldokusha.utils.ifCase
+import my.noveldokusha.utils.mix
+import my.noveldokusha.utils.unboundedIndicatorClickable
 
-@OptIn(ExperimentalAnimationApi::class)
 @Composable
 private fun CurrentBookInfo(
     chapterTitle: String,
@@ -83,11 +91,11 @@ private fun CurrentBookInfo(
 @Composable
 private fun Settings(
     textFont: String,
-    textSize: Float,
-    modifier: Modifier = Modifier,
     onTextFontChanged: (String) -> Unit,
+    textSize: Float,
     onTextSizeChanged: (Float) -> Unit,
-    onTranslationLanguageChanged: () -> Unit,
+    liveTranslationSettingData: LiveTranslationSettingData,
+    modifier: Modifier = Modifier,
 ) {
     Column(
         modifier
@@ -103,8 +111,172 @@ private fun Settings(
             textFont,
             onTextFontChanged
         )
-        MyButton(text = "RESTART", onClick = onTranslationLanguageChanged)
+        LiveTranslationSetting(
+            enable = liveTranslationSettingData.enable.value,
+            listOfAvailableModels = liveTranslationSettingData.listOfAvailableModels,
+            source = liveTranslationSettingData.source.value,
+            target = liveTranslationSettingData.target.value,
+            onEnable = liveTranslationSettingData.onEnable,
+            onSourceChange = liveTranslationSettingData.onSourceChange,
+            onTargetChange = liveTranslationSettingData.onTargetChange,
+            onDownloadTranslationModel = liveTranslationSettingData.onDownloadTranslationModel
+        )
     }
+}
+
+data class LiveTranslationSettingData(
+    val enable: MutableState<Boolean>,
+    val listOfAvailableModels: SnapshotStateList<TranslationModelState>,
+    val source: MutableState<TranslationModelState?>,
+    val target: MutableState<TranslationModelState?>,
+    val onEnable: (Boolean) -> Unit,
+    val onSourceChange: (TranslationModelState?) -> Unit,
+    val onTargetChange: (TranslationModelState?) -> Unit,
+    val onDownloadTranslationModel: (language: String) -> Unit,
+)
+
+@Composable
+fun LiveTranslationSetting(
+    enable: Boolean,
+    listOfAvailableModels: List<TranslationModelState>,
+    source: TranslationModelState?,
+    target: TranslationModelState?,
+    onEnable: (Boolean) -> Unit,
+    onSourceChange: (TranslationModelState?) -> Unit,
+    onTargetChange: (TranslationModelState?) -> Unit,
+    onDownloadTranslationModel: (language: String) -> Unit,
+) {
+
+    var modelSelectorExpanded by rememberSaveable { mutableStateOf(false) }
+    var modelSelectorExpandedForTarget by rememberSaveable { mutableStateOf(false) }
+    var rowSize by remember { mutableStateOf(Size.Zero) }
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp)
+            .onGloballyPositioned { layoutCoordinates ->
+                rowSize = layoutCoordinates.size.toSize()
+            },
+        horizontalArrangement = Arrangement.Center,
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Row(
+            modifier = Modifier.roundedOutline(),
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Surface(
+                modifier = Modifier
+                    .roundedOutline()
+                    .clickable { onEnable(!enable) },
+                color = if (enable) MaterialTheme.colors.primary.mix(
+                    ColorAccent,
+                    fraction = 0.8f
+                ) else MaterialTheme.colors.primary
+            ) {
+                Text(
+                    text = "Live translation",
+                    modifier = Modifier.padding(12.dp)
+                )
+            }
+            AnimatedVisibility(visible = enable) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.padding(horizontal = 16.dp)
+                ) {
+                    Surface(
+                        modifier = Modifier
+                            .unboundedIndicatorClickable {
+                                modelSelectorExpanded = !modelSelectorExpanded
+                                modelSelectorExpandedForTarget = false
+                            }
+                    ) {
+                        Text(
+                            text = source?.locale?.displayLanguage ?: "Source",
+                            modifier = Modifier
+                                .padding(6.dp)
+                                .ifCase(source == null) { alpha(0.5f) },
+                        )
+                    }
+                    Icon(Icons.Default.ArrowRightAlt, contentDescription = null)
+                    Surface(
+                        modifier = Modifier
+                            .unboundedIndicatorClickable {
+                                modelSelectorExpanded = !modelSelectorExpanded
+                                modelSelectorExpandedForTarget = true
+                            }
+                    ) {
+                        Text(
+                            text = target?.locale?.displayLanguage ?: "Target",
+                            modifier = Modifier
+                                .padding(6.dp)
+                                .ifCase(target == null) { alpha(0.5f) },
+                        )
+                    }
+                }
+            }
+        }
+
+        DropdownMenu(
+            expanded = modelSelectorExpanded,
+            onDismissRequest = { modelSelectorExpanded = false },
+            offset = DpOffset(0.dp, 10.dp),
+            modifier = Modifier
+                .heightIn(max = 300.dp)
+                .width(with(LocalDensity.current) { rowSize.width.toDp() })
+        ) {
+            listOfAvailableModels.forEach { item ->
+                val isAvailable = item.model != null
+                val isAlreadySelected =
+                    if (modelSelectorExpandedForTarget) item.language == target?.language
+                    else item.language == source?.language
+                DropdownMenuItem(
+                    onClick = {
+                        if (modelSelectorExpandedForTarget) onTargetChange(item)
+                        else onSourceChange(item)
+                    },
+                    enabled = !isAlreadySelected && isAvailable
+                ) {
+                    Box(Modifier.weight(1f)) {
+                        Text(
+                            text = item.locale.displayLanguage,
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier
+                                .padding(4.dp)
+                                .fillMaxWidth()
+                                .align(Alignment.Center)
+                        )
+                        if (item.model == null) Box(
+                            contentAlignment = Alignment.Center,
+                            modifier = Modifier
+                                .widthIn(min = 22.dp)
+                                .height(22.dp)
+                                .align(Alignment.CenterEnd)
+                        ) {
+                            when {
+                                item.downloading -> IconButton(onClick = { }, enabled = false) {
+                                    CircularProgressIndicator(
+                                        modifier = Modifier.size(22.dp),
+                                        color = MaterialTheme.colors.onPrimary
+                                    )
+                                }
+                                else -> IconButton(
+                                    onClick = { onDownloadTranslationModel(item.language) }) {
+                                    Icon(
+                                        Icons.Default.CloudDownload,
+                                        contentDescription = null,
+                                        tint = if (item.downloadingFailed) Color.Red
+                                        else LocalContentColor.current.copy(alpha = LocalContentAlpha.current)
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
 }
 
 @Composable
@@ -197,6 +369,18 @@ fun TextFontDropDown(
     }
 }
 
+private fun Modifier.roundedOutline(): Modifier = composed {
+    border(
+        width = 1.dp,
+        color = MaterialTheme.colors.onPrimary.copy(alpha = 0.5f),
+        shape = CircleShape
+    )
+        .background(
+            color = MaterialTheme.colors.primary,
+            shape = CircleShape
+        )
+        .clip(CircleShape)
+}
 
 @Composable
 private fun RoundedContentLayout(
@@ -208,16 +392,7 @@ private fun RoundedContentLayout(
         modifier = modifier
             .fillMaxWidth()
             .height(50.dp)
-            .border(
-                width = 1.dp,
-                color = MaterialTheme.colors.onPrimary.copy(alpha = 0.5f),
-                shape = CircleShape
-            )
-            .background(
-                color = MaterialTheme.colors.primary,
-                shape = CircleShape
-            )
-            .clip(CircleShape)
+            .roundedOutline()
             .then(modifier)
     ) {
         content(this)
@@ -234,7 +409,7 @@ fun ReaderInfoView(
     textSize: Float,
     onTextFontChanged: (String) -> Unit,
     onTextSizeChanged: (Float) -> Unit,
-    onTranslationLanguageChanged: () -> Unit,
+    liveTranslationSettingData: LiveTranslationSettingData,
     visible: Boolean,
     modifier: Modifier = Modifier
 ) {
@@ -266,14 +441,14 @@ fun ReaderInfoView(
                     bottom.linkTo(parent.bottom)
                     width = Dimension.matchParent
                 }
-                .padding(bottom = 10.dp)
+                .padding(bottom = 60.dp)
         ) {
             Settings(
                 textFont = textFont,
                 textSize = textSize,
                 onTextFontChanged = onTextFontChanged,
                 onTextSizeChanged = onTextSizeChanged,
-                onTranslationLanguageChanged = onTranslationLanguageChanged
+                liveTranslationSettingData = liveTranslationSettingData,
             )
         }
     }
@@ -296,7 +471,34 @@ private fun ViewsPreview() {
             onTextSizeChanged = {},
             onTextFontChanged = {},
             visible = true,
-            onTranslationLanguageChanged = {}
+            liveTranslationSettingData = LiveTranslationSettingData(
+                enable = remember { mutableStateOf(true) },
+                listOfAvailableModels = remember { mutableStateListOf() },
+                source = remember {
+                    mutableStateOf(
+                        TranslationModelState(
+                            language = "fr",
+                            model = null,
+                            false,
+                            false
+                        )
+                    )
+                },
+                target = remember {
+                    mutableStateOf(
+                        TranslationModelState(
+                            language = "en",
+                            model = null,
+                            false,
+                            false
+                        )
+                    )
+                },
+                onTargetChange = {},
+                onEnable = {},
+                onSourceChange = {},
+                onDownloadTranslationModel = {}
+            )
         )
     }
 }

@@ -91,6 +91,10 @@ class ReaderActivity : BaseActivity() {
 
         viewBind.listView.adapter = viewAdapter.listView
 
+        viewModel.onTranslatorStateChanged = {
+            reloadReader()
+        }
+
         viewModel.initialLoad { loadInitialChapter() }
 
         viewBind.settings.setContent {
@@ -146,9 +150,7 @@ class ReaderActivity : BaseActivity() {
                     visible = viewModel.showReaderInfoView,
                     onTextFontChanged = { appPreferences.READER_FONT_FAMILY.value = it },
                     onTextSizeChanged = { appPreferences.READER_FONT_SIZE.value = it },
-                    onTranslationLanguageChanged = {
-                        reloadReader()
-                    }
+                    liveTranslationSettingData = viewModel.liveTranslationSettingData
                 )
             }
         }
@@ -422,7 +424,8 @@ class ReaderActivity : BaseActivity() {
             val chapter = viewModel.orderedChapters[index]
             val itemProgressBar = ReaderItem.PROGRESSBAR(chapter.url)
             val itemTitle = ReaderItem.TITLE(chapter.url, 0, chapter.title).copy(
-                textTranslated = viewModel.translator?.translate(chapter.title)?.await() ?: chapter.title
+                textTranslated = viewModel.translator?.translate(chapter.title)?.await()
+                    ?: chapter.title
             )
             withContext(Dispatchers.Main) {
                 maintainPosition {
@@ -466,7 +469,7 @@ class ReaderActivity : BaseActivity() {
                         viewModel.addChapterStats(chapter, items.size, index)
                         maintainPosition {
                             remove(itemProgressBar)
-                            if(itemTranslation != null) {
+                            if (itemTranslation != null) {
                                 remove(itemTranslation)
                             }
                             insertAll(items)

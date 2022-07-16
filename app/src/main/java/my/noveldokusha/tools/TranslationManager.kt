@@ -2,13 +2,11 @@ package my.noveldokusha.tools
 
 import androidx.compose.runtime.mutableStateListOf
 import com.google.mlkit.common.model.DownloadConditions
+import com.google.mlkit.common.model.RemoteModel
 import com.google.mlkit.common.model.RemoteModelManager
 import com.google.mlkit.nl.translate.*
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import kotlinx.coroutines.tasks.await
-import kotlinx.coroutines.withContext
 import java.util.Locale
 
 data class TranslationModelState(
@@ -45,13 +43,21 @@ class TranslationManager(
         addAll(list)
     }
 
+    val modelsDownloaded = mutableStateListOf<TranslationModelState>()
+
     init {
         coroutineScope.launch {
             val downloaded = loadDownloadedModelsList().associateBy { it.language }
             models.replaceAll {
                 it.copy(model = downloaded[it.language])
             }
+            updateModelsDownloaded()
         }
+    }
+
+    private fun updateModelsDownloaded() {
+        modelsDownloaded.clear()
+        modelsDownloaded.addAll(models.filter { it.model != null })
     }
 
     private suspend fun loadDownloadedModelsList() = withContext(Dispatchers.IO) {
@@ -61,7 +67,23 @@ class TranslationManager(
             .await()
     }
 
+    // TODO Should not use blocking code
+    fun hasModelDownloadedSync(language: String) = runBlocking {
+        val model = TranslateRemoteModel.Builder(language).build()
+        val isDownloaded = RemoteModelManager
+            .getInstance()
+            .isModelDownloaded(model)
+            .await()
+        if (isDownloaded) TranslationModelState(
+            model = model,
+            downloading = false,
+            language = language,
+            downloadingFailed = false
+        ) else null
+    }
+
     /**
+     * Doesn't check if the model has been downloaded. Must be externally guaranteed.
      * @param source [TranslateLanguage]
      * @param target [TranslateLanguage]
      */
@@ -102,6 +124,7 @@ class TranslationManager(
                     downloading = false,
                     model = TranslateRemoteModel.Builder(language).build()
                 )
+                updateModelsDownloaded()
             }
             .addOnFailureListener {
                 models[index] = models[index].copy(
@@ -114,7 +137,7 @@ class TranslationManager(
     fun removeModel(language: String) = coroutineScope.launch {
 
         // English can't be removed.
-        if(language == "en") return@launch
+        if (language == "en") return@launch
 
         val index = models.indexOfFirst { it.language == language }
         if (index == -1) return@launch
@@ -129,6 +152,7 @@ class TranslationManager(
                     downloading = false,
                     model = null
                 )
+                updateModelsDownloaded()
             }
     }
 }
