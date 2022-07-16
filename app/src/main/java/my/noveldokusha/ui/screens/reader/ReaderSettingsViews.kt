@@ -234,6 +234,7 @@ fun LiveTranslationSetting(
                     onClick = {
                         if (modelSelectorExpandedForTarget) onTargetChange(item)
                         else onSourceChange(item)
+                        modelSelectorExpanded = false
                     },
                     enabled = !isAlreadySelected && isAvailable
                 ) {

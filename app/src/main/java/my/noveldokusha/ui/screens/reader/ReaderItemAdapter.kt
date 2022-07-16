@@ -39,8 +39,8 @@ class ReaderItemAdapter(
     private val topPadding = ReaderItem.PADDING("")
     private val bottomPadding = ReaderItem.PADDING("")
 
-    override fun getViewTypeCount(): Int = 9
-    override fun getItemViewType(position: Int) = when (val item = getItem(position))
+    override fun getViewTypeCount(): Int = 11
+    override fun getItemViewType(position: Int) = when (getItem(position))
     {
         is ReaderItem.BODY -> 0
         is ReaderItem.BODY_IMAGE -> 1
@@ -52,6 +52,17 @@ class ReaderItemAdapter(
         is ReaderItem.PROGRESSBAR -> 6
         is ReaderItem.TITLE -> 7
         is ReaderItem.TRANSLATING -> 8
+        is ReaderItem.GOOGLE_TRANSLATE_ATTRIBUTION -> 9
+    }
+
+    private fun viewTranslateAttribution(item: ReaderItem.GOOGLE_TRANSLATE_ATTRIBUTION, convertView: View?, parent: ViewGroup): View
+    {
+        val bind = when (convertView)
+        {
+            null -> ActivityReaderListItemGoogleTranslateAttributionBinding.inflate(parent.inflater, parent, false).also { it.root.tag = it }
+            else -> ActivityReaderListItemGoogleTranslateAttributionBinding.bind(convertView)
+        }
+        return bind.root
     }
 
     private fun viewBody(item: ReaderItem.BODY, convertView: View?, parent: ViewGroup): View
@@ -212,6 +223,7 @@ class ReaderItemAdapter(
 
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View = when (val item = getItem(position))
     {
+        is ReaderItem.GOOGLE_TRANSLATE_ATTRIBUTION -> viewTranslateAttribution(item, convertView, parent)
         is ReaderItem.BODY -> viewBody(item, convertView, parent)
         is ReaderItem.BODY_IMAGE -> viewImage(item, convertView, parent)
         is ReaderItem.BOOK_END -> viewBookEnd(item, convertView, parent)

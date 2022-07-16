@@ -11,6 +11,10 @@ sealed class ReaderItem {
 
     enum class LOCATION { FIRST, MIDDLE, LAST }
 
+    data class GOOGLE_TRANSLATE_ATTRIBUTION(
+        override val chapterUrl: String,
+    ) : ReaderItem()
+
     data class TITLE(
         override val chapterUrl: String,
         override val pos: Int,

@@ -440,6 +440,12 @@ class ReaderActivity : BaseActivity() {
                     // Split chapter text into items
                     val itemsOriginal = textToItemsConverter(chapter.url, res.data)
 
+                    val itemTranslationAttribution = viewModel.translator?.let {
+                        ReaderItem.GOOGLE_TRANSLATE_ATTRIBUTION(
+                            chapterUrl = chapter.url
+                        )
+                    }
+
                     val itemTranslation = viewModel.translator?.let {
                         ReaderItem.TRANSLATING(
                             chapterUrl = chapter.url,
@@ -469,8 +475,11 @@ class ReaderActivity : BaseActivity() {
                         viewModel.addChapterStats(chapter, items.size, index)
                         maintainPosition {
                             remove(itemProgressBar)
-                            if (itemTranslation != null) {
-                                remove(itemTranslation)
+                            itemTranslation?.let {
+                                remove(it)
+                            }
+                            itemTranslationAttribution?.let {
+                                insert(it)
                             }
                             insertAll(items)
                             insert(ReaderItem.DIVIDER(chapter.url))
