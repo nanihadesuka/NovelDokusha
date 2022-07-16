@@ -126,6 +126,8 @@ class ReaderViewModel @Inject constructor(
     var readingPosStats by mutableStateOf<Pair<ChapterStats, Int>?>(null)
 
     init {
+        updateTranslatorState()
+
         val chapter =
             viewModelScope.async(Dispatchers.IO) { repository.bookChapter.get(chapterUrl) }
         val bookChapters =
