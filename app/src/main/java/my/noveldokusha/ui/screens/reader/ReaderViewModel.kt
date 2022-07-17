@@ -71,21 +71,24 @@ class ReaderViewModel @Inject constructor(
         val isEnabled = liveTranslationSettingData.enable.value
         val source = liveTranslationSettingData.source.value
         val target = liveTranslationSettingData.target.value
-        if (!isEnabled || source == null || target == null) {
+        translator = if (
+            !isEnabled ||
+            source == null ||
+            target == null ||
+            source.language == target.language
+        ) {
             if (translator == null) return
-            translator = null
+            null
         } else {
             val old = translator
             if (old != null && old.source == source.language && old.target == target.language)
                 return
-            if (source.language == target.language)
-                return
-            translator = translationManager.getTranslator(
+            translationManager.getTranslator(
                 source = source.language,
                 target = target.language
             )
-            onTranslatorStateChanged?.invoke()
         }
+        onTranslatorStateChanged?.invoke()
     }
 
     private fun translatorOnEnable(it: Boolean) {
