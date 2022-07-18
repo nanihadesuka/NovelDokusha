@@ -42,11 +42,8 @@ class Aixdzs : SourceInterface.Catalog {
     }
 
     override suspend fun getCatalogList(index: Int): Response<PagedList<BookMetadata>> {
-        val page = index + 1
-//        val url = baseUrl.toUrlBuilderSafe().apply {
-//            if (page == 1) addPath("all.html")
-//            else addPath("all-$page.html")
-//        }
+
+
 
         return tryConnect {
             val doc = fetchDoc(catalogUrl)
