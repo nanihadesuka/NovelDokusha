@@ -90,11 +90,11 @@ dependencies {
 
     // Kotlin
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
-    implementation("org.jetbrains.kotlin:kotlin-script-runtime:1.6.20")
-    implementation("org.jetbrains.kotlin:kotlin-stdlib:1.6.21")
+    implementation("org.jetbrains.kotlin:kotlin-script-runtime:1.7.10")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib:1.7.10")
 
     // Needed to have the Task -> await extension.
-    implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.6.2")
+    implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.6.4")
 
 
     // Room components
@@ -122,7 +122,7 @@ dependencies {
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
     implementation("androidx.recyclerview:recyclerview:1.2.1")
     implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
-    implementation("com.google.android.material:material:1.7.0-alpha02")
+    implementation("com.google.android.material:material:1.7.0-alpha03")
     implementation("com.l4digital.fastscroll:fastscroll:2.0.1")
     implementation("com.afollestad.material-dialogs:core:3.3.0")
 
@@ -142,13 +142,13 @@ dependencies {
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
 
     // Dependency injection
-    implementation("com.google.dagger:hilt-android:2.42")
-    kapt("com.google.dagger:hilt-compiler:2.42")
+    implementation("com.google.dagger:hilt-android:2.43")
+    kapt("com.google.dagger:hilt-compiler:2.43")
 
     // HTML text extractor
-    implementation("com.chimbori.crux:crux:3.5.3")
+    implementation("com.chimbori.crux:crux:3.8.1")
     implementation("net.dankito.readability4j:readability4j:1.0.8")
-    implementation("org.jsoup:jsoup:1.14.3")
+    implementation("org.jsoup:jsoup:1.15.2")
 
     // Memory leak detector
     //debugImplementation("com.squareup.leakcanary:leakcanary-android:2.7")
@@ -177,7 +177,7 @@ dependencies {
     implementation("me.onebone:toolbar-compose:2.3.3")
 
     // Compose scroll bar
-    implementation("com.github.nanihadesuka:LazyColumnScrollbar:1.3.1")
+    implementation("com.github.nanihadesuka:LazyColumnScrollbar:1.5.1")
 
     // Android ML Translation Kit
     implementation("com.google.mlkit:translate:17.0.0")
