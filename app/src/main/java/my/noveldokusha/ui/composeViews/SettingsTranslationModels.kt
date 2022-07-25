@@ -50,7 +50,7 @@ fun SettingsTranslationModels(
                             .height(22.dp)
                     ) {
                         when {
-                            it.model != null -> {
+                            it.available -> {
                                 Row(verticalAlignment = Alignment.CenterVertically) {
                                     Icon(
                                         Icons.Outlined.Done,

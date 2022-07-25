@@ -13,6 +13,7 @@ import kotlinx.coroutines.SupervisorJob
 import my.noveldokusha.data.Repository
 import my.noveldokusha.data.database.AppDatabase
 import my.noveldokusha.tools.TranslationManager
+import my.noveldokusha.tools.TranslationManagerMLKit
 import javax.inject.Singleton
 
 @InstallIn(SingletonComponent::class)
@@ -47,6 +48,6 @@ object AppModule {
     @Provides
     @Singleton
     fun provideTranslationManager(coroutineScope: CoroutineScope): TranslationManager {
-        return TranslationManager(coroutineScope)
+        return TranslationManagerMLKit(coroutineScope)
     }
 }

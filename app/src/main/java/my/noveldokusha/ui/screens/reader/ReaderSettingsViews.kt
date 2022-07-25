@@ -253,7 +253,6 @@ fun LiveTranslationSetting(
             }
 
             listOfAvailableModels.forEach { item ->
-                val isAvailable = item.model != null
                 val isAlreadySelected =
                     if (modelSelectorExpandedForTarget) item.language == target?.language
                     else item.language == source?.language
@@ -263,7 +262,7 @@ fun LiveTranslationSetting(
                         else onSourceChange(item)
                         modelSelectorExpanded = false
                     },
-                    enabled = !isAlreadySelected && isAvailable
+                    enabled = !isAlreadySelected && item.available
                 ) {
                     Box(Modifier.weight(1f)) {
                         Text(
@@ -274,7 +273,7 @@ fun LiveTranslationSetting(
                                 .fillMaxWidth()
                                 .align(Alignment.Center)
                         )
-                        if (item.model == null) Box(
+                        if (!item.available) Box(
                             contentAlignment = Alignment.Center,
                             modifier = Modifier
                                 .widthIn(min = 22.dp)
@@ -505,7 +504,7 @@ private fun ViewsPreview() {
                     mutableStateOf(
                         TranslationModelState(
                             language = "fr",
-                            model = null,
+                            available = false,
                             false,
                             false
                         )
@@ -515,7 +514,7 @@ private fun ViewsPreview() {
                     mutableStateOf(
                         TranslationModelState(
                             language = "en",
-                            model = null,
+                            available = false,
                             false,
                             false
                         )

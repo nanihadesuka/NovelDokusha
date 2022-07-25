@@ -428,7 +428,7 @@ class ReaderActivity : BaseActivity() {
             val chapter = viewModel.orderedChapters[index]
             val itemProgressBar = ReaderItem.PROGRESSBAR(chapter.url)
             val itemTitle = ReaderItem.TITLE(chapter.url, 0, chapter.title).copy(
-                textTranslated = viewModel.translator?.translate(chapter.title)?.await()
+                textTranslated = viewModel.translator?.translate?.invoke(chapter.title)
                     ?: chapter.title
             )
             withContext(Dispatchers.Main) {
@@ -470,7 +470,7 @@ class ReaderActivity : BaseActivity() {
                     val items = viewModel.translator?.let { translator ->
                         itemsOriginal.map {
                             if (it is ReaderItem.BODY) {
-                                it.copy(textTranslated = translator.translate(it.text).await())
+                                it.copy(textTranslated = translator.translate(it.text))
                             } else it
                         }
                     } ?: itemsOriginal
