@@ -156,9 +156,8 @@ class ReaderActivity : BaseActivity() {
             }
         }
 
-        viewBind.listView.setOnItemLongClickListener { _, _, _, _ ->
+        viewBind.listView.setOnClickListener {
             viewModel.showReaderInfoView = !viewModel.showReaderInfoView
-            true
         }
 
         viewBind.listView.setOnScrollListener(
