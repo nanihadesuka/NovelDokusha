@@ -11,12 +11,13 @@ plugins {
 android {
 
     val localPropertiesFile = file("../local.properties")
-    val propertiesData = Properties().apply {
-        if(localPropertiesFile.exists())
+
+    val defaultSigningConfigData = Properties().apply {
+        if (localPropertiesFile.exists())
             load(localPropertiesFile.inputStream())
     }
-    val isSignBuild = propertiesData.hasProperty("storeFile")
-    println("isSignBuild: $isSignBuild")
+    val hasDefaultSigningConfigData = defaultSigningConfigData.hasProperty("storeFile")
+    println("hasDefaultSigningConfigData: $hasDefaultSigningConfigData")
 
     compileSdk = 32
 
@@ -42,19 +43,21 @@ android {
         setProperty("archivesBaseName", "NovelDokusha_v$versionName")
     }
 
-    if (isSignBuild) signingConfigs {
-        create("release") {
-            storeFile = file(propertiesData.getProperty("storeFile"))
-            storePassword = propertiesData.getProperty("storePassword")
-            keyAlias = propertiesData.getProperty("keyAlias")
-            keyPassword = propertiesData.getProperty("keyPassword")
+    signingConfigs {
+        if (hasDefaultSigningConfigData) create("default") {
+            storeFile = file(defaultSigningConfigData.getProperty("storeFile"))
+            storePassword = defaultSigningConfigData.getProperty("storePassword")
+            keyAlias = defaultSigningConfigData.getProperty("keyAlias")
+            keyPassword = defaultSigningConfigData.getProperty("keyPassword")
         }
     }
 
     buildTypes {
 
-        if (isSignBuild) all {
-            signingConfig = signingConfigs["release"]
+        signingConfigs.asMap["default"]?.let {
+            all {
+                signingConfig = it
+            }
         }
 
         named("debug") {
@@ -64,7 +67,6 @@ android {
                 isOptimizeCode = false
                 isRemoveUnusedResources = false
             }
-
         }
 
         named("release") {
@@ -94,7 +96,7 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-stdlib:1.7.10")
 
     // Needed to have the Task -> await extension.
-    implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.6.4")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.6.4")
 
 
     // Room components
