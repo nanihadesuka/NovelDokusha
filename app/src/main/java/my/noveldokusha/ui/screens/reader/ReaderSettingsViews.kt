@@ -40,9 +40,9 @@ import my.noveldokusha.ui.screens.reader.tools.FontsLoader
 import my.noveldokusha.ui.theme.ColorAccent
 import my.noveldokusha.ui.theme.InternalTheme
 import my.noveldokusha.utils.blockInteraction
+import my.noveldokusha.utils.clickableWithUnboundedIndicator
 import my.noveldokusha.utils.ifCase
 import my.noveldokusha.utils.mix
-import my.noveldokusha.utils.clickableWithUnboundedIndicator
 
 @Composable
 private fun CurrentBookInfo(
@@ -101,21 +101,21 @@ private fun Settings(
     modifier: Modifier = Modifier,
 ) {
     Column(
-        modifier
+        verticalArrangement = Arrangement.spacedBy(10.dp),
+        modifier = modifier
             .fillMaxWidth()
             .padding(10.dp)
+
     ) {
         TextSizeSlider(
             textSize,
             onTextSizeChanged
         )
-        Box(Modifier.height(10.dp))
         TextFontDropDown(
             textFont,
             onTextFontChanged
         )
-        Box(Modifier.height(10.dp))
-        LiveTranslationSetting(
+        if (liveTranslationSettingData.isAvailable) LiveTranslationSetting(
             enable = liveTranslationSettingData.enable.value,
             listOfAvailableModels = liveTranslationSettingData.listOfAvailableModels,
             source = liveTranslationSettingData.source.value,
@@ -129,6 +129,7 @@ private fun Settings(
 }
 
 data class LiveTranslationSettingData(
+    val isAvailable: Boolean,
     val enable: MutableState<Boolean>,
     val listOfAvailableModels: SnapshotStateList<TranslationModelState>,
     val source: MutableState<TranslationModelState?>,
@@ -498,6 +499,7 @@ private fun ViewsPreview() {
             onTextFontChanged = {},
             visible = true,
             liveTranslationSettingData = LiveTranslationSettingData(
+                isAvailable = true,
                 enable = remember { mutableStateOf(true) },
                 listOfAvailableModels = remember { mutableStateListOf() },
                 source = remember {

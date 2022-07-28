@@ -55,9 +55,9 @@ open class MainActivity : ComponentActivity()
                         Box(Modifier.weight(1f)) {
                             when (page)
                             {
-                                PAGE.LIBRARY -> LibraryView(context = this@MainActivity)
-                                PAGE.FINDER -> FinderView(context = this@MainActivity)
-                                PAGE.SETTINGS -> SettingsView(context = this@MainActivity)
+                                PAGE.LIBRARY -> LibraryView()
+                                PAGE.FINDER -> FinderView()
+                                PAGE.SETTINGS -> SettingsView()
                             }
                         }
                         Row(

@@ -2,15 +2,20 @@ package my.noveldokusha.ui.screens.main.settings
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.ExperimentalAnimationApi
-import androidx.compose.foundation.*
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.*
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.Icon
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Cancel
 import androidx.compose.material.icons.outlined.CheckCircle
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -29,9 +34,9 @@ import my.noveldokusha.ui.composeViews.SettingsTranslationModels
 import my.noveldokusha.ui.theme.ColorAccent
 import my.noveldokusha.ui.theme.InternalTheme
 import my.noveldokusha.ui.theme.Themes
+import my.noveldokusha.uiViews.MyButton
 import my.noveldokusha.utils.drawBottomLine
 import my.noveldokusha.utils.ifCase
-import my.noveldokusha.uiViews.MyButton
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
@@ -232,6 +237,7 @@ fun SettingsBody(
     onThemeSelected: (Themes) -> Unit,
     databaseSize: String,
     imagesFolderSize: String,
+    isTranslationSettingsVisible: Boolean,
     translationModelsStates: List<TranslationModelState>,
     onCleanDatabase: () -> Unit,
     onCleanImageFolder: () -> Unit,
@@ -263,7 +269,7 @@ fun SettingsBody(
             onBackupData = onBackupData,
             onRestoreData = onRestoreData
         )
-        SettingsTranslationModels(
+        if (isTranslationSettingsVisible) SettingsTranslationModels(
             translationModelsStates = translationModelsStates,
             onDownloadTranslationModel = onDownloadTranslationModel,
             onRemoveTranslationModel = onRemoveTranslationModel
@@ -295,6 +301,7 @@ private fun Preview() {
             onThemeSelected = { },
             databaseSize = "1 MB",
             imagesFolderSize = "10 MB",
+            isTranslationSettingsVisible = true,
             translationModelsStates = listOf(),
             onCleanDatabase = { },
             onCleanImageFolder = { },

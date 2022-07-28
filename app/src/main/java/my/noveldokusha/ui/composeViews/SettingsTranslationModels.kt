@@ -26,12 +26,14 @@ fun SettingsTranslationModels(
         Column(
             verticalArrangement = Arrangement.spacedBy(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.padding(horizontal = 4.dp)
+            modifier = Modifier.padding(horizontal = 4.dp).fillMaxWidth()
         ) {
             Spacer(modifier = Modifier.height(0.dp))
             Text(
                 text = stringResource(R.string.settings_translations_models_main_description),
-                modifier = Modifier.width(260.dp),
+                modifier = Modifier
+                    .width(260.dp)
+                    .align(Alignment.CenterHorizontally),
                 textAlign = TextAlign.Center
             )
             translationModelsStates.forEach {

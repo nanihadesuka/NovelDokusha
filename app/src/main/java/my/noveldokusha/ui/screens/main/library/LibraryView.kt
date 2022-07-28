@@ -9,6 +9,7 @@ import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
@@ -24,8 +25,8 @@ import my.noveldokusha.ui.screens.main.OptionsDialogBookLibrary
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun LibraryView(context: Context) = with(context)
-{
+fun LibraryView() {
+    val context by rememberUpdatedState(LocalContext.current)
     val title = stringResource(id = R.string.app_name)
     val downDownExpanded = remember { mutableStateOf(false) }
     val libraryModel = viewModel<LibraryViewModel>()
@@ -42,15 +43,15 @@ fun LibraryView(context: Context) = with(context)
         )
         LibraryBody(
             tabs = listOf("Default", "Completed"),
-            onBookClick = ::goToBookChaptersPage,
+            onBookClick = context::goToBookChaptersPage,
             onBookLongClick = {
                 libraryModel.optionsBookDialogState = OptionsBookDialogState.Show(it.book)
             }
         )
     }
+
     // Book selected options dialog
-    when (val state = libraryModel.optionsBookDialogState)
-    {
+    when (val state = libraryModel.optionsBookDialogState) {
         is OptionsBookDialogState.Show -> Dialog(
             onDismissRequest = {
                 libraryModel.optionsBookDialogState = OptionsBookDialogState.Hide
@@ -71,8 +72,7 @@ fun LibraryView(context: Context) = with(context)
 }
 
 @Composable
-fun OptionsDropDownView(expanded: MutableState<Boolean>)
-{
+fun OptionsDropDownView(expanded: MutableState<Boolean>) {
     DropdownMenu(expanded = expanded.value, onDismissRequest = { expanded.value = false }) {
         Text(
             text = stringResource(id = R.string.import_epub),
@@ -83,8 +83,7 @@ fun OptionsDropDownView(expanded: MutableState<Boolean>)
     }
 }
 
-private fun Context.goToBookChaptersPage(book: BookWithContext)
-{
+private fun Context.goToBookChaptersPage(book: BookWithContext) {
     ChaptersActivity.IntentData(
         this,
         bookMetadata = BookMetadata(title = book.book.title, url = book.book.url)

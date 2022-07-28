@@ -16,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -29,19 +30,20 @@ import my.noveldokusha.R
 import my.noveldokusha.scraper.DatabaseInterface
 import my.noveldokusha.scraper.SourceInterface
 import my.noveldokusha.scraper.scraper
+import my.noveldokusha.ui.composeViews.ToolbarModeSearch
 import my.noveldokusha.ui.screens.databaseSearch.DatabaseSearchActivity
 import my.noveldokusha.ui.screens.globalSourceSearch.GlobalSourceSearchActivity
 import my.noveldokusha.ui.screens.sourceCatalog.SourceCatalogActivity
 import my.noveldokusha.ui.screens.sourceCatalog.ToolbarMode
 import my.noveldokusha.ui.theme.ColorAccent
 import my.noveldokusha.ui.theme.InternalTheme
-import my.noveldokusha.ui.composeViews.ToolbarModeSearch
-import my.noveldokusha.utils.drawBottomLine
 import my.noveldokusha.uiViews.MyButton
+import my.noveldokusha.utils.drawBottomLine
 
 @Composable
-fun FinderView(context: Context)
+fun FinderView()
 {
+    val context by rememberUpdatedState(newValue = LocalContext.current)
     val viewModel = viewModel<FinderViewModel>()
     val title = stringResource(id = R.string.app_name)
     val searchText = rememberSaveable { mutableStateOf("") }

@@ -12,8 +12,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import my.noveldokusha.data.Repository
 import my.noveldokusha.data.database.AppDatabase
-import my.noveldokusha.tools.TranslationManager
-import my.noveldokusha.tools.TranslationManagerMLKit
 import javax.inject.Singleton
 
 @InstallIn(SingletonComponent::class)
@@ -43,11 +41,5 @@ object AppModule {
     @Singleton
     fun provideAppCoroutineScope(): CoroutineScope {
         return CoroutineScope(SupervisorJob() + Dispatchers.Main + CoroutineName("App"))
-    }
-
-    @Provides
-    @Singleton
-    fun provideTranslationManager(coroutineScope: CoroutineScope): TranslationManager {
-        return TranslationManagerMLKit(coroutineScope)
     }
 }

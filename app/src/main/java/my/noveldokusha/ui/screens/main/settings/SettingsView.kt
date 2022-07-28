@@ -1,8 +1,7 @@
 package my.noveldokusha.ui.screens.main.settings
 
-import android.content.Context
-import androidx.compose.foundation.layout.*
-import androidx.compose.runtime.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.viewmodel.compose.viewModel
 import my.noveldokusha.R
@@ -10,7 +9,7 @@ import my.noveldokusha.composableActions.onDoBackup
 import my.noveldokusha.composableActions.onDoRestore
 
 @Composable
-fun SettingsView(context: Context)
+fun SettingsView()
 {
     val viewModel = viewModel<SettingsViewModel>()
     Column {
@@ -23,6 +22,7 @@ fun SettingsView(context: Context)
             databaseSize = viewModel.databaseSize,
             imagesFolderSize = viewModel.imageFolderSize,
             translationModelsStates = viewModel.translationManager.models,
+            isTranslationSettingsVisible = viewModel.translationManager.available,
             onCleanDatabase = viewModel::cleanDatabase,
             onCleanImageFolder = viewModel::cleanImagesFolder,
             onBackupData = onDoBackup(),

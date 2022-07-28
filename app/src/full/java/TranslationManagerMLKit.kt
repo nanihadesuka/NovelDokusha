@@ -1,4 +1,4 @@
-package my.noveldokusha.tools
+package my.noveldokusha.full
 
 import androidx.compose.runtime.mutableStateListOf
 import com.google.mlkit.common.model.DownloadConditions
@@ -9,6 +9,9 @@ import com.google.mlkit.nl.translate.Translation
 import com.google.mlkit.nl.translate.TranslatorOptions
 import kotlinx.coroutines.*
 import kotlinx.coroutines.tasks.await
+import my.noveldokusha.tools.TranslationManager
+import my.noveldokusha.tools.TranslationModelState
+import my.noveldokusha.tools.TranslatorState
 
 class TranslationManagerMLKit(
     private val coroutineScope: CoroutineScope

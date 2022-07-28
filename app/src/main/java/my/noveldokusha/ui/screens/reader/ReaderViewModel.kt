@@ -1,13 +1,14 @@
 package my.noveldokusha.ui.screens.reader
 
-import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.lifecycle.*
-import com.google.mlkit.nl.translate.TranslateLanguage
+import androidx.lifecycle.SavedStateHandle
+import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.runBlocking
 import my.noveldokusha.AppPreferences
 import my.noveldokusha.data.Repository
 import my.noveldokusha.data.database.tables.Chapter
@@ -21,7 +22,7 @@ import my.noveldokusha.utils.StateExtra_String
 import java.io.File
 import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
-import kotlin.collections.ArrayList
+import kotlin.collections.set
 import kotlin.properties.Delegates
 
 interface ReaderStateBundle {
@@ -52,6 +53,7 @@ class ReaderViewModel @Inject constructor(
     var translator: TranslatorState? = null
 
     val liveTranslationSettingData = LiveTranslationSettingData(
+        isAvailable = translationManager.available,
         listOfAvailableModels = translationManager.models,
         enable = mutableStateOf(appPreferences.GLOBAL_TRANSLATIOR_ENABLED.value),
         source = mutableStateOf(getValidTranslatorOrNull(appPreferences.GLOBAL_TRANSLATIOR_PREFERRED_SOURCE.value)),

@@ -1,5 +1,5 @@
 import org.jetbrains.kotlin.konan.properties.hasProperty
-import java.util.Properties
+import java.util.*
 
 plugins {
     id("com.android.application")
@@ -80,6 +80,28 @@ android {
         }
     }
 
+    productFlavors {
+        flavorDimensions.add("dependencies")
+
+        create("full") {
+            dimension = "dependencies"
+            dependencies {
+                // Needed to have the Task -> await extension.
+                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.6.4")
+
+                // Android ML Translation Kit
+                implementation("com.google.mlkit:translate:17.0.0")
+            }
+        }
+
+        create(   "foss") {
+            dimension = "dependencies"
+            dependencies {
+
+            }
+        }
+    }
+
     buildFeatures {
         viewBinding = true
         compose = true
@@ -94,9 +116,6 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
     implementation("org.jetbrains.kotlin:kotlin-script-runtime:1.7.10")
     implementation("org.jetbrains.kotlin:kotlin-stdlib:1.7.10")
-
-    // Needed to have the Task -> await extension.
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.6.4")
 
 
     // Room components
@@ -181,10 +200,6 @@ dependencies {
     // Compose scroll bar
     implementation("com.github.nanihadesuka:LazyColumnScrollbar:1.5.1")
 
-    // Android ML Translation Kit
-    implementation("com.google.mlkit:translate:17.0.0")
-
     // Logging
     implementation("com.jakewharton.timber:timber:5.0.1")
-
 }
