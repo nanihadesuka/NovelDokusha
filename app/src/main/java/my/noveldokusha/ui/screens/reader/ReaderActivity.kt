@@ -4,7 +4,6 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import android.view.WindowManager
 import android.widget.AbsListView
 import androidx.activity.compose.BackHandler
@@ -12,7 +11,6 @@ import androidx.activity.viewModels
 import androidx.compose.material.LocalContentColor
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.*
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
@@ -22,7 +20,6 @@ import com.afollestad.materialdialogs.MaterialDialog
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.drop
-import kotlinx.coroutines.tasks.await
 import my.noveldokusha.R
 import my.noveldokusha.databinding.ActivityReaderBinding
 import my.noveldokusha.scraper.Response
@@ -38,8 +35,8 @@ import kotlin.math.ceil
 @AndroidEntryPoint
 class ReaderActivity : BaseActivity() {
     class IntentData : Intent {
-        var bookUrl by Extra_String()
-        var chapterUrl by Extra_String()
+        private var bookUrl by Extra_String()
+        private var chapterUrl by Extra_String()
 
         constructor(intent: Intent) : super(intent)
         constructor(ctx: Context, bookUrl: String, chapterUrl: String) : super(
@@ -76,14 +73,17 @@ class ReaderActivity : BaseActivity() {
 
     private val fontsLoader = FontsLoader()
 
-    fun reloadReader() {
+    private fun reloadReader() {
         viewBind.listView.isEnabled = false
-        val currentChapter = viewModel.currentChapter.copy(
-            position = viewModel.currentChapter.position + 1 // needs + 1 for some unknown reason
-        )
+        val currentChapter = viewModel.currentChapter.copy()
         lifecycleScope.coroutineContext.cancelChildren()
         viewModel.reloadReader()
         loadRestartedInitialChapter(currentChapter)
+    }
+
+    override fun onDestroy() {
+        viewModel.onTranslatorStateChanged = null
+        super.onDestroy()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -341,7 +341,7 @@ class ReaderActivity : BaseActivity() {
         }
     }
 
-    fun loadNextChapter(): Boolean {
+    private fun loadNextChapter(): Boolean {
         viewModel.readerState = ReaderViewModel.ReaderState.LOADING
 
         val lastItem = viewModel.items.lastOrNull()!!
@@ -368,7 +368,7 @@ class ReaderActivity : BaseActivity() {
         }
     }
 
-    fun loadPreviousChapter(): Boolean {
+    private fun loadPreviousChapter(): Boolean {
         viewModel.readerState = ReaderViewModel.ReaderState.LOADING
 
         val firstItem = viewModel.items.firstOrNull()!!
@@ -377,16 +377,16 @@ class ReaderActivity : BaseActivity() {
             return false
         }
 
-        var list_index = 0
+        var listIndex = 0
         val insert = { item: ReaderItem ->
-            viewAdapter.listView.insert(item, list_index); list_index += 1
+            viewAdapter.listView.insert(item, listIndex); listIndex += 1
         }
         val insertAll = { items: Collection<ReaderItem> -> items.forEach { insert(it) } }
         val remove = { item: ReaderItem ->
             val pos = viewAdapter.listView.getPosition(item)
             if (pos != -1) {
-                viewAdapter.listView.remove(item);
-                list_index -= 1
+                viewAdapter.listView.remove(item)
+                listIndex -= 1
             }
         }
 
