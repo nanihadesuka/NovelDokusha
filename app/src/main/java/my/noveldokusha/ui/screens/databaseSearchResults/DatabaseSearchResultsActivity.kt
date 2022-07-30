@@ -14,10 +14,11 @@ import my.noveldokusha.R
 import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.ui.screens.databaseBookInfo.DatabaseBookInfoActivity
 import my.noveldokusha.ui.theme.Theme
+import my.noveldokusha.uiViews.BooksVerticalView
 import my.noveldokusha.utils.Extra_String
 import my.noveldokusha.utils.Extra_StringArrayList
+import my.noveldokusha.utils.capitalize
 import my.noveldokusha.utils.copyToClipboard
-import my.noveldokusha.uiViews.BooksVerticalView
 import java.util.*
 import javax.inject.Inject
 

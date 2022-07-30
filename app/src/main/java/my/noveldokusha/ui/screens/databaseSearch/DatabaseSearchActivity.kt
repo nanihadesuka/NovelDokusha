@@ -14,10 +14,10 @@ import my.noveldokusha.R
 import my.noveldokusha.ui.screens.databaseSearchResults.DatabaseSearchResultsActivity
 import my.noveldokusha.ui.theme.Theme
 import my.noveldokusha.utils.Extra_String
+import my.noveldokusha.utils.capitalize
 import my.noveldokusha.utils.colorAttrRes
 import java.util.*
 import javax.inject.Inject
-import kotlin.collections.ArrayList
 
 @AndroidEntryPoint
 class DatabaseSearchActivity : ComponentActivity() {

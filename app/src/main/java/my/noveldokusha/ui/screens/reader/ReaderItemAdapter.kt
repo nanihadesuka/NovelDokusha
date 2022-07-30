@@ -15,7 +15,6 @@ import my.noveldokusha.databinding.*
 import my.noveldokusha.ui.screens.reader.tools.FontsLoader
 import my.noveldokusha.utils.inflater
 import java.io.File
-import java.util.ArrayList
 
 class ReaderItemAdapter(
     val ctx: Context,

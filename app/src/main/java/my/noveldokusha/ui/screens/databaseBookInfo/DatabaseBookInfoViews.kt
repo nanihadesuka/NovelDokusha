@@ -117,7 +117,7 @@ fun DatabaseBookInfoView(
                     modifier = Modifier
                         .align(Alignment.CenterHorizontally)
                         .padding(top = 8.dp),
-                    outterPadding = 0.dp
+                    outerPadding = 0.dp
                 )
             }
         }
@@ -140,7 +140,7 @@ fun DatabaseBookInfoView(
                 for (author in data.authors) MyButton(
                     text = author.name,
                     enabled = author.url != null,
-                    outterPadding = 0.dp,
+                    outerPadding = 0.dp,
                     onClick = { onAuthorsClick(author) }
                 )
             }
@@ -151,7 +151,7 @@ fun DatabaseBookInfoView(
             Title(stringResource(R.string.genres))
             MyButton(
                 text = data.genres.joinToString(" · "),
-                outterPadding = 0.dp,
+                outerPadding = 0.dp,
                 onClick = { onGenresClick(data.genres) }
             )
 
@@ -167,7 +167,7 @@ fun DatabaseBookInfoView(
                 for (book in data.relatedBooks) MyButton(
                     text = book.title,
                     onClick = { onBookClick(book) },
-                    outterPadding = 0.dp,
+                    outerPadding = 0.dp,
                     modifier = Modifier
                         .fillMaxWidth()
                 )
@@ -182,7 +182,7 @@ fun DatabaseBookInfoView(
                 for (book in data.similarRecommended) MyButton(
                     text = book.title,
                     onClick = { onBookClick(book) },
-                    outterPadding = 0.dp,
+                    outerPadding = 0.dp,
                     modifier = Modifier
                         .fillMaxWidth()
                 )

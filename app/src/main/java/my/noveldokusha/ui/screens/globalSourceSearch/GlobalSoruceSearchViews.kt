@@ -1,6 +1,5 @@
 package my.noveldokusha.ui.screens.globalSourceSearch
 
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -29,6 +28,8 @@ import my.noveldokusha.ui.theme.ImageBorderRadius
 import my.noveldokusha.ui.theme.InternalTheme
 import my.noveldokusha.uiViews.ImageView
 import my.noveldokusha.uiViews.ListLoadWatcher
+import my.noveldokusha.utils.capitalize
+import java.util.*
 
 @Composable
 fun GlobalSourceSearchView(
@@ -40,7 +41,7 @@ fun GlobalSourceSearchView(
     ) {
         items(listSources) { entry ->
             Text(
-                text = entry.source.name.capitalize(),
+                text = entry.source.name.capitalize(Locale.ROOT),
                 style = MaterialTheme.typography.h6,
                 modifier = Modifier.padding(vertical = 4.dp, horizontal = 8.dp)
             )
@@ -56,7 +57,6 @@ fun GlobalSourceSearchView(
     }
 }
 
-@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun SourceListView(
     list: List<BookMetadata>,

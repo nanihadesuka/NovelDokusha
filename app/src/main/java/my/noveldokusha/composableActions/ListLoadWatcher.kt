@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.filter
 import my.noveldokusha.scraper.IteratorState
 
-@FlowPreview
+@OptIn(FlowPreview::class)
 @Composable
 fun ListLoadWatcher(
     listState: LazyListState,

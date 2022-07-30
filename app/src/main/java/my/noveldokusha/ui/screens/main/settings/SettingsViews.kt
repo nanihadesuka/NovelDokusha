@@ -106,8 +106,8 @@ private fun SettingsTheme(
                         onClick = { onThemeSelected(theme) },
                         textAlign = TextAlign.Center,
                         modifier = Modifier.weight(1f),
-                        outterPadding = 0.dp
-                    ) { _, _, _ ->
+                        outerPadding = 0.dp
+                    ) { _, _, _, _ ->
                         val textColor = when (currentTheme == theme) {
                             true -> Color.White
                             false -> MaterialTheme.colors.onPrimary

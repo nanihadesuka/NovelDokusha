@@ -249,7 +249,7 @@ private fun Button(
     MyButton(
         text = text,
         onClick = onClick,
-        outterPadding = 0.dp,
+        outerPadding = 0.dp,
         backgroundColor = MaterialTheme.colors.primary,
         modifier = Modifier.fillMaxWidth(),
         textStyle = LocalTextStyle.current.copy(fontWeight = FontWeight.Bold)

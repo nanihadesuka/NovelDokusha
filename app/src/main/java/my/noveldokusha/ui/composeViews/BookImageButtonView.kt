@@ -1,6 +1,5 @@
 package my.noveldokusha.uiViews
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -33,7 +32,7 @@ fun BookImageButtonView(
         radius = ImageBorderRadius,
         borderWidth = 0.dp,
         modifier = Modifier.fillMaxWidth()
-    ) { _, radius, _ ->
+    ) { _, radius, _, _ ->
         Box(
             Modifier
                 .fillMaxWidth()

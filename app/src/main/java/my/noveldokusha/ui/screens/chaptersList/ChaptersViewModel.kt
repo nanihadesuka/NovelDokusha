@@ -1,19 +1,21 @@
 package my.noveldokusha.ui.screens.chaptersList
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import androidx.compose.runtime.*
-import androidx.lifecycle.*
+import androidx.lifecycle.SavedStateHandle
+import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
-import my.noveldokusha.*
+import my.noveldokusha.AppPreferences
 import my.noveldokusha.R
-import my.noveldokusha.data.database.tables.Book
 import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.data.ChapterWithContext
 import my.noveldokusha.data.Repository
+import my.noveldokusha.data.database.tables.Book
 import my.noveldokusha.scraper.Response
 import my.noveldokusha.scraper.downloadBookCoverImageUrl
 import my.noveldokusha.scraper.downloadBookDescription
@@ -51,6 +53,7 @@ data class BookDataView(
     )
 }
 
+@OptIn(FlowPreview::class)
 @HiltViewModel
 class ChaptersViewModel @Inject constructor(
     private val repository: Repository,

@@ -3,6 +3,7 @@ package my.noveldokusha.scraper.sources
 import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.data.ChapterMetadata
 import my.noveldokusha.scraper.*
+import my.noveldokusha.utils.capitalize
 import org.jsoup.nodes.Document
 import java.net.URLDecoder
 import java.util.*

@@ -10,7 +10,7 @@ import androidx.core.content.ContextCompat
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.actor
-import my.noveldokusha.*
+import my.noveldokusha.R
 import my.noveldokusha.data.Repository
 import my.noveldokusha.data.database.tables.Book
 import my.noveldokusha.scraper.Response
@@ -20,6 +20,7 @@ import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import javax.inject.Inject
 
 @AndroidEntryPoint
+@OptIn(ObsoleteCoroutinesApi::class)
 class LibraryUpdateService : Service()
 {
     @Inject

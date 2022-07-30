@@ -36,7 +36,6 @@ import my.noveldokusha.ui.composeViews.ToolbarModeSearch
 import my.noveldokusha.uiViews.AnimatedTransition
 import my.noveldokusha.uiViews.MyButton
 
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun CheckBoxCategory(
     state: ToggleableState,

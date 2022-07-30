@@ -105,7 +105,7 @@
 	<string name="search_chapter_title">Pesquisar título do capítulo</string>
     <string name="settings_translations_models_main_description">Baixe os modelos de idiomas desejados para traduzir romances em tempo real</string>
 	<string name="settings_title_translation_models">Modelos de tradução ao vivo</string>
-    <string name="translating_from_lang_a_to_lang_b">Traduzindo de %s para %s</string>
+    <string name="translating_from_lang_a_to_lang_b">Traduzindo de %1$s para %2$s</string>
     <string name="language_source_empty_text">Fonte</string>
 	<string name="language_target_empty_text">Alvo</string>
     <string name="language_clear_selection">Limpar seleção</string>

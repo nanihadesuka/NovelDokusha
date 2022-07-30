@@ -45,7 +45,7 @@ fun onDoBackup(): () -> Unit
     }
 
     val fileExplorer = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.CreateDocument(),
+        contract = ActivityResultContracts.CreateDocument("*/*"),
         onResult = {
             if (it != null) BackupDataService.start(
                 ctx = context,
