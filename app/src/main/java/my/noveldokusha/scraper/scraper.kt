@@ -1,6 +1,6 @@
 package my.noveldokusha.scraper
 
-import BoxNovel
+import my.noveldokusha.scraper.sources.BoxNovel
 import my.noveldokusha.scraper.databases.BakaUpdates
 import my.noveldokusha.scraper.databases.NovelUpdates
 import my.noveldokusha.scraper.sources.*

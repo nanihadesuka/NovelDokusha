@@ -1,3 +1,5 @@
+package my.noveldokusha.scraper.sources
+
 import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.data.ChapterMetadata
 import my.noveldokusha.scraper.*
@@ -6,7 +8,7 @@ import org.jsoup.nodes.Document
 class BoxNovel : SourceInterface.Catalog {
     override val name = "Box Novel"
     override val baseUrl = "https://boxnovel.com/"
-    override val catalogUrl = "https://boxnovel.com/novel/?m_orderby=alphabet"
+    override val catalogUrl = "https://boxnovelA.com/novel/?m_orderby=alphabet"
     override val language = "English"
 
     override suspend fun getBookCoverImageUrl(doc: Document): String? {
