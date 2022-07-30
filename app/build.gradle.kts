@@ -95,18 +95,15 @@ android {
             dimension = "dependencies"
             dependencies {
                 // Needed to have the Task -> await extension.
-                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.6.4")
+                fullImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.6.4")
 
                 // Android ML Translation Kit
-                implementation("com.google.mlkit:translate:17.0.0")
+                fullImplementation("com.google.mlkit:translate:17.0.0")
             }
         }
 
         create("foss") {
             dimension = "dependencies"
-            dependencies {
-
-            }
         }
     }
 
@@ -116,9 +113,13 @@ android {
     }
 }
 
-dependencies {
+fun DependencyHandler.`fullImplementation`(dependencyNotation: Any): Dependency? =
+    add("fullImplementation", dependencyNotation)
 
-    implementation(fileTree("libs") { include("*.jar") })
+fun DependencyHandler.`fossImplementation`(dependencyNotation: Any): Dependency? =
+    add("fossImplementation", dependencyNotation)
+
+dependencies {
 
     // Kotlin
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
