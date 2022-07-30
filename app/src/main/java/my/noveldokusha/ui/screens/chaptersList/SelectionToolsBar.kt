@@ -8,9 +8,9 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.GridCells
-import androidx.compose.foundation.lazy.LazyGridScope
-import androidx.compose.foundation.lazy.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyGridScope
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -22,7 +22,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import my.noveldokusha.R
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun SelectionToolsBar(
     onDeleteDownload: () -> Unit,
@@ -57,7 +56,7 @@ fun SelectionToolsBar(
     }
 
     LazyVerticalGrid(
-        cells = GridCells.Fixed(4),
+        columns = GridCells.Fixed(4),
         horizontalArrangement = Arrangement.Center,
         modifier = modifier
             .shadow(6.dp)

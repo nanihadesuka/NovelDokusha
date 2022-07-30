@@ -9,7 +9,9 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.asLiveData
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.drop
-import my.noveldokusha.*
+import my.noveldokusha.AppModule
+import my.noveldokusha.AppPreferences
+import my.noveldokusha.R
 import my.noveldokusha.utils.toast
 
 @AndroidEntryPoint
@@ -53,6 +55,7 @@ open class BaseActivity : AppCompatActivity()
         startActivityForResult(intent, requestCode)
     }
 
+    @Deprecated("Deprecated in Java")
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?)
     {
         super.onActivityResult(requestCode, resultCode, data)

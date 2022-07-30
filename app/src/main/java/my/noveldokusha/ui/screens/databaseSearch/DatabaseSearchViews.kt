@@ -7,9 +7,9 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.GridCells
-import androidx.compose.foundation.lazy.LazyVerticalGrid
-import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -29,10 +29,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import my.noveldokusha.R
+import my.noveldokusha.ui.composeViews.ToolbarModeSearch
 import my.noveldokusha.ui.screens.sourceCatalog.ToolbarMode
 import my.noveldokusha.ui.theme.InternalTheme
 import my.noveldokusha.ui.theme.Themes
-import my.noveldokusha.ui.composeViews.ToolbarModeSearch
 import my.noveldokusha.uiViews.AnimatedTransition
 import my.noveldokusha.uiViews.MyButton
 
@@ -104,7 +104,7 @@ fun SearchGenres(
         )
 
         LazyVerticalGrid(
-            cells = GridCells.Fixed(2),
+            columns = GridCells.Fixed(2),
             contentPadding = PaddingValues(bottom = 200.dp)
         ) {
             itemsIndexed(list) { index, it ->

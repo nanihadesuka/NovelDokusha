@@ -1,13 +1,18 @@
 package my.noveldokusha.ui.screens.sourceCatalog
 
-import androidx.compose.foundation.*
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.*
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -23,9 +28,9 @@ import my.noveldokusha.AppPreferences
 import my.noveldokusha.R
 import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.scraper.IteratorState
+import my.noveldokusha.ui.composeViews.BooksVerticalGridView
 import my.noveldokusha.ui.theme.ColorAccent
 import my.noveldokusha.ui.theme.InternalTheme
-import my.noveldokusha.uiViews.BooksVerticalGridView
 import my.noveldokusha.uiViews.BooksVerticalListView
 
 enum class ToolbarMode { MAIN, SEARCH }
@@ -162,7 +167,6 @@ fun OptionsDropDown(
 @Preview
 @Composable
 fun PreviewList() {
-    val state = rememberLazyListState()
     InternalTheme {
         BooksVerticalListView(
             list = (1..10).map { BookMetadata("Book $it", "url") },
@@ -171,7 +175,7 @@ fun PreviewList() {
             onLoadNext = {},
             onBookClicked = {},
             onBookLongClicked = {},
-            listState = state
+            listState = rememberLazyListState()
         )
     }
 }
@@ -180,7 +184,6 @@ fun PreviewList() {
 @Preview
 @Composable
 fun PreviewGrid() {
-    val state = rememberLazyListState()
     InternalTheme {
         BooksVerticalGridView(
             cells = GridCells.Fixed(2),
@@ -190,7 +193,7 @@ fun PreviewGrid() {
             onLoadNext = {},
             onBookClicked = {},
             onBookLongClicked = {},
-            listState = state
+            listState = rememberLazyGridState()
         )
     }
 }

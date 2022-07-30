@@ -1,12 +1,11 @@
 package my.noveldokusha.ui.screens.main.library
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.GridCells
-import androidx.compose.foundation.lazy.LazyVerticalGrid
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -30,8 +29,8 @@ import my.noveldokusha.R
 import my.noveldokusha.data.BookWithContext
 import my.noveldokusha.services.LibraryUpdateService
 import my.noveldokusha.ui.theme.ColorAccent
-import my.noveldokusha.utils.toast
 import my.noveldokusha.uiViews.BookImageButtonView
+import my.noveldokusha.utils.toast
 
 @OptIn(ExperimentalPagerApi::class)
 @Composable
@@ -39,13 +38,12 @@ fun LibraryBody(
     tabs: List<String>,
     onBookClick: (BookWithContext) -> Unit,
     onBookLongClick: (BookWithContext) -> Unit
-)
-{
+) {
     val viewModel = viewModel<LibraryPageViewModel>()
     val pagerState = rememberPagerState()
     val scope = rememberCoroutineScope()
     val pageIndex by remember {
-        derivedStateOf { pagerState.targetPage }
+        derivedStateOf { pagerState.currentPage }
     }
     val context = LocalContext.current
     val updateCompleted = rememberUpdatedState(newValue = pageIndex)
@@ -86,8 +84,7 @@ fun LibraryBody(
                 }
                 val list: List<BookWithContext> by remember {
                     derivedStateOf {
-                        when (showCompleted)
-                        {
+                        when (showCompleted) {
                             true -> viewModel.listCompleted
                             else -> viewModel.listReading
                         }
@@ -103,16 +100,14 @@ fun LibraryBody(
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun LibraryPageBody(
     list: List<BookWithContext>,
     onClick: (BookWithContext) -> Unit,
     onLongClick: (BookWithContext) -> Unit,
-)
-{
+) {
     LazyVerticalGrid(
-        cells = GridCells.Fixed(2),
+        columns = GridCells.Fixed(2),
         contentPadding = PaddingValues(top = 4.dp, bottom = 400.dp, start = 4.dp, end = 4.dp)
     ) {
         items(list) {
@@ -145,8 +140,7 @@ fun ToolbarMain(
     onOpenBottomSheetOptionsPress: () -> Unit,
     onOptionsDropDownPress: () -> Unit,
     onOptionsDropDownView: @Composable () -> Unit
-)
-{
+) {
     Row(
         horizontalArrangement = Arrangement.End,
         verticalAlignment = Alignment.CenterVertically,

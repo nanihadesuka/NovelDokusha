@@ -1,11 +1,13 @@
-package my.noveldokusha.uiViews
+package my.noveldokusha.ui.composeViews
 
-import androidx.compose.foundation.*
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.lazy.grid.*
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -14,12 +16,14 @@ import my.noveldokusha.R
 import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.scraper.IteratorState
 import my.noveldokusha.ui.theme.ColorAccent
+import my.noveldokusha.uiViews.BookImageButtonView
+import my.noveldokusha.uiViews.ErrorView
+import my.noveldokusha.uiViews.ListGridLoadWatcher
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun BooksVerticalGridView(
     list: List<BookMetadata>,
-    listState: LazyListState,
+    listState: LazyGridState,
     error: String?,
     loadState: IteratorState,
     cells: GridCells,
@@ -30,14 +34,14 @@ fun BooksVerticalGridView(
     onCopyError: (String) -> Unit = {}
 )
 {
-    ListLoadWatcher(
+    ListGridLoadWatcher(
         listState = listState,
         loadState = loadState,
         onLoadNext = onLoadNext
     )
 
     LazyVerticalGrid(
-        cells = cells,
+        columns = cells,
         state = listState,
         modifier = Modifier.fillMaxWidth(),
         contentPadding = PaddingValues(start = 4.dp, end = 4.dp, top = 0.dp, bottom = 260.dp)

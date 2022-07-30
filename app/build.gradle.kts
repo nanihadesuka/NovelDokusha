@@ -28,11 +28,15 @@ android {
 
     kotlinOptions {
         jvmTarget = JavaVersion.VERSION_1_8.toString()
-        freeCompilerArgs = freeCompilerArgs + "-opt-in=kotlin.RequiresOptIn"
+        freeCompilerArgs = freeCompilerArgs + listOf(
+            "-opt-in=kotlin.RequiresOptIn",
+            "-Xjvm-default=enable"
+        )
+
     }
 
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.1.1"
+        kotlinCompilerExtensionVersion = "1.2.0"
     }
 
     splits {
@@ -172,8 +176,8 @@ dependencies {
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
 
     // Dependency injection
-    implementation("com.google.dagger:hilt-android:2.43")
-    kapt("com.google.dagger:hilt-compiler:2.43")
+    implementation("com.google.dagger:hilt-android:2.43.1")
+    kapt("com.google.dagger:hilt-compiler:2.43.1")
 
     // HTML text extractor
     implementation("com.chimbori.crux:crux:3.8.1")
@@ -184,31 +188,39 @@ dependencies {
     //debugImplementation("com.squareup.leakcanary:leakcanary-android:2.7")
 
     // Jetpack compose
-    implementation("androidx.activity:activity-compose:1.5.0")
-    implementation("androidx.compose.material:material:1.1.1")
-    implementation("androidx.compose.animation:animation:1.1.1")
-    implementation("androidx.compose.ui:ui-tooling:1.1.1")
-    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.5.0")
-    implementation("androidx.compose.runtime:runtime-livedata:1.1.1")
+    implementation("androidx.activity:activity-compose:1.5.1")
+    implementation("androidx.compose.material:material:1.2.0")
+    implementation("androidx.compose.animation:animation:1.2.0")
+    implementation("androidx.compose.ui:ui-tooling:1.2.0")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.5.1")
+    implementation("androidx.compose.runtime:runtime-livedata:1.2.0")
     implementation("androidx.constraintlayout:constraintlayout-compose:1.0.1")
-    implementation("androidx.compose.material:material-icons-extended:1.1.1")
-    implementation("com.google.accompanist:accompanist-systemuicontroller:0.24.6-alpha")
-    implementation("com.google.accompanist:accompanist-swiperefresh:0.20.2")
-    implementation("com.google.accompanist:accompanist-insets:0.14.0")
-    implementation("com.google.accompanist:accompanist-pager:0.20.2")
-    implementation("com.google.accompanist:accompanist-pager-indicators:0.20.2")
+    implementation("androidx.compose.material:material-icons-extended:1.2.0")
+    implementation("com.google.accompanist:accompanist-systemuicontroller:0.25.0")
+    implementation("com.google.accompanist:accompanist-swiperefresh:0.25.0")
+    implementation("com.google.accompanist:accompanist-insets:0.25.0")
+    implementation("com.google.accompanist:accompanist-pager:0.25.0")
+    implementation("com.google.accompanist:accompanist-pager-indicators:0.25.0")
 
-    androidTestImplementation("androidx.compose.ui:ui-test-junit4:1.1.1")
+    androidTestImplementation("androidx.compose.ui:ui-test-junit4:1.2.0")
 
     // Coil for jetpack compose
     implementation("io.coil-kt:coil-compose:2.1.0")
 
     // Compose collapsing toolbar
-    implementation("me.onebone:toolbar-compose:2.3.3")
+    implementation("me.onebone:toolbar-compose:2.3.4")
 
     // Compose scroll bar
     implementation("com.github.nanihadesuka:LazyColumnScrollbar:1.5.1")
 
     // Logging
     implementation("com.jakewharton.timber:timber:5.0.1")
+}
+
+kapt {
+    correctErrorTypes = true
+}
+
+hilt {
+    enableAggregatingTask = true
 }
