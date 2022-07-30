@@ -34,6 +34,13 @@ android {
         kotlinCompilerExtensionVersion = "1.1.1"
     }
 
+    splits {
+        abi {
+            isEnable = true
+            isUniversalApk = true
+        }
+    }
+
     defaultConfig {
         applicationId = "my.noveldokusha"
         minSdk = 26
@@ -94,7 +101,7 @@ android {
             }
         }
 
-        create(   "foss") {
+        create("foss") {
             dimension = "dependencies"
             dependencies {
 
