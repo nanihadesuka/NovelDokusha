@@ -113,10 +113,10 @@ android {
     }
 }
 
-fun DependencyHandler.`fullImplementation`(dependencyNotation: Any): Dependency? =
+fun DependencyHandler.fullImplementation(dependencyNotation: Any): Dependency? =
     add("fullImplementation", dependencyNotation)
 
-fun DependencyHandler.`fossImplementation`(dependencyNotation: Any): Dependency? =
+fun DependencyHandler.fossImplementation(dependencyNotation: Any): Dependency? =
     add("fossImplementation", dependencyNotation)
 
 dependencies {
@@ -128,15 +128,15 @@ dependencies {
 
 
     // Room components
-    implementation("androidx.room:room-runtime:2.4.2")
-    implementation("androidx.room:room-ktx:2.4.2")
-    kapt("androidx.room:room-compiler:2.4.2")
-    androidTestImplementation("androidx.room:room-testing:2.4.2")
+    implementation("androidx.room:room-runtime:2.4.3")
+    implementation("androidx.room:room-ktx:2.4.3")
+    kapt("androidx.room:room-compiler:2.4.3")
+    androidTestImplementation("androidx.room:room-testing:2.4.3")
 
     // Lifecycle components
-    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.5.0")
-    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.5.0")
-    implementation("androidx.lifecycle:lifecycle-common-java8:2.5.0")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.5.1")
+    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.5.1")
+    implementation("androidx.lifecycle:lifecycle-common-java8:2.5.1")
     implementation("androidx.coordinatorlayout:coordinatorlayout:1.2.0")
 
     // Preferences
@@ -145,10 +145,10 @@ dependencies {
     // UI
     implementation("androidx.appcompat:appcompat:1.4.2")
     implementation("androidx.core:core-ktx:1.9.0-alpha05")
-    implementation("androidx.navigation:navigation-fragment-ktx:2.5.0")
-    implementation("androidx.navigation:navigation-ui-ktx:2.5.0")
-    implementation("androidx.activity:activity-ktx:1.5.0")
-    implementation("androidx.fragment:fragment-ktx:1.5.0")
+    implementation("androidx.navigation:navigation-fragment-ktx:2.5.1")
+    implementation("androidx.navigation:navigation-ui-ktx:2.5.1")
+    implementation("androidx.activity:activity-ktx:1.5.1")
+    implementation("androidx.fragment:fragment-ktx:1.5.1")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
     implementation("androidx.recyclerview:recyclerview:1.2.1")
     implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
