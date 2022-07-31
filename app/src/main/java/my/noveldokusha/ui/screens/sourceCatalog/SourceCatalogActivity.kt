@@ -8,11 +8,8 @@ import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.layout.Column
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
@@ -57,7 +54,8 @@ class SourceCatalogActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         setContent {
-            val focusRequester = rememberSaveable { FocusRequester() }
+
+            val focusRequester = remember { FocusRequester() }
             val focusManager by rememberUpdatedState(newValue = LocalFocusManager.current)
             var optionsExpanded by rememberSaveable { mutableStateOf(false) }
 
