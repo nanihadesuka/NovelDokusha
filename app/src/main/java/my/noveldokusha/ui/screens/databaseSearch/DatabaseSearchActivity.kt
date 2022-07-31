@@ -49,7 +49,8 @@ class DatabaseSearchActivity : ComponentActivity() {
                     searchText = viewModel.searchText,
                     genresList = viewModel.genresList,
                     onTitleSearchClick = ::openSearchPageByTitle,
-                    onGenreSearchClick = ::openSearchPageByGenres
+                    onGenreSearchClick = ::openSearchPageByGenres,
+                    onSearchTextChange = { viewModel.searchText = it }
                 )
             }
         }

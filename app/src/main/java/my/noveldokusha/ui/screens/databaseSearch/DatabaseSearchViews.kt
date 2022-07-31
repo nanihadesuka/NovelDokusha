@@ -15,7 +15,6 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.graphics.Color
@@ -161,12 +160,13 @@ private fun ToolbarMain(
 }
 
 
-@OptIn(ExperimentalComposeUiApi::class, ExperimentalAnimationApi::class)
+@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun DatabaseSearchView(
     title: String,
     subtitle: String,
-    searchText: MutableState<String>,
+    searchText: String,
+    onSearchTextChange: (String) -> Unit,
     genresList: SnapshotStateList<GenreItem>,
     onTitleSearchClick: (text: String) -> Unit,
     onGenreSearchClick: () -> Unit,
@@ -188,11 +188,12 @@ fun DatabaseSearchView(
                 ToolbarMode.SEARCH -> ToolbarModeSearch(
                     focusRequester = focusRequester,
                     searchText = searchText,
+                    onSearchTextChange = onSearchTextChange,
                     onClose = {
                         focusManager.clearFocus()
                         toolbarMode = ToolbarMode.MAIN
                     },
-                    onTextDone = { onTitleSearchClick(searchText.value) },
+                    onTextDone = { onTitleSearchClick(searchText) },
                     placeholderText = stringResource(R.string.search_by_title),
                     topPadding = 8.dp,
                     height = 56.dp
@@ -233,12 +234,14 @@ fun PreviewView() {
             GenreItem("Action", "fn", ToggleableState.Off)
         )
     }
+    var searchText by remember { mutableStateOf("hero") }
 
     InternalTheme(Themes.LIGHT) {
         DatabaseSearchView(
             title = "Database",
             subtitle = "Baka-Updates",
-            searchText = remember { mutableStateOf("hero") },
+            searchText = searchText,
+            onSearchTextChange = { searchText = it },
             genresList = list,
             onTitleSearchClick = {},
             onGenreSearchClick = {}

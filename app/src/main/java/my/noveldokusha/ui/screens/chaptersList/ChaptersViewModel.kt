@@ -1,6 +1,5 @@
 package my.noveldokusha.ui.screens.chaptersList
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import androidx.compose.runtime.*
@@ -115,7 +114,7 @@ class ChaptersViewModel @Inject constructor(
     val selectedChaptersUrl = mutableStateMapOf<String, Unit>()
     val chaptersWithContext = mutableStateListOf<ChapterWithContext>()
     var isRefreshing by mutableStateOf(false)
-    val textSearch = mutableStateOf("")
+    var searchText by mutableStateOf("")
 
     init {
         viewModelScope.launch {
@@ -131,7 +130,7 @@ class ChaptersViewModel @Inject constructor(
                 }
                 // Filter the chapters if search is active
                 .combine(
-                    snapshotFlow { textSearch.value }
+                    snapshotFlow { searchText }
                         .debounce(500)
                         .flowOn(Dispatchers.Main)
                 ) { chapters, searchText ->

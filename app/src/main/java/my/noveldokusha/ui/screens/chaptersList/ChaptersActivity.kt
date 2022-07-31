@@ -44,11 +44,11 @@ import my.noveldokusha.R
 import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.data.ChapterWithContext
 import my.noveldokusha.scraper.scraper
+import my.noveldokusha.ui.composeViews.ToolbarModeSearch
 import my.noveldokusha.ui.screens.databaseSearchResults.DatabaseSearchResultsActivity
 import my.noveldokusha.ui.screens.reader.ReaderActivity
 import my.noveldokusha.ui.theme.ColorAccent
 import my.noveldokusha.ui.theme.Theme
-import my.noveldokusha.ui.composeViews.ToolbarModeSearch
 import my.noveldokusha.utils.Extra_String
 import my.noveldokusha.utils.toast
 import javax.inject.Inject
@@ -174,7 +174,8 @@ class ChaptersActivity : ComponentActivity() {
                         }
                         ToolbarMode.SEARCH -> ToolbarModeSearch(
                             focusRequester = focusRequester,
-                            searchText = viewModel.textSearch,
+                            searchText = viewModel.searchText,
+                            onSearchTextChange = { viewModel.searchText = it },
                             onClose = {
                                 focusManager.clearFocus()
                                 toolbarMode = ToolbarMode.MAIN

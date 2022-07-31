@@ -41,20 +41,18 @@ import my.noveldokusha.uiViews.MyButton
 import my.noveldokusha.utils.drawBottomLine
 
 @Composable
-fun FinderView()
-{
+fun FinderView() {
     val context by rememberUpdatedState(newValue = LocalContext.current)
     val viewModel = viewModel<FinderViewModel>()
     val title = stringResource(id = R.string.app_name)
-    val searchText = rememberSaveable { mutableStateOf("") }
+    var searchText by rememberSaveable { mutableStateOf("") }
     val focusRequester = remember { FocusRequester() }
     val toolbarMode = rememberSaveable { mutableStateOf(ToolbarMode.MAIN) }
     var languagesOptionsExpanded by remember { mutableStateOf(false) }
     val focusManager by rememberUpdatedState(newValue = LocalFocusManager.current)
 
     Column {
-        when (toolbarMode.value)
-        {
+        when (toolbarMode.value) {
             ToolbarMode.MAIN -> ToolbarMain(
                 title = title,
                 onSearchPress = {
@@ -75,11 +73,14 @@ fun FinderView()
             ToolbarMode.SEARCH -> ToolbarModeSearch(
                 focusRequester = focusRequester,
                 searchText = searchText,
+                onSearchTextChange = {
+                    searchText = it
+                },
                 onClose = {
                     focusManager.clearFocus()
                     toolbarMode.value = ToolbarMode.MAIN
                 },
-                onTextDone = { context.goToGlobalSearch(searchText.value) },
+                onTextDone = { context.goToGlobalSearch(searchText) },
                 placeholderText = stringResource(R.string.global_search),
                 showUnderline = true
             )
@@ -99,8 +100,7 @@ fun FinderBody(
     sourcesList: List<SourceInterface.Catalog>,
     onDatabaseClick: (DatabaseInterface) -> Unit,
     onSourceClick: (SourceInterface.Catalog) -> Unit
-)
-{
+) {
     LazyColumn(
         contentPadding = PaddingValues(start = 8.dp, end = 8.dp, bottom = 200.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -147,8 +147,7 @@ fun ToolbarMain(
     onSearchPress: () -> Unit,
     onLanguagesOptionsPress: () -> Unit,
     languagesDropDownView: @Composable () -> Unit
-)
-{
+) {
     Row(
         horizontalArrangement = Arrangement.End,
         verticalAlignment = Alignment.CenterVertically,
@@ -187,8 +186,7 @@ fun LanguagesDropDown(
     list: List<LanguagesActive>,
     onDismiss: () -> Unit,
     onToggleLanguage: (LanguagesActive) -> Unit
-)
-{
+) {
     @Composable
     fun colorBackground(active: Boolean) =
         if (active) ColorAccent else MaterialTheme.colors.surface
@@ -244,8 +242,7 @@ fun LanguagesDropDown(
 private fun Button(
     text: String,
     onClick: () -> Unit,
-)
-{
+) {
     MyButton(
         text = text,
         onClick = onClick,
@@ -258,8 +255,7 @@ private fun Button(
 
 @Preview
 @Composable
-fun PreviewView()
-{
+fun PreviewView() {
     InternalTheme {
         FinderBody(
             databasesList = scraper.databasesList.toList(),
@@ -270,22 +266,19 @@ fun PreviewView()
     }
 }
 
-private fun Context.goToSourceCatalog(source: SourceInterface.Catalog)
-{
+private fun Context.goToSourceCatalog(source: SourceInterface.Catalog) {
     SourceCatalogActivity
         .IntentData(this, sourceBaseUrl = source.baseUrl)
         .let(::startActivity)
 }
 
-private fun Context.goToDatabaseSearch(database: DatabaseInterface)
-{
+private fun Context.goToDatabaseSearch(database: DatabaseInterface) {
     DatabaseSearchActivity
         .IntentData(this, databaseBaseUrl = database.baseUrl)
         .let(::startActivity)
 }
 
-private fun Context.goToGlobalSearch(text: String)
-{
+private fun Context.goToGlobalSearch(text: String) {
     GlobalSourceSearchActivity
         .IntentData(this, text)
         .let(::startActivity)

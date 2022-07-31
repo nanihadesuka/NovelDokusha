@@ -5,10 +5,14 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.material.*
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
@@ -29,7 +33,8 @@ import my.noveldokusha.utils.ifCase
 @Composable
 fun ToolbarModeSearch(
     focusRequester: FocusRequester,
-    searchText: MutableState<String>,
+    searchText: String,
+    onSearchTextChange: (String) -> Unit,
     onClose: () -> Unit,
     onTextDone: (String) -> Unit,
     color: Color = MaterialTheme.colors.surface,
@@ -67,8 +72,8 @@ fun ToolbarModeSearch(
         IconButton(onClick = { }, enabled = false) {}
 
         BasicTextField(
-            value = searchText.value,
-            onValueChange = { searchText.value = it },
+            value = searchText,
+            onValueChange = onSearchTextChange,
             singleLine = true,
             maxLines = 1,
             textStyle = MaterialTheme.typography.h6.copy(
@@ -77,10 +82,10 @@ fun ToolbarModeSearch(
             ),
             cursorBrush = SolidColor(ColorAccent),
             keyboardActions = KeyboardActions(
-                onDone = { onTextDone(searchText.value) }
+                onDone = { onTextDone(searchText) }
             ),
             decorationBox = {
-                if (searchText.value.isBlank()) Text(
+                if (searchText.isBlank()) Text(
                     text = placeholderText,
                     style = MaterialTheme.typography.h6.copy(
                         color = MaterialTheme.colors.onPrimary.copy(alpha = 0.3f)
@@ -93,8 +98,8 @@ fun ToolbarModeSearch(
         )
 
         IconButton(onClick = {
-            if (searchText.value.isBlank()) onClose()
-            else searchText.value = ""
+            if (searchText.isBlank()) onClose()
+            else onSearchTextChange("")
         }) {
             Icon(
                 Icons.Default.Close,

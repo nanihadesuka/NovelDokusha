@@ -8,9 +8,11 @@ import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.runtime.*
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
@@ -55,23 +57,22 @@ class SourceCatalogActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         setContent {
-            val searchText = rememberSaveable { mutableStateOf("") }
-            val focusRequester = remember { FocusRequester() }
+            val focusRequester = rememberSaveable { FocusRequester() }
             val focusManager by rememberUpdatedState(newValue = LocalFocusManager.current)
-            var toolbarMode by rememberSaveable { mutableStateOf(ToolbarMode.MAIN) }
-            val state = rememberLazyListState()
-            var optionsExpanded by remember { mutableStateOf(false) }
+            var optionsExpanded by rememberSaveable { mutableStateOf(false) }
 
             Theme(appPreferences = appPreferences) {
                 Column {
-                    AnimatedTransition(targetState = toolbarMode) { target ->
+                    AnimatedTransition(targetState = viewModel.toolbarMode) { target ->
                         when (target) {
                             ToolbarMode.MAIN -> ToolbarMain(
                                 title = stringResource(R.string.catalog),
                                 subtitle = viewModel.source.name.capitalize(Locale.ROOT),
                                 onOpenSourceWebPage = ::openSourceWebPage,
                                 onPressMoreOptions = { optionsExpanded = !optionsExpanded },
-                                onPressSearchForTitle = { toolbarMode = ToolbarMode.SEARCH },
+                                onPressSearchForTitle = {
+                                    viewModel.toolbarMode = ToolbarMode.SEARCH
+                                },
                                 optionsDropDownView = {
                                     OptionsDropDown(
                                         expanded = optionsExpanded,
@@ -85,21 +86,22 @@ class SourceCatalogActivity : ComponentActivity() {
                             )
                             ToolbarMode.SEARCH -> ToolbarModeSearch(
                                 focusRequester = focusRequester,
-                                searchText = searchText,
+                                searchText = viewModel.searchText,
                                 onClose = {
                                     focusManager.clearFocus()
-                                    toolbarMode = ToolbarMode.MAIN
+                                    viewModel.toolbarMode = ToolbarMode.MAIN
                                     viewModel.startCatalogListMode()
                                 },
-                                onTextDone = { viewModel.startCatalogSearchMode(searchText.value) },
-                                placeholderText = stringResource(R.string.search_by_title)
+                                onTextDone = { viewModel.startCatalogSearchMode(viewModel.searchText) },
+                                placeholderText = stringResource(R.string.search_by_title),
+                                onSearchTextChange = { viewModel.searchText = it }
                             )
                         }
                     }
                     BooksVerticalView(
                         layoutMode = viewModel.listLayout,
                         list = viewModel.fetchIterator.list,
-                        listState = state,
+                        listState = viewModel.listState,
                         error = viewModel.fetchIterator.error,
                         loadState = viewModel.fetchIterator.state,
                         onLoadNext = { viewModel.fetchIterator.fetchNext() },

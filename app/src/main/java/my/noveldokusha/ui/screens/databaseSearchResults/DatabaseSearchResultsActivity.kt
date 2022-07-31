@@ -7,7 +7,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import dagger.hilt.android.AndroidEntryPoint
 import my.noveldokusha.AppPreferences
 import my.noveldokusha.R
@@ -75,7 +75,7 @@ class DatabaseSearchResultsActivity : ComponentActivity() {
                     BooksVerticalView(
                         layoutMode = viewModel.listLayout,
                         list = viewModel.fetchIterator.list,
-                        listState = rememberLazyListState(),
+                        listState = rememberLazyGridState(),
                         error = viewModel.fetchIterator.error,
                         loadState = viewModel.fetchIterator.state,
                         onLoadNext = { viewModel.fetchIterator.fetchNext() },
