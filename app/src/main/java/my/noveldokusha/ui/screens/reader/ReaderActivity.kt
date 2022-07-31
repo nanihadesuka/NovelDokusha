@@ -156,7 +156,7 @@ class ReaderActivity : BaseActivity() {
                     visible = viewModel.showReaderInfoView,
                     onTextFontChanged = { appPreferences.READER_FONT_FAMILY.value = it },
                     onTextSizeChanged = { appPreferences.READER_FONT_SIZE.value = it },
-                    liveTranslationSettingData = viewModel.liveTranslationSettingData,
+                    liveTranslationSettingData = viewModel.liveTranslationSettingState,
                 )
             }
         }

@@ -12,6 +12,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import my.noveldokusha.data.Repository
 import my.noveldokusha.data.database.AppDatabase
+import my.noveldokusha.tools.TranslationManager
+import my.noveldokusha.ui.screens.reader.tools.LiveTranslation
 import javax.inject.Singleton
 
 @InstallIn(SingletonComponent::class)
@@ -42,4 +44,13 @@ object AppModule {
     fun provideAppCoroutineScope(): CoroutineScope {
         return CoroutineScope(SupervisorJob() + Dispatchers.Main + CoroutineName("App"))
     }
+
+    @Provides
+    fun provideLiveTranslation(
+        translationManager: TranslationManager,
+        appPreferences: AppPreferences,
+    ): LiveTranslation {
+        return LiveTranslation(translationManager, appPreferences)
+    }
+
 }

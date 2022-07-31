@@ -13,11 +13,9 @@ import kotlinx.coroutines.launch
 import my.noveldokusha.AppPreferences
 import my.noveldokusha.data.Repository
 import my.noveldokusha.data.database.tables.Chapter
-import my.noveldokusha.tools.TranslationManager
-import my.noveldokusha.tools.TranslationModelState
-import my.noveldokusha.tools.TranslatorState
 import my.noveldokusha.ui.BaseViewModel
 import my.noveldokusha.ui.screens.reader.tools.ChaptersIsReadRoutine
+import my.noveldokusha.ui.screens.reader.tools.LiveTranslation
 import my.noveldokusha.ui.screens.reader.tools.saveLastReadPositionState
 import my.noveldokusha.utils.StateExtra_String
 import java.io.File
@@ -34,9 +32,9 @@ interface ReaderStateBundle {
 @HiltViewModel
 class ReaderViewModel @Inject constructor(
     private val repository: Repository,
-    private val state: SavedStateHandle,
+    state: SavedStateHandle,
     val appPreferences: AppPreferences,
-    private val translationManager: TranslationManager,
+    private val liveTranslation: LiveTranslation,
 ) : BaseViewModel(), ReaderStateBundle {
     enum class ReaderState { IDLE, LOADING, INITIAL_LOAD }
 
@@ -46,74 +44,18 @@ class ReaderViewModel @Inject constructor(
     override var bookUrl by StateExtra_String(state)
     override var chapterUrl by StateExtra_String(state)
 
-    var onTranslatorStateChanged: (() -> Unit)? = null
-
     val textFont by appPreferences.READER_FONT_FAMILY.state(viewModelScope)
     val textSize by appPreferences.READER_FONT_SIZE.state(viewModelScope)
 
-    var translator: TranslatorState? = null
-
-    val liveTranslationSettingData = LiveTranslationSettingData(
-        isAvailable = translationManager.available,
-        listOfAvailableModels = translationManager.models,
-        enable = mutableStateOf(appPreferences.GLOBAL_TRANSLATIOR_ENABLED.value),
-        source = mutableStateOf(null),
-        target = mutableStateOf(null),
-        onEnable = ::translatorOnEnable,
-        onSourceChange = ::translatorOnSourceChange,
-        onTargetChange = ::translatorOnTargetChange,
-        onDownloadTranslationModel = translationManager::downloadModel
-    )
-
-    private suspend fun getValidTranslatorOrNull(language: String): TranslationModelState? {
-        if (language.isBlank()) return null
-        return translationManager.hasModelDownloaded(language)
-    }
-
-    private fun updateLiveTranslation() {
-        val isEnabled = liveTranslationSettingData.enable.value
-        val source = liveTranslationSettingData.source.value
-        val target = liveTranslationSettingData.target.value
-        translator = if (
-            !isEnabled ||
-            source == null ||
-            target == null ||
-            source.language == target.language
-        ) {
-            if (translator == null) return
-            null
-        } else {
-            val old = translator
-            if (old != null && old.source == source.language && old.target == target.language)
-                return
-            translationManager.getTranslator(
-                source = source.language,
-                target = target.language
-            )
-        }
-        onTranslatorStateChanged?.invoke()
-    }
-
-    private fun translatorOnEnable(it: Boolean) {
-        liveTranslationSettingData.enable.value = it
-        appPreferences.GLOBAL_TRANSLATIOR_ENABLED.value = it
-        updateLiveTranslation()
-    }
-
-    private fun translatorOnSourceChange(it: TranslationModelState?) {
-        liveTranslationSettingData.source.value = it
-        appPreferences.GLOBAL_TRANSLATIOR_PREFERRED_SOURCE.value = it?.language ?: ""
-        updateLiveTranslation()
-    }
-
-    private fun translatorOnTargetChange(it: TranslationModelState?) {
-        liveTranslationSettingData.target.value = it
-        appPreferences.GLOBAL_TRANSLATIOR_PREFERRED_TARGET.value = it?.language ?: ""
-        updateLiveTranslation()
-    }
-
     val localBookBaseFolder =
         File(repository.settings.folderBooks, bookUrl.removePrefix("local://"))
+
+    var onTranslatorStateChanged by Delegates.observable(liveTranslation.onTranslatorChanged) { _, _, new ->
+        liveTranslation.onTranslatorChanged = new
+    }
+
+    val translator get() = liveTranslation.translator
+    val liveTranslationSettingState get() = liveTranslation.settingsState
 
     var currentChapter: ChapterState by Delegates.observable(
         ChapterState(
@@ -151,9 +93,7 @@ class ReaderViewModel @Inject constructor(
                 offset = chapter.await()?.lastReadOffset ?: 0
             )
             orderedChapters = bookChapters.await()
-            initLiveTranslation()
-            updateLiveTranslation()
-
+            liveTranslation.init()
         }
     }
 
@@ -163,13 +103,6 @@ class ReaderViewModel @Inject constructor(
 
     private val chaptersStats = mutableMapOf<String, ChapterStats>()
     private val initialLoadDone = AtomicBoolean(false)
-
-    private suspend fun initLiveTranslation() {
-        val source = appPreferences.GLOBAL_TRANSLATIOR_PREFERRED_SOURCE.value
-        val target = appPreferences.GLOBAL_TRANSLATIOR_PREFERRED_TARGET.value
-        liveTranslationSettingData.source.value = getValidTranslatorOrNull(source)
-        liveTranslationSettingData.target.value = getValidTranslatorOrNull(target)
-    }
 
     override fun onCleared() {
         saveLastReadPositionState(repository, bookUrl, currentChapter)
