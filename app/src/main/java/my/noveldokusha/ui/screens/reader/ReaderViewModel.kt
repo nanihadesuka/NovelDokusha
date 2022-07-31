@@ -126,7 +126,8 @@ class ReaderViewModel @Inject constructor(
     }
 
     var showReaderInfoView by mutableStateOf(false)
-    val orderedChapters: List<Chapter>
+    var orderedChapters: List<Chapter>
+        private set
 
     var readingPosStats by mutableStateOf<Pair<ChapterStats, Int>?>(null)
 
@@ -145,7 +146,7 @@ class ReaderViewModel @Inject constructor(
                 position = chapter.await()?.lastReadPosition ?: 0,
                 offset = chapter.await()?.lastReadOffset ?: 0
             )
-            this@ReaderViewModel.orderedChapters = bookChapters.await()
+            orderedChapters = bookChapters.await()
         }
     }
 
