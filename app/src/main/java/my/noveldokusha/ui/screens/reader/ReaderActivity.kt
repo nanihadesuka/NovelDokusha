@@ -96,7 +96,12 @@ class ReaderActivity : BaseActivity() {
             reloadReader()
         }
 
-        viewModel.initialLoad { loadInitialChapter() }
+        viewModel.initialLoad {
+            lifecycleScope.launch {
+                viewModel.initJob.join()
+                loadInitialChapter()
+            }
+        }
 
         viewBind.settings.setContent {
             Theme(

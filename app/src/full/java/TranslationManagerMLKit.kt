@@ -7,8 +7,11 @@ import com.google.mlkit.nl.translate.TranslateLanguage
 import com.google.mlkit.nl.translate.TranslateRemoteModel
 import com.google.mlkit.nl.translate.Translation
 import com.google.mlkit.nl.translate.TranslatorOptions
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.withContext
 import my.noveldokusha.tools.TranslationManager
 import my.noveldokusha.tools.TranslationModelState
 import my.noveldokusha.tools.TranslatorState
@@ -48,7 +51,7 @@ class TranslationManagerMLKit(
     }
 
 
-    override fun hasModelDownloadedSync(language: String) = runBlocking {
+    override suspend fun hasModelDownloaded(language: String) = withContext(Dispatchers.IO) {
         val model = TranslateRemoteModel.Builder(language).build()
         val isDownloaded = RemoteModelManager
             .getInstance()

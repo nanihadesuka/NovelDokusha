@@ -28,8 +28,7 @@ interface TranslationManager {
 
     val models: SnapshotStateList<TranslationModelState>
 
-    // TODO Should not use blocking code
-    fun hasModelDownloadedSync(language: String): TranslationModelState?
+    suspend fun hasModelDownloaded(language: String): TranslationModelState?
 
     /**
      * Doesn't check if the model has been downloaded. Must be externally guaranteed.

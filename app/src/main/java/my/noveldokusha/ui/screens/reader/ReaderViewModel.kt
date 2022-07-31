@@ -7,8 +7,9 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.launch
 import my.noveldokusha.AppPreferences
 import my.noveldokusha.data.Repository
 import my.noveldokusha.data.database.tables.Chapter
@@ -56,20 +57,20 @@ class ReaderViewModel @Inject constructor(
         isAvailable = translationManager.available,
         listOfAvailableModels = translationManager.models,
         enable = mutableStateOf(appPreferences.GLOBAL_TRANSLATIOR_ENABLED.value),
-        source = mutableStateOf(getValidTranslatorOrNull(appPreferences.GLOBAL_TRANSLATIOR_PREFERRED_SOURCE.value)),
-        target = mutableStateOf(getValidTranslatorOrNull(appPreferences.GLOBAL_TRANSLATIOR_PREFERRED_TARGET.value)),
+        source = mutableStateOf(null),
+        target = mutableStateOf(null),
         onEnable = ::translatorOnEnable,
         onSourceChange = ::translatorOnSourceChange,
         onTargetChange = ::translatorOnTargetChange,
         onDownloadTranslationModel = translationManager::downloadModel
     )
 
-    private fun getValidTranslatorOrNull(language: String): TranslationModelState? {
+    private suspend fun getValidTranslatorOrNull(language: String): TranslationModelState? {
         if (language.isBlank()) return null
-        return translationManager.hasModelDownloadedSync(language)
+        return translationManager.hasModelDownloaded(language)
     }
 
-    private fun updateTranslatorState() {
+    private fun updateLiveTranslation() {
         val isEnabled = liveTranslationSettingData.enable.value
         val source = liveTranslationSettingData.source.value
         val target = liveTranslationSettingData.target.value
@@ -96,19 +97,19 @@ class ReaderViewModel @Inject constructor(
     private fun translatorOnEnable(it: Boolean) {
         liveTranslationSettingData.enable.value = it
         appPreferences.GLOBAL_TRANSLATIOR_ENABLED.value = it
-        updateTranslatorState()
+        updateLiveTranslation()
     }
 
     private fun translatorOnSourceChange(it: TranslationModelState?) {
         liveTranslationSettingData.source.value = it
         appPreferences.GLOBAL_TRANSLATIOR_PREFERRED_SOURCE.value = it?.language ?: ""
-        updateTranslatorState()
+        updateLiveTranslation()
     }
 
     private fun translatorOnTargetChange(it: TranslationModelState?) {
         liveTranslationSettingData.target.value = it
         appPreferences.GLOBAL_TRANSLATIOR_PREFERRED_TARGET.value = it?.language ?: ""
-        updateTranslatorState()
+        updateLiveTranslation()
     }
 
     val localBookBaseFolder =
@@ -126,27 +127,33 @@ class ReaderViewModel @Inject constructor(
     }
 
     var showReaderInfoView by mutableStateOf(false)
-    var orderedChapters: List<Chapter>
+    var orderedChapters: List<Chapter> = listOf()
         private set
 
     var readingPosStats by mutableStateOf<Pair<ChapterStats, Int>?>(null)
 
+    var initJob: Job
+        private set
+
     init {
-        updateTranslatorState()
+        initJob = viewModelScope.launch {
 
-        val chapter =
-            viewModelScope.async(Dispatchers.IO) { repository.bookChapter.get(chapterUrl) }
-        val bookChapters =
-            viewModelScope.async(Dispatchers.IO) { repository.bookChapter.chapters(bookUrl) }
+            val chapter = viewModelScope.async(Dispatchers.IO) {
+                repository.bookChapter.get(chapterUrl)
+            }
+            val bookChapters = viewModelScope.async(Dispatchers.IO) {
+                repository.bookChapter.chapters(bookUrl)
+            }
 
-        // Need to fix this somehow
-        runBlocking {
             currentChapter = ChapterState(
                 url = chapterUrl,
                 position = chapter.await()?.lastReadPosition ?: 0,
                 offset = chapter.await()?.lastReadOffset ?: 0
             )
             orderedChapters = bookChapters.await()
+            initLiveTranslation()
+            updateLiveTranslation()
+
         }
     }
 
@@ -156,6 +163,13 @@ class ReaderViewModel @Inject constructor(
 
     private val chaptersStats = mutableMapOf<String, ChapterStats>()
     private val initialLoadDone = AtomicBoolean(false)
+
+    private suspend fun initLiveTranslation() {
+        val source = appPreferences.GLOBAL_TRANSLATIOR_PREFERRED_SOURCE.value
+        val target = appPreferences.GLOBAL_TRANSLATIOR_PREFERRED_TARGET.value
+        liveTranslationSettingData.source.value = getValidTranslatorOrNull(source)
+        liveTranslationSettingData.target.value = getValidTranslatorOrNull(target)
+    }
 
     override fun onCleared() {
         saveLastReadPositionState(repository, bookUrl, currentChapter)

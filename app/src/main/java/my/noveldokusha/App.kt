@@ -6,18 +6,15 @@ import java.io.File
 import javax.inject.Inject
 
 @HiltAndroidApp
-class App @Inject constructor() : Application()
-{
-    override fun onCreate()
-    {
+class App @Inject constructor() : Application() {
+    override fun onCreate() {
         _instance = this
         super.onCreate()
     }
 
-    companion object
-    {
-        private lateinit var _instance: App
-        val instance get() = _instance
-        val cacheDir: File get() = _instance.cacheDir
+    companion object {
+        private var _instance: App? = null
+        val instance get() = _instance!!
+        val cacheDir: File get() = instance.cacheDir
     }
 }

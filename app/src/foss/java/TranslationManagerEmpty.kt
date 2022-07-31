@@ -13,7 +13,7 @@ class TranslationManagerEmpty(
 
     override val available = false
     override val models = mutableStateListOf<TranslationModelState>()
-    override fun hasModelDownloadedSync(language: String) = null
+    override suspend fun hasModelDownloaded(language: String) = null
     override fun getTranslator(
         source: String,
         target: String
