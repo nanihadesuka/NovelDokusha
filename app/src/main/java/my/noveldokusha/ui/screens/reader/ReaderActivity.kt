@@ -82,7 +82,7 @@ class ReaderActivity : BaseActivity() {
     }
 
     override fun onDestroy() {
-        viewModel.onTranslatorStateChanged = null
+        viewModel.onTranslatorChanged = null
         super.onDestroy()
     }
 
@@ -92,7 +92,7 @@ class ReaderActivity : BaseActivity() {
 
         viewBind.listView.adapter = viewAdapter.listView
 
-        viewModel.onTranslatorStateChanged = {
+        viewModel.onTranslatorChanged = {
             reloadReader()
         }
 

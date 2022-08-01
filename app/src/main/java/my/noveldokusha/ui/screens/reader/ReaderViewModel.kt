@@ -50,12 +50,14 @@ class ReaderViewModel @Inject constructor(
     val localBookBaseFolder =
         File(repository.settings.folderBooks, bookUrl.removePrefix("local://"))
 
-    var onTranslatorStateChanged by Delegates.observable(liveTranslation.onTranslatorChanged) { _, _, new ->
-        liveTranslation.onTranslatorChanged = new
-    }
 
     val translator get() = liveTranslation.translator
     val liveTranslationSettingState get() = liveTranslation.settingsState
+    var onTranslatorChanged
+        get() = liveTranslation.onTranslatorChanged
+        set(value) {
+            liveTranslation.onTranslatorChanged = value
+        }
 
     var currentChapter: ChapterState by Delegates.observable(
         ChapterState(
