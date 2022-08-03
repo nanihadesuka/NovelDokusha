@@ -1,10 +1,9 @@
 package my.noveldokusha.scraper
 
-import net.dankito.readability4j.Readability4J
 import net.dankito.readability4j.extended.Readability4JExtended
+import org.jsoup.nodes.Document
 
-suspend fun downloadChapter(chapterUrl: String): Response<ChapterDownload>
-{
+suspend fun downloadChapter(chapterUrl: String): Response<ChapterDownload> {
     return tryConnect {
         val con = connect(chapterUrl)
             .timeout(30 * 1000)
@@ -34,16 +33,21 @@ suspend fun downloadChapter(chapterUrl: String): Response<ChapterDownload>
             return@tryConnect Response.Success(data)
         }
 
-        // If no predefined source is found try extracting text with Readability4J library
-        Readability4JExtended(realUrl, fetchDoc(realUrl)).parse().also { article ->
-            val content = article.articleContent ?: return@also
-            val data = ChapterDownload(
-                body = textExtractor.get(content),
-                title = article.title
-            )
-            return@tryConnect Response.Success(data)
+        // If no predefined source is found try extracting text with heuristic extraction
+        val chapter = heuristicChapterExtraction(realUrl, fetchDoc(realUrl))
+        return@tryConnect when (chapter) {
+            null -> Response.Error(error)
+            else -> Response.Success(chapter)
         }
+    }
+}
 
-        Response.Error(error)
+fun heuristicChapterExtraction(url: String, document: Document): ChapterDownload? {
+    Readability4JExtended(url, document).parse().also { article ->
+        val content = article.articleContent ?: return null
+        return ChapterDownload(
+            body = textExtractor.get(content),
+            title = article.title
+        )
     }
 }
