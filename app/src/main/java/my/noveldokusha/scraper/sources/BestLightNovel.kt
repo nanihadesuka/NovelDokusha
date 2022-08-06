@@ -1,11 +1,11 @@
 package my.noveldokusha.scraper.sources
 
-import android.net.Uri
 import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.data.ChapterMetadata
 import my.noveldokusha.scraper.*
 import org.jsoup.nodes.Document
 
+// ALL OK
 class BestLightNovel : SourceInterface.Catalog {
     override val name = "BestLightNovel"
     override val baseUrl = "https://bestlightnovel.com/"
@@ -25,7 +25,7 @@ class BestLightNovel : SourceInterface.Catalog {
             ?.attr("src")
     }
 
-    override suspend fun getBookDescripton(doc: Document): String? {
+    override suspend fun getBookDescription(doc: Document): String? {
         return doc.selectFirst("#noidungm")
             ?.let {
                 it.select("h2").remove()
@@ -51,7 +51,7 @@ class BestLightNovel : SourceInterface.Catalog {
                     add("state", "all")
                     add("page", page)
                 }
-            parseToBooks(url, index)
+            parseToBooks(fetchDoc(url), index)
         }
     }
 
@@ -67,12 +67,12 @@ class BestLightNovel : SourceInterface.Catalog {
                 .toUrlBuilderSafe()
                 .addPath("search_novels", input.replace(" ", "_"))
                 .ifCase(page != 1) { add("page", page) }
-            parseToBooks(url, index)
+            parseToBooks(fetchDoc(url), index)
         }
     }
 
-    suspend fun parseToBooks(url: Uri.Builder, index: Int): Response<PagedList<BookMetadata>> {
-        val doc = fetchDoc(url)
+    private fun parseToBooks(doc: Document, index: Int): Response<PagedList<BookMetadata>> {
+
         return doc.select(".update_item.list_category")
             .mapNotNull {
                 val link = it.selectFirst("a[href]") ?: return@mapNotNull null

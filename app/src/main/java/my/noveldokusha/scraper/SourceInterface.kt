@@ -4,8 +4,7 @@ import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.data.ChapterMetadata
 import org.jsoup.nodes.Document
 
-interface SourceInterface
-{
+interface SourceInterface {
     val name: String
     val baseUrl: String
 
@@ -16,13 +15,12 @@ interface SourceInterface
     suspend fun getChapterText(doc: Document): String? = null
 
     interface Base : SourceInterface
-    interface Catalog : SourceInterface
-    {
+    interface Catalog : SourceInterface {
         val catalogUrl: String
         val language: String
 
         suspend fun getBookCoverImageUrl(doc: Document): String? = null
-        suspend fun getBookDescripton(doc: Document): String? = null
+        suspend fun getBookDescription(doc: Document): String? = null
 
         /**
          * Chapters list ordered from first one (oldest) to newest one.

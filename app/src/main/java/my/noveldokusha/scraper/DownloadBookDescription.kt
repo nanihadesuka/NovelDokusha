@@ -16,7 +16,7 @@ suspend fun downloadBookDescription(bookUrl: String): Response<String>
 
     return tryConnect {
         val doc = fetchDoc(bookUrl)
-        scrap.getBookDescripton(doc)
+        scrap.getBookDescription(doc)
             ?.let { Response.Success(it) }
             ?: Response.Error("")
     }

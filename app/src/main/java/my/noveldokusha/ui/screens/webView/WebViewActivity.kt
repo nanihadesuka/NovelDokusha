@@ -11,8 +11,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import my.noveldokusha.R
-import my.noveldokusha.data.cookiesData
-import my.noveldokusha.data.headersData
 import my.noveldokusha.databinding.ActivityWebviewBinding
 import my.noveldokusha.scraper.toUrl
 import my.noveldokusha.ui.BaseActivity
@@ -21,18 +19,15 @@ import my.noveldokusha.utils.toast
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class WebViewActivity : BaseActivity()
-{
+class WebViewActivity : BaseActivity() {
     @Inject
     lateinit var appScope: CoroutineScope
 
-    class IntentData : Intent
-    {
+    class IntentData : Intent {
         var url by Extra_String()
 
         constructor(intent: Intent) : super(intent)
-        constructor(ctx: Context, url: String) : super(ctx, WebViewActivity::class.java)
-        {
+        constructor(ctx: Context, url: String) : super(ctx, WebViewActivity::class.java) {
             this.url = url
         }
     }
@@ -41,20 +36,18 @@ class WebViewActivity : BaseActivity()
     private val viewBind by lazy { ActivityWebviewBinding.inflate(layoutInflater) }
 
     @SuppressLint("SetJavaScriptEnabled")
-    override fun onCreate(savedInstanceState: Bundle?)
-    {
+    override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(viewBind.root)
         setSupportActionBar(viewBind.toolbar)
 
-        if (!packageManager.hasSystemFeature(PackageManager.FEATURE_WEBVIEW))
-        {
+        if (!packageManager.hasSystemFeature(PackageManager.FEATURE_WEBVIEW)) {
             toast(getString(R.string.webview_not_available))
             finish()
             return
         }
 
-        val authority = extras.url.toUrl()?.authority ?: run {
+        extras.url.toUrl()?.authority ?: run {
             toast(getString(R.string.invalid_URL))
             finish()
             return
@@ -62,35 +55,35 @@ class WebViewActivity : BaseActivity()
 
         viewBind.webview.settings.javaScriptEnabled = true
 
-        viewBind.webview.webViewClient = object : WebViewClient()
-        {
+        CookieManager.getInstance().apply {
+            setAcceptCookie(true)
+            setAcceptThirdPartyCookies(viewBind.webview, true)
+        }
 
-            override fun onPageFinished(view: WebView?, url: String?)
-            {
-                if (url?.toUrl()?.authority == authority) CookieManager.getInstance().also { manager ->
-                    val cookies = manager.getCookie(url)
-                        .split(";")
-                        .map { it.split("=") }
-                        .associate { it[0].trim() to it[1].trim() }
-                    appScope.launch(Dispatchers.Default) { cookiesData.add(url, cookies) }
-                    toast(getString(R.string.cookies_saved))
+        viewBind.webview.webViewClient = object : WebViewClient() {
+
+            override fun onPageFinished(view: WebView?, url: String?) {
+                appScope.launch(Dispatchers.IO) {
+                    CookieManager.getInstance().flush()
                 }
+                toast(getString(R.string.cookies_saved))
 
                 super.onPageFinished(view, url)
             }
 
-            override fun shouldInterceptRequest(view: WebView?, request: WebResourceRequest?): WebResourceResponse?
-            {
-                if (request?.url?.authority == authority)
-                    appScope.launch(Dispatchers.Default) { headersData.add(request.url.toString(), request.requestHeaders) }
+            override fun shouldInterceptRequest(
+                view: WebView?,
+                request: WebResourceRequest?
+            ): WebResourceResponse? {
+                appScope.launch(Dispatchers.IO) {
+                    CookieManager.getInstance().flush()
+                }
                 return super.shouldInterceptRequest(view, request)
             }
         }
 
         viewBind.webview.loadUrl(extras.url)
 
-        supportActionBar!!.let {
-            it.subtitle = extras.url
-        }
+        supportActionBar!!.subtitle = extras.url
     }
 }

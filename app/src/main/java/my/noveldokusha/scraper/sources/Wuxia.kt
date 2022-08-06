@@ -5,6 +5,7 @@ import my.noveldokusha.data.ChapterMetadata
 import my.noveldokusha.scraper.*
 import org.jsoup.nodes.Document
 
+// ALL WORKS
 class Wuxia : SourceInterface.Catalog {
     override val name = "Wuxia"
     override val baseUrl = "https://www.wuxia.blog/"
@@ -28,7 +29,7 @@ class Wuxia : SourceInterface.Catalog {
             ?.attr("src")
     }
 
-    override suspend fun getBookDescripton(doc: Document): String? {
+    override suspend fun getBookDescription(doc: Document): String? {
         return doc.selectFirst("div[itemprop=description]")
             ?.let {
                 it.select("h4").remove()
@@ -40,9 +41,9 @@ class Wuxia : SourceInterface.Catalog {
         val id = doc.selectFirst("#more")!!.attr("data-nid")
         val newChapters = doc.select("#chapters a[href]")
         val res = tryConnect {
-            connect("https://wuxia.blog/temphtml/_tempChapterList_all_$id.html")
-                .addHeaderRequest()
-                .postIO()
+            postRequest("https://wuxia.blog/temphtml/_tempChapterList_all_$id.html")
+                .let { client.call(it) }
+                .toDocument()
                 .select("a[href]")
                 .let { Response.Success(it) }
         }

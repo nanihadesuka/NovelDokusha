@@ -7,6 +7,7 @@ import my.noveldokusha.scraper.*
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 
+// TODO() NOT WORKING JSON MANGLED EVEN IF IN THE LOGS SHOWS JUST FINE
 class MTLNovel : SourceInterface.Catalog {
     override val name = "MTLNovel"
     override val baseUrl = "https://www.mtlnovel.com/"
@@ -24,7 +25,7 @@ class MTLNovel : SourceInterface.Catalog {
             ?.attr("src")
     }
 
-    override suspend fun getBookDescripton(doc: Document): String? {
+    override suspend fun getBookDescription(doc: Document): String? {
         val text = doc.selectFirst(".desc") ?: return null
         val node = text.apply {
             select("h2").remove()
@@ -35,7 +36,13 @@ class MTLNovel : SourceInterface.Catalog {
 
     override suspend fun getChapterList(doc: Document): List<ChapterMetadata> {
         // Needs to add "/" at the end
-        val url = doc.location().toUrlBuilderSafe().addPath("chapter-list").toString() + "/"
+        val url = doc
+            .selectFirst("meta[property=og:url] ")!!
+            .attr("content")
+            .toUrlBuilderSafe()
+            .addPath("chapter-list")
+            .toString() + "/"
+
         return fetchDoc(url)
             .select("a.ch-link[href]")
             .map {
@@ -80,26 +87,27 @@ class MTLNovel : SourceInterface.Catalog {
     }
 
     val extraHeaders = mapOf(
-        ":authority:" to """www.mtlnovel.com""",
-        ":method:" to """GET""",
-        ":scheme:" to """https""",
-        "accept:" to """application/json""",
-        "accept-encoding:" to """gzip, deflate, br""",
-        "accept-language:" to """en-GB,en-US;q=0.9,en;q=0.8,ca;q=0.7,es-ES;q=0.6,es;q=0.5,de;q=0.4""",
-        "amp-same-origin:" to """true""",
-        "cache-control:" to """no-cache""",
-        "dnt:" to """1""",
-        "pragma:" to """no-cache""",
-        "referer:" to """https://www.mtlnovel.com/""",
-        "sec-ch-ua:" to """" Not A;Brand";v="99", "Chromium";v="101", "Google Chrome";v="101"""",
-        "sec-ch-ua-mobile:" to """?0""",
-        "sec-ch-ua-platform:" to """Windows""",
-        "sec-fetch-dest:" to """empty""",
-        "sec-fetch-mode:" to """cors""",
-        "sec-fetch-site:" to """same-origin""",
-        "user-agent:" to """Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/101.0.4951.54 Safari/537.36"""
+        ":authority" to """www.mtlnovel.com""",
+        ":method" to """GET""",
+        ":scheme" to """https""",
+        "accept" to """application/json""",
+        "accept-encoding" to """gzip, deflate, br""",
+        "accept-language" to """en-GB,en-US;q=0.9,en;q=0.8,ca;q=0.7,es-ES;q=0.6,es;q=0.5,de;q=0.4""",
+        "amp-same-origin" to """true""",
+        "cache-control" to """no-cache""",
+        "dnt" to """1""",
+        "pragma" to """no-cache""",
+        "referer" to """https://www.mtlnovel.com/""",
+        "sec-ch-ua" to """" Not A;Brand";v="99", "Chromium";v="101", "Google Chrome";v="101"""",
+        "sec-ch-ua-mobile" to """?0""",
+        "sec-ch-ua-platform" to """Windows""",
+        "sec-fetch-dest" to """empty""",
+        "sec-fetch-mode" to """cors""",
+        "sec-fetch-site" to """same-origin""",
+        "user-agent" to """Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/101.0.4951.54 Safari/537.36"""
     )
 
+    // TODO() NOT WORKING JSON MANGLED EVEN IF IN THE LOGS SHOWS FINE
     override suspend fun getCatalogSearch(
         index: Int,
         input: String
@@ -107,22 +115,24 @@ class MTLNovel : SourceInterface.Catalog {
         if (input.isBlank() || index > 0)
             return Response.Success(PagedList.createEmpty(index = index))
 
-        val url = """https://www.mtlnovel.com/wp-admin/admin-ajax.php""".toUrlBuilderSafe().apply {
-            add("action", "autosuggest")
-            add("q", input)
-            add("__amp_source_origin", "https://www.mtlnovel.com")
-        }.toString()
+        val url = """https://www.mtlnovel.com/wp-admin/admin-ajax.php"""
+            .toUrlBuilderSafe()
+            .add("action", "autosuggest")
+            .add("q", input)
+            .add("__amp_source_origin", "https://www.mtlnovel.com")
+            .toString()
 
         return tryConnect {
-            val json = connect(url)
-                .addHeaderRequest()
-                .headers(extraHeaders)
-                .ignoreContentType(true)
-                .getIO()
-                .text()
+            val request = getRequest(url)
+            for ((key, value) in extraHeaders) {
+                request.addHeader(key, value)
+            }
+            val jsonReader = request
+                .let { client.call(it) }
+                .body!!.charStream()
 
             JsonParser
-                .parseString(json)
+                .parseReader(jsonReader)
                 .asJsonObject["items"]
                 .asJsonArray[0]
                 .asJsonObject["results"]

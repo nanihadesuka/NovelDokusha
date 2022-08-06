@@ -11,6 +11,7 @@ import org.jsoup.nodes.Document
  * Chapter url example:
  * https://www.readlightnovel.org/goat-of-all-ghouls-1/chapter-1
  */
+// TODO() missing cookies, doesn't work
 class ReadLightNovel : SourceInterface.Catalog {
 
     override val name = "Read Light Novel"
@@ -36,7 +37,7 @@ class ReadLightNovel : SourceInterface.Catalog {
             ?.attr("src")
     }
 
-    override suspend fun getBookDescripton(doc: Document): String? {
+    override suspend fun getBookDescription(doc: Document): String? {
         return doc.selectFirst("h6:containsOwn(Description)")
             ?.parent()
             ?.nextElementSibling()
@@ -81,6 +82,7 @@ class ReadLightNovel : SourceInterface.Catalog {
         }
     }
 
+    // TODO() missing cookies, doesn't work
     override suspend fun getCatalogSearch(
         index: Int,
         input: String
@@ -89,10 +91,13 @@ class ReadLightNovel : SourceInterface.Catalog {
             return Response.Success(PagedList.createEmpty(index = index))
 
         return tryConnect {
-            connect("https://www.readlightnovel.org/search/autocomplete")
-                .addHeaderRequest()
-                .data("q", input)
-                .postIO()
+
+            postRequest("https://www.readlightnovel.org/search/autocomplete")
+                .postScope {
+                    add("q", input)
+                }
+                .let { client.call(it) }
+                .toDocument()
                 .children()
                 .mapNotNull {
                     val link = it.selectFirst("a[href]") ?: return@mapNotNull null

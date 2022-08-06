@@ -5,6 +5,7 @@ import my.noveldokusha.data.ChapterMetadata
 import my.noveldokusha.scraper.*
 import org.jsoup.nodes.Document
 
+// ALL OK
 /**
  * Novel main page (chapter list) example:
  * https://www.koreanmtl.online/p/is-this-hero-for-real.html
@@ -22,7 +23,7 @@ class KoreanNovelsMTL : SourceInterface.Catalog {
 
     override suspend fun getBookCoverImageUrl(doc: Document): String = ""
 
-    override suspend fun getBookDescripton(doc: Document): String {
+    override suspend fun getBookDescription(doc: Document): String {
         return doc.select(".post-body.entry-content.float-container > p")
             .drop(1)
             .joinToString("\n\n") { it.text() }

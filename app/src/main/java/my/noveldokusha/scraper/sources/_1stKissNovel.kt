@@ -5,6 +5,7 @@ import my.noveldokusha.data.ChapterMetadata
 import my.noveldokusha.scraper.*
 import org.jsoup.nodes.Document
 
+// CHAPTERS LIST FAILS
 class _1stKissNovel : SourceInterface.Catalog {
     override val catalogUrl = "https://1stkissnovel.love/novel/?m_orderby=alphabet"
     override val name = "1stKissNovel"
@@ -18,19 +19,22 @@ class _1stKissNovel : SourceInterface.Catalog {
             ?.attr("data-src")
     }
 
-    override suspend fun getBookDescripton(doc: Document): String? {
+    override suspend fun getBookDescription(doc: Document): String? {
         return doc.selectFirst(".summary__content.show-more")
             ?.let { textExtractor.get(it) }
     }
 
+    // TODO() not working, website blocking calls
     override suspend fun getChapterList(doc: Document): List<ChapterMetadata> {
         val url = "https://1stkissnovel.love/wp-admin/admin-ajax.php"
         val id = doc.selectFirst("input.rating-post-id")!!.attr("value")
-        return connect(url)
-            .addHeaderRequest()
-            .data("action", "manga_get_chapters")
-            .data("manga", id)
-            .postIO()
+        return postRequest(url)
+            .postScope {
+                add("action", "manga_get_chapters")
+                add("manga", id)
+            }
+            .let { client.call(it) }
+            .toDocument()
             .select(".wp-manga-chapter > a[href]")
             .map { ChapterMetadata(title = it.text(), url = it.attr("href")) }
             .reversed()
@@ -39,10 +43,14 @@ class _1stKissNovel : SourceInterface.Catalog {
     override suspend fun getCatalogList(index: Int): Response<PagedList<BookMetadata>> {
         val page = index + 1
         return tryConnect {
-
-            val url = baseUrl
-                .toUrlBuilderSafe()
-                .ifCase(page == 1) { addPath("page", page.toString()) }
+            val url = when (page) {
+                1 -> catalogUrl
+                else -> baseUrl
+                    .toUrlBuilderSafe()
+                    .addPath("novel", "page", page.toString())
+                    .add("m_orderby", "alphabet")
+                    .toString()
+            }
 
             val doc = fetchDoc(url, 20000)
             doc.select(".page-item-detail")
@@ -73,14 +81,11 @@ class _1stKissNovel : SourceInterface.Catalog {
     ): Response<PagedList<BookMetadata>> {
         val page = index + 1
         return tryConnect {
-
             val url = baseUrl
                 .toUrlBuilderSafe()
-                .ifCase(page == 1) { addPath("page", page.toString()) }
+                .ifCase(page != 1) { addPath("page", page.toString()) }
                 .add("s", input)
                 .add("post_type", "wp-manga")
-                .toString()
-                .plus("&op&author&artist&release&adult&m_orderby")
 
             val doc = fetchDoc(url, 20000)
             doc.select(".row.c-tabs-item__content")

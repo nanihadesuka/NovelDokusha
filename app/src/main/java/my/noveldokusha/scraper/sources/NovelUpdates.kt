@@ -12,6 +12,7 @@ import org.jsoup.nodes.Document
  * Chapter url example:
  * (redirected url) Doesn't have chapters, assume it redirects to different website
  */
+// ALL OK
 class NovelUpdates : SourceInterface.Catalog {
     override val name = "Novel Updates"
     override val baseUrl = "https://www.novelupdates.com/"
@@ -32,19 +33,22 @@ class NovelUpdates : SourceInterface.Catalog {
             ?.let { if (it == "https://www.novelupdates.com/img/noimagefound.jpg") null else it }
     }
 
-    override suspend fun getBookDescripton(doc: Document): String? {
+    override suspend fun getBookDescription(doc: Document): String? {
         return doc.selectFirst("#editdescription")
             ?.let { textExtractor.get(it) }
     }
 
     override suspend fun getChapterList(doc: Document): List<ChapterMetadata> {
-        return connect("https://www.novelupdates.com/wp-admin/admin-ajax.php")
-            .addHeaderRequest()
-            .data("action", "nd_getchapters")
-            .data("mygrr", doc.selectFirst("#grr_groups")!!.attr("value"))
-            .data("mygroupfilter", "")
-            .data("mypostid", doc.selectFirst("#mypostid")!!.attr("value"))
-            .postIO()
+
+        return postRequest("https://www.novelupdates.com/wp-admin/admin-ajax.php")
+            .postScope {
+                add("action", "nd_getchapters")
+                add("mygrr", doc.selectFirst("#grr_groups")!!.attr("value"))
+                add("mygroupfilter", "")
+                add("mypostid", doc.selectFirst("#mypostid")!!.attr("value"))
+            }
+            .let { client.call(it) }
+            .toDocument()
             .select("a[href]")
             .asSequence()
             .filter { it.hasAttr("data-id") }
@@ -77,7 +81,7 @@ class NovelUpdates : SourceInterface.Catalog {
         return getSearchList(index, url)
     }
 
-    suspend fun getSearchList(index: Int, url: Uri.Builder) = tryConnect(
+    private suspend fun getSearchList(index: Int, url: Uri.Builder) = tryConnect(
         extraErrorInfo = "index: $index\nurl: $url"
     ) {
         val doc = fetchDoc(url)
@@ -102,8 +106,9 @@ class NovelUpdates : SourceInterface.Catalog {
             }
     }
 
-    private fun isLastPage(doc: Document) = when (val nav = doc.selectFirst("div.digg_pagination")) {
-        null -> true
-        else -> nav.children().last()?.`is`(".current") ?: true
-    }
+    private fun isLastPage(doc: Document) =
+        when (val nav = doc.selectFirst("div.digg_pagination")) {
+            null -> true
+            else -> nav.children().last()?.`is`(".current") ?: true
+        }
 }

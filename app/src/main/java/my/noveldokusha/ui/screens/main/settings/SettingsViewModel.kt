@@ -1,14 +1,22 @@
 package my.noveldokusha.ui.screens.main.settings
 
 import android.text.format.Formatter
-import androidx.compose.runtime.*
-import androidx.lifecycle.*
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.lifecycle.asFlow
+import androidx.lifecycle.viewModelScope
 import com.bumptech.glide.Glide
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.mapNotNull
-import my.noveldokusha.*
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import my.noveldokusha.App
+import my.noveldokusha.AppPreferences
 import my.noveldokusha.data.Repository
 import my.noveldokusha.tools.TranslationManager
 import my.noveldokusha.ui.BaseViewModel

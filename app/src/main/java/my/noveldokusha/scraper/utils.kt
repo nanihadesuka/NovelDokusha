@@ -1,9 +1,8 @@
 package my.noveldokusha.scraper
 
 import android.net.Uri
-import kotlinx.coroutines.*
-import my.noveldokusha.data.cookiesData
-import my.noveldokusha.data.headersData
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import org.jsoup.Connection
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
@@ -22,33 +21,38 @@ fun Uri.Builder.ifCase(case: Boolean, action: Uri.Builder.() -> Uri.Builder) = w
     case -> action(this)
     else -> this
 }
+
 fun Uri.Builder.addPath(vararg path: String) = path.fold(this) { builder, s ->
     builder.appendPath(s)
 }
-fun Uri.Builder.add(vararg query: Pair<String,Any>) = query.fold(this) { builder, s ->
-    builder.appendQueryParameter(s.first,s.second.toString())
+
+fun Uri.Builder.add(vararg query: Pair<String, Any>) = query.fold(this) { builder, s ->
+    builder.appendQueryParameter(s.first, s.second.toString())
 }
-fun Uri.Builder.add(key: String, value: Any): Uri.Builder = appendQueryParameter(key, value.toString())
+
+fun Uri.Builder.add(key: String, value: Any): Uri.Builder =
+    appendQueryParameter(key, value.toString())
+
 fun Connection.addHeaderRequest(): Connection = this.header("X-Requested-With", "XMLHttpRequest")
 
-suspend fun connect(url: String): Connection = Jsoup.connect(url).apply {
-    referrer("http://www.google.com")
-    userAgent("Mozilla/5.0 (X11; U; Linux i586; en-US; rv:1.7.3) Gecko/20040924 Epiphany/1.4.4 (Ubuntu)")
-    header("Content-Language", "en-US")
-    header("Accept", "text/html")
-    header("Accept-Encoding", "gzip,deflate")
-    headers(headersData.get(url))
-    cookies(cookiesData.get(url))
+fun okhttp3.Response.toDocument(): Document {
+    return Jsoup.parse(body!!.string())
 }
 
-suspend fun fetchDoc(url: String, timeoutMilliseconds: Int = 20 * 1000): Document = connect(url).timeout(timeoutMilliseconds).getIO()
-suspend fun fetchDoc(url: Uri.Builder, timeoutMilliseconds: Int = 20 * 1000) = fetchDoc(url.toString(), timeoutMilliseconds)
+suspend fun fetchDoc(url: String, timeoutMilliseconds: Int = 20 * 1000): Document {
+    val response = client.call(getRequest(url = url))
+    return response.toDocument()
+}
 
-suspend fun <T> tryConnect(extraErrorInfo: String = "", call: suspend () -> Response<T>): Response<T> = try
-{
+suspend fun fetchDoc(url: Uri.Builder, timeoutMilliseconds: Int = 20 * 1000) =
+    fetchDoc(url.toString(), timeoutMilliseconds)
+
+suspend fun <T> tryConnect(
+    extraErrorInfo: String = "",
+    call: suspend () -> Response<T>
+): Response<T> = try {
     call()
-} catch (e: SocketTimeoutException)
-{
+} catch (e: SocketTimeoutException) {
     val error = listOf(
         "Timeout error.",
         "",
@@ -60,8 +64,7 @@ suspend fun <T> tryConnect(extraErrorInfo: String = "", call: suspend () -> Resp
     ).joinToString("\n")
 
     Response.Error(error)
-} catch (e: Exception)
-{
+} catch (e: Exception) {
     val error = listOf(
         "Unknown error.",
         "",

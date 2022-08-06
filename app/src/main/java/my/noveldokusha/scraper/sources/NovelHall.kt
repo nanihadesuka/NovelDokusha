@@ -1,11 +1,11 @@
 package my.noveldokusha.scraper.sources
 
-import android.net.Uri
 import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.data.ChapterMetadata
 import my.noveldokusha.scraper.*
 import org.jsoup.nodes.Document
 
+// ALL OK
 class NovelHall : SourceInterface.Catalog {
     override val name = "NovelHall"
     override val baseUrl = "https://www.novelhall.com/"
@@ -27,7 +27,7 @@ class NovelHall : SourceInterface.Catalog {
             ?.attr("src")
     }
 
-    override suspend fun getBookDescripton(doc: Document): String? {
+    override suspend fun getBookDescription(doc: Document): String? {
         return doc
             .selectFirst("span.js-close-wrap")
             ?.let { textExtractor.get(it) }

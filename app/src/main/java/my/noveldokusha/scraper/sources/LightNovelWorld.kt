@@ -1,14 +1,15 @@
 package my.noveldokusha.scraper.sources
 
 import com.google.gson.JsonParser
+import com.google.gson.stream.JsonReader
 import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.data.ChapterMetadata
-import my.noveldokusha.data.cookiesData
-import my.noveldokusha.data.headersData
 import my.noveldokusha.scraper.*
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
+import java.io.StringReader
 
+// CATALOG SEATCH NOT WORKING
 /**
  * Novel main page (chapter list) example:
  * https://www.lightnovelworld.com/novel/the-devil-does-not-need-to-be-defeated
@@ -28,11 +29,11 @@ class LightNovelWorld : SourceInterface.Catalog {
     }
 
     override suspend fun getBookCoverImageUrl(doc: Document): String? {
-        return doc.selectFirst(".cover > img[^src]")
-            ?.dataset()?.get("src")
+        return doc.selectFirst(".cover > img[data-src]")
+            ?.attr("data-src")
     }
 
-    override suspend fun getBookDescripton(doc: Document): String? {
+    override suspend fun getBookDescription(doc: Document): String? {
         return doc.selectFirst(".summary > .content")
             ?.let { textExtractor.get(it) }
     }
@@ -40,11 +41,14 @@ class LightNovelWorld : SourceInterface.Catalog {
     override suspend fun getChapterList(doc: Document): List<ChapterMetadata> {
 
         val list = mutableListOf<ChapterMetadata>()
+        val baseChaptersUrl = doc
+            .selectFirst("meta[property=og:url] ")!!
+            .attr("content")
+            .toUrlBuilderSafe()
+            .addPath("chapters")
+
         for (page in 1..Int.MAX_VALUE) {
-            val urlBuilder = doc
-                .location()
-                .toUrlBuilder()!!
-                .addPath("chapters", "page-$page")
+            val urlBuilder = baseChaptersUrl.addPath("page-$page")
 
             val res = fetchDoc(urlBuilder)
                 .select(".chapter-list > li > a")
@@ -83,15 +87,16 @@ class LightNovelWorld : SourceInterface.Catalog {
             return Response.Success(PagedList.createEmpty(index = index))
 
         return tryConnect {
-            val json = connect("https://www.lightnovelworld.com/lnsearchlive")
-                .addHeaderRequest()
-                .data("inputContent", input)
-                .ignoreContentType(true)
-                .postIO()
+            val json = postRequest("https://www.lightnovelworld.com/lnsearchlive")
+                .postScope {
+                    add("inputContent", input)
+                }
+                .let { client.call(it) }
+                .toDocument()
                 .text()
 
             JsonParser
-                .parseString(json)
+                .parseReader(JsonReader(StringReader(json)).apply { isLenient = true })
                 .asJsonObject["resultview"]
                 .asString
                 .let { Jsoup.parse(it) }
@@ -102,7 +107,7 @@ class LightNovelWorld : SourceInterface.Catalog {
     private fun getBooksList(doc: Document, index: Int) = doc
         .select(".novel-item")
         .mapNotNull {
-            val coverUrl = it.selectFirst(".novel-cover > img[src]")?.attr("src") ?: ""
+            val coverUrl = it.selectFirst(".novel-cover > img[data-src]")?.attr("data-src") ?: ""
             val book = it.selectFirst("a[title]") ?: return@mapNotNull null
             BookMetadata(
                 title = book.attr("title"),

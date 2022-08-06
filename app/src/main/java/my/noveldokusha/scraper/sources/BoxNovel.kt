@@ -5,33 +5,35 @@ import my.noveldokusha.data.ChapterMetadata
 import my.noveldokusha.scraper.*
 import org.jsoup.nodes.Document
 
+// ALL OK
 class BoxNovel : SourceInterface.Catalog {
     override val name = "Box Novel"
     override val baseUrl = "https://boxnovel.com/"
-    override val catalogUrl = "https://boxnovelA.com/novel/?m_orderby=alphabet"
+    override val catalogUrl = "https://boxnovel.com/novel/?m_orderby=alphabet"
     override val language = "English"
 
     override suspend fun getBookCoverImageUrl(doc: Document): String? {
-        return doc.selectFirst("div.summary_image")
-            ?.selectFirst("img[src]")
-            ?.attr("src")
+        return doc.selectFirst("div.summary_image img[data-src]")
+            ?.attr("data-src")
     }
 
-    override suspend fun getBookDescripton(doc: Document): String? {
+    override suspend fun getBookDescription(doc: Document): String? {
         return doc.selectFirst(".summary__content.show-more")
             ?.let { textExtractor.get(it) }
     }
 
     override suspend fun getChapterList(doc: Document): List<ChapterMetadata> {
         val url = doc
-            .location()
-            .toUrlBuilder()
-            ?.addPath("ajax")
-            ?.addPath("chapters")
+            .selectFirst("meta[property=og:url] ")!!
+            .attr("content")
+            .toUrlBuilderSafe()
+            .addPath("ajax")
+            .addPath("chapters")
+            .toString()
 
-        return connect(url.toString())
-            .addHeaderRequest()
-            .postIO()
+        return postRequest(url)
+            .let { client.call(it) }
+            .toDocument()
             .select(".wp-manga-chapter > a[href]")
             .map { ChapterMetadata(title = it.text(), url = it.attr("href")) }
             .reversed()
@@ -50,7 +52,7 @@ class BoxNovel : SourceInterface.Catalog {
             doc.select(".page-item-detail")
                 .mapNotNull {
                     val link = it.selectFirst("a[href]") ?: return@mapNotNull null
-                    val bookCover = it.selectFirst("img[src]")?.attr("src") ?: ""
+                    val bookCover = it.selectFirst("img[data-src]")?.attr("data-src") ?: ""
                     BookMetadata(
                         title = link.attr("title"),
                         url = link.attr("href"),
@@ -92,7 +94,7 @@ class BoxNovel : SourceInterface.Catalog {
             doc.select(".c-tabs-item__content")
                 .mapNotNull {
                     val link = it.selectFirst("a[href]") ?: return@mapNotNull null
-                    val bookCover = it.selectFirst("img[src]")?.attr("src") ?: ""
+                    val bookCover = it.selectFirst("img[data-src]")?.attr("data-src") ?: ""
                     BookMetadata(
                         title = link.attr("title"),
                         url = link.attr("href"),

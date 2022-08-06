@@ -5,12 +5,11 @@ import org.jsoup.nodes.Document
 
 suspend fun downloadChapter(chapterUrl: String): Response<ChapterDownload> {
     return tryConnect {
-        val con = connect(chapterUrl)
-            .timeout(30 * 1000)
-            .followRedirects(true)
-            .executeIO()
+        val realUrl = getRequest(chapterUrl)
+            .let { clientRedirects.call(it) }
+            .request.url
+            .toString()
 
-        val realUrl = con.url().toString()
 
         val error by lazy {
             """

@@ -8,6 +8,7 @@ import org.jsoup.nodes.Document
 import java.net.URLDecoder
 import java.util.*
 
+// ALL OK
 /**
  * Novel main page (chapter list) example:
  * https://lightnovelstranslations.com/the-sage-summoned-to-another-world/
@@ -38,7 +39,7 @@ class LightNovelsTranslations : SourceInterface.Catalog {
             ?.replace("&#038;", "")
     }
 
-    override suspend fun getBookDescripton(doc: Document): String? {
+    override suspend fun getBookDescription(doc: Document): String? {
         return doc.selectFirst("div.entry-content")
             ?.select("p")
             ?.find { it.text().startsWith("Synopsis", ignoreCase = true) }
