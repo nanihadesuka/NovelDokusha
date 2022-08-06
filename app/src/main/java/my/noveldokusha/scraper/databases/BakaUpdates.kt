@@ -1,6 +1,7 @@
 package my.noveldokusha.scraper.databases
 
 import android.net.Uri
+import android.util.Log
 import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.scraper.*
 import org.jsoup.nodes.Document
@@ -25,8 +26,8 @@ class BakaUpdates : DatabaseInterface {
 
         return tryConnect {
             fetchDoc(urlAuthorPage)
-                .select("div.pl-2.col-md-5.col-7.text-truncate.text")
-                .map { it.select("a[href]")[1] }
+                .select("div.pl-2.col-md-5.col-7.text-truncate.text a[href]")
+                .map { it }
                 .filter { it.text().endsWith("(Novel)") }
                 .map { BookMetadata(title = it.text(), url = it.attr("href")) }
                 .let {
@@ -116,8 +117,8 @@ class BakaUpdates : DatabaseInterface {
             .select("a[href]")
             .map {
                 BookMetadata(
-                    it.text().removeNovelTag(),
-                    "https://www.mangaupdates.com/" + it.attr("href")
+                    title = it.text().removeNovelTag(),
+                    url = it.attr("href")
                 )
             }
             .toList()
@@ -126,8 +127,8 @@ class BakaUpdates : DatabaseInterface {
             .select("a[href]")
             .map {
                 BookMetadata(
-                    it.text().removeNovelTag(),
-                    "https://www.mangaupdates.com/" + it.attr("href")
+                    title = it.text().removeNovelTag(),
+                    url = it.attr("href")
                 )
             }
             .toList()
@@ -178,6 +179,8 @@ class BakaUpdates : DatabaseInterface {
             tags = tags,
             authors = authors,
             coverImageUrl = coverImageUrl
-        )
+        ).also {
+            Log.e(">>>DATA", it.toString())
+        }
     }
 }
