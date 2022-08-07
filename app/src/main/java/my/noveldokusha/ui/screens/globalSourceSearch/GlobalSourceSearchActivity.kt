@@ -20,13 +20,14 @@ import dagger.hilt.android.AndroidEntryPoint
 import my.noveldokusha.AppPreferences
 import my.noveldokusha.R
 import my.noveldokusha.data.BookMetadata
+import my.noveldokusha.ui.BaseActivity
 import my.noveldokusha.ui.screens.chaptersList.ChaptersActivity
 import my.noveldokusha.ui.theme.Theme
 import my.noveldokusha.utils.Extra_String
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class GlobalSourceSearchActivity : ComponentActivity() {
+class GlobalSourceSearchActivity : BaseActivity() {
     class IntentData : Intent, GlobalSourceSearchStateBundle {
         override var input by Extra_String()
 
@@ -38,9 +39,6 @@ class GlobalSourceSearchActivity : ComponentActivity() {
             this.input = input
         }
     }
-
-    @Inject
-    lateinit var appPreferences: AppPreferences
 
     private val viewModel by viewModels<GlobalSourceSearchViewModel>()
 

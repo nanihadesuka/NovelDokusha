@@ -1,5 +1,7 @@
 package my.noveldokusha.scraper
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import my.noveldokusha.network.NetworkClient
 import my.noveldokusha.network.Response
 import my.noveldokusha.network.getRequest
@@ -13,8 +15,8 @@ suspend fun downloadChapter(
     scraper: Scraper,
     networkClient: NetworkClient,
     chapterUrl: String,
-): Response<ChapterDownload> {
-    return tryConnect {
+): Response<ChapterDownload> = withContext(Dispatchers.IO) {
+    tryConnect {
         val request = getRequest(chapterUrl)
         val realUrl = networkClient
             .clientWithRedirects
@@ -46,7 +48,7 @@ suspend fun downloadChapter(
 
         // If no predefined source is found try extracting text with heuristic extraction
         val chapter = heuristicChapterExtraction(realUrl, networkClient.get(realUrl).toDocument())
-        return@tryConnect when (chapter) {
+        when (chapter) {
             null -> Response.Error(error)
             else -> Response.Success(chapter)
         }

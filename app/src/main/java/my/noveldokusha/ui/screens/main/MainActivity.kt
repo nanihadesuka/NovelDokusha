@@ -23,6 +23,7 @@ import com.google.accompanist.insets.navigationBarsPadding
 import dagger.hilt.android.AndroidEntryPoint
 import my.noveldokusha.AppPreferences
 import my.noveldokusha.R
+import my.noveldokusha.ui.BaseActivity
 import my.noveldokusha.ui.screens.main.finder.FinderView
 import my.noveldokusha.ui.screens.main.library.LibraryView
 import my.noveldokusha.ui.screens.main.library.LibraryViewModel
@@ -33,15 +34,12 @@ import my.noveldokusha.utils.mix
 import javax.inject.Inject
 
 @AndroidEntryPoint
-open class MainActivity : ComponentActivity()
+open class MainActivity : BaseActivity()
 {
     enum class PAGE
     {
         LIBRARY, FINDER, SETTINGS
     }
-
-    @Inject
-    lateinit var appPreferences: AppPreferences
 
     override fun onCreate(savedInstanceState: Bundle?)
     {

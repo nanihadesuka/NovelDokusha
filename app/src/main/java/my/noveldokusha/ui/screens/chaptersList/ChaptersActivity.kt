@@ -44,17 +44,18 @@ import my.noveldokusha.R
 import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.data.ChapterWithContext
 import my.noveldokusha.scraper.Scraper
+import my.noveldokusha.ui.BaseActivity
+import my.noveldokusha.ui.Toasty
 import my.noveldokusha.ui.composeViews.ToolbarModeSearch
 import my.noveldokusha.ui.screens.databaseSearchResults.DatabaseSearchResultsActivity
 import my.noveldokusha.ui.screens.reader.ReaderActivity
 import my.noveldokusha.ui.theme.ColorAccent
 import my.noveldokusha.ui.theme.Theme
 import my.noveldokusha.utils.Extra_String
-import my.noveldokusha.utils.toast
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class ChaptersActivity : ComponentActivity() {
+class ChaptersActivity : BaseActivity() {
     class IntentData : Intent, ChapterStateBundle {
         override var bookUrl by Extra_String()
         override var bookTitle by Extra_String()
@@ -68,9 +69,6 @@ class ChaptersActivity : ComponentActivity() {
             this.bookTitle = bookMetadata.title
         }
     }
-
-    @Inject
-    lateinit var appPreferences: AppPreferences
 
     @Inject
     lateinit var scraper: Scraper
@@ -117,7 +115,7 @@ class ChaptersActivity : ComponentActivity() {
                         state = rememberSwipeRefreshState(isRefreshingDelayed),
                         onRefresh = {
                             isRefreshingDelayed = true
-                            toast(getString(R.string.updating_book_info))
+                            toasty.show(R.string.updating_book_info)
                             viewModel.reloadAll()
                         }
                     ) {
@@ -255,7 +253,7 @@ class ChaptersActivity : ComponentActivity() {
         lifecycleScope.launch(Dispatchers.IO) {
             val lastReadChapter = viewModel.getLastReadChapter()
             if (lastReadChapter == null) {
-                toast(getString(R.string.no_chapters))
+                toasty.show(R.string.no_chapters)
                 return@launch
             }
 
@@ -277,7 +275,7 @@ class ChaptersActivity : ComponentActivity() {
             val isBookmarked = viewModel.toggleBookmark()
             val msg = if (isBookmarked) R.string.added_to_library else R.string.removed_from_library
             withContext(Dispatchers.Main) {
-                toast(getString(msg))
+                toasty.show(msg)
             }
         }
     }

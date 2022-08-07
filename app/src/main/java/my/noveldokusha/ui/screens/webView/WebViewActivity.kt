@@ -15,7 +15,6 @@ import my.noveldokusha.databinding.ActivityWebviewBinding
 import my.noveldokusha.ui.BaseActivity
 import my.noveldokusha.utils.Extra_String
 import my.noveldokusha.utils.toUrl
-import my.noveldokusha.utils.toast
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -42,13 +41,13 @@ class WebViewActivity : BaseActivity() {
         setSupportActionBar(viewBind.toolbar)
 
         if (!packageManager.hasSystemFeature(PackageManager.FEATURE_WEBVIEW)) {
-            toast(getString(R.string.webview_not_available))
+            toasty.show(R.string.webview_not_available)
             finish()
             return
         }
 
         extras.url.toUrl()?.authority ?: run {
-            toast(getString(R.string.invalid_URL))
+            toasty.show(R.string.invalid_URL)
             finish()
             return
         }
@@ -66,7 +65,7 @@ class WebViewActivity : BaseActivity() {
                 appScope.launch(Dispatchers.IO) {
                     CookieManager.getInstance().flush()
                 }
-                toast(getString(R.string.cookies_saved))
+                toasty.show(R.string.cookies_saved)
 
                 super.onPageFinished(view, url)
             }

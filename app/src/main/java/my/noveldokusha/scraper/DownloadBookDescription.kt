@@ -1,5 +1,7 @@
 package my.noveldokusha.scraper
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import my.noveldokusha.network.NetworkClient
 import my.noveldokusha.network.Response
 import my.noveldokusha.network.tryConnect
@@ -9,7 +11,7 @@ suspend fun downloadBookDescription(
     scraper: Scraper,
     networkClient: NetworkClient,
     bookUrl: String,
-): Response<String> {
+): Response<String> = withContext(Dispatchers.IO) {
     val error by lazy {
         """
 			Incompatible source.
@@ -20,9 +22,10 @@ suspend fun downloadBookDescription(
     }
 
     // Return if can't find compatible source for url
-    val scrap = scraper.getCompatibleSourceCatalog(bookUrl) ?: return Response.Error(error)
+    val scrap = scraper.getCompatibleSourceCatalog(bookUrl)
+        ?: return@withContext Response.Error(error)
 
-    return tryConnect {
+    tryConnect {
         val doc = networkClient.get(bookUrl).toDocument()
         scrap.getBookDescription(doc)
             ?.let { Response.Success(it) }

@@ -12,6 +12,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import my.noveldokusha.AppPreferences
 import my.noveldokusha.R
 import my.noveldokusha.data.BookMetadata
+import my.noveldokusha.ui.BaseActivity
 import my.noveldokusha.ui.screens.databaseBookInfo.DatabaseBookInfoActivity
 import my.noveldokusha.ui.theme.Theme
 import my.noveldokusha.uiViews.BooksVerticalView
@@ -23,7 +24,7 @@ import java.util.*
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class DatabaseSearchResultsActivity : ComponentActivity() {
+class DatabaseSearchResultsActivity : BaseActivity() {
     class IntentData : Intent, DatabaseSearchResultsStateBundle {
         override var databaseUrlBase by Extra_String()
         override var text by Extra_String()
@@ -53,9 +54,6 @@ class DatabaseSearchResultsActivity : ComponentActivity() {
     }
 
     private val viewModel by viewModels<DatabaseSearchResultsViewModel>()
-
-    @Inject
-    lateinit var appPreferences: AppPreferences
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

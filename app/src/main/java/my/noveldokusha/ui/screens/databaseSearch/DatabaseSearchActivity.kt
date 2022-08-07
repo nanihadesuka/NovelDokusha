@@ -11,6 +11,7 @@ import androidx.compose.ui.state.ToggleableState
 import dagger.hilt.android.AndroidEntryPoint
 import my.noveldokusha.AppPreferences
 import my.noveldokusha.R
+import my.noveldokusha.ui.BaseActivity
 import my.noveldokusha.ui.screens.databaseSearchResults.DatabaseSearchResultsActivity
 import my.noveldokusha.ui.theme.Theme
 import my.noveldokusha.utils.Extra_String
@@ -20,7 +21,7 @@ import java.util.*
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class DatabaseSearchActivity : ComponentActivity() {
+class DatabaseSearchActivity : BaseActivity() {
     class IntentData : Intent, DatabaseSearchStateBundle {
         override var databaseBaseUrl by Extra_String()
 
@@ -32,9 +33,6 @@ class DatabaseSearchActivity : ComponentActivity() {
             this.databaseBaseUrl = databaseBaseUrl
         }
     }
-
-    @Inject
-    lateinit var appPreferences: AppPreferences
 
     private val viewModel by viewModels<DatabaseSearchViewModel>()
 

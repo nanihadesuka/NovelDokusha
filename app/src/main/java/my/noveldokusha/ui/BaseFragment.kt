@@ -8,7 +8,6 @@ import androidx.fragment.app.Fragment
 import dagger.hilt.android.AndroidEntryPoint
 import my.noveldokusha.AppPreferences
 import my.noveldokusha.R
-import my.noveldokusha.utils.toast
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -16,6 +15,9 @@ open class BaseFragment : Fragment()
 {
 	@Inject
 	lateinit var appPreferences: AppPreferences
+
+	@Inject
+	lateinit var toasty: Toasty
 	
 	fun permissionsCondition(vararg permissions: String): Boolean
 	{
@@ -51,7 +53,7 @@ open class BaseFragment : Fragment()
 	
 	fun permissionRequest(
 		vararg permissions: String,
-		denied: (deniedPermissions: List<String>) -> Unit = { toast(getString(R.string.permissions_denied)) },
+		denied: (deniedPermissions: List<String>) -> Unit = { toasty.show(R.string.permissions_denied) },
 		granted: () -> Unit
 	)
 	{

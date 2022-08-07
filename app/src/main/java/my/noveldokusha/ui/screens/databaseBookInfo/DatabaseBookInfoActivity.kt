@@ -14,15 +14,16 @@ import dagger.hilt.android.AndroidEntryPoint
 import my.noveldokusha.AppPreferences
 import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.scraper.DatabaseInterface
+import my.noveldokusha.ui.BaseActivity
 import my.noveldokusha.ui.screens.databaseSearchResults.DatabaseSearchResultsActivity
 import my.noveldokusha.ui.screens.globalSourceSearch.GlobalSourceSearchActivity
 import my.noveldokusha.ui.theme.Theme
-import my.noveldokusha.utils.Extra_String
 import my.noveldokusha.uiViews.SetSystemBarTransparent
+import my.noveldokusha.utils.Extra_String
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class DatabaseBookInfoActivity : ComponentActivity() {
+class DatabaseBookInfoActivity : BaseActivity() {
     class IntentData : Intent, DatabaseBookInfoStateBundle {
         override var databaseUrlBase by Extra_String()
         override var bookUrl by Extra_String()
@@ -38,9 +39,6 @@ class DatabaseBookInfoActivity : ComponentActivity() {
             this.bookTitle = bookMetadata.title
         }
     }
-
-    @Inject
-    lateinit var appPreferences: AppPreferences
 
     private val viewModel by viewModels<DatabaseBookInfoViewModel>()
 

@@ -13,9 +13,11 @@ import kotlinx.coroutines.SupervisorJob
 import my.noveldokusha.data.Repository
 import my.noveldokusha.data.database.AppDatabase
 import my.noveldokusha.network.NetworkClient
-import my.noveldokusha.scraper.Scraper
 import my.noveldokusha.network.ScrapperNetworkClient
+import my.noveldokusha.scraper.Scraper
 import my.noveldokusha.tools.TranslationManager
+import my.noveldokusha.ui.Toasty
+import my.noveldokusha.ui.ToastyToast
 import my.noveldokusha.ui.screens.reader.tools.LiveTranslation
 import java.io.File
 import javax.inject.Singleton
@@ -80,5 +82,11 @@ object AppModule {
         appPreferences: AppPreferences,
     ): LiveTranslation {
         return LiveTranslation(translationManager, appPreferences)
+    }
+
+    @Provides
+    @Singleton
+    fun provideToasty(@ApplicationContext context: Context): Toasty {
+        return ToastyToast(applicationContext = context)
     }
 }

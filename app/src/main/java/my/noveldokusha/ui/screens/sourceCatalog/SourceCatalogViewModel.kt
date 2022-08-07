@@ -1,6 +1,5 @@
 package my.noveldokusha.ui.screens.sourceCatalog
 
-import android.content.Context
 import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -8,7 +7,6 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.saveable
 import dagger.hilt.android.lifecycle.HiltViewModel
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import my.noveldokusha.AppPreferences
@@ -20,8 +18,8 @@ import my.noveldokusha.network.PagedListIteratorState
 import my.noveldokusha.network.Response
 import my.noveldokusha.scraper.Scraper
 import my.noveldokusha.ui.BaseViewModel
+import my.noveldokusha.ui.Toasty
 import my.noveldokusha.utils.StateExtra_String
-import my.noveldokusha.utils.toast
 import javax.inject.Inject
 
 interface SourceCatalogStateBundle {
@@ -31,10 +29,10 @@ interface SourceCatalogStateBundle {
 @HiltViewModel
 class SourceCatalogViewModel @Inject constructor(
     private val repository: Repository,
+    private val toasty: Toasty,
     state: SavedStateHandle,
-    @ApplicationContext private val context: Context,
     appPreferences: AppPreferences,
-    scraper: Scraper
+    scraper: Scraper,
 ) : BaseViewModel(), SourceCatalogStateBundle {
 
     override var sourceBaseUrl by StateExtra_String(state)
@@ -75,6 +73,6 @@ class SourceCatalogViewModel @Inject constructor(
         repository.bookLibrary.toggleBookmark(book)
         val isInLibrary = repository.bookLibrary.existInLibrary(book.url)
         val res = if (isInLibrary) R.string.added_to_library else R.string.removed_from_library
-        toast(context.getString(res))
+        toasty.show(res)
     }
 }

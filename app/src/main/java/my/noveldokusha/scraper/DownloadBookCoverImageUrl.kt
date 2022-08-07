@@ -25,7 +25,7 @@ suspend fun downloadBookCoverImageUrl(
     val scrap = scraper.getCompatibleSourceCatalog(bookUrl)
         ?: return@withContext Response.Error(error)
 
-    return@withContext tryConnect {
+    tryConnect {
         val doc = networkClient.get(bookUrl).toDocument()
         scrap.getBookCoverImageUrl(doc)
             ?.let { Response.Success(it) }

@@ -6,7 +6,6 @@ import androidx.compose.runtime.*
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import my.noveldokusha.AppPreferences
@@ -17,12 +16,15 @@ import my.noveldokusha.data.Repository
 import my.noveldokusha.data.database.tables.Book
 import my.noveldokusha.network.NetworkClient
 import my.noveldokusha.network.Response
-import my.noveldokusha.scraper.*
+import my.noveldokusha.scraper.Scraper
+import my.noveldokusha.scraper.downloadBookCoverImageUrl
+import my.noveldokusha.scraper.downloadBookDescription
+import my.noveldokusha.scraper.downloadChaptersList
 import my.noveldokusha.ui.BaseViewModel
+import my.noveldokusha.ui.Toasty
 import my.noveldokusha.utils.Extra_String
 import my.noveldokusha.utils.StateExtra_String
 import my.noveldokusha.utils.toState
-import my.noveldokusha.utils.toast
 import javax.inject.Inject
 
 interface ChapterStateBundle {
@@ -58,7 +60,7 @@ class ChaptersViewModel @Inject constructor(
     private val appScope: CoroutineScope,
     private val networkClient: NetworkClient,
     private val scraper: Scraper,
-    @ApplicationContext private val context: Context,
+    private val toasty: Toasty,
     val appPreferences: AppPreferences,
     state: SavedStateHandle,
 ) : BaseViewModel(), ChapterStateBundle {
@@ -66,7 +68,6 @@ class ChaptersViewModel @Inject constructor(
     override var bookTitle by StateExtra_String(state)
 
     class IntentData : Intent {
-        val bookMetadata get() = BookMetadata(title = bookTitle, url = bookUrl)
         private var bookUrl by Extra_String()
         private var bookTitle by Extra_String()
 
@@ -157,7 +158,6 @@ class ChaptersViewModel @Inject constructor(
         updateChaptersList()
     }
 
-
     fun updateCover() = viewModelScope.launch(Dispatchers.IO) {
         val res = downloadBookCoverImageUrl(scraper, networkClient, bookUrl)
         if (res is Response.Success)
@@ -173,7 +173,7 @@ class ChaptersViewModel @Inject constructor(
     private var loadChaptersJob: Job? = null
     fun updateChaptersList() {
         if (bookMetadata.url.startsWith("local://")) {
-            toast(context.getString(R.string.local_book_nothing_to_update))
+            toasty.show(R.string.local_book_nothing_to_update)
             isRefreshing = false
             return
         }
@@ -184,14 +184,12 @@ class ChaptersViewModel @Inject constructor(
             error = ""
             isRefreshing = true
             val url = bookMetadata.url
-            val res = withContext(Dispatchers.IO) {
-                downloadChaptersList(scraper, networkClient, url)
-            }
+            val res = downloadChaptersList(scraper, networkClient, url)
             isRefreshing = false
             when (res) {
                 is Response.Success -> {
                     if (res.data.isEmpty())
-                        toast(context.getString(R.string.no_chapters_found))
+                        toasty.show(R.string.no_chapters_found)
 
                     withContext(Dispatchers.IO) {
                         repository.bookChapter.merge(res.data, url)

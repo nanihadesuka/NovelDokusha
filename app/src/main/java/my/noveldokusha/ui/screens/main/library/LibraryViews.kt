@@ -27,10 +27,8 @@ import com.google.accompanist.swiperefresh.SwipeRefresh
 import kotlinx.coroutines.launch
 import my.noveldokusha.R
 import my.noveldokusha.data.BookWithContext
-import my.noveldokusha.services.LibraryUpdateService
 import my.noveldokusha.ui.theme.ColorAccent
 import my.noveldokusha.uiViews.BookImageButtonView
-import my.noveldokusha.utils.toast
 
 @OptIn(ExperimentalPagerApi::class)
 @Composable
@@ -50,12 +48,7 @@ fun LibraryBody(
     SwipeRefresh(
         state = viewModel.refreshState,
         onRefresh = {
-            viewModel.showLoadingSpinner()
-            toast(context.getString(R.string.updaing_library))
-            LibraryUpdateService.start(
-                ctx = context,
-                completedCategory = updateCompleted.value == 1
-            )
+            viewModel.onLibraryCategoryRefresh(updateCompleted.value == 1)
         }
     ) {
         Column {

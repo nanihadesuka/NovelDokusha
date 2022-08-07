@@ -29,11 +29,10 @@ class SettingsViewModel @Inject constructor(
     private val repository: Repository,
     private val appScope: CoroutineScope,
     private val appPreferences: AppPreferences,
+    private val app: App,
     val translationManager: TranslationManager,
-) : BaseViewModel()
-{
-    fun <T> stateCreator(theFlow: Flow<T>, initialValue: T): MutableState<T>
-    {
+) : BaseViewModel() {
+    fun <T> stateCreator(theFlow: Flow<T>, initialValue: T): MutableState<T> {
         val value = mutableStateOf(initialValue)
         viewModelScope.launch(Dispatchers.IO) {
             theFlow.collect { withContext(Dispatchers.Main) { value.value = it } }
@@ -50,8 +49,7 @@ class SettingsViewModel @Inject constructor(
     var databaseSize by mutableStateOf("")
     var imageFolderSize by mutableStateOf("")
 
-    init
-    {
+    init {
         viewModelScope.launch(Dispatchers.IO) { updateDatabaseSize() }
         viewModelScope.launch(Dispatchers.IO) { updateImagesFolderSize() }
         viewModelScope.launch(Dispatchers.IO) {
@@ -93,22 +91,20 @@ class SettingsViewModel @Inject constructor(
             ?.forEach { it.deleteRecursively() }
 
         updateImagesFolderSize()
-        Glide.get(App.instance).clearDiskCache()
+        Glide.get(app).clearDiskCache()
     }
 
-    fun onFollowSystem(follow: Boolean)
-    {
+    fun onFollowSystem(follow: Boolean) {
         appPreferences.THEME_FOLLOW_SYSTEM.value = follow
     }
 
-    fun onThemeSelected(themes:Themes) {
+    fun onThemeSelected(themes: Themes) {
         appPreferences.THEME_ID.value = Themes.toIDTheme(themes)
     }
 }
 
 private suspend fun getFolderSizeBytes(file: File): Long = withContext(Dispatchers.IO) {
-    when
-    {
+    when {
         !file.exists() -> 0
         file.isFile -> file.length()
         else -> file.walkBottomUp().sumOf { if (it.isDirectory) 0 else it.length() }

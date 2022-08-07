@@ -11,12 +11,12 @@ import androidx.core.content.ContextCompat
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.*
-import my.noveldokusha.App
 import my.noveldokusha.R
 import my.noveldokusha.data.Repository
 import my.noveldokusha.data.database.AppDatabase
 import my.noveldokusha.network.NetworkClient
 import my.noveldokusha.scraper.Scraper
+import my.noveldokusha.ui.Toasty
 import my.noveldokusha.utils.*
 import okhttp3.internal.closeQuietly
 import java.io.File
@@ -30,12 +30,18 @@ class RestoreDataService : Service() {
     @Inject
     @ApplicationContext
     lateinit var context: Context
+
     @Inject
     lateinit var repository: Repository
+
     @Inject
     lateinit var scraper: Scraper
+
     @Inject
     lateinit var networkClient: NetworkClient
+
+    @Inject
+    lateinit var toasty: Toasty
 
     private class IntentData : Intent {
         var uri by Extra_Uri()
@@ -107,7 +113,7 @@ class RestoreDataService : Service() {
             setProgress(100, 0, true)
         }
 
-        val inputStream = App.instance.contentResolver.openInputStream(uri)
+        val inputStream = context.contentResolver.openInputStream(uri)
         if (inputStream == null) {
             builder.showNotification(channel_id) {
                 removeProgressBar()
@@ -141,7 +147,7 @@ class RestoreDataService : Service() {
                 repository.bookChapter.insert(backupDatabase.bookChapter.getAll())
                 builder.showNotification(channel_id) { text = "Adding chapters text" }
                 repository.bookChapterBody.insertReplace(backupDatabase.bookChapterBody.getAll())
-                toast(getString(R.string.database_restored))
+                toasty.show(R.string.database_restored)
                 backupDatabase.close()
                 backupDatabase.delete()
             } catch (e: Exception) {

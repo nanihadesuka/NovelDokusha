@@ -17,6 +17,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import my.noveldokusha.AppPreferences
 import my.noveldokusha.R
 import my.noveldokusha.data.BookMetadata
+import my.noveldokusha.ui.BaseActivity
 import my.noveldokusha.ui.composeViews.ToolbarModeSearch
 import my.noveldokusha.ui.screens.chaptersList.ChaptersActivity
 import my.noveldokusha.ui.screens.webView.WebViewActivity
@@ -31,7 +32,7 @@ import javax.inject.Inject
 
 
 @AndroidEntryPoint
-class SourceCatalogActivity : ComponentActivity() {
+class SourceCatalogActivity : BaseActivity() {
     class IntentData : Intent, SourceCatalogStateBundle {
         override var sourceBaseUrl by Extra_String()
 
@@ -45,9 +46,6 @@ class SourceCatalogActivity : ComponentActivity() {
     }
 
     private val viewModel by viewModels<SourceCatalogViewModel>()
-
-    @Inject
-    lateinit var appPreferences: AppPreferences
 
     @OptIn(ExperimentalAnimationApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
