@@ -9,15 +9,14 @@ class UserAgentInterceptor : Interceptor {
 
     override fun intercept(chain: Interceptor.Chain): Response {
         val originalRequest = chain.request()
-        return if (originalRequest.header("User-Agent").isNullOrEmpty()) {
-            val newRequest = originalRequest
+        val hasNoUserAgent = originalRequest.header("User-Agent").isNullOrBlank()
+        val modifiedRequest = if (hasNoUserAgent) {
+            originalRequest
                 .newBuilder()
                 .removeHeader("User-Agent")
                 .addHeader("User-Agent", DEFAULT_USERAGENT)
                 .build()
-            chain.proceed(newRequest)
-        } else {
-            chain.proceed(originalRequest)
-        }
+        } else originalRequest
+        return chain.proceed(modifiedRequest)
     }
 }
