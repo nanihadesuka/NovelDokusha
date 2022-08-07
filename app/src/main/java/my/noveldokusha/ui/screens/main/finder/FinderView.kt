@@ -41,7 +41,6 @@ import my.noveldokusha.ui.theme.ColorAccent
 import my.noveldokusha.ui.theme.InternalTheme
 import my.noveldokusha.uiViews.MyButton
 import my.noveldokusha.utils.drawBottomLine
-import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
 
@@ -263,11 +262,10 @@ private fun Button(
 fun PreviewView() {
 
     val scraper = Scraper(object : NetworkClient {
-        override val client by lazy { OkHttpClient() }
-        override val clientWithRedirects by lazy { OkHttpClient() }
-        override suspend fun call(request: Request.Builder) = Response.Builder().build()
         override suspend fun get(url: String) = Response.Builder().build()
         override suspend fun get(url: Uri.Builder) = Response.Builder().build()
+        override suspend fun call(request: Request.Builder, followRedirects: Boolean) =
+            Response.Builder().build()
     })
 
     InternalTheme {

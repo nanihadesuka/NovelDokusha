@@ -13,10 +13,7 @@ import java.io.File
 import java.util.concurrent.TimeUnit
 
 interface NetworkClient {
-    val client: OkHttpClient
-    val clientWithRedirects: OkHttpClient
-
-    suspend fun call(request: Request.Builder): Response
+    suspend fun call(request: Request.Builder, followRedirects: Boolean = false): Response
     suspend fun get(url: String): Response
     suspend fun get(url: Uri.Builder): Response
 }
@@ -27,11 +24,13 @@ class ScrapperNetworkClient(
 ) : NetworkClient {
     private val cookieJar = ScraperCookieJar()
 
-    private val okhttpLoggingInterceptor = HttpLoggingInterceptor { Log.v("OkHttp", it) }.apply {
+    private val okhttpLoggingInterceptor = HttpLoggingInterceptor {
+        Log.v("OkHttp", it)
+    }.apply {
         level = HttpLoggingInterceptor.Level.BODY
     }
 
-    override val client = OkHttpClient.Builder()
+    private val client = OkHttpClient.Builder()
         .let {
             if (BuildConfig.DEBUG) {
                 it.addInterceptor(okhttpLoggingInterceptor)
@@ -44,13 +43,15 @@ class ScrapperNetworkClient(
         .readTimeout(30, TimeUnit.SECONDS)
         .build()
 
-    override val clientWithRedirects = client
+    private val clientWithRedirects = client
         .newBuilder()
         .followRedirects(true)
         .followSslRedirects(true)
         .build()
 
-    override suspend fun call(request: Request.Builder) = client.call(request)
+    override suspend fun call(request: Request.Builder, followRedirects: Boolean): Response {
+        return if (followRedirects) clientWithRedirects.call(request) else client.call(request)
+    }
 
     override suspend fun get(url: String) = call(getRequest(url))
     override suspend fun get(url: Uri.Builder) = call(getRequest(url.toString()))

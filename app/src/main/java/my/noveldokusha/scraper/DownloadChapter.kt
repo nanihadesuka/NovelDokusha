@@ -6,7 +6,6 @@ import my.noveldokusha.network.NetworkClient
 import my.noveldokusha.network.Response
 import my.noveldokusha.network.getRequest
 import my.noveldokusha.network.tryConnect
-import my.noveldokusha.utils.call
 import my.noveldokusha.utils.toDocument
 import net.dankito.readability4j.extended.Readability4JExtended
 import org.jsoup.nodes.Document
@@ -19,8 +18,7 @@ suspend fun downloadChapter(
     tryConnect {
         val request = getRequest(chapterUrl)
         val realUrl = networkClient
-            .clientWithRedirects
-            .call(request)
+            .call(request, followRedirects = true)
             .request.url
             .toString()
 
