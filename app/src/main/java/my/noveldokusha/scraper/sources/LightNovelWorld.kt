@@ -1,7 +1,6 @@
 package my.noveldokusha.scraper.sources
 
 import com.google.gson.JsonParser
-import com.google.gson.stream.JsonReader
 import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.data.ChapterMetadata
 import my.noveldokusha.network.*
@@ -11,11 +10,10 @@ import my.noveldokusha.utils.addPath
 import my.noveldokusha.utils.toDocument
 import my.noveldokusha.utils.toUrlBuilder
 import my.noveldokusha.utils.toUrlBuilderSafe
+import okhttp3.Headers
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
-import java.io.StringReader
 
-// CATALOG SEATCH NOT WORKING
 /**
  * Novel main page (chapter list) example:
  * https://www.lightnovelworld.com/novel/the-devil-does-not-need-to-be-defeated
@@ -96,17 +94,57 @@ class LightNovelWorld(
             return Response.Success(PagedList.createEmpty(index = index))
 
         return tryConnect {
-            val request = postRequest("https://www.lightnovelworld.com/lnsearchlive")
-                .postPayload {
-                    add("inputContent", input)
-                }
+            val request = postRequest(
+                url = "https://www.lightnovelworld.com/lnsearchlive",
+                headers = Headers.Builder().apply {
+                    add("accept", """*/*""")
+                    add("accept-encoding", """gzip, deflate, br""")
+                    add(
+                        "accept-language",
+                        """en-GB,en-US;q=0.9,en;q=0.8,ca;q=0.7,es-ES;q=0.6,es;q=0.5,de;q=0.4"""
+                    )
+                    add("cache-control", """no-cache""")
+                    add("content-length", """16""")
+                    add("content-type", """application/x-www-form-urlencoded; charset=UTF-8""")
+                    add(
+                        "cookie",
+                        """lncoreantifrg=CfDJ8I0f6r3I-mpDp8gg0LfwguD096gc7bPUCNwK5qYMQGeRvnTkCnDiq8ojv0o30LfGCRq3E5uAavI_vMrz3HKgtYWoxZG242sHov1_deI8blXoWhqCOAgdbwgF8ObSN8O76Op5lkigLECS4ZxWeCi2lCw"""
+                    )
+                    add("dnt", """1""")
+                    add(
+                        "lnrequestverifytoken",
+                        """CfDJ8I0f6r3I-mpDp8gg0LfwguDqv1-Muj3LDHQZA6e0PXfX44NvoAizhMliI37Gkf3tKKsm7Tco5iQ5NxmuHFxT_joq_AIFHsxeJB0ZD7GkWYrTxow0lJo8vQAAQd5MdChlHTXI15seYyDTpUS0NsuxraU"""
+                    )
+                    add("origin", """https://www.lightnovelworld.com""")
+                    add("pragma", """no-cache""")
+                    add("referer", """https://www.lightnovelworld.com/search""")
+                    add(
+                        "sec-ch-ua",
+                        """".Not/A)Brand";v="99", "Google Chrome";v="103", "Chromium";v="103""""
+                    )
+                    add("sec-ch-ua-mobile", """?0""")
+                    add("sec-ch-ua-platform", """Windows""")
+                    add("sec-fetch-dest", """empty""")
+                    add("sec-fetch-mode", """cors""")
+                    add("sec-fetch-site", """same-origin""")
+                    add(
+                        "user-agent",
+                        """Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36"""
+                    )
+                    add("x-requested-with", """XMLHttpRequest""")
+                }.build()
+            ).postPayload {
+                add("inputContent", input)
+            }
 
+            // content-encoding:br
+            // Needs okhttp brotli dependency to decode
             val json = networkClient.call(request)
-                .toDocument()
-                .text()
+                .body!!
+                .string()
 
             JsonParser
-                .parseReader(JsonReader(StringReader(json)).apply { isLenient = true })
+                .parseString(json)
                 .asJsonObject["resultview"]
                 .asString
                 .let { Jsoup.parse(it) }

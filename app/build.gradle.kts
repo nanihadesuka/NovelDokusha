@@ -131,7 +131,6 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-script-runtime:1.7.10")
     implementation("org.jetbrains.kotlin:kotlin-stdlib:1.7.10")
 
-
     // Room components
     implementation("androidx.room:room-runtime:2.4.3")
     implementation("androidx.room:room-ktx:2.4.3")
@@ -205,6 +204,11 @@ dependencies {
 
     androidTestImplementation("androidx.compose.ui:ui-test-junit4:1.2.0")
 
+    // Networking
+    implementation("com.squareup.okhttp3:okhttp:4.10.0")
+    implementation("com.squareup.okhttp3:okhttp-brotli:4.10.0")
+    implementation("com.squareup.okhttp3:logging-interceptor:4.10.0")
+
     // Coil for jetpack compose
     implementation("io.coil-kt:coil-compose:2.1.0")
 
@@ -216,7 +220,6 @@ dependencies {
 
     // Logging
     implementation("com.jakewharton.timber:timber:5.0.1")
-    implementation("com.squareup.okhttp3:logging-interceptor:4.10.0")
 }
 
 kapt {

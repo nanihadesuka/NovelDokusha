@@ -8,7 +8,6 @@ import my.noveldokusha.scraper.TextExtractor
 import my.noveldokusha.utils.*
 import org.jsoup.nodes.Document
 
-// ALL OK
 class BoxNovel(
     private val networkClient: NetworkClient
 ) : SourceInterface.Catalog {

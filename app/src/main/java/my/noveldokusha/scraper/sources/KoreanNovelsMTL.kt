@@ -10,7 +10,6 @@ import my.noveldokusha.scraper.SourceInterface
 import my.noveldokusha.utils.toDocument
 import org.jsoup.nodes.Document
 
-// ALL OK
 /**
  * Novel main page (chapter list) example:
  * https://www.koreanmtl.online/p/is-this-hero-for-real.html

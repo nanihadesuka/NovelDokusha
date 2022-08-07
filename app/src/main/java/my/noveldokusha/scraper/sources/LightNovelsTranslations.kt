@@ -16,7 +16,6 @@ import org.jsoup.nodes.Document
 import java.net.URLDecoder
 import java.util.*
 
-// ALL OK
 /**
  * Novel main page (chapter list) example:
  * https://lightnovelstranslations.com/the-sage-summoned-to-another-world/

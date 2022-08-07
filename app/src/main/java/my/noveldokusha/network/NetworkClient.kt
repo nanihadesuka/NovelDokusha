@@ -37,6 +37,7 @@ class ScrapperNetworkClient(
             } else it
         }
         .addInterceptor(UserAgentInterceptor())
+        .addInterceptor(BrotliDecodeResponseInterceptor())
         .cookieJar(cookieJar)
         .cache(Cache(cacheDir, cacheSize))
         .connectTimeout(30, TimeUnit.SECONDS)
