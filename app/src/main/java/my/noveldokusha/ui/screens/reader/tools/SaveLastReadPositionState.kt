@@ -18,11 +18,21 @@ fun saveLastReadPositionState(
         }
 
         if (oldChapter?.url != null) repository.bookChapter.get(oldChapter.url)?.let {
-            repository.bookChapter.update(it.copy(lastReadPosition = oldChapter.position, lastReadOffset = oldChapter.offset))
+            repository.bookChapter.update(
+                it.copy(
+                    lastReadPosition = oldChapter.position,
+                    lastReadOffset = oldChapter.offset
+                )
+            )
         }
 
         repository.bookChapter.get(chapter.url)?.let {
-            repository.bookChapter.update(it.copy(lastReadPosition = chapter.position, lastReadOffset = chapter.offset))
+            repository.bookChapter.update(
+                it.copy(
+                    lastReadPosition = chapter.position,
+                    lastReadOffset = chapter.offset
+                )
+            )
         }
     }
 }

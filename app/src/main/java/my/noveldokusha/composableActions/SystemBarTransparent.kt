@@ -6,8 +6,7 @@ import androidx.compose.runtime.SideEffect
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
 @Composable
-fun SetSystemBarTransparent(alpha : Float)
-{
+fun SetSystemBarTransparent(alpha: Float) {
     val systemUiController = rememberSystemUiController()
     val useDarkIcons = MaterialTheme.colors.isLight
     val color = MaterialTheme.colors.primary.copy(alpha = alpha)

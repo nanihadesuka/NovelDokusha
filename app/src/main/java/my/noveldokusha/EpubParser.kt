@@ -2,11 +2,11 @@ package my.noveldokusha
 
 import android.graphics.BitmapFactory
 import kotlinx.coroutines.*
-import my.noveldokusha.tools.BookTextMapper
 import my.noveldokusha.data.Repository
 import my.noveldokusha.data.database.tables.Book
 import my.noveldokusha.data.database.tables.Chapter
 import my.noveldokusha.data.database.tables.ChapterBody
+import my.noveldokusha.tools.BookTextMapper
 import org.jsoup.Jsoup
 import org.jsoup.nodes.TextNode
 import org.w3c.dom.Document
@@ -27,8 +27,12 @@ private val Node.childElements get() = childNodes.elements
 private fun Document.selectFirstTag(tag: String): Node? = getElementsByTagName(tag).item(0)
 private fun Node.selectFirstChildTag(tag: String) = childElements.find { it.tagName == tag }
 private fun Node.selectChildTag(tag: String) = childElements.filter { it.tagName == tag }
-private fun Node.getAttributeValue(attribute: String): String? = attributes?.getNamedItem(attribute)?.textContent
-private fun parseXMLFile(inputSteam: InputStream): Document? = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(inputSteam)
+private fun Node.getAttributeValue(attribute: String): String? =
+    attributes?.getNamedItem(attribute)?.textContent
+
+private fun parseXMLFile(inputSteam: InputStream): Document? =
+    DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(inputSteam)
+
 private fun parseXMLFile(byteArray: ByteArray): Document? = parseXMLFile(byteArray.inputStream())
 private fun parseXMLText(text: String): Document? = text.reader().runCatching {
     DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(InputSource(this))
@@ -48,8 +52,7 @@ data class EpubBook(
     val images: List<EpubImage>
 )
 
-fun createEpubBook(inputStream: InputStream): EpubBook
-{
+fun createEpubBook(inputStream: InputStream): EpubBook {
     val zipFile = ZipInputStream(inputStream).use { zipInputStream ->
         zipInputStream
             .entries()
@@ -57,7 +60,8 @@ fun createEpubBook(inputStream: InputStream): EpubBook
             .associate { it.name to (it to zipInputStream.readBytes()) }
     }
 
-    val container = zipFile["META-INF/container.xml"] ?: throw Exception("META-INF/container.xml file missing")
+    val container =
+        zipFile["META-INF/container.xml"] ?: throw Exception("META-INF/container.xml file missing")
 
     val opfFilePath = parseXMLFile(container.second)
         ?.selectFirstTag("rootfile")
@@ -67,11 +71,15 @@ fun createEpubBook(inputStream: InputStream): EpubBook
     val opfFile = zipFile[opfFilePath] ?: throw Exception(".opf file missing")
 
     val docuemnt = parseXMLFile(opfFile.second) ?: throw Exception(".opf file failed to parse data")
-    val metadata = docuemnt.selectFirstTag("metadata") ?: throw Exception(".opf file metadata section missing")
-    val manifest = docuemnt.selectFirstTag("manifest") ?: throw Exception(".opf file manifest section missing")
-    val spine = docuemnt.selectFirstTag("spine") ?: throw Exception(".opf file spine section missing")
+    val metadata =
+        docuemnt.selectFirstTag("metadata") ?: throw Exception(".opf file metadata section missing")
+    val manifest =
+        docuemnt.selectFirstTag("manifest") ?: throw Exception(".opf file manifest section missing")
+    val spine =
+        docuemnt.selectFirstTag("spine") ?: throw Exception(".opf file spine section missing")
 
-    val bookTitle = metadata.selectFirstChildTag("dc:title")?.textContent ?: throw Exception(".opf metadata title tag missing")
+    val bookTitle = metadata.selectFirstChildTag("dc:title")?.textContent
+        ?: throw Exception(".opf metadata title tag missing")
     val bookUrl = bookTitle.asFileName()
     val rootPath = File(opfFilePath).parentFile ?: File("")
     fun String.absPath() = File(rootPath, this).path.replace("""\""", "/").removePrefix("/")
@@ -88,7 +96,12 @@ fun createEpubBook(inputStream: InputStream): EpubBook
 
     val idRef = spine.selectChildTag("itemref").map { it.getAttribute("idref") }
 
-    data class TempEpubChapter(val url: String, val title: String?, val body: String, val chapterIndex: Int)
+    data class TempEpubChapter(
+        val url: String,
+        val title: String?,
+        val body: String,
+        val chapterIndex: Int
+    )
 
     var chapterIndex = 0
     val chapterExtensions = listOf("xhtml", "xml", "html").map { ".$it" }
@@ -136,46 +149,63 @@ fun createEpubBook(inputStream: InputStream): EpubBook
 
     val images = (listedImages + unlistedImages).distinctBy { it.path }
 
-    return EpubBook(fileName = bookUrl, title = bookTitle, chapters = chapters.toList(), images = images.toList())
+    return EpubBook(
+        fileName = bookUrl,
+        title = bookTitle,
+        chapters = chapters.toList(),
+        images = images.toList()
+    )
 }
 
-fun importEpubToRepository(repository: Repository, epub: EpubBook) = CoroutineScope(Dispatchers.IO).launch {
-    // First clean any previous entries from the book
-    fun String.withLocalPrefix() = "local://${this}"
+fun importEpubToRepository(repository: Repository, epub: EpubBook) =
+    CoroutineScope(Dispatchers.IO).launch {
+        // First clean any previous entries from the book
+        fun String.withLocalPrefix() = "local://${this}"
 
-    val bookUrl = epub.fileName.withLocalPrefix()
-    repository.bookChapter.chapters(bookUrl)
-        .map { it.url }
-        .let { repository.bookChapterBody.removeRows(it) }
-    repository.bookChapter.removeAllFromBook(bookUrl)
-    repository.bookLibrary.remove(bookUrl)
+        val bookUrl = epub.fileName.withLocalPrefix()
+        repository.bookChapter.chapters(bookUrl)
+            .map { it.url }
+            .let { repository.bookChapterBody.removeRows(it) }
+        repository.bookChapter.removeAllFromBook(bookUrl)
+        repository.bookLibrary.remove(bookUrl)
 
-    // Insert new book data
-    Book(title = epub.title, url = bookUrl, inLibrary = true)
-        .let { repository.bookLibrary.insert(it) }
+        // Insert new book data
+        Book(title = epub.title, url = bookUrl, inLibrary = true)
+            .let { repository.bookLibrary.insert(it) }
 
-    epub.chapters
-        .mapIndexed { i, it -> Chapter(title = it.title, url = it.url.withLocalPrefix(), bookUrl = bookUrl, position = i) }
-        .let { repository.bookChapter.insert(it) }
-
-    epub.chapters
-        .map { ChapterBody(url = it.url.withLocalPrefix(), body = it.body) }
-        .let { repository.bookChapterBody.insertReplace(it) }
-
-    epub.images.map {
-        async {
-            val imgFile = Paths.get(repository.settings.folderBooks.path, epub.fileName, it.path).toFile()
-            imgFile.parentFile?.also { parent ->
-                parent.mkdirs()
-                if (parent.exists())
-                    imgFile.writeBytes(it.image)
+        epub.chapters
+            .mapIndexed { i, it ->
+                Chapter(
+                    title = it.title,
+                    url = it.url.withLocalPrefix(),
+                    bookUrl = bookUrl,
+                    position = i
+                )
             }
-        }
-    }.awaitAll()
-}
+            .let { repository.bookChapter.insert(it) }
 
-private class EpubXMLFileParser(val fileAbsolutePath: String, val data: ByteArray, val zipFile: Map<String, Pair<ZipEntry, ByteArray>>)
-{
+        epub.chapters
+            .map { ChapterBody(url = it.url.withLocalPrefix(), body = it.body) }
+            .let { repository.bookChapterBody.insertReplace(it) }
+
+        epub.images.map {
+            async {
+                val imgFile =
+                    Paths.get(repository.settings.folderBooks.path, epub.fileName, it.path).toFile()
+                imgFile.parentFile?.also { parent ->
+                    parent.mkdirs()
+                    if (parent.exists())
+                        imgFile.writeBytes(it.image)
+                }
+            }
+        }.awaitAll()
+    }
+
+private class EpubXMLFileParser(
+    val fileAbsolutePath: String,
+    val data: ByteArray,
+    val zipFile: Map<String, Pair<ZipEntry, ByteArray>>
+) {
     data class Output(val title: String?, val body: String)
 
     val fileParentFolder: File = File(fileAbsolutePath).parentFile ?: File("")
@@ -183,8 +213,7 @@ private class EpubXMLFileParser(val fileAbsolutePath: String, val data: ByteArra
     // Make all local references absolute to the root of the epub for consistent references
     val absBasePath: String = File("").canonicalPath
 
-    fun parse(): Output
-    {
+    fun parse(): Output {
         val body = Jsoup.parse(data.inputStream(), "UTF-8", "").body()
 
         val title = body.selectFirst("h1, h2, h3, h4, h5, h6")?.text()
@@ -197,8 +226,7 @@ private class EpubXMLFileParser(val fileAbsolutePath: String, val data: ByteArra
     }
 
     // Rewrites the image node to xml for the next stage.
-    private fun declareImgEntry(node: org.jsoup.nodes.Node): String
-    {
+    private fun declareImgEntry(node: org.jsoup.nodes.Node): String {
         val relPathEncoded = (node as? org.jsoup.nodes.Element)?.attr("src") ?: return ""
         val absPath = File(fileParentFolder, relPathEncoded.decodedURL).canonicalPath
             .removePrefix(absBasePath)
@@ -218,37 +246,33 @@ private class EpubXMLFileParser(val fileAbsolutePath: String, val data: ByteArra
         return "\n\n$text\n\n"
     }
 
-    private fun getPTraverse(node: org.jsoup.nodes.Node): String
-    {
-        fun innerTraverse(node: org.jsoup.nodes.Node): String = node.childNodes().joinToString("") { child ->
-            when
-            {
-                child.nodeName() == "br" -> "\n"
-                child.nodeName() == "img" -> declareImgEntry(child)
-                child is TextNode -> child.text()
-                else -> innerTraverse(child)
+    private fun getPTraverse(node: org.jsoup.nodes.Node): String {
+        fun innerTraverse(node: org.jsoup.nodes.Node): String =
+            node.childNodes().joinToString("") { child ->
+                when {
+                    child.nodeName() == "br" -> "\n"
+                    child.nodeName() == "img" -> declareImgEntry(child)
+                    child is TextNode -> child.text()
+                    else -> innerTraverse(child)
+                }
             }
-        }
 
         val paragraph = innerTraverse(node).trim()
         return if (paragraph.isEmpty()) "" else innerTraverse(node).trim() + "\n\n"
     }
 
-    private fun getNodeTextTraverse(node: org.jsoup.nodes.Node): String
-    {
+    private fun getNodeTextTraverse(node: org.jsoup.nodes.Node): String {
         val children = node.childNodes()
         if (children.isEmpty())
             return ""
 
         return children.joinToString("") { child ->
-            when
-            {
+            when {
                 child.nodeName() == "p" -> getPTraverse(child)
                 child.nodeName() == "br" -> "\n"
                 child.nodeName() == "hr" -> "\n\n"
                 child.nodeName() == "img" -> declareImgEntry(child)
-                child is TextNode ->
-                {
+                child is TextNode -> {
                     val text = child.text().trim()
                     if (text.isEmpty()) "" else text + "\n\n"
                 }
@@ -257,15 +281,13 @@ private class EpubXMLFileParser(val fileAbsolutePath: String, val data: ByteArra
         }
     }
 
-    private fun getNodeStructuredText(node: org.jsoup.nodes.Node): String
-    {
+    private fun getNodeStructuredText(node: org.jsoup.nodes.Node): String {
         val children = node.childNodes()
         if (children.isEmpty())
             return ""
 
         return children.joinToString("") { child ->
-            when
-            {
+            when {
                 child.nodeName() == "p" -> getPTraverse(child)
                 child.nodeName() == "br" -> "\n"
                 child.nodeName() == "hr" -> "\n\n"

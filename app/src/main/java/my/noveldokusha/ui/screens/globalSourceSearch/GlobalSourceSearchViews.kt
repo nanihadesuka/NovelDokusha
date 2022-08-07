@@ -21,6 +21,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import my.noveldokusha.R
+import my.noveldokusha.composableActions.ListLoadWatcher
 import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.network.IteratorState
 import my.noveldokusha.network.NetworkClient
@@ -29,7 +30,6 @@ import my.noveldokusha.ui.theme.ColorAccent
 import my.noveldokusha.ui.theme.ImageBorderRadius
 import my.noveldokusha.ui.theme.InternalTheme
 import my.noveldokusha.uiViews.ImageView
-import my.noveldokusha.composableActions.ListLoadWatcher
 import my.noveldokusha.utils.capitalize
 import okhttp3.OkHttpClient
 import okhttp3.Request

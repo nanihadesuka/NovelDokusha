@@ -3,7 +3,6 @@ package my.noveldokusha.ui.screens.sourceCatalog
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.animation.ExperimentalAnimationApi
@@ -14,7 +13,6 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import dagger.hilt.android.AndroidEntryPoint
-import my.noveldokusha.AppPreferences
 import my.noveldokusha.R
 import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.ui.BaseActivity
@@ -28,7 +26,6 @@ import my.noveldokusha.utils.Extra_String
 import my.noveldokusha.utils.capitalize
 import my.noveldokusha.utils.copyToClipboard
 import java.util.*
-import javax.inject.Inject
 
 
 @AndroidEntryPoint

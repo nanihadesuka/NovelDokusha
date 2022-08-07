@@ -15,8 +15,7 @@ fun ListLoadWatcher(
     loadState: IteratorState,
     onLoadNext: () -> Unit,
     debounceMilliseconds: Long = 100L
-)
-{
+) {
     val loadStateUpdated by rememberUpdatedState(newValue = loadState)
     val isReadyToLoad by remember {
         derivedStateOf {
@@ -44,8 +43,7 @@ fun ListGridLoadWatcher(
     loadState: IteratorState,
     onLoadNext: () -> Unit,
     debounceMilliseconds: Long = 100L
-)
-{
+) {
     val loadStateUpdated by rememberUpdatedState(newValue = loadState)
     val isReadyToLoad by remember {
         derivedStateOf {

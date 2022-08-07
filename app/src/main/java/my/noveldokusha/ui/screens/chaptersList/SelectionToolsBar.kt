@@ -2,7 +2,6 @@ package my.noveldokusha.ui.screens.chaptersList
 
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -32,14 +31,12 @@ fun SelectionToolsBar(
     onSelectAllChaptersAfterSelectedOnes: () -> Unit,
     onCloseSelectionbar: () -> Unit,
     modifier: Modifier = Modifier
-)
-{
+) {
     fun LazyGridScope.buttonItem(
         @DrawableRes id: Int,
         @StringRes description: Int,
         onClick: () -> Unit
-    )
-    {
+    ) {
         item {
             Box(
                 contentAlignment = Alignment.Center,

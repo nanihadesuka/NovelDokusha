@@ -3,7 +3,6 @@ package my.noveldokusha.ui.screens.globalSourceSearch
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.foundation.background
@@ -17,14 +16,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import dagger.hilt.android.AndroidEntryPoint
-import my.noveldokusha.AppPreferences
 import my.noveldokusha.R
 import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.ui.BaseActivity
 import my.noveldokusha.ui.screens.chaptersList.ChaptersActivity
 import my.noveldokusha.ui.theme.Theme
 import my.noveldokusha.utils.Extra_String
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class GlobalSourceSearchActivity : BaseActivity() {

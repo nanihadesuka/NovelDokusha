@@ -1,6 +1,5 @@
 package my.noveldokusha.uiViews
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -27,8 +26,7 @@ fun ErrorView(
     error: String,
     onReload: (() -> Unit)? = null,
     onCopyError: ((String) -> Unit)? = null
-)
-{
+) {
     @Composable
     fun Modifier.click(onClick: () -> Unit) = clickable(
         interactionSource = remember { MutableInteractionSource() },
@@ -41,8 +39,7 @@ fun ErrorView(
             .padding(4.dp)
             .border(0.5.dp, Color.Red, RoundedCornerShape(4.dp))
     ) {
-        if (onReload != null || onCopyError != null)
-        {
+        if (onReload != null || onCopyError != null) {
             Row(Modifier.height(IntrinsicSize.Min)) {
                 if (onReload != null)
                     Text(

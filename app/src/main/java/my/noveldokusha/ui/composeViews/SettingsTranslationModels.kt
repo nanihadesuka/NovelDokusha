@@ -26,7 +26,9 @@ fun SettingsTranslationModels(
         Column(
             verticalArrangement = Arrangement.spacedBy(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.padding(horizontal = 4.dp).fillMaxWidth()
+            modifier = Modifier
+                .padding(horizontal = 4.dp)
+                .fillMaxWidth()
         ) {
             Spacer(modifier = Modifier.height(0.dp))
             Text(

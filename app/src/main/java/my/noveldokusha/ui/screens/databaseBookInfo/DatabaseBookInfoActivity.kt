@@ -3,7 +3,6 @@ package my.noveldokusha.ui.screens.databaseBookInfo
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.foundation.rememberScrollState
@@ -11,7 +10,6 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.core.view.WindowCompat
 import dagger.hilt.android.AndroidEntryPoint
-import my.noveldokusha.AppPreferences
 import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.scraper.DatabaseInterface
 import my.noveldokusha.ui.BaseActivity
@@ -20,7 +18,6 @@ import my.noveldokusha.ui.screens.globalSourceSearch.GlobalSourceSearchActivity
 import my.noveldokusha.ui.theme.Theme
 import my.noveldokusha.uiViews.SetSystemBarTransparent
 import my.noveldokusha.utils.Extra_String
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class DatabaseBookInfoActivity : BaseActivity() {

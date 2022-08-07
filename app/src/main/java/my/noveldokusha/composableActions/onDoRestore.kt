@@ -8,8 +8,7 @@ import androidx.compose.ui.platform.LocalContext
 import my.noveldokusha.services.RestoreDataService
 
 @Composable
-fun onDoRestore(): () -> Unit
-{
+fun onDoRestore(): () -> Unit {
     val context = LocalContext.current
     val fileExplorer = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent(),

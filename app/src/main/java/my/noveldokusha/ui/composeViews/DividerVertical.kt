@@ -19,8 +19,7 @@ fun DividerVertical(
     color: Color = MaterialTheme.colors.onSurface,
     thickness: Dp = 1.dp,
     topIndent: Dp = 0.dp
-)
-{
+) {
     Box(
         modifier = modifier
             .padding(top = topIndent)

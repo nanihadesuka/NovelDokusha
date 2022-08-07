@@ -18,7 +18,7 @@ import my.noveldokusha.ui.theme.InternalTheme
 fun ToolbarMain(
     title: String,
     subtitle: String
-){
+) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier

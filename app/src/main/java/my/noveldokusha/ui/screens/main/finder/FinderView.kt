@@ -28,8 +28,8 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import my.noveldokusha.R
-import my.noveldokusha.scraper.DatabaseInterface
 import my.noveldokusha.network.NetworkClient
+import my.noveldokusha.scraper.DatabaseInterface
 import my.noveldokusha.scraper.Scraper
 import my.noveldokusha.scraper.SourceInterface
 import my.noveldokusha.ui.composeViews.ToolbarModeSearch

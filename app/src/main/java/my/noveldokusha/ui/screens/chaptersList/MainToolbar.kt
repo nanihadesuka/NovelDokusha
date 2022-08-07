@@ -32,8 +32,7 @@ fun MainToolbar(
     onClickChapterTitleSearch: () -> Unit,
     topPadding: Dp,
     height: Dp
-)
-{
+) {
     val bookmarkColor by animateColorAsState(
         targetValue = when (isBookmarked) {
             true -> colorResource(id = R.color.dark_orange_red)

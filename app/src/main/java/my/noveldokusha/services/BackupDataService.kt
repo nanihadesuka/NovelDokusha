@@ -9,38 +9,35 @@ import android.util.Log
 import androidx.core.app.NotificationCompat
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.*
-import my.noveldokusha.*
+import my.noveldokusha.R
 import my.noveldokusha.data.Repository
 import my.noveldokusha.utils.*
 import okhttp3.internal.closeQuietly
-import java.lang.Exception
 import java.util.zip.ZipEntry
 import java.util.zip.ZipOutputStream
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class BackupDataService : Service()
-{
+class BackupDataService : Service() {
     @Inject
     lateinit var repository: Repository
 
-    private class IntentData : Intent
-    {
+    private class IntentData : Intent {
         var uri by Extra_Uri()
         var backupImages by Extra_Boolean()
 
         constructor(intent: Intent) : super(intent)
-        constructor(ctx: Context, uri: Uri, backupImages: Boolean) : super(ctx, BackupDataService::class.java)
-        {
+        constructor(ctx: Context, uri: Uri, backupImages: Boolean) : super(
+            ctx,
+            BackupDataService::class.java
+        ) {
             this.uri = uri
             this.backupImages = backupImages
         }
     }
 
-    companion object
-    {
-        fun start(ctx: Context, uri: Uri, backupImages: Boolean)
-        {
+    companion object {
+        fun start(ctx: Context, uri: Uri, backupImages: Boolean) {
             if (!isRunning(ctx))
                 ctx.startService(IntentData(ctx, uri, backupImages))
         }
@@ -55,30 +52,25 @@ class BackupDataService : Service()
 
     override fun onBind(intent: Intent?): IBinder? = null
 
-    override fun onCreate()
-    {
+    override fun onCreate() {
         super.onCreate()
         notificationBuilder = showNotification(this, channel_id) {}
         startForeground(channel_id.hashCode(), notificationBuilder.build())
     }
 
-    override fun onDestroy()
-    {
+    override fun onDestroy() {
         job?.cancel()
         super.onDestroy()
     }
 
-    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int
-    {
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         if (intent == null) return START_NOT_STICKY
         val intentData = IntentData(intent)
 
         job = CoroutineScope(Dispatchers.IO).launch {
-            try
-            {
+            try {
                 backupData(intentData.uri, intentData.backupImages)
-            } catch (e: Exception)
-            {
+            } catch (e: Exception) {
                 Log.e(this::class.simpleName, "Failed to start command")
             }
 
@@ -123,21 +115,21 @@ class BackupDataService : Service()
             }
 
             // Save books extra data (like images)
-            if (backupImages)
-            {
+            if (backupImages) {
                 notificationBuilder.showNotification(channel_id) {
                     text = "Copying images"
                 }
                 val basePath = repository.settings.folderBooks.toPath().parent
-                repository.settings.folderBooks.walkBottomUp().filterNot { it.isDirectory }.forEach { file ->
-                    val name = basePath.relativize(file.toPath()).toString()
-                    val entry = ZipEntry(name)
-                    entry.method = ZipOutputStream.DEFLATED
-                    file.inputStream().use {
-                        zip.putNextEntry(entry)
-                        it.copyTo(zip)
+                repository.settings.folderBooks.walkBottomUp().filterNot { it.isDirectory }
+                    .forEach { file ->
+                        val name = basePath.relativize(file.toPath()).toString()
+                        val entry = ZipEntry(name)
+                        entry.method = ZipOutputStream.DEFLATED
+                        file.inputStream().use {
+                            zip.putNextEntry(entry)
+                            it.copyTo(zip)
+                        }
                     }
-                }
             }
 
             zip.closeQuietly()

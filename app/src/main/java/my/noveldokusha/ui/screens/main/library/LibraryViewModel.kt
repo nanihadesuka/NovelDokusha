@@ -22,8 +22,7 @@ import javax.inject.Inject
 class LibraryViewModel @Inject constructor(
     val appPreferences: AppPreferences,
     private val repository: Repository,
-) : BaseViewModel()
-{
+) : BaseViewModel() {
     @OptIn(ExperimentalMaterialApi::class)
     val bottomSheetState = ModalBottomSheetState(ModalBottomSheetValue.Hidden)
 
@@ -36,18 +35,15 @@ class LibraryViewModel @Inject constructor(
     val readFilter by appPreferences.LIBRARY_FILTER_READ.state(viewModelScope)
     val readSort by appPreferences.LIBRARY_SORT_READ.state(viewModelScope)
 
-    fun readFilterToggle()
-    {
+    fun readFilterToggle() {
         appPreferences.LIBRARY_FILTER_READ.value = appPreferences.LIBRARY_FILTER_READ.value.next()
     }
 
-    fun readSortToggle()
-    {
+    fun readSortToggle() {
         appPreferences.LIBRARY_SORT_READ.value = appPreferences.LIBRARY_SORT_READ.value.next()
     }
 
-    fun bookCompletedToggle(bookUrl: String)
-    {
+    fun bookCompletedToggle(bookUrl: String) {
         viewModelScope.launch {
             val book = repository.BookLibrary().get(bookUrl) ?: return@launch
             repository.BookLibrary().update(book.copy(completed = !book.completed))
@@ -57,8 +53,7 @@ class LibraryViewModel @Inject constructor(
     fun getBook(bookUrl: String) = repository.BookLibrary().getFlow(bookUrl).filterNotNull()
 }
 
-sealed interface OptionsBookDialogState
-{
+sealed interface OptionsBookDialogState {
     object Hide : OptionsBookDialogState
     data class Show(val book: Book) : OptionsBookDialogState
 }

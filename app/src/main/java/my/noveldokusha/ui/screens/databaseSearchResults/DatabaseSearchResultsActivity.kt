@@ -3,13 +3,11 @@ package my.noveldokusha.ui.screens.databaseSearchResults
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import dagger.hilt.android.AndroidEntryPoint
-import my.noveldokusha.AppPreferences
 import my.noveldokusha.R
 import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.ui.BaseActivity
@@ -21,7 +19,6 @@ import my.noveldokusha.utils.Extra_StringArrayList
 import my.noveldokusha.utils.capitalize
 import my.noveldokusha.utils.copyToClipboard
 import java.util.*
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class DatabaseSearchResultsActivity : BaseActivity() {

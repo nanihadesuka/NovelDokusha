@@ -2,12 +2,11 @@ package my.noveldokusha.data.database.DAOs
 
 import androidx.room.*
 import kotlinx.coroutines.flow.Flow
-import my.noveldokusha.data.database.tables.Book
 import my.noveldokusha.data.BookWithContext
+import my.noveldokusha.data.database.tables.Book
 
 @Dao
-interface LibraryDao
-{
+interface LibraryDao {
     @Query("SELECT * FROM Book")
     suspend fun getAll(): List<Book>
 

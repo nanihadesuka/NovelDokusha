@@ -1,7 +1,6 @@
 package my.noveldokusha.ui.screens.main
 
 import android.os.Bundle
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -19,7 +18,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.state.ToggleableState
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.google.accompanist.insets.navigationBarsPadding
 import dagger.hilt.android.AndroidEntryPoint
 import my.noveldokusha.AppPreferences
 import my.noveldokusha.R
@@ -31,18 +29,14 @@ import my.noveldokusha.ui.screens.main.settings.SettingsView
 import my.noveldokusha.ui.theme.Theme
 import my.noveldokusha.utils.drawTopLine
 import my.noveldokusha.utils.mix
-import javax.inject.Inject
 
 @AndroidEntryPoint
-open class MainActivity : BaseActivity()
-{
-    enum class PAGE
-    {
+open class MainActivity : BaseActivity() {
+    enum class PAGE {
         LIBRARY, FINDER, SETTINGS
     }
 
-    override fun onCreate(savedInstanceState: Bundle?)
-    {
+    override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             var page by rememberSaveable { mutableStateOf(PAGE.LIBRARY) }
@@ -51,8 +45,7 @@ open class MainActivity : BaseActivity()
                 BottomSheetMain {
                     Column(Modifier.fillMaxSize()) {
                         Box(Modifier.weight(1f)) {
-                            when (page)
-                            {
+                            when (page) {
                                 PAGE.LIBRARY -> LibraryView()
                                 PAGE.FINDER -> FinderView()
                                 PAGE.SETTINGS -> SettingsView()
@@ -92,8 +85,7 @@ open class MainActivity : BaseActivity()
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun BottomSheetMain(body: @Composable () -> Unit)
-{
+fun BottomSheetMain(body: @Composable () -> Unit) {
     val model = viewModel<LibraryViewModel>()
     ModalBottomSheetLayout(
         sheetState = model.bottomSheetState,
@@ -109,8 +101,7 @@ fun BottomSheetMain(body: @Composable () -> Unit)
     )
 }
 
-fun AppPreferences.TERNARY_STATE.toToggleableState() = when (this)
-{
+fun AppPreferences.TERNARY_STATE.toToggleableState() = when (this) {
     AppPreferences.TERNARY_STATE.active -> ToggleableState.On
     AppPreferences.TERNARY_STATE.inverse -> ToggleableState.Indeterminate
     AppPreferences.TERNARY_STATE.inactive -> ToggleableState.Off
@@ -123,8 +114,7 @@ private fun RowScope.NavItem(
     painter: Painter,
     onClick: () -> Unit,
     selected: Boolean,
-)
-{
+) {
     Column(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,

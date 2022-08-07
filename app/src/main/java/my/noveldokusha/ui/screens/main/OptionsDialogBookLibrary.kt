@@ -20,12 +20,11 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import my.noveldokusha.R
 import my.noveldokusha.data.database.tables.Book
 import my.noveldokusha.ui.screens.main.library.LibraryViewModel
-import my.noveldokusha.utils.drawBottomLine
 import my.noveldokusha.uiViews.ImageView
+import my.noveldokusha.utils.drawBottomLine
 
 @Composable
-fun OptionsDialogBookLibrary(book: Book)
-{
+fun OptionsDialogBookLibrary(book: Book) {
     val model = viewModel<LibraryViewModel>()
     Card {
         Column(Modifier.padding(top = 0.dp, bottom = 16.dp)) {
@@ -61,8 +60,7 @@ fun OptionsDialogBookLibrary(book: Book)
             ) {
                 val checkState by remember {
                     derivedStateOf {
-                        when (model.readFilter.toToggleableState())
-                        {
+                        when (model.readFilter.toToggleableState()) {
                             ToggleableState.Off -> Color.Green
                             ToggleableState.On -> Color.Green
                             ToggleableState.Indeterminate -> Color.Red

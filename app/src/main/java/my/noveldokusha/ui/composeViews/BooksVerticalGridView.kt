@@ -13,12 +13,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import my.noveldokusha.R
+import my.noveldokusha.composableActions.ListGridLoadWatcher
 import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.network.IteratorState
 import my.noveldokusha.ui.theme.ColorAccent
 import my.noveldokusha.uiViews.BookImageButtonView
 import my.noveldokusha.uiViews.ErrorView
-import my.noveldokusha.composableActions.ListGridLoadWatcher
 
 @Composable
 fun BooksVerticalGridView(
@@ -32,8 +32,7 @@ fun BooksVerticalGridView(
     onBookLongClicked: (bookItem: BookMetadata) -> Unit,
     onReload: () -> Unit = {},
     onCopyError: (String) -> Unit = {}
-)
-{
+) {
     ListGridLoadWatcher(
         listState = listState,
         loadState = loadState,
@@ -62,14 +61,12 @@ fun BooksVerticalGridView(
                     .fillMaxWidth()
                     .height(160.dp),
             ) {
-                when (loadState)
-                {
+                when (loadState) {
                     IteratorState.LOADING -> CircularProgressIndicator(
                         color = ColorAccent
                     )
                     IteratorState.CONSUMED -> Text(
-                        text = when
-                        {
+                        text = when {
                             list.isEmpty() -> stringResource(R.string.no_results_found)
                             else -> stringResource(R.string.no_more_results)
                         },

@@ -13,10 +13,8 @@ class FetchIterator<T>(
     private val coroutineScope: CoroutineScope,
     private val list: ArrayList<T> = ArrayList(listOf()),
     private var fn: (suspend (index: Int) -> Response<List<T>>)
-)
-{
-    enum class STATE
-    { IDLE, LOADING, CONSUMED }
+) {
+    enum class STATE { IDLE, LOADING, CONSUMED }
 
     private var state = STATE.IDLE
     private var index = 0
@@ -29,13 +27,11 @@ class FetchIterator<T>(
     val onFetching = MutableLiveData<Boolean>()
     val onReset = MutableLiveData<Unit>()
 
-    fun setFunction(fn: (suspend (index: Int) -> Response<List<T>>))
-    {
+    fun setFunction(fn: (suspend (index: Int) -> Response<List<T>>)) {
         this.fn = fn
     }
 
-    fun reset()
-    {
+    fun reset() {
         job?.cancel()
         state = STATE.IDLE
         index = 0
@@ -44,14 +40,12 @@ class FetchIterator<T>(
         onReset.value = Unit
     }
 
-    fun fetchTrigger(trigger: () -> Boolean)
-    {
+    fun fetchTrigger(trigger: () -> Boolean) {
         if (state == STATE.IDLE && trigger())
             fetchNext()
     }
 
-    private fun fetchNext()
-    {
+    private fun fetchNext() {
         if (state != STATE.IDLE) return
         state = STATE.LOADING
 
@@ -60,26 +54,21 @@ class FetchIterator<T>(
             val res = withContext(Dispatchers.IO) { fn(index) }
             onFetching.value = false
             if (!isActive) return@launch
-            when (res)
-            {
-                is Response.Success ->
-                {
-                    if (res.data.isEmpty())
-                    {
+            when (res) {
+                is Response.Success -> {
+                    if (res.data.isEmpty()) {
                         state = STATE.CONSUMED
                         if (list.isEmpty())
                             onCompletedEmpty.value = Unit
                         else
                             onCompleted.value = Unit
-                    } else
-                    {
+                    } else {
                         state = STATE.IDLE
                         list.addAll(res.data)
                         onSuccess.value = list.toList()
                     }
                 }
-                is Response.Error ->
-                {
+                is Response.Error -> {
                     state = STATE.CONSUMED
                     onError.value = res
                     if (list.isEmpty())

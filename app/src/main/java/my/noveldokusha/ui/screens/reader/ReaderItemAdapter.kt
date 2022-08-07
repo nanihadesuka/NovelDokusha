@@ -25,11 +25,9 @@ class ReaderItemAdapter(
     val onChapterStartVisible: (chapterUrl: String) -> Unit,
     val onChapterEndVisible: (chapterUrl: String) -> Unit
 ) :
-    ArrayAdapter<ReaderItem>(ctx, 0, list)
-{
+    ArrayAdapter<ReaderItem>(ctx, 0, list) {
     override fun getCount() = super.getCount() + 2
-    override fun getItem(position: Int): ReaderItem = when (position)
-    {
+    override fun getItem(position: Int): ReaderItem = when (position) {
         0 -> topPadding
         this.count - 1 -> bottomPadding
         else -> super.getItem(position - 1)!!
@@ -39,8 +37,7 @@ class ReaderItemAdapter(
     private val bottomPadding = ReaderItem.PADDING("")
 
     override fun getViewTypeCount(): Int = 11
-    override fun getItemViewType(position: Int) = when (getItem(position))
-    {
+    override fun getItemViewType(position: Int) = when (getItem(position)) {
         is ReaderItem.BODY -> 0
         is ReaderItem.BODY_IMAGE -> 1
         is ReaderItem.BOOK_END -> 2
@@ -54,21 +51,26 @@ class ReaderItemAdapter(
         is ReaderItem.GOOGLE_TRANSLATE_ATTRIBUTION -> 9
     }
 
-    private fun viewTranslateAttribution(item: ReaderItem.GOOGLE_TRANSLATE_ATTRIBUTION, convertView: View?, parent: ViewGroup): View
-    {
-        val bind = when (convertView)
-        {
-            null -> ActivityReaderListItemGoogleTranslateAttributionBinding.inflate(parent.inflater, parent, false).also { it.root.tag = it }
+    private fun viewTranslateAttribution(
+        item: ReaderItem.GOOGLE_TRANSLATE_ATTRIBUTION,
+        convertView: View?,
+        parent: ViewGroup
+    ): View {
+        val bind = when (convertView) {
+            null -> ActivityReaderListItemGoogleTranslateAttributionBinding.inflate(
+                parent.inflater,
+                parent,
+                false
+            ).also { it.root.tag = it }
             else -> ActivityReaderListItemGoogleTranslateAttributionBinding.bind(convertView)
         }
         return bind.root
     }
 
-    private fun viewBody(item: ReaderItem.BODY, convertView: View?, parent: ViewGroup): View
-    {
-        val bind = when (convertView)
-        {
-            null -> ActivityReaderListItemBodyBinding.inflate(parent.inflater, parent, false).also { it.root.tag = it }
+    private fun viewBody(item: ReaderItem.BODY, convertView: View?, parent: ViewGroup): View {
+        val bind = when (convertView) {
+            null -> ActivityReaderListItemBodyBinding.inflate(parent.inflater, parent, false)
+                .also { it.root.tag = it }
             else -> ActivityReaderListItemBodyBinding.bind(convertView)
         }
 
@@ -77,8 +79,7 @@ class ReaderItemAdapter(
         bind.body.textSize = appPreferences.READER_FONT_SIZE.value
         bind.body.typeface = fontsLoader.getTypeFaceNORMAL(appPreferences.READER_FONT_FAMILY.value)
 
-        when (item.location)
-        {
+        when (item.location) {
             ReaderItem.LOCATION.FIRST -> onChapterStartVisible(item.chapterUrl)
             ReaderItem.LOCATION.LAST -> onChapterEndVisible(item.chapterUrl)
             else -> run {}
@@ -86,11 +87,14 @@ class ReaderItemAdapter(
         return bind.root
     }
 
-    private fun viewImage(item: ReaderItem.BODY_IMAGE, convertView: View?, parent: ViewGroup): View
-    {
-        val bind = when (convertView)
-        {
-            null -> ActivityReaderListItemImageBinding.inflate(parent.inflater, parent, false).also { it.root.tag = it }
+    private fun viewImage(
+        item: ReaderItem.BODY_IMAGE,
+        convertView: View?,
+        parent: ViewGroup
+    ): View {
+        val bind = when (convertView) {
+            null -> ActivityReaderListItemImageBinding.inflate(parent.inflater, parent, false)
+                .also { it.root.tag = it }
             else -> ActivityReaderListItemImageBinding.bind(convertView)
         }
 
@@ -118,8 +122,7 @@ class ReaderItemAdapter(
                 .into(bind.image)
         }
 
-        when (item.location)
-        {
+        when (item.location) {
             ReaderItem.LOCATION.FIRST -> onChapterStartVisible(item.chapterUrl)
             ReaderItem.LOCATION.LAST -> onChapterEndVisible(item.chapterUrl)
             else -> run {}
@@ -128,45 +131,65 @@ class ReaderItemAdapter(
         return bind.root
     }
 
-    private fun viewBookEnd(item: ReaderItem.BOOK_END, convertView: View?, parent: ViewGroup): View
-    {
-        val bind = when (convertView)
-        {
-            null -> ActivityReaderListItemSpecialTitleBinding.inflate(parent.inflater, parent, false).also { it.root.tag = it }
+    private fun viewBookEnd(
+        item: ReaderItem.BOOK_END,
+        convertView: View?,
+        parent: ViewGroup
+    ): View {
+        val bind = when (convertView) {
+            null -> ActivityReaderListItemSpecialTitleBinding.inflate(
+                parent.inflater,
+                parent,
+                false
+            ).also { it.root.tag = it }
             else -> ActivityReaderListItemSpecialTitleBinding.bind(convertView)
         }
         bind.specialTitle.text = ctx.getString(R.string.reader_no_more_chapters)
-        bind.specialTitle.typeface = fontsLoader.getTypeFaceBOLD(appPreferences.READER_FONT_FAMILY.value)
+        bind.specialTitle.typeface =
+            fontsLoader.getTypeFaceBOLD(appPreferences.READER_FONT_FAMILY.value)
         return bind.root
     }
 
-    private fun viewBookStart(item: ReaderItem.BOOK_START, convertView: View?, parent: ViewGroup): View
-    {
-        val bind = when (convertView)
-        {
-            null -> ActivityReaderListItemSpecialTitleBinding.inflate(parent.inflater, parent, false).also { it.root.tag = it }
+    private fun viewBookStart(
+        item: ReaderItem.BOOK_START,
+        convertView: View?,
+        parent: ViewGroup
+    ): View {
+        val bind = when (convertView) {
+            null -> ActivityReaderListItemSpecialTitleBinding.inflate(
+                parent.inflater,
+                parent,
+                false
+            ).also { it.root.tag = it }
             else -> ActivityReaderListItemSpecialTitleBinding.bind(convertView)
         }
         bind.specialTitle.text = ctx.getString(R.string.reader_first_chapter)
-        bind.specialTitle.typeface = fontsLoader.getTypeFaceBOLD(appPreferences.READER_FONT_FAMILY.value)
+        bind.specialTitle.typeface =
+            fontsLoader.getTypeFaceBOLD(appPreferences.READER_FONT_FAMILY.value)
         return bind.root
     }
 
-    private fun viewProgressbar(item: ReaderItem.PROGRESSBAR, convertView: View?, parent: ViewGroup): View
-    {
-        val bind = when (convertView)
-        {
-            null -> ActivityReaderListItemProgressBarBinding.inflate(parent.inflater, parent, false).also { it.root.tag = it }
+    private fun viewProgressbar(
+        item: ReaderItem.PROGRESSBAR,
+        convertView: View?,
+        parent: ViewGroup
+    ): View {
+        val bind = when (convertView) {
+            null -> ActivityReaderListItemProgressBarBinding.inflate(parent.inflater, parent, false)
+                .also { it.root.tag = it }
             else -> ActivityReaderListItemProgressBarBinding.bind(convertView)
         }
         return bind.root
     }
 
-    private fun viewTranslating(item: ReaderItem.TRANSLATING, convertView: View?, parent: ViewGroup): View
-    {
-        val bind = when (convertView)
-        {
-            null -> ActivityReaderListItemTranslatingBinding.inflate(parent.inflater, parent, false).also { it.root.tag = it }
+    private fun viewTranslating(
+        item: ReaderItem.TRANSLATING,
+        convertView: View?,
+        parent: ViewGroup
+    ): View {
+        val bind = when (convertView) {
+            null -> ActivityReaderListItemTranslatingBinding.inflate(parent.inflater, parent, false)
+                .also { it.root.tag = it }
             else -> ActivityReaderListItemTranslatingBinding.bind(convertView)
         }
         bind.text.text = context.getString(
@@ -177,42 +200,38 @@ class ReaderItemAdapter(
         return bind.root
     }
 
-    private fun viewDivider(item: ReaderItem.DIVIDER, convertView: View?, parent: ViewGroup): View
-    {
-        val bind = when (convertView)
-        {
-            null -> ActivityReaderListItemDividerBinding.inflate(parent.inflater, parent, false).also { it.root.tag = it }
+    private fun viewDivider(item: ReaderItem.DIVIDER, convertView: View?, parent: ViewGroup): View {
+        val bind = when (convertView) {
+            null -> ActivityReaderListItemDividerBinding.inflate(parent.inflater, parent, false)
+                .also { it.root.tag = it }
             else -> ActivityReaderListItemDividerBinding.bind(convertView)
         }
         return bind.root
     }
 
-    private fun viewError(item: ReaderItem.ERROR, convertView: View?, parent: ViewGroup): View
-    {
-        val bind = when (convertView)
-        {
-            null -> ActivityReaderListItemErrorBinding.inflate(parent.inflater, parent, false).also { it.root.tag = it }
+    private fun viewError(item: ReaderItem.ERROR, convertView: View?, parent: ViewGroup): View {
+        val bind = when (convertView) {
+            null -> ActivityReaderListItemErrorBinding.inflate(parent.inflater, parent, false)
+                .also { it.root.tag = it }
             else -> ActivityReaderListItemErrorBinding.bind(convertView)
         }
         bind.error.text = item.text
         return bind.root
     }
 
-    private fun viewPadding(item: ReaderItem.PADDING, convertView: View?, parent: ViewGroup): View
-    {
-        val bind = when (convertView)
-        {
-            null -> ActivityReaderListItemPaddingBinding.inflate(parent.inflater, parent, false).also { it.root.tag = it }
+    private fun viewPadding(item: ReaderItem.PADDING, convertView: View?, parent: ViewGroup): View {
+        val bind = when (convertView) {
+            null -> ActivityReaderListItemPaddingBinding.inflate(parent.inflater, parent, false)
+                .also { it.root.tag = it }
             else -> ActivityReaderListItemPaddingBinding.bind(convertView)
         }
         return bind.root
     }
 
-    private fun viewTitle(item: ReaderItem.TITLE, convertView: View?, parent: ViewGroup): View
-    {
-        val bind = when (convertView)
-        {
-            null -> ActivityReaderListItemTitleBinding.inflate(parent.inflater, parent, false).also { it.root.tag = it }
+    private fun viewTitle(item: ReaderItem.TITLE, convertView: View?, parent: ViewGroup): View {
+        val bind = when (convertView) {
+            null -> ActivityReaderListItemTitleBinding.inflate(parent.inflater, parent, false)
+                .also { it.root.tag = it }
             else -> ActivityReaderListItemTitleBinding.bind(convertView)
         }
         bind.title.text = item.textToDisplay
@@ -220,18 +239,22 @@ class ReaderItemAdapter(
         return bind.root
     }
 
-    override fun getView(position: Int, convertView: View?, parent: ViewGroup): View = when (val item = getItem(position))
-    {
-        is ReaderItem.GOOGLE_TRANSLATE_ATTRIBUTION -> viewTranslateAttribution(item, convertView, parent)
-        is ReaderItem.BODY -> viewBody(item, convertView, parent)
-        is ReaderItem.BODY_IMAGE -> viewImage(item, convertView, parent)
-        is ReaderItem.BOOK_END -> viewBookEnd(item, convertView, parent)
-        is ReaderItem.BOOK_START -> viewBookStart(item, convertView, parent)
-        is ReaderItem.DIVIDER -> viewDivider(item, convertView, parent)
-        is ReaderItem.ERROR -> viewError(item, convertView, parent)
-        is ReaderItem.PADDING -> viewPadding(item, convertView, parent)
-        is ReaderItem.PROGRESSBAR -> viewProgressbar(item, convertView, parent)
-        is ReaderItem.TRANSLATING -> viewTranslating(item, convertView, parent)
-        is ReaderItem.TITLE -> viewTitle(item, convertView, parent)
-    }
+    override fun getView(position: Int, convertView: View?, parent: ViewGroup): View =
+        when (val item = getItem(position)) {
+            is ReaderItem.GOOGLE_TRANSLATE_ATTRIBUTION -> viewTranslateAttribution(
+                item,
+                convertView,
+                parent
+            )
+            is ReaderItem.BODY -> viewBody(item, convertView, parent)
+            is ReaderItem.BODY_IMAGE -> viewImage(item, convertView, parent)
+            is ReaderItem.BOOK_END -> viewBookEnd(item, convertView, parent)
+            is ReaderItem.BOOK_START -> viewBookStart(item, convertView, parent)
+            is ReaderItem.DIVIDER -> viewDivider(item, convertView, parent)
+            is ReaderItem.ERROR -> viewError(item, convertView, parent)
+            is ReaderItem.PADDING -> viewPadding(item, convertView, parent)
+            is ReaderItem.PROGRESSBAR -> viewProgressbar(item, convertView, parent)
+            is ReaderItem.TRANSLATING -> viewTranslating(item, convertView, parent)
+            is ReaderItem.TITLE -> viewTitle(item, convertView, parent)
+        }
 }

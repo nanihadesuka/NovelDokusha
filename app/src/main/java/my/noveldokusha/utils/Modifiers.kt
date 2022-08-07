@@ -46,8 +46,10 @@ fun Modifier.drawTopLine(color: Color = MaterialTheme.colors.onPrimary.copy(alph
 fun Modifier.blockInteraction() = this.pointerInput(Unit) {}
 
 
-fun Modifier.clickableWithUnboundedIndicator(onClick: () -> Unit) = composed { clickable(
-    interactionSource = remember { MutableInteractionSource() },
-    indication = rememberRipple(bounded = false),
-    onClick = onClick
-) }
+fun Modifier.clickableWithUnboundedIndicator(onClick: () -> Unit) = composed {
+    clickable(
+        interactionSource = remember { MutableInteractionSource() },
+        indication = rememberRipple(bounded = false),
+        onClick = onClick
+    )
+}

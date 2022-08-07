@@ -1,10 +1,16 @@
 package my.noveldokusha.ui.screens.chaptersList
 
 import androidx.compose.animation.*
-import androidx.compose.foundation.*
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.ripple.rememberRipple
@@ -33,13 +39,12 @@ import my.noveldokusha.ui.theme.ColorAccent
 import my.noveldokusha.ui.theme.ImageBorderRadius
 import my.noveldokusha.ui.theme.InternalTheme
 import my.noveldokusha.ui.theme.Themes
-import my.noveldokusha.utils.ifCase
-import my.noveldokusha.utils.mix
 import my.noveldokusha.uiViews.ErrorView
 import my.noveldokusha.uiViews.ImageView
+import my.noveldokusha.utils.ifCase
+import my.noveldokusha.utils.mix
 
-enum class ToolbarMode
-{ MAIN, SEARCH }
+enum class ToolbarMode { MAIN, SEARCH }
 
 @Composable
 fun HeaderView(
@@ -50,8 +55,7 @@ fun HeaderView(
     description: String,
     onSearchBookInDatabase: () -> Unit,
     onOpenInBrowser: () -> Unit
-)
-{
+) {
     val bookCoverImg = bookCover ?: R.drawable.ic_baseline_empty_24
     Box {
         Box {
@@ -170,8 +174,7 @@ fun ChaptersListView(
     error: String,
     onClick: (ChapterWithContext) -> Unit,
     onLongClick: (ChapterWithContext) -> Unit
-)
-{
+) {
     LazyColumn(
         state = listState,
         contentPadding = PaddingValues(bottom = 240.dp)
@@ -183,15 +186,13 @@ fun ChaptersListView(
             }
 
             val backgroundColor by animateColorAsState(
-                targetValue = when (selected)
-                {
+                targetValue = when (selected) {
                     false -> MaterialTheme.colors.surface
                     true -> MaterialTheme.colors.onPrimary.mix(MaterialTheme.colors.surface, 0.1f)
                 }
             )
 
-            val indicatorColor = when (selected)
-            {
+            val indicatorColor = when (selected) {
                 true -> MaterialTheme.colors.surface
                 false -> MaterialTheme.colors.onPrimary.mix(MaterialTheme.colors.surface, 0.5f)
             }
@@ -212,32 +213,28 @@ fun ChaptersListView(
             ) {
 
                 val tintColor by animateColorAsState(
-                    targetValue = when (it.lastReadChapter)
-                    {
+                    targetValue = when (it.lastReadChapter) {
                         true -> ColorAccent
                         false -> MaterialTheme.colors.onPrimary
                     }
                 )
 
                 val readColorText by animateColorAsState(
-                    targetValue = when (it.chapter.read)
-                    {
+                    targetValue = when (it.chapter.read) {
                         true -> tintColor.copy(alpha = 0.5f)
                         false -> tintColor.copy(alpha = 1f)
                     }
                 )
 
                 val readColor by animateColorAsState(
-                    targetValue = when (it.chapter.read)
-                    {
+                    targetValue = when (it.chapter.read) {
                         true -> tintColor.copy(alpha = 0.5f)
                         false -> tintColor.copy(alpha = 0f)
                     }
                 )
 
                 val downloadedColor by animateColorAsState(
-                    targetValue = when (it.downloaded)
-                    {
+                    targetValue = when (it.downloaded) {
                         true -> tintColor.copy(alpha = 0.5f)
                         false -> tintColor.copy(alpha = 0f)
                     }
@@ -277,14 +274,13 @@ fun ChaptersListView(
     }
 }
 
-private class SampleProvider: PreviewParameterProvider<Themes> {
+private class SampleProvider : PreviewParameterProvider<Themes> {
     override val values = Themes.list.asSequence()
 }
 
 @Preview
 @Composable
-private fun Preview(@PreviewParameter(SampleProvider::class) theme: Themes)
-{
+private fun Preview(@PreviewParameter(SampleProvider::class) theme: Themes) {
     val list = (0..10).map {
         ChapterWithContext(
             chapter = Chapter(

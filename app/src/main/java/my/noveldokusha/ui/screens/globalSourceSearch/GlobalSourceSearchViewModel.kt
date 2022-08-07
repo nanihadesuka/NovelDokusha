@@ -12,8 +12,7 @@ import my.noveldokusha.ui.BaseViewModel
 import my.noveldokusha.utils.StateExtra_String
 import javax.inject.Inject
 
-interface GlobalSourceSearchStateBundle
-{
+interface GlobalSourceSearchStateBundle {
     val input: String
 }
 
@@ -22,8 +21,7 @@ class GlobalSourceSearchViewModel @Inject constructor(
     state: SavedStateHandle,
     val appPreferences: AppPreferences,
     private val scraper: Scraper,
-) : BaseViewModel(), GlobalSourceSearchStateBundle
-{
+) : BaseViewModel(), GlobalSourceSearchStateBundle {
     override val input by StateExtra_String(state)
 
     val list = appPreferences.SOURCES_LANGUAGES.value.let { activeLangs ->
@@ -33,12 +31,15 @@ class GlobalSourceSearchViewModel @Inject constructor(
     }
 }
 
-data class SourceResults(val source: SourceInterface.Catalog, val searchInput: String, val coroutineScope: CoroutineScope)
-{
-    val fetchIterator = PagedListIteratorState(coroutineScope) { source.getCatalogSearch(it, searchInput) }
+data class SourceResults(
+    val source: SourceInterface.Catalog,
+    val searchInput: String,
+    val coroutineScope: CoroutineScope
+) {
+    val fetchIterator =
+        PagedListIteratorState(coroutineScope) { source.getCatalogSearch(it, searchInput) }
 
-    init
-    {
+    init {
         fetchIterator.fetchNext()
     }
 }

@@ -8,8 +8,7 @@ import androidx.compose.ui.platform.LocalContext
 import my.noveldokusha.services.EpubImportService
 
 @Composable
-fun onDoImportEPUB(): () -> Unit
-{
+fun onDoImportEPUB(): () -> Unit {
     val context = LocalContext.current
     val fileExplorer = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent(),

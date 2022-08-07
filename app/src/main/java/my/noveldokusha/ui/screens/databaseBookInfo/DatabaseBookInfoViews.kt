@@ -4,7 +4,8 @@ import androidx.compose.animation.*
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.*
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -27,8 +28,7 @@ import my.noveldokusha.uiViews.ImageView
 import my.noveldokusha.uiViews.MyButton
 
 @Composable
-private fun Title(name: String)
-{
+private fun Title(name: String) {
     Text(
         text = name,
         fontWeight = FontWeight.Bold,
@@ -40,8 +40,7 @@ private fun Title(name: String)
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
-private fun TextAnimated(text: String)
-{
+private fun TextAnimated(text: String) {
     AnimatedContent(
         targetState = text,
         transitionSpec = { fadeIn() with fadeOut() }
@@ -61,8 +60,7 @@ fun DatabaseBookInfoView(
     onGenresClick: (genres: List<String>) -> Unit,
     onBookClick: (book: BookMetadata) -> Unit,
     scrollState: ScrollState,
-)
-{
+) {
     val coverImg = data.coverImageUrl ?: R.drawable.ic_baseline_empty_24
     Column(
         Modifier.verticalScroll(scrollState)
@@ -195,8 +193,7 @@ fun DatabaseBookInfoView(
 
 @Preview
 @Composable
-fun Preview()
-{
+fun Preview() {
     InternalTheme {
         DatabaseBookInfoView(
             scrollState = rememberScrollState(),

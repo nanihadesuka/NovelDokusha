@@ -7,8 +7,7 @@ import androidx.room.Query
 import my.noveldokusha.data.database.tables.ChapterBody
 
 @Dao
-interface ChapterBodyDao
-{
+interface ChapterBodyDao {
     @Query("SELECT * FROM ChapterBody")
     suspend fun getAll(): List<ChapterBody>
 

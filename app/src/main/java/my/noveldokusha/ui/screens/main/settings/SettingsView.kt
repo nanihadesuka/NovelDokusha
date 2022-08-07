@@ -9,8 +9,7 @@ import my.noveldokusha.composableActions.onDoBackup
 import my.noveldokusha.composableActions.onDoRestore
 
 @Composable
-fun SettingsView()
-{
+fun SettingsView() {
     val viewModel = viewModel<SettingsViewModel>()
     Column {
         ToolbarMain(title = stringResource(id = R.string.app_name))

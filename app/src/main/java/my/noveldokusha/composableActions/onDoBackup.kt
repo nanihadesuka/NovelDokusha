@@ -24,8 +24,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 @Composable
-fun onDoBackup(): () -> Unit
-{
+fun onDoBackup(): () -> Unit {
     val context = LocalContext.current
     var showDialog by remember { mutableStateOf(false) }
     var saveImages by remember { mutableStateOf(false) }

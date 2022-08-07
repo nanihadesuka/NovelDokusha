@@ -20,10 +20,8 @@ fun BooksVerticalView(
     onBookLongClicked: (bookItem: BookMetadata) -> Unit,
     onReload: () -> Unit,
     onCopyError: (String) -> Unit
-)
-{
-    when (layoutMode)
-    {
+) {
+    when (layoutMode) {
         AppPreferences.LIST_LAYOUT_MODE.verticalGrid -> BooksVerticalGridView(
             cells = GridCells.Fixed(2),
             list = list,

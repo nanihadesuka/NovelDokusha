@@ -23,14 +23,12 @@ import java.io.InputStream
     version = 4,
     exportSchema = false
 )
-abstract class AppDatabase : RoomDatabase()
-{
+abstract class AppDatabase : RoomDatabase() {
     abstract fun libraryDao(): LibraryDao
     abstract fun chapterDao(): ChapterDao
     abstract fun chapterBodyDao(): ChapterBodyDao
 
-    companion object
-    {
+    companion object {
         fun createRoom(ctx: Context, name: String) = Room
             .databaseBuilder(ctx, AppDatabase::class.java, name)
             .addMigrations(*migrations())
@@ -52,13 +50,13 @@ private fun migrations() = arrayOf(
         it.execSQL("ALTER TABLE Book ADD COLUMN inLibrary INTEGER NOT NULL DEFAULT 0")
         it.execSQL("UPDATE Book SET inLibrary = 1")
     },
-    migration(3,4){
+    migration(3, 4) {
         it.execSQL("ALTER TABLE Book ADD COLUMN coverImageUrl TEXT NOT NULL DEFAULT ''")
         it.execSQL("ALTER TABLE Book ADD COLUMN description TEXT NOT NULL DEFAULT ''")
     }
 )
 
-private fun migration(vi: Int, vf: Int, migrate: (SupportSQLiteDatabase) -> Unit) = object : Migration(vi, vf)
-{
-    override fun migrate(database: SupportSQLiteDatabase) = migrate(database)
-}
+private fun migration(vi: Int, vf: Int, migrate: (SupportSQLiteDatabase) -> Unit) =
+    object : Migration(vi, vf) {
+        override fun migrate(database: SupportSQLiteDatabase) = migrate(database)
+    }

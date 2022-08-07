@@ -4,7 +4,6 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
@@ -39,13 +38,11 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import my.nanihadesuka.compose.LazyColumnScrollbar
-import my.noveldokusha.AppPreferences
 import my.noveldokusha.R
 import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.data.ChapterWithContext
 import my.noveldokusha.scraper.Scraper
 import my.noveldokusha.ui.BaseActivity
-import my.noveldokusha.ui.Toasty
 import my.noveldokusha.ui.composeViews.ToolbarModeSearch
 import my.noveldokusha.ui.screens.databaseSearchResults.DatabaseSearchResultsActivity
 import my.noveldokusha.ui.screens.reader.ReaderActivity

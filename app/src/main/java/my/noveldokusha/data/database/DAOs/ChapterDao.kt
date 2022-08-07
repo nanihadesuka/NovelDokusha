@@ -2,12 +2,11 @@ package my.noveldokusha.data.database.DAOs
 
 import androidx.room.*
 import kotlinx.coroutines.flow.Flow
-import my.noveldokusha.data.database.tables.Chapter
 import my.noveldokusha.data.ChapterWithContext
+import my.noveldokusha.data.database.tables.Chapter
 
 @Dao
-interface ChapterDao
-{
+interface ChapterDao {
     @Query("SELECT * FROM Chapter")
     suspend fun getAll(): List<Chapter>
 

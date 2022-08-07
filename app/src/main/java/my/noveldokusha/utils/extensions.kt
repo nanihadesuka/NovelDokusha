@@ -40,7 +40,6 @@ fun RecyclerView.ViewHolder.addLeftMargin(marginPx: Int = 1000, condition: () ->
     itemView.addLeftMargin(marginPx, condition)
 
 
-
 @ColorInt
 fun @receiver:AttrRes Int.colorAttrRes(ctx: Context): Int =
     ctx.theme.obtainStyledAttributes(intArrayOf(this)).use {

@@ -28,8 +28,7 @@ import my.noveldokusha.ui.theme.ColorAccent
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
-fun OptionsSheetLibrary()
-{
+fun OptionsSheetLibrary() {
     val model = viewModel<LibraryViewModel>()
     Column(Modifier.padding(top = 16.dp, bottom = 64.dp)) {
         Text(
@@ -50,8 +49,7 @@ fun OptionsSheetLibrary()
                 .padding(horizontal = 8.dp)
         ) {
             val checkedColor by animateColorAsState(
-                targetValue = when (model.readFilter.toToggleableState())
-                {
+                targetValue = when (model.readFilter.toToggleableState()) {
                     ToggleableState.Off -> Color.Green
                     ToggleableState.On -> Color.Green
                     ToggleableState.Indeterminate -> Color.Red
@@ -91,8 +89,7 @@ fun OptionsSheetLibrary()
         ) {
             AnimatedContent(targetState = model.readSort) {
                 Icon(
-                    imageVector = when (it)
-                    {
+                    imageVector = when (it) {
                         AppPreferences.TERNARY_STATE.active -> Icons.Default.ArrowUpward
                         AppPreferences.TERNARY_STATE.inverse -> Icons.Default.ArrowDownward
                         AppPreferences.TERNARY_STATE.inactive -> Icons.Default.SwapVert

@@ -35,10 +35,10 @@ class FetchIteratorState<T>(
     }
 
     fun reloadFailedLastLoad() {
-        if(error == null)
+        if (error == null)
             return
         job?.cancel()
-        index = (index-1).coerceAtLeast(0)
+        index = (index - 1).coerceAtLeast(0)
         state = IteratorState.IDLE
         error = null
         fetchNext()
@@ -66,6 +66,6 @@ class FetchIteratorState<T>(
     }
 
     fun setFunction(fn: (suspend (index: Int) -> Response<List<T>>)) {
-            this.fn = fn
+        this.fn = fn
     }
 }

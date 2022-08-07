@@ -3,13 +3,11 @@ package my.noveldokusha.ui.screens.databaseSearch
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.state.ToggleableState
 import dagger.hilt.android.AndroidEntryPoint
-import my.noveldokusha.AppPreferences
 import my.noveldokusha.R
 import my.noveldokusha.ui.BaseActivity
 import my.noveldokusha.ui.screens.databaseSearchResults.DatabaseSearchResultsActivity
@@ -18,7 +16,6 @@ import my.noveldokusha.utils.Extra_String
 import my.noveldokusha.utils.capitalize
 import my.noveldokusha.utils.colorAttrRes
 import java.util.*
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class DatabaseSearchActivity : BaseActivity() {
