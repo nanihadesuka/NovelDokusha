@@ -8,7 +8,6 @@ import my.noveldokusha.scraper.TextExtractor
 import my.noveldokusha.utils.*
 import org.jsoup.nodes.Document
 
-// CHAPTERS LIST FAILS
 class _1stKissNovel(
     private val networkClient: NetworkClient
 ) : SourceInterface.Catalog {
@@ -31,18 +30,19 @@ class _1stKissNovel(
 
     // TODO() not working, website blocking calls
     override suspend fun getChapterList(doc: Document): List<ChapterMetadata> {
-        val url = "https://1stkissnovel.love/wp-admin/admin-ajax.php"
-        val id = doc.selectFirst("input.rating-post-id")!!.attr("value")
+        val url = doc
+            .selectFirst("meta[property=og:url]")!!
+            .attr("content")
+            .toUrlBuilderSafe()
+            .addPath("ajax", "chapters")
+            .toString()
 
-        val request = postRequest(url).postPayload {
-            add("action", "manga_get_chapters")
-            add("manga", id)
-        }
+        val request = postRequest(url)
 
         return networkClient
             .call(request)
             .toDocument()
-            .select(".wp-manga-chapter > a[href]")
+            .select(".wp-manga-chapter a[href]")
             .map { ChapterMetadata(title = it.text(), url = it.attr("href")) }
             .reversed()
     }
