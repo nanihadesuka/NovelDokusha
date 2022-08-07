@@ -10,7 +10,7 @@ import okio.source
 import org.brotli.dec.BrotliInputStream
 
 /**
- * Interceptor to decode/uncompress the a response body
+ * Interceptor to decode/uncompress a response body
  * with header content-encoding:br
  */
 class BrotliDecodeResponseInterceptor : Interceptor {
