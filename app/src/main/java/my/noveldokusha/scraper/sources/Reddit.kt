@@ -1,8 +1,9 @@
 package my.noveldokusha.scraper.sources
 
+import my.noveldokusha.network.NetworkClient
 import my.noveldokusha.scraper.SourceInterface
-import my.noveldokusha.scraper.textExtractor
-import my.noveldokusha.scraper.toUrlBuilder
+import my.noveldokusha.scraper.TextExtractor
+import my.noveldokusha.utils.toUrlBuilder
 import org.jsoup.nodes.Document
 
 /**
@@ -11,26 +12,25 @@ import org.jsoup.nodes.Document
  * Chapter url example: (redirected)
  * https://www.reddit.com/r/mushokutensei/comments/g50ry7/translation_old_dragons_tale_chapter_1_dragon_and/
  */
-class Reddit : SourceInterface.Base
-{
-	override val name = "Reddit"
-	override val baseUrl = "https://www.reddit.com/"
-	
-	override suspend fun transformChapterUrl(url: String): String
-	{
-		return url.toUrlBuilder()!!.authority("old.reddit.com").toString()
-	}
-	
-	override suspend fun getChapterTitle(doc: Document): String? = doc.title().ifBlank { null }
-	
-	override suspend fun getChapterText(doc: Document): String
-	{
-		return doc.selectFirst(".linklisting")!!
-			.selectFirst(".usertext-body, .may-blank-within, .md-container")!!
-			.let {
-				it.select("table").remove()
-				it.select("blockquote").remove()
-				textExtractor.get(it)
-			}
-	}
+class Reddit(
+    private val networkClient: NetworkClient
+) : SourceInterface.Base {
+    override val name = "Reddit"
+    override val baseUrl = "https://www.reddit.com/"
+
+    override suspend fun transformChapterUrl(url: String): String {
+        return url.toUrlBuilder()!!.authority("old.reddit.com").toString()
+    }
+
+    override suspend fun getChapterTitle(doc: Document): String? = doc.title().ifBlank { null }
+
+    override suspend fun getChapterText(doc: Document): String {
+        return doc.selectFirst(".linklisting")!!
+            .selectFirst(".usertext-body, .may-blank-within, .md-container")!!
+            .let {
+                it.select("table").remove()
+                it.select("blockquote").remove()
+                TextExtractor.get(it)
+            }
+    }
 }

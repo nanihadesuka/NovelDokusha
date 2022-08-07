@@ -14,11 +14,11 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import my.noveldokusha.R
 import my.noveldokusha.data.BookMetadata
-import my.noveldokusha.scraper.IteratorState
+import my.noveldokusha.network.IteratorState
 import my.noveldokusha.ui.theme.ColorAccent
 import my.noveldokusha.uiViews.BookImageButtonView
 import my.noveldokusha.uiViews.ErrorView
-import my.noveldokusha.uiViews.ListGridLoadWatcher
+import my.noveldokusha.composableActions.ListGridLoadWatcher
 
 @Composable
 fun BooksVerticalGridView(

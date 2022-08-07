@@ -4,7 +4,13 @@ import com.google.gson.JsonParser
 import com.google.gson.stream.JsonReader
 import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.data.ChapterMetadata
-import my.noveldokusha.scraper.*
+import my.noveldokusha.network.*
+import my.noveldokusha.scraper.SourceInterface
+import my.noveldokusha.scraper.TextExtractor
+import my.noveldokusha.utils.addPath
+import my.noveldokusha.utils.toDocument
+import my.noveldokusha.utils.toUrlBuilder
+import my.noveldokusha.utils.toUrlBuilderSafe
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import java.io.StringReader
@@ -16,7 +22,9 @@ import java.io.StringReader
  * Chapter url example:
  * https://www.lightnovelworld.com/novel/the-devil-does-not-need-to-be-defeated/1348-chapter-0
  */
-class LightNovelWorld : SourceInterface.Catalog {
+class LightNovelWorld(
+    private val networkClient: NetworkClient
+) : SourceInterface.Catalog {
     override val name = "Light Novel World"
     override val baseUrl = "https://www.lightnovelworld.com/"
     override val catalogUrl = "https://www.lightnovelworld.com/genre/all/popular/all/"
@@ -24,7 +32,7 @@ class LightNovelWorld : SourceInterface.Catalog {
 
     override suspend fun getChapterText(doc: Document): String {
         return doc.selectFirst("#chapter-container")!!.let {
-            textExtractor.get(it)
+            TextExtractor.get(it)
         }
     }
 
@@ -35,7 +43,7 @@ class LightNovelWorld : SourceInterface.Catalog {
 
     override suspend fun getBookDescription(doc: Document): String? {
         return doc.selectFirst(".summary > .content")
-            ?.let { textExtractor.get(it) }
+            ?.let { TextExtractor.get(it) }
     }
 
     override suspend fun getChapterList(doc: Document): List<ChapterMetadata> {
@@ -50,7 +58,8 @@ class LightNovelWorld : SourceInterface.Catalog {
         for (page in 1..Int.MAX_VALUE) {
             val urlBuilder = baseChaptersUrl.addPath("page-$page")
 
-            val res = fetchDoc(urlBuilder)
+            val res = networkClient.get(urlBuilder)
+                .toDocument()
                 .select(".chapter-list > li > a")
                 .map {
                     ChapterMetadata(
@@ -73,7 +82,7 @@ class LightNovelWorld : SourceInterface.Catalog {
         }
 
         return tryConnect {
-            getBooksList(fetchDoc(url), index)
+            getBooksList(networkClient.get(url).toDocument(), index)
         }
     }
 
@@ -87,11 +96,12 @@ class LightNovelWorld : SourceInterface.Catalog {
             return Response.Success(PagedList.createEmpty(index = index))
 
         return tryConnect {
-            val json = postRequest("https://www.lightnovelworld.com/lnsearchlive")
-                .postScope {
+            val request = postRequest("https://www.lightnovelworld.com/lnsearchlive")
+                .postPayload {
                     add("inputContent", input)
                 }
-                .let { client.call(it) }
+
+            val json = networkClient.call(request)
                 .toDocument()
                 .text()
 

@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.debounce
 import my.noveldokusha.App
-import my.noveldokusha.scraper.toUrl
+import my.noveldokusha.utils.toUrl
 import java.io.File
 import java.net.CookieStore
 import java.net.HttpCookie
@@ -19,12 +19,14 @@ import java.util.concurrent.ConcurrentHashMap
 private typealias CHMap = ConcurrentHashMap<String, ConcurrentHashMap<String, String>>
 private typealias MM = MutableMap<String, MutableMap<String, String>>
 
-class ScraperCookiesStorage(
+// TODO() make it work with okhttp
+class PersistentInMemoryCacheCookieData(
     val name: String,
-    private val coroutineScope: CoroutineScope
+    private val coroutineScope: CoroutineScope,
+    private val app: App
 ) : CookieStore {
     private val serializer: Gson = GsonBuilder().setPrettyPrinting().create()
-    private val file = File(App.cacheDir, name)
+    private val file = File(app.cacheDir, name)
     private val data = CHMap()
     private val loadJob: Job
     private val persistentSaveFlow = MutableSharedFlow<MM>(

@@ -2,11 +2,16 @@ package my.noveldokusha.scraper.sources
 
 import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.data.ChapterMetadata
-import my.noveldokusha.scraper.*
+import my.noveldokusha.network.*
+import my.noveldokusha.scraper.SourceInterface
+import my.noveldokusha.scraper.TextExtractor
+import my.noveldokusha.utils.*
 import org.jsoup.nodes.Document
 
 // ALL OK
-class BoxNovel : SourceInterface.Catalog {
+class BoxNovel(
+    private val networkClient: NetworkClient
+) : SourceInterface.Catalog {
     override val name = "Box Novel"
     override val baseUrl = "https://boxnovel.com/"
     override val catalogUrl = "https://boxnovel.com/novel/?m_orderby=alphabet"
@@ -19,7 +24,7 @@ class BoxNovel : SourceInterface.Catalog {
 
     override suspend fun getBookDescription(doc: Document): String? {
         return doc.selectFirst(".summary__content.show-more")
-            ?.let { textExtractor.get(it) }
+            ?.let { TextExtractor.get(it) }
     }
 
     override suspend fun getChapterList(doc: Document): List<ChapterMetadata> {
@@ -31,8 +36,7 @@ class BoxNovel : SourceInterface.Catalog {
             .addPath("chapters")
             .toString()
 
-        return postRequest(url)
-            .let { client.call(it) }
+        return networkClient.call(postRequest(url))
             .toDocument()
             .select(".wp-manga-chapter > a[href]")
             .map { ChapterMetadata(title = it.text(), url = it.attr("href")) }
@@ -48,7 +52,7 @@ class BoxNovel : SourceInterface.Catalog {
                 .ifCase(page != 1) { addPath("page", page.toString()) }
                 .add("m_orderby", "alphabet")
 
-            val doc = fetchDoc(url)
+            val doc = networkClient.get(url).toDocument()
             doc.select(".page-item-detail")
                 .mapNotNull {
                     val link = it.selectFirst("a[href]") ?: return@mapNotNull null
@@ -90,7 +94,7 @@ class BoxNovel : SourceInterface.Catalog {
                     "adult" to ""
                 )
 
-            val doc = fetchDoc(url)
+            val doc = networkClient.get(url).toDocument()
             doc.select(".c-tabs-item__content")
                 .mapNotNull {
                     val link = it.selectFirst("a[href]") ?: return@mapNotNull null

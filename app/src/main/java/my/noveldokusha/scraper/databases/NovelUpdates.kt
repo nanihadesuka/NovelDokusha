@@ -2,14 +2,24 @@ package my.noveldokusha.scraper.databases
 
 import android.net.Uri
 import my.noveldokusha.data.BookMetadata
-import my.noveldokusha.scraper.*
+import my.noveldokusha.network.NetworkClient
+import my.noveldokusha.network.PagedList
+import my.noveldokusha.network.Response
+import my.noveldokusha.network.tryConnect
+import my.noveldokusha.scraper.DatabaseInterface
+import my.noveldokusha.scraper.TextExtractor
+import my.noveldokusha.utils.add
+import my.noveldokusha.utils.toDocument
+import my.noveldokusha.utils.toUrlBuilderSafe
 import org.jsoup.nodes.Document
 
 /**
  * Novel main page example:
  * https://www.novelupdates.com/series/mushoku-tensei/
  */
-class NovelUpdates : DatabaseInterface {
+class NovelUpdates(
+    private val networkClient: NetworkClient
+) : DatabaseInterface {
     override val id = "novel_updates"
     override val name = "Novel Updates"
     override val baseUrl = "https://www.novelupdates.com/"
@@ -22,7 +32,8 @@ class NovelUpdates : DatabaseInterface {
             return Response.Success(PagedList.createEmpty(index = index))
 
         return tryConnect {
-            fetchDoc(urlAuthorPage)
+            networkClient.get(urlAuthorPage)
+                .toDocument()
                 .select("div.search_title > a[href]")
                 .map { BookMetadata(title = it.text(), url = it.attr("href")) }
                 .let {
@@ -34,13 +45,13 @@ class NovelUpdates : DatabaseInterface {
     }
 
     override suspend fun getSearchGenres(): Response<Map<String, String>> {
-        return searchGenresCache.fetch {
-            tryConnect {
-                fetchDoc("https://www.novelupdates.com/series-finder/")
-                    .select(".genreme")
-                    .associate { it.text().trim() to it.attr("genreid") }
-                    .let { Response.Success(it) }
-            }
+        return tryConnect {
+            return@tryConnect networkClient
+                .get("https://www.novelupdates.com/series-finder/")
+                .toDocument()
+                .select(".genreme")
+                .associate { it.text().trim() to it.attr("genreid") }
+                .let { Response.Success(it) }
         }
     }
 
@@ -84,7 +95,7 @@ class NovelUpdates : DatabaseInterface {
     private suspend fun getSearchList(index: Int, url: Uri.Builder) = tryConnect(
         extraErrorInfo = "index: $index\n\nurl: $url"
     ) {
-        val doc = fetchDoc(url)
+        val doc = networkClient.get(url).toDocument()
         doc.select(".search_main_box_nu")
             .mapNotNull {
                 val title = it.selectFirst(".search_title > a[href]") ?: return@mapNotNull null
@@ -96,13 +107,13 @@ class NovelUpdates : DatabaseInterface {
                 )
             }
             .let {
-                    Response.Success(
-                        PagedList(
-                            list = it,
-                            index = index,
-                            isLastPage = isLastPage(doc)
-                        )
+                Response.Success(
+                    PagedList(
+                        list = it,
+                        index = index,
+                        isLastPage = isLastPage(doc)
                     )
+                )
             }
     }
 
@@ -132,8 +143,8 @@ class NovelUpdates : DatabaseInterface {
 
         return DatabaseInterface.BookData(
             title = doc.selectFirst(".seriestitlenu")?.text() ?: "",
-            description = textExtractor.get(doc.selectFirst("#editdescription")).trim(),
-            alternativeTitles = textExtractor.get(doc.selectFirst("#editassociated")).split("\n"),
+            description = TextExtractor.get(doc.selectFirst("#editdescription")).trim(),
+            alternativeTitles = TextExtractor.get(doc.selectFirst("#editassociated")).split("\n"),
             relatedBooks = relatedBooks,
             similarRecommended = similarRecommended,
             bookType = doc.selectFirst(".genre, .type")?.text() ?: "",
@@ -144,8 +155,9 @@ class NovelUpdates : DatabaseInterface {
         )
     }
 
-    private fun isLastPage(doc: Document) = when (val nav = doc.selectFirst("div.digg_pagination")) {
-        null -> true
-        else -> nav.children().last()?.`is`(".current") ?: true
-    }
+    private fun isLastPage(doc: Document) =
+        when (val nav = doc.selectFirst("div.digg_pagination")) {
+            null -> true
+            else -> nav.children().last()?.`is`(".current") ?: true
+        }
 }

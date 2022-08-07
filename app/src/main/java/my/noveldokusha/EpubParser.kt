@@ -2,7 +2,7 @@ package my.noveldokusha
 
 import android.graphics.BitmapFactory
 import kotlinx.coroutines.*
-import my.noveldokusha.data.BookTextUtils
+import my.noveldokusha.tools.BookTextMapper
 import my.noveldokusha.data.Repository
 import my.noveldokusha.data.database.tables.Book
 import my.noveldokusha.data.database.tables.Chapter
@@ -210,7 +210,7 @@ private class EpubXMLFileParser(val fileAbsolutePath: String, val data: ByteArra
             BitmapFactory.decodeByteArray(this, 0, this.size)
         }?.getOrNull()
 
-        val text = BookTextUtils.ImgEntry(
+        val text = BookTextMapper.ImgEntry(
             path = absPath,
             yrel = bitmap?.let { it.height.toFloat() / it.width.toFloat() } ?: 1.45f
         ).toXMLString()

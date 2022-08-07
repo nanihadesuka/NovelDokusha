@@ -1,5 +1,6 @@
 package my.noveldokusha.ui.screens.globalSourceSearch
 
+import android.net.Uri
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -21,14 +22,18 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import my.noveldokusha.R
 import my.noveldokusha.data.BookMetadata
-import my.noveldokusha.scraper.IteratorState
-import my.noveldokusha.scraper.scraper
+import my.noveldokusha.network.IteratorState
+import my.noveldokusha.network.NetworkClient
+import my.noveldokusha.scraper.Scraper
 import my.noveldokusha.ui.theme.ColorAccent
 import my.noveldokusha.ui.theme.ImageBorderRadius
 import my.noveldokusha.ui.theme.InternalTheme
 import my.noveldokusha.uiViews.ImageView
-import my.noveldokusha.uiViews.ListLoadWatcher
+import my.noveldokusha.composableActions.ListLoadWatcher
 import my.noveldokusha.utils.capitalize
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import okhttp3.Response
 import java.util.*
 
 @Composable
@@ -151,6 +156,14 @@ fun SourceListView(
 @Preview
 @Composable
 fun Preview() {
+
+    val scraper = Scraper(object : NetworkClient {
+        override val client by lazy { OkHttpClient() }
+        override val clientWithRedirects by lazy { OkHttpClient() }
+        override suspend fun call(request: Request.Builder) = Response.Builder().build()
+        override suspend fun get(url: String) = Response.Builder().build()
+        override suspend fun get(url: Uri.Builder) = Response.Builder().build()
+    })
 
     val list = scraper.sourcesListCatalog.map { source ->
         source to (0..5).map { BookMetadata(title = "Book $it", url = "") }

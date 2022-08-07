@@ -43,7 +43,7 @@ import my.noveldokusha.AppPreferences
 import my.noveldokusha.R
 import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.data.ChapterWithContext
-import my.noveldokusha.scraper.scraper
+import my.noveldokusha.scraper.Scraper
 import my.noveldokusha.ui.composeViews.ToolbarModeSearch
 import my.noveldokusha.ui.screens.databaseSearchResults.DatabaseSearchResultsActivity
 import my.noveldokusha.ui.screens.reader.ReaderActivity
@@ -71,6 +71,10 @@ class ChaptersActivity : ComponentActivity() {
 
     @Inject
     lateinit var appPreferences: AppPreferences
+
+    @Inject
+    lateinit var scraper: Scraper
+
     val viewModel by viewModels<ChaptersViewModel>()
 
     override fun onCreate(savedInstanceState: Bundle?) {

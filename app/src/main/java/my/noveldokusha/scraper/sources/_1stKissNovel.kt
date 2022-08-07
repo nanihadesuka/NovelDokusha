@@ -2,11 +2,16 @@ package my.noveldokusha.scraper.sources
 
 import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.data.ChapterMetadata
-import my.noveldokusha.scraper.*
+import my.noveldokusha.network.*
+import my.noveldokusha.scraper.SourceInterface
+import my.noveldokusha.scraper.TextExtractor
+import my.noveldokusha.utils.*
 import org.jsoup.nodes.Document
 
 // CHAPTERS LIST FAILS
-class _1stKissNovel : SourceInterface.Catalog {
+class _1stKissNovel(
+    private val networkClient: NetworkClient
+) : SourceInterface.Catalog {
     override val catalogUrl = "https://1stkissnovel.love/novel/?m_orderby=alphabet"
     override val name = "1stKissNovel"
     override val baseUrl = "https://1stkissnovel.love/"
@@ -21,19 +26,21 @@ class _1stKissNovel : SourceInterface.Catalog {
 
     override suspend fun getBookDescription(doc: Document): String? {
         return doc.selectFirst(".summary__content.show-more")
-            ?.let { textExtractor.get(it) }
+            ?.let { TextExtractor.get(it) }
     }
 
     // TODO() not working, website blocking calls
     override suspend fun getChapterList(doc: Document): List<ChapterMetadata> {
         val url = "https://1stkissnovel.love/wp-admin/admin-ajax.php"
         val id = doc.selectFirst("input.rating-post-id")!!.attr("value")
-        return postRequest(url)
-            .postScope {
-                add("action", "manga_get_chapters")
-                add("manga", id)
-            }
-            .let { client.call(it) }
+
+        val request = postRequest(url).postPayload {
+            add("action", "manga_get_chapters")
+            add("manga", id)
+        }
+
+        return networkClient
+            .call(request)
             .toDocument()
             .select(".wp-manga-chapter > a[href]")
             .map { ChapterMetadata(title = it.text(), url = it.attr("href")) }
@@ -52,7 +59,7 @@ class _1stKissNovel : SourceInterface.Catalog {
                     .toString()
             }
 
-            val doc = fetchDoc(url, 20000)
+            val doc = networkClient.get(url).toDocument()
             doc.select(".page-item-detail")
                 .mapNotNull { it.selectFirst("a[href]") }
                 .map {
@@ -87,7 +94,7 @@ class _1stKissNovel : SourceInterface.Catalog {
                 .add("s", input)
                 .add("post_type", "wp-manga")
 
-            val doc = fetchDoc(url, 20000)
+            val doc = networkClient.get(url).toDocument()
             doc.select(".row.c-tabs-item__content")
                 .mapNotNull { it.selectFirst("a[href]") }
                 .map {

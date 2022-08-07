@@ -1,4 +1,4 @@
-package my.noveldokusha.scraper
+package my.noveldokusha.network
 
 import androidx.lifecycle.MutableLiveData
 import kotlinx.coroutines.*
@@ -7,7 +7,7 @@ import kotlinx.coroutines.*
  * Used to fetch data that needs multiple request.
  * e.g: Asking for a list of results that has multiple pages
  *
- * The fetch iteration will be consided finished if a results returns an empty list.
+ * The fetch iteration will be consider finished if a results returns an empty list.
  */
 class FetchIterator<T>(
     private val coroutineScope: CoroutineScope,
@@ -50,7 +50,7 @@ class FetchIterator<T>(
             fetchNext()
     }
 
-    fun fetchNext()
+    private fun fetchNext()
     {
         if (state != STATE.IDLE) return
         state = STATE.LOADING

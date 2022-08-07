@@ -2,11 +2,19 @@ package my.noveldokusha.scraper.sources
 
 import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.data.ChapterMetadata
-import my.noveldokusha.scraper.*
+import my.noveldokusha.network.NetworkClient
+import my.noveldokusha.network.PagedList
+import my.noveldokusha.network.Response
+import my.noveldokusha.network.tryConnect
+import my.noveldokusha.scraper.SourceInterface
+import my.noveldokusha.scraper.TextExtractor
+import my.noveldokusha.utils.*
 import org.jsoup.nodes.Document
 
 // ALL OK
-class BestLightNovel : SourceInterface.Catalog {
+class BestLightNovel(
+    private val networkClient: NetworkClient
+) : SourceInterface.Catalog {
     override val name = "BestLightNovel"
     override val baseUrl = "https://bestlightnovel.com/"
     override val catalogUrl = "https://bestlightnovel.com/novel_list"
@@ -16,7 +24,7 @@ class BestLightNovel : SourceInterface.Catalog {
 
     override suspend fun getChapterText(doc: Document): String {
         return doc.selectFirst("#vung_doc")!!.let {
-            textExtractor.get(it)
+            TextExtractor.get(it)
         }
     }
 
@@ -29,7 +37,7 @@ class BestLightNovel : SourceInterface.Catalog {
         return doc.selectFirst("#noidungm")
             ?.let {
                 it.select("h2").remove()
-                textExtractor.get(it)
+                TextExtractor.get(it)
             }
     }
 
@@ -51,7 +59,7 @@ class BestLightNovel : SourceInterface.Catalog {
                     add("state", "all")
                     add("page", page)
                 }
-            parseToBooks(fetchDoc(url), index)
+            parseToBooks(networkClient.get(url).toDocument(), index)
         }
     }
 
@@ -67,7 +75,7 @@ class BestLightNovel : SourceInterface.Catalog {
                 .toUrlBuilderSafe()
                 .addPath("search_novels", input.replace(" ", "_"))
                 .ifCase(page != 1) { add("page", page) }
-            parseToBooks(fetchDoc(url), index)
+            parseToBooks(networkClient.get(url).toDocument(), index)
         }
     }
 

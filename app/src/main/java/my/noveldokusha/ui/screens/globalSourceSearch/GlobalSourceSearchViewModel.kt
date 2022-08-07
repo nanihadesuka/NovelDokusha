@@ -5,8 +5,8 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import my.noveldokusha.AppPreferences
-import my.noveldokusha.scraper.PagedListIteratorState
-import my.noveldokusha.scraper.scraper
+import my.noveldokusha.network.PagedListIteratorState
+import my.noveldokusha.scraper.Scraper
 import my.noveldokusha.scraper.SourceInterface
 import my.noveldokusha.ui.BaseViewModel
 import my.noveldokusha.utils.StateExtra_String
@@ -20,7 +20,8 @@ interface GlobalSourceSearchStateBundle
 @HiltViewModel
 class GlobalSourceSearchViewModel @Inject constructor(
     state: SavedStateHandle,
-    val appPreferences: AppPreferences
+    val appPreferences: AppPreferences,
+    private val scraper: Scraper,
 ) : BaseViewModel(), GlobalSourceSearchStateBundle
 {
     override val input by StateExtra_String(state)

@@ -15,10 +15,10 @@ import my.noveldokusha.AppPreferences
 import my.noveldokusha.R
 import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.data.Repository
-import my.noveldokusha.scraper.PagedList
-import my.noveldokusha.scraper.PagedListIteratorState
-import my.noveldokusha.scraper.Response
-import my.noveldokusha.scraper.scraper
+import my.noveldokusha.network.PagedList
+import my.noveldokusha.network.PagedListIteratorState
+import my.noveldokusha.network.Response
+import my.noveldokusha.scraper.Scraper
 import my.noveldokusha.ui.BaseViewModel
 import my.noveldokusha.utils.StateExtra_String
 import my.noveldokusha.utils.toast
@@ -33,7 +33,8 @@ class SourceCatalogViewModel @Inject constructor(
     private val repository: Repository,
     state: SavedStateHandle,
     @ApplicationContext private val context: Context,
-    appPreferences: AppPreferences
+    appPreferences: AppPreferences,
+    scraper: Scraper
 ) : BaseViewModel(), SourceCatalogStateBundle {
 
     override var sourceBaseUrl by StateExtra_String(state)

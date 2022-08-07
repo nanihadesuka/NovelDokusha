@@ -1,4 +1,4 @@
-package my.noveldokusha.scraper
+package my.noveldokusha.network
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf

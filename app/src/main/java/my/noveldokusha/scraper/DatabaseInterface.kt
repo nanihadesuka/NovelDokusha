@@ -1,19 +1,23 @@
 package my.noveldokusha.scraper
 
 import my.noveldokusha.data.BookMetadata
-import my.noveldokusha.data.DataCache_DatabaseSearchGenres
+import my.noveldokusha.network.PagedList
+import my.noveldokusha.network.Response
 import org.jsoup.nodes.Document
 
+interface DatabaseInterface {
 
-interface DatabaseInterface
-{
     val id: String
     val name: String
     val baseUrl: String
 
-    val searchGenresCache get() = DataCache_DatabaseSearchGenres(id)
+    val searchGenresCacheFileName get() = "database_search_genres__$id"
 
-    suspend fun getSearchAuthorSeries(index: Int, urlAuthorPage: String): Response<PagedList<BookMetadata>>
+    suspend fun getSearchAuthorSeries(
+        index: Int,
+        urlAuthorPage: String
+    ): Response<PagedList<BookMetadata>>
+
     suspend fun getSearchGenres(): Response<Map<String, String>>
     suspend fun getSearch(index: Int, input: String): Response<PagedList<BookMetadata>>
     suspend fun getSearchAdvanced(

@@ -2,9 +2,11 @@ package my.noveldokusha.scraper
 
 import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.data.ChapterMetadata
+import my.noveldokusha.network.PagedList
+import my.noveldokusha.network.Response
 import org.jsoup.nodes.Document
 
-interface SourceInterface {
+sealed interface SourceInterface {
     val name: String
     val baseUrl: String
 

@@ -4,12 +4,22 @@ import com.google.gson.JsonParser
 import com.google.gson.stream.JsonReader
 import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.data.ChapterMetadata
-import my.noveldokusha.scraper.*
+import my.noveldokusha.network.NetworkClient
+import my.noveldokusha.network.PagedList
+import my.noveldokusha.network.Response
+import my.noveldokusha.network.tryConnect
+import my.noveldokusha.scraper.SourceInterface
+import my.noveldokusha.scraper.TextExtractor
+import my.noveldokusha.utils.add
+import my.noveldokusha.utils.toDocument
+import my.noveldokusha.utils.toUrlBuilderSafe
 import org.jsoup.nodes.Document
 import java.io.StringReader
 
 // ALL OK
-class Saikai : SourceInterface.Catalog {
+class Saikai(
+    private val networkClient: NetworkClient
+) : SourceInterface.Catalog {
     override val name = "Saikai"
     override val baseUrl = "https://saikaiscan.com.br/"
     override val catalogUrl = "https://saikaiscan.com.br/series"
@@ -22,7 +32,7 @@ class Saikai : SourceInterface.Catalog {
 
     override suspend fun getBookDescription(doc: Document): String? {
         return doc.selectFirst("#synopsis-content")
-            ?.let { textExtractor.get(it) }
+            ?.let { TextExtractor.get(it) }
     }
 
     override suspend fun getChapterList(doc: Document): List<ChapterMetadata> {
@@ -34,11 +44,7 @@ class Saikai : SourceInterface.Catalog {
             .add("tab", "capitulos")
             .toString()
 
-        // no  cookies, header !! but works
-        val chaptersDoc = getRequest(url)
-            .let { client.call(it) }
-            .toDocument()
-
+        val chaptersDoc = networkClient.get(url).toDocument()
         val firstChapterData = chaptersDoc
             .selectFirst("ul.__chapters li")!!
 
@@ -118,8 +124,7 @@ class Saikai : SourceInterface.Catalog {
             .toString()
 
         return tryConnect {
-            val json = getRequest(url)
-                .let { client.call(it) }
+            val json = networkClient.get(url)
                 .body!!
                 .string()
 

@@ -11,9 +11,11 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import my.noveldokusha.App
 import my.noveldokusha.data.Repository
-import my.noveldokusha.scraper.Response
-import my.noveldokusha.scraper.scraper
+import my.noveldokusha.data.persistentCacheDatabaseSearchGenres
+import my.noveldokusha.network.Response
+import my.noveldokusha.scraper.Scraper
 import my.noveldokusha.ui.BaseViewModel
 import my.noveldokusha.utils.StateExtra_String
 import javax.inject.Inject
@@ -27,24 +29,34 @@ data class GenreItem(val genre: String, val genreId: String, var state: Toggleab
 @HiltViewModel
 class DatabaseSearchViewModel @Inject constructor(
     private val repository: Repository,
-    state: SavedStateHandle
+    state: SavedStateHandle,
+    private val scraper: Scraper,
+    app: App
 ) : BaseViewModel(), DatabaseSearchStateBundle {
 
     override var databaseBaseUrl by StateExtra_String(state)
     var searchText by mutableStateOf("")
     var genresList = mutableStateListOf<GenreItem>()
-    val database = scraper.getCompatibleDatabase(databaseBaseUrl)!!
+    val database get() = scraper.getCompatibleDatabase(databaseBaseUrl)!!
+
+    private val searchGenresCache = persistentCacheDatabaseSearchGenres(database, app.cacheDir)
 
     init {
         load()
     }
 
+    private suspend fun getGenres() = withContext(Dispatchers.IO) {
+        searchGenresCache.fetch { database.getSearchGenres() }
+    }
+
     private fun load() = viewModelScope.launch(Dispatchers.IO) {
-        when (val res = database.getSearchGenres()) {
+
+        when (val res = getGenres()) {
             is Response.Success -> {
-                val list =
-                    res.data.asSequence().map { GenreItem(it.key, it.value, ToggleableState.Off) }
-                        .toList()
+                val list = res.data
+                    .asSequence()
+                    .map { GenreItem(it.key, it.value, ToggleableState.Off) }
+                    .toList()
                 withContext(Dispatchers.Main) {
                     genresList.addAll(list)
                 }

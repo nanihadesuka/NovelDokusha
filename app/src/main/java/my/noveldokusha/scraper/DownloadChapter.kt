@@ -1,12 +1,24 @@
 package my.noveldokusha.scraper
 
+import my.noveldokusha.network.NetworkClient
+import my.noveldokusha.network.Response
+import my.noveldokusha.network.getRequest
+import my.noveldokusha.network.tryConnect
+import my.noveldokusha.utils.call
+import my.noveldokusha.utils.toDocument
 import net.dankito.readability4j.extended.Readability4JExtended
 import org.jsoup.nodes.Document
 
-suspend fun downloadChapter(chapterUrl: String): Response<ChapterDownload> {
+suspend fun downloadChapter(
+    scraper: Scraper,
+    networkClient: NetworkClient,
+    chapterUrl: String,
+): Response<ChapterDownload> {
     return tryConnect {
-        val realUrl = getRequest(chapterUrl)
-            .let { clientRedirects.call(it) }
+        val request = getRequest(chapterUrl)
+        val realUrl = networkClient
+            .clientWithRedirects
+            .call(request)
             .request.url
             .toString()
 
@@ -24,7 +36,7 @@ suspend fun downloadChapter(chapterUrl: String): Response<ChapterDownload> {
         }
 
         scraper.getCompatibleSource(realUrl)?.also { source ->
-            val doc = fetchDoc(source.transformChapterUrl(realUrl))
+            val doc = networkClient.get(source.transformChapterUrl(realUrl)).toDocument()
             val data = ChapterDownload(
                 body = source.getChapterText(doc) ?: return@also,
                 title = source.getChapterTitle(doc)
@@ -33,7 +45,7 @@ suspend fun downloadChapter(chapterUrl: String): Response<ChapterDownload> {
         }
 
         // If no predefined source is found try extracting text with heuristic extraction
-        val chapter = heuristicChapterExtraction(realUrl, fetchDoc(realUrl))
+        val chapter = heuristicChapterExtraction(realUrl, networkClient.get(realUrl).toDocument())
         return@tryConnect when (chapter) {
             null -> Response.Error(error)
             else -> Response.Success(chapter)
@@ -45,7 +57,7 @@ fun heuristicChapterExtraction(url: String, document: Document): ChapterDownload
     Readability4JExtended(url, document).parse().also { article ->
         val content = article.articleContent ?: return null
         return ChapterDownload(
-            body = textExtractor.get(content),
+            body = TextExtractor.get(content),
             title = article.title
         )
     }

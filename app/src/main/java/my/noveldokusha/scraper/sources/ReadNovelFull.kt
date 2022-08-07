@@ -2,7 +2,16 @@ package my.noveldokusha.scraper.sources
 
 import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.data.ChapterMetadata
-import my.noveldokusha.scraper.*
+import my.noveldokusha.network.NetworkClient
+import my.noveldokusha.network.PagedList
+import my.noveldokusha.network.Response
+import my.noveldokusha.network.tryConnect
+import my.noveldokusha.scraper.SourceInterface
+import my.noveldokusha.scraper.TextExtractor
+import my.noveldokusha.utils.add
+import my.noveldokusha.utils.addPath
+import my.noveldokusha.utils.toDocument
+import my.noveldokusha.utils.toUrlBuilderSafe
 import org.jsoup.nodes.Document
 
 /**
@@ -12,7 +21,9 @@ import org.jsoup.nodes.Document
  * https://readnovelfull.com/reincarnation-of-the-strongest-sword-god/chapter-1-starting-over-v1.html
  */
 // ALL OK
-class ReadNovelFull : SourceInterface.Catalog {
+class ReadNovelFull(
+    private val networkClient: NetworkClient
+) : SourceInterface.Catalog {
     override val name = "Read Novel Full"
     override val baseUrl = "https://readnovelfull.com/"
     override val catalogUrl = "https://readnovelfull.com/novel-list/most-popular-novel"
@@ -22,7 +33,7 @@ class ReadNovelFull : SourceInterface.Catalog {
 
     override suspend fun getChapterText(doc: Document): String {
         return doc.selectFirst("#chr-content")!!
-            .let { textExtractor.get(it) }
+            .let { TextExtractor.get(it) }
     }
 
     override suspend fun getBookCoverImageUrl(doc: Document): String? {
@@ -33,7 +44,7 @@ class ReadNovelFull : SourceInterface.Catalog {
 
     override suspend fun getBookDescription(doc: Document): String? {
         return doc.selectFirst("#tab-description")
-            ?.let { textExtractor.get(it) }
+            ?.let { TextExtractor.get(it) }
     }
 
     override suspend fun getChapterList(doc: Document): List<ChapterMetadata> {
@@ -43,8 +54,7 @@ class ReadNovelFull : SourceInterface.Catalog {
             .add("novelId", id)
             .toString()
 
-        return getRequest(url)
-            .let { client.call(it) }
+        return networkClient.get(url)
             .toDocument()
             .select("a[href]")
             .map {
@@ -63,7 +73,7 @@ class ReadNovelFull : SourceInterface.Catalog {
                 .apply {
                     if (page > 1) add("page", page)
                 }
-            val doc = fetchDoc(url)
+            val doc = networkClient.get(url).toDocument()
             parseToBooks(doc, index)
         }
     }
@@ -85,7 +95,7 @@ class ReadNovelFull : SourceInterface.Catalog {
                     if (page > 1) add("page", page)
                 }.toString()
 
-            val doc = fetchDoc(url)
+            val doc = networkClient.get(url).toDocument()
             parseToBooks(doc, index)
         }
     }

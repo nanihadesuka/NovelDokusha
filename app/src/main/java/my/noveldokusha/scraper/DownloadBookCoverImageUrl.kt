@@ -2,8 +2,16 @@ package my.noveldokusha.scraper
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import my.noveldokusha.network.NetworkClient
+import my.noveldokusha.network.Response
+import my.noveldokusha.network.tryConnect
+import my.noveldokusha.utils.toDocument
 
-suspend fun downloadBookCoverImageUrl(bookUrl: String) = withContext(Dispatchers.IO) {
+suspend fun downloadBookCoverImageUrl(
+    scraper: Scraper,
+    networkClient: NetworkClient,
+    bookUrl: String,
+) = withContext(Dispatchers.IO) {
     val error by lazy {
         """
 			Incompatible source.
@@ -18,7 +26,7 @@ suspend fun downloadBookCoverImageUrl(bookUrl: String) = withContext(Dispatchers
         ?: return@withContext Response.Error(error)
 
     return@withContext tryConnect {
-        val doc = fetchDoc(bookUrl)
+        val doc = networkClient.get(bookUrl).toDocument()
         scrap.getBookCoverImageUrl(doc)
             ?.let { Response.Success(it) }
             ?: Response.Error("")

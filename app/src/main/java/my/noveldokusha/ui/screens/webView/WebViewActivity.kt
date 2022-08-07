@@ -12,9 +12,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import my.noveldokusha.R
 import my.noveldokusha.databinding.ActivityWebviewBinding
-import my.noveldokusha.scraper.toUrl
 import my.noveldokusha.ui.BaseActivity
 import my.noveldokusha.utils.Extra_String
+import my.noveldokusha.utils.toUrl
 import my.noveldokusha.utils.toast
 import javax.inject.Inject
 

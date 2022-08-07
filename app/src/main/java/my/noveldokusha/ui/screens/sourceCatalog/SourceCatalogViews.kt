@@ -27,7 +27,7 @@ import androidx.compose.ui.unit.dp
 import my.noveldokusha.AppPreferences
 import my.noveldokusha.R
 import my.noveldokusha.data.BookMetadata
-import my.noveldokusha.scraper.IteratorState
+import my.noveldokusha.network.IteratorState
 import my.noveldokusha.ui.composeViews.BooksVerticalGridView
 import my.noveldokusha.ui.theme.ColorAccent
 import my.noveldokusha.ui.theme.InternalTheme

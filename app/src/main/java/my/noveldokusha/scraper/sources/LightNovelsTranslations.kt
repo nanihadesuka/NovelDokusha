@@ -2,8 +2,16 @@ package my.noveldokusha.scraper.sources
 
 import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.data.ChapterMetadata
-import my.noveldokusha.scraper.*
+import my.noveldokusha.network.NetworkClient
+import my.noveldokusha.network.PagedList
+import my.noveldokusha.network.Response
+import my.noveldokusha.network.tryConnect
+import my.noveldokusha.scraper.SourceInterface
+import my.noveldokusha.scraper.TextExtractor
+import my.noveldokusha.utils.add
 import my.noveldokusha.utils.capitalize
+import my.noveldokusha.utils.toDocument
+import my.noveldokusha.utils.toUrlBuilder
 import org.jsoup.nodes.Document
 import java.net.URLDecoder
 import java.util.*
@@ -15,7 +23,9 @@ import java.util.*
  * Chapter url example:
  * https://lightnovelstranslations.com/the-sage-summoned-to-another-world/the-sage-summoned-to-another-world-volume-1-chapter-1/
  */
-class LightNovelsTranslations : SourceInterface.Catalog {
+class LightNovelsTranslations(
+    private val networkClient: NetworkClient
+) : SourceInterface.Catalog {
     override val name = "Light Novel Translations"
     override val baseUrl = "https://lightnovelstranslations.com/"
     override val catalogUrl = "https://lightnovelstranslations.com/"
@@ -28,7 +38,7 @@ class LightNovelsTranslations : SourceInterface.Catalog {
         return doc.selectFirst(".page, .type-page, .status-publish, .hentry")!!
             .selectFirst(".entry-content").run {
                 this!!.select("#textbox").remove()
-                textExtractor.get(this)
+                TextExtractor.get(this)
             }
     }
 
@@ -68,7 +78,7 @@ class LightNovelsTranslations : SourceInterface.Catalog {
             return Response.Success(PagedList.createEmpty(index = index))
 
         return tryConnect {
-            fetchDoc(catalogUrl)
+            networkClient.get(catalogUrl).toDocument()
                 .selectFirst("#prime_nav")!!
                 .children()
                 .subList(1, 4)
@@ -110,8 +120,9 @@ class LightNovelsTranslations : SourceInterface.Catalog {
         }
 
         return tryConnect {
-            val doc = fetchDoc(url)
-            doc.selectFirst(".jetpack-search-filters-widget__filter-list")!!
+            networkClient.get(url)
+                .toDocument()
+                .selectFirst(".jetpack-search-filters-widget__filter-list")!!
                 .select("a[href]")
                 .map {
                     val (name) = Regex("""^.*category_name=(.*)$""").find(it.attr("href"))!!.destructured

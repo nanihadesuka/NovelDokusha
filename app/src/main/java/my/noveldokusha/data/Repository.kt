@@ -5,11 +5,13 @@ import androidx.room.withTransaction
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import my.noveldokusha.data.database.*
+import my.noveldokusha.data.database.AppDatabase
 import my.noveldokusha.data.database.tables.Book
 import my.noveldokusha.data.database.tables.Chapter
 import my.noveldokusha.data.database.tables.ChapterBody
-import my.noveldokusha.scraper.Response
+import my.noveldokusha.network.NetworkClient
+import my.noveldokusha.network.Response
+import my.noveldokusha.scraper.Scraper
 import my.noveldokusha.scraper.downloadChapter
 import my.noveldokusha.utils.LiveEvent
 import java.io.File
@@ -18,28 +20,32 @@ import javax.inject.Inject
 class Repository @Inject constructor(
     private val db: AppDatabase,
     @ApplicationContext private val context: Context,
-    val name: String
-)
-{
+    val name: String,
+    private val scraper: Scraper,
+    private val networkClient: NetworkClient,
+) {
     val settings = Settings()
     val bookLibrary = BookLibrary()
     val bookChapter = BookChapter()
     val bookChapterBody = BookChapterBody()
     val eventDataRestored = LiveEvent<Unit>()
 
-    suspend fun getDatabaseSizeBytes() = withContext(Dispatchers.IO) { context.getDatabasePath(name).length() }
+    suspend fun getDatabaseSizeBytes() =
+        withContext(Dispatchers.IO) { context.getDatabasePath(name).length() }
+
     fun close() = db.close()
     fun delete() = context.deleteDatabase(name)
     fun clearAllTables() = db.clearAllTables()
-    suspend fun vacuum() = withContext(Dispatchers.IO) { db.openHelper.writableDatabase.execSQL("VACUUM") }
+    suspend fun vacuum() =
+        withContext(Dispatchers.IO) { db.openHelper.writableDatabase.execSQL("VACUUM") }
 
     suspend fun <T> withTransaction(fn: suspend () -> T) = db.withTransaction(fn)
 
     fun isValid(book: Book): Boolean = book.url.matches("""^(https?|local)://.*""".toRegex())
-    fun isValid(chapter: Chapter): Boolean = chapter.url.matches("""^(https?|local)://.*""".toRegex())
+    fun isValid(chapter: Chapter): Boolean =
+        chapter.url.matches("""^(https?|local)://.*""".toRegex())
 
-    inner class Settings
-    {
+    inner class Settings {
         suspend fun clearNonLibraryData() = withContext(Dispatchers.IO)
         {
             db.libraryDao().removeAllNonLibraryRows()
@@ -55,20 +61,28 @@ class Repository @Inject constructor(
         val folderBooks = File(context.filesDir, "books")
     }
 
-    inner class BookLibrary
-    {
+    inner class BookLibrary {
         val booksInLibraryFlow by lazy { db.libraryDao().booksInLibraryFlow() }
-        val getBooksInLibraryWithContextFlow by lazy { db.libraryDao().getBooksInLibraryWithContextFlow() }
+        val getBooksInLibraryWithContextFlow by lazy {
+            db.libraryDao().getBooksInLibraryWithContextFlow()
+        }
+
         fun existInLibraryFlow(url: String) = db.libraryDao().existInLibraryFlow(url)
         fun getFlow(url: String) = db.libraryDao().getFlow(url)
         suspend fun insert(book: Book) = if (isValid(book)) db.libraryDao().insert(book) else Unit
         suspend fun insert(books: List<Book>) = db.libraryDao().insert(books.filter(::isValid))
-        suspend fun insertReplace(books: List<Book>) = db.libraryDao().insertReplace(books.filter(::isValid))
+        suspend fun insertReplace(books: List<Book>) =
+            db.libraryDao().insertReplace(books.filter(::isValid))
+
         suspend fun remove(bookUrl: String) = db.libraryDao().remove(bookUrl)
         suspend fun remove(book: Book) = db.libraryDao().remove(book)
         suspend fun update(book: Book) = db.libraryDao().update(book)
-        suspend fun updateCover(bookUrl: String, coverUrl:String) = db.libraryDao().updateCover(bookUrl,coverUrl)
-        suspend fun updateDescription(bookUrl: String, description:String) = db.libraryDao().updateDescription(bookUrl,description)
+        suspend fun updateCover(bookUrl: String, coverUrl: String) =
+            db.libraryDao().updateCover(bookUrl, coverUrl)
+
+        suspend fun updateDescription(bookUrl: String, description: String) =
+            db.libraryDao().updateDescription(bookUrl, description)
+
         suspend fun get(url: String) = db.libraryDao().get(url)
         suspend fun getAll() = db.libraryDao().getAll()
         suspend fun getAllInLibrary() = db.libraryDao().getAllInLibrary()
@@ -82,37 +96,55 @@ class Repository @Inject constructor(
         }
     }
 
-    inner class BookChapter
-    {
-        fun numberOfUnreadChaptersFlow(bookUrl: String) = db.chapterDao().numberOfUnreadChaptersFlow(bookUrl)
+    inner class BookChapter {
+        fun numberOfUnreadChaptersFlow(bookUrl: String) =
+            db.chapterDao().numberOfUnreadChaptersFlow(bookUrl)
+
         suspend fun update(chapter: Chapter) = db.chapterDao().update(chapter)
         suspend fun get(url: String) = db.chapterDao().get(url)
         suspend fun hasChapters(bookUrl: String) = db.chapterDao().hasChapters(bookUrl)
         suspend fun getAll() = db.chapterDao().getAll()
-        suspend fun updateTitle(url: String, title: String) = db.chapterDao().updateTitle(url, title)
-        suspend fun setAsRead(chaptersUrl: List<String>) = chaptersUrl.chunked(500).forEach { db.chapterDao().setAsRead(it) }
-        suspend fun setAsUnread(chaptersUrl: List<String>) = chaptersUrl.chunked(500).forEach { db.chapterDao().setAsUnread(it) }
-        suspend fun insert(chapters: List<Chapter>) = db.chapterDao().insert(chapters.filter(::isValid))
-        suspend fun insertReplace(chapters: List<Chapter>) = db.chapterDao().insertReplace(chapters.filter(::isValid))
+        suspend fun updateTitle(url: String, title: String) =
+            db.chapterDao().updateTitle(url, title)
+
+        suspend fun setAsRead(chaptersUrl: List<String>) =
+            chaptersUrl.chunked(500).forEach { db.chapterDao().setAsRead(it) }
+
+        suspend fun setAsUnread(chaptersUrl: List<String>) =
+            chaptersUrl.chunked(500).forEach { db.chapterDao().setAsUnread(it) }
+
+        suspend fun insert(chapters: List<Chapter>) =
+            db.chapterDao().insert(chapters.filter(::isValid))
+
+        suspend fun insertReplace(chapters: List<Chapter>) =
+            db.chapterDao().insertReplace(chapters.filter(::isValid))
+
         suspend fun removeAllFromBook(bookUrl: String) = db.chapterDao().removeAllFromBook(bookUrl)
         suspend fun chapters(bookUrl: String) = db.chapterDao().chapters(bookUrl)
         suspend fun getFirstChapter(bookUrl: String) = db.chapterDao().getFirstChapter(bookUrl)
-        fun getChaptersWithContexFlow(bookUrl: String) = db.chapterDao().getChaptersWithContextFlow(bookUrl)
-        suspend fun merge(newChapters: List<Chapter>, bookUrl: String)
-        {
+        fun getChaptersWithContexFlow(bookUrl: String) =
+            db.chapterDao().getChaptersWithContextFlow(bookUrl)
+
+        suspend fun merge(newChapters: List<Chapter>, bookUrl: String) {
             val current = chapters(bookUrl).associateBy { it.url }.toMutableMap()
             for (chapter in newChapters)
-                current.merge(chapter.url, chapter) { old, new -> old.copy(position = new.position) }
+                current.merge(
+                    chapter.url,
+                    chapter
+                ) { old, new -> old.copy(position = new.position) }
             insertReplace(current.values.toList())
         }
 
     }
 
-    inner class BookChapterBody
-    {
+    inner class BookChapterBody {
         suspend fun getAll() = db.chapterBodyDao().getAll()
-        suspend fun insertReplace(chapterBodies: List<ChapterBody>) = db.chapterBodyDao().insertReplace(chapterBodies)
-        suspend fun insertReplace(chapterBody: ChapterBody) = db.chapterBodyDao().insertReplace(chapterBody)
+        suspend fun insertReplace(chapterBodies: List<ChapterBody>) =
+            db.chapterBodyDao().insertReplace(chapterBodies)
+
+        suspend fun insertReplace(chapterBody: ChapterBody) =
+            db.chapterBodyDao().insertReplace(chapterBody)
+
         suspend fun removeRows(chaptersUrl: List<String>) =
             chaptersUrl.chunked(500).forEach { db.chapterBodyDao().removeChapterRows(it) }
 
@@ -122,14 +154,12 @@ class Repository @Inject constructor(
                 bookChapter.updateTitle(chapterBody.url, title)
         }
 
-        suspend fun fetchBody(urlChapter: String, tryCache: Boolean = true): Response<String>
-        {
+        suspend fun fetchBody(urlChapter: String, tryCache: Boolean = true): Response<String> {
             if (tryCache) db.chapterBodyDao().get(urlChapter)?.let {
                 return@fetchBody Response.Success(it.body)
             }
 
-            if (urlChapter.startsWith("local://"))
-            {
+            if (urlChapter.startsWith("local://")) {
                 return Response.Error(
                     """
                     Unable to load chapter from url:
@@ -140,15 +170,15 @@ class Repository @Inject constructor(
                 )
             }
 
-            return when (val res = downloadChapter(urlChapter))
-            {
-                is Response.Success ->
-                {
-                    insertWithTitle(ChapterBody(url = urlChapter, body = res.data.body), res.data.title)
+            return when (val res = downloadChapter(scraper, networkClient, urlChapter)) {
+                is Response.Success -> {
+                    insertWithTitle(
+                        ChapterBody(url = urlChapter, body = res.data.body),
+                        res.data.title
+                    )
                     return Response.Success(res.data.body)
                 }
-                is Response.Error ->
-                {
+                is Response.Error -> {
                     Response.Error(res.message)
                 }
             }

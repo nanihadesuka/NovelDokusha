@@ -12,8 +12,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import my.noveldokusha.R
+import my.noveldokusha.composableActions.ListLoadWatcher
 import my.noveldokusha.data.BookMetadata
-import my.noveldokusha.scraper.IteratorState
+import my.noveldokusha.network.IteratorState
 import my.noveldokusha.ui.theme.ColorAccent
 
 @ExperimentalFoundationApi

@@ -2,7 +2,12 @@ package my.noveldokusha.scraper.sources
 
 import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.data.ChapterMetadata
-import my.noveldokusha.scraper.*
+import my.noveldokusha.network.*
+import my.noveldokusha.scraper.SourceInterface
+import my.noveldokusha.scraper.TextExtractor
+import my.noveldokusha.utils.addPath
+import my.noveldokusha.utils.toDocument
+import my.noveldokusha.utils.toUrlBuilderSafe
 import org.jsoup.nodes.Document
 
 /**
@@ -12,7 +17,9 @@ import org.jsoup.nodes.Document
  * https://www.readlightnovel.org/goat-of-all-ghouls-1/chapter-1
  */
 // TODO() missing cookies, doesn't work
-class ReadLightNovel : SourceInterface.Catalog {
+class ReadLightNovel(
+    private val networkClient: NetworkClient
+) : SourceInterface.Catalog {
 
     override val name = "Read Light Novel"
     override val baseUrl = "https://www.readlightnovel.me/"
@@ -28,7 +35,7 @@ class ReadLightNovel : SourceInterface.Catalog {
             it.select("a").remove()
             it.select(".ads-title").remove()
             it.select(".hidden").remove()
-            return textExtractor.get(it)
+            return TextExtractor.get(it)
         }
     }
 
@@ -41,7 +48,7 @@ class ReadLightNovel : SourceInterface.Catalog {
         return doc.selectFirst("h6:containsOwn(Description)")
             ?.parent()
             ?.nextElementSibling()
-            ?.let { textExtractor.get(it) }
+            ?.let { TextExtractor.get(it) }
     }
 
     override suspend fun getChapterList(doc: Document): List<ChapterMetadata> {
@@ -56,7 +63,7 @@ class ReadLightNovel : SourceInterface.Catalog {
                 .toUrlBuilderSafe()
                 .addPath("top-novels", "new", page.toString())
 
-            val doc = fetchDoc(url)
+            val doc = networkClient.get(url).toDocument()
             doc.select(".top-novel-block")
                 .mapNotNull {
                     val link = it.selectFirst("a[href]") ?: return@mapNotNull null
@@ -91,12 +98,12 @@ class ReadLightNovel : SourceInterface.Catalog {
             return Response.Success(PagedList.createEmpty(index = index))
 
         return tryConnect {
-
-            postRequest("https://www.readlightnovel.org/search/autocomplete")
-                .postScope {
+            val request = postRequest("https://www.readlightnovel.org/search/autocomplete")
+                .postPayload {
                     add("q", input)
                 }
-                .let { client.call(it) }
+
+            return@tryConnect networkClient.call(request)
                 .toDocument()
                 .children()
                 .mapNotNull {

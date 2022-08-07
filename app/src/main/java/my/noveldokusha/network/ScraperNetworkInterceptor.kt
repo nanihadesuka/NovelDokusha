@@ -1,9 +1,7 @@
-package my.noveldokusha.scraper
+package my.noveldokusha.network
 
-import my.noveldokusha.BuildConfig
 import okhttp3.Interceptor
 import okhttp3.Response
-import timber.log.Timber
 
 private const val DEFAULT_USERAGENT = "Mozilla/5.0 (Windows NT 6.3; WOW64)"
 

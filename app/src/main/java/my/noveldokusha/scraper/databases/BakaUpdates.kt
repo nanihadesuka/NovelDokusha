@@ -3,14 +3,24 @@ package my.noveldokusha.scraper.databases
 import android.net.Uri
 import android.util.Log
 import my.noveldokusha.data.BookMetadata
-import my.noveldokusha.scraper.*
+import my.noveldokusha.network.NetworkClient
+import my.noveldokusha.network.PagedList
+import my.noveldokusha.network.Response
+import my.noveldokusha.network.tryConnect
+import my.noveldokusha.scraper.DatabaseInterface
+import my.noveldokusha.scraper.TextExtractor
+import my.noveldokusha.utils.add
+import my.noveldokusha.utils.toDocument
+import my.noveldokusha.utils.toUrlBuilderSafe
 import org.jsoup.nodes.Document
 
 /**
  * Novel main page example:
  * https://www.novelupdates.com/series/mushoku-tensei/
  */
-class BakaUpdates : DatabaseInterface {
+class BakaUpdates(
+    private val networkClient: NetworkClient
+) : DatabaseInterface {
     override val id = "baka_updates"
     override val name = "Baka-Updates"
     override val baseUrl = "https://www.mangaupdates.com/"
@@ -25,7 +35,8 @@ class BakaUpdates : DatabaseInterface {
             return Response.Success(PagedList.createEmpty(index = index))
 
         return tryConnect {
-            fetchDoc(urlAuthorPage)
+            networkClient.get(urlAuthorPage)
+                .toDocument()
                 .select("div.pl-2.col-md-5.col-7.text-truncate.text a[href]")
                 .map { it }
                 .filter { it.text().endsWith("(Novel)") }
@@ -39,14 +50,14 @@ class BakaUpdates : DatabaseInterface {
     }
 
     override suspend fun getSearchGenres(): Response<Map<String, String>> {
-        return searchGenresCache.fetch {
-            tryConnect {
-                fetchDoc("https://www.mangaupdates.com/series.html?act=genresearch")
-                    .select(".p-1.col-6.text")
-                    .map { it.text().trim() }
-                    .associateWith { it.replace(" ", "+") }
-                    .let { Response.Success(it) }
-            }
+        return tryConnect {
+            return@tryConnect networkClient
+                .get("https://www.mangaupdates.com/series.html?act=genresearch")
+                .toDocument()
+                .select(".p-1.col-6.text")
+                .map { it.text().trim() }
+                .associateWith { it.replace(" ", "+") }
+                .let { Response.Success(it) }
         }
     }
 
@@ -84,7 +95,7 @@ class BakaUpdates : DatabaseInterface {
 
     private suspend fun getSearchList(index: Int, url: Uri.Builder) =
         tryConnect("index: $index\n\nurl: $url") {
-            val doc = fetchDoc(url)
+            val doc = networkClient.get(url).toDocument()
             doc.select(".col-12.col-lg-6.p-3.text")
                 .mapNotNull {
                     val link = it.selectFirst("div.text > a[href]") ?: return@mapNotNull null
@@ -158,7 +169,7 @@ class BakaUpdates : DatabaseInterface {
             it.selectFirst("[id=div_desc_more]") ?: it.selectFirst("div")
         }.also {
             it?.select("a")?.remove()
-        }.let { textExtractor.get(it!!) }
+        }.let { TextExtractor.get(it!!) }
 
         val tags = entry("Categories")
             .select("li > a")
@@ -171,7 +182,7 @@ class BakaUpdates : DatabaseInterface {
         return DatabaseInterface.BookData(
             title = doc.selectFirst(".releasestitle.tabletitle")!!.text().removeNovelTag(),
             description = description,
-            alternativeTitles = textExtractor.get(entry("Associated Names")).split("\n\n"),
+            alternativeTitles = TextExtractor.get(entry("Associated Names")).split("\n\n"),
             relatedBooks = relatedBooks,
             similarRecommended = similarRecommended,
             bookType = entry("Type").text(),

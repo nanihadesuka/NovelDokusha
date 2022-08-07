@@ -2,7 +2,12 @@ package my.noveldokusha.scraper.sources
 
 import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.data.ChapterMetadata
-import my.noveldokusha.scraper.*
+import my.noveldokusha.network.NetworkClient
+import my.noveldokusha.network.PagedList
+import my.noveldokusha.network.Response
+import my.noveldokusha.network.tryConnect
+import my.noveldokusha.scraper.SourceInterface
+import my.noveldokusha.utils.toDocument
 import org.jsoup.nodes.Document
 
 // ALL OK
@@ -12,7 +17,9 @@ import org.jsoup.nodes.Document
  * Chapter url example:
  * https://www.koreanmtl.online/2020/05/running-away-from-hero-chapter-17.html
  */
-class KoreanNovelsMTL : SourceInterface.Catalog {
+class KoreanNovelsMTL(
+    private val networkClient: NetworkClient
+) : SourceInterface.Catalog {
     override val name = "Korean Novels MTL"
     override val baseUrl = "https://www.koreanmtl.online/"
     override val catalogUrl = "https://www.koreanmtl.online/p/novels-listing.html?m=1"
@@ -45,7 +52,8 @@ class KoreanNovelsMTL : SourceInterface.Catalog {
             return Response.Success(PagedList.createEmpty(index = index))
 
         return tryConnect {
-            fetchDoc(catalogUrl)
+            networkClient.get(catalogUrl)
+                .toDocument()
                 .select(".post-body.entry-content.float-container li a[href]")
                 .map {
                     val url = it.attr("href")
@@ -72,7 +80,7 @@ class KoreanNovelsMTL : SourceInterface.Catalog {
             return Response.Success(PagedList.createEmpty(index = index))
 
         return tryConnect {
-            fetchDoc(catalogUrl)
+            networkClient.get(catalogUrl).toDocument()
                 .select(".post-body.entry-content.float-container a[href]")
                 .map {
                     val url = it.attr("href")

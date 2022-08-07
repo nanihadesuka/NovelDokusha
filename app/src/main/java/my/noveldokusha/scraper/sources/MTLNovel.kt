@@ -3,12 +3,20 @@ package my.noveldokusha.scraper.sources
 import com.google.gson.JsonParser
 import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.data.ChapterMetadata
-import my.noveldokusha.scraper.*
+import my.noveldokusha.network.*
+import my.noveldokusha.scraper.SourceInterface
+import my.noveldokusha.scraper.TextExtractor
+import my.noveldokusha.utils.add
+import my.noveldokusha.utils.addPath
+import my.noveldokusha.utils.toDocument
+import my.noveldokusha.utils.toUrlBuilderSafe
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 
 // TODO() NOT WORKING JSON MANGLED EVEN IF IN THE LOGS SHOWS JUST FINE
-class MTLNovel : SourceInterface.Catalog {
+class MTLNovel(
+    private val networkClient: NetworkClient
+) : SourceInterface.Catalog {
     override val name = "MTLNovel"
     override val baseUrl = "https://www.mtlnovel.com/"
     override val catalogUrl = "https://www.mtlnovel.com/alltime-rank/"
@@ -17,7 +25,7 @@ class MTLNovel : SourceInterface.Catalog {
     override suspend fun getChapterTitle(doc: Document): String? = null
 
     override suspend fun getChapterText(doc: Document): String {
-        return doc.selectFirst(".par.fontsize-16")!!.let { textExtractor.get(it) }
+        return doc.selectFirst(".par.fontsize-16")!!.let { TextExtractor.get(it) }
     }
 
     override suspend fun getBookCoverImageUrl(doc: Document): String? {
@@ -31,7 +39,7 @@ class MTLNovel : SourceInterface.Catalog {
             select("h2").remove()
             select("p.descr").remove()
         }
-        return textExtractor.get(node).trim()
+        return TextExtractor.get(node).trim()
     }
 
     override suspend fun getChapterList(doc: Document): List<ChapterMetadata> {
@@ -43,7 +51,8 @@ class MTLNovel : SourceInterface.Catalog {
             .addPath("chapter-list")
             .toString() + "/"
 
-        return fetchDoc(url)
+        return networkClient.get(url)
+            .toDocument()
             .select("a.ch-link[href]")
             .map {
                 ChapterMetadata(
@@ -61,7 +70,7 @@ class MTLNovel : SourceInterface.Catalog {
         }
 
         return tryConnect {
-            val doc = fetchDoc(url)
+            val doc = networkClient.get(url).toDocument()
             doc.select(".box.wide")
                 .mapNotNull {
                     val link = it.selectFirst("a.list-title[href]") ?: return@mapNotNull null
@@ -86,7 +95,7 @@ class MTLNovel : SourceInterface.Catalog {
         }
     }
 
-    val extraHeaders = mapOf(
+    private val extraHeaders = mapOf(
         ":authority" to """www.mtlnovel.com""",
         ":method" to """GET""",
         ":scheme" to """https""",
@@ -127,8 +136,7 @@ class MTLNovel : SourceInterface.Catalog {
             for ((key, value) in extraHeaders) {
                 request.addHeader(key, value)
             }
-            val jsonReader = request
-                .let { client.call(it) }
+            val jsonReader = networkClient.call(request)
                 .body!!.charStream()
 
             JsonParser

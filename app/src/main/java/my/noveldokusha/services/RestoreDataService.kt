@@ -11,9 +11,12 @@ import androidx.core.content.ContextCompat
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.*
-import my.noveldokusha.*
+import my.noveldokusha.App
+import my.noveldokusha.R
 import my.noveldokusha.data.Repository
 import my.noveldokusha.data.database.AppDatabase
+import my.noveldokusha.network.NetworkClient
+import my.noveldokusha.scraper.Scraper
 import my.noveldokusha.utils.*
 import okhttp3.internal.closeQuietly
 import java.io.File
@@ -23,30 +26,28 @@ import java.util.zip.ZipInputStream
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class RestoreDataService : Service()
-{
+class RestoreDataService : Service() {
     @Inject
     @ApplicationContext
     lateinit var context: Context
-
     @Inject
     lateinit var repository: Repository
+    @Inject
+    lateinit var scraper: Scraper
+    @Inject
+    lateinit var networkClient: NetworkClient
 
-    private class IntentData : Intent
-    {
+    private class IntentData : Intent {
         var uri by Extra_Uri()
 
         constructor(intent: Intent) : super(intent)
-        constructor(ctx: Context, uri: Uri) : super(ctx, RestoreDataService::class.java)
-        {
+        constructor(ctx: Context, uri: Uri) : super(ctx, RestoreDataService::class.java) {
             this.uri = uri
         }
     }
 
-    companion object
-    {
-        fun start(ctx: Context, uri: Uri)
-        {
+    companion object {
+        fun start(ctx: Context, uri: Uri) {
             if (!isRunning(ctx))
                 ContextCompat.startForegroundService(ctx, IntentData(ctx, uri))
         }
@@ -61,31 +62,26 @@ class RestoreDataService : Service()
 
     override fun onBind(intent: Intent?): IBinder? = null
 
-    override fun onCreate()
-    {
+    override fun onCreate() {
         super.onCreate()
         notificationBuilder = showNotification(this, channel_id) {}
         startForeground(channel_id.hashCode(), notificationBuilder.build())
     }
 
-    override fun onDestroy()
-    {
+    override fun onDestroy() {
         job?.cancel()
         super.onDestroy()
     }
 
-    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int
-    {
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         if (intent == null) return START_NOT_STICKY
         val intentData = IntentData(intent)
 
         job = CoroutineScope(Dispatchers.IO).launch {
-            try
-            {
+            try {
                 restoreData(intentData.uri)
                 repository.eventDataRestored.postValue(Unit)
-            } catch (e: Exception)
-            {
+            } catch (e: Exception) {
                 Log.e(this::class.simpleName, "Failed to start command")
             }
 
@@ -112,8 +108,7 @@ class RestoreDataService : Service()
         }
 
         val inputStream = App.instance.contentResolver.openInputStream(uri)
-        if (inputStream == null)
-        {
+        if (inputStream == null) {
             builder.showNotification(channel_id) {
                 removeProgressBar()
                 text = getString(R.string.failed_to_restore_cant_access_file)
@@ -128,16 +123,16 @@ class RestoreDataService : Service()
         }
 
 
-        suspend fun mergeToDatabase(inputStream: InputStream)
-        {
-            try
-            {
+        suspend fun mergeToDatabase(inputStream: InputStream) {
+            try {
                 builder.showNotification(channel_id) { text = "Loading database" }
                 val backupDatabase = inputStream.use {
                     Repository(
                         db = AppDatabase.createRoomFromStream(context, "temp_database", it),
                         context = context,
-                        name = "temp_database"
+                        name = "temp_database",
+                        scraper = scraper,
+                        networkClient = networkClient
                     )
                 }
                 builder.showNotification(channel_id) { text = "Adding books" }
@@ -149,8 +144,7 @@ class RestoreDataService : Service()
                 toast(getString(R.string.database_restored))
                 backupDatabase.close()
                 backupDatabase.delete()
-            } catch (e: Exception)
-            {
+            } catch (e: Exception) {
                 builder.showNotification(channel_id) {
                     removeProgressBar()
                     text = getString(R.string.failed_to_restore_invalid_backup_database)
@@ -158,8 +152,7 @@ class RestoreDataService : Service()
             }
         }
 
-        suspend fun mergetoBookFolder(entry: ZipEntry, inputStream: InputStream)
-        {
+        suspend fun mergetoBookFolder(entry: ZipEntry, inputStream: InputStream) {
             val file = File(repository.settings.folderBooks.parentFile, entry.name)
             if (file.isDirectory) return
             file.parentFile?.mkdirs()
@@ -170,8 +163,7 @@ class RestoreDataService : Service()
             }
         }
 
-        for ((entry, file) in zipSequence) when
-        {
+        for ((entry, file) in zipSequence) when {
             entry.name == "database.sqlite3" -> mergeToDatabase(file.inputStream())
             entry.name.startsWith("books/") -> mergetoBookFolder(entry, file.inputStream())
         }

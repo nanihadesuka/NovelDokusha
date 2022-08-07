@@ -1,11 +1,11 @@
 package my.noveldokusha.scraper
 
-import my.noveldokusha.data.BookTextUtils
+import my.noveldokusha.tools.BookTextMapper
 import org.jsoup.nodes.Element
 import org.jsoup.nodes.Node
 import org.jsoup.nodes.TextNode
 
-object textExtractor
+object TextExtractor
 {
     /**
      * Given an node, extract the text.
@@ -75,7 +75,7 @@ object textExtractor
     private fun declareImgEntry(node: Node): String
     {
         val relPathEncoded = (node as? Element)?.attr("src") ?: return ""
-        val text = BookTextUtils.ImgEntry(
+        val text = BookTextMapper.ImgEntry(
             path = relPathEncoded,
             yrel =  1.45f
         ).toXMLString()

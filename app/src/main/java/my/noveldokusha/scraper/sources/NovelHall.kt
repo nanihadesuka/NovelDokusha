@@ -2,11 +2,22 @@ package my.noveldokusha.scraper.sources
 
 import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.data.ChapterMetadata
-import my.noveldokusha.scraper.*
+import my.noveldokusha.network.NetworkClient
+import my.noveldokusha.network.PagedList
+import my.noveldokusha.network.Response
+import my.noveldokusha.network.tryConnect
+import my.noveldokusha.scraper.SourceInterface
+import my.noveldokusha.scraper.TextExtractor
+import my.noveldokusha.utils.add
+import my.noveldokusha.utils.addPath
+import my.noveldokusha.utils.toDocument
+import my.noveldokusha.utils.toUrlBuilderSafe
 import org.jsoup.nodes.Document
 
 // ALL OK
-class NovelHall : SourceInterface.Catalog {
+class NovelHall(
+    private val networkClient: NetworkClient
+) : SourceInterface.Catalog {
     override val name = "NovelHall"
     override val baseUrl = "https://www.novelhall.com/"
     override val catalogUrl = "https://www.novelhall.com/all.html"
@@ -17,7 +28,7 @@ class NovelHall : SourceInterface.Catalog {
     override suspend fun getChapterText(doc: Document): String {
         return doc
             .selectFirst("div#htmlContent")!!
-            .let { textExtractor.get(it) }
+            .let { TextExtractor.get(it) }
     }
 
     override suspend fun getBookCoverImageUrl(doc: Document): String? {
@@ -30,7 +41,7 @@ class NovelHall : SourceInterface.Catalog {
     override suspend fun getBookDescription(doc: Document): String? {
         return doc
             .selectFirst("span.js-close-wrap")
-            ?.let { textExtractor.get(it) }
+            ?.let { TextExtractor.get(it) }
     }
 
     override suspend fun getChapterList(doc: Document): List<ChapterMetadata> {
@@ -47,7 +58,7 @@ class NovelHall : SourceInterface.Catalog {
         }
 
         return tryConnect {
-            val doc = fetchDoc(url)
+            val doc = networkClient.get(url).toDocument()
             doc.select("li.btm")
                 .mapNotNull {
                     val link = it.selectFirst("a[href]") ?: return@mapNotNull null
@@ -82,7 +93,7 @@ class NovelHall : SourceInterface.Catalog {
             add("keyword", input)
         }
         return tryConnect {
-            val doc = fetchDoc(url)
+            val doc = networkClient.get(url).toDocument()
             doc.selectFirst(".section3.inner.mt30 > table")
                 ?.select("tr > td:nth-child(2) > a[href]")
                 .let { it ?: listOf() }

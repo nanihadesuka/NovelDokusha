@@ -1,4 +1,4 @@
-package my.noveldokusha.data
+package my.noveldokusha.tools
 
 import org.jsoup.Jsoup
 import org.w3c.dom.Document
@@ -14,7 +14,7 @@ private fun parseXMLText(text: String): Document? = text.reader().runCatching {
     DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(InputSource(this))
 }.getOrNull()
 
-object BookTextUtils {
+object BookTextMapper {
     // <img yrel="{float}"> {uri} </img>
     data class ImgEntry(val path: String, val yrel: Float) {
         /**

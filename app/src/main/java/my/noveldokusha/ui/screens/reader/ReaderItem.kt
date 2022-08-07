@@ -1,6 +1,6 @@
 package my.noveldokusha.ui.screens.reader
 
-import my.noveldokusha.data.BookTextUtils
+import my.noveldokusha.tools.BookTextMapper
 
 sealed class ReaderItem {
     abstract val chapterUrl: String
@@ -39,7 +39,7 @@ sealed class ReaderItem {
         override val pos: Int,
         val text: String,
         val location: LOCATION,
-        val image: BookTextUtils.ImgEntry
+        val image: BookTextMapper.ImgEntry
     ) : ReaderItem(), Position
 
     class TRANSLATING(

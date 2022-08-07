@@ -5,7 +5,7 @@ import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.runtime.Composable
 import my.noveldokusha.AppPreferences
 import my.noveldokusha.data.BookMetadata
-import my.noveldokusha.scraper.IteratorState
+import my.noveldokusha.network.IteratorState
 import my.noveldokusha.ui.composeViews.BooksVerticalGridView
 
 @Composable

@@ -22,7 +22,7 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.drop
 import my.noveldokusha.R
 import my.noveldokusha.databinding.ActivityReaderBinding
-import my.noveldokusha.scraper.Response
+import my.noveldokusha.network.Response
 import my.noveldokusha.ui.BaseActivity
 import my.noveldokusha.ui.screens.reader.tools.FontsLoader
 import my.noveldokusha.ui.theme.Theme

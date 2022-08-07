@@ -3,7 +3,12 @@ package my.noveldokusha.scraper.sources
 import android.net.Uri
 import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.data.ChapterMetadata
-import my.noveldokusha.scraper.*
+import my.noveldokusha.network.*
+import my.noveldokusha.scraper.SourceInterface
+import my.noveldokusha.scraper.TextExtractor
+import my.noveldokusha.utils.add
+import my.noveldokusha.utils.toDocument
+import my.noveldokusha.utils.toUrlBuilderSafe
 import org.jsoup.nodes.Document
 
 /**
@@ -13,7 +18,9 @@ import org.jsoup.nodes.Document
  * (redirected url) Doesn't have chapters, assume it redirects to different website
  */
 // ALL OK
-class NovelUpdates : SourceInterface.Catalog {
+class NovelUpdates(
+    private val networkClient: NetworkClient
+) : SourceInterface.Catalog {
     override val name = "Novel Updates"
     override val baseUrl = "https://www.novelupdates.com/"
     override val catalogUrl = "https://www.novelupdates.com/novelslisting/?sort=7&order=1&status=1"
@@ -35,19 +42,19 @@ class NovelUpdates : SourceInterface.Catalog {
 
     override suspend fun getBookDescription(doc: Document): String? {
         return doc.selectFirst("#editdescription")
-            ?.let { textExtractor.get(it) }
+            ?.let { TextExtractor.get(it) }
     }
 
     override suspend fun getChapterList(doc: Document): List<ChapterMetadata> {
 
-        return postRequest("https://www.novelupdates.com/wp-admin/admin-ajax.php")
-            .postScope {
+        val request = postRequest("https://www.novelupdates.com/wp-admin/admin-ajax.php")
+            .postPayload {
                 add("action", "nd_getchapters")
                 add("mygrr", doc.selectFirst("#grr_groups")!!.attr("value"))
                 add("mygroupfilter", "")
                 add("mypostid", doc.selectFirst("#mypostid")!!.attr("value"))
             }
-            .let { client.call(it) }
+        return networkClient.call(request)
             .toDocument()
             .select("a[href]")
             .asSequence()
@@ -84,7 +91,7 @@ class NovelUpdates : SourceInterface.Catalog {
     private suspend fun getSearchList(index: Int, url: Uri.Builder) = tryConnect(
         extraErrorInfo = "index: $index\nurl: $url"
     ) {
-        val doc = fetchDoc(url)
+        val doc = networkClient.get(url).toDocument()
         doc.select(".search_main_box_nu")
             .mapNotNull {
                 val title = it.selectFirst(".search_title > a[href]") ?: return@mapNotNull null

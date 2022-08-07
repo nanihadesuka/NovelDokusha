@@ -1,10 +1,13 @@
 package my.noveldokusha.scraper.sources
 
+import my.noveldokusha.network.NetworkClient
 import my.noveldokusha.scraper.SourceInterface
-import my.noveldokusha.scraper.textExtractor
+import my.noveldokusha.scraper.TextExtractor
 import org.jsoup.nodes.Document
 
-class Sousetsuka : SourceInterface.Base
+class Sousetsuka(
+	private val networkClient: NetworkClient
+) : SourceInterface.Base
 {
 	override val name = "Sousetsuka"
 	override val baseUrl = "https://www.sousetsuka.com/"
@@ -14,6 +17,6 @@ class Sousetsuka : SourceInterface.Base
 	override suspend fun getChapterText(doc: Document): String
 	{
 		return doc.selectFirst(".post-body.entry-content")!!
-			.let { textExtractor.get(it) }
+			.let { TextExtractor.get(it) }
 	}
 }

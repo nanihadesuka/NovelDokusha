@@ -1,4 +1,4 @@
-package my.noveldokusha.scraper
+package my.noveldokusha.network
 
 import android.webkit.CookieManager
 import okhttp3.Cookie

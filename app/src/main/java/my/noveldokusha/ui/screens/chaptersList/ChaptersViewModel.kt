@@ -15,10 +15,9 @@ import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.data.ChapterWithContext
 import my.noveldokusha.data.Repository
 import my.noveldokusha.data.database.tables.Book
-import my.noveldokusha.scraper.Response
-import my.noveldokusha.scraper.downloadBookCoverImageUrl
-import my.noveldokusha.scraper.downloadBookDescription
-import my.noveldokusha.scraper.downloadChaptersList
+import my.noveldokusha.network.NetworkClient
+import my.noveldokusha.network.Response
+import my.noveldokusha.scraper.*
 import my.noveldokusha.ui.BaseViewModel
 import my.noveldokusha.utils.Extra_String
 import my.noveldokusha.utils.StateExtra_String
@@ -57,6 +56,8 @@ data class BookDataView(
 class ChaptersViewModel @Inject constructor(
     private val repository: Repository,
     private val appScope: CoroutineScope,
+    private val networkClient: NetworkClient,
+    private val scraper: Scraper,
     @ApplicationContext private val context: Context,
     val appPreferences: AppPreferences,
     state: SavedStateHandle,
@@ -88,8 +89,8 @@ class ChaptersViewModel @Inject constructor(
             if (book != null)
                 return@launch
 
-            val coverUrl = async { downloadBookCoverImageUrl(bookUrl) }
-            val description = async { downloadBookDescription(bookUrl) }
+            val coverUrl = async { downloadBookCoverImageUrl(scraper, networkClient, bookUrl) }
+            val description = async { downloadBookDescription(scraper, networkClient, bookUrl) }
 
             repository.bookLibrary.insert(
                 Book(
@@ -158,13 +159,13 @@ class ChaptersViewModel @Inject constructor(
 
 
     fun updateCover() = viewModelScope.launch(Dispatchers.IO) {
-        val res = downloadBookCoverImageUrl(bookUrl)
+        val res = downloadBookCoverImageUrl(scraper, networkClient, bookUrl)
         if (res is Response.Success)
             repository.bookLibrary.updateCover(bookUrl, res.data)
     }
 
     fun updateDescription() = viewModelScope.launch(Dispatchers.IO) {
-        val res = downloadBookDescription(bookUrl)
+        val res = downloadBookDescription(scraper, networkClient, bookUrl)
         if (res is Response.Success)
             repository.bookLibrary.updateDescription(bookUrl, res.data)
     }
@@ -183,7 +184,9 @@ class ChaptersViewModel @Inject constructor(
             error = ""
             isRefreshing = true
             val url = bookMetadata.url
-            val res = withContext(Dispatchers.IO) { downloadChaptersList(url) }
+            val res = withContext(Dispatchers.IO) {
+                downloadChaptersList(scraper, networkClient, url)
+            }
             isRefreshing = false
             when (res) {
                 is Response.Success -> {

@@ -1,9 +1,16 @@
 package my.noveldokusha.scraper
 
 import my.noveldokusha.data.database.tables.Chapter
+import my.noveldokusha.network.NetworkClient
+import my.noveldokusha.network.Response
+import my.noveldokusha.network.tryConnect
+import my.noveldokusha.utils.toDocument
 
-suspend fun downloadChaptersList(bookUrl: String): Response<List<Chapter>>
-{
+suspend fun downloadChaptersList(
+    scraper: Scraper,
+    networkClient: NetworkClient,
+    bookUrl: String,
+): Response<List<Chapter>> {
     val error by lazy {
         """
 			Incompatible source.
@@ -17,9 +24,16 @@ suspend fun downloadChaptersList(bookUrl: String): Response<List<Chapter>>
     val scrap = scraper.getCompatibleSourceCatalog(bookUrl) ?: return Response.Error(error)
 
     return tryConnect {
-        val doc = fetchDoc(bookUrl)
+        val doc = networkClient.get(bookUrl).toDocument()
         scrap.getChapterList(doc)
-            .mapIndexed { index, it -> Chapter(title = it.title, url = it.url, bookUrl = bookUrl, position = index) }
+            .mapIndexed { index, it ->
+                Chapter(
+                    title = it.title,
+                    url = it.url,
+                    bookUrl = bookUrl,
+                    position = index
+                )
+            }
             .let { Response.Success(it) }
     }
 }

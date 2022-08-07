@@ -1,4 +1,4 @@
-package my.noveldokusha.uiViews
+package my.noveldokusha.composableActions
 
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.grid.LazyGridState
@@ -6,7 +6,7 @@ import androidx.compose.runtime.*
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.filter
-import my.noveldokusha.scraper.IteratorState
+import my.noveldokusha.network.IteratorState
 
 @OptIn(FlowPreview::class)
 @Composable

@@ -2,11 +2,18 @@ package my.noveldokusha.scraper.sources
 
 import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.data.ChapterMetadata
-import my.noveldokusha.scraper.*
+import my.noveldokusha.network.*
+import my.noveldokusha.scraper.SourceInterface
+import my.noveldokusha.scraper.TextExtractor
+import my.noveldokusha.utils.add
+import my.noveldokusha.utils.toDocument
+import my.noveldokusha.utils.toUrlBuilderSafe
 import org.jsoup.nodes.Document
 
 // ALL WORKS
-class Wuxia : SourceInterface.Catalog {
+class Wuxia(
+    private val networkClient: NetworkClient
+) : SourceInterface.Catalog {
     override val name = "Wuxia"
     override val baseUrl = "https://www.wuxia.blog/"
     override val catalogUrl = "https://www.wuxia.blog/listNovels"
@@ -20,7 +27,7 @@ class Wuxia : SourceInterface.Catalog {
             it.select(".fa.fa-calendar").remove()
             it.select("button.btn.btn-default").remove()
             it.select("div.recently-nav.pull-right").remove()
-        }.let { textExtractor.get(it) }
+        }.let { TextExtractor.get(it) }
     }
 
     override suspend fun getBookCoverImageUrl(doc: Document): String? {
@@ -33,7 +40,7 @@ class Wuxia : SourceInterface.Catalog {
         return doc.selectFirst("div[itemprop=description]")
             ?.let {
                 it.select("h4").remove()
-                textExtractor.get(it)
+                TextExtractor.get(it)
             }
     }
 
@@ -41,8 +48,8 @@ class Wuxia : SourceInterface.Catalog {
         val id = doc.selectFirst("#more")!!.attr("data-nid")
         val newChapters = doc.select("#chapters a[href]")
         val res = tryConnect {
-            postRequest("https://wuxia.blog/temphtml/_tempChapterList_all_$id.html")
-                .let { client.call(it) }
+            val request = postRequest("https://wuxia.blog/temphtml/_tempChapterList_all_$id.html")
+            networkClient.call(request)
                 .toDocument()
                 .select("a[href]")
                 .let { Response.Success(it) }
@@ -60,7 +67,8 @@ class Wuxia : SourceInterface.Catalog {
             return Response.Success(PagedList.createEmpty(index = index))
 
         return tryConnect {
-            fetchDoc(catalogUrl)
+            networkClient.get(catalogUrl)
+                .toDocument()
                 .select("td.novel a[href]")
                 .map { BookMetadata(title = it.text(), url = baseUrl + it.attr("href")) }
                 .let { Response.Success(PagedList(list = it, index = index, isLastPage = true)) }
@@ -79,7 +87,8 @@ class Wuxia : SourceInterface.Catalog {
         }
 
         return tryConnect {
-            fetchDoc(url)
+            networkClient.get(url)
+                .toDocument()
                 .selectFirst("#table")!!
                 .children()
                 .first()!!

@@ -1,7 +1,15 @@
 package my.noveldokusha.scraper
 
-suspend fun downloadBookDescription(bookUrl: String): Response<String>
-{
+import my.noveldokusha.network.NetworkClient
+import my.noveldokusha.network.Response
+import my.noveldokusha.network.tryConnect
+import my.noveldokusha.utils.toDocument
+
+suspend fun downloadBookDescription(
+    scraper: Scraper,
+    networkClient: NetworkClient,
+    bookUrl: String,
+): Response<String> {
     val error by lazy {
         """
 			Incompatible source.
@@ -15,7 +23,7 @@ suspend fun downloadBookDescription(bookUrl: String): Response<String>
     val scrap = scraper.getCompatibleSourceCatalog(bookUrl) ?: return Response.Error(error)
 
     return tryConnect {
-        val doc = fetchDoc(bookUrl)
+        val doc = networkClient.get(bookUrl).toDocument()
         scrap.getBookDescription(doc)
             ?.let { Response.Success(it) }
             ?: Response.Error("")

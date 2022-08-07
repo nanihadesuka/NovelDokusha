@@ -1,10 +1,13 @@
 package my.noveldokusha.scraper.sources
 
+import my.noveldokusha.network.NetworkClient
 import my.noveldokusha.scraper.SourceInterface
 import org.jsoup.nodes.Document
 
 // NO LONGER EXISTS
-class AT : SourceInterface.Base
+class AT(
+	private val networkClient: NetworkClient
+) : SourceInterface.Base
 {
 	override val name = "AT"
 	override val baseUrl = "https://a-t.nu/"

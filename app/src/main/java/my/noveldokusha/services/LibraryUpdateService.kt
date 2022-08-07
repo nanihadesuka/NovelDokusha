@@ -13,7 +13,9 @@ import kotlinx.coroutines.channels.actor
 import my.noveldokusha.R
 import my.noveldokusha.data.Repository
 import my.noveldokusha.data.database.tables.Book
-import my.noveldokusha.scraper.Response
+import my.noveldokusha.network.NetworkClient
+import my.noveldokusha.network.Response
+import my.noveldokusha.scraper.Scraper
 import my.noveldokusha.scraper.downloadChaptersList
 import my.noveldokusha.utils.*
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
@@ -21,26 +23,30 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 @OptIn(ObsoleteCoroutinesApi::class)
-class LibraryUpdateService : Service()
-{
+class LibraryUpdateService : Service() {
     @Inject
     lateinit var repository: Repository
 
-    private class IntentData : Intent
-    {
+    @Inject
+    lateinit var networkClient: NetworkClient
+
+    @Inject
+    lateinit var scraper: Scraper
+
+    private class IntentData : Intent {
         var completedCategory by Extra_Boolean()
 
         constructor(intent: Intent) : super(intent)
-        constructor(ctx: Context, completedCategory: Boolean) : super(ctx, LibraryUpdateService::class.java)
-        {
+        constructor(ctx: Context, completedCategory: Boolean) : super(
+            ctx,
+            LibraryUpdateService::class.java
+        ) {
             this.completedCategory = completedCategory
         }
     }
 
-    companion object
-    {
-        fun start(ctx: Context, completedCategory: Boolean)
-        {
+    companion object {
+        fun start(ctx: Context, completedCategory: Boolean) {
             if (!isRunning(ctx))
                 ContextCompat.startForegroundService(ctx, IntentData(ctx, completedCategory))
         }
@@ -60,8 +66,7 @@ class LibraryUpdateService : Service()
      */
     val updateActor = CoroutineScope(Dispatchers.IO).actor<Pair<Book, Boolean>> {
         val books = mutableSetOf<Book>()
-        for ((book, add) in channel)
-        {
+        for ((book, add) in channel) {
             if (add) books.add(book) else books.remove(book)
             if (books.isNotEmpty()) notification.showNotification(channel_id) {
                 text = books.joinToString("\n") { it.title }
@@ -72,52 +77,46 @@ class LibraryUpdateService : Service()
     /**
      * Updates in the notification the update progress count.
      */
-    val updateActorCounter = CoroutineScope(Dispatchers.IO).actor<Pair<Int, Boolean>>(Dispatchers.IO) {
-        var count = 0
-        var totalCount = 0
-        for ((value, isInit) in channel)
-        {
-            if (isInit)
-            {
-                count = 0
-                totalCount = value
-            } else count += 1
+    val updateActorCounter =
+        CoroutineScope(Dispatchers.IO).actor<Pair<Int, Boolean>>(Dispatchers.IO) {
+            var count = 0
+            var totalCount = 0
+            for ((value, isInit) in channel) {
+                if (isInit) {
+                    count = 0
+                    totalCount = value
+                } else count += 1
 
-            notification.showNotification(channel_id) {
-                title = "Updating library ($count/$totalCount)"
-                setProgress(totalCount, count, false)
+                notification.showNotification(channel_id) {
+                    title = "Updating library ($count/$totalCount)"
+                    setProgress(totalCount, count, false)
+                }
             }
         }
-    }
 
     override fun onBind(intent: Intent?): IBinder? = null
 
-    override fun onCreate()
-    {
+    override fun onCreate() {
         super.onCreate()
         notification = showNotification(this, channel_id) {}
         startForeground(channel_id.hashCode(), notification.build())
     }
 
-    override fun onDestroy()
-    {
+    override fun onDestroy() {
         job?.cancel()
         updateActor.close()
         updateActorCounter.close()
         super.onDestroy()
     }
 
-    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int
-    {
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         if (intent == null) return START_NOT_STICKY
         val intentData = IntentData(intent)
 
         job = CoroutineScope(Dispatchers.IO).launch {
-            try
-            {
+            try {
                 updateLibrary(intentData.completedCategory)
-            } catch (e: Exception)
-            {
+            } catch (e: Exception) {
                 Log.e(this::class.simpleName, "Failed to start command")
             }
 
@@ -166,40 +165,38 @@ class LibraryUpdateService : Service()
         notification.close(this@LibraryUpdateService, channel_id)
     }
 
-    private suspend fun updateBooks(books: List<Book>): Pair<List<String>, List<String>> = withContext(Dispatchers.Default)
-    {
-        val hasUpdates = mutableListOf<String>()
-        val hasFailed = mutableListOf<String>()
-        for (book in books)
+    private suspend fun updateBooks(books: List<Book>): Pair<List<String>, List<String>> =
+        withContext(Dispatchers.Default)
         {
-            val oldChaptersList = async(Dispatchers.IO) {
-                repository.bookChapter.chapters(book.url).map { it.url }.toSet()
-            }
-
-            launch(Dispatchers.IO) {
-                updateActor.send(Pair(book, true))
-            }
-
-            when (val res = downloadChaptersList(book.url))
-            {
-                is Response.Success ->
-                {
-                    oldChaptersList.join()
-                    launch(Dispatchers.IO) {
-                        repository.bookChapter.merge(res.data, book.url)
-                    }
-                    val hasNewChapters = res.data.any { it.url !in oldChaptersList.await() }
-                    if (hasNewChapters)
-                        hasUpdates.add(book.title)
+            val hasUpdates = mutableListOf<String>()
+            val hasFailed = mutableListOf<String>()
+            for (book in books) {
+                val oldChaptersList = async(Dispatchers.IO) {
+                    repository.bookChapter.chapters(book.url).map { it.url }.toSet()
                 }
-                is Response.Error -> hasFailed.add(book.title)
-            }
 
-            launch(Dispatchers.IO) {
-                updateActor.send(Pair(book, false))
-                updateActorCounter.send(Pair(0, false))
+                launch(Dispatchers.IO) {
+                    updateActor.send(Pair(book, true))
+                }
+
+                when (val res = downloadChaptersList(scraper, networkClient, book.url)) {
+                    is Response.Success -> {
+                        oldChaptersList.join()
+                        launch(Dispatchers.IO) {
+                            repository.bookChapter.merge(res.data, book.url)
+                        }
+                        val hasNewChapters = res.data.any { it.url !in oldChaptersList.await() }
+                        if (hasNewChapters)
+                            hasUpdates.add(book.title)
+                    }
+                    is Response.Error -> hasFailed.add(book.title)
+                }
+
+                launch(Dispatchers.IO) {
+                    updateActor.send(Pair(book, false))
+                    updateActorCounter.send(Pair(0, false))
+                }
             }
+            Pair(hasUpdates, hasFailed)
         }
-        Pair(hasUpdates, hasFailed)
-    }
 }

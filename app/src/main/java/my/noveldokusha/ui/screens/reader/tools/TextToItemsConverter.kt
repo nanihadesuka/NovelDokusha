@@ -4,7 +4,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.withContext
-import my.noveldokusha.data.BookTextUtils
+import my.noveldokusha.tools.BookTextMapper
 
 suspend fun textToItemsConverter(
     chapterUrl: String,
@@ -48,7 +48,7 @@ private fun generateITEM(
     pos: Int,
     text: String,
     location: ReaderItem.LOCATION
-): ReaderItem = when (val imgEntry = BookTextUtils.ImgEntry.fromXMLString(text)) {
+): ReaderItem = when (val imgEntry = BookTextMapper.ImgEntry.fromXMLString(text)) {
     null -> ReaderItem.BODY(
         chapterUrl = chapterUrl,
         pos = pos,

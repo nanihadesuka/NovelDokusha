@@ -2,11 +2,19 @@ package my.noveldokusha.scraper.sources
 
 import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.data.ChapterMetadata
-import my.noveldokusha.scraper.*
+import my.noveldokusha.network.NetworkClient
+import my.noveldokusha.network.PagedList
+import my.noveldokusha.network.Response
+import my.noveldokusha.network.tryConnect
+import my.noveldokusha.scraper.SourceInterface
+import my.noveldokusha.scraper.TextExtractor
+import my.noveldokusha.utils.*
 import org.jsoup.nodes.Document
 
 // TODO() website not working
-class WebNovelLight : SourceInterface.Catalog {
+class WebNovelLight(
+    private val networkClient: NetworkClient
+) : SourceInterface.Catalog {
     override val name = "Web Novel Light"
     override val baseUrl = "https://webnovellight.com/"
     override val catalogUrl = "https://webnovellight.com/series/?m_orderby=alphabet"
@@ -21,18 +29,17 @@ class WebNovelLight : SourceInterface.Catalog {
 
     override suspend fun getBookDescription(doc: Document): String? {
         return doc.selectFirst(".summary__content.show-more")
-            ?.let { textExtractor.get(it) }
+            ?.let { TextExtractor.get(it) }
     }
 
     override suspend fun getChapterList(doc: Document): List<ChapterMetadata> {
         val url = doc
             .location()
-            .toUrlBuilder()
-            ?.addPath("ajax")
-            ?.addPath("chapters")
+            .toUrlBuilderSafe()
+            .addPath("ajax")
+            .addPath("chapters")
 
-        return postRequest(url.toString())
-            .let { client.call(it) }
+        return networkClient.get(url)
             .toDocument()
             .select(".wp-manga-chapter > a[href]")
             .map { ChapterMetadata(title = it.text(), url = it.attr("href")) }
@@ -51,7 +58,8 @@ class WebNovelLight : SourceInterface.Catalog {
                 .ifCase(page != 1) { addPath("page", page.toString()) }
                 .add("m_orderby", "alphabet")
 
-            fetchDoc(url)
+            networkClient.get(url)
+                .toDocument()
                 .select(".page-item-detail")
                 .mapNotNull {
                     val link = it.selectFirst("a[href]") ?: return@mapNotNull null
@@ -89,7 +97,8 @@ class WebNovelLight : SourceInterface.Catalog {
                     "adult" to ""
                 )
 
-            fetchDoc(url)
+            networkClient.get(url)
+                .toDocument()
                 .select(".c-tabs-item__content")
                 .mapNotNull {
                     val link = it.selectFirst("a[href]") ?: return@mapNotNull null

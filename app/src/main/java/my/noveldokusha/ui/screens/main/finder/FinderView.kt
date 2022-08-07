@@ -1,6 +1,7 @@
 package my.noveldokusha.ui.screens.main.finder
 
 import android.content.Context
+import android.net.Uri
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -28,8 +29,9 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import my.noveldokusha.R
 import my.noveldokusha.scraper.DatabaseInterface
+import my.noveldokusha.network.NetworkClient
+import my.noveldokusha.scraper.Scraper
 import my.noveldokusha.scraper.SourceInterface
-import my.noveldokusha.scraper.scraper
 import my.noveldokusha.ui.composeViews.ToolbarModeSearch
 import my.noveldokusha.ui.screens.databaseSearch.DatabaseSearchActivity
 import my.noveldokusha.ui.screens.globalSourceSearch.GlobalSourceSearchActivity
@@ -39,6 +41,9 @@ import my.noveldokusha.ui.theme.ColorAccent
 import my.noveldokusha.ui.theme.InternalTheme
 import my.noveldokusha.uiViews.MyButton
 import my.noveldokusha.utils.drawBottomLine
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import okhttp3.Response
 
 @Composable
 fun FinderView() {
@@ -256,6 +261,15 @@ private fun Button(
 @Preview
 @Composable
 fun PreviewView() {
+
+    val scraper = Scraper(object : NetworkClient {
+        override val client by lazy { OkHttpClient() }
+        override val clientWithRedirects by lazy { OkHttpClient() }
+        override suspend fun call(request: Request.Builder) = Response.Builder().build()
+        override suspend fun get(url: String) = Response.Builder().build()
+        override suspend fun get(url: Uri.Builder) = Response.Builder().build()
+    })
+
     InternalTheme {
         FinderBody(
             databasesList = scraper.databasesList.toList(),
