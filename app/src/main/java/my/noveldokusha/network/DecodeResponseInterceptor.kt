@@ -11,36 +11,30 @@ import org.brotli.dec.BrotliInputStream
 
 /**
  * Interceptor to decode/uncompress a response body
- * with header content-encoding:br
+ * with header content-encoding value:
+ * 1) br
+ * 2) gzip
  */
-class BrotliDecodeResponseInterceptor : Interceptor {
+class DecodeResponseInterceptor : Interceptor {
+
     override fun intercept(chain: Interceptor.Chain): Response {
-
         val response = chain.proceed(chain.request())
-        if (response.header("Content-Encoding") == "br") {
-            return uncompress(response)
-        }
-        return response
-    }
 
-    /**
-     * Taken from okhttp-brotli [BrotliInterceptor.kt]
-     */
-    private fun uncompress(response: Response): Response {
         if (!response.promisesBody()) {
             return response
         }
-        val body = response.body ?: return response
-        val encoding = response.header("Content-Encoding") ?: return response
 
-        val decompressedSource = when {
-            encoding.equals("br", ignoreCase = true) ->
-                BrotliInputStream(body.source().inputStream()).source().buffer()
-            encoding.equals("gzip", ignoreCase = true) ->
-                GzipSource(body.source()).buffer()
+        val body = response.body ?: return response
+        val contentEncoding = response.header("Content-Encoding")?.lowercase()
+            ?: return response
+
+        val decompressedSource = when (contentEncoding) {
+            "br" -> BrotliInputStream(body.source().inputStream()).source().buffer()
+            "gzip" -> GzipSource(body.source()).buffer()
             else -> return response
         }
 
+        // We set the content length to -1 as we can't knew the uncompressed size without reading it
         return response.newBuilder()
             .removeHeader("Content-Encoding")
             .removeHeader("Content-Length")

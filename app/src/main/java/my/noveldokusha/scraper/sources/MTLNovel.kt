@@ -95,28 +95,6 @@ class MTLNovel(
         }
     }
 
-    private val extraHeaders = mapOf(
-        ":authority" to """www.mtlnovel.com""",
-        ":method" to """GET""",
-        ":scheme" to """https""",
-        "accept" to """application/json""",
-        "accept-encoding" to """gzip, deflate, br""",
-        "accept-language" to """en-GB,en-US;q=0.9,en;q=0.8,ca;q=0.7,es-ES;q=0.6,es;q=0.5,de;q=0.4""",
-        "amp-same-origin" to """true""",
-        "cache-control" to """no-cache""",
-        "dnt" to """1""",
-        "pragma" to """no-cache""",
-        "referer" to """https://www.mtlnovel.com/""",
-        "sec-ch-ua" to """" Not A;Brand";v="99", "Chromium";v="101", "Google Chrome";v="101"""",
-        "sec-ch-ua-mobile" to """?0""",
-        "sec-ch-ua-platform" to """Windows""",
-        "sec-fetch-dest" to """empty""",
-        "sec-fetch-mode" to """cors""",
-        "sec-fetch-site" to """same-origin""",
-        "user-agent" to """Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/101.0.4951.54 Safari/537.36"""
-    )
-
-    // TODO() NOT WORKING JSON MANGLED EVEN IF IN THE LOGS SHOWS FINE
     override suspend fun getCatalogSearch(
         index: Int,
         input: String
@@ -133,14 +111,12 @@ class MTLNovel(
 
         return tryConnect {
             val request = getRequest(url)
-            for ((key, value) in extraHeaders) {
-                request.addHeader(key, value)
-            }
-            val jsonReader = networkClient.call(request)
-                .body!!.charStream()
+            val json = networkClient.call(request)
+                .body!!
+                .string()
 
             JsonParser
-                .parseReader(jsonReader)
+                .parseString(json)
                 .asJsonObject["items"]
                 .asJsonArray[0]
                 .asJsonObject["results"]
