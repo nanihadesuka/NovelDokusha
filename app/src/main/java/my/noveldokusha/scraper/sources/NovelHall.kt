@@ -14,7 +14,6 @@ import my.noveldokusha.utils.toDocument
 import my.noveldokusha.utils.toUrlBuilderSafe
 import org.jsoup.nodes.Document
 
-// ALL OK
 class NovelHall(
     private val networkClient: NetworkClient
 ) : SourceInterface.Catalog {

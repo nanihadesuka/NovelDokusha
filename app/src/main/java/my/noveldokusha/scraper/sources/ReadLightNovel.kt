@@ -16,7 +16,6 @@ import org.jsoup.nodes.Document
  * Chapter url example:
  * https://www.readlightnovel.org/goat-of-all-ghouls-1/chapter-1
  */
-// TODO() missing cookies, doesn't work
 class ReadLightNovel(
     private val networkClient: NetworkClient
 ) : SourceInterface.Catalog {
@@ -89,7 +88,6 @@ class ReadLightNovel(
         }
     }
 
-    // TODO() missing cookies, doesn't work
     override suspend fun getCatalogSearch(
         index: Int,
         input: String
@@ -98,14 +96,27 @@ class ReadLightNovel(
             return Response.Success(PagedList.createEmpty(index = index))
 
         return tryConnect {
-            val request = postRequest("https://www.readlightnovel.org/search/autocomplete")
+            val request = postRequest("https://www.readlightnovel.me/search/autocomplete")
+                .addHeader("accept", "*/*")
+                .addHeader("accept-encoding", "gzip, deflate, br")
+                .addHeader("accept-language", "en-GB,en-US;q=0.9,en;q=0.8,ca;q=0.7,es-ES;q=0.6,es;q=0.5,de;q=0.4")
+                .addHeader("cache-control", "no-cache")
+                .addHeader("content-type", "application/x-www-form-urlencoded; charset=UTF-8")
+                .addHeader("origin", "https://www.readlightnovel.me")
+                .addHeader("pragma", "no-cache")
+                .addHeader("referer", "https://www.readlightnovel.me")
+                .addHeader("sec-ch-ua-platform", "Windows")
+                .addHeader("sec-fetch-dest", "empty")
+                .addHeader("sec-fetch-mode", "cors")
+                .addHeader("sec-fetch-site", "same-origin")
+                .addHeader("x-requested-with", "XMLHttpRequest")
                 .postPayload {
                     add("q", input)
                 }
 
             return@tryConnect networkClient.call(request)
                 .toDocument()
-                .children()
+                .select("li")
                 .mapNotNull {
                     val link = it.selectFirst("a[href]") ?: return@mapNotNull null
                     val bookCover = it.selectFirst("img[src]")?.attr("src") ?: ""

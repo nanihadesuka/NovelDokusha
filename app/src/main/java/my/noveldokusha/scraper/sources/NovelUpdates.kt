@@ -17,7 +17,6 @@ import org.jsoup.nodes.Document
  * Chapter url example:
  * (redirected url) Doesn't have chapters, assume it redirects to different website
  */
-// ALL OK
 class NovelUpdates(
     private val networkClient: NetworkClient
 ) : SourceInterface.Catalog {
