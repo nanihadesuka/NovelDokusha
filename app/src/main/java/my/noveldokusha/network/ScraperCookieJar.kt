@@ -14,7 +14,7 @@ class ScraperCookieJar : CookieJar {
 
     override fun loadForRequest(url: HttpUrl): List<Cookie> {
         val authority = url.toUrl().authority
-        val cookies = manager.getCookie(authority)
+        val cookies = manager.getCookie(url.toString())
         return if (cookies != null && cookies.isNotBlank()) {
             if(BuildConfig.DEBUG){
                 Log.v("CookieJar:loadForRequest", "url:$url\n\nauthority:$authority\n\ncookies:$cookies")
@@ -29,7 +29,7 @@ class ScraperCookieJar : CookieJar {
             Log.v("CookieJar:saveFromResponse", "url:$url\n\nauthority:$authority\n\ncookies:$cookies")
         }
         cookies.forEach {
-            manager.setCookie(authority, it.toString())
+            manager.setCookie(url.toString(), it.toString())
         }
     }
 }

@@ -16,7 +16,6 @@ import my.noveldokusha.utils.toUrlBuilderSafe
 import org.jsoup.nodes.Document
 import java.io.StringReader
 
-// ALL OK
 class Saikai(
     private val networkClient: NetworkClient
 ) : SourceInterface.Catalog {

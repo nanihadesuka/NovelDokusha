@@ -10,7 +10,6 @@ import my.noveldokusha.utils.toDocument
 import my.noveldokusha.utils.toUrlBuilderSafe
 import org.jsoup.nodes.Document
 
-// ALL WORKS
 class Wuxia(
     private val networkClient: NetworkClient
 ) : SourceInterface.Catalog {

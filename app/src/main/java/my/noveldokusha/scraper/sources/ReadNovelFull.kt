@@ -20,7 +20,6 @@ import org.jsoup.nodes.Document
  * Chapter url example:
  * https://readnovelfull.com/reincarnation-of-the-strongest-sword-god/chapter-1-starting-over-v1.html
  */
-// ALL OK
 class ReadNovelFull(
     private val networkClient: NetworkClient
 ) : SourceInterface.Catalog {

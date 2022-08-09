@@ -63,10 +63,11 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideNetworkClient(app: App): NetworkClient {
+    fun provideNetworkClient(app: App, @ApplicationContext context: Context): NetworkClient {
         return ScrapperNetworkClient(
             cacheDir = File(app.cacheDir, "network_cache"),
-            cacheSize = 5L * 1024 * 1024
+            cacheSize = 5L * 1024 * 1024,
+            appContext = context
         )
     }
 
