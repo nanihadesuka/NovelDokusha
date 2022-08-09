@@ -20,20 +20,19 @@ class WuxiaWorld(
 
     override suspend fun getBookCoverImageUrl(doc: Document): String? {
         return doc.selectFirst("div.summary_image")
-            ?.selectFirst("img[data-src]")
-            ?.attr("data-src")
-            ?.replace("wuxiaworld.b-cdn.net", "wuxiaworld.site")
-            ?.replace("-193x278", "")
+            ?.selectFirst("img[src]")
+            ?.attr("src")
     }
 
     override suspend fun getBookDescription(doc: Document): String? {
         return doc.selectFirst(".summary__content.show-more")
-            ?.let { TextExtractor.get(it) }
+            ?.let { TextExtractor.get(it).trim() }
     }
 
     override suspend fun getChapterList(doc: Document): List<ChapterMetadata> {
         val url = doc
-            .location()
+            .selectFirst("meta[property=og:url]")!!
+            .attr("content")
             .toUrlBuilder()
             ?.addPath("ajax")
             ?.addPath("chapters")
@@ -60,10 +59,8 @@ class WuxiaWorld(
                 .mapNotNull {
                     val link = it.selectFirst("a[href]") ?: return@mapNotNull null
                     val bookCover = it
-                        .selectFirst("img[data-src]")
-                        ?.attr("data-src")
-                        ?.replace("wuxiaworld.b-cdn.net", "wuxiaworld.site")
-                        ?.replace("-193x278", "") ?: ""
+                        .selectFirst("img[src]")
+                        ?.attr("src") ?: ""
 
                     BookMetadata(
                         title = link.attr("title"),
@@ -109,10 +106,8 @@ class WuxiaWorld(
             doc.select(".c-tabs-item__content")
                 .mapNotNull {
                     val link = it.selectFirst("a[href]") ?: return@mapNotNull null
-                    val bookCover = it.selectFirst("img[data-src]")
-                        ?.attr("data-src")
-                        ?.replace("wuxiaworld.b-cdn.net", "wuxiaworld.site")
-                        ?.replace("-193x278", "") ?: ""
+                    val bookCover = it.selectFirst("img[src]")
+                        ?.attr("src") ?: ""
 
                     BookMetadata(
                         title = link.attr("title"),
