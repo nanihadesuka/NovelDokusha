@@ -8,7 +8,6 @@ import my.noveldokusha.scraper.TextExtractor
 import my.noveldokusha.utils.*
 import org.jsoup.nodes.Document
 
-// TODO() NOT WORKING: cookies not setting in
 class WuxiaWorld(
     private val networkClient: NetworkClient
 ) : SourceInterface.Catalog {
