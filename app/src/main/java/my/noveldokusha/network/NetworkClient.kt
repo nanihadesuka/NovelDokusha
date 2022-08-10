@@ -33,7 +33,7 @@ class ScrapperNetworkClient(
         level = HttpLoggingInterceptor.Level.BODY
     }
 
-    private val client = OkHttpClient.Builder()
+    val client = OkHttpClient.Builder()
         .let {
             if (BuildConfig.DEBUG) {
                 it.addInterceptor(okhttpLoggingInterceptor)
@@ -48,7 +48,7 @@ class ScrapperNetworkClient(
         .readTimeout(30, TimeUnit.SECONDS)
         .build()
 
-    private val clientWithRedirects = client
+    val clientWithRedirects = client
         .newBuilder()
         .followRedirects(true)
         .followSslRedirects(true)
