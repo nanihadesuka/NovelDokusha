@@ -160,10 +160,6 @@ dependencies {
     implementation("com.l4digital.fastscroll:fastscroll:2.0.1")
     implementation("com.afollestad.material-dialogs:core:3.3.0")
 
-    // Glide
-    implementation("com.github.bumptech.glide:glide:4.13.2")
-    kapt("com.github.bumptech.glide:compiler:4.13.2")
-
     // Test
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.3")
@@ -211,6 +207,9 @@ dependencies {
 
     // Coil for jetpack compose
     implementation("io.coil-kt:coil-compose:2.1.0")
+
+    // Glide for jetpack compose (has more compatible formats)
+    implementation("com.github.skydoves:landscapist-glide:1.6.0")
 
     // Compose collapsing toolbar
     implementation("me.onebone:toolbar-compose:2.3.4")

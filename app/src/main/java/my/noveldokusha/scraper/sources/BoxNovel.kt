@@ -14,6 +14,7 @@ class BoxNovel(
     override val name = "Box Novel"
     override val baseUrl = "https://boxnovel.com/"
     override val catalogUrl = "https://boxnovel.com/novel/?m_orderby=alphabet"
+    override val iconUrl = "https://boxnovel.com/wp-content/uploads/2018/04/box-icon-150x150.png"
     override val language = "English"
 
     override suspend fun getBookCoverImageUrl(doc: Document): String? {

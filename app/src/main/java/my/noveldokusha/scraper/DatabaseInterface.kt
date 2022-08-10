@@ -10,6 +10,7 @@ interface DatabaseInterface {
     val id: String
     val name: String
     val baseUrl: String
+    val iconUrl: String get() = "$baseUrl/favicon.ico"
 
     val searchGenresCacheFileName get() = "database_search_genres__$id"
 

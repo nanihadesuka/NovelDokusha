@@ -29,7 +29,7 @@ import my.noveldokusha.scraper.Scraper
 import my.noveldokusha.ui.theme.ColorAccent
 import my.noveldokusha.ui.theme.ImageBorderRadius
 import my.noveldokusha.ui.theme.InternalTheme
-import my.noveldokusha.uiViews.ImageView
+import my.noveldokusha.ui.composeViews.ImageView
 import my.noveldokusha.utils.capitalize
 import okhttp3.Request
 import okhttp3.Response

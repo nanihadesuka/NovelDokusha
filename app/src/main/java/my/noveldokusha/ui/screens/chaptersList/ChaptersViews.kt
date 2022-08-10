@@ -40,7 +40,7 @@ import my.noveldokusha.ui.theme.ImageBorderRadius
 import my.noveldokusha.ui.theme.InternalTheme
 import my.noveldokusha.ui.theme.Themes
 import my.noveldokusha.uiViews.ErrorView
-import my.noveldokusha.uiViews.ImageView
+import my.noveldokusha.ui.composeViews.ImageView
 import my.noveldokusha.utils.ifCase
 import my.noveldokusha.utils.mix
 

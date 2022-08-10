@@ -11,13 +11,15 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.painterResource
-import coil.compose.AsyncImage
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
+import com.skydoves.landscapist.glide.GlideImage
 import my.noveldokusha.R
 
 @Composable
-fun ImageView(
+fun ImageViewGlide(
     imageModel: Any?,
     modifier: Modifier = Modifier,
     fadeInDurationMillis: Int = 250,
@@ -42,12 +44,15 @@ fun ImageView(
             modifier = modifier
         )
     } else {
-        AsyncImage(
-            model = ImageRequest
-                .Builder(LocalContext.current)
-                .data(model)
-                .crossfade(fadeInDurationMillis)
-                .build(),
+
+        GlideImage(
+            imageModel = model,
+            requestBuilder = {
+                Glide
+                    .with(LocalContext.current)
+                    .asDrawable()
+                    .transition(DrawableTransitionOptions.withCrossFade(fadeInDurationMillis))
+            },
             contentDescription = contentDescription,
             contentScale = contentScale,
             modifier = modifier,

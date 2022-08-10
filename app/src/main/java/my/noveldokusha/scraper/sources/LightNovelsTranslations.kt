@@ -28,6 +28,7 @@ class LightNovelsTranslations(
     override val name = "Light Novel Translations"
     override val baseUrl = "https://lightnovelstranslations.com/"
     override val catalogUrl = "https://lightnovelstranslations.com/"
+    override val iconUrl = "https://c10.patreonusercontent.com/4/patreon-media/p/campaign/458169/797a2e9b03094435947635c4da0fc683/eyJ3IjoyMDB9/1.jpeg?token-time=2145916800&token-hash=2gkkI3EgQqRPh5dQe9uxrULjURfQVm60BHKUdh91MtE%3D"
     override val language = "English"
 
     override suspend fun getChapterTitle(doc: Document): String? =

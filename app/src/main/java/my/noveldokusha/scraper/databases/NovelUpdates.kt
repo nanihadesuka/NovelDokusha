@@ -23,6 +23,7 @@ class NovelUpdates(
     override val id = "novel_updates"
     override val name = "Novel Updates"
     override val baseUrl = "https://www.novelupdates.com/"
+    override val iconUrl = "https://www.novelupdates.com/favicon.ico"
 
     override suspend fun getSearchAuthorSeries(
         index: Int,

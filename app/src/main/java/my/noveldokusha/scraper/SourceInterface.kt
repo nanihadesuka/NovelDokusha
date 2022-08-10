@@ -20,6 +20,7 @@ sealed interface SourceInterface {
     interface Catalog : SourceInterface {
         val catalogUrl: String
         val language: String
+        val iconUrl: String get() = "$baseUrl/favicon.ico"
 
         suspend fun getBookCoverImageUrl(doc: Document): String? = null
         suspend fun getBookDescription(doc: Document): String? = null

@@ -15,6 +15,7 @@ class WuxiaWorld(
     override val name = "Wuxia World"
     override val baseUrl = "https://wuxiaworld.site/"
     override val catalogUrl = "https://wuxiaworld.site/novel/?m_orderby=trending"
+    override val iconUrl = "https://wuxiaworld.site/wp-content/uploads/2019/04/favicon-1.ico"
     override val language = "English"
 
     override suspend fun getBookCoverImageUrl(doc: Document): String? {

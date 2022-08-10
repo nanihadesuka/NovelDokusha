@@ -26,6 +26,7 @@ class LightNovelWorld(
     override val name = "Light Novel World"
     override val baseUrl = "https://www.lightnovelworld.com/"
     override val catalogUrl = "https://www.lightnovelworld.com/genre/all/popular/all/"
+    override val iconUrl = "https://static.lightnovelworld.com/content/img/lightnovelworld/favicon.png"
     override val language = "English"
 
     override suspend fun getChapterText(doc: Document): String {

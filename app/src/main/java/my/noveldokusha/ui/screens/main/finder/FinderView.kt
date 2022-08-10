@@ -21,6 +21,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -32,12 +33,14 @@ import my.noveldokusha.network.NetworkClient
 import my.noveldokusha.scraper.DatabaseInterface
 import my.noveldokusha.scraper.Scraper
 import my.noveldokusha.scraper.SourceInterface
+import my.noveldokusha.ui.composeViews.ImageViewGlide
 import my.noveldokusha.ui.composeViews.ToolbarModeSearch
 import my.noveldokusha.ui.screens.databaseSearch.DatabaseSearchActivity
 import my.noveldokusha.ui.screens.globalSourceSearch.GlobalSourceSearchActivity
 import my.noveldokusha.ui.screens.sourceCatalog.SourceCatalogActivity
 import my.noveldokusha.ui.screens.sourceCatalog.ToolbarMode
 import my.noveldokusha.ui.theme.ColorAccent
+import my.noveldokusha.ui.theme.ImageBorderRadius
 import my.noveldokusha.ui.theme.InternalTheme
 import my.noveldokusha.uiViews.MyButton
 import my.noveldokusha.utils.drawBottomLine
@@ -122,6 +125,7 @@ fun FinderBody(
         items(databasesList) {
             Button(
                 text = it.name,
+                iconUrl = it.iconUrl,
                 onClick = { onDatabaseClick(it) },
             )
         }
@@ -139,6 +143,7 @@ fun FinderBody(
         items(sourcesList) {
             Button(
                 text = it.name,
+                iconUrl = it.iconUrl,
                 onClick = { onSourceClick(it) },
             )
         }
@@ -245,6 +250,7 @@ fun LanguagesDropDown(
 @Composable
 private fun Button(
     text: String,
+    iconUrl: String,
     onClick: () -> Unit,
 ) {
     MyButton(
@@ -254,7 +260,26 @@ private fun Button(
         backgroundColor = MaterialTheme.colors.primary,
         modifier = Modifier.fillMaxWidth(),
         textStyle = LocalTextStyle.current.copy(fontWeight = FontWeight.Bold)
-    )
+    ) { text: String, radius: Dp, textAlign: TextAlign, textStyle: TextStyle ->
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.padding(horizontal = 12.dp),
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            ImageViewGlide(
+                imageModel = iconUrl,
+                modifier = Modifier
+                    .padding(vertical = 12.dp)
+                    .size(18.dp)
+                    .clip(RoundedCornerShape(ImageBorderRadius))
+            )
+            Text(
+                text = text,
+                textAlign = textAlign,
+                style = textStyle,
+            )
+        }
+    }
 }
 
 @Preview

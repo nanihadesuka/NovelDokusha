@@ -14,13 +14,14 @@ class _1stKissNovel(
     override val catalogUrl = "https://1stkissnovel.love/novel/?m_orderby=alphabet"
     override val name = "1stKissNovel"
     override val baseUrl = "https://1stkissnovel.love/"
+    override val iconUrl = "https://1stkissnovel.love/wp-content/uploads/2020/10/cropped-HINH-NEN-3-1-32x32.png"
     override val language = "English"
 
 
     override suspend fun getBookCoverImageUrl(doc: Document): String? {
         return doc.selectFirst("div.summary_image")
-            ?.selectFirst("img[data-src]")
-            ?.attr("data-src")
+            ?.selectFirst("img[src]")
+            ?.attr("src")
     }
 
     override suspend fun getBookDescription(doc: Document): String? {
@@ -63,7 +64,7 @@ class _1stKissNovel(
             doc.select(".page-item-detail")
                 .mapNotNull { it.selectFirst("a[href]") }
                 .map {
-                    val coverImageUrl = it.selectFirst("img[data-src]")?.attr("data-src")
+                    val coverImageUrl = it.selectFirst("img[src]")?.attr("src")
                     BookMetadata(
                         title = it.attr("title"),
                         url = it.attr("href"),
@@ -98,7 +99,7 @@ class _1stKissNovel(
             doc.select(".row.c-tabs-item__content")
                 .mapNotNull { it.selectFirst("a[href]") }
                 .map {
-                    val coverImageUrl = it.selectFirst("img[data-src]")?.attr("data-src")
+                    val coverImageUrl = it.selectFirst("img[src]")?.attr("src")
                     BookMetadata(
                         title = it.attr("title"),
                         url = it.attr("href"),
