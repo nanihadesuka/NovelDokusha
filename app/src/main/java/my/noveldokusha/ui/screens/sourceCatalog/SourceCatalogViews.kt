@@ -7,7 +7,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -28,10 +27,9 @@ import my.noveldokusha.AppPreferences
 import my.noveldokusha.R
 import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.network.IteratorState
-import my.noveldokusha.ui.composeViews.BooksVerticalGridView
+import my.noveldokusha.ui.composeViews.BooksVerticalView
 import my.noveldokusha.ui.theme.ColorAccent
 import my.noveldokusha.ui.theme.InternalTheme
-import my.noveldokusha.uiViews.BooksVerticalListView
 
 enum class ToolbarMode { MAIN, SEARCH }
 
@@ -168,14 +166,15 @@ fun OptionsDropDown(
 @Composable
 fun PreviewList() {
     InternalTheme {
-        BooksVerticalListView(
+        BooksVerticalView(
             list = (1..10).map { BookMetadata("Book $it", "url") },
             error = null,
             loadState = IteratorState.LOADING,
             onLoadNext = {},
             onBookClicked = {},
             onBookLongClicked = {},
-            listState = rememberLazyListState()
+            state = rememberLazyGridState(),
+            layoutMode = AppPreferences.LIST_LAYOUT_MODE.verticalList
         )
     }
 }
@@ -185,7 +184,7 @@ fun PreviewList() {
 @Composable
 fun PreviewGrid() {
     InternalTheme {
-        BooksVerticalGridView(
+        BooksVerticalView(
             cells = GridCells.Fixed(2),
             list = (1..10).map { BookMetadata("Book $it", "url") },
             error = null,
@@ -193,7 +192,8 @@ fun PreviewGrid() {
             onLoadNext = {},
             onBookClicked = {},
             onBookLongClicked = {},
-            listState = rememberLazyGridState()
+            state = rememberLazyGridState(),
+            layoutMode = AppPreferences.LIST_LAYOUT_MODE.verticalGrid
         )
     }
 }

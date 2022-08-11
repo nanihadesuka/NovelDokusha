@@ -11,9 +11,9 @@ import dagger.hilt.android.AndroidEntryPoint
 import my.noveldokusha.R
 import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.ui.BaseActivity
+import my.noveldokusha.ui.composeViews.BooksVerticalView
 import my.noveldokusha.ui.screens.databaseBookInfo.DatabaseBookInfoActivity
 import my.noveldokusha.ui.theme.Theme
-import my.noveldokusha.uiViews.BooksVerticalView
 import my.noveldokusha.utils.Extra_String
 import my.noveldokusha.utils.Extra_StringArrayList
 import my.noveldokusha.utils.capitalize
@@ -70,7 +70,7 @@ class DatabaseSearchResultsActivity : BaseActivity() {
                     BooksVerticalView(
                         layoutMode = viewModel.listLayout,
                         list = viewModel.fetchIterator.list,
-                        listState = rememberLazyGridState(),
+                        state = rememberLazyGridState(),
                         error = viewModel.fetchIterator.error,
                         loadState = viewModel.fetchIterator.state,
                         onLoadNext = { viewModel.fetchIterator.fetchNext() },
