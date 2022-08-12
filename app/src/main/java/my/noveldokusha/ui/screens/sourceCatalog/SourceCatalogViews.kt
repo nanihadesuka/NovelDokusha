@@ -103,7 +103,7 @@ fun OptionsDropDown(
     ) {
         Column(Modifier.padding(horizontal = 8.dp)) {
             Text(
-                text = "Books layout",
+                text = stringResource(R.string.books_layout),
                 Modifier
                     .padding(8.dp)
                     .fillMaxWidth(),

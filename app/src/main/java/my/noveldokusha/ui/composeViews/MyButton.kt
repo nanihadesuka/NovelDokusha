@@ -1,5 +1,6 @@
 package my.noveldokusha.uiViews
 
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.border
@@ -7,32 +8,47 @@ import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.LocalTextStyle
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import my.noveldokusha.ui.theme.ColorAccent
 import my.noveldokusha.ui.theme.InternalThemeObject
 import my.noveldokusha.ui.theme.Themes
 import my.noveldokusha.utils.ifCase
 
 private val defaultButtonContent =
-    @Composable { text: String, radius: Dp, textAlign: TextAlign, textStyle: TextStyle ->
+    @Composable { text: String, radius: Dp, textAlign: TextAlign, textStyle: TextStyle, contentPadding: Dp ->
         Text(
             text = text,
-            modifier = Modifier.padding(12.dp),
+            modifier = Modifier
+                .padding(contentPadding)
+                .wrapContentHeight(Alignment.CenterVertically),
             textAlign = textAlign,
             style = textStyle
+        )
+    }
+
+private val defaultIconButtonContent =
+    @Composable { icon: ImageVector, contentPadding: Dp, contentDescription: String? ->
+        Icon(
+            icon,
+            contentDescription = contentDescription,
+            modifier = Modifier
+                .padding(contentPadding)
+                .wrapContentHeight(Alignment.CenterVertically),
         )
     }
 
@@ -45,15 +61,21 @@ fun MyButton(
     animate: Boolean = true,
     textAlign: TextAlign = TextAlign.Start,
     outerPadding: Dp = 4.dp,
+    contentPadding: Dp = 12.dp,
     radius: Dp = 4.dp,
     borderWidth: Dp = 1.dp,
     backgroundColor: Color = MaterialTheme.colors.primary,
+    selectedBackgroundColor: Color = ColorAccent,
     textStyle: TextStyle = LocalTextStyle.current,
+    selected: Boolean = false,
     onClick: () -> Unit,
     onLongClick: (() -> Unit)? = null,
-    content: @Composable (String, Dp, TextAlign, TextStyle) -> Unit = defaultButtonContent
+    content: @Composable (String, Dp, TextAlign, TextStyle, Dp) -> Unit = defaultButtonContent
 ) {
     val shape = RoundedCornerShape(radius)
+    val background by animateColorAsState(
+        targetValue = if (selected) selectedBackgroundColor else backgroundColor
+    )
     Surface(
         modifier = modifier
             .ifCase(animate) { animateContentSize() }
@@ -66,9 +88,50 @@ fun MyButton(
                 onClick = onClick,
                 onLongClick = onLongClick
             ),
-        color = backgroundColor
+        color = background,
     ) {
-        content(text, radius, textAlign, textStyle)
+        content(text, radius, textAlign, textStyle, contentPadding)
+    }
+}
+
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+fun MyIconButton(
+    icon: ImageVector,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    animate: Boolean = true,
+    contentDescription: String? = null,
+    outerPadding: Dp = 4.dp,
+    contentPadding: Dp = 12.dp,
+    radius: Dp = 4.dp,
+    borderWidth: Dp = 1.dp,
+    backgroundColor: Color = MaterialTheme.colors.primary,
+    selectedBackgroundColor: Color = ColorAccent,
+    selected: Boolean = false,
+    onClick: () -> Unit,
+    onLongClick: (() -> Unit)? = null,
+    content: @Composable (ImageVector, Dp, String?) -> Unit = defaultIconButtonContent
+) {
+    val shape = RoundedCornerShape(radius)
+    val background by animateColorAsState(
+        targetValue = if (selected) selectedBackgroundColor else backgroundColor
+    )
+    Surface(
+        modifier = modifier
+            .ifCase(animate) { animateContentSize() }
+            .padding(outerPadding)
+            .border(borderWidth, MaterialTheme.colors.onSurface.copy(alpha = 0.2f), shape)
+            .clip(shape)
+            .combinedClickable(
+                enabled = enabled,
+                role = Role.Button,
+                onClick = onClick,
+                onLongClick = onLongClick
+            ),
+        color = background
+    ) {
+        content(icon, contentPadding, contentDescription)
     }
 }
 

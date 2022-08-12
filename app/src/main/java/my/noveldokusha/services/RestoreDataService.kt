@@ -108,8 +108,8 @@ class RestoreDataService : Service() {
     suspend fun restoreData(uri: Uri) = withContext(Dispatchers.IO) {
 
         val builder = showNotification(this@RestoreDataService, channel_id) {
-            title = "Restore data"
-            text = "Loading data"
+            title = getString(R.string.restore_data)
+            text = getString(R.string.loading_data)
             setProgress(100, 0, true)
         }
 
@@ -131,7 +131,7 @@ class RestoreDataService : Service() {
 
         suspend fun mergeToDatabase(inputStream: InputStream) {
             try {
-                builder.showNotification(channel_id) { text = "Loading database" }
+                builder.showNotification(channel_id) { text = getString(R.string.loading_database) }
                 val backupDatabase = inputStream.use {
                     Repository(
                         db = AppDatabase.createRoomFromStream(context, "temp_database", it),
@@ -141,11 +141,11 @@ class RestoreDataService : Service() {
                         networkClient = networkClient
                     )
                 }
-                builder.showNotification(channel_id) { text = "Adding books" }
+                builder.showNotification(channel_id) { text = getString(R.string.adding_books) }
                 repository.bookLibrary.insertReplace(backupDatabase.bookLibrary.getAll())
-                builder.showNotification(channel_id) { text = "Adding chapters" }
+                builder.showNotification(channel_id) { text = getString(R.string.adding_chapters) }
                 repository.bookChapter.insert(backupDatabase.bookChapter.getAll())
-                builder.showNotification(channel_id) { text = "Adding chapters text" }
+                builder.showNotification(channel_id) { text = getString(R.string.adding_chapters_text) }
                 repository.bookChapterBody.insertReplace(backupDatabase.bookChapterBody.getAll())
                 toasty.show(R.string.database_restored)
                 backupDatabase.close()
@@ -158,26 +158,26 @@ class RestoreDataService : Service() {
             }
         }
 
-        suspend fun mergetoBookFolder(entry: ZipEntry, inputStream: InputStream) {
+        suspend fun mergeToBookFolder(entry: ZipEntry, inputStream: InputStream) {
             val file = File(repository.settings.folderBooks.parentFile, entry.name)
             if (file.isDirectory) return
             file.parentFile?.mkdirs()
             if (file.parentFile?.exists() != true) return
-            builder.showNotification(channel_id) { text = "Adding image: ${file.name}" }
             file.outputStream().use { output ->
                 inputStream.use { it.copyTo(output) }
             }
         }
 
+        builder.showNotification(channel_id) { text = getString(R.string.adding_images) }
         for ((entry, file) in zipSequence) when {
             entry.name == "database.sqlite3" -> mergeToDatabase(file.inputStream())
-            entry.name.startsWith("books/") -> mergetoBookFolder(entry, file.inputStream())
+            entry.name.startsWith("books/") -> mergeToBookFolder(entry, file.inputStream())
         }
 
         inputStream.closeQuietly()
         builder.showNotification(channel_id) {
             removeProgressBar()
-            text = "Data restored"
+            text = getString(R.string.data_restored)
         }
     }
 }

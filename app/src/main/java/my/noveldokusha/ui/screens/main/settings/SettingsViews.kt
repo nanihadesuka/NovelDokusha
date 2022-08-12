@@ -36,11 +36,10 @@ import my.noveldokusha.ui.theme.InternalTheme
 import my.noveldokusha.ui.theme.Themes
 import my.noveldokusha.uiViews.MyButton
 import my.noveldokusha.utils.drawBottomLine
-import my.noveldokusha.utils.ifCase
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
-private fun SettingsTheme(
+fun SettingsTheme(
     currentTheme: Themes,
     currentFollowSystem: Boolean,
     onFollowSystem: (Boolean) -> Unit,
@@ -106,19 +105,16 @@ private fun SettingsTheme(
                         onClick = { onThemeSelected(theme) },
                         textAlign = TextAlign.Center,
                         modifier = Modifier.weight(1f),
-                        outerPadding = 0.dp
-                    ) { _, _, _, _ ->
+                        outerPadding = 0.dp,
+                        selected = currentTheme == theme
+                    ) { _, _, _, _, _ ->
                         val textColor = when (currentTheme == theme) {
                             true -> Color.White
                             false -> MaterialTheme.colors.onPrimary
                         }
                         Text(
                             text = themeName,
-                            modifier = Modifier
-                                .ifCase(currentTheme == theme) {
-                                    background(ColorAccent)
-                                }
-                                .padding(12.dp),
+                            modifier = Modifier.padding(12.dp).fillMaxWidth(),
                             textAlign = TextAlign.Center,
                             fontWeight = FontWeight.Bold,
                             color = textColor

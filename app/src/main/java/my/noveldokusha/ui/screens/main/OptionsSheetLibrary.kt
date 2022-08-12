@@ -66,7 +66,7 @@ fun OptionsSheetLibrary() {
                     disabledIndeterminateColor = MaterialTheme.colors.onPrimary.copy(alpha = 0.25f),
                 )
             )
-            Text(text = "Read", modifier = Modifier.padding(8.dp))
+            Text(text = stringResource(id = R.string.read), modifier = Modifier.padding(8.dp))
         }
 
 
@@ -97,7 +97,7 @@ fun OptionsSheetLibrary() {
                     contentDescription = null
                 )
             }
-            Text(text = "Read", modifier = Modifier.padding(8.dp))
+            Text(text = stringResource(id = R.string.read), modifier = Modifier.padding(8.dp))
         }
     }
 }

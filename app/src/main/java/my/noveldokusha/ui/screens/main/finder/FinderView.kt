@@ -260,7 +260,7 @@ private fun Button(
         backgroundColor = MaterialTheme.colors.primary,
         modifier = Modifier.fillMaxWidth(),
         textStyle = LocalTextStyle.current.copy(fontWeight = FontWeight.Bold)
-    ) { text: String, radius: Dp, textAlign: TextAlign, textStyle: TextStyle ->
+    ) { text: String, radius: Dp, textAlign: TextAlign, textStyle: TextStyle, contentPadding: Dp ->
         Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.padding(horizontal = 12.dp),

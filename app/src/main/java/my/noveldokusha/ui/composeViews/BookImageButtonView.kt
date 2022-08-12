@@ -33,7 +33,7 @@ fun BookImageButtonView(
         radius = ImageBorderRadius,
         borderWidth = 0.dp,
         modifier = Modifier.fillMaxWidth()
-    ) { _, radius, _, _ ->
+    ) { _, radius, _, _, _ ->
         Box(
             Modifier
                 .fillMaxWidth()

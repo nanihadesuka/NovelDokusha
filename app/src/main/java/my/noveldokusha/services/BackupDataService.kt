@@ -91,8 +91,8 @@ class BackupDataService : Service() {
     suspend fun backupData(uri: Uri, backupImages: Boolean) = withContext(Dispatchers.IO) {
 
         notificationBuilder.showNotification(channel_id) {
-            title = "Backup"
-            text = "Creating backup"
+            title = getString(R.string.backup)
+            text = getString(R.string.creating_backup)
             setProgress(100, 0, true)
         }
 
@@ -100,7 +100,7 @@ class BackupDataService : Service() {
             val zip = ZipOutputStream(outputStream)
 
             notificationBuilder.showNotification(channel_id) {
-                text = "Copying database"
+                text = getString(R.string.copying_database)
             }
 
             // Save database
@@ -117,7 +117,7 @@ class BackupDataService : Service() {
             // Save books extra data (like images)
             if (backupImages) {
                 notificationBuilder.showNotification(channel_id) {
-                    text = "Copying images"
+                    text = getString(R.string.copying_images)
                 }
                 val basePath = repository.settings.folderBooks.toPath().parent
                 repository.settings.folderBooks.walkBottomUp().filterNot { it.isDirectory }

@@ -5,6 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -36,13 +37,21 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import my.noveldokusha.R
 import my.noveldokusha.tools.TranslationModelState
+import my.noveldokusha.ui.screens.main.settings.SettingsTheme
 import my.noveldokusha.ui.screens.reader.tools.FontsLoader
 import my.noveldokusha.ui.theme.ColorAccent
 import my.noveldokusha.ui.theme.InternalTheme
+import my.noveldokusha.ui.theme.Themes
+import my.noveldokusha.uiViews.MyButton
+import my.noveldokusha.uiViews.MyIconButton
 import my.noveldokusha.utils.blockInteraction
 import my.noveldokusha.utils.clickableWithUnboundedIndicator
 import my.noveldokusha.utils.ifCase
 import my.noveldokusha.utils.mix
+
+private enum class CurrentSettingVisible {
+    TextSize, TextFont, LiveTranslation, Theme, None
+}
 
 @Composable
 private fun CurrentBookInfo(
@@ -52,22 +61,7 @@ private fun CurrentBookInfo(
     chaptersTotalSize: Int,
     modifier: Modifier = Modifier
 ) {
-    Column(
-        modifier
-            .fillMaxWidth()
-            .background(
-                brush = Brush.verticalGradient(
-                    colors = listOf(
-                        MaterialTheme.colors.primary,
-                        MaterialTheme.colors.primary,
-                        MaterialTheme.colors.primary,
-                        MaterialTheme.colors.primary.copy(alpha = 0f)
-                    )
-                )
-            )
-            .padding(horizontal = 20.dp)
-            .padding(top = 35.dp, bottom = 50.dp)
-    ) {
+    Column(modifier) {
         Text(
             text = chapterTitle,
             style = MaterialTheme.typography.h5,
@@ -91,6 +85,7 @@ private fun CurrentBookInfo(
     }
 }
 
+@OptIn(ExperimentalAnimationApi::class)
 @Composable
 private fun Settings(
     textFont: String,
@@ -99,32 +94,115 @@ private fun Settings(
     onTextSizeChanged: (Float) -> Unit,
     liveTranslationSettingData: LiveTranslationSettingData,
     modifier: Modifier = Modifier,
+    visibleSetting: MutableState<CurrentSettingVisible>,
+    currentTheme: Themes,
+    currentFollowSystem: Boolean,
+    onFollowSystem: (Boolean) -> Unit,
+    onThemeSelected: (Themes) -> Unit,
 ) {
     Column(
         verticalArrangement = Arrangement.spacedBy(10.dp),
         modifier = modifier
             .fillMaxWidth()
-            .padding(10.dp)
-
+            .windowInsetsPadding(WindowInsets.navigationBars)
     ) {
-        TextSizeSlider(
-            textSize,
-            onTextSizeChanged
+        Box(Modifier.padding(horizontal = 16.dp)) {
+            AnimatedContent(targetState = visibleSetting.value) { target ->
+                when (target) {
+                    CurrentSettingVisible.TextSize -> TextSizeSlider(
+                        textSize,
+                        onTextSizeChanged
+                    )
+                    CurrentSettingVisible.TextFont -> TextFontDropDown(
+                        textFont,
+                        onTextFontChanged
+                    )
+                    CurrentSettingVisible.LiveTranslation -> LiveTranslationSetting(
+                        enable = liveTranslationSettingData.enable.value,
+                        listOfAvailableModels = liveTranslationSettingData.listOfAvailableModels,
+                        source = liveTranslationSettingData.source.value,
+                        target = liveTranslationSettingData.target.value,
+                        onEnable = liveTranslationSettingData.onEnable,
+                        onSourceChange = liveTranslationSettingData.onSourceChange,
+                        onTargetChange = liveTranslationSettingData.onTargetChange,
+                        onDownloadTranslationModel = liveTranslationSettingData.onDownloadTranslationModel
+                    )
+                    CurrentSettingVisible.Theme -> SettingsTheme(
+                        currentTheme = currentTheme,
+                        currentFollowSystem = currentFollowSystem,
+                        onFollowSystem = onFollowSystem,
+                        onThemeSelected = onThemeSelected,
+                    )
+                    CurrentSettingVisible.None -> Unit
+                }
+            }
+        }
+        SettingsRowList(
+            visibleSetting = visibleSetting.value,
+            setVisibleSetting = { visibleSetting.value = it },
+            liveTranslationSettingDataIsAvailable = liveTranslationSettingData.isAvailable
         )
-        TextFontDropDown(
-            textFont,
-            onTextFontChanged
+    }
+}
+
+@Composable
+private fun SettingsRowList(
+    visibleSetting: CurrentSettingVisible,
+    setVisibleSetting: (CurrentSettingVisible) -> Unit,
+    liveTranslationSettingDataIsAvailable: Boolean
+) {
+    fun toggleOrOpen(state: CurrentSettingVisible) {
+        setVisibleSetting(if (visibleSetting == state) CurrentSettingVisible.None else state)
+    }
+
+    LazyRow(
+        horizontalArrangement = Arrangement.spacedBy(6.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier
+            .background(MaterialTheme.colors.secondary),
+        contentPadding = PaddingValues(
+            start = 16.dp,
+            end = 16.dp + 200.dp,
+            top = 4.dp,
+            bottom = 4.dp
         )
-        if (liveTranslationSettingData.isAvailable) LiveTranslationSetting(
-            enable = liveTranslationSettingData.enable.value,
-            listOfAvailableModels = liveTranslationSettingData.listOfAvailableModels,
-            source = liveTranslationSettingData.source.value,
-            target = liveTranslationSettingData.target.value,
-            onEnable = liveTranslationSettingData.onEnable,
-            onSourceChange = liveTranslationSettingData.onSourceChange,
-            onTargetChange = liveTranslationSettingData.onTargetChange,
-            onDownloadTranslationModel = liveTranslationSettingData.onDownloadTranslationModel
-        )
+    ) {
+        item {
+            MyIconButton(
+                icon = Icons.TwoTone.FormatSize,
+                selected = visibleSetting == CurrentSettingVisible.TextSize,
+                contentPadding = 8.dp,
+                modifier = Modifier.height(50.dp),
+                onClick = { toggleOrOpen(CurrentSettingVisible.TextSize) },
+            )
+        }
+        item {
+            MyIconButton(
+                icon = Icons.Default.FontDownload,
+                selected = visibleSetting == CurrentSettingVisible.TextFont,
+                contentPadding = 8.dp,
+                modifier = Modifier.height(50.dp),
+                onClick = { toggleOrOpen(CurrentSettingVisible.TextFont) },
+            )
+        }
+        if (liveTranslationSettingDataIsAvailable) item {
+            MyButton(
+                text = stringResource(id = R.string.live_translation),
+                selected = visibleSetting == CurrentSettingVisible.LiveTranslation,
+                contentPadding = 8.dp,
+                modifier = Modifier.height(50.dp),
+                onClick = { toggleOrOpen(CurrentSettingVisible.LiveTranslation) },
+            )
+        }
+        item {
+            MyButton(
+                text = stringResource(id = R.string.theme),
+                selected = visibleSetting == CurrentSettingVisible.Theme,
+                contentPadding = 8.dp,
+                modifier = Modifier.height(50.dp),
+                onClick = { toggleOrOpen(CurrentSettingVisible.Theme) },
+            )
+        }
     }
 }
 
@@ -151,10 +229,10 @@ fun LiveTranslationSetting(
     onTargetChange: (TranslationModelState?) -> Unit,
     onDownloadTranslationModel: (language: String) -> Unit,
 ) {
-
     var modelSelectorExpanded by rememberSaveable { mutableStateOf(false) }
     var modelSelectorExpandedForTarget by rememberSaveable { mutableStateOf(false) }
     var rowSize by remember { mutableStateOf(Size.Zero) }
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -181,7 +259,7 @@ fun LiveTranslationSetting(
                 ) else MaterialTheme.colors.primary
             ) {
                 Text(
-                    text = "Live translation",
+                    text = stringResource(R.string.live_translation),
                     modifier = Modifier.padding(12.dp)
                 )
             }
@@ -426,6 +504,7 @@ private fun RoundedContentLayout(
     }
 }
 
+
 @Composable
 fun ReaderInfoView(
     chapterTitle: String,
@@ -434,12 +513,18 @@ fun ReaderInfoView(
     chaptersTotalSize: Int,
     textFont: String,
     textSize: Float,
+    currentTheme: Themes,
+    currentFollowSystem: Boolean,
+    onFollowSystem: (Boolean) -> Unit,
+    onThemeSelected: (Themes) -> Unit,
     onTextFontChanged: (String) -> Unit,
     onTextSizeChanged: (Float) -> Unit,
     liveTranslationSettingData: LiveTranslationSettingData,
     visible: Boolean,
     modifier: Modifier = Modifier
 ) {
+    val visibleSetting = rememberSaveable { mutableStateOf(CurrentSettingVisible.None) }
+
     ConstraintLayout(modifier.fillMaxSize()) {
         val (info, settings) = createRefs()
         AnimatedVisibility(
@@ -451,13 +536,33 @@ fun ReaderInfoView(
                 width = Dimension.matchParent
             }
         ) {
-            CurrentBookInfo(
-                chapterTitle = chapterTitle,
-                chapterCurrentNumber = chapterCurrentNumber,
-                chapterPercentageProgress = chapterPercentageProgress,
-                chaptersTotalSize = chaptersTotalSize,
-
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(
+                        brush = Brush.verticalGradient(
+                            colors = listOf(
+                                MaterialTheme.colors.primary,
+                                MaterialTheme.colors.primary,
+                                MaterialTheme.colors.primary,
+                                MaterialTheme.colors.primary.copy(alpha = 0f)
+                            )
+                        )
+                    )
+                    .padding(bottom = 50.dp)
+                    .windowInsetsPadding(WindowInsets.displayCutout)
+                    .windowInsetsPadding(WindowInsets.systemBars)
+            ) {
+                CurrentBookInfo(
+                    chapterTitle = chapterTitle,
+                    chapterCurrentNumber = chapterCurrentNumber,
+                    chapterPercentageProgress = chapterPercentageProgress,
+                    chaptersTotalSize = chaptersTotalSize,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 20.dp)
                 )
+            }
         }
         AnimatedVisibility(
             visible = visible,
@@ -476,6 +581,11 @@ fun ReaderInfoView(
                 onTextFontChanged = onTextFontChanged,
                 onTextSizeChanged = onTextSizeChanged,
                 liveTranslationSettingData = liveTranslationSettingData,
+                visibleSetting = visibleSetting,
+                currentTheme = currentTheme,
+                currentFollowSystem = currentFollowSystem,
+                onFollowSystem = onFollowSystem,
+                onThemeSelected = onThemeSelected,
             )
         }
     }
@@ -487,46 +597,55 @@ fun ReaderInfoView(
 )
 @Composable
 private fun ViewsPreview() {
-    InternalTheme {
-        ReaderInfoView(
-            chapterTitle = "Chapter title",
-            chapterCurrentNumber = 64,
-            chapterPercentageProgress = 20f,
-            chaptersTotalSize = 540,
-            textFont = "serif",
-            textSize = 15f,
-            onTextSizeChanged = {},
-            onTextFontChanged = {},
-            visible = true,
-            liveTranslationSettingData = LiveTranslationSettingData(
-                isAvailable = true,
-                enable = remember { mutableStateOf(true) },
-                listOfAvailableModels = remember { mutableStateListOf() },
-                source = remember {
-                    mutableStateOf(
-                        TranslationModelState(
-                            language = "fr",
-                            available = false,
-                            false,
-                            false
-                        )
-                    )
-                },
-                target = remember {
-                    mutableStateOf(
-                        TranslationModelState(
-                            language = "en",
-                            available = false,
-                            false,
-                            false
-                        )
-                    )
-                },
-                onTargetChange = {},
-                onEnable = {},
-                onSourceChange = {},
-                onDownloadTranslationModel = {}
+
+    val liveTranslationSettingData = LiveTranslationSettingData(
+        isAvailable = true,
+        enable = remember { mutableStateOf(true) },
+        listOfAvailableModels = remember { mutableStateListOf() },
+        source = remember {
+            mutableStateOf(
+                TranslationModelState(
+                    language = "fr",
+                    available = true,
+                    downloading = false,
+                    downloadingFailed = false
+                )
             )
-        )
+        },
+        target = remember {
+            mutableStateOf(
+                TranslationModelState(
+                    language = "en",
+                    available = true,
+                    downloading = false,
+                    downloadingFailed = false
+                )
+            )
+        },
+        onTargetChange = {},
+        onEnable = {},
+        onSourceChange = {},
+        onDownloadTranslationModel = {}
+    )
+
+    InternalTheme {
+        Surface(color = Color.Black) {
+            ReaderInfoView(
+                chapterTitle = "Chapter title",
+                chapterCurrentNumber = 64,
+                chapterPercentageProgress = 20f,
+                chaptersTotalSize = 540,
+                textFont = "serif",
+                textSize = 15f,
+                onTextSizeChanged = {},
+                onTextFontChanged = {},
+                visible = true,
+                liveTranslationSettingData = liveTranslationSettingData,
+                currentTheme = Themes.DARK,
+                currentFollowSystem = true,
+                onFollowSystem = {},
+                onThemeSelected = {},
+            )
+        }
     }
 }

@@ -209,17 +209,17 @@ fun DatabaseSearchView(
 fun PreviewView() {
     val list = remember {
         mutableStateListOf<GenreItem>(
-            GenreItem("Fantasy", "fn", ToggleableState.Off),
+            GenreItem("Fantasy", "fn", ToggleableState.On),
             GenreItem("Horror", "fn", ToggleableState.Off),
             GenreItem("Honesty", "fn", ToggleableState.Off),
-            GenreItem("Drama", "fn", ToggleableState.Off),
+            GenreItem("Drama", "fn", ToggleableState.Indeterminate),
             GenreItem("Historical", "fn", ToggleableState.Off),
             GenreItem("Crime", "fn", ToggleableState.Off),
             GenreItem("Seinen", "fn", ToggleableState.Off),
             GenreItem("Action", "fn", ToggleableState.Off),
             GenreItem("Fantasy", "fn", ToggleableState.Off),
-            GenreItem("Horror", "fn", ToggleableState.Off),
-            GenreItem("Honesty", "fn", ToggleableState.Off),
+            GenreItem("Horror", "fn", ToggleableState.On),
+            GenreItem("Honesty", "fn", ToggleableState.On),
             GenreItem("Drama", "fn", ToggleableState.Off),
             GenreItem("Historical", "fn", ToggleableState.Off),
             GenreItem("Crime", "fn", ToggleableState.Off),

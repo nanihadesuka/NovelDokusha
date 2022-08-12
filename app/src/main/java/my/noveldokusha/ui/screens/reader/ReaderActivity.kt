@@ -24,6 +24,7 @@ import my.noveldokusha.R
 import my.noveldokusha.databinding.ActivityReaderBinding
 import my.noveldokusha.network.Response
 import my.noveldokusha.ui.BaseActivity
+import my.noveldokusha.ui.screens.main.settings.SettingsViewModel
 import my.noveldokusha.ui.screens.reader.tools.FontsLoader
 import my.noveldokusha.ui.theme.Theme
 import my.noveldokusha.utils.Extra_String
@@ -55,6 +56,7 @@ class ReaderActivity : BaseActivity() {
     }
 
     private val viewModel by viewModels<ReaderViewModel>()
+    private val viewModelGlobalSettings by viewModels<SettingsViewModel>()
 
     private val viewBind by lazy { ActivityReaderBinding.inflate(layoutInflater) }
     private val viewAdapter = object {
@@ -157,6 +159,10 @@ class ReaderActivity : BaseActivity() {
                     onTextFontChanged = { appPreferences.READER_FONT_FAMILY.value = it },
                     onTextSizeChanged = { appPreferences.READER_FONT_SIZE.value = it },
                     liveTranslationSettingData = viewModel.liveTranslationSettingState,
+                    currentFollowSystem = viewModelGlobalSettings.followsSystem,
+                    currentTheme = viewModelGlobalSettings.theme,
+                    onFollowSystem = viewModelGlobalSettings::onFollowSystem,
+                    onThemeSelected = viewModelGlobalSettings::onThemeSelected,
                 )
             }
         }

@@ -109,4 +109,17 @@
     <string name="language_source_empty_text">Source</string>
 	<string name="language_target_empty_text">Target</string>
     <string name="language_clear_selection">Clear selection</string>
+	<string name="live_translation">Live translation</string>
+	<string name="books_layout">Books layout</string>
+	<string name="creating_backup">Creating backup</string>
+	<string name="copying_database">Copying database</string>
+	<string name="copying_images">Copying images</string>
+	<string name="loading_database">Loading database</string>
+	<string name="adding_books">Adding books</string>
+	<string name="adding_chapters">Adding chapters</string>
+	<string name="adding_chapters_text">Adding chapters text</string>
+	<string name="adding_images">Adding images</string>
+	<string name="data_restored">Data restored</string>
+	<string name="completed">Completed</string>
+	<string name="loading_data">Loading data</string>
 </resources>

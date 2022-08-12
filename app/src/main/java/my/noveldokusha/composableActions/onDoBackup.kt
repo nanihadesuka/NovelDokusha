@@ -99,7 +99,7 @@ fun onDoBackup(): () -> Unit {
                         )
                     }
                     MyButton(
-                        text = "Backup",
+                        text = stringResource(id = R.string.backup),
                         textAlign = TextAlign.Center,
                         onClick = {
                             showDialog = false
