@@ -20,6 +20,7 @@ import org.jsoup.nodes.Document
 class NovelUpdates(
     private val networkClient: NetworkClient
 ) : SourceInterface.Catalog {
+    override val id = "novel_updates"
     override val name = "Novel Updates"
     override val baseUrl = "https://www.novelupdates.com/"
     override val catalogUrl = "https://www.novelupdates.com/novelslisting/?sort=7&order=1&status=1"

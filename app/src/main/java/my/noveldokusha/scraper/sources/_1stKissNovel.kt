@@ -11,8 +11,9 @@ import org.jsoup.nodes.Document
 class _1stKissNovel(
     private val networkClient: NetworkClient
 ) : SourceInterface.Catalog {
-    override val catalogUrl = "https://1stkissnovel.love/novel/?m_orderby=alphabet"
+    override val id = "1stkissnovel"
     override val name = "1stKissNovel"
+    override val catalogUrl = "https://1stkissnovel.love/novel/?m_orderby=alphabet"
     override val baseUrl = "https://1stkissnovel.love/"
     override val iconUrl = "https://1stkissnovel.love/wp-content/uploads/2020/10/cropped-HINH-NEN-3-1-32x32.png"
     override val language = "English"

@@ -1,30 +1,38 @@
 package my.noveldokusha
 
-import my.noveldokusha.scraper.scraper
+import my.noveldokusha.network.NetworkClient
+import my.noveldokusha.scraper.Scraper
 import org.junit.Assert.*
+import org.junit.Before
 import org.junit.Test
+import org.junit.runner.RunWith
+import org.mockito.Mock
+import org.mockito.junit.MockitoJUnitRunner
 
-/**
- * Local unit test, which will execute on the development machine (host).
- * See [testing documentation](http://d.android.com/tools/testing).
- *
- */
-class ScraperTest
-{
+@RunWith(MockitoJUnitRunner::class)
+class ScraperTest {
 
     // DATABASES TEST
 
+    @Mock
+    lateinit var networkClient: NetworkClient
+
+    private lateinit var scraper: Scraper
+
+    @Before
+    fun setup() {
+        scraper = Scraper(networkClient = networkClient)
+    }
+
     @Test
-    fun databaseList_IsCompatible()
-    {
-        for(database in scraper.databasesList)
+    fun `databaseList items are compatible`() {
+        for (database in scraper.databasesList)
             assertNotNull(scraper.getCompatibleDatabase(database.baseUrl))
     }
 
     @Test
-    fun databaseList_BaseUrlEndsWithSlash()
-    {
-        for(database in scraper.databasesList)
+    fun `databaseList items baseUrl ends with slash`() {
+        for (database in scraper.databasesList)
             assertTrue(
                 "${database::class.simpleName} baseUrl missing ending slash",
                 database.baseUrl.endsWith("/")
@@ -32,24 +40,22 @@ class ScraperTest
     }
 
     @Test
-    fun databaseList_CheckUniqueId()
-    {
+    fun `databaseList items have unique id`() {
         val groups = scraper.databasesList.groupBy { it.id }
-        for(list in groups)
+        for (list in groups)
             assertEquals(
-                "${ list.value.joinToString { it::class.simpleName.toString() }}: id can't be the same value for multiple databases",
+                "${list.value.joinToString { it::class.simpleName.toString() }}: id can't be the same value for multiple databases",
                 1,
                 list.value.size
             )
     }
 
     @Test
-    fun databaseList_CheckUniqueName()
-    {
+    fun `databaseList items have unique name`() {
         val groups = scraper.databasesList.groupBy { it.name }
-        for(list in groups)
+        for (list in groups)
             assertEquals(
-                "${ list.value.joinToString { it::class.simpleName.toString() }}: name can't be the same value for multiple databases",
+                "${list.value.joinToString { it::class.simpleName.toString() }}: name can't be the same value for multiple databases",
                 1,
                 list.value.size
             )
@@ -58,16 +64,14 @@ class ScraperTest
     // SOURCES TEST
 
     @Test
-    fun sourceList_IsCompatible()
-    {
-        for(source in scraper.sourcesList)
+    fun `sourceList items are compatible`() {
+        for (source in scraper.sourcesList)
             assertNotNull(scraper.getCompatibleSource(source.baseUrl))
     }
 
     @Test
-    fun sourceList_BaseUrlEndsWithSlash()
-    {
-        for(source in scraper.sourcesList)
+    fun `sourceList items baseUrl ends with slash`() {
+        for (source in scraper.sourcesList)
             assertTrue(
                 "${source::class.simpleName} baseUrl missing ending slash",
                 source.baseUrl.endsWith("/")
@@ -75,12 +79,22 @@ class ScraperTest
     }
 
     @Test
-    fun sourceList_CheckUniqueName()
-    {
-        val groups = scraper.sourcesList.groupBy { it.name }
-        for(list in groups)
+    fun `sourceList items have unique id`() {
+        val groups = scraper.sourcesList.groupBy { it.id }
+        for (list in groups)
             assertEquals(
-                "${ list.value.joinToString { it::class.simpleName.toString() }}: name can't be the same value for multiple sources",
+                "${list.value.joinToString { it::class.simpleName.toString() }}: name can't be the same value for multiple sources",
+                1,
+                list.value.size
+            )
+    }
+
+    @Test
+    fun `sourceList items have unique name`() {
+        val groups = scraper.sourcesList.groupBy { it.name }
+        for (list in groups)
+            assertEquals(
+                "${list.value.joinToString { it::class.simpleName.toString() }}: name can't be the same value for multiple sources",
                 1,
                 list.value.size
             )

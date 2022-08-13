@@ -3,14 +3,19 @@ package my.noveldokusha.ui.screens.main.finder
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import my.noveldokusha.AppPreferences
 import my.noveldokusha.scraper.Scraper
+import my.noveldokusha.scraper.SourceInterface
 import my.noveldokusha.ui.BaseViewModel
 import my.noveldokusha.utils.toState
 import javax.inject.Inject
 
 data class LanguagesActive(val language: String, val active: Boolean)
+data class FinderCatalogItem(val catalog: SourceInterface.Catalog, val pinned: Boolean)
 
 @HiltViewModel
 class FinderViewModel @Inject constructor(
@@ -20,11 +25,15 @@ class FinderViewModel @Inject constructor(
     val databaseList = scraper.databasesList.toList()
     val sourcesList by appPreferences.SOURCES_LANGUAGES
         .flow()
-        .map { activeLangs ->
+        .combine(appPreferences.FINDER_SOURCES_PINNED.flow()) { activeLangs, pinnedSources ->
             scraper
                 .sourcesListCatalog
                 .filter { it.language in activeLangs }
-        }.toState(viewModelScope, listOf())
+                .map { FinderCatalogItem(catalog = it, pinned = it.id in pinnedSources) }
+                .sortedByDescending { it.pinned }
+        }
+        .flowOn(Dispatchers.Default)
+        .toState(viewModelScope, listOf())
 
     val languagesList by appPreferences.SOURCES_LANGUAGES
         .flow()
@@ -41,5 +50,10 @@ class FinderViewModel @Inject constructor(
             true -> langs.minus(language)
             false -> langs.plus(language)
         }
+    }
+
+    fun onSourceSetPinned(id: String, pinned: Boolean) {
+        appPreferences.FINDER_SOURCES_PINNED.value = appPreferences.FINDER_SOURCES_PINNED
+            .value.let { if (pinned) it.plus(id) else it.minus(id) }
     }
 }

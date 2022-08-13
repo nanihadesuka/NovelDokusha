@@ -7,6 +7,7 @@ import my.noveldokusha.network.Response
 import org.jsoup.nodes.Document
 
 sealed interface SourceInterface {
+    val id: String
     val name: String
     val baseUrl: String
 

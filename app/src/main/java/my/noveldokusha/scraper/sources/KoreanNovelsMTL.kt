@@ -19,6 +19,7 @@ import org.jsoup.nodes.Document
 class KoreanNovelsMTL(
     private val networkClient: NetworkClient
 ) : SourceInterface.Catalog {
+    override val id = "korean_novels_mtl"
     override val name = "Korean Novels MTL"
     override val baseUrl = "https://www.koreanmtl.online/"
     override val catalogUrl = "https://www.koreanmtl.online/p/novels-listing.html?m=1"

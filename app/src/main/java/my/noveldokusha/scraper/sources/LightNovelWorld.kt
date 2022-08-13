@@ -23,10 +23,12 @@ import org.jsoup.nodes.Document
 class LightNovelWorld(
     private val networkClient: NetworkClient
 ) : SourceInterface.Catalog {
+    override val id = "light_novel_world"
     override val name = "Light Novel World"
     override val baseUrl = "https://www.lightnovelworld.com/"
     override val catalogUrl = "https://www.lightnovelworld.com/genre/all/popular/all/"
-    override val iconUrl = "https://static.lightnovelworld.com/content/img/lightnovelworld/favicon.png"
+    override val iconUrl =
+        "https://static.lightnovelworld.com/content/img/lightnovelworld/favicon.png"
     override val language = "English"
 
     override suspend fun getChapterText(doc: Document): String {

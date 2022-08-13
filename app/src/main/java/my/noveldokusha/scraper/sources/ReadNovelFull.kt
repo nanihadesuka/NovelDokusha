@@ -23,6 +23,7 @@ import org.jsoup.nodes.Document
 class ReadNovelFull(
     private val networkClient: NetworkClient
 ) : SourceInterface.Catalog {
+    override val id = "read_novel_full"
     override val name = "Read Novel Full"
     override val baseUrl = "https://readnovelfull.com/"
     override val catalogUrl = "https://readnovelfull.com/novel-list/most-popular-novel"

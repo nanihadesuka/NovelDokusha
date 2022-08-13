@@ -15,6 +15,7 @@ import org.jsoup.nodes.Document
 class Reddit(
     private val networkClient: NetworkClient
 ) : SourceInterface.Base {
+    override val id = "reddit"
     override val name = "Reddit"
     override val baseUrl = "https://www.reddit.com/"
 

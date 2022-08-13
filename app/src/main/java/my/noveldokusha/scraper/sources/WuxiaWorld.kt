@@ -11,7 +11,7 @@ import org.jsoup.nodes.Document
 class WuxiaWorld(
     private val networkClient: NetworkClient
 ) : SourceInterface.Catalog {
-
+    override val id = "wuxia_world"
     override val name = "Wuxia World"
     override val baseUrl = "https://wuxiaworld.site/"
     override val catalogUrl = "https://wuxiaworld.site/novel/?m_orderby=trending"

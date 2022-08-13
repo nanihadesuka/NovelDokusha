@@ -14,6 +14,7 @@ import org.jsoup.nodes.Document
 class BestLightNovel(
     private val networkClient: NetworkClient
 ) : SourceInterface.Catalog {
+    override val id = "best_light_novel"
     override val name = "BestLightNovel"
     override val baseUrl = "https://bestlightnovel.com/"
     override val catalogUrl = "https://bestlightnovel.com/novel_list"

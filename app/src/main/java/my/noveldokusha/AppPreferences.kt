@@ -54,6 +54,9 @@ class AppPreferences @Inject constructor(
     val SOURCES_LANGUAGES = object : Preference<Set<String>>("SOURCES_LANGUAGES") {
         override var value by SharedPreference_StringSet(name, preferences, setOf("English"))
     }
+    val FINDER_SOURCES_PINNED = object : Preference<Set<String>>("FINDER_SOURCES_PINNED") {
+        override var value by SharedPreference_StringSet(name, preferences, setOf())
+    }
     val LIBRARY_FILTER_READ = object : Preference<TERNARY_STATE>("LIBRARY_FILTER_READ") {
         override var value by SharedPreference_Enum(
             name,
@@ -101,7 +104,7 @@ class AppPreferences @Inject constructor(
 
     abstract inner class Preference<T>(val name: String) {
         abstract var value: T
-        fun flow() = toFlow(name) { value }
+        fun flow() = toFlow(name) { value }.flowOn(Dispatchers.IO)
         fun state(scope: CoroutineScope) = toState(scope, name) { value }
     }
 

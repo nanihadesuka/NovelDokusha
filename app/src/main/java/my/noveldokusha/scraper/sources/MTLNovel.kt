@@ -13,10 +13,10 @@ import my.noveldokusha.utils.toUrlBuilderSafe
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 
-// TODO() NOT WORKING JSON MANGLED EVEN IF IN THE LOGS SHOWS JUST FINE
 class MTLNovel(
     private val networkClient: NetworkClient
 ) : SourceInterface.Catalog {
+    override val id = "mtlnovel"
     override val name = "MTLNovel"
     override val baseUrl = "https://www.mtlnovel.com/"
     override val catalogUrl = "https://www.mtlnovel.com/alltime-rank/"

@@ -122,4 +122,5 @@
 	<string name="data_restored">Data restored</string>
 	<string name="completed">Completed</string>
 	<string name="loading_data">Loading data</string>
+    <string name="pin_or_unpin_source">Pin or unpin source</string>
 </resources>

@@ -8,6 +8,7 @@ import org.jsoup.nodes.Document
 class Sousetsuka(
     private val networkClient: NetworkClient
 ) : SourceInterface.Base {
+    override val id = "sousetsuka"
     override val name = "Sousetsuka"
     override val baseUrl = "https://www.sousetsuka.com/"
 

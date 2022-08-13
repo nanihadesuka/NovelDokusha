@@ -17,6 +17,7 @@ import org.jsoup.nodes.Document
 class NovelHall(
     private val networkClient: NetworkClient
 ) : SourceInterface.Catalog {
+    override val id = "novelhall"
     override val name = "NovelHall"
     override val baseUrl = "https://www.novelhall.com/"
     override val catalogUrl = "https://www.novelhall.com/all.html"

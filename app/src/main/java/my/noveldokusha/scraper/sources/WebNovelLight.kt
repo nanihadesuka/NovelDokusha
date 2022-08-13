@@ -15,6 +15,7 @@ import org.jsoup.nodes.Document
 class WebNovelLight(
     private val networkClient: NetworkClient
 ) : SourceInterface.Catalog {
+    override val id = "web_novel_light"
     override val name = "Web Novel Light"
     override val baseUrl = "https://webnovellight.com/"
     override val catalogUrl = "https://webnovellight.com/series/?m_orderby=alphabet"

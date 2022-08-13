@@ -8,6 +8,7 @@ import org.jsoup.nodes.Document
 class AT(
     private val networkClient: NetworkClient
 ) : SourceInterface.Base {
+    override val id = "at_nu"
     override val name = "AT"
     override val baseUrl = "https://a-t.nu/"
 
