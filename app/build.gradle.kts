@@ -116,6 +116,7 @@ android {
         viewBinding = true
         compose = true
     }
+    namespace = "my.noveldokusha"
 }
 
 fun DependencyHandler.fullImplementation(dependencyNotation: Any): Dependency? =
