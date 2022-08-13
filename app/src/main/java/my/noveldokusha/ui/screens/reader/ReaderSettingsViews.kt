@@ -106,7 +106,7 @@ private fun Settings(
             .fillMaxWidth()
             .windowInsetsPadding(WindowInsets.navigationBars)
     ) {
-        Box(Modifier.padding(horizontal = 16.dp)) {
+        Box(Modifier.padding(horizontal = 14.dp)) {
             AnimatedContent(targetState = visibleSetting.value) { target ->
                 when (target) {
                     CurrentSettingVisible.TextSize -> TextSizeSlider(
