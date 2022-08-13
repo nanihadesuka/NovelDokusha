@@ -69,6 +69,7 @@ class ReaderActivity : BaseActivity() {
                 appPreferences,
                 onChapterStartVisible = { url -> viewModel.readRoutine.setReadStart(url) },
                 onChapterEndVisible = { url -> viewModel.readRoutine.setReadEnd(url) },
+                onReloadReader = ::reloadReader
             )
         }
     }
@@ -315,7 +316,7 @@ class ReaderActivity : BaseActivity() {
     }
 
     private fun setInitialChapterPosition(position: Int, offset: Int) {
-        val index = viewAdapter.listView.list.indexOfFirst {
+        val index = viewModel.items.indexOfFirst {
             it is ReaderItem.Position && it.pos == position
         }
         if (index != -1) {

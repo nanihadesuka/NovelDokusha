@@ -17,13 +17,14 @@ import my.noveldokusha.utils.inflater
 import java.io.File
 
 class ReaderItemAdapter(
-    val ctx: Context,
-    val list: ArrayList<ReaderItem>,
-    val localBookBaseFolder: File,
-    val fontsLoader: FontsLoader,
-    val appPreferences: AppPreferences,
-    val onChapterStartVisible: (chapterUrl: String) -> Unit,
-    val onChapterEndVisible: (chapterUrl: String) -> Unit
+    private val ctx: Context,
+    list: ArrayList<ReaderItem>,
+    private val localBookBaseFolder: File,
+    private val fontsLoader: FontsLoader,
+    private val appPreferences: AppPreferences,
+    private val onChapterStartVisible: (chapterUrl: String) -> Unit,
+    private val onChapterEndVisible: (chapterUrl: String) -> Unit,
+    private val onReloadReader: () -> Unit,
 ) :
     ArrayAdapter<ReaderItem>(ctx, 0, list) {
     override fun getCount() = super.getCount() + 2
@@ -215,6 +216,7 @@ class ReaderItemAdapter(
                 .also { it.root.tag = it }
             else -> ActivityReaderListItemErrorBinding.bind(convertView)
         }
+        bind.reloadButton.setOnClickListener { onReloadReader() }
         bind.error.text = item.text
         return bind.root
     }
