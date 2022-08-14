@@ -12,14 +12,14 @@ import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import my.noveldokusha.AppPreferences
 import my.noveldokusha.R
 import my.noveldokusha.databinding.*
+import my.noveldokusha.resolvedBookImagePath
 import my.noveldokusha.ui.screens.reader.tools.FontsLoader
 import my.noveldokusha.utils.inflater
-import java.io.File
 
 class ReaderItemAdapter(
     private val ctx: Context,
     list: ArrayList<ReaderItem>,
-    private val localBookBaseFolder: File,
+    private val bookUrl: String,
     private val fontsLoader: FontsLoader,
     private val appPreferences: AppPreferences,
     private val onChapterStartVisible: (chapterUrl: String) -> Unit,
@@ -103,11 +103,7 @@ class ReaderItemAdapter(
             dimensionRatio = "1:${item.image.yrel}"
         }
 
-        val imageModel = when {
-            item.image.path.startsWith("http://", ignoreCase = true) -> item.image.path
-            item.image.path.startsWith("https://", ignoreCase = true) -> item.image.path
-            else -> File(localBookBaseFolder, item.image.path)
-        }
+        val imageModel = resolvedBookImagePath(ctx, bookUrl = bookUrl, imagePath = item.image.path)
 
         // Glide uses current imageView size to load the bitmap best optimized for it, but current
         // size corresponds to the last image (different size) and the view layout only updates to

@@ -56,11 +56,10 @@ fun HeaderView(
     onSearchBookInDatabase: () -> Unit,
     onOpenInBrowser: () -> Unit
 ) {
-    val bookCoverImg = bookCover ?: R.drawable.ic_baseline_empty_24
     Box {
         Box {
             ImageView(
-                imageModel = bookCoverImg,
+                imageModel = bookCover,
                 contentScale = ContentScale.FillWidth,
                 modifier = Modifier
                     .alpha(0.2f)
@@ -89,7 +88,7 @@ fun HeaderView(
                         .size(160.dp, 230.dp),
                 ) {
                     ImageView(
-                        imageModel = bookCoverImg,
+                        imageModel = bookCover,
                         contentScale = ContentScale.FillHeight,
                         modifier = Modifier
                             .fillMaxHeight()
@@ -310,7 +309,7 @@ private fun Preview(@PreviewParameter(SampleProvider::class) theme: Themes) {
                         bookTitle = "Book title",
                         sourceName = "Novel Web Name",
                         numberOfChapters = 34,
-                        bookCover = null,
+                        bookCover = R.drawable.ic_baseline_empty_24,
                         description = "In a very far land, there was a web novel being written.",
                         onSearchBookInDatabase = { },
                         onOpenInBrowser = { }

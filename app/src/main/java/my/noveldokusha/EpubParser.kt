@@ -48,6 +48,7 @@ data class EpubImage(val path: String, val image: ByteArray)
 data class EpubBook(
     val fileName: String,
     val title: String,
+    val coverImagePath: String,
     val chapters: List<EpubChapter>,
     val images: List<EpubImage>
 )
@@ -84,13 +85,19 @@ fun createEpubBook(inputStream: InputStream): EpubBook {
     val rootPath = File(opfFilePath).parentFile ?: File("")
     fun String.absPath() = File(rootPath, this).path.replace("""\""", "/").removePrefix("/")
 
-    data class EpubManifestItem(val id: String, val href: String, val mediaType: String)
+    data class EpubManifestItem(
+        val id: String,
+        val href: String,
+        val mediaType: String,
+        val properties: String
+    )
 
     val items = manifest.selectChildTag("item").map {
         EpubManifestItem(
             id = it.getAttribute("id"),
             href = it.getAttribute("href").decodedURL,
-            mediaType = it.getAttribute("media-type")
+            mediaType = it.getAttribute("media-type"),
+            properties = it.getAttribute("properties")
         )
     }.associateBy { it.id }
 
@@ -109,7 +116,7 @@ fun createEpubBook(inputStream: InputStream): EpubBook {
         .mapNotNull { items.get(it) }
         .filter { item -> chapterExtensions.any { item.href.endsWith(it, ignoreCase = true) } }
         .mapNotNull { zipFile[it.href.absPath()] }
-        .mapIndexedNotNull { index, (entry, byteArray) ->
+        .mapIndexed { index, (entry, byteArray) ->
             val res = EpubXMLFileParser(entry.name, byteArray, zipFile).parse()
             // A full chapter usually is split in multiple sequential entries,
             // try to merge them and extract the main title of each one.
@@ -149,9 +156,16 @@ fun createEpubBook(inputStream: InputStream): EpubBook {
 
     val images = (listedImages + unlistedImages).distinctBy { it.path }
 
+    val coverImage = items.values.asSequence()
+        .filter { it.mediaType.startsWith("image/") }
+        .find { it.properties == "cover-image" }
+        ?.let { zipFile[it.href.absPath()] }
+        ?.let { (entry, byteArray) -> EpubImage(path = entry.name, image = byteArray) }
+
     return EpubBook(
         fileName = bookUrl,
         title = bookTitle,
+        coverImagePath = coverImage?.path ?: "",
         chapters = chapters.toList(),
         images = images.toList()
     )
@@ -170,8 +184,12 @@ fun importEpubToRepository(repository: Repository, epub: EpubBook) =
         repository.bookLibrary.remove(bookUrl)
 
         // Insert new book data
-        Book(title = epub.title, url = bookUrl, inLibrary = true)
-            .let { repository.bookLibrary.insert(it) }
+        Book(
+            title = epub.title,
+            url = bookUrl,
+            coverImageUrl = epub.coverImagePath.withLocalPrefix(),
+            inLibrary = true
+        ).let { repository.bookLibrary.insert(it) }
 
         epub.chapters
             .mapIndexed { i, it ->

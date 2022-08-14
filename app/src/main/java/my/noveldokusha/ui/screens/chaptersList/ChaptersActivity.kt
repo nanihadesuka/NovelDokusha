@@ -41,6 +41,7 @@ import my.nanihadesuka.compose.LazyColumnScrollbar
 import my.noveldokusha.R
 import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.data.ChapterWithContext
+import my.noveldokusha.rememberResolvedBookImagePath
 import my.noveldokusha.scraper.Scraper
 import my.noveldokusha.ui.BaseActivity
 import my.noveldokusha.ui.composeViews.ToolbarModeSearch
@@ -118,11 +119,18 @@ class ChaptersActivity : BaseActivity() {
                     ) {
                         ChaptersListView(
                             header = {
+                                val image = viewModel.book.coverImageUrl?.let {
+                                    rememberResolvedBookImagePath(
+                                        bookUrl = viewModel.book.url,
+                                        imagePath = it
+                                    ).value
+                                } ?: R.drawable.ic_baseline_empty_24
+
                                 HeaderView(
                                     bookTitle = viewModel.bookTitle,
                                     sourceName = sourceName,
                                     numberOfChapters = viewModel.chaptersWithContext.size,
-                                    bookCover = viewModel.book.coverImageUrl,
+                                    bookCover = image,
                                     description = viewModel.book.description,
                                     onSearchBookInDatabase = ::searchBookInDatabase,
                                     onOpenInBrowser = ::openInBrowser,

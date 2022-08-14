@@ -1,10 +1,11 @@
-package my.noveldokusha.ui.screens.reader
+package my.noveldokusha.ui.screens.reader.tools
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.withContext
 import my.noveldokusha.tools.BookTextMapper
+import my.noveldokusha.ui.screens.reader.ReaderItem
 
 suspend fun textToItemsConverter(
     chapterUrl: String,

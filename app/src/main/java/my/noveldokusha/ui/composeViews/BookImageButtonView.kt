@@ -22,7 +22,7 @@ import my.noveldokusha.ui.theme.InternalTheme
 @Composable
 fun BookImageButtonView(
     title: String,
-    coverImageUrl: String,
+    coverImageUrl: Any,
     onClick: () -> Unit,
     onLongClick: () -> Unit,
 ) {

@@ -9,12 +9,12 @@ import my.noveldokusha.data.database.AppDatabase
 import my.noveldokusha.data.database.tables.Book
 import my.noveldokusha.data.database.tables.Chapter
 import my.noveldokusha.data.database.tables.ChapterBody
+import my.noveldokusha.folderBooks
 import my.noveldokusha.network.NetworkClient
 import my.noveldokusha.network.Response
 import my.noveldokusha.scraper.Scraper
 import my.noveldokusha.scraper.downloadChapter
 import my.noveldokusha.utils.LiveEvent
-import java.io.File
 import javax.inject.Inject
 
 class Repository @Inject constructor(
@@ -58,7 +58,7 @@ class Repository @Inject constructor(
          * Each subfolder must be an unique folder for each book.
          * Each book folder can have an arbitrary structure internally.
          */
-        val folderBooks = File(context.filesDir, "books")
+        val folderBooks = context.folderBooks
     }
 
     inner class BookLibrary {

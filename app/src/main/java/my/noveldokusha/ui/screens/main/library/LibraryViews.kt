@@ -14,7 +14,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -27,6 +26,7 @@ import com.google.accompanist.swiperefresh.SwipeRefresh
 import kotlinx.coroutines.launch
 import my.noveldokusha.R
 import my.noveldokusha.data.BookWithContext
+import my.noveldokusha.rememberResolvedBookImagePath
 import my.noveldokusha.ui.theme.ColorAccent
 import my.noveldokusha.uiViews.BookImageButtonView
 
@@ -43,7 +43,6 @@ fun LibraryBody(
     val pageIndex by remember {
         derivedStateOf { pagerState.currentPage }
     }
-    val context = LocalContext.current
     val updateCompleted = rememberUpdatedState(newValue = pageIndex)
     SwipeRefresh(
         state = viewModel.refreshState,
@@ -104,10 +103,14 @@ fun LibraryPageBody(
         contentPadding = PaddingValues(top = 4.dp, bottom = 400.dp, start = 4.dp, end = 4.dp)
     ) {
         items(list) {
+            val coverImageUrl by rememberResolvedBookImagePath(
+                bookUrl = it.book.url,
+                imagePath = it.book.coverImageUrl
+            )
             Box {
                 BookImageButtonView(
                     title = it.book.title,
-                    coverImageUrl = it.book.coverImageUrl,
+                    coverImageUrl = coverImageUrl,
                     onClick = { onClick(it) },
                     onLongClick = { onLongClick(it) }
                 )

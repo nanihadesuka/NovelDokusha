@@ -18,7 +18,6 @@ import my.noveldokusha.ui.screens.reader.tools.ChaptersIsReadRoutine
 import my.noveldokusha.ui.screens.reader.tools.LiveTranslation
 import my.noveldokusha.ui.screens.reader.tools.saveLastReadPositionState
 import my.noveldokusha.utils.StateExtra_String
-import java.io.File
 import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
 import kotlin.collections.set
@@ -46,10 +45,6 @@ class ReaderViewModel @Inject constructor(
 
     val textFont by appPreferences.READER_FONT_FAMILY.state(viewModelScope)
     val textSize by appPreferences.READER_FONT_SIZE.state(viewModelScope)
-
-    val localBookBaseFolder =
-        File(repository.settings.folderBooks, bookUrl.removePrefix("local://"))
-
 
     val translator get() = liveTranslation.translator
     val liveTranslationSettingState get() = liveTranslation.settingsState

@@ -26,6 +26,7 @@ import my.noveldokusha.network.Response
 import my.noveldokusha.ui.BaseActivity
 import my.noveldokusha.ui.screens.main.settings.SettingsViewModel
 import my.noveldokusha.ui.screens.reader.tools.FontsLoader
+import my.noveldokusha.ui.screens.reader.tools.textToItemsConverter
 import my.noveldokusha.ui.theme.Theme
 import my.noveldokusha.utils.Extra_String
 import my.noveldokusha.utils.colorAttrRes
@@ -64,7 +65,7 @@ class ReaderActivity : BaseActivity() {
             ReaderItemAdapter(
                 this@ReaderActivity,
                 viewModel.items,
-                viewModel.localBookBaseFolder,
+                viewModel.bookUrl,
                 fontsLoader,
                 appPreferences,
                 onChapterStartVisible = { url -> viewModel.readRoutine.setReadStart(url) },

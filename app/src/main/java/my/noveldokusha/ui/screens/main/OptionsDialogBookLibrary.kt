@@ -20,6 +20,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import my.noveldokusha.R
 import my.noveldokusha.data.database.tables.Book
+import my.noveldokusha.rememberResolvedBookImagePath
 import my.noveldokusha.ui.composeViews.ImageView
 import my.noveldokusha.ui.screens.main.library.LibraryViewModel
 import my.noveldokusha.utils.drawBottomLine
@@ -35,8 +36,12 @@ fun OptionsDialogBookLibrary(book: Book) {
                     .drawBottomLine()
                     .padding(8.dp)
             ) {
+                val image by rememberResolvedBookImagePath(
+                    bookUrl = book.url,
+                    imagePath = book.coverImageUrl
+                )
                 ImageView(
-                    imageModel = book.coverImageUrl,
+                    imageModel = image,
                     error = R.drawable.default_book_cover,
                     modifier = Modifier
                         .size(48.dp)
