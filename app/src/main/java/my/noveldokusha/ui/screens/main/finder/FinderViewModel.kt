@@ -3,52 +3,31 @@ package my.noveldokusha.ui.screens.main.finder
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.flow.map
 import my.noveldokusha.AppPreferences
-import my.noveldokusha.scraper.Scraper
-import my.noveldokusha.scraper.SourceInterface
 import my.noveldokusha.ui.BaseViewModel
+import my.noveldokusha.ui.repositories.ScraperRepository
 import my.noveldokusha.utils.toState
 import javax.inject.Inject
 
-data class LanguagesActive(val language: String, val active: Boolean)
-data class FinderCatalogItem(val catalog: SourceInterface.Catalog, val pinned: Boolean)
+
 
 @HiltViewModel
 class FinderViewModel @Inject constructor(
     private val appPreferences: AppPreferences,
-    private val scraper: Scraper,
+    private val scraperRepository: ScraperRepository,
 ) : BaseViewModel() {
-    val databaseList = scraper.databasesList.toList()
-    val sourcesList by appPreferences.SOURCES_LANGUAGES
-        .flow()
-        .combine(appPreferences.FINDER_SOURCES_PINNED.flow()) { activeLangs, pinnedSources ->
-            scraper
-                .sourcesListCatalog
-                .filter { it.language in activeLangs }
-                .map { FinderCatalogItem(catalog = it, pinned = it.id in pinnedSources) }
-                .sortedByDescending { it.pinned }
-        }
-        .flowOn(Dispatchers.Default)
+    val databaseList = scraperRepository.databaseList()
+    val sourcesList by scraperRepository.sourcesCatalogListFlow()
         .toState(viewModelScope, listOf())
 
-    val languagesList by appPreferences.SOURCES_LANGUAGES
-        .flow()
-        .map { activeLangs ->
-            scraper
-                .sourcesLanguages
-                .map { LanguagesActive(it, active = activeLangs.contains(it)) }
-        }
+    val languagesList by scraperRepository.sourcesLanguagesListFlow()
         .toState(viewModelScope, listOf())
 
     fun toggleSourceLanguage(language: String) {
-        val langs = appPreferences.SOURCES_LANGUAGES.value
-        appPreferences.SOURCES_LANGUAGES.value = when (language in langs) {
-            true -> langs.minus(language)
-            false -> langs.plus(language)
+        val languages = appPreferences.SOURCES_LANGUAGES.value
+        appPreferences.SOURCES_LANGUAGES.value = when (language in languages) {
+            true -> languages.minus(language)
+            false -> languages.plus(language)
         }
     }
 

@@ -40,6 +40,8 @@ import my.noveldokusha.scraper.Scraper
 import my.noveldokusha.scraper.SourceInterface
 import my.noveldokusha.ui.composeViews.ImageViewGlide
 import my.noveldokusha.ui.composeViews.ToolbarModeSearch
+import my.noveldokusha.ui.repositories.SourceCatalogItem
+import my.noveldokusha.ui.repositories.SourceLanguageItem
 import my.noveldokusha.ui.screens.databaseSearch.DatabaseSearchActivity
 import my.noveldokusha.ui.screens.globalSourceSearch.GlobalSourceSearchActivity
 import my.noveldokusha.ui.screens.sourceCatalog.SourceCatalogActivity
@@ -112,7 +114,7 @@ fun FinderView() {
 @Composable
 fun FinderBody(
     databasesList: List<DatabaseInterface>,
-    sourcesList: List<FinderCatalogItem>,
+    sourcesList: List<SourceCatalogItem>,
     onDatabaseClick: (DatabaseInterface) -> Unit,
     onSourceClick: (SourceInterface.Catalog) -> Unit,
     onSourceSetPinned: (id: String, pinned: Boolean) -> Unit
@@ -218,9 +220,9 @@ fun ToolbarMain(
 @Composable
 fun LanguagesDropDown(
     expanded: Boolean,
-    list: List<LanguagesActive>,
+    list: List<SourceLanguageItem>,
     onDismiss: () -> Unit,
-    onToggleLanguage: (LanguagesActive) -> Unit
+    onToggleLanguage: (SourceLanguageItem) -> Unit
 ) {
     @Composable
     fun colorBackground(active: Boolean) =
@@ -323,7 +325,7 @@ fun PreviewView() {
     })
 
     val sourcesList = scraper.sourcesListCatalog.toList().mapIndexed { index, it ->
-        FinderCatalogItem(
+        SourceCatalogItem(
             catalog = it, pinned = index < 3
         )
     }

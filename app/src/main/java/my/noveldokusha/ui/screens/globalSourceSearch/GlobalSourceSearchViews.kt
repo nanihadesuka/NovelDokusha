@@ -26,10 +26,11 @@ import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.network.IteratorState
 import my.noveldokusha.network.NetworkClient
 import my.noveldokusha.scraper.Scraper
+import my.noveldokusha.ui.composeViews.ImageView
+import my.noveldokusha.ui.repositories.SourceCatalogItem
 import my.noveldokusha.ui.theme.ColorAccent
 import my.noveldokusha.ui.theme.ImageBorderRadius
 import my.noveldokusha.ui.theme.InternalTheme
-import my.noveldokusha.ui.composeViews.ImageView
 import my.noveldokusha.utils.capitalize
 import okhttp3.Request
 import okhttp3.Response
@@ -45,7 +46,7 @@ fun GlobalSourceSearchView(
     ) {
         items(listSources) { entry ->
             Text(
-                text = entry.source.name.capitalize(Locale.ROOT),
+                text = entry.source.catalog.name.capitalize(Locale.ROOT),
                 style = MaterialTheme.typography.h6,
                 modifier = Modifier.padding(vertical = 4.dp, horizontal = 8.dp)
             )
@@ -163,7 +164,10 @@ fun Preview() {
     })
 
     val list = scraper.sourcesListCatalog.map { source ->
-        source to (0..5).map { BookMetadata(title = "Book $it", url = "") }
+        SourceCatalogItem(
+            catalog = source,
+            pinned = false
+        ) to (0..5).map { BookMetadata(title = "Book $it", url = "") }
     }.map { (source, books) ->
         val sr = SourceResults(source, "", rememberCoroutineScope())
         sr.fetchIterator.list.addAll(books)

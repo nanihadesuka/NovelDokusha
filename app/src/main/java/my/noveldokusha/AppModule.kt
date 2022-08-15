@@ -18,6 +18,7 @@ import my.noveldokusha.scraper.Scraper
 import my.noveldokusha.tools.TranslationManager
 import my.noveldokusha.ui.Toasty
 import my.noveldokusha.ui.ToastyToast
+import my.noveldokusha.ui.repositories.ScraperRepository
 import my.noveldokusha.ui.screens.reader.tools.LiveTranslation
 import java.io.File
 import javax.inject.Singleton
@@ -89,5 +90,14 @@ object AppModule {
     @Singleton
     fun provideToasty(@ApplicationContext context: Context): Toasty {
         return ToastyToast(applicationContext = context)
+    }
+
+    @Provides
+    @Singleton
+    fun provideScraperRepository(
+        appPreferences: AppPreferences,
+        scraper: Scraper
+    ): ScraperRepository {
+        return ScraperRepository(appPreferences, scraper)
     }
 }
