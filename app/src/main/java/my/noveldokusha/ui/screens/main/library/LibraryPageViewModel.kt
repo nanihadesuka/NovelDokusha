@@ -39,10 +39,10 @@ class LibraryPageViewModel @Inject constructor(
                 AppPreferences.TERNARY_STATE.inverse -> list.filter { it.chaptersCount != it.chaptersReadCount }
                 AppPreferences.TERNARY_STATE.inactive -> list
             }
-        }.combine(preferences.LIBRARY_SORT_READ.flow()) { list, sortRead ->
+        }.combine(preferences.LIBRARY_SORT_LAST_READ.flow()) { list, sortRead ->
             when (sortRead) {
-                AppPreferences.TERNARY_STATE.active -> list.sortedBy { it.chaptersCount - it.chaptersReadCount }
-                AppPreferences.TERNARY_STATE.inverse -> list.sortedByDescending { it.chaptersCount - it.chaptersReadCount }
+                AppPreferences.TERNARY_STATE.active -> list.sortedByDescending { it.book.lastReadEpochTimeMilli }
+                AppPreferences.TERNARY_STATE.inverse -> list.sortedBy { it.book.lastReadEpochTimeMilli }
                 AppPreferences.TERNARY_STATE.inactive -> list
             }
         }

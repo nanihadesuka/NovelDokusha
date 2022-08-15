@@ -125,4 +125,5 @@
     <string name="pin_or_unpin_source">Pin or unpin source</string>
     <string name="text_selection">Text selection</string>
     <string name="allow_text_selection">Allow text selection</string>
+	<string name="last_read">Last read</string>
 </resources>

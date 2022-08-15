@@ -14,6 +14,13 @@ import kotlinx.coroutines.withContext
 import my.noveldokusha.utils.*
 import javax.inject.Inject
 
+
+/**
+ * KEYS ALREADY USED AND REMOVED:
+ *
+ * LIBRARY_SORT_READ
+ */
+
 class AppPreferences @Inject constructor(
     @ApplicationContext val context: Context
 ) {
@@ -67,7 +74,7 @@ class AppPreferences @Inject constructor(
             TERNARY_STATE.inactive
         ) { enumValueOf(it) }
     }
-    val LIBRARY_SORT_READ = object : Preference<TERNARY_STATE>("LIBRARY_SORT_READ") {
+    val LIBRARY_SORT_LAST_READ = object : Preference<TERNARY_STATE>("LIBRARY_SORT_LAST_READ") {
         override var value by SharedPreference_Enum(
             name,
             preferences,
@@ -81,14 +88,14 @@ class AppPreferences @Inject constructor(
             LIST_LAYOUT_MODE.verticalGrid
         ) { enumValueOf(it) }
     }
-    val GLOBAL_TRANSLATIOR_ENABLED = object : Preference<Boolean>("GLOBAL_TRANSLATION_ENABLED") {
+    val GLOBAL_TRANSLATION_ENABLED = object : Preference<Boolean>("GLOBAL_TRANSLATION_ENABLED") {
         override var value by SharedPreference_Boolean(name, preferences, false)
     }
-    val GLOBAL_TRANSLATIOR_PREFERRED_SOURCE =
+    val GLOBAL_TRANSLATION_PREFERRED_SOURCE =
         object : Preference<String>("GLOBAL_TRANSLATIOR_PREFERRED_SOURCE") {
             override var value by SharedPreference_String(name, preferences, "en")
         }
-    val GLOBAL_TRANSLATIOR_PREFERRED_TARGET =
+    val GLOBAL_TRANSLATION_PREFERRED_TARGET =
         object : Preference<String>("GLOBAL_TRANSLATION_PREFERRED_TARGET") {
             override var value by SharedPreference_String(name, preferences, "")
         }

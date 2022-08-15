@@ -97,7 +97,7 @@ fun OptionsSheetLibrary() {
                     contentDescription = null
                 )
             }
-            Text(text = stringResource(id = R.string.read), modifier = Modifier.padding(8.dp))
+            Text(text = stringResource(R.string.last_read), modifier = Modifier.padding(8.dp))
         }
     }
 }

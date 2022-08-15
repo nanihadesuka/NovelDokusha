@@ -14,7 +14,7 @@ class LiveTranslation(
     val settingsState = LiveTranslationSettingData(
         isAvailable = translationManager.available,
         listOfAvailableModels = translationManager.models,
-        enable = mutableStateOf(appPreferences.GLOBAL_TRANSLATIOR_ENABLED.value),
+        enable = mutableStateOf(appPreferences.GLOBAL_TRANSLATION_ENABLED.value),
         source = mutableStateOf(null),
         target = mutableStateOf(null),
         onEnable = ::onEnable,
@@ -29,8 +29,8 @@ class LiveTranslation(
     var onTranslatorChanged: (() -> Unit)? = null
 
     suspend fun init() {
-        val source = appPreferences.GLOBAL_TRANSLATIOR_PREFERRED_SOURCE.value
-        val target = appPreferences.GLOBAL_TRANSLATIOR_PREFERRED_TARGET.value
+        val source = appPreferences.GLOBAL_TRANSLATION_PREFERRED_SOURCE.value
+        val target = appPreferences.GLOBAL_TRANSLATION_PREFERRED_TARGET.value
         settingsState.source.value = getValidTranslatorOrNull(source)
         settingsState.target.value = getValidTranslatorOrNull(target)
 
@@ -68,19 +68,19 @@ class LiveTranslation(
 
     private fun onEnable(it: Boolean) {
         settingsState.enable.value = it
-        appPreferences.GLOBAL_TRANSLATIOR_ENABLED.value = it
+        appPreferences.GLOBAL_TRANSLATION_ENABLED.value = it
         updateLiveTranslation()
     }
 
     private fun oSourceChange(it: TranslationModelState?) {
         settingsState.source.value = it
-        appPreferences.GLOBAL_TRANSLATIOR_PREFERRED_SOURCE.value = it?.language ?: ""
+        appPreferences.GLOBAL_TRANSLATION_PREFERRED_SOURCE.value = it?.language ?: ""
         updateLiveTranslation()
     }
 
     private fun onTargetChange(it: TranslationModelState?) {
         settingsState.target.value = it
-        appPreferences.GLOBAL_TRANSLATIOR_PREFERRED_TARGET.value = it?.language ?: ""
+        appPreferences.GLOBAL_TRANSLATION_PREFERRED_TARGET.value = it?.language ?: ""
         updateLiveTranslation()
     }
 }

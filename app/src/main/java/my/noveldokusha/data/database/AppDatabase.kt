@@ -20,7 +20,7 @@ import java.io.InputStream
         Chapter::class,
         ChapterBody::class
     ],
-    version = 4,
+    version = 5,
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {
@@ -53,6 +53,9 @@ private fun migrations() = arrayOf(
     migration(3, 4) {
         it.execSQL("ALTER TABLE Book ADD COLUMN coverImageUrl TEXT NOT NULL DEFAULT ''")
         it.execSQL("ALTER TABLE Book ADD COLUMN description TEXT NOT NULL DEFAULT ''")
+    },
+    migration(4, 5) {
+        it.execSQL("ALTER TABLE Book ADD COLUMN lastReadEpochTimeMilli INTEGER NOT NULL DEFAULT 0")
     }
 )
 

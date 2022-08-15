@@ -93,6 +93,10 @@ class ReaderViewModel @Inject constructor(
             orderedChapters = bookChapters.await()
             liveTranslation.init()
         }
+        
+        viewModelScope.launch {
+            repository.bookLibrary.updateLastReadEpochTimeMilli(bookUrl, System.currentTimeMillis())
+        }
     }
 
     val items = ArrayList<ReaderItem>()

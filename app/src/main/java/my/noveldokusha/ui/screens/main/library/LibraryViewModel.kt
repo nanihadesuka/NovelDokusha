@@ -33,14 +33,14 @@ class LibraryViewModel @Inject constructor(
     var optionsBookDialogState by mutableStateOf<OptionsBookDialogState>(OptionsBookDialogState.Hide)
 
     val readFilter by appPreferences.LIBRARY_FILTER_READ.state(viewModelScope)
-    val readSort by appPreferences.LIBRARY_SORT_READ.state(viewModelScope)
+    val readSort by appPreferences.LIBRARY_SORT_LAST_READ.state(viewModelScope)
 
     fun readFilterToggle() {
         appPreferences.LIBRARY_FILTER_READ.value = appPreferences.LIBRARY_FILTER_READ.value.next()
     }
 
     fun readSortToggle() {
-        appPreferences.LIBRARY_SORT_READ.value = appPreferences.LIBRARY_SORT_READ.value.next()
+        appPreferences.LIBRARY_SORT_LAST_READ.value = appPreferences.LIBRARY_SORT_LAST_READ.value.next()
     }
 
     fun bookCompletedToggle(bookUrl: String) {

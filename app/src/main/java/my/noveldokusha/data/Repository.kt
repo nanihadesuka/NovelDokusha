@@ -77,6 +77,9 @@ class Repository @Inject constructor(
         suspend fun remove(bookUrl: String) = db.libraryDao().remove(bookUrl)
         suspend fun remove(book: Book) = db.libraryDao().remove(book)
         suspend fun update(book: Book) = db.libraryDao().update(book)
+        suspend fun updateLastReadEpochTimeMilli(bookUrl: String, lastReadEpochTimeMilli: Long) =
+            db.libraryDao().updateLastReadEpochTimeMilli(bookUrl, lastReadEpochTimeMilli)
+
         suspend fun updateCover(bookUrl: String, coverUrl: String) =
             db.libraryDao().updateCover(bookUrl, coverUrl)
 
