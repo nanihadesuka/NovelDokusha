@@ -1,6 +1,7 @@
 package my.noveldokusha.ui.screens.reader
 
 import android.content.Context
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
@@ -25,6 +26,7 @@ class ReaderItemAdapter(
     private val onChapterStartVisible: (chapterUrl: String) -> Unit,
     private val onChapterEndVisible: (chapterUrl: String) -> Unit,
     private val onReloadReader: () -> Unit,
+    private val onClick: () -> Unit,
 ) :
     ArrayAdapter<ReaderItem>(ctx, 0, list) {
     override fun getCount() = super.getCount() + 2
@@ -73,6 +75,12 @@ class ReaderItemAdapter(
             null -> ActivityReaderListItemBodyBinding.inflate(parent.inflater, parent, false)
                 .also { it.root.tag = it }
             else -> ActivityReaderListItemBodyBinding.bind(convertView)
+        }
+
+        val selectableText = appPreferences.READER_SELECTABLE_TEXT.value
+        bind.body.setTextIsSelectable(selectableText)
+        if(selectableText) {
+            bind.root.setTextSelectionAwareClick { onClick() }
         }
 
         val paragraph = item.textToDisplay + "\n"
@@ -141,6 +149,13 @@ class ReaderItemAdapter(
             ).also { it.root.tag = it }
             else -> ActivityReaderListItemSpecialTitleBinding.bind(convertView)
         }
+
+        val selectableText = appPreferences.READER_SELECTABLE_TEXT.value
+        bind.specialTitle.setTextIsSelectable(selectableText)
+        if(selectableText) {
+            bind.root.setTextSelectionAwareClick { onClick() }
+        }
+
         bind.specialTitle.text = ctx.getString(R.string.reader_no_more_chapters)
         bind.specialTitle.typeface =
             fontsLoader.getTypeFaceBOLD(appPreferences.READER_FONT_FAMILY.value)
@@ -160,6 +175,13 @@ class ReaderItemAdapter(
             ).also { it.root.tag = it }
             else -> ActivityReaderListItemSpecialTitleBinding.bind(convertView)
         }
+
+        val selectableText = appPreferences.READER_SELECTABLE_TEXT.value
+        bind.specialTitle.setTextIsSelectable(selectableText)
+        if(selectableText) {
+            bind.root.setTextSelectionAwareClick { onClick() }
+        }
+
         bind.specialTitle.text = ctx.getString(R.string.reader_first_chapter)
         bind.specialTitle.typeface =
             fontsLoader.getTypeFaceBOLD(appPreferences.READER_FONT_FAMILY.value)
@@ -212,6 +234,13 @@ class ReaderItemAdapter(
                 .also { it.root.tag = it }
             else -> ActivityReaderListItemErrorBinding.bind(convertView)
         }
+
+        val selectableText = appPreferences.READER_SELECTABLE_TEXT.value
+        bind.error.setTextIsSelectable(selectableText)
+        if(selectableText) {
+            bind.root.setTextSelectionAwareClick { onClick() }
+        }
+
         bind.reloadButton.setOnClickListener { onReloadReader() }
         bind.error.text = item.text
         return bind.root
@@ -232,6 +261,13 @@ class ReaderItemAdapter(
                 .also { it.root.tag = it }
             else -> ActivityReaderListItemTitleBinding.bind(convertView)
         }
+
+        val selectableText = appPreferences.READER_SELECTABLE_TEXT.value
+        bind.title.setTextIsSelectable(selectableText)
+        if(selectableText) {
+            bind.root.setTextSelectionAwareClick { onClick() }
+        }
+
         bind.title.text = item.textToDisplay
         bind.title.typeface = fontsLoader.getTypeFaceBOLD(appPreferences.READER_FONT_FAMILY.value)
         return bind.root
@@ -255,4 +291,14 @@ class ReaderItemAdapter(
             is ReaderItem.TRANSLATING -> viewTranslating(item, convertView, parent)
             is ReaderItem.TITLE -> viewTitle(item, convertView, parent)
         }
+}
+
+private fun View.setTextSelectionAwareClick(action: () -> Unit) {
+    setOnClickListener { action() }
+    setOnTouchListener { _, event ->
+        if (event.action == MotionEvent.ACTION_UP && !this.isFocused) {
+            performClick()
+        }
+        false
+    }
 }

@@ -45,6 +45,7 @@ class ReaderViewModel @Inject constructor(
 
     val textFont by appPreferences.READER_FONT_FAMILY.state(viewModelScope)
     val textSize by appPreferences.READER_FONT_SIZE.state(viewModelScope)
+    val isTextSelectable by appPreferences.READER_SELECTABLE_TEXT.state(viewModelScope)
 
     val translator get() = liveTranslation.translator
     val liveTranslationSettingState get() = liveTranslation.settingsState

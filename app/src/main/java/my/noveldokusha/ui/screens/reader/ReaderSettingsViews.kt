@@ -5,13 +5,18 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowRightAlt
 import androidx.compose.material.icons.filled.CloudDownload
 import androidx.compose.material.icons.filled.FontDownload
+import androidx.compose.material.icons.outlined.Cancel
+import androidx.compose.material.icons.outlined.CheckCircle
 import androidx.compose.material.icons.twotone.FormatSize
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -50,7 +55,7 @@ import my.noveldokusha.utils.ifCase
 import my.noveldokusha.utils.mix
 
 private enum class CurrentSettingVisible {
-    TextSize, TextFont, LiveTranslation, Theme, None
+    None, TextSize, TextFont, LiveTranslation, Theme, SelectableText
 }
 
 @Composable
@@ -95,8 +100,11 @@ private fun Settings(
     liveTranslationSettingData: LiveTranslationSettingData,
     modifier: Modifier = Modifier,
     visibleSetting: MutableState<CurrentSettingVisible>,
+    settingsListState: LazyListState,
     currentTheme: Themes,
     currentFollowSystem: Boolean,
+    selectableText: Boolean,
+    onSelectableTextChange: (Boolean) -> Unit,
     onFollowSystem: (Boolean) -> Unit,
     onThemeSelected: (Themes) -> Unit,
 ) {
@@ -133,11 +141,16 @@ private fun Settings(
                         onFollowSystem = onFollowSystem,
                         onThemeSelected = onThemeSelected,
                     )
+                    CurrentSettingVisible.SelectableText -> SelectableTextSetting(
+                        enable = selectableText,
+                        onEnable = onSelectableTextChange
+                    )
                     CurrentSettingVisible.None -> Unit
                 }
             }
         }
         SettingsRowList(
+            listState = settingsListState,
             visibleSetting = visibleSetting.value,
             setVisibleSetting = { visibleSetting.value = it },
             liveTranslationSettingDataIsAvailable = liveTranslationSettingData.isAvailable
@@ -147,6 +160,7 @@ private fun Settings(
 
 @Composable
 private fun SettingsRowList(
+    listState: LazyListState,
     visibleSetting: CurrentSettingVisible,
     setVisibleSetting: (CurrentSettingVisible) -> Unit,
     liveTranslationSettingDataIsAvailable: Boolean
@@ -156,6 +170,7 @@ private fun SettingsRowList(
     }
 
     LazyRow(
+        state = listState,
         horizontalArrangement = Arrangement.spacedBy(6.dp),
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
@@ -202,6 +217,64 @@ private fun SettingsRowList(
                 modifier = Modifier.height(50.dp),
                 onClick = { toggleOrOpen(CurrentSettingVisible.Theme) },
             )
+        }
+        item {
+            MyButton(
+                text = stringResource(R.string.text_selection),
+                selected = visibleSetting == CurrentSettingVisible.SelectableText,
+                contentPadding = 8.dp,
+                modifier = Modifier.height(50.dp),
+                onClick = { toggleOrOpen(CurrentSettingVisible.SelectableText) },
+            )
+        }
+    }
+}
+
+@OptIn(ExperimentalAnimationApi::class)
+@Composable
+fun SelectableTextSetting(
+    enable: Boolean,
+    onEnable: (Boolean) -> Unit
+) {
+    Box(
+        modifier = Modifier.fillMaxWidth(),
+        contentAlignment = Alignment.Center,
+    ) {
+
+        val textColor = when (enable) {
+            true -> Color.White
+            false -> MaterialTheme.colors.onPrimary
+        }
+
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(4.dp),
+            modifier = Modifier
+                .padding(0.dp)
+                .clip(CircleShape)
+                .toggleable(
+                    value = enable,
+                    onValueChange = { onEnable(!enable) }
+                )
+                .background(
+                    if (enable) ColorAccent
+                    else MaterialTheme.colors.secondary
+                )
+                .padding(8.dp)
+                .padding(start = 6.dp)
+        ) {
+            Text(
+                text = stringResource(R.string.allow_text_selection),
+                fontWeight = FontWeight.Bold,
+                color = textColor
+            )
+            AnimatedContent(targetState = enable) { follow ->
+                Icon(
+                    if (follow) Icons.Outlined.CheckCircle else Icons.Outlined.Cancel,
+                    contentDescription = null,
+                    tint = textColor
+                )
+            }
         }
     }
 }
@@ -515,6 +588,8 @@ fun ReaderInfoView(
     textSize: Float,
     currentTheme: Themes,
     currentFollowSystem: Boolean,
+    selectableText: Boolean,
+    onSelectableTextChange: (Boolean) -> Unit,
     onFollowSystem: (Boolean) -> Unit,
     onThemeSelected: (Themes) -> Unit,
     onTextFontChanged: (String) -> Unit,
@@ -524,6 +599,7 @@ fun ReaderInfoView(
     modifier: Modifier = Modifier
 ) {
     val visibleSetting = rememberSaveable { mutableStateOf(CurrentSettingVisible.None) }
+    val settingsListState = rememberLazyListState()
 
     ConstraintLayout(modifier.fillMaxSize()) {
         val (info, settings) = createRefs()
@@ -582,8 +658,11 @@ fun ReaderInfoView(
                 onTextSizeChanged = onTextSizeChanged,
                 liveTranslationSettingData = liveTranslationSettingData,
                 visibleSetting = visibleSetting,
+                settingsListState = settingsListState,
                 currentTheme = currentTheme,
                 currentFollowSystem = currentFollowSystem,
+                selectableText = selectableText,
+                onSelectableTextChange = onSelectableTextChange,
                 onFollowSystem = onFollowSystem,
                 onThemeSelected = onThemeSelected,
             )
@@ -643,6 +722,8 @@ private fun ViewsPreview() {
                 liveTranslationSettingData = liveTranslationSettingData,
                 currentTheme = Themes.DARK,
                 currentFollowSystem = true,
+                selectableText = false,
+                onSelectableTextChange = {},
                 onFollowSystem = {},
                 onThemeSelected = {},
             )

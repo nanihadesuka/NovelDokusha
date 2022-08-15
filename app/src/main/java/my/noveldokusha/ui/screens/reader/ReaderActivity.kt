@@ -70,7 +70,8 @@ class ReaderActivity : BaseActivity() {
                 appPreferences,
                 onChapterStartVisible = { url -> viewModel.readRoutine.setReadStart(url) },
                 onChapterEndVisible = { url -> viewModel.readRoutine.setReadEnd(url) },
-                onReloadReader = ::reloadReader
+                onReloadReader = ::reloadReader,
+                onClick = { viewModel.showReaderInfoView = !viewModel.showReaderInfoView },
             )
         }
     }
@@ -144,6 +145,15 @@ class ReaderActivity : BaseActivity() {
                         }
                 }
 
+                // Notify manually selectable text changed for list view
+                LaunchedEffect(true) {
+                    snapshotFlow { viewModel.isTextSelectable }.drop(1)
+                        .collect {
+                            viewAdapter.listView.notifyDataSetChanged()
+                        }
+                }
+
+
                 // Capture back action when viewing info
                 BackHandler(enabled = viewModel.showReaderInfoView) {
                     viewModel.showReaderInfoView = false
@@ -163,6 +173,10 @@ class ReaderActivity : BaseActivity() {
                     liveTranslationSettingData = viewModel.liveTranslationSettingState,
                     currentFollowSystem = viewModelGlobalSettings.followsSystem,
                     currentTheme = viewModelGlobalSettings.theme,
+                    selectableText = viewModel.isTextSelectable,
+                    onSelectableTextChange = {
+                        appPreferences.READER_SELECTABLE_TEXT.value = it
+                    },
                     onFollowSystem = viewModelGlobalSettings::onFollowSystem,
                     onThemeSelected = viewModelGlobalSettings::onThemeSelected,
                 )
