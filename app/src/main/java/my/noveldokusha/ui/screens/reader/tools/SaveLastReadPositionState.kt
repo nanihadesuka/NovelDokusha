@@ -14,22 +14,22 @@ fun saveLastReadPositionState(
 ) = CoroutineScope(Dispatchers.IO).launch {
     repository.withTransaction {
         repository.bookLibrary.get(bookUrl)?.let {
-            repository.bookLibrary.update(it.copy(lastReadChapter = chapter.url))
+            repository.bookLibrary.update(it.copy(lastReadChapter = chapter.chapterUrl))
         }
 
-        if (oldChapter?.url != null) repository.bookChapter.get(oldChapter.url)?.let {
+        if (oldChapter?.chapterUrl != null) repository.bookChapter.get(oldChapter.chapterUrl)?.let {
             repository.bookChapter.update(
                 it.copy(
-                    lastReadPosition = oldChapter.position,
+                    lastReadPosition = oldChapter.chapterItemIndex,
                     lastReadOffset = oldChapter.offset
                 )
             )
         }
 
-        repository.bookChapter.get(chapter.url)?.let {
+        repository.bookChapter.get(chapter.chapterUrl)?.let {
             repository.bookChapter.update(
                 it.copy(
-                    lastReadPosition = chapter.position,
+                    lastReadPosition = chapter.chapterItemIndex,
                     lastReadOffset = chapter.offset
                 )
             )

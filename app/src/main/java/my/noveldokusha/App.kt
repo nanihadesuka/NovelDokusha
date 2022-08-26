@@ -15,7 +15,7 @@ import com.bumptech.glide.module.AppGlideModule
 import dagger.hilt.android.EntryPointAccessors
 import dagger.hilt.android.HiltAndroidApp
 import my.noveldokusha.network.NetworkClient
-import my.noveldokusha.network.ScrapperNetworkClient
+import my.noveldokusha.network.ScraperNetworkClient
 import java.io.InputStream
 import javax.inject.Inject
 
@@ -39,7 +39,7 @@ class App @Inject constructor(
     }
 
     override fun newImageLoader(): ImageLoader = when (val networkClient = networkClient) {
-        is ScrapperNetworkClient -> ImageLoader
+        is ScraperNetworkClient -> ImageLoader
             .Builder(this)
             .okHttpClient(networkClient.client)
             .build()
@@ -54,7 +54,7 @@ private class CustomGlideModule : AppGlideModule() {
     override fun registerComponents(context: Context, glide: Glide, registry: Registry) {
         val appContext = context.applicationContext
         val networkClient = EntryPointAccessors.fromApplication<NetworkClient>(appContext)
-        if (networkClient !is ScrapperNetworkClient) {
+        if (networkClient !is ScraperNetworkClient) {
             return
         }
         registry.replace(

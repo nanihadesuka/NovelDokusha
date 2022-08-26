@@ -16,11 +16,11 @@ suspend fun getChapterInitialPosition(
 
     val book = async(Dispatchers.IO) { repository.bookLibrary.get(bookUrl) }
     val titlePos = async(Dispatchers.Default) {
-        items.indexOfFirst { it is ReaderItem.TITLE }
+        items.indexOfFirst { it is ReaderItem.Title }
     }
     val position = async(Dispatchers.Default) {
         items.indexOfFirst {
-            it is ReaderItem.Position && it.pos == chapter.lastReadPosition
+            it is ReaderItem.Position && it.chapterItemIndex == chapter.lastReadPosition
         }.let { index ->
             if (index == -1) Pair(titlePos.await(), 0)
             else Pair(index, chapter.lastReadOffset)

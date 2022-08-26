@@ -5,18 +5,16 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.lazy.*
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowRightAlt
-import androidx.compose.material.icons.filled.CloudDownload
-import androidx.compose.material.icons.filled.FontDownload
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.Cancel
 import androidx.compose.material.icons.outlined.CheckCircle
+import androidx.compose.material.icons.outlined.FastForward
+import androidx.compose.material.icons.outlined.FastRewind
 import androidx.compose.material.icons.twotone.FormatSize
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -38,14 +36,19 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.toSize
+import androidx.compose.ui.window.Dialog
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import my.noveldokusha.R
+import my.noveldokusha.tools.TextSynthesis
+import my.noveldokusha.tools.TextSynthesisState
 import my.noveldokusha.tools.TranslationModelState
+import my.noveldokusha.tools.VoiceData
 import my.noveldokusha.ui.screens.main.settings.SettingsTheme
 import my.noveldokusha.ui.screens.reader.tools.FontsLoader
 import my.noveldokusha.ui.theme.ColorAccent
 import my.noveldokusha.ui.theme.InternalTheme
+import my.noveldokusha.ui.theme.InternalThemeObject
 import my.noveldokusha.ui.theme.Themes
 import my.noveldokusha.uiViews.MyButton
 import my.noveldokusha.uiViews.MyIconButton
@@ -55,7 +58,7 @@ import my.noveldokusha.utils.ifCase
 import my.noveldokusha.utils.mix
 
 private enum class CurrentSettingVisible {
-    None, TextSize, TextFont, LiveTranslation, Theme, SelectableText
+    None, TextSize, TextFont, LiveTranslation, TextToSpeech, Theme, SelectableText
 }
 
 @Composable
@@ -98,6 +101,7 @@ private fun Settings(
     textSize: Float,
     onTextSizeChanged: (Float) -> Unit,
     liveTranslationSettingData: LiveTranslationSettingData,
+    textToSpeechSettingData: TextToSpeechSettingData,
     modifier: Modifier = Modifier,
     visibleSetting: MutableState<CurrentSettingVisible>,
     settingsListState: LazyListState,
@@ -144,6 +148,17 @@ private fun Settings(
                     CurrentSettingVisible.SelectableText -> SelectableTextSetting(
                         enable = selectableText,
                         onEnable = onSelectableTextChange
+                    )
+                    CurrentSettingVisible.TextToSpeech -> TextToSpeechSetting(
+                        isEnabled = textToSpeechSettingData.isEnabled.value,
+                        isPlaying = textToSpeechSettingData.isPlaying.value,
+                        availableVoices = textToSpeechSettingData.availableVoices,
+                        setPlaying = textToSpeechSettingData.setPlaying,
+                        playPreviousItem = textToSpeechSettingData.playPreviousItem,
+                        playPreviousChapter = textToSpeechSettingData.playPreviousChapter,
+                        playNextItem = textToSpeechSettingData.playNextItem,
+                        playNextChapter = textToSpeechSettingData.playNextChapter,
+                        onSelectVoice = textToSpeechSettingData.onSelectVoice,
                     )
                     CurrentSettingVisible.None -> Unit
                 }
@@ -207,6 +222,15 @@ private fun SettingsRowList(
                 contentPadding = 8.dp,
                 modifier = Modifier.height(50.dp),
                 onClick = { toggleOrOpen(CurrentSettingVisible.LiveTranslation) },
+            )
+        }
+        item {
+            MyButton(
+                text = stringResource(R.string.text_to_speech),
+                selected = visibleSetting == CurrentSettingVisible.TextToSpeech,
+                contentPadding = 8.dp,
+                modifier = Modifier.height(50.dp),
+                onClick = { toggleOrOpen(CurrentSettingVisible.TextToSpeech) },
             )
         }
         item {
@@ -489,7 +513,6 @@ fun TextSizeSlider(
     }
 }
 
-
 @Composable
 fun TextFontDropDown(
     textFont: String,
@@ -577,7 +600,6 @@ private fun RoundedContentLayout(
     }
 }
 
-
 @Composable
 fun ReaderInfoView(
     chapterTitle: String,
@@ -595,6 +617,7 @@ fun ReaderInfoView(
     onTextFontChanged: (String) -> Unit,
     onTextSizeChanged: (Float) -> Unit,
     liveTranslationSettingData: LiveTranslationSettingData,
+    textToSpeechSettingData: TextToSpeechSettingData,
     visible: Boolean,
     modifier: Modifier = Modifier
 ) {
@@ -657,6 +680,7 @@ fun ReaderInfoView(
                 onTextFontChanged = onTextFontChanged,
                 onTextSizeChanged = onTextSizeChanged,
                 liveTranslationSettingData = liveTranslationSettingData,
+                textToSpeechSettingData = textToSpeechSettingData,
                 visibleSetting = visibleSetting,
                 settingsListState = settingsListState,
                 currentTheme = currentTheme,
@@ -666,6 +690,168 @@ fun ReaderInfoView(
                 onFollowSystem = onFollowSystem,
                 onThemeSelected = onThemeSelected,
             )
+        }
+    }
+}
+
+@Preview(group = "setting")
+@Composable
+fun TextToSpeechSettingPreview() {
+    InternalThemeObject {
+        TextToSpeechSetting(
+            isEnabled = false,
+            isPlaying = true,
+            setPlaying = {},
+            playPreviousItem = {},
+            playPreviousChapter = {},
+            playNextItem = {},
+            playNextChapter = {},
+            onSelectVoice = {},
+            availableVoices = (0..7).map {
+                VoiceData(
+                    id = "$it",
+                    language = "lang$it",
+                    needsInternet = (it % 2) == 0,
+                    quality = it
+                )
+            }
+        )
+    }
+}
+
+data class TextToSpeechSettingData(
+    val isEnabled: MutableState<Boolean>,
+    val isPlaying: MutableState<Boolean>,
+    val availableVoices: SnapshotStateList<VoiceData>,
+    val currentActiveItemState: State<TextSynthesis>,
+    val setPlaying: (Boolean) -> Unit,
+    val playPreviousItem: () -> Unit,
+    val playPreviousChapter: () -> Unit,
+    val playNextItem: () -> Unit,
+    val playNextChapter: () -> Unit,
+    val onSelectVoice: (VoiceData) -> Unit,
+)
+
+@OptIn(ExperimentalAnimationApi::class)
+@Composable
+fun TextToSpeechSetting(
+    isEnabled: Boolean,
+    isPlaying: Boolean,
+    setPlaying: (Boolean) -> Unit,
+    playPreviousItem: () -> Unit,
+    playPreviousChapter: () -> Unit,
+    playNextItem: () -> Unit,
+    playNextChapter: () -> Unit,
+    availableVoices: List<VoiceData>,
+    onSelectVoice: (VoiceData) -> Unit,
+) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Row(
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
+                .padding(4.dp)
+                .background(
+                    Brush.radialGradient(
+                        listOf(
+                            MaterialTheme.colors.primaryVariant,
+                            MaterialTheme.colors.primaryVariant.copy(alpha = 0.5f)
+                        )
+                    )
+                )
+        ) {
+            IconButton(onClick = playPreviousChapter) {
+                Icon(
+                    imageVector = Icons.Outlined.FastRewind,
+                    contentDescription = null,
+                    modifier = Modifier
+                        .size(24.dp)
+                        .background(ColorAccent, CircleShape),
+                    tint = Color.White,
+                )
+            }
+            IconButton(onClick = playPreviousItem) {
+                Icon(
+                    imageVector = Icons.Filled.NavigateBefore,
+                    contentDescription = null,
+                    tint = Color.White,
+                    modifier = Modifier
+                        .size(32.dp)
+                        .background(ColorAccent, CircleShape),
+                )
+            }
+            IconButton(onClick = { setPlaying(!isPlaying) }) {
+                AnimatedContent(
+                    targetState = isPlaying,
+                    modifier = Modifier
+                        .size(46.dp)
+                        .background(ColorAccent, CircleShape)
+                ) { target ->
+                    when (target) {
+                        true -> Icon(
+                            Icons.Filled.Pause,
+                            contentDescription = null,
+                            tint = Color.White,
+                        )
+                        false -> Icon(
+                            Icons.Filled.PlayArrow,
+                            contentDescription = null,
+                            tint = Color.White,
+                        )
+                    }
+                }
+
+            }
+            IconButton(onClick = playNextItem) {
+                Icon(
+                    Icons.Filled.NavigateNext,
+                    contentDescription = null,
+                    tint = Color.White,
+                    modifier = Modifier
+                        .size(32.dp)
+                        .background(ColorAccent, CircleShape),
+                )
+            }
+            IconButton(onClick = playNextChapter) {
+                Icon(
+                    Icons.Outlined.FastForward,
+                    contentDescription = null,
+                    tint = Color.White,
+                    modifier = Modifier
+                        .size(24.dp)
+                        .background(ColorAccent, CircleShape),
+                )
+            }
+        }
+
+        var openVoicesDialog by remember { mutableStateOf(false) }
+        Row {
+            MyButton(
+                text = stringResource(R.string.enable),
+                onClick = { /*TODO*/ },
+                enabled = isEnabled
+            )
+            MyButton(
+                text = stringResource(R.string.voices),
+                onClick = { openVoicesDialog = !openVoicesDialog }
+            )
+        }
+
+        if (openVoicesDialog) Dialog(onDismissRequest = { openVoicesDialog = false }) {
+            LazyColumn {
+                items(availableVoices) {
+                    MyButton(
+                        text = "Name: ${it.id}  Lang:${it.language}  Internet:${it.needsInternet}  Quality: ${it.quality}/500",
+                        onClick = {
+                            openVoicesDialog = false
+                            onSelectVoice(it)
+                        },
+                    )
+                }
+            }
         }
     }
 }
@@ -707,6 +893,27 @@ private fun ViewsPreview() {
         onDownloadTranslationModel = {}
     )
 
+    val textToSpeechSettingData = TextToSpeechSettingData(
+        isEnabled = remember { mutableStateOf(true) },
+        isPlaying = remember { mutableStateOf(false) },
+        availableVoices = remember { mutableStateListOf() },
+        currentActiveItemState = remember {
+            mutableStateOf(
+                TextSynthesis(
+                    chapterItemIndex = 0,
+                    chapterIndex = 0,
+                    state = TextSynthesisState.PLAYING
+                )
+            )
+        },
+        setPlaying = {},
+        playPreviousItem = {},
+        playPreviousChapter = {},
+        playNextItem = {},
+        playNextChapter = {},
+        onSelectVoice = {},
+    )
+
     InternalTheme {
         Surface(color = Color.Black) {
             ReaderInfoView(
@@ -720,6 +927,7 @@ private fun ViewsPreview() {
                 onTextFontChanged = {},
                 visible = true,
                 liveTranslationSettingData = liveTranslationSettingData,
+                textToSpeechSettingData = textToSpeechSettingData,
                 currentTheme = Themes.DARK,
                 currentFollowSystem = true,
                 selectableText = false,

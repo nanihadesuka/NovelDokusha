@@ -13,8 +13,9 @@ import kotlinx.coroutines.SupervisorJob
 import my.noveldokusha.data.Repository
 import my.noveldokusha.data.database.AppDatabase
 import my.noveldokusha.network.NetworkClient
-import my.noveldokusha.network.ScrapperNetworkClient
+import my.noveldokusha.network.ScraperNetworkClient
 import my.noveldokusha.scraper.Scraper
+import my.noveldokusha.tools.TextToSpeechManager
 import my.noveldokusha.tools.TranslationManager
 import my.noveldokusha.ui.Toasty
 import my.noveldokusha.ui.ToastyToast
@@ -65,7 +66,7 @@ object AppModule {
     @Provides
     @Singleton
     fun provideNetworkClient(app: App, @ApplicationContext context: Context): NetworkClient {
-        return ScrapperNetworkClient(
+        return ScraperNetworkClient(
             cacheDir = File(app.cacheDir, "network_cache"),
             cacheSize = 5L * 1024 * 1024,
             appContext = context
@@ -84,6 +85,13 @@ object AppModule {
         appPreferences: AppPreferences,
     ): LiveTranslation {
         return LiveTranslation(translationManager, appPreferences)
+    }
+
+    @Provides
+    fun provideTextToSpeechManager(
+        @ApplicationContext context: Context
+    ): TextToSpeechManager {
+        return TextToSpeechManager(context)
     }
 
     @Provides

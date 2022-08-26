@@ -126,4 +126,7 @@
     <string name="text_selection">Text selection</string>
     <string name="allow_text_selection">Allow text selection</string>
 	<string name="last_read">Last read</string>
+    <string name="text_to_speech">Text to speech</string>
+    <string name="voices">Voices</string>
+	<string name="enable">Enable</string>
 </resources>

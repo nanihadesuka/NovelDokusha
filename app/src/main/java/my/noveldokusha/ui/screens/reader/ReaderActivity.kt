@@ -10,35 +10,40 @@ import androidx.activity.compose.BackHandler
 import androidx.activity.viewModels
 import androidx.compose.material.LocalContentColor
 import androidx.compose.material.MaterialTheme
-import androidx.compose.runtime.*
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.snapshotFlow
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.core.view.doOnNextLayout
+import androidx.lifecycle.asLiveData
 import androidx.lifecycle.lifecycleScope
 import com.afollestad.materialdialogs.MaterialDialog
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.cancelChildren
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.drop
+import kotlinx.coroutines.launch
 import my.noveldokusha.R
 import my.noveldokusha.databinding.ActivityReaderBinding
-import my.noveldokusha.network.Response
+import my.noveldokusha.tools.TextSynthesis
 import my.noveldokusha.ui.BaseActivity
 import my.noveldokusha.ui.screens.main.settings.SettingsViewModel
 import my.noveldokusha.ui.screens.reader.tools.FontsLoader
-import my.noveldokusha.ui.screens.reader.tools.textToItemsConverter
 import my.noveldokusha.ui.theme.Theme
 import my.noveldokusha.utils.Extra_String
 import my.noveldokusha.utils.colorAttrRes
+import my.noveldokusha.utils.dpToPx
 import my.noveldokusha.utils.fadeIn
 import java.util.concurrent.atomic.AtomicBoolean
-import kotlin.math.ceil
 
 @AndroidEntryPoint
 class ReaderActivity : BaseActivity() {
-    class IntentData : Intent {
-        private var bookUrl by Extra_String()
-        private var chapterUrl by Extra_String()
+    class IntentData : Intent, ReaderStateBundle {
+        override var bookUrl by Extra_String()
+        override var chapterUrl by Extra_String()
 
         constructor(intent: Intent) : super(intent)
         constructor(ctx: Context, bookUrl: String, chapterUrl: String) : super(
@@ -50,6 +55,7 @@ class ReaderActivity : BaseActivity() {
         }
     }
 
+    private var listIsScrolling = false
     private val fadeInTextAlready = AtomicBoolean(false)
     private fun fadeInText() {
         if (fadeInTextAlready.compareAndSet(false, true))
@@ -68,6 +74,7 @@ class ReaderActivity : BaseActivity() {
                 viewModel.bookUrl,
                 fontsLoader,
                 appPreferences,
+                viewModel.readerSpeaker,
                 onChapterStartVisible = { url -> viewModel.readRoutine.setReadStart(url) },
                 onChapterEndVisible = { url -> viewModel.readRoutine.setReadEnd(url) },
                 onReloadReader = ::reloadReader,
@@ -83,11 +90,20 @@ class ReaderActivity : BaseActivity() {
         val currentChapter = viewModel.currentChapter.copy()
         lifecycleScope.coroutineContext.cancelChildren()
         viewModel.reloadReader()
-        loadRestartedInitialChapter(currentChapter)
+        viewModel.chaptersLoader.loadRestartedInitialChapter(currentChapter)
+    }
+
+    override fun onBackPressed() {
+        viewModel.readerSpeaker.stop()
+        super.onBackPressed()
     }
 
     override fun onDestroy() {
         viewModel.onTranslatorChanged = null
+        viewModel.forceUpdateListViewState = null
+        viewModel.maintainStartPosition = null
+        viewModel.maintainLastVisiblePosition = null
+        viewModel.showInvalidChapterDialog = null
         super.onDestroy()
     }
 
@@ -97,15 +113,73 @@ class ReaderActivity : BaseActivity() {
 
         viewBind.listView.adapter = viewAdapter.listView
 
-        viewModel.onTranslatorChanged = {
-            reloadReader()
+        viewModel.onTranslatorChanged = { reloadReader() }
+        viewModel.forceUpdateListViewState = {
+            lifecycleScope.launch(Dispatchers.Main.immediate) {
+                viewAdapter.listView.notifyDataSetChanged()
+            }
+        }
+        viewModel.showInvalidChapterDialog = {
+            lifecycleScope.launch(Dispatchers.Main.immediate) {
+                MaterialDialog(this@ReaderActivity).show {
+                    title(text = getString(R.string.invalid_chapter))
+                    cornerRadius(16f)
+                }
+            }
+        }
+        viewModel.maintainStartPosition = {
+            it()
+            val titleIndex = (0..viewAdapter.listView.count)
+                .asSequence()
+                .map { viewAdapter.listView.getItem(it) }
+                .indexOfFirst { it is ReaderItem.Title }
+
+            if (titleIndex != -1) {
+                viewBind.listView.setSelection(titleIndex)
+            }
+        }
+        viewModel.maintainLastVisiblePosition = {
+            val oldSize = viewAdapter.listView.count
+            val index = viewBind.listView.lastVisiblePosition
+            val indexView = index - viewBind.listView.firstVisiblePosition
+            val top = viewBind.listView.getChildAt(indexView).run { top - paddingTop }
+            it()
+            val displacement = viewAdapter.listView.count - oldSize
+            viewBind.listView.setSelectionFromTop(index + displacement, top)
         }
 
-        viewModel.initialLoad {
-            lifecycleScope.launch {
-                viewModel.initJob.join()
-                loadInitialChapter()
+        viewBind.listView.isEnabled = false
+
+        viewModel.chaptersLoader.initialChapterLoadedFlow.asLiveData().observe(this) {
+            if (!viewModel.readerSpeaker.settings.isEnabled.value) {
+                return@observe
             }
+            lifecycleScope.launch(Dispatchers.Main.immediate) {
+                when (it) {
+                    is ChaptersLoader.InitialLoadCompleted.Initial -> {
+                        val initialState = viewModel.getChapterInitialPosition()
+                        if (initialState != null) {
+                            val (position: Int, offset: Int) = initialState
+                            setInitialChapterPosition(position = position, offset = offset)
+                        }
+                    }
+                    is ChaptersLoader.InitialLoadCompleted.Reloaded -> {
+                        setInitialChapterPosition(
+                            position = it.chapterState.chapterItemIndex,
+                            offset = it.chapterState.offset
+                        )
+                    }
+                }
+                viewBind.listView.isEnabled = true
+            }
+        }
+
+        viewModel.readerSpeaker.currentTextLiveData.observe(this) {
+            scrollToReadingPosition(it)
+        }
+
+        viewModel.readerSpeaker.startReadingFromFirstVisibleItemFlow.asLiveData().observe(this) {
+            viewBind.listView.doOnNextLayout { startSpeaking() }
         }
 
         viewBind.settings.setContent {
@@ -119,16 +193,6 @@ class ReaderActivity : BaseActivity() {
                     ) { it() }
                 }
             ) {
-                val percentage by remember {
-                    derivedStateOf {
-                        val (info, itemPos) = viewModel.readingPosStats ?: return@derivedStateOf 0f
-                        when (info.itemCount) {
-                            0 -> 100f
-                            else -> ceil((itemPos.toFloat() / info.itemCount.toFloat()) * 100f)
-                        }
-                    }
-                }
-
                 // Notify manually text font changed for list view
                 LaunchedEffect(true) {
                     snapshotFlow { viewModel.textFont }.drop(1)
@@ -153,7 +217,6 @@ class ReaderActivity : BaseActivity() {
                         }
                 }
 
-
                 // Capture back action when viewing info
                 BackHandler(enabled = viewModel.showReaderInfoView) {
                     viewModel.showReaderInfoView = false
@@ -162,8 +225,9 @@ class ReaderActivity : BaseActivity() {
                 // Reader info
                 ReaderInfoView(
                     chapterTitle = viewModel.readingPosStats?.run { first.chapter.title } ?: "",
-                    chapterCurrentNumber = viewModel.readingPosStats?.run { first.index + 1 } ?: 0,
-                    chapterPercentageProgress = percentage,
+                    chapterCurrentNumber = viewModel.readingPosStats?.run { first.chapterIndex + 1 }
+                        ?: 0,
+                    chapterPercentageProgress = viewModel.chapterPercentageProgress,
                     chaptersTotalSize = viewModel.orderedChapters.size,
                     textFont = viewModel.textFont,
                     textSize = viewModel.textSize,
@@ -171,6 +235,7 @@ class ReaderActivity : BaseActivity() {
                     onTextFontChanged = { appPreferences.READER_FONT_FAMILY.value = it },
                     onTextSizeChanged = { appPreferences.READER_FONT_SIZE.value = it },
                     liveTranslationSettingData = viewModel.liveTranslationSettingState,
+                    textToSpeechSettingData = viewModel.textToSpeechSettingData,
                     currentFollowSystem = viewModelGlobalSettings.followsSystem,
                     currentTheme = viewModelGlobalSettings.theme,
                     selectableText = viewModel.isTextSelectable,
@@ -200,7 +265,9 @@ class ReaderActivity : BaseActivity() {
                     updateReadingState()
                 }
 
-                override fun onScrollStateChanged(view: AbsListView?, scrollState: Int) = run { }
+                override fun onScrollStateChanged(view: AbsListView?, scrollState: Int) {
+                    listIsScrolling = scrollState != AbsListView.OnScrollListener.SCROLL_STATE_IDLE
+                }
             })
 
         // Show reader if text hasn't loaded after 200 ms of waiting
@@ -219,11 +286,44 @@ class ReaderActivity : BaseActivity() {
                 WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
         }
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
             window.attributes.layoutInDisplayCutoutMode =
                 WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES
+        }
 
         window.statusBarColor = R.attr.colorSurface.colorAttrRes(this)
+        viewAdapter.listView.notifyDataSetChanged()
+    }
+
+    private fun scrollToReadingPosition(textSynthesis: TextSynthesis) {
+        // If user already scrolling ignore
+        if (listIsScrolling) {
+            viewAdapter.listView.notifyDataSetChanged()
+            return
+        }
+        // Search for the item being read otherwise do nothing
+        val firstIndex = viewBind.listView.firstVisiblePosition
+        val lastIndex = viewBind.listView.lastVisiblePosition
+        for (index in firstIndex..lastIndex) {
+            val item = viewAdapter.listView.getItem(index)
+            if (
+                item.chapterIndex == textSynthesis.chapterIndex &&
+                item is ReaderItem.Position &&
+                item.chapterItemIndex == textSynthesis.chapterItemIndex
+            ) {
+                val viewIndex = index - viewBind.listView.firstVisiblePosition
+                val currentOffsetPx =
+                    viewBind.listView.getChildAt(viewIndex).run { top - paddingTop }
+                val newOffsetPx = 200.dpToPx(this@ReaderActivity)
+                viewAdapter.listView.notifyDataSetChanged()
+                // Scroll if item below new scroll position
+                if (currentOffsetPx > newOffsetPx) {
+                    viewBind.listView.smoothScrollToPositionFromTop(index, newOffsetPx, 1000)
+                }
+                return
+            }
+        }
+        viewAdapter.listView.notifyDataSetChanged()
     }
 
     private fun updateReadingState() {
@@ -237,107 +337,29 @@ class ReaderActivity : BaseActivity() {
         val isBottom =
             visibleItemCount != 0 && (firstVisibleItem + visibleItemCount) >= totalItemCount - 1
 
-        when (viewModel.readerState) {
+        when (viewModel.chaptersLoader.readerState) {
             ReaderViewModel.ReaderState.IDLE -> when {
-                isBottom && loadNextChapter() -> run {}
-                isTop && loadPreviousChapter() -> run {}
+                isBottom && viewModel.chaptersLoader.loadNextChapter() -> run {}
+                isTop && viewModel.chaptersLoader.loadPreviousChapter() -> run {}
             }
             ReaderViewModel.ReaderState.LOADING -> run {}
             ReaderViewModel.ReaderState.INITIAL_LOAD -> run {}
         }
     }
 
-    private fun loadRestartedInitialChapter(chapterLastState: ReaderViewModel.ChapterState): Boolean {
-        viewModel.readerState = ReaderViewModel.ReaderState.INITIAL_LOAD
-        viewAdapter.listView.clear()
-
-        val insert = { item: ReaderItem -> viewAdapter.listView.add(item) }
-        val insertAll = { items: Collection<ReaderItem> -> viewAdapter.listView.addAll(items) }
-        val remove = { item: ReaderItem -> viewAdapter.listView.remove(item) }
-
-        val index = viewModel.orderedChapters.indexOfFirst {
-            it.url == viewModel.currentChapter.url
-        }
-        if (index == -1) {
-            MaterialDialog(this).show {
-                title(text = getString(R.string.invalid_chapter))
-                cornerRadius(16f)
-            }
-            return false
-        }
-
-        val maintainStartPosition = { fn: () -> Unit ->
-            fn()
-            // This is the position of the item TITLE at initialization
-            viewBind.listView.setSelection(2)
-        }
-
-        viewBind.listView.isEnabled = false
-        return addChapter(
-            index,
-            insert,
-            insertAll,
-            remove,
-            maintainPosition = maintainStartPosition
-        ) {
-            setInitialChapterPosition(
-                position = chapterLastState.position,
-                offset = chapterLastState.offset
-            )
-            viewBind.listView.isEnabled = true
-        }
-    }
-
-    private fun loadInitialChapter(): Boolean {
-        viewModel.readerState = ReaderViewModel.ReaderState.INITIAL_LOAD
-        viewAdapter.listView.clear()
-
-        val insert = { item: ReaderItem -> viewAdapter.listView.add(item) }
-        val insertAll = { items: Collection<ReaderItem> -> viewAdapter.listView.addAll(items) }
-        val remove = { item: ReaderItem -> viewAdapter.listView.remove(item) }
-
-        val index = viewModel.orderedChapters.indexOfFirst {
-            it.url == viewModel.currentChapter.url
-        }
-        if (index == -1) {
-            MaterialDialog(this).show {
-                title(text = getString(R.string.invalid_chapter))
-                cornerRadius(16f)
-            }
-            return false
-        }
-
-        val maintainStartPosition = { fn: () -> Unit ->
-            fn()
-            // This is the position of the item TITLE at initialization
-            viewBind.listView.setSelection(2)
-        }
-
-        viewBind.listView.isEnabled = false
-        return addChapter(
-            index,
-            insert,
-            insertAll,
-            remove,
-            maintainPosition = maintainStartPosition
-        ) {
-            lifecycleScope.launch(Dispatchers.Main) {
-                val (position: Int, offset: Int) = viewModel.getChapterInitialPosition()
-                    ?: return@launch
-                setInitialChapterPosition(position = position, offset = offset)
-            }
-            viewBind.listView.isEnabled = true
-        }
+    private fun startSpeaking() {
+        val index = viewAdapter.listView.fromPositionToIndex(viewBind.listView.firstVisiblePosition)
+        viewModel.startSpeaker(itemIndex = index)
     }
 
     private fun setInitialChapterPosition(position: Int, offset: Int) {
         val index = viewModel.items.indexOfFirst {
-            it is ReaderItem.Position && it.pos == position
+            it is ReaderItem.Position && it.chapterItemIndex == position
         }
         if (index != -1) {
             viewBind.listView.setSelectionFromTop(index, offset)
         }
-        viewModel.readerState = ReaderViewModel.ReaderState.IDLE
+        viewModel.chaptersLoader.readerState = ReaderViewModel.ReaderState.IDLE
         fadeInText()
         viewBind.listView.doOnNextLayout { updateReadingState() }
     }
@@ -348,7 +370,7 @@ class ReaderActivity : BaseActivity() {
         val item = viewAdapter.listView.getItem(lastVisiblePosition)
         if (item !is ReaderItem.Position) return
 
-        viewModel.updateInfoViewTo(item.chapterUrl, item.pos)
+        viewModel.updateInfoViewTo(item.chapterUrl, item.chapterItemIndex)
     }
 
     override fun onPause() {
@@ -361,175 +383,10 @@ class ReaderActivity : BaseActivity() {
         if (item is ReaderItem.Position) {
             val offset = viewBind.listView.run { getChildAt(0).top - paddingTop }
             viewModel.currentChapter = ReaderViewModel.ChapterState(
-                url = item.chapterUrl,
-                position = item.pos,
+                chapterUrl = item.chapterUrl,
+                chapterItemIndex = item.chapterItemIndex,
                 offset = offset
             )
         }
-    }
-
-    private fun loadNextChapter(): Boolean {
-        viewModel.readerState = ReaderViewModel.ReaderState.LOADING
-
-        val lastItem = viewModel.items.lastOrNull()!!
-        if (lastItem is ReaderItem.BOOK_END) {
-            viewModel.readerState = ReaderViewModel.ReaderState.IDLE
-            return false
-        }
-
-        val insert = { item: ReaderItem -> viewAdapter.listView.add(item) }
-        val insertAll = { items: Collection<ReaderItem> -> viewAdapter.listView.addAll(items) }
-        val remove = { item: ReaderItem -> viewAdapter.listView.remove(item) }
-
-        val nextIndex = viewModel.getNextChapterIndex(lastItem.chapterUrl)
-        if (nextIndex >= viewModel.orderedChapters.size) {
-            lifecycleScope.launch(Dispatchers.Main) {
-                insert(ReaderItem.BOOK_END(lastItem.chapterUrl))
-                viewModel.readerState = ReaderViewModel.ReaderState.IDLE
-            }
-            return false
-        }
-
-        return addChapter(nextIndex, insert, insertAll, remove) {
-            viewModel.readerState = ReaderViewModel.ReaderState.IDLE
-        }
-    }
-
-    private fun loadPreviousChapter(): Boolean {
-        viewModel.readerState = ReaderViewModel.ReaderState.LOADING
-
-        val firstItem = viewModel.items.firstOrNull()!!
-        if (firstItem is ReaderItem.BOOK_START) {
-            viewModel.readerState = ReaderViewModel.ReaderState.IDLE
-            return false
-        }
-
-        var listIndex = 0
-        val insert = { item: ReaderItem ->
-            viewAdapter.listView.insert(item, listIndex); listIndex += 1
-        }
-        val insertAll = { items: Collection<ReaderItem> -> items.forEach { insert(it) } }
-        val remove = { item: ReaderItem ->
-            val pos = viewAdapter.listView.getPosition(item)
-            if (pos != -1) {
-                viewAdapter.listView.remove(item)
-                listIndex -= 1
-            }
-        }
-
-        val maintainLastVisiblePosition = { fn: () -> Unit ->
-            val oldSize = viewAdapter.listView.count
-            val lvp = viewBind.listView.lastVisiblePosition
-            val ivpView =
-                viewBind.listView.lastVisiblePosition - viewBind.listView.firstVisiblePosition
-            val top = viewBind.listView.getChildAt(ivpView).run { top - paddingTop }
-            fn()
-            val displacement = viewAdapter.listView.count - oldSize
-            viewBind.listView.setSelectionFromTop(lvp + displacement, top)
-        }
-
-        val previousIndex = viewModel.getPreviousChapterIndex(firstItem.chapterUrl)
-        if (previousIndex < 0) {
-            maintainLastVisiblePosition {
-                insert(ReaderItem.BOOK_START(firstItem.chapterUrl))
-            }
-            viewModel.readerState = ReaderViewModel.ReaderState.IDLE
-            return false
-        }
-
-        return addChapter(previousIndex, insert, insertAll, remove, maintainLastVisiblePosition) {
-            viewModel.readerState = ReaderViewModel.ReaderState.IDLE
-        }
-    }
-
-    private fun addChapter(
-        index: Int,
-        insert: ((ReaderItem) -> Unit),
-        insertAll: ((Collection<ReaderItem>) -> Unit),
-        remove: ((ReaderItem) -> Unit),
-        maintainPosition: (() -> Unit) -> Unit = { it() },
-        onCompletion: (() -> Unit)
-    ): Boolean {
-        lifecycleScope.launch(Dispatchers.Default) {
-
-            val chapter = viewModel.orderedChapters[index]
-            val itemProgressBar = ReaderItem.PROGRESSBAR(chapter.url)
-            val itemTitle = ReaderItem.TITLE(chapter.url, 0, chapter.title).copy(
-                textTranslated = viewModel.translator?.translate?.invoke(chapter.title)
-                    ?: chapter.title
-            )
-            withContext(Dispatchers.Main) {
-                maintainPosition {
-                    insert(ReaderItem.DIVIDER(chapter.url))
-                    insert(itemTitle)
-                    insert(itemProgressBar)
-                }
-            }
-
-            when (val res = viewModel.fetchChapterBody(chapter.url)) {
-                is Response.Success -> {
-                    // Split chapter text into items
-                    val itemsOriginal = textToItemsConverter(chapter.url, res.data)
-
-                    val itemTranslationAttribution = viewModel.translator?.let {
-                        ReaderItem.GOOGLE_TRANSLATE_ATTRIBUTION(
-                            chapterUrl = chapter.url
-                        )
-                    }
-
-                    val itemTranslation = viewModel.translator?.let {
-                        ReaderItem.TRANSLATING(
-                            chapterUrl = chapter.url,
-                            sourceLang = it.sourceLocale.displayLanguage,
-                            targetLang = it.targetLocale.displayLanguage,
-                        )
-                    }
-
-                    if (itemTranslation != null) {
-                        withContext(Dispatchers.Main) {
-                            maintainPosition {
-                                insert(itemTranslation)
-                            }
-                        }
-                    }
-
-                    // Translate if necessary
-                    val items = viewModel.translator?.let { translator ->
-                        itemsOriginal.map {
-                            if (it is ReaderItem.BODY) {
-                                it.copy(textTranslated = translator.translate(it.text))
-                            } else it
-                        }
-                    } ?: itemsOriginal
-
-                    withContext(Dispatchers.Main) {
-                        viewModel.addChapterStats(chapter, items.size, index)
-                        maintainPosition {
-                            remove(itemProgressBar)
-                            itemTranslation?.let {
-                                remove(it)
-                            }
-                            itemTranslationAttribution?.let {
-                                insert(it)
-                            }
-                            insertAll(items)
-                            insert(ReaderItem.DIVIDER(chapter.url))
-                        }
-                        onCompletion()
-                    }
-                }
-                is Response.Error -> {
-                    withContext(Dispatchers.Main) {
-                        viewModel.addChapterStats(chapter, 1, index)
-                        maintainPosition {
-                            remove(itemProgressBar)
-                            insert(ReaderItem.ERROR(chapter.url, res.message))
-                        }
-                        onCompletion()
-                    }
-                }
-            }
-        }
-        return true
     }
 }

@@ -7,6 +7,7 @@
 		<item name="android:statusBarColor">?colorPrimary</item>
 
 		<item name="colorAccent">#2A59B6</item>
+		<item name="colorAccentTransparent">#332A59B6</item>
 
 		<item name="colorPrimary">@color/dark_20</item>
 		<item name="colorPrimaryTransparent">#00202020</item>
