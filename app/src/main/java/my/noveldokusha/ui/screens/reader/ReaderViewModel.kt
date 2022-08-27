@@ -8,6 +8,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.take
 import my.noveldokusha.AppPreferences
@@ -35,9 +36,14 @@ class ReaderViewModel @Inject constructor(
     private val liveTranslation: LiveTranslation,
     private val textToSpeechManager: TextToSpeechManager,
 ) : BaseViewModel(), ReaderStateBundle {
-    enum class ReaderState { IDLE, LOADING, INITIAL_LOAD }
 
-    data class ChapterState(val chapterUrl: String, val chapterItemIndex: Int, val offset: Int)
+    enum class ReaderState { IDLE, LOADING, INITIAL_LOAD }
+    data class ChapterState(
+        val chapterUrl: String,
+        val chapterItemIndex: Int,
+        val offset: Int
+    )
+
     data class ChapterStats(val itemCount: Int, val chapter: Chapter, val chapterIndex: Int)
 
     override var bookUrl by StateExtra_String(state)
@@ -110,6 +116,10 @@ class ReaderViewModel @Inject constructor(
         showInvalidChapterDialog = { showInvalidChapterDialog?.invoke() }
     )
 
+    data class ChapterPosition(val chapterIndex: Int, val chapterItemIndex: Int, val offset: Int)
+
+    val moveToItemPositionFlow = MutableSharedFlow<ChapterPosition>()
+
     init {
         readerSpeaker.settings.isEnabled.value = true
 
@@ -119,13 +129,14 @@ class ReaderViewModel @Inject constructor(
             val loadChaptersList = async(Dispatchers.IO) {
                 orderedChapters.addAll(repository.bookChapter.chapters(bookUrl))
             }
+            loadChaptersList.await()
+            val chapterIndex = orderedChapters.indexOfFirst { it.url == chapterUrl }
+            loadTranslator.await()
             currentChapter = ChapterState(
                 chapterUrl = chapterUrl,
                 chapterItemIndex = chapter.await()?.lastReadPosition ?: 0,
                 offset = chapter.await()?.lastReadOffset ?: 0
             )
-            loadChaptersList.await()
-            loadTranslator.await()
             // All data prepared! Let's load the current chapter
             chaptersLoader.loadInitialChapter(chapterUrl)
         }
@@ -155,6 +166,33 @@ class ReaderViewModel @Inject constructor(
                                     chapterIndex = nextChapterIndex
                                 )
                             }
+                    }
+                }
+            }
+        }
+
+        viewModelScope.launch {
+            chaptersLoader.initialChapterLoadedFlow.collect {
+                when (it) {
+                    is ChaptersLoader.InitialLoadCompleted.Initial -> {
+                        val initialState = getChapterInitialPosition() ?: return@collect
+                        val (chapterItemIndex: Int, offset: Int) = initialState
+                        moveToItemPositionFlow.emit(
+                            ChapterPosition(
+                                chapterIndex = it.chapterIndex,
+                                chapterItemIndex = chapterItemIndex,
+                                offset = offset,
+                            )
+                        )
+                    }
+                    is ChaptersLoader.InitialLoadCompleted.Reloaded -> {
+                        moveToItemPositionFlow.emit(
+                            ChapterPosition(
+                                chapterIndex = it.chapterIndex,
+                                chapterItemIndex = it.chapterItemIndex,
+                                offset = it.chapterItemOffset,
+                            )
+                        )
                     }
                 }
             }

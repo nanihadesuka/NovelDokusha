@@ -49,6 +49,11 @@ class ReaderItemAdapter(
         else -> position - 1
     }
 
+    fun fromIndexToPosition(index: Int): Int = when (index) {
+        -1 -> -1
+        else -> index + 1
+    }
+
     private val topPadding = ReaderItem.Padding(chapterUrl = "", chapterIndex = Int.MIN_VALUE)
     private val bottomPadding = ReaderItem.Padding(chapterUrl = "", chapterIndex = Int.MAX_VALUE)
 

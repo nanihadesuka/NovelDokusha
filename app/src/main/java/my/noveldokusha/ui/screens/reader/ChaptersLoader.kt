@@ -22,9 +22,13 @@ class ChaptersLoader(
 ) : CoroutineScope {
 
 
-    sealed class InitialLoadCompleted {
-        object Initial : InitialLoadCompleted()
-        data class Reloaded(val chapterState: ReaderViewModel.ChapterState) : InitialLoadCompleted()
+    sealed interface InitialLoadCompleted {
+        data class Initial(val chapterIndex: Int) : InitialLoadCompleted
+        data class Reloaded(
+            val chapterIndex: Int,
+            val chapterItemIndex: Int,
+            val chapterItemOffset: Int
+        ) : InitialLoadCompleted
     }
 
     data class ChapterLoaded(val chapterIndex: Int, val type: Type) {
@@ -38,7 +42,7 @@ class ChaptersLoader(
     val chaptersStats = mutableMapOf<String, ReaderViewModel.ChapterStats>()
     val loadedChapters = mutableSetOf<String>()
 
-    val initialChapterLoadedFlow = MutableSharedFlow<InitialLoadCompleted>(replay = 1)
+    val initialChapterLoadedFlow = MutableSharedFlow<InitialLoadCompleted>()
     val chapterLoadedFlow = MutableSharedFlow<ChapterLoaded>()
 
     fun reload() {
@@ -71,7 +75,11 @@ class ChaptersLoader(
                 remove = remove,
                 maintainPosition = maintainStartPosition,
                 onCompletion = {
-                    initialChapterLoadedFlow.emit(InitialLoadCompleted.Reloaded(chapterLastState))
+                    initialChapterLoadedFlow.emit(InitialLoadCompleted.Reloaded(
+                        chapterIndex = index,
+                        chapterItemIndex = chapterLastState.chapterItemIndex,
+                        chapterItemOffset = chapterLastState.offset
+                    ))
                     chapterLoadedFlow.emit(
                         ChapterLoaded(
                             chapterIndex = index,
@@ -107,7 +115,7 @@ class ChaptersLoader(
                 remove = remove,
                 maintainPosition = maintainStartPosition,
                 onCompletion = {
-                    initialChapterLoadedFlow.emit(InitialLoadCompleted.Initial)
+                    initialChapterLoadedFlow.emit(InitialLoadCompleted.Initial(chapterIndex = index))
                     chapterLoadedFlow.emit(
                         ChapterLoaded(
                             chapterIndex = index,
