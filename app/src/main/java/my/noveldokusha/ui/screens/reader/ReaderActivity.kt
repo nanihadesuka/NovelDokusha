@@ -21,11 +21,8 @@ import androidx.lifecycle.asLiveData
 import androidx.lifecycle.lifecycleScope
 import com.afollestad.materialdialogs.MaterialDialog
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.cancelChildren
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.drop
-import kotlinx.coroutines.launch
 import my.noveldokusha.R
 import my.noveldokusha.databinding.ActivityReaderBinding
 import my.noveldokusha.ui.BaseActivity
@@ -86,11 +83,11 @@ class ReaderActivity : BaseActivity() {
     private val fontsLoader = FontsLoader()
 
     private fun reloadReader() {
-        viewBind.listView.isEnabled = false
+        viewModel.listIsEnabled.postValue(false)
         val currentChapter = viewModel.currentChapter.copy()
         lifecycleScope.coroutineContext.cancelChildren()
         viewModel.reloadReader()
-        viewModel.chaptersLoader.loadRestartedInitialChapter(currentChapter)
+        viewModel.chaptersLoader.loadRestartedInitial(currentChapter)
     }
 
     override fun onBackPressed() {
@@ -103,6 +100,7 @@ class ReaderActivity : BaseActivity() {
         viewModel.forceUpdateListViewState = null
         viewModel.maintainStartPosition = null
         viewModel.maintainLastVisiblePosition = null
+        viewModel.setInitialPosition = null
         viewModel.showInvalidChapterDialog = null
         super.onDestroy()
     }
@@ -113,16 +111,22 @@ class ReaderActivity : BaseActivity() {
 
         viewBind.listView.adapter = viewAdapter.listView
 
-        viewModel.onTranslatorChanged = { reloadReader() }
+        viewModel.listIsEnabled.observe(this) {
+            viewBind.listView.isEnabled = it
+        }
+
+        viewModel.onTranslatorChanged = {
+            reloadReader()
+        }
 
         viewModel.forceUpdateListViewState = {
-            lifecycleScope.launch(Dispatchers.Main.immediate) {
+            withContext(Dispatchers.Main.immediate) {
                 viewAdapter.listView.notifyDataSetChanged()
             }
         }
 
         viewModel.showInvalidChapterDialog = {
-            lifecycleScope.launch(Dispatchers.Main.immediate) {
+            withContext(Dispatchers.Main.immediate) {
                 MaterialDialog(this@ReaderActivity).show {
                     title(text = getString(R.string.invalid_chapter))
                     cornerRadius(16f)
@@ -131,37 +135,42 @@ class ReaderActivity : BaseActivity() {
         }
 
         viewModel.maintainStartPosition = {
-            it()
-            val titleIndex = (0..viewAdapter.listView.count)
-                .asSequence()
-                .map { viewAdapter.listView.getItem(it) }
-                .indexOfFirst { it is ReaderItem.Title }
+            withContext(Dispatchers.Main.immediate) {
+                it()
+                val titleIndex = (0..viewAdapter.listView.count)
+                    .asSequence()
+                    .map { viewAdapter.listView.getItem(it) }
+                    .indexOfFirst { it is ReaderItem.Title }
 
-            if (titleIndex != -1) {
-                viewBind.listView.setSelection(titleIndex)
+                if (titleIndex != -1) {
+                    viewBind.listView.setSelection(titleIndex)
+                }
+            }
+        }
+
+        viewModel.setInitialPosition = {
+            withContext(Dispatchers.Main.immediate) {
+                setInitialChapterPosition(
+                    chapterIndex = it.chapterIndex,
+                    chapterItemIndex = it.chapterItemIndex,
+                    offset = it.itemOffset
+                )
+                viewModel.listIsEnabled.postValue(true)
             }
         }
 
         viewModel.maintainLastVisiblePosition = {
-            val oldSize = viewAdapter.listView.count
-            val position = viewBind.listView.lastVisiblePosition
-            val positionView = position - viewBind.listView.firstVisiblePosition
-            val top = viewBind.listView.getChildAt(positionView).run { top - paddingTop }
-            it()
-            val displacement = viewAdapter.listView.count - oldSize
-            viewBind.listView.setSelectionFromTop(position + displacement, top)
+            withContext(Dispatchers.Main.immediate) {
+                val oldSize = viewAdapter.listView.count
+                val position = viewBind.listView.lastVisiblePosition
+                val positionView = position - viewBind.listView.firstVisiblePosition
+                val top = viewBind.listView.getChildAt(positionView).run { top - paddingTop }
+                it()
+                val displacement = viewAdapter.listView.count - oldSize
+                viewBind.listView.setSelectionFromTop(position + displacement, top)
+            }
         }
 
-        viewBind.listView.isEnabled = false
-
-        viewModel.moveToItemPositionFlow.asLiveData().observe(this) {
-            setInitialChapterPosition(
-                chapterIndex = it.chapterIndex,
-                chapterItemIndex = it.chapterItemIndex,
-                offset = it.offset
-            )
-            viewBind.listView.isEnabled = true
-        }
 
         viewModel.readerSpeaker.currentTextLiveData.observe(this) {
             scrollToReadingPosition(
@@ -252,7 +261,9 @@ class ReaderActivity : BaseActivity() {
                     visibleItemCount: Int,
                     totalItemCount: Int
                 ) {
-                    updateCurrentReadingPosSavingState(viewBind.listView.firstVisiblePosition)
+                    updateCurrentReadingPosSavingState(
+                        viewBind.listView.firstVisiblePosition
+                    )
                     updateInfoView()
                     updateReadingState()
                 }
@@ -263,9 +274,10 @@ class ReaderActivity : BaseActivity() {
             })
 
         // Show reader if text hasn't loaded after 200 ms of waiting
-        lifecycleScope.launch(Dispatchers.Main)
+        lifecycleScope.launch(Dispatchers.Main.immediate)
         {
             delay(200)
+            viewAdapter.listView.notifyDataSetChanged()
             fadeInText()
         }
 
@@ -330,9 +342,13 @@ class ReaderActivity : BaseActivity() {
             visibleItemCount != 0 && (firstVisibleItem + visibleItemCount) >= totalItemCount - 1
 
         when (viewModel.chaptersLoader.readerState) {
-            ReaderViewModel.ReaderState.IDLE -> when {
-                isBottom && viewModel.chaptersLoader.loadNextChapter() -> run {}
-                isTop && viewModel.chaptersLoader.loadPreviousChapter() -> run {}
+            ReaderViewModel.ReaderState.IDLE -> {
+                if (isBottom) {
+                    viewModel.chaptersLoader.loadNext()
+                }
+                if (isTop) {
+                    viewModel.chaptersLoader.loadPrevious()
+                }
             }
             ReaderViewModel.ReaderState.LOADING -> run {}
             ReaderViewModel.ReaderState.INITIAL_LOAD -> run {}
@@ -340,8 +356,9 @@ class ReaderActivity : BaseActivity() {
     }
 
     private fun startSpeaking() {
-        val index = viewAdapter.listView.fromPositionToIndex(viewBind.listView.firstVisiblePosition)
-        viewModel.startSpeaker(itemIndex = index)
+        viewModel.startSpeaker(
+            itemIndex = viewAdapter.listView.fromPositionToIndex(viewBind.listView.firstVisiblePosition)
+        )
     }
 
     private fun setInitialChapterPosition(
@@ -354,11 +371,10 @@ class ReaderActivity : BaseActivity() {
             chapterIndex = chapterIndex,
             chapterItemIndex = chapterItemIndex
         )
-        val position = viewAdapter.listView.fromPositionToIndex(index)
+        val position = viewAdapter.listView.fromIndexToPosition(index)
         if (index != -1) {
             viewBind.listView.setSelectionFromTop(position, offset)
         }
-        viewModel.chaptersLoader.readerState = ReaderViewModel.ReaderState.IDLE
         fadeInText()
         viewBind.listView.doOnNextLayout { updateReadingState() }
     }
@@ -373,12 +389,17 @@ class ReaderActivity : BaseActivity() {
     }
 
     override fun onPause() {
-        updateCurrentReadingPosSavingState(viewBind.listView.firstVisiblePosition)
+        updateCurrentReadingPosSavingState(
+            firstVisibleItemIndex = viewAdapter.listView.fromPositionToIndex(
+                viewBind.listView.firstVisiblePosition
+            )
+        )
         super.onPause()
     }
 
-    private fun updateCurrentReadingPosSavingState(firstVisibleItem: Int) {
-        val item = viewAdapter.listView.getItem(firstVisibleItem)
+    private fun updateCurrentReadingPosSavingState(firstVisibleItemIndex: Int) {
+        if (firstVisibleItemIndex == -1 || firstVisibleItemIndex > viewModel.items.lastIndex) return
+        val item = viewModel.items[firstVisibleItemIndex]
         if (item is ReaderItem.Position) {
             val offset = viewBind.listView.run { getChildAt(0).top - paddingTop }
             viewModel.currentChapter = ReaderViewModel.ChapterState(

@@ -10,6 +10,7 @@ import my.noveldokusha.ui.screens.reader.ReaderItem
 suspend fun textToItemsConverter(
     chapterUrl: String,
     chapterPos: Int,
+    initialChapterItemIndex: Int,
     text: String
 ): List<ReaderItem> = withContext(Dispatchers.Default) {
     val paragraphs = text
@@ -21,52 +22,39 @@ suspend fun textToItemsConverter(
     return@withContext paragraphs
         .mapIndexed { index, paragraph ->
             async {
-                when (index) {
-                    0 -> generateITEM(
-                        chapterUrl = chapterUrl,
-                        chapterPos = chapterPos,
-                        pos = index + 1,
-                        text = paragraph,
-                        location = ReaderItem.LOCATION.FIRST
-                    )
-                    paragraphs.lastIndex -> generateITEM(
-                        chapterUrl = chapterUrl,
-                        chapterPos = chapterPos,
-                        pos = index + 1,
-                        text = paragraph,
-                        location = ReaderItem.LOCATION.LAST
-                    )
-                    else -> generateITEM(
-                        chapterUrl = chapterUrl,
-                        chapterPos = chapterPos,
-                        pos = index + 1,
-                        text = paragraph,
-                        location = ReaderItem.LOCATION.MIDDLE
-                    )
-                }
+                generateITEM(
+                    chapterUrl = chapterUrl,
+                    chapterIndex = chapterPos,
+                    chapterItemIndex = index + initialChapterItemIndex,
+                    text = paragraph,
+                    location = when (index) {
+                        0 -> ReaderItem.LOCATION.FIRST
+                        paragraphs.lastIndex -> ReaderItem.LOCATION.LAST
+                        else -> ReaderItem.LOCATION.MIDDLE
+                    }
+                )
             }
-        }
-        .awaitAll()
+        }.awaitAll()
 }
 
 private fun generateITEM(
     chapterUrl: String,
-    chapterPos: Int,
-    pos: Int,
+    chapterIndex: Int,
+    chapterItemIndex: Int,
     text: String,
     location: ReaderItem.LOCATION
 ): ReaderItem = when (val imgEntry = BookTextMapper.ImgEntry.fromXMLString(text)) {
     null -> ReaderItem.Body(
         chapterUrl = chapterUrl,
-        chapterIndex = chapterPos,
-        chapterItemIndex = pos,
+        chapterIndex = chapterIndex,
+        chapterItemIndex = chapterItemIndex,
         text = text,
         location = location
     )
     else -> ReaderItem.Image(
         chapterUrl = chapterUrl,
-        chapterIndex = chapterPos,
-        chapterItemIndex = pos,
+        chapterIndex = chapterIndex,
+        chapterItemIndex = chapterItemIndex,
         text = text,
         location = location,
         image = imgEntry

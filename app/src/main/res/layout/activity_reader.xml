@@ -20,6 +20,7 @@
 		android:listSelector="#0000"
 		android:longClickable="false"
 		android:scrollbars="none"
+		android:enabled="false"
 		android:visibility="invisible"
 		tools:visibility="visible"
 		tools:listitem="@layout/activity_reader_list_item_body"

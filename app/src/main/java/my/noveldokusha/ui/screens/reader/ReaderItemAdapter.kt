@@ -24,7 +24,7 @@ import my.noveldokusha.utils.inflater
 
 class ReaderItemAdapter(
     private val ctx: Context,
-    list: ArrayList<ReaderItem>,
+    list: List<ReaderItem>,
     private val bookUrl: String,
     private val fontsLoader: FontsLoader,
     private val appPreferences: AppPreferences,
@@ -33,25 +33,23 @@ class ReaderItemAdapter(
     private val onChapterEndVisible: (chapterUrl: String) -> Unit,
     private val onReloadReader: () -> Unit,
     private val onClick: () -> Unit,
-) :
-    ArrayAdapter<ReaderItem>(ctx, 0, list) {
+) : ArrayAdapter<ReaderItem>(ctx, 0, list) {
     override fun getCount() = super.getCount() + 2
     override fun getItem(position: Int): ReaderItem = when (position) {
         0 -> topPadding
-        this.count - 1 -> bottomPadding
+        count - 1 -> bottomPadding
         else -> super.getItem(position - 1)!!
     }
 
     // Get list index from current position
     fun fromPositionToIndex(position: Int): Int = when (position) {
-        0 -> -1
-        this.count -> -1
-        else -> position - 1
+        in 1 until (count - 1) -> position - 1
+        else -> -1
     }
 
     fun fromIndexToPosition(index: Int): Int = when (index) {
-        -1 -> -1
-        else -> index + 1
+        in 0 until super.getCount() -> index + 1
+        else -> -1
     }
 
     private val topPadding = ReaderItem.Padding(chapterUrl = "", chapterIndex = Int.MIN_VALUE)
@@ -62,14 +60,14 @@ class ReaderItemAdapter(
         is ReaderItem.Body -> 0
         is ReaderItem.Image -> 1
         is ReaderItem.BookEnd -> 2
-        is ReaderItem.BookStart -> 2
-        is ReaderItem.Divider -> 3
-        is ReaderItem.Error -> 4
-        is ReaderItem.Padding -> 5
-        is ReaderItem.Progressbar -> 6
-        is ReaderItem.Title -> 7
-        is ReaderItem.Translating -> 8
-        is ReaderItem.GoogleTranslateAttribution -> 9
+        is ReaderItem.BookStart -> 3
+        is ReaderItem.Divider -> 4
+        is ReaderItem.Error -> 5
+        is ReaderItem.Padding -> 6
+        is ReaderItem.Progressbar -> 7
+        is ReaderItem.Title -> 8
+        is ReaderItem.Translating -> 9
+        is ReaderItem.GoogleTranslateAttribution -> 10
     }
 
     private fun viewTranslateAttribution(
