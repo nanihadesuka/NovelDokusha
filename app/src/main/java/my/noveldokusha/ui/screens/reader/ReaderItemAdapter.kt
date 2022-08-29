@@ -283,7 +283,7 @@ class ReaderItemAdapter(
     }
 
     private fun getItemReadingStateBackground(item: ReaderItem): Drawable? {
-        val textSynthesis = readerSpeaker.currentTextPlaying
+        val textSynthesis = readerSpeaker.currentTextPlaying.value
         val isReadingItem = item is ReaderItem.Position &&
                 textSynthesis.state == TextSynthesisState.PLAYING &&
                 textSynthesis.chapterIndex == item.chapterIndex &&

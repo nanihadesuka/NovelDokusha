@@ -59,7 +59,7 @@ class TextToSpeechManager @Inject constructor(
         started = SharingStarted.WhileSubscribed()
     )
 
-    var currentActiveItemState = mutableStateOf(
+    val currentActiveItemState = mutableStateOf(
         TextSynthesis(
             chapterIndex = -1,
             chapterItemIndex = 0,
