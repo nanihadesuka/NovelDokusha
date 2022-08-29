@@ -7,14 +7,16 @@ import my.noveldokusha.data.Repository
 import my.noveldokusha.data.database.tables.Chapter
 import my.noveldokusha.network.Response
 import my.noveldokusha.ui.screens.reader.tools.ItemPosition
-import my.noveldokusha.ui.screens.reader.tools.LiveTranslation
 import my.noveldokusha.ui.screens.reader.tools.getChapterInitialPosition
 import my.noveldokusha.ui.screens.reader.tools.textToItemsConverter
 import kotlin.coroutines.CoroutineContext
 
 class ChaptersLoader(
     private val repository: Repository,
-    private val liveTranslation: LiveTranslation,
+    private val translateOrNull: suspend (text: String) -> String?,
+    private val translationIsActive: () -> Boolean,
+    private val translationSourceLanguageOrNull: () -> String?,
+    private val translationTargetLanguageOrNull: () -> String?,
     private val bookUrl: String,
     val orderedChapters: List<Chapter>,
     @Volatile var readerState: ReaderViewModel.ReaderState,
@@ -53,7 +55,7 @@ class ChaptersLoader(
         startChapterLoaderWatcher()
     }
 
-    fun isLastChapter(index: Int) = index == orderedChapters.lastIndex
+    fun isLastChapter(chapterIndex: Int) = chapterIndex == orderedChapters.lastIndex
 
     @Synchronized
     fun loadInitial(chapterIndex: Int) {
@@ -231,14 +233,14 @@ class ChaptersLoader(
         forceUpdateListViewState()
         setInitialPosition(initialPosition)
 
-        readerState = ReaderViewModel.ReaderState.IDLE
-
         chapterLoadedFlow.emit(
             ChapterLoaded(
                 chapterIndex = chapterIndex,
                 type = ChapterLoaded.Type.Initial
             )
         )
+
+        readerState = ReaderViewModel.ReaderState.IDLE
     }
 
     private suspend fun loadPreviousChapter() = withContext(Dispatchers.Main.immediate) {
@@ -295,7 +297,6 @@ class ChaptersLoader(
             maintainPosition = maintainLastVisiblePosition,
         )
 
-        readerState = ReaderViewModel.ReaderState.IDLE
 
         chapterLoadedFlow.emit(
             ChapterLoaded(
@@ -303,6 +304,7 @@ class ChaptersLoader(
                 type = ChapterLoaded.Type.Previous
             )
         )
+        readerState = ReaderViewModel.ReaderState.IDLE
     }
 
     private suspend fun loadNextChapter() = withContext(Dispatchers.Main.immediate) {
@@ -311,6 +313,7 @@ class ChaptersLoader(
         val lastItem = items.lastOrNull()!!
         if (lastItem is ReaderItem.BookEnd) {
             readerState = ReaderViewModel.ReaderState.IDLE
+            return@withContext
         }
         val nextIndex = lastItem.chapterIndex + 1
 
@@ -348,13 +351,15 @@ class ChaptersLoader(
             insertAll = insertAll,
             remove = remove,
         )
-        readerState = ReaderViewModel.ReaderState.IDLE
+
         chapterLoadedFlow.emit(
             ChapterLoaded(
                 chapterIndex = nextIndex,
                 type = ChapterLoaded.Type.Next
             )
         )
+
+        readerState = ReaderViewModel.ReaderState.IDLE
     }
 
     private suspend fun addChapter(
@@ -376,8 +381,7 @@ class ChaptersLoader(
             text = chapter.title,
             chapterItemIndex = chapterItemIndex,
         ).copy(
-            textTranslated = liveTranslation.translator?.translate?.invoke(chapter.title)
-                ?: chapter.title
+            textTranslated = translateOrNull(chapter.title) ?: chapter.title
         )
         chapterItemIndex += 1
 
@@ -404,21 +408,21 @@ class ChaptersLoader(
                 )
                 chapterItemIndex += itemsOriginal.size
 
-                val itemTranslationAttribution = liveTranslation.translator?.let {
+                val itemTranslationAttribution = if (translationIsActive()) {
                     ReaderItem.GoogleTranslateAttribution(
                         chapterUrl = chapter.url,
                         chapterIndex = index,
                     )
-                }
+                } else null
 
-                val itemTranslating = liveTranslation.translator?.let {
+                val itemTranslating = if (translationIsActive()) {
                     ReaderItem.Translating(
                         chapterUrl = chapter.url,
                         chapterIndex = index,
-                        sourceLang = it.sourceLocale.displayLanguage,
-                        targetLang = it.targetLocale.displayLanguage,
+                        sourceLang = translationSourceLanguageOrNull() ?: "",
+                        targetLang = translationTargetLanguageOrNull() ?: "",
                     )
-                }
+                } else null
 
                 if (itemTranslating != null) {
                     maintainPosition {
@@ -428,13 +432,14 @@ class ChaptersLoader(
                 }
 
                 // Translate if necessary
-                val items = liveTranslation.translator?.let { translator ->
-                    itemsOriginal.map {
+                val items = when {
+                    translationIsActive() -> itemsOriginal.map {
                         if (it is ReaderItem.Body) {
-                            it.copy(textTranslated = translator.translate(it.text))
+                            it.copy(textTranslated = translateOrNull(it.text))
                         } else it
                     }
-                } ?: itemsOriginal
+                    else -> itemsOriginal
+                }
 
                 withContext(Dispatchers.Main.immediate) {
                     chaptersStats[chapter.url] = ReaderViewModel.ChapterStats(
@@ -443,6 +448,7 @@ class ChaptersLoader(
                         chapterIndex = index
                     )
                 }
+
                 maintainPosition {
                     remove(itemProgressBar)
                     itemTranslating?.let {

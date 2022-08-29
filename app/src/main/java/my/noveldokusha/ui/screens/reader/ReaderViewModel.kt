@@ -112,7 +112,10 @@ class ReaderViewModel @Inject constructor(
 
     val chaptersLoader = ChaptersLoader(
         repository = repository,
-        liveTranslation = liveTranslation,
+        translateOrNull = { liveTranslation.translator?.translate?.invoke(it) },
+        translationIsActive = { liveTranslation.translator != null },
+        translationSourceLanguageOrNull = { liveTranslation.translator?.sourceLocale?.displayLanguage },
+        translationTargetLanguageOrNull = { liveTranslation.translator?.targetLocale?.displayLanguage },
         bookUrl = bookUrl,
         orderedChapters = orderedChapters,
         readerState = ReaderState.INITIAL_LOAD,
@@ -130,9 +133,6 @@ class ReaderViewModel @Inject constructor(
         items = items,
         coroutineScope = viewModelScope
     )
-
-    data class ChapterPosition(val chapterIndex: Int, val chapterItemIndex: Int, val offset: Int)
-
 
     init {
         readerSpeaker.settings.isEnabled.value = true
@@ -162,11 +162,11 @@ class ReaderViewModel @Inject constructor(
         }
 
         viewModelScope.launch {
-            readerSpeaker.reachedChapterEndFlowChapterIndex.collect { index ->
+            readerSpeaker.reachedChapterEndFlowChapterIndex.collect { chapterIndex ->
                 withContext(Dispatchers.Main.immediate) {
                     if (!readerSpeaker.settings.isEnabled.value) return@withContext
-                    if (chaptersLoader.isLastChapter(index)) return@withContext
-                    val nextChapterIndex = index + 1
+                    if (chaptersLoader.isLastChapter(chapterIndex)) return@withContext
+                    val nextChapterIndex = chapterIndex + 1
                     val chapterItem = chaptersLoader.orderedChapters[nextChapterIndex]
                     if (chaptersLoader.loadedChapters.contains(chapterItem.url)) {
                         readerSpeaker.readChapterStartingFromStart(
