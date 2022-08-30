@@ -1,5 +1,6 @@
 package my.noveldokusha.ui.screens.reader
 
+import android.util.Log
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -9,6 +10,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.take
 import my.noveldokusha.AppPreferences
@@ -107,6 +109,9 @@ class ReaderViewModel @Inject constructor(
 
     val listIsEnabled = MutableLiveData<Boolean>(false)
 
+    val scrollToTheTop = MutableSharedFlow<Unit>()
+    val scrollToTheBottom = MutableSharedFlow<Unit>()
+
     private suspend fun <T> withMainNow(fn: suspend CoroutineScope.() -> T) =
         withContext(Dispatchers.Main.immediate, fn)
 
@@ -131,7 +136,14 @@ class ReaderViewModel @Inject constructor(
     val readerSpeaker = ReaderSpeaker(
         textToSpeechManager = textToSpeechManager,
         items = items,
-        coroutineScope = viewModelScope
+        coroutineScope = viewModelScope,
+        chapterLoadedFlow = chaptersLoader.chapterLoadedFlow,
+        isChapterIndexLoaded = chaptersLoader::isChapterIndexLoaded,
+        isChapterIndexValid = chaptersLoader::isChapterIndexValid,
+        loadPreviousChapter = chaptersLoader::loadPrevious,
+        loadNextChapter = chaptersLoader::loadNext,
+        scrollToTheTop = scrollToTheTop,
+        scrollToTheBottom = scrollToTheBottom,
     )
 
     init {
@@ -197,6 +209,10 @@ class ReaderViewModel @Inject constructor(
                 itemIndex = itemIndex
             )
         }
+    }
+
+    fun onClose() {
+        readerSpeaker.stop()
     }
 
     override fun onCleared() {

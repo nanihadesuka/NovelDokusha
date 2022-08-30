@@ -91,7 +91,7 @@ class ReaderActivity : BaseActivity() {
     }
 
     override fun onBackPressed() {
-        viewModel.readerSpeaker.stop()
+        viewModel.onClose()
         super.onBackPressed()
     }
 
@@ -171,15 +171,38 @@ class ReaderActivity : BaseActivity() {
             }
         }
 
+        viewModel.scrollToTheTop.asLiveData().observe(this) {
+            viewAdapter.listView.notifyDataSetChanged()
+            if (viewAdapter.listView.count < 1) {
+                return@observe
+            }
+            viewBind.listView.smoothScrollToPositionFromTop(
+                1,
+                300.dpToPx(this),
+                250
+            )
+        }
 
-        viewModel.readerSpeaker.currentTextLiveData.observe(this) {
+        viewModel.scrollToTheBottom.asLiveData().observe(this) {
+            viewAdapter.listView.notifyDataSetChanged()
+            if (viewAdapter.listView.count < 2) {
+                return@observe
+            }
+            viewBind.listView.smoothScrollToPositionFromTop(
+                viewAdapter.listView.count - 2,
+                300.dpToPx(this),
+                250
+            )
+        }
+
+        viewModel.readerSpeaker.currentReaderItem.observe(this) {
             scrollToReadingPositionOptional(
                 chapterIndex = it.chapterIndex,
                 chapterItemIndex = it.chapterItemIndex,
             )
         }
 
-        viewModel.readerSpeaker.scrollToItemFlowReaderItem.asLiveData().observe(this) {
+        viewModel.readerSpeaker.scrollToReaderItem.asLiveData().observe(this) {
             if (it !is ReaderItem.Position) return@observe
             scrollToReadingPositionForced(
                 chapterIndex = it.chapterIndex,
@@ -187,7 +210,7 @@ class ReaderActivity : BaseActivity() {
             )
         }
 
-        viewModel.readerSpeaker.scrollToChapterTopFlowChapterIndex.asLiveData()
+        viewModel.readerSpeaker.scrollToFirstChapterItemIndex.asLiveData()
             .observe(this) { chapterIndex ->
                 scrollToReadingPositionForced(
                     chapterIndex = chapterIndex,
@@ -195,15 +218,11 @@ class ReaderActivity : BaseActivity() {
                 )
             }
 
-        viewModel.readerSpeaker.currentTextLiveData.observe(this) {
-            scrollToReadingPositionOptional(
-                chapterIndex = it.chapterIndex,
-                chapterItemIndex = it.chapterItemIndex,
+        viewModel.readerSpeaker.startReadingFromFirstVisibleItem.asLiveData().observe(this) {
+            val firstPosition = viewBind.listView.firstVisiblePosition
+            viewModel.startSpeaker(
+                itemIndex = viewAdapter.listView.fromPositionToIndex(firstPosition)
             )
-        }
-
-        viewModel.readerSpeaker.startReadingFromFirstVisibleItemFlow.asLiveData().observe(this) {
-            viewBind.listView.doOnNextLayout { startSpeaking() }
         }
 
         viewBind.settings.setContent {
@@ -391,12 +410,6 @@ class ReaderActivity : BaseActivity() {
             ReaderViewModel.ReaderState.LOADING -> run {}
             ReaderViewModel.ReaderState.INITIAL_LOAD -> run {}
         }
-    }
-
-    private fun startSpeaking() {
-        viewModel.startSpeaker(
-            itemIndex = viewAdapter.listView.fromPositionToIndex(viewBind.listView.firstVisiblePosition)
-        )
     }
 
     private fun setInitialChapterPosition(

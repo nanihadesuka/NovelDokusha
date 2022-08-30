@@ -274,6 +274,13 @@ class ReaderItemAdapter(
         )
     }
 
+    private val currentReadingAloudLoadingDrawable by lazy {
+        AppCompatResources.getDrawable(
+            context,
+            R.drawable.translucent_current_reading_loading_text_background
+        )
+    }
+
     private fun TextView.updateTextSelectability() {
         val selectableText = appPreferences.READER_SELECTABLE_TEXT.value
         setTextIsSelectable(selectableText)
@@ -285,10 +292,16 @@ class ReaderItemAdapter(
     private fun getItemReadingStateBackground(item: ReaderItem): Drawable? {
         val textSynthesis = readerSpeaker.currentTextPlaying.value
         val isReadingItem = item is ReaderItem.Position &&
-                textSynthesis.state == TextSynthesisState.PLAYING &&
                 textSynthesis.chapterIndex == item.chapterIndex &&
                 textSynthesis.chapterItemIndex == item.chapterItemIndex
-        return if (isReadingItem) currentReadingAloudDrawable else null
+
+        if (!isReadingItem) return null
+
+        return when (textSynthesis.state) {
+            TextSynthesisState.PLAYING -> currentReadingAloudDrawable
+            TextSynthesisState.LOADING -> currentReadingAloudLoadingDrawable
+            TextSynthesisState.FINISHED -> null
+        }
     }
 
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View =

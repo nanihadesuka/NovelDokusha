@@ -27,6 +27,8 @@ class ChaptersLoader(
     val showInvalidChapterDialog: suspend () -> Unit,
 ) : CoroutineScope {
 
+    override val coroutineContext: CoroutineContext = SupervisorJob() + Dispatchers.Main.immediate
+
     data class ChapterLoaded(val chapterIndex: Int, val type: Type) {
         enum class Type { Previous, Next, Initial }
     }
@@ -39,7 +41,6 @@ class ChaptersLoader(
         object Next : LoadChapter
     }
 
-    override val coroutineContext: CoroutineContext = SupervisorJob() + Dispatchers.Main.immediate
     val chaptersStats = mutableMapOf<String, ReaderViewModel.ChapterStats>()
     val loadedChapters = mutableSetOf<String>()
     val chapterLoadedFlow = MutableSharedFlow<ChapterLoaded>()
@@ -55,7 +56,14 @@ class ChaptersLoader(
         startChapterLoaderWatcher()
     }
 
-    fun isLastChapter(chapterIndex: Int) = chapterIndex == orderedChapters.lastIndex
+    fun isLastChapter(chapterIndex: Int): Boolean = chapterIndex == orderedChapters.lastIndex
+    fun isChapterIndexLoaded(chapterIndex: Int): Boolean {
+        return orderedChapters.getOrNull(chapterIndex)?.url
+            ?.let { loadedChapters.contains(it) }
+            ?: false
+    }
+
+    fun isChapterIndexValid(chapterIndex: Int) = 0 <= chapterIndex && chapterIndex < orderedChapters.size
 
     @Synchronized
     fun loadInitial(chapterIndex: Int) {

@@ -15,7 +15,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 enum class TextSynthesisState {
-    PLAYING, FINISHED,
+    PLAYING, FINISHED, LOADING,
 }
 
 data class TextSynthesis(
@@ -74,17 +74,6 @@ class TextToSpeechManager @Inject constructor(
             ?.let { service.setVoice(it) }
     }
 
-    fun getAvailableVoices(): List<VoiceData> {
-        return service.voices.map {
-            VoiceData(
-                id = it.name,
-                language = it.locale.displayLanguage,
-                needsInternet = it.isNetworkConnectionRequired,
-                quality = it.quality
-            )
-        }
-    }
-
     fun stop() {
         service.stop()
         _queueList.clear()
@@ -96,6 +85,22 @@ class TextToSpeechManager @Inject constructor(
             putString(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, textSynthesis.utteranceId)
         }
         service.speak(text, TextToSpeech.QUEUE_ADD, bundle, textSynthesis.utteranceId)
+    }
+
+    fun setCurrentSpeakState(textSynthesis: TextSynthesis) {
+        currentActiveItemState.value = textSynthesis
+        scope.launch { _currentTextSpeakFlow.emit(textSynthesis) }
+    }
+
+    private fun getAvailableVoices(): List<VoiceData> {
+        return service.voices.map {
+            VoiceData(
+                id = it.name,
+                language = it.locale.displayLanguage,
+                needsInternet = it.isNetworkConnectionRequired,
+                quality = it.quality
+            )
+        }
     }
 
     private fun listenToUtterances() {
