@@ -50,12 +50,11 @@ class ChaptersLoader(
         onBufferOverflow = BufferOverflow.SUSPEND
     )
 
-    fun getItems(): List<ReaderItem> = items
-
     init {
         startChapterLoaderWatcher()
     }
 
+    fun getItems(): List<ReaderItem> = items
     fun isLastChapter(chapterIndex: Int): Boolean = chapterIndex == orderedChapters.lastIndex
     fun isChapterIndexLoaded(chapterIndex: Int): Boolean {
         return orderedChapters.getOrNull(chapterIndex)?.url

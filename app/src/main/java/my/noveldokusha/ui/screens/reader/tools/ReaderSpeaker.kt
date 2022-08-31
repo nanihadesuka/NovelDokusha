@@ -1,6 +1,5 @@
 package my.noveldokusha.ui.screens.reader.tools
 
-import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.asLiveData
@@ -144,9 +143,16 @@ class ReaderSpeaker(
 
     @Synchronized
     private fun playPreviousChapter() {
-        val previousChapterIndex = settings.currentActiveItemState.value.chapterIndex - 1
+        val currentChapterIndex = settings.currentActiveItemState.value.chapterIndex
+        val currentChapterItemIndex = settings.currentActiveItemState.value.chapterItemIndex
+        // Scroll to current chapter top if not already otherwise scroll to previous top
+        val targetChapterIndex = when (currentChapterItemIndex == 0) {
+            true -> currentChapterIndex - 1
+            false -> currentChapterIndex
+        }
+
         stop()
-        if (!isChapterIndexValid(previousChapterIndex)) {
+        if (!isChapterIndexValid(targetChapterIndex)) {
             coroutineScope.launch {
                 scrollToTheTop.emit(Unit)
             }
@@ -154,15 +160,15 @@ class ReaderSpeaker(
         }
         start()
         coroutineScope.launch {
-            if (!isChapterIndexLoaded(previousChapterIndex)) {
+            if (!isChapterIndexLoaded(targetChapterIndex)) {
                 loadPreviousChapter()
                 chapterLoadedFlow
-                    .filter { it.chapterIndex == previousChapterIndex }
+                    .filter { it.chapterIndex == targetChapterIndex }
                     .take(1)
                     .collect()
             }
-            readChapterStartingFromStart(previousChapterIndex)
-            scrollToFirstChapterItemIndex.emit(previousChapterIndex)
+            readChapterStartingFromStart(targetChapterIndex)
+            scrollToFirstChapterItemIndex.emit(targetChapterIndex)
         }
     }
 
