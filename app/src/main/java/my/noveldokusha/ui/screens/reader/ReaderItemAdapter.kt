@@ -1,6 +1,7 @@
 package my.noveldokusha.ui.screens.reader
 
 import android.content.Context
+import android.graphics.Typeface
 import android.graphics.drawable.Drawable
 import android.view.MotionEvent
 import android.view.View
@@ -13,22 +14,22 @@ import androidx.core.view.doOnNextLayout
 import androidx.core.view.updateLayoutParams
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
-import my.noveldokusha.AppPreferences
 import my.noveldokusha.R
 import my.noveldokusha.databinding.*
 import my.noveldokusha.resolvedBookImagePath
+import my.noveldokusha.tools.TextSynthesis
 import my.noveldokusha.tools.TextSynthesisState
-import my.noveldokusha.ui.screens.reader.tools.FontsLoader
-import my.noveldokusha.ui.screens.reader.tools.ReaderSpeaker
 import my.noveldokusha.utils.inflater
 
 class ReaderItemAdapter(
     private val ctx: Context,
     list: List<ReaderItem>,
     private val bookUrl: String,
-    private val fontsLoader: FontsLoader,
-    private val appPreferences: AppPreferences,
-    private val readerSpeaker: ReaderSpeaker,
+    private val currentSpeakerActiveItem: () -> TextSynthesis,
+    private val currentTextSelectability: () -> Boolean,
+    private val currentFontSize: () -> Float,
+    private val currentTypeface: () -> Typeface,
+    private val currentTypefaceBold: () -> Typeface,
     private val onChapterStartVisible: (chapterUrl: String) -> Unit,
     private val onChapterEndVisible: (chapterUrl: String) -> Unit,
     private val onReloadReader: () -> Unit,
@@ -97,8 +98,8 @@ class ReaderItemAdapter(
         bind.root.background = getItemReadingStateBackground(item)
         val paragraph = item.textToDisplay + "\n"
         bind.body.text = paragraph
-        bind.body.textSize = appPreferences.READER_FONT_SIZE.value
-        bind.body.typeface = fontsLoader.getTypeFaceNORMAL(appPreferences.READER_FONT_FAMILY.value)
+        bind.body.textSize = currentFontSize()
+        bind.body.typeface = currentTypeface()
 
         when (item.location) {
             ReaderItem.LOCATION.FIRST -> onChapterStartVisible(item.chapterUrl)
@@ -164,8 +165,7 @@ class ReaderItemAdapter(
 
         bind.specialTitle.updateTextSelectability()
         bind.specialTitle.text = ctx.getString(R.string.reader_no_more_chapters)
-        bind.specialTitle.typeface =
-            fontsLoader.getTypeFaceBOLD(appPreferences.READER_FONT_FAMILY.value)
+        bind.specialTitle.typeface = currentTypefaceBold()
         return bind.root
     }
 
@@ -186,8 +186,7 @@ class ReaderItemAdapter(
 
         bind.specialTitle.updateTextSelectability()
         bind.specialTitle.text = ctx.getString(R.string.reader_first_chapter)
-        bind.specialTitle.typeface =
-            fontsLoader.getTypeFaceBOLD(appPreferences.READER_FONT_FAMILY.value)
+        bind.specialTitle.typeface = currentTypefaceBold()
         return bind.root
     }
 
@@ -263,7 +262,7 @@ class ReaderItemAdapter(
         bind.title.updateTextSelectability()
         bind.root.background = getItemReadingStateBackground(item)
         bind.title.text = item.textToDisplay
-        bind.title.typeface = fontsLoader.getTypeFaceBOLD(appPreferences.READER_FONT_FAMILY.value)
+        bind.title.typeface = currentTypefaceBold()
         return bind.root
     }
 
@@ -282,7 +281,7 @@ class ReaderItemAdapter(
     }
 
     private fun TextView.updateTextSelectability() {
-        val selectableText = appPreferences.READER_SELECTABLE_TEXT.value
+        val selectableText = currentTextSelectability()
         setTextIsSelectable(selectableText)
         if (selectableText) {
             setTextSelectionAwareClick { onClick() }
@@ -290,7 +289,7 @@ class ReaderItemAdapter(
     }
 
     private fun getItemReadingStateBackground(item: ReaderItem): Drawable? {
-        val textSynthesis = readerSpeaker.currentTextPlaying.value
+        val textSynthesis = currentSpeakerActiveItem()
         val isReadingItem = item is ReaderItem.Position &&
                 textSynthesis.chapterIndex == item.chapterIndex &&
                 textSynthesis.chapterItemIndex == item.chapterItemIndex

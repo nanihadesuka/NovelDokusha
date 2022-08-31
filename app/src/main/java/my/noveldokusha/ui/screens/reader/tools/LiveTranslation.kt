@@ -1,11 +1,24 @@
 package my.noveldokusha.ui.screens.reader.tools
 
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import my.noveldokusha.AppPreferences
 import my.noveldokusha.tools.TranslationManager
 import my.noveldokusha.tools.TranslationModelState
 import my.noveldokusha.tools.TranslatorState
-import my.noveldokusha.ui.screens.reader.LiveTranslationSettingData
+
+data class LiveTranslationSettingData(
+    val isAvailable: Boolean,
+    val enable: MutableState<Boolean>,
+    val listOfAvailableModels: SnapshotStateList<TranslationModelState>,
+    val source: MutableState<TranslationModelState?>,
+    val target: MutableState<TranslationModelState?>,
+    val onEnable: (Boolean) -> Unit,
+    val onSourceChange: (TranslationModelState?) -> Unit,
+    val onTargetChange: (TranslationModelState?) -> Unit,
+    val onDownloadTranslationModel: (language: String) -> Unit,
+)
 
 class LiveTranslation(
     private val translationManager: TranslationManager,

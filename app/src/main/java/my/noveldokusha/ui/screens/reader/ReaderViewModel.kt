@@ -146,7 +146,7 @@ class ReaderViewModel @Inject constructor(
     )
 
     init {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.Default) {
             val chapter = async(Dispatchers.IO) { repository.bookChapter.get(chapterUrl) }
             val loadTranslator = async(Dispatchers.IO) { liveTranslation.init() }
             val chaptersList = async(Dispatchers.Default) {
