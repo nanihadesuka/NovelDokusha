@@ -1,7 +1,9 @@
 package my.noveldokusha.ui.screens.reader.tools
 
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.lifecycle.asLiveData
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
@@ -11,7 +13,21 @@ import my.noveldokusha.tools.TextToSpeechManager
 import my.noveldokusha.tools.VoiceData
 import my.noveldokusha.ui.screens.reader.ChaptersLoader
 import my.noveldokusha.ui.screens.reader.ReaderItem
-import my.noveldokusha.ui.screens.reader.TextToSpeechSettingData
+
+data class TextToSpeechSettingData(
+    val isPlaying: MutableState<Boolean>,
+    val isLoadingChapter: MutableState<Boolean>,
+    val availableVoices: SnapshotStateList<VoiceData>,
+    val currentActiveItemState: State<TextSynthesis>,
+    val setPlaying: (Boolean) -> Unit,
+    val playFirstVisibleItem: () -> Unit,
+    val playPreviousItem: () -> Unit,
+    val playPreviousChapter: () -> Unit,
+    val playNextItem: () -> Unit,
+    val playNextChapter: () -> Unit,
+    val onSelectVoice: (VoiceData) -> Unit,
+    val scrollToActiveItem: () -> Unit,
+)
 
 class ReaderSpeaker(
     private val textToSpeechManager: TextToSpeechManager,
@@ -32,19 +48,42 @@ class ReaderSpeaker(
     val scrollToReaderItem = MutableSharedFlow<ReaderItem>()
     val scrollToFirstChapterItemIndex = MutableSharedFlow<Int>()
 
-
     val settings = TextToSpeechSettingData(
-        isEnabled = mutableStateOf(false),
         isPlaying = mutableStateOf(false),
+        isLoadingChapter = mutableStateOf(false),
         availableVoices = textToSpeechManager.availableVoices,
         currentActiveItemState = textToSpeechManager.currentActiveItemState,
         onSelectVoice = ::onSelectVoice,
+        playFirstVisibleItem = ::playFirstVisibleItem,
         playNextChapter = ::playNextChapter,
         playPreviousChapter = ::playPreviousChapter,
         playNextItem = ::playNextItem,
         playPreviousItem = ::playPreviousItem,
-        setPlaying = ::setPlaying
+        setPlaying = ::setPlaying,
+        scrollToActiveItem = ::scrollToActiveItem
     )
+
+    @Synchronized
+    private fun scrollToActiveItem() {
+        coroutineScope.launch {
+            val itemIndex = indexOfReaderItem(
+                list = items,
+                chapterIndex = settings.currentActiveItemState.value.chapterIndex,
+                chapterItemIndex = settings.currentActiveItemState.value.chapterItemIndex,
+            )
+            if (itemIndex == -1) return@launch
+            scrollToReaderItem.emit(items[itemIndex])
+        }
+    }
+
+    @Synchronized
+    private fun playFirstVisibleItem() {
+        stop()
+        start()
+        coroutineScope.launch {
+            startReadingFromFirstVisibleItem.emit(Unit)
+        }
+    }
 
     @Synchronized
     private fun setPlaying(playing: Boolean) {

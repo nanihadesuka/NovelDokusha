@@ -46,6 +46,7 @@ import my.noveldokusha.tools.TranslationModelState
 import my.noveldokusha.tools.VoiceData
 import my.noveldokusha.ui.screens.main.settings.SettingsTheme
 import my.noveldokusha.ui.screens.reader.tools.FontsLoader
+import my.noveldokusha.ui.screens.reader.tools.TextToSpeechSettingData
 import my.noveldokusha.ui.theme.ColorAccent
 import my.noveldokusha.ui.theme.InternalTheme
 import my.noveldokusha.ui.theme.InternalThemeObject
@@ -150,7 +151,6 @@ private fun Settings(
                         onEnable = onSelectableTextChange
                     )
                     CurrentSettingVisible.TextToSpeech -> TextToSpeechSetting(
-                        isEnabled = textToSpeechSettingData.isEnabled.value,
                         isPlaying = textToSpeechSettingData.isPlaying.value,
                         availableVoices = textToSpeechSettingData.availableVoices,
                         setPlaying = textToSpeechSettingData.setPlaying,
@@ -699,7 +699,6 @@ fun ReaderInfoView(
 fun TextToSpeechSettingPreview() {
     InternalThemeObject {
         TextToSpeechSetting(
-            isEnabled = false,
             isPlaying = true,
             setPlaying = {},
             playPreviousItem = {},
@@ -719,23 +718,10 @@ fun TextToSpeechSettingPreview() {
     }
 }
 
-data class TextToSpeechSettingData(
-    val isEnabled: MutableState<Boolean>,
-    val isPlaying: MutableState<Boolean>,
-    val availableVoices: SnapshotStateList<VoiceData>,
-    val currentActiveItemState: State<TextSynthesis>,
-    val setPlaying: (Boolean) -> Unit,
-    val playPreviousItem: () -> Unit,
-    val playPreviousChapter: () -> Unit,
-    val playNextItem: () -> Unit,
-    val playNextChapter: () -> Unit,
-    val onSelectVoice: (VoiceData) -> Unit,
-)
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun TextToSpeechSetting(
-    isEnabled: Boolean,
     isPlaying: Boolean,
     setPlaying: (Boolean) -> Unit,
     playPreviousItem: () -> Unit,
@@ -828,17 +814,10 @@ fun TextToSpeechSetting(
         }
 
         var openVoicesDialog by remember { mutableStateOf(false) }
-        Row {
-            MyButton(
-                text = stringResource(R.string.enable),
-                onClick = { /*TODO*/ },
-                enabled = isEnabled
-            )
-            MyButton(
-                text = stringResource(R.string.voices),
-                onClick = { openVoicesDialog = !openVoicesDialog }
-            )
-        }
+        MyButton(
+            text = stringResource(R.string.voices),
+            onClick = { openVoicesDialog = !openVoicesDialog }
+        )
 
         if (openVoicesDialog) Dialog(onDismissRequest = { openVoicesDialog = false }) {
             LazyColumn {
@@ -894,8 +873,8 @@ private fun ViewsPreview() {
     )
 
     val textToSpeechSettingData = TextToSpeechSettingData(
-        isEnabled = remember { mutableStateOf(true) },
         isPlaying = remember { mutableStateOf(false) },
+        isLoadingChapter = remember { mutableStateOf(false) },
         availableVoices = remember { mutableStateListOf() },
         currentActiveItemState = remember {
             mutableStateOf(
@@ -912,6 +891,8 @@ private fun ViewsPreview() {
         playNextItem = {},
         playNextChapter = {},
         onSelectVoice = {},
+        playFirstVisibleItem = {},
+        scrollToActiveItem = {}
     )
 
     InternalTheme {

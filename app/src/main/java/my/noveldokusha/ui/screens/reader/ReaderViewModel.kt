@@ -1,6 +1,5 @@
 package my.noveldokusha.ui.screens.reader
 
-import android.util.Log
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -147,8 +146,6 @@ class ReaderViewModel @Inject constructor(
     )
 
     init {
-        readerSpeaker.settings.isEnabled.value = true
-
         viewModelScope.launch {
             val chapter = async(Dispatchers.IO) { repository.bookChapter.get(chapterUrl) }
             val loadTranslator = async(Dispatchers.IO) { liveTranslation.init() }
@@ -176,7 +173,6 @@ class ReaderViewModel @Inject constructor(
         viewModelScope.launch {
             readerSpeaker.reachedChapterEndFlowChapterIndex.collect { chapterIndex ->
                 withContext(Dispatchers.Main.immediate) {
-                    if (!readerSpeaker.settings.isEnabled.value) return@withContext
                     if (chaptersLoader.isLastChapter(chapterIndex)) return@withContext
                     val nextChapterIndex = chapterIndex + 1
                     val chapterItem = chaptersLoader.orderedChapters[nextChapterIndex]
