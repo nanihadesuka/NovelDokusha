@@ -17,6 +17,7 @@ import my.noveldokusha.ui.screens.reader.ReaderItem
 data class TextToSpeechSettingData(
     val isPlaying: MutableState<Boolean>,
     val isLoadingChapter: MutableState<Boolean>,
+    val activeVoice: MutableState<VoiceData?>,
     val availableVoices: SnapshotStateList<VoiceData>,
     val currentActiveItemState: State<TextSynthesis>,
     val setPlaying: (Boolean) -> Unit,
@@ -51,6 +52,7 @@ class ReaderSpeaker(
     val settings = TextToSpeechSettingData(
         isPlaying = mutableStateOf(false),
         isLoadingChapter = mutableStateOf(false),
+        activeVoice = textToSpeechManager.activeVoice,
         availableVoices = textToSpeechManager.availableVoices,
         currentActiveItemState = textToSpeechManager.currentActiveItemState,
         onSelectVoice = ::onSelectVoice,

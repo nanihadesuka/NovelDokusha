@@ -32,6 +32,7 @@ import my.noveldokusha.R
 import my.noveldokusha.tools.TextSynthesis
 import my.noveldokusha.tools.TextSynthesisState
 import my.noveldokusha.tools.TranslationModelState
+import my.noveldokusha.tools.VoiceData
 import my.noveldokusha.ui.screens.main.settings.SettingsTheme
 import my.noveldokusha.ui.screens.reader.settingsViews.*
 import my.noveldokusha.ui.screens.reader.tools.LiveTranslationSettingData
@@ -135,6 +136,7 @@ private fun Settings(
                     )
                     CurrentSettingVisible.TextToSpeech -> TextToSpeechSetting(
                         isPlaying = textToSpeechSettingData.isPlaying.value,
+                        currentVoice = textToSpeechSettingData.activeVoice.value,
                         availableVoices = textToSpeechSettingData.availableVoices,
                         setPlaying = textToSpeechSettingData.setPlaying,
                         playPreviousItem = textToSpeechSettingData.playPreviousItem,
@@ -402,6 +404,16 @@ private fun ViewsPreview() {
         isPlaying = remember { mutableStateOf(false) },
         isLoadingChapter = remember { mutableStateOf(false) },
         availableVoices = remember { mutableStateListOf() },
+        activeVoice = remember {
+            mutableStateOf(
+                VoiceData(
+                    id = "",
+                    language = "",
+                    quality = 100,
+                    needsInternet = true
+                )
+            )
+        },
         currentActiveItemState = remember {
             mutableStateOf(
                 TextSynthesis(
@@ -418,7 +430,7 @@ private fun ViewsPreview() {
         playNextChapter = {},
         onSelectVoice = {},
         playFirstVisibleItem = {},
-        scrollToActiveItem = {}
+        scrollToActiveItem = {},
     )
 
     InternalTheme {

@@ -4,6 +4,7 @@ import android.content.Context
 import android.os.Bundle
 import android.speech.tts.TextToSpeech
 import android.speech.tts.UtteranceProgressListener
+import android.speech.tts.Voice
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import kotlinx.coroutines.CoroutineScope
@@ -39,6 +40,7 @@ class TextToSpeechManager @Inject constructor(
     private val _queueList = mutableMapOf<String, TextSynthesis>()
     val queueList = _queueList as Map<String, TextSynthesis>
     val availableVoices = mutableStateListOf<VoiceData>()
+    val activeVoice = mutableStateOf<VoiceData?>(null)
 
     private val scope = CoroutineScope(Dispatchers.Default)
 
@@ -47,11 +49,13 @@ class TextToSpeechManager @Inject constructor(
             TextToSpeech.SUCCESS -> {
                 listenToUtterances()
                 availableVoices.addAll(getAvailableVoices())
+                updateActiveVoice()
             }
             TextToSpeech.ERROR -> Unit
             else -> Unit
         }
     }
+
 
     private val _currentTextSpeakFlow = MutableSharedFlow<TextSynthesis>()
     val currentTextSpeakFlow = _currentTextSpeakFlow.shareIn(
@@ -71,7 +75,10 @@ class TextToSpeechManager @Inject constructor(
         service
             .voices
             .find { it.name == id }
-            ?.let { service.setVoice(it) }
+            ?.let {
+                service.voice = it
+                updateActiveVoice()
+            }
     }
 
     fun stop() {
@@ -92,15 +99,19 @@ class TextToSpeechManager @Inject constructor(
         scope.launch { _currentTextSpeakFlow.emit(textSynthesis) }
     }
 
+    private fun updateActiveVoice() {
+        activeVoice.value = service.voice?.toVoiceData()
+    }
+
+    private fun Voice.toVoiceData() = VoiceData(
+        id = name,
+        language = locale.displayLanguage,
+        needsInternet = isNetworkConnectionRequired,
+        quality = quality
+    )
+
     private fun getAvailableVoices(): List<VoiceData> {
-        return service.voices.map {
-            VoiceData(
-                id = it.name,
-                language = it.locale.displayLanguage,
-                needsInternet = it.isNetworkConnectionRequired,
-                quality = it.quality
-            )
-        }
+        return service.voices.map { it.toVoiceData() }
     }
 
     private fun listenToUtterances() {
