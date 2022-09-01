@@ -162,6 +162,15 @@ class ReaderSpeaker(
         stop()
         if (!isChapterIndexValid(nextChapterIndex)) {
             coroutineScope.launch {
+                val state = settings.currentActiveItemState.value
+                val item = items.findLast {
+                    it is ReaderItem.Position && it.chapterIndex == state.chapterIndex
+                }
+                val chapterItemIndex = (item as? ReaderItem.Position)?.chapterItemIndex ?: 0
+                textToSpeechManager.currentActiveItemState.value = state.copy(
+                    state = TextSynthesisState.FINISHED,
+                    chapterItemIndex = chapterItemIndex
+                )
                 scrollToTheBottom.emit(Unit)
             }
             return
@@ -193,6 +202,8 @@ class ReaderSpeaker(
         stop()
         if (!isChapterIndexValid(targetChapterIndex)) {
             coroutineScope.launch {
+                textToSpeechManager.currentActiveItemState.value =
+                    settings.currentActiveItemState.value.copy(state = TextSynthesisState.FINISHED)
                 scrollToTheTop.emit(Unit)
             }
             return

@@ -17,7 +17,9 @@ import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.core.view.doOnNextLayout
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.asLiveData
+import androidx.lifecycle.distinctUntilChanged
 import androidx.lifecycle.lifecycleScope
 import com.afollestad.materialdialogs.MaterialDialog
 import dagger.hilt.android.AndroidEntryPoint
@@ -34,7 +36,6 @@ import my.noveldokusha.utils.Extra_String
 import my.noveldokusha.utils.colorAttrRes
 import my.noveldokusha.utils.dpToPx
 import my.noveldokusha.utils.fadeIn
-import java.util.concurrent.atomic.AtomicBoolean
 
 @AndroidEntryPoint
 class ReaderActivity : BaseActivity() {
@@ -53,11 +54,7 @@ class ReaderActivity : BaseActivity() {
     }
 
     private var listIsScrolling = false
-    private val fadeInTextAlready = AtomicBoolean(false)
-    private fun fadeInText() {
-        if (fadeInTextAlready.compareAndSet(false, true))
-            viewBind.listView.fadeIn()
-    }
+    private val fadeInTextLiveData = MutableLiveData<Boolean>(false)
 
     private val viewModel by viewModels<ReaderViewModel>()
     private val viewModelGlobalSettings by viewModels<SettingsViewModel>()
@@ -69,10 +66,10 @@ class ReaderActivity : BaseActivity() {
                 this@ReaderActivity,
                 viewModel.items,
                 viewModel.bookUrl,
-                currentTextSelectability = {appPreferences.READER_SELECTABLE_TEXT.value },
+                currentTextSelectability = { appPreferences.READER_SELECTABLE_TEXT.value },
                 currentFontSize = { appPreferences.READER_FONT_SIZE.value },
-                currentTypeface = {fontsLoader.getTypeFaceNORMAL(appPreferences.READER_FONT_FAMILY.value)},
-                currentTypefaceBold = {fontsLoader.getTypeFaceBOLD(appPreferences.READER_FONT_FAMILY.value)},
+                currentTypeface = { fontsLoader.getTypeFaceNORMAL(appPreferences.READER_FONT_FAMILY.value) },
+                currentTypefaceBold = { fontsLoader.getTypeFaceBOLD(appPreferences.READER_FONT_FAMILY.value) },
                 currentSpeakerActiveItem = { viewModel.readerSpeaker.currentTextPlaying.value },
                 onChapterStartVisible = { url -> viewModel.readRoutine.setReadStart(url) },
                 onChapterEndVisible = { url -> viewModel.readRoutine.setReadEnd(url) },
@@ -85,7 +82,6 @@ class ReaderActivity : BaseActivity() {
     private val fontsLoader = FontsLoader()
 
     private fun reloadReader() {
-        viewModel.listIsEnabled.postValue(false)
         val currentChapter = viewModel.currentChapter.copy()
         lifecycleScope.coroutineContext.cancelChildren()
         viewModel.reloadReader()
@@ -113,8 +109,10 @@ class ReaderActivity : BaseActivity() {
 
         viewBind.listView.adapter = viewAdapter.listView
 
-        viewModel.listIsEnabled.observe(this) {
-            viewBind.listView.isEnabled = it
+        fadeInTextLiveData.distinctUntilChanged().observe(this) {
+            if (it) {
+                viewBind.listView.fadeIn(durationMillis = 150)
+            }
         }
 
         viewModel.onTranslatorChanged = {
@@ -157,7 +155,6 @@ class ReaderActivity : BaseActivity() {
                     chapterItemIndex = it.chapterItemIndex,
                     offset = it.itemOffset
                 )
-                viewModel.listIsEnabled.postValue(true)
             }
         }
 
@@ -317,14 +314,6 @@ class ReaderActivity : BaseActivity() {
                 }
             })
 
-        // Show reader if text hasn't loaded after 200 ms of waiting
-        lifecycleScope.launch(Dispatchers.Main.immediate)
-        {
-            delay(200)
-            viewAdapter.listView.notifyDataSetChanged()
-            fadeInText()
-        }
-
         // Fullscreen mode that ignores any cutout, notch etc.
         WindowCompat.setDecorFitsSystemWindows(window, false)
         WindowInsetsControllerCompat(window, window.decorView).let {
@@ -341,6 +330,10 @@ class ReaderActivity : BaseActivity() {
 
         window.statusBarColor = R.attr.colorSurface.colorAttrRes(this)
         viewAdapter.listView.notifyDataSetChanged()
+        lifecycleScope.launch {
+            delay(200)
+            fadeInTextLiveData.postValue(true)
+        }
     }
 
     private fun scrollToReadingPositionOptional(chapterIndex: Int, chapterItemIndex: Int) {
@@ -428,7 +421,7 @@ class ReaderActivity : BaseActivity() {
         if (index != -1) {
             viewBind.listView.setSelectionFromTop(position, offset)
         }
-        fadeInText()
+        fadeInTextLiveData.postValue(true)
         viewBind.listView.doOnNextLayout { updateReadingState() }
     }
 

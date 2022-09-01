@@ -46,8 +46,7 @@ class LiveTranslation(
         val target = appPreferences.GLOBAL_TRANSLATION_PREFERRED_TARGET.value
         settingsState.source.value = getValidTranslatorOrNull(source)
         settingsState.target.value = getValidTranslatorOrNull(target)
-
-        updateLiveTranslation()
+        updateTranslatorState()
     }
 
     private suspend fun getValidTranslatorOrNull(language: String): TranslationModelState? {
@@ -55,7 +54,7 @@ class LiveTranslation(
         return translationManager.hasModelDownloaded(language)
     }
 
-    private fun updateLiveTranslation() {
+    private fun updateTranslatorState() {
         val isEnabled = settingsState.enable.value
         val source = settingsState.source.value
         val target = settingsState.target.value
@@ -76,24 +75,26 @@ class LiveTranslation(
                 target = target.language
             )
         }
-        onTranslatorChanged?.invoke()
     }
 
     private fun onEnable(it: Boolean) {
         settingsState.enable.value = it
         appPreferences.GLOBAL_TRANSLATION_ENABLED.value = it
-        updateLiveTranslation()
+        updateTranslatorState()
+        onTranslatorChanged?.invoke()
     }
 
     private fun oSourceChange(it: TranslationModelState?) {
         settingsState.source.value = it
         appPreferences.GLOBAL_TRANSLATION_PREFERRED_SOURCE.value = it?.language ?: ""
-        updateLiveTranslation()
+        updateTranslatorState()
+        onTranslatorChanged?.invoke()
     }
 
     private fun onTargetChange(it: TranslationModelState?) {
         settingsState.target.value = it
         appPreferences.GLOBAL_TRANSLATION_PREFERRED_TARGET.value = it?.language ?: ""
-        updateLiveTranslation()
+        updateTranslatorState()
+        onTranslatorChanged?.invoke()
     }
 }
