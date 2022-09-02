@@ -13,10 +13,7 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.NavigateBefore
-import androidx.compose.material.icons.filled.NavigateNext
-import androidx.compose.material.icons.filled.Pause
-import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.FastForward
 import androidx.compose.material.icons.outlined.FastRewind
 import androidx.compose.runtime.*
@@ -214,23 +211,36 @@ private fun VoiceSelectorDialog(
         ) {
             stickyHeader {
                 Surface(color = MaterialTheme.colors.background) {
-                    OutlinedTextField(
-                        value = inputTextFilter.value,
-                        onValueChange = { inputTextFilter.value = it },
-                        maxLines = 1,
-                        placeholder = {
+                    Column(
+                        verticalArrangement = Arrangement.spacedBy(4.dp),
+                        modifier = Modifier.padding(bottom = 2.dp),
+                    ) {
+                        OutlinedTextField(
+                            value = inputTextFilter.value,
+                            onValueChange = { inputTextFilter.value = it },
+                            singleLine = true,
+                            placeholder = {
+                                Text(
+                                    text = "Search voice by language",
+                                    modifier = Modifier.alpha(0.7f),
+                                    style = MaterialTheme.typography.subtitle2
+                                )
+                            },
+                            modifier = Modifier
+                                .heightIn(min = 42.dp)
+                                .fillMaxWidth(),
+                            shape = MaterialTheme.shapes.large
+                        )
+                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                             Text(
-                                text = "Search voice by language",
-                                modifier = Modifier.alpha(0.7f),
-                                style = MaterialTheme.typography.subtitle2
+                                text = "Language",
+                                modifier = Modifier
+                                    .widthIn(min = 84.dp)
+                                    .padding(start = 8.dp)
                             )
-                        },
-                        modifier = Modifier
-                            .padding(bottom = 8.dp)
-                            .heightIn(min = 42.dp)
-                            .fillMaxWidth(),
-                        shape = MaterialTheme.shapes.large
-                    )
+                            Text(text = "Quality", modifier = Modifier.padding(horizontal = 10.dp))
+                        }
+                    }
                 }
             }
             items(voicesFiltered) {
@@ -255,16 +265,24 @@ private fun VoiceSelectorDialog(
                         text = it.language,
                         fontWeight = FontWeight.Bold,
                         modifier = Modifier
-                            .widthIn(min = 64.dp)
+                            .widthIn(min = 84.dp)
                     )
-                    Text(
-                        text = "${it.quality}/500",
-                        modifier = Modifier
-                            .background(MaterialTheme.colors.primary, MaterialTheme.shapes.medium)
-                            .padding(4.dp),
-                        fontWeight = FontWeight.Bold,
-                        style = MaterialTheme.typography.overline
-                    )
+                    Row {
+                        for (star in 0..4) {
+                            Icon(
+                                imageVector = Icons.Default.StarRate,
+                                contentDescription = null,
+                                tint = if (it.quality > star * 100) {
+                                    Color.Yellow
+                                } else {
+                                    LocalContentColor.current.copy(
+                                        alpha = LocalContentAlpha.current
+                                    )
+                                },
+                                modifier = Modifier.size(10.dp)
+                            )
+                        }
+                    }
                     Spacer(Modifier.weight(1f))
                     Column(
                         verticalArrangement = Arrangement.spacedBy(2.dp),
