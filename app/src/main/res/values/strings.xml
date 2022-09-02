@@ -129,4 +129,9 @@
     <string name="text_to_speech">Text to speech</string>
     <string name="voices">Voices</string>
 	<string name="enable">Enable</string>
+    <string name="search_voice_by_language">Search voice by language</string>
+	<string name="language">Language</string>
+	<string name="quality">Quality</string>
+	<string name="needs_internet">Needs Internet</string>
+	<string name="no_matches">No matches</string>
 </resources>

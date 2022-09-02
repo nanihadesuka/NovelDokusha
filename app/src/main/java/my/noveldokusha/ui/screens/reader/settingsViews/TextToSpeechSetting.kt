@@ -17,6 +17,7 @@ import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.FastForward
 import androidx.compose.material.icons.outlined.FastRewind
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -25,6 +26,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -136,18 +138,16 @@ fun TextToSpeechSetting(
             }
         }
 
-        var openVoicesDialog by remember { mutableStateOf(false) }
+        var openVoicesDialog by rememberSaveable { mutableStateOf(false) }
         MyButton(
             text = stringResource(R.string.voices),
             onClick = { openVoicesDialog = !openVoicesDialog }
         )
 
-        val inputTextFilter = remember { mutableStateOf("") }
-
         VoiceSelectorDialog(
             availableVoices = availableVoices,
             currentVoice = currentVoice,
-            inputTextFilter = inputTextFilter,
+            inputTextFilter = rememberSaveable { mutableStateOf("") },
             setVoice = onSelectVoice,
             isDialogOpen = openVoicesDialog,
             setDialogOpen = { openVoicesDialog = it }
@@ -221,7 +221,7 @@ private fun VoiceSelectorDialog(
                             singleLine = true,
                             placeholder = {
                                 Text(
-                                    text = "Search voice by language",
+                                    text = stringResource(R.string.search_voice_by_language),
                                     modifier = Modifier.alpha(0.7f),
                                     style = MaterialTheme.typography.subtitle2
                                 )
@@ -229,20 +229,37 @@ private fun VoiceSelectorDialog(
                             modifier = Modifier
                                 .heightIn(min = 42.dp)
                                 .fillMaxWidth(),
-                            shape = MaterialTheme.shapes.large
+                            shape = CircleShape,
+                            colors = TextFieldDefaults.outlinedTextFieldColors(
+                                focusedBorderColor = MaterialTheme.colors.onPrimary
+                            )
                         )
                         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                             Text(
-                                text = "Language",
+                                text = stringResource(R.string.language),
                                 modifier = Modifier
                                     .widthIn(min = 84.dp)
-                                    .padding(start = 8.dp)
+                                    .padding(start = 20.dp)
                             )
-                            Text(text = "Quality", modifier = Modifier.padding(horizontal = 10.dp))
+                            Text(
+                                text = stringResource(R.string.quality),
+                                modifier = Modifier.padding(horizontal = 20.dp)
+                            )
                         }
                     }
                 }
             }
+
+            if (voicesFiltered.isEmpty()) item {
+                Text(
+                    text = stringResource(R.string.no_matches),
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(12.dp),
+                )
+            }
+
             items(voicesFiltered) {
                 val selected = it.id == currentVoice?.id
                 Row(
@@ -250,12 +267,12 @@ private fun VoiceSelectorDialog(
                         .heightIn(min = 54.dp)
                         .background(
                             if (selected) MaterialTheme.colors.secondaryVariant else MaterialTheme.colors.secondaryVariant,
-                            MaterialTheme.shapes.large
+                            CircleShape
                         )
-                        .clip(MaterialTheme.shapes.large)
+                        .clip(CircleShape)
                         .clickable(enabled = !selected) { setVoice(it) }
-                        .ifCase(selected) { border(2.dp, ColorAccent, MaterialTheme.shapes.large) }
-                        .padding(horizontal = 8.dp)
+                        .ifCase(selected) { border(2.dp, ColorAccent, CircleShape) }
+                        .padding(horizontal = 16.dp)
                         .padding(4.dp)
                         .fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically,
@@ -264,8 +281,7 @@ private fun VoiceSelectorDialog(
                     Text(
                         text = it.language,
                         fontWeight = FontWeight.Bold,
-                        modifier = Modifier
-                            .widthIn(min = 84.dp)
+                        modifier = Modifier.widthIn(min = 84.dp)
                     )
                     Row {
                         for (star in 0..4) {
@@ -298,20 +314,20 @@ private fun VoiceSelectorDialog(
                                 )
                                 .padding(horizontal = 4.dp, vertical = 2.dp),
                             fontWeight = FontWeight.Bold,
-                            style = MaterialTheme.typography.overline,
-                            fontSize = 8.sp,
+                            style = MaterialTheme.typography.body1,
+                            fontSize = 10.sp,
                         )
                         if (it.needsInternet) {
                             Text(
-                                text = "Needs Internet",
+                                text = stringResource(R.string.needs_internet),
                                 modifier = Modifier
                                     .background(
                                         MaterialTheme.colors.primary,
                                         MaterialTheme.shapes.medium
                                     )
                                     .padding(horizontal = 4.dp, vertical = 2.dp),
-                                fontSize = 8.sp,
-                                style = MaterialTheme.typography.overline
+                                fontSize = 10.sp,
+                                style = MaterialTheme.typography.body1
                             )
                         }
                     }
