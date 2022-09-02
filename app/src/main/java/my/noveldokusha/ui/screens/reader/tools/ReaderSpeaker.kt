@@ -180,11 +180,13 @@ class ReaderSpeaker(
         start()
         coroutineScope.launch {
             if (!isChapterIndexLoaded(nextChapterIndex)) {
+                settings.isLoadingChapter.value = true
                 loadNextChapter()
                 chapterLoadedFlow
                     .filter { it.chapterIndex == nextChapterIndex }
                     .take(1)
                     .collect()
+                settings.isLoadingChapter.value = false
             }
             readChapterStartingFromStart(nextChapterIndex)
             scrollToFirstChapterItemIndex.emit(nextChapterIndex)
@@ -213,11 +215,13 @@ class ReaderSpeaker(
         start()
         coroutineScope.launch {
             if (!isChapterIndexLoaded(targetChapterIndex)) {
+                settings.isLoadingChapter.value = true
                 loadPreviousChapter()
                 chapterLoadedFlow
                     .filter { it.chapterIndex == targetChapterIndex }
                     .take(1)
                     .collect()
+                settings.isLoadingChapter.value = false
             }
             readChapterStartingFromStart(targetChapterIndex)
             scrollToFirstChapterItemIndex.emit(targetChapterIndex)

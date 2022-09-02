@@ -136,6 +136,7 @@ private fun Settings(
                     )
                     CurrentSettingVisible.TextToSpeech -> TextToSpeechSetting(
                         isPlaying = textToSpeechSettingData.isPlaying.value,
+                        isLoadingChapter = textToSpeechSettingData.isLoadingChapter.value,
                         currentVoice = textToSpeechSettingData.activeVoice.value,
                         availableVoices = textToSpeechSettingData.availableVoices,
                         setPlaying = textToSpeechSettingData.setPlaying,
@@ -144,6 +145,8 @@ private fun Settings(
                         playNextItem = textToSpeechSettingData.playNextItem,
                         playNextChapter = textToSpeechSettingData.playNextChapter,
                         onSelectVoice = textToSpeechSettingData.onSelectVoice,
+                        playFirstVisibleItem = textToSpeechSettingData.playFirstVisibleItem,
+                        scrollToActiveItem = textToSpeechSettingData.scrollToActiveItem,
                     )
                     CurrentSettingVisible.None -> Unit
                 }

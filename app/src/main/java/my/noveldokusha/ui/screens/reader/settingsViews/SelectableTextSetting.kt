@@ -43,7 +43,6 @@ fun SelectableTextSetting(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(4.dp),
             modifier = Modifier
-                .padding(0.dp)
                 .clip(CircleShape)
                 .toggleable(
                     value = enable,
