@@ -12,6 +12,7 @@ import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
+import my.noveldokusha.composableActions.debouncedAction
 
 @Composable
 fun Modifier.ifCase(condition: Boolean, fn: @Composable Modifier.() -> Modifier): Modifier {
@@ -51,5 +52,11 @@ fun Modifier.clickableWithUnboundedIndicator(onClick: () -> Unit) = composed {
         interactionSource = remember { MutableInteractionSource() },
         indication = rememberRipple(bounded = false),
         onClick = onClick
+    )
+}
+
+fun Modifier.debouncedClickable(waitMillis: Long = 250, action: () -> Unit) = composed {
+    clickable(
+        onClick = debouncedAction(waitMillis = waitMillis, action = action)
     )
 }

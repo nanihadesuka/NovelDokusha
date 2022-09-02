@@ -35,13 +35,16 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.withContext
 import my.noveldokusha.R
+import my.noveldokusha.composableActions.debouncedAction
 import my.noveldokusha.tools.VoiceData
 import my.noveldokusha.ui.screens.reader.roundedOutline
 import my.noveldokusha.ui.theme.ColorAccent
 import my.noveldokusha.ui.theme.InternalTheme
 import my.noveldokusha.ui.theme.InternalThemeObject
 import my.noveldokusha.ui.theme.Themes
+import my.noveldokusha.utils.debouncedClickable
 import my.noveldokusha.utils.ifCase
+
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
@@ -82,7 +85,7 @@ fun TextToSpeechSetting(
                 .background(MaterialTheme.colors.primaryVariant.copy(alpha = 0.8f), CircleShape)
                 .padding(4.dp)
         ) {
-            IconButton(onClick = playPreviousChapter) {
+            IconButton(onClick = debouncedAction { playPreviousChapter() }) {
                 Icon(
                     imageVector = Icons.Rounded.FastRewind,
                     contentDescription = null,
@@ -92,7 +95,7 @@ fun TextToSpeechSetting(
                     tint = Color.White,
                 )
             }
-            IconButton(onClick = playPreviousItem) {
+            IconButton(onClick = debouncedAction(waitMillis = 50) { playPreviousItem() }) {
                 Icon(
                     imageVector = Icons.Rounded.NavigateBefore,
                     contentDescription = null,
@@ -124,7 +127,7 @@ fun TextToSpeechSetting(
                 }
 
             }
-            IconButton(onClick = playNextItem) {
+            IconButton(onClick = debouncedAction(waitMillis = 50) { playNextItem() }) {
                 Icon(
                     Icons.Rounded.NavigateNext,
                     contentDescription = null,
@@ -134,7 +137,7 @@ fun TextToSpeechSetting(
                         .background(ColorAccent, CircleShape),
                 )
             }
-            IconButton(onClick = playNextChapter) {
+            IconButton(onClick = debouncedAction { playNextChapter() }) {
                 Icon(
                     Icons.Rounded.FastForward,
                     contentDescription = null,
@@ -156,7 +159,7 @@ fun TextToSpeechSetting(
                 color = MaterialTheme.colors.primary,
                 modifier = Modifier
                     .roundedOutline()
-                    .clickable { playFirstVisibleItem() }
+                    .debouncedClickable { playFirstVisibleItem() }
                     .widthIn(min = 76.dp)
             ) {
                 Text(
@@ -169,7 +172,7 @@ fun TextToSpeechSetting(
                 color = MaterialTheme.colors.primary,
                 modifier = Modifier
                     .roundedOutline()
-                    .clickable { scrollToActiveItem() }
+                    .debouncedClickable { scrollToActiveItem() }
                     .widthIn(min = 76.dp)
             ) {
                 Text(
@@ -400,7 +403,12 @@ fun VoiceSelectorDialogContentPreview() {
             },
             setVoice = {},
             inputTextFilter = remember { mutableStateOf("hello") },
-            currentVoice = VoiceData(id = "2", language = "", needsInternet = false, quality = 100),
+            currentVoice = VoiceData(
+                id = "2",
+                language = "",
+                needsInternet = false,
+                quality = 100
+            ),
             setDialogOpen = {},
             isDialogOpen = true
         )
@@ -415,7 +423,12 @@ fun TextToSpeechSettingPreview() {
             isPlaying = true,
             isLoadingChapter = true,
             setPlaying = {},
-            currentVoice = VoiceData(id = "", language = "", needsInternet = false, quality = 100),
+            currentVoice = VoiceData(
+                id = "",
+                language = "",
+                needsInternet = false,
+                quality = 100
+            ),
             playPreviousItem = {},
             playPreviousChapter = {},
             playNextItem = {},
