@@ -426,6 +426,7 @@ private fun ViewsPreview() {
                 )
             )
         },
+        isThereActiveItem = remember { mutableStateOf(true) },
         setPlaying = {},
         playPreviousItem = {},
         playPreviousChapter = {},

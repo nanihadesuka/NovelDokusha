@@ -106,3 +106,7 @@ fun androidx.compose.ui.graphics.Color.mix(
 fun String.capitalize(locale: Locale): String = this.replaceFirstChar {
     if (it.isLowerCase()) it.titlecase(locale) else it.toString()
 }
+
+
+fun <T> List<T>.hasValidIndex(index: Int): Boolean = (0 >= index) && (index <= lastIndex)
+fun <T> List<T>.hasNotValidIndex(index: Int): Boolean = !hasValidIndex(index = index)

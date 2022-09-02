@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.speech.tts.TextToSpeech
 import android.speech.tts.UtteranceProgressListener
 import android.speech.tts.Voice
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import kotlinx.coroutines.CoroutineScope
@@ -70,6 +71,8 @@ class TextToSpeechManager @Inject constructor(
             state = TextSynthesisState.FINISHED
         )
     )
+
+    val isThereActiveItem = derivedStateOf { currentActiveItemState.value.chapterIndex != -1 }
 
     fun setVoiceById(id: String) {
         service

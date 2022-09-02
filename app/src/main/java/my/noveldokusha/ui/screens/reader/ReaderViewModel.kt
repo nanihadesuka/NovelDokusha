@@ -197,8 +197,8 @@ class ReaderViewModel @Inject constructor(
     }
 
     fun startSpeaker(itemIndex: Int) {
+        val startingItem = items.getOrNull(itemIndex) ?: return
         readerSpeaker.start()
-        val startingItem = items[itemIndex]
         viewModelScope.launch {
             readerSpeaker.readChapterStartingFromItemIndex(
                 chapterIndex = startingItem.chapterIndex,
