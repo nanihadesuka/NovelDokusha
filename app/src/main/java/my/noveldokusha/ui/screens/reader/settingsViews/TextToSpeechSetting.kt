@@ -31,9 +31,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
-import com.smarttoolfactory.slider.ColorfulSlider
-import com.smarttoolfactory.slider.MaterialSliderDefaults
-import com.smarttoolfactory.slider.SliderBrushColor
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.debounce
@@ -41,6 +38,7 @@ import kotlinx.coroutines.withContext
 import my.noveldokusha.R
 import my.noveldokusha.composableActions.debouncedAction
 import my.noveldokusha.tools.VoiceData
+import my.noveldokusha.ui.composeViews.MySlider
 import my.noveldokusha.ui.screens.reader.roundedOutline
 import my.noveldokusha.ui.theme.ColorAccent
 import my.noveldokusha.ui.theme.InternalTheme
@@ -48,7 +46,6 @@ import my.noveldokusha.ui.theme.InternalThemeObject
 import my.noveldokusha.ui.theme.Themes
 import my.noveldokusha.utils.debouncedClickable
 import my.noveldokusha.utils.ifCase
-import my.noveldokusha.utils.mix
 
 
 @OptIn(ExperimentalAnimationApi::class, ExperimentalMaterialApi::class)
@@ -228,7 +225,7 @@ fun TextToSpeechSetting(
             value = voicePitch,
             valueRange = 0.1f..5f,
             onValueChange = setVoicePitch,
-            modifier = Modifier.padding(horizontal = 12.dp),
+            modifier = Modifier.padding(horizontal = 24.dp),
             text = stringResource(R.string.voice_pitch) + ": %.2f".format(voicePitch),
         )
 
@@ -236,7 +233,7 @@ fun TextToSpeechSetting(
             value = voiceSpeed,
             valueRange = 0.1f..5f,
             onValueChange = setVoiceSpeed,
-            modifier = Modifier.padding(horizontal = 12.dp),
+            modifier = Modifier.padding(horizontal = 24.dp),
             text = stringResource(R.string.voice_speed) + ": %.2f".format(voiceSpeed),
         )
 
@@ -248,38 +245,6 @@ fun TextToSpeechSetting(
             isDialogOpen = openVoicesDialog,
             setDialogOpen = { openVoicesDialog = it }
         )
-    }
-}
-
-@Composable
-fun MySlider(
-    value: Float,
-    valueRange: ClosedFloatingPointRange<Float>,
-    onValueChange: (Float) -> Unit,
-    modifier: Modifier,
-    text: String,
-) {
-    Box(modifier) {
-        ColorfulSlider(
-            value = value,
-            valueRange = valueRange,
-            onValueChange = { value -> onValueChange(value) },
-            coerceThumbInTrack = true,
-            modifier = Modifier.padding(horizontal = 12.dp),
-            colors = MaterialSliderDefaults.defaultColors(
-                activeTrackColor = SliderBrushColor(ColorAccent),
-                thumbColor = SliderBrushColor(ColorAccent),
-                inactiveTrackColor = SliderBrushColor(
-                    MaterialTheme.colors.primaryVariant.mix(
-                        ColorAccent,
-                        0.5f
-                    )
-                )
-            ),
-            trackHeight = 30.dp,
-            thumbRadius = 15.dp,
-        )
-        Text(text = text, modifier = Modifier.align(Alignment.Center))
     }
 }
 
@@ -304,8 +269,9 @@ private fun VoiceSelectorDialog(
         }.let { voicesSorted.addAll(it) }
     }
 
-    val voicesFiltered =
-        remember { mutableStateListOf<VoiceData>().apply { addAll(availableVoices) } }
+    val voicesFiltered = remember {
+        mutableStateListOf<VoiceData>().apply { addAll(availableVoices) }
+    }
 
     LaunchedEffect(Unit) {
         snapshotFlow { inputTextFilter.value }

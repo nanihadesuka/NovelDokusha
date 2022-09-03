@@ -30,7 +30,7 @@ fun BookImageButtonView(
         text = title,
         onClick = onClick,
         onLongClick = onLongClick,
-        radius = ImageBorderRadius,
+        shape = RoundedCornerShape(ImageBorderRadius),
         borderWidth = 0.dp,
         modifier = Modifier.fillMaxWidth()
     ) { _, radius, _, _, _ ->
@@ -38,7 +38,7 @@ fun BookImageButtonView(
             Modifier
                 .fillMaxWidth()
                 .aspectRatio(1 / 1.45f)
-                .clip(RoundedCornerShape(radius))
+                .clip(radius)
         ) {
             ImageView(
                 imageModel = coverImageUrl,

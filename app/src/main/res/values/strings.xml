@@ -140,4 +140,5 @@
     <string name="voice_speed">Voice speed</string>
 	<string name="chapter_x_over_n">Chapter: %1$d/%2$d</string>
 	<string name="progress_x_percentage">Progress: %1$.0f%%</string>
+	<string name="text_size">Text size</string>
 </resources>

@@ -17,6 +17,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.TextStyle
@@ -30,7 +31,7 @@ import my.noveldokusha.ui.theme.Themes
 import my.noveldokusha.utils.ifCase
 
 private val defaultButtonContent =
-    @Composable { text: String, radius: Dp, textAlign: TextAlign, textStyle: TextStyle, contentPadding: Dp ->
+    @Composable { text: String, shape: Shape, textAlign: TextAlign, textStyle: TextStyle, contentPadding: Dp ->
         Text(
             text = text,
             modifier = Modifier
@@ -62,7 +63,7 @@ fun MyButton(
     textAlign: TextAlign = TextAlign.Start,
     outerPadding: Dp = 4.dp,
     contentPadding: Dp = 12.dp,
-    radius: Dp = 4.dp,
+    shape: Shape = RoundedCornerShape(4.dp),
     borderWidth: Dp = 1.dp,
     backgroundColor: Color = MaterialTheme.colors.primary,
     selectedBackgroundColor: Color = ColorAccent,
@@ -70,9 +71,8 @@ fun MyButton(
     selected: Boolean = false,
     onClick: () -> Unit,
     onLongClick: (() -> Unit)? = null,
-    content: @Composable (String, Dp, TextAlign, TextStyle, Dp) -> Unit = defaultButtonContent
+    content: @Composable (String, Shape, TextAlign, TextStyle, Dp) -> Unit = defaultButtonContent
 ) {
-    val shape = RoundedCornerShape(radius)
     val background by animateColorAsState(
         targetValue = if (selected) selectedBackgroundColor else backgroundColor
     )
@@ -90,7 +90,7 @@ fun MyButton(
             ),
         color = background,
     ) {
-        content(text, radius, textAlign, textStyle, contentPadding)
+        content(text, shape, textAlign, textStyle, contentPadding)
     }
 }
 
@@ -104,7 +104,7 @@ fun MyIconButton(
     contentDescription: String? = null,
     outerPadding: Dp = 4.dp,
     contentPadding: Dp = 12.dp,
-    radius: Dp = 4.dp,
+    shape: Shape = RoundedCornerShape(4.dp),
     borderWidth: Dp = 1.dp,
     backgroundColor: Color = MaterialTheme.colors.primary,
     selectedBackgroundColor: Color = ColorAccent,
@@ -113,7 +113,6 @@ fun MyIconButton(
     onLongClick: (() -> Unit)? = null,
     content: @Composable (ImageVector, Dp, String?) -> Unit = defaultIconButtonContent
 ) {
-    val shape = RoundedCornerShape(radius)
     val background by animateColorAsState(
         targetValue = if (selected) selectedBackgroundColor else backgroundColor
     )
