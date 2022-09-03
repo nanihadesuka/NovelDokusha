@@ -89,7 +89,7 @@ fun TextToSpeechSetting(
         ) {
             val alpha by animateFloatAsState(targetValue = if (isActive) 1f else 0.5f)
             IconButton(
-                onClick = debouncedAction { playPreviousChapter() },
+                onClick = debouncedAction(waitMillis = 1000) { playPreviousChapter() },
                 enabled = isActive,
                 modifier = Modifier.alpha(alpha),
             ) {
@@ -103,7 +103,7 @@ fun TextToSpeechSetting(
                 )
             }
             IconButton(
-                onClick = debouncedAction(waitMillis = 50) { playPreviousItem() },
+                onClick = debouncedAction(waitMillis = 100) { playPreviousItem() },
                 enabled = isActive,
                 modifier = Modifier.alpha(alpha),
             ) {
@@ -139,7 +139,7 @@ fun TextToSpeechSetting(
 
             }
             IconButton(
-                onClick = debouncedAction(waitMillis = 50) { playNextItem() },
+                onClick = debouncedAction(waitMillis = 100) { playNextItem() },
                 enabled = isActive,
                 modifier = Modifier.alpha(alpha),
             ) {
@@ -153,7 +153,7 @@ fun TextToSpeechSetting(
                 )
             }
             IconButton(
-                onClick = debouncedAction { playNextChapter() },
+                onClick = debouncedAction(waitMillis = 1000) { playNextChapter() },
                 enabled = isActive,
                 modifier = Modifier.alpha(alpha),
             ) {
