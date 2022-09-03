@@ -40,7 +40,7 @@ class ReaderSpeaker(
     private val scrollToTheBottom: MutableSharedFlow<Unit>,
     private val isChapterIndexValid: (chapterIndex: Int) -> Boolean,
     private val isChapterIndexLoaded: (chapterIndex: Int) -> Boolean,
-    private val loadPreviousChapter: () -> Unit,
+    private val tryLoadPreviousChapter: () -> Unit,
     private val loadNextChapter: () -> Unit,
 ) {
     val currentReaderItem = textToSpeechManager.currentTextSpeakFlow.asLiveData()
@@ -336,7 +336,7 @@ class ReaderSpeaker(
         coroutineScope.launch {
             if (!isChapterIndexLoaded(targetChapterIndex)) {
                 settings.isLoadingChapter.value = true
-                loadPreviousChapter()
+                tryLoadPreviousChapter()
                 chapterLoadedFlow
                     .filter { it.chapterIndex == targetChapterIndex }
                     .take(1)

@@ -4,7 +4,6 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -106,8 +105,6 @@ class ReaderViewModel @Inject constructor(
     @Volatile
     var showInvalidChapterDialog: (suspend () -> Unit)? = null
 
-    val listIsEnabled = MutableLiveData<Boolean>(false)
-
     val scrollToTheTop = MutableSharedFlow<Unit>()
     val scrollToTheBottom = MutableSharedFlow<Unit>()
 
@@ -139,8 +136,8 @@ class ReaderViewModel @Inject constructor(
         chapterLoadedFlow = chaptersLoader.chapterLoadedFlow,
         isChapterIndexLoaded = chaptersLoader::isChapterIndexLoaded,
         isChapterIndexValid = chaptersLoader::isChapterIndexValid,
-        loadPreviousChapter = chaptersLoader::loadPrevious,
-        loadNextChapter = chaptersLoader::loadNext,
+        tryLoadPreviousChapter = chaptersLoader::tryLoadPrevious,
+        loadNextChapter = chaptersLoader::tryLoadNext,
         scrollToTheTop = scrollToTheTop,
         scrollToTheBottom = scrollToTheBottom,
     )
@@ -163,7 +160,7 @@ class ReaderViewModel @Inject constructor(
                 offset = chapter.await()?.lastReadOffset ?: 0,
             )
             // All data prepared! Let's load the current chapter
-            chaptersLoader.loadInitial(chapterIndex = chapterIndex.await())
+            chaptersLoader.tryLoadInitial(chapterIndex = chapterIndex.await())
         }
 
         viewModelScope.launch {
@@ -181,7 +178,7 @@ class ReaderViewModel @Inject constructor(
                             chapterIndex = nextChapterIndex
                         )
                     } else launch {
-                        chaptersLoader.loadNext()
+                        chaptersLoader.tryLoadNext()
                         chaptersLoader.chapterLoadedFlow
                             .filter { it.type == ChaptersLoader.ChapterLoaded.Type.Next }
                             .take(1)

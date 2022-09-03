@@ -62,10 +62,11 @@ class ChaptersLoader(
             ?: false
     }
 
-    fun isChapterIndexValid(chapterIndex: Int) = 0 <= chapterIndex && chapterIndex < orderedChapters.size
+    fun isChapterIndexValid(chapterIndex: Int) =
+        0 <= chapterIndex && chapterIndex < orderedChapters.size
 
     @Synchronized
-    fun loadInitial(chapterIndex: Int) {
+    fun tryLoadInitial(chapterIndex: Int) {
         if (LoadChapter.Type.Initial in loaderQueue) return
         loaderQueue.add(LoadChapter.Type.Initial)
         launch {
@@ -74,7 +75,7 @@ class ChaptersLoader(
     }
 
     @Synchronized
-    fun loadRestartedInitial(chapterLastState: ReaderViewModel.ChapterState) {
+    fun tryLoadRestartedInitial(chapterLastState: ReaderViewModel.ChapterState) {
         if (LoadChapter.Type.RestartInitial in loaderQueue) return
         loaderQueue.add(LoadChapter.Type.RestartInitial)
         launch {
@@ -83,14 +84,14 @@ class ChaptersLoader(
     }
 
     @Synchronized
-    fun loadPrevious() {
+    fun tryLoadPrevious() {
         if (LoadChapter.Type.Previous in loaderQueue) return
         loaderQueue.add(LoadChapter.Type.Previous)
         launch { chapterLoaderFlow.emit(LoadChapter.Previous) }
     }
 
     @Synchronized
-    fun loadNext() {
+    fun tryLoadNext() {
         if (LoadChapter.Type.Next in loaderQueue) return
         loaderQueue.add(LoadChapter.Type.Next)
         launch { chapterLoaderFlow.emit(LoadChapter.Next) }
@@ -98,11 +99,14 @@ class ChaptersLoader(
 
     fun reload() {
         coroutineContext.cancelChildren()
-        items.clear()
-        loadedChapters.clear()
         loaderQueue.clear()
-        readerState = ReaderViewModel.ReaderState.INITIAL_LOAD
-        startChapterLoaderWatcher()
+        launch(Dispatchers.Main.immediate) {
+            items.clear()
+            forceUpdateListViewState()
+            loadedChapters.clear()
+            readerState = ReaderViewModel.ReaderState.INITIAL_LOAD
+            startChapterLoaderWatcher()
+        }
     }
 
     private fun startChapterLoaderWatcher() {

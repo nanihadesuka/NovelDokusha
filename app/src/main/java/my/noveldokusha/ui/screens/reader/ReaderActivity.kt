@@ -85,7 +85,7 @@ class ReaderActivity : BaseActivity() {
         val currentChapter = viewModel.currentChapter.copy()
         lifecycleScope.coroutineContext.cancelChildren()
         viewModel.reloadReader()
-        viewModel.chaptersLoader.loadRestartedInitial(currentChapter)
+        viewModel.chaptersLoader.tryLoadRestartedInitial(currentChapter)
     }
 
     override fun onBackPressed() {
@@ -398,10 +398,10 @@ class ReaderActivity : BaseActivity() {
         when (viewModel.chaptersLoader.readerState) {
             ReaderViewModel.ReaderState.IDLE -> {
                 if (isBottom) {
-                    viewModel.chaptersLoader.loadNext()
+                    viewModel.chaptersLoader.tryLoadNext()
                 }
                 if (isTop) {
-                    viewModel.chaptersLoader.loadPrevious()
+                    viewModel.chaptersLoader.tryLoadPrevious()
                 }
             }
             ReaderViewModel.ReaderState.LOADING -> run {}

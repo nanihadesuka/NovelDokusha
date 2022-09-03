@@ -138,6 +138,7 @@ private fun Settings(
                         isPlaying = textToSpeechSettingData.isPlaying.value,
                         isLoadingChapter = textToSpeechSettingData.isLoadingChapter.value,
                         currentVoice = textToSpeechSettingData.activeVoice.value,
+                        isActive = textToSpeechSettingData.isThereActiveItem.value,
                         availableVoices = textToSpeechSettingData.availableVoices,
                         setPlaying = textToSpeechSettingData.setPlaying,
                         playPreviousItem = textToSpeechSettingData.playPreviousItem,

@@ -52,6 +52,7 @@ fun TextToSpeechSetting(
     isPlaying: Boolean,
     isLoadingChapter: Boolean,
     currentVoice: VoiceData?,
+    isActive: Boolean,
     setPlaying: (Boolean) -> Unit,
     playPreviousItem: () -> Unit,
     playPreviousChapter: () -> Unit,
@@ -85,7 +86,11 @@ fun TextToSpeechSetting(
                 .background(MaterialTheme.colors.primaryVariant.copy(alpha = 0.8f), CircleShape)
                 .padding(4.dp)
         ) {
-            IconButton(onClick = debouncedAction { playPreviousChapter() }) {
+            IconButton(
+                onClick = debouncedAction { playPreviousChapter() },
+                enabled = isActive,
+                modifier = Modifier.ifCase(!isActive) { alpha(0.5f) },
+            ) {
                 Icon(
                     imageVector = Icons.Rounded.FastRewind,
                     contentDescription = null,
@@ -95,7 +100,11 @@ fun TextToSpeechSetting(
                     tint = Color.White,
                 )
             }
-            IconButton(onClick = debouncedAction(waitMillis = 50) { playPreviousItem() }) {
+            IconButton(
+                onClick = debouncedAction(waitMillis = 50) { playPreviousItem() },
+                enabled = isActive,
+                modifier = Modifier.ifCase(!isActive) { alpha(0.5f) },
+            ) {
                 Icon(
                     imageVector = Icons.Rounded.NavigateBefore,
                     contentDescription = null,
@@ -127,7 +136,11 @@ fun TextToSpeechSetting(
                 }
 
             }
-            IconButton(onClick = debouncedAction(waitMillis = 50) { playNextItem() }) {
+            IconButton(
+                onClick = debouncedAction(waitMillis = 50) { playNextItem() },
+                enabled = isActive,
+                modifier = Modifier.ifCase(!isActive) { alpha(0.5f) },
+            ) {
                 Icon(
                     Icons.Rounded.NavigateNext,
                     contentDescription = null,
@@ -137,7 +150,11 @@ fun TextToSpeechSetting(
                         .background(ColorAccent, CircleShape),
                 )
             }
-            IconButton(onClick = debouncedAction { playNextChapter() }) {
+            IconButton(
+                onClick = debouncedAction { playNextChapter() },
+                enabled = isActive,
+                modifier = Modifier.ifCase(!isActive) { alpha(0.5f) },
+            ) {
                 Icon(
                     Icons.Rounded.FastForward,
                     contentDescription = null,
@@ -444,6 +461,7 @@ fun TextToSpeechSettingPreview() {
             },
             scrollToActiveItem = {},
             playFirstVisibleItem = {},
+            isActive = false
         )
     }
 }
