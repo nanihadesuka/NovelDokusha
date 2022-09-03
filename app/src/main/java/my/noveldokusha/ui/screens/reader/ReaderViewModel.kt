@@ -1,5 +1,6 @@
 package my.noveldokusha.ui.screens.reader
 
+import android.content.Context
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -7,6 +8,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.debounce
@@ -15,7 +17,6 @@ import kotlinx.coroutines.flow.take
 import my.noveldokusha.AppPreferences
 import my.noveldokusha.data.Repository
 import my.noveldokusha.data.database.tables.Chapter
-import my.noveldokusha.tools.TextToSpeechManager
 import my.noveldokusha.ui.BaseViewModel
 import my.noveldokusha.ui.screens.reader.tools.*
 import my.noveldokusha.utils.StateExtra_String
@@ -34,7 +35,7 @@ class ReaderViewModel @Inject constructor(
     state: SavedStateHandle,
     val appPreferences: AppPreferences,
     private val liveTranslation: LiveTranslation,
-    textToSpeechManager: TextToSpeechManager,
+    @ApplicationContext private val context: Context,
 ) : BaseViewModel(), ReaderStateBundle {
 
     enum class ReaderState { IDLE, LOADING, INITIAL_LOAD }
@@ -147,7 +148,7 @@ class ReaderViewModel @Inject constructor(
 
     val readerSpeaker = ReaderSpeaker(
         coroutineScope = viewModelScope,
-        textToSpeechManager = textToSpeechManager,
+        context = context,
         items = items,
         chapterLoadedFlow = chaptersLoader.chapterLoadedFlow,
         isChapterIndexLoaded = chaptersLoader::isChapterIndexLoaded,
@@ -229,17 +230,12 @@ class ReaderViewModel @Inject constructor(
                 .currentReaderItemFlow
                 .filter { isReaderInSpeakMode }
                 .collect {
-                    val itemIndex = indexOfReaderItem(
-                        list = items,
-                        chapterIndex = it.chapterIndex,
-                        chapterItemIndex = it.chapterItemIndex
-                    )
-                    val item = items.getOrNull(itemIndex) ?: return@collect
+                    val item = it.item
                     if (item !is ReaderItem.ParagraphLocation) return@collect
                     when (item.location) {
-                        ReaderItem.LOCATION.FIRST -> markChapterStartAsSeen(chapterUrl = item.chapterUrl)
-                        ReaderItem.LOCATION.LAST -> markChapterEndAsSeen(chapterUrl = item.chapterUrl)
-                        ReaderItem.LOCATION.MIDDLE -> Unit
+                        ReaderItem.Location.FIRST -> markChapterStartAsSeen(chapterUrl = item.chapterUrl)
+                        ReaderItem.Location.LAST -> markChapterEndAsSeen(chapterUrl = item.chapterUrl)
+                        ReaderItem.Location.MIDDLE -> Unit
                     }
                 }
         }
@@ -266,14 +262,13 @@ class ReaderViewModel @Inject constructor(
     }
 
     private fun saveLastReadPositionFromCurrentSpeakItem() {
-        val state = readerSpeaker.settings.currentActiveItemState.value
-        val chapter = chaptersLoader.orderedChapters.getOrNull(state.chapterIndex) ?: return
+        val item = readerSpeaker.settings.currentActiveItemState.value.item
         saveLastReadPositionState(
             repository = repository,
             bookUrl = bookUrl,
             chapter = ChapterState(
-                chapterUrl = chapter.url,
-                chapterItemIndex = state.chapterItemIndex,
+                chapterUrl = item.chapterUrl,
+                chapterItemIndex = item.chapterItemIndex,
                 offset = 0
             )
         )

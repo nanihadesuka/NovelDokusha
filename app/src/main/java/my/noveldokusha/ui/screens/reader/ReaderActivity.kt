@@ -194,10 +194,10 @@ class ReaderActivity : BaseActivity() {
             )
         }
 
-        viewModel.readerSpeaker.currentReaderItem.observe(this) {
+        viewModel.readerSpeaker.currentReaderItemLiveData.observe(this) {
             scrollToReadingPositionOptional(
-                chapterIndex = it.chapterIndex,
-                chapterItemIndex = it.chapterItemIndex,
+                chapterIndex = it.item.chapterIndex,
+                chapterItemIndex = it.item.chapterItemIndex,
             )
         }
 

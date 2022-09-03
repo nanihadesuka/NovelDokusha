@@ -29,13 +29,13 @@ import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import my.noveldokusha.R
-import my.noveldokusha.tools.TextSynthesis
-import my.noveldokusha.tools.TextSynthesisState
 import my.noveldokusha.tools.TranslationModelState
+import my.noveldokusha.tools.Utterance
 import my.noveldokusha.tools.VoiceData
 import my.noveldokusha.ui.screens.main.settings.SettingsTheme
 import my.noveldokusha.ui.screens.reader.settingsViews.*
 import my.noveldokusha.ui.screens.reader.tools.LiveTranslationSettingData
+import my.noveldokusha.ui.screens.reader.tools.TextSynthesis
 import my.noveldokusha.ui.screens.reader.tools.TextToSpeechSettingData
 import my.noveldokusha.ui.theme.InternalTheme
 import my.noveldokusha.ui.theme.Themes
@@ -431,9 +431,13 @@ private fun ViewsPreview() {
         currentActiveItemState = remember {
             mutableStateOf(
                 TextSynthesis(
-                    chapterItemIndex = 0,
-                    chapterIndex = 0,
-                    state = TextSynthesisState.PLAYING
+                    playState = Utterance.PlayState.PLAYING,
+                    item = ReaderItem.Title(
+                        chapterUrl = "",
+                        chapterItemIndex = 1,
+                        chapterIndex = 1,
+                        text = ""
+                    )
                 )
             )
         },

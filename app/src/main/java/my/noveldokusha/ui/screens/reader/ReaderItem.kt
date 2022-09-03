@@ -6,16 +6,16 @@ sealed interface ReaderItem {
     val chapterUrl: String
     val chapterIndex: Int
 
-    interface Position {
+    sealed interface Position : ReaderItem {
         val chapterItemIndex: Int
     }
 
-    enum class LOCATION { FIRST, MIDDLE, LAST }
-    interface ParagraphLocation {
-        val location: LOCATION
+    enum class Location { FIRST, MIDDLE, LAST }
+    sealed interface ParagraphLocation : ReaderItem {
+        val location: Location
     }
 
-    interface Text {
+    sealed interface Text : ReaderItem, Position {
         val text: String
         val textTranslated: String?
         val textToDisplay get() = textTranslated ?: text
@@ -32,22 +32,22 @@ sealed interface ReaderItem {
         override val chapterItemIndex: Int,
         override val text: String,
         override val textTranslated: String? = null
-    ) : ReaderItem, Position, Text
+    ) : ReaderItem, Text, Position
 
     data class Body(
         override val chapterUrl: String,
         override val chapterIndex: Int,
         override val chapterItemIndex: Int,
         override val text: String,
-        override val location: LOCATION,
+        override val location: Location,
         override val textTranslated: String? = null
-    ) : ReaderItem, Position, Text, ParagraphLocation
+    ) : ReaderItem, Text, Position, ParagraphLocation
 
     data class Image(
         override val chapterUrl: String,
         override val chapterIndex: Int,
         override val chapterItemIndex: Int,
-        override val location: LOCATION,
+        override val location: Location,
         val text: String,
         val image: BookTextMapper.ImgEntry
     ) : ReaderItem, Position, ParagraphLocation

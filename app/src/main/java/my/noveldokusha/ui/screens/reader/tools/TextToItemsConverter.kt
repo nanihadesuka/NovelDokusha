@@ -18,7 +18,6 @@ suspend fun textToItemsConverter(
         .filter { it.isNotBlank() }
         .toList()
 
-    // We set pos := index + 1 as the title is pos := 0
     return@withContext paragraphs
         .mapIndexed { index, paragraph ->
             async {
@@ -28,9 +27,9 @@ suspend fun textToItemsConverter(
                     chapterItemIndex = index + initialChapterItemIndex,
                     text = paragraph,
                     location = when (index) {
-                        0 -> ReaderItem.LOCATION.FIRST
-                        paragraphs.lastIndex -> ReaderItem.LOCATION.LAST
-                        else -> ReaderItem.LOCATION.MIDDLE
+                        0 -> ReaderItem.Location.FIRST
+                        paragraphs.lastIndex -> ReaderItem.Location.LAST
+                        else -> ReaderItem.Location.MIDDLE
                     }
                 )
             }
@@ -42,7 +41,7 @@ private fun generateITEM(
     chapterIndex: Int,
     chapterItemIndex: Int,
     text: String,
-    location: ReaderItem.LOCATION
+    location: ReaderItem.Location
 ): ReaderItem = when (val imgEntry = BookTextMapper.ImgEntry.fromXMLString(text)) {
     null -> ReaderItem.Body(
         chapterUrl = chapterUrl,

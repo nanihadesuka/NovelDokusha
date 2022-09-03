@@ -1,4 +1,4 @@
-package my.noveldokusha.ui.screens.reader
+package my.noveldokusha.ui.screens.reader.tools
 
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.BufferOverflow
@@ -6,9 +6,8 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import my.noveldokusha.data.Repository
 import my.noveldokusha.data.database.tables.Chapter
 import my.noveldokusha.network.Response
-import my.noveldokusha.ui.screens.reader.tools.ItemPosition
-import my.noveldokusha.ui.screens.reader.tools.getChapterInitialPosition
-import my.noveldokusha.ui.screens.reader.tools.textToItemsConverter
+import my.noveldokusha.ui.screens.reader.ReaderItem
+import my.noveldokusha.ui.screens.reader.ReaderViewModel
 import kotlin.coroutines.CoroutineContext
 
 class ChaptersLoader(
@@ -150,16 +149,19 @@ class ChaptersLoader(
         val insert: suspend (ReaderItem) -> Unit = {
             withContext(Dispatchers.Main.immediate) {
                 items.add(it)
+                forceUpdateListViewState()
             }
         }
         val insertAll: suspend (Collection<ReaderItem>) -> Unit = {
             withContext(Dispatchers.Main.immediate) {
                 items.addAll(it)
+                forceUpdateListViewState()
             }
         }
         val remove: suspend (ReaderItem) -> Unit = {
             withContext(Dispatchers.Main.immediate) {
                 items.remove(it)
+                forceUpdateListViewState()
             }
         }
         val index = orderedChapters.indexOfFirst { it.url == chapterLastState.chapterUrl }
@@ -211,18 +213,21 @@ class ChaptersLoader(
         val insert: suspend (ReaderItem) -> Unit = {
             withContext(Dispatchers.Main.immediate) {
                 items.add(it)
+                forceUpdateListViewState()
             }
         }
 
         val insertAll: suspend (Collection<ReaderItem>) -> Unit = {
             withContext(Dispatchers.Main.immediate) {
                 items.addAll(it)
+                forceUpdateListViewState()
             }
         }
 
         val remove: suspend (ReaderItem) -> Unit = {
             withContext(Dispatchers.Main.immediate) {
                 items.remove(it)
+                forceUpdateListViewState()
             }
         }
 
@@ -268,12 +273,14 @@ class ChaptersLoader(
             withContext(Dispatchers.Main.immediate) {
                 items.add(listIndex, it)
                 listIndex += 1
+                forceUpdateListViewState()
             }
         }
         val insertAll: suspend (Collection<ReaderItem>) -> Unit = {
             withContext(Dispatchers.Main.immediate) {
                 items.addAll(listIndex, it)
                 listIndex += it.size
+                forceUpdateListViewState()
             }
         }
         val remove: suspend (ReaderItem) -> Unit = {
@@ -282,6 +289,7 @@ class ChaptersLoader(
                 if (isRemoved) {
                     listIndex -= 1
                 }
+                forceUpdateListViewState()
             }
         }
 
@@ -331,16 +339,19 @@ class ChaptersLoader(
         val insert: suspend (ReaderItem) -> Unit = {
             withContext(Dispatchers.Main.immediate) {
                 items.add(it)
+                forceUpdateListViewState()
             }
         }
         val insertAll: suspend (Collection<ReaderItem>) -> Unit = {
             withContext(Dispatchers.Main.immediate) {
                 items.addAll(it)
+                forceUpdateListViewState()
             }
         }
         val remove: suspend (ReaderItem) -> Unit = {
             withContext(Dispatchers.Main.immediate) {
                 items.remove(it)
+                forceUpdateListViewState()
             }
         }
 

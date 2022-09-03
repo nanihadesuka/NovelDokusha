@@ -17,8 +17,8 @@ import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import my.noveldokusha.R
 import my.noveldokusha.databinding.*
 import my.noveldokusha.resolvedBookImagePath
-import my.noveldokusha.tools.TextSynthesis
-import my.noveldokusha.tools.TextSynthesisState
+import my.noveldokusha.tools.Utterance
+import my.noveldokusha.ui.screens.reader.tools.TextSynthesis
 import my.noveldokusha.utils.inflater
 
 class ReaderItemAdapter(
@@ -102,8 +102,8 @@ class ReaderItemAdapter(
         bind.body.typeface = currentTypeface()
 
         when (item.location) {
-            ReaderItem.LOCATION.FIRST -> onChapterStartVisible(item.chapterUrl)
-            ReaderItem.LOCATION.LAST -> onChapterEndVisible(item.chapterUrl)
+            ReaderItem.Location.FIRST -> onChapterStartVisible(item.chapterUrl)
+            ReaderItem.Location.LAST -> onChapterEndVisible(item.chapterUrl)
             else -> run {}
         }
         return bind.root
@@ -141,8 +141,8 @@ class ReaderItemAdapter(
         }
 
         when (item.location) {
-            ReaderItem.LOCATION.FIRST -> onChapterStartVisible(item.chapterUrl)
-            ReaderItem.LOCATION.LAST -> onChapterEndVisible(item.chapterUrl)
+            ReaderItem.Location.FIRST -> onChapterStartVisible(item.chapterUrl)
+            ReaderItem.Location.LAST -> onChapterEndVisible(item.chapterUrl)
             else -> run {}
         }
 
@@ -291,15 +291,15 @@ class ReaderItemAdapter(
     private fun getItemReadingStateBackground(item: ReaderItem): Drawable? {
         val textSynthesis = currentSpeakerActiveItem()
         val isReadingItem = item is ReaderItem.Position &&
-                textSynthesis.chapterIndex == item.chapterIndex &&
-                textSynthesis.chapterItemIndex == item.chapterItemIndex
+                textSynthesis.item.chapterIndex == item.chapterIndex &&
+                textSynthesis.item.chapterItemIndex == item.chapterItemIndex
 
         if (!isReadingItem) return null
 
-        return when (textSynthesis.state) {
-            TextSynthesisState.PLAYING -> currentReadingAloudDrawable
-            TextSynthesisState.LOADING -> currentReadingAloudLoadingDrawable
-            TextSynthesisState.FINISHED -> null
+        return when (textSynthesis.playState) {
+            Utterance.PlayState.PLAYING -> currentReadingAloudDrawable
+            Utterance.PlayState.LOADING -> currentReadingAloudLoadingDrawable
+            Utterance.PlayState.FINISHED -> null
         }
     }
 
