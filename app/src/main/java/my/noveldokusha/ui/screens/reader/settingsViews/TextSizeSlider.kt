@@ -21,7 +21,6 @@ fun TextSizeSetting(
             pos = it
             onTextSizeChanged(pos)
         },
-        modifier = Modifier.padding(12.dp),
         text = stringResource(R.string.text_size) + ": %.2f".format(pos)
     )
 }

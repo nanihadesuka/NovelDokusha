@@ -39,13 +39,10 @@ import my.noveldokusha.R
 import my.noveldokusha.composableActions.debouncedAction
 import my.noveldokusha.tools.VoiceData
 import my.noveldokusha.ui.composeViews.MySlider
-import my.noveldokusha.ui.screens.reader.roundedOutline
-import my.noveldokusha.ui.theme.ColorAccent
-import my.noveldokusha.ui.theme.InternalTheme
-import my.noveldokusha.ui.theme.InternalThemeObject
-import my.noveldokusha.ui.theme.Themes
+import my.noveldokusha.ui.theme.*
 import my.noveldokusha.utils.debouncedClickable
 import my.noveldokusha.utils.ifCase
+import my.noveldokusha.utils.roundedOutline
 
 
 @OptIn(ExperimentalAnimationApi::class, ExperimentalMaterialApi::class)
@@ -73,9 +70,9 @@ fun TextToSpeechSetting(
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(8.dp),
         modifier = Modifier.fillMaxWidth()
     ) {
-
         AnimatedVisibility(visible = isLoadingChapter) {
             CircularProgressIndicator(
                 strokeWidth = 6.dp,
@@ -177,45 +174,53 @@ fun TextToSpeechSetting(
 
         Row(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
-            modifier = Modifier.padding(8.dp)
         ) {
 
             Surface(
                 color = MaterialTheme.colors.primary,
                 modifier = Modifier
+                    .height(selectableMinHeight)
                     .roundedOutline()
                     .debouncedClickable { playFirstVisibleItem() }
                     .widthIn(min = 76.dp)
             ) {
                 Text(
                     text = stringResource(R.string.start_here),
-                    modifier = Modifier.padding(12.dp),
+                    modifier = Modifier
+                        .padding(12.dp)
+                        .wrapContentHeight(Alignment.CenterVertically),
                     textAlign = TextAlign.Center
                 )
             }
             Surface(
                 color = MaterialTheme.colors.primary,
                 modifier = Modifier
+                    .height(selectableMinHeight)
                     .roundedOutline()
                     .debouncedClickable { scrollToActiveItem() }
                     .widthIn(min = 76.dp)
             ) {
                 Text(
                     text = stringResource(R.string.focus),
-                    modifier = Modifier.padding(12.dp),
+                    modifier = Modifier
+                        .padding(12.dp)
+                        .wrapContentHeight(Alignment.CenterVertically),
                     textAlign = TextAlign.Center
                 )
             }
             Surface(
                 color = MaterialTheme.colors.primary,
                 modifier = Modifier
+                    .height(selectableMinHeight)
                     .roundedOutline()
                     .clickable { openVoicesDialog = !openVoicesDialog }
                     .widthIn(min = 76.dp)
             ) {
                 Text(
                     text = stringResource(id = R.string.voices),
-                    modifier = Modifier.padding(12.dp),
+                    modifier = Modifier
+                        .padding(12.dp)
+                        .wrapContentHeight(Alignment.CenterVertically),
                     textAlign = TextAlign.Center
                 )
             }
@@ -225,7 +230,6 @@ fun TextToSpeechSetting(
             value = voicePitch,
             valueRange = 0.1f..5f,
             onValueChange = setVoicePitch,
-            modifier = Modifier.padding(horizontal = 24.dp),
             text = stringResource(R.string.voice_pitch) + ": %.2f".format(voicePitch),
         )
 
@@ -233,7 +237,6 @@ fun TextToSpeechSetting(
             value = voiceSpeed,
             valueRange = 0.1f..5f,
             onValueChange = setVoiceSpeed,
-            modifier = Modifier.padding(horizontal = 24.dp),
             text = stringResource(R.string.voice_speed) + ": %.2f".format(voiceSpeed),
         )
 

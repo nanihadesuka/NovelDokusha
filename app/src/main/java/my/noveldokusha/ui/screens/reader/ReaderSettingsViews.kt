@@ -2,7 +2,6 @@ package my.noveldokusha.ui.screens.reader
 
 import androidx.compose.animation.*
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.LazyRow
@@ -18,8 +17,6 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.composed
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
@@ -102,12 +99,12 @@ private fun Settings(
     onThemeSelected: (Themes) -> Unit,
 ) {
     Column(
-        verticalArrangement = Arrangement.spacedBy(10.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp),
         modifier = modifier
             .fillMaxWidth()
             .windowInsetsPadding(WindowInsets.navigationBars)
     ) {
-        Box(Modifier.padding(horizontal = 14.dp)) {
+        Box(Modifier.padding(horizontal = 24.dp)) {
             AnimatedContent(targetState = visibleSetting.value) { target ->
                 when (target) {
                     CurrentSettingVisible.TextSize -> TextSizeSetting(
@@ -183,7 +180,7 @@ private fun SettingsRowList(
 
     LazyRow(
         state = listState,
-        horizontalArrangement = Arrangement.spacedBy(6.dp),
+        horizontalArrangement = Arrangement.spacedBy(4.dp),
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
             .background(MaterialTheme.colors.secondary),
@@ -198,8 +195,9 @@ private fun SettingsRowList(
             MyIconButton(
                 icon = Icons.TwoTone.FormatSize,
                 selected = visibleSetting == CurrentSettingVisible.TextSize,
+                shape = CircleShape,
                 contentPadding = 8.dp,
-                modifier = Modifier.height(50.dp),
+                modifier = Modifier.size(50.dp),
                 onClick = { toggleOrOpen(CurrentSettingVisible.TextSize) },
             )
         }
@@ -207,8 +205,9 @@ private fun SettingsRowList(
             MyIconButton(
                 icon = Icons.Default.FontDownload,
                 selected = visibleSetting == CurrentSettingVisible.TextFont,
+                shape = CircleShape,
                 contentPadding = 8.dp,
-                modifier = Modifier.height(50.dp),
+                modifier = Modifier.size(50.dp),
                 onClick = { toggleOrOpen(CurrentSettingVisible.TextFont) },
             )
         }
@@ -216,6 +215,7 @@ private fun SettingsRowList(
             MyButton(
                 text = stringResource(id = R.string.live_translation),
                 selected = visibleSetting == CurrentSettingVisible.LiveTranslation,
+                shape = CircleShape,
                 contentPadding = 8.dp,
                 modifier = Modifier.height(50.dp),
                 onClick = { toggleOrOpen(CurrentSettingVisible.LiveTranslation) },
@@ -225,6 +225,7 @@ private fun SettingsRowList(
             MyButton(
                 text = stringResource(R.string.text_to_speech),
                 selected = visibleSetting == CurrentSettingVisible.TextToSpeech,
+                shape = CircleShape,
                 contentPadding = 8.dp,
                 modifier = Modifier.height(50.dp),
                 onClick = { toggleOrOpen(CurrentSettingVisible.TextToSpeech) },
@@ -234,6 +235,7 @@ private fun SettingsRowList(
             MyButton(
                 text = stringResource(id = R.string.theme),
                 selected = visibleSetting == CurrentSettingVisible.Theme,
+                shape = CircleShape,
                 contentPadding = 8.dp,
                 modifier = Modifier.height(50.dp),
                 onClick = { toggleOrOpen(CurrentSettingVisible.Theme) },
@@ -243,6 +245,7 @@ private fun SettingsRowList(
             MyButton(
                 text = stringResource(R.string.text_selection),
                 selected = visibleSetting == CurrentSettingVisible.SelectableText,
+                shape = CircleShape,
                 contentPadding = 8.dp,
                 modifier = Modifier.height(50.dp),
                 onClick = { toggleOrOpen(CurrentSettingVisible.SelectableText) },
@@ -251,35 +254,7 @@ private fun SettingsRowList(
     }
 }
 
-fun Modifier.roundedOutline(): Modifier = composed {
-    border(
-        width = 1.dp,
-        color = MaterialTheme.colors.onPrimary.copy(alpha = 0.5f),
-        shape = CircleShape
-    )
-        .background(
-            color = MaterialTheme.colors.primary,
-            shape = CircleShape
-        )
-        .clip(CircleShape)
-}
 
-@Composable
-fun RoundedContentLayout(
-    modifier: Modifier = Modifier,
-    content: @Composable RowScope.() -> Unit
-) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = modifier
-            .fillMaxWidth()
-            .height(50.dp)
-            .roundedOutline()
-            .then(modifier)
-    ) {
-        content(this)
-    }
-}
 
 @Composable
 fun ReaderInfoView(

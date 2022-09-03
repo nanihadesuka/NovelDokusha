@@ -15,6 +15,7 @@ import com.smarttoolfactory.slider.ColorfulIconSlider
 import com.smarttoolfactory.slider.MaterialSliderDefaults
 import com.smarttoolfactory.slider.SliderBrushColor
 import my.noveldokusha.ui.theme.ColorAccent
+import my.noveldokusha.ui.theme.selectableMinHeight
 import my.noveldokusha.utils.mix
 
 @Composable
@@ -22,8 +23,8 @@ fun MySlider(
     value: Float,
     valueRange: ClosedFloatingPointRange<Float>,
     onValueChange: (Float) -> Unit,
-    modifier: Modifier,
     text: String,
+    modifier: Modifier = Modifier,
 ) {
     MySlider(
         value = value,
@@ -40,7 +41,7 @@ fun MySlider(
     value: Float,
     valueRange: ClosedFloatingPointRange<Float>,
     onValueChange: (Float) -> Unit,
-    modifier: Modifier,
+    modifier: Modifier = Modifier,
     overlayContent: @Composable BoxScope.() -> Unit,
 ) {
     Box(modifier) {
@@ -59,7 +60,7 @@ fun MySlider(
                     )
                 )
             ),
-            trackHeight = 42.dp,
+            trackHeight = selectableMinHeight,
             thumb = {
                 Surface(
                     color = ColorAccent,

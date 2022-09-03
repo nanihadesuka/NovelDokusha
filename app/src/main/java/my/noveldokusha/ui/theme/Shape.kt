@@ -11,3 +11,5 @@ val Shapes = Shapes(
 )
 
 val ImageBorderRadius = 4.dp
+
+val selectableMinHeight = 48.dp

@@ -25,12 +25,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.toSize
 import my.noveldokusha.R
 import my.noveldokusha.tools.TranslationModelState
-import my.noveldokusha.ui.screens.reader.roundedOutline
 import my.noveldokusha.ui.theme.ColorAccent
-import my.noveldokusha.utils.blockInteraction
-import my.noveldokusha.utils.clickableWithUnboundedIndicator
-import my.noveldokusha.utils.ifCase
-import my.noveldokusha.utils.mix
+import my.noveldokusha.ui.theme.selectableMinHeight
+import my.noveldokusha.utils.*
 
 @Composable
 fun LiveTranslationSetting(
@@ -58,6 +55,7 @@ fun LiveTranslationSetting(
     ) {
         Row(
             modifier = Modifier
+                .height(selectableMinHeight)
                 .roundedOutline()
                 .blockInteraction(),
             horizontalArrangement = Arrangement.Center,
@@ -65,6 +63,7 @@ fun LiveTranslationSetting(
         ) {
             Surface(
                 modifier = Modifier
+                    .height(selectableMinHeight)
                     .roundedOutline()
                     .clickable { onEnable(!enable) },
                 color = if (enable) MaterialTheme.colors.primary.mix(
@@ -74,7 +73,9 @@ fun LiveTranslationSetting(
             ) {
                 Text(
                     text = stringResource(R.string.live_translation),
-                    modifier = Modifier.padding(12.dp)
+                    modifier = Modifier
+                        .padding(12.dp)
+                        .wrapContentHeight(Alignment.CenterVertically)
                 )
             }
             AnimatedVisibility(visible = enable) {

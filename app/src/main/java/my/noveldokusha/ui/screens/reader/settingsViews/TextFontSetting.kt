@@ -1,10 +1,7 @@
 package my.noveldokusha.ui.screens.reader.settingsViews
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.heightIn
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.FontDownload
@@ -17,8 +14,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.toSize
-import my.noveldokusha.ui.screens.reader.RoundedContentLayout
+import my.noveldokusha.ui.composeViews.RoundedContentLayout
 import my.noveldokusha.ui.screens.reader.tools.FontsLoader
+import my.noveldokusha.ui.theme.selectableMinHeight
 
 @Composable
 fun TextFontSetting(
@@ -32,6 +30,7 @@ fun TextFontSetting(
     RoundedContentLayout(
         modifier
             .clickable { expanded = true }
+            .height(selectableMinHeight)
             .onGloballyPositioned { layoutCoordinates ->
                 rowSize = layoutCoordinates.size.toSize()
             }

@@ -22,6 +22,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import my.noveldokusha.R
 import my.noveldokusha.ui.theme.ColorAccent
+import my.noveldokusha.ui.theme.selectableMinHeight
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
@@ -44,6 +45,7 @@ fun SelectableTextSetting(
             horizontalArrangement = Arrangement.spacedBy(4.dp),
             modifier = Modifier
                 .clip(CircleShape)
+                .height(selectableMinHeight)
                 .toggleable(
                     value = enable,
                     onValueChange = { onEnable(!enable) }
