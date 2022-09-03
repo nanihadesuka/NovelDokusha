@@ -126,6 +126,11 @@ class ReaderSpeaker(
         textToSpeechManager.stop()
     }
 
+    fun onClose() {
+        stop()
+        textToSpeechManager.service.shutdown()
+    }
+
     suspend fun readChapterStartingFromStart(
         chapterIndex: Int
     ) {

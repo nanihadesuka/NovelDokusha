@@ -207,7 +207,7 @@ class ReaderViewModel @Inject constructor(
     }
 
     fun onClose() {
-        readerSpeaker.stop()
+        readerSpeaker.onClose()
     }
 
     override fun onCleared() {
