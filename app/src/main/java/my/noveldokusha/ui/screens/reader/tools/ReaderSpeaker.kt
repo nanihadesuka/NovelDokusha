@@ -53,7 +53,8 @@ class ReaderSpeaker(
     private val getPreferredVoiceSpeed: () -> Float,
     private val setPreferredVoiceSpeed: (voiceId: Float) -> Unit,
 ) {
-    val currentReaderItem = textToSpeechManager.currentTextSpeakFlow.asLiveData()
+    val currentReaderItemFlow = textToSpeechManager.currentTextSpeakFlow
+    val currentReaderItem = currentReaderItemFlow.asLiveData()
     val currentTextPlaying = textToSpeechManager.currentActiveItemState as State<TextSynthesis>
     val reachedChapterEndFlowChapterIndex = MutableSharedFlow<Int>() // chapter pos
     val startReadingFromFirstVisibleItem = MutableSharedFlow<Unit>()
@@ -188,7 +189,7 @@ class ReaderSpeaker(
         if (firstItem is ReaderItem.Position) {
             textToSpeechManager.setCurrentSpeakState(
                 TextSynthesis(
-                    chapterItemIndex = (firstItem as ReaderItem.Position).chapterItemIndex,
+                    chapterItemIndex = firstItem.chapterItemIndex,
                     chapterIndex = firstItem.chapterIndex,
                     state = TextSynthesisState.LOADING
                 )

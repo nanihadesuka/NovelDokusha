@@ -64,13 +64,17 @@ private fun CurrentBookInfo(
                 .animateContentSize()
         )
         Text(
-            text = "Chapter: $chapterCurrentNumber/$chaptersTotalSize",
+            text = stringResource(
+                id = R.string.chapter_x_over_n,
+                chapterCurrentNumber,
+                chaptersTotalSize
+            ),
             style = MaterialTheme.typography.body1,
             fontWeight = FontWeight.Bold,
             modifier = Modifier.padding()
         )
         Text(
-            text = "Progress: ${chapterPercentageProgress.toInt()}%",
+            text = stringResource(id = R.string.progress_x_percentage, chapterPercentageProgress),
             style = MaterialTheme.typography.body1,
             fontWeight = FontWeight.Bold,
             modifier = Modifier.padding()

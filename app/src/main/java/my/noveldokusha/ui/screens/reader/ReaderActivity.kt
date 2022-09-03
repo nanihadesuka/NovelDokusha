@@ -71,8 +71,8 @@ class ReaderActivity : BaseActivity() {
                 currentTypeface = { fontsLoader.getTypeFaceNORMAL(appPreferences.READER_FONT_FAMILY.value) },
                 currentTypefaceBold = { fontsLoader.getTypeFaceBOLD(appPreferences.READER_FONT_FAMILY.value) },
                 currentSpeakerActiveItem = { viewModel.readerSpeaker.currentTextPlaying.value },
-                onChapterStartVisible = { url -> viewModel.readRoutine.setReadStart(url) },
-                onChapterEndVisible = { url -> viewModel.readRoutine.setReadEnd(url) },
+                onChapterStartVisible = viewModel::markChapterStartAsSeen,
+                onChapterEndVisible = viewModel::markChapterEndAsSeen,
                 onReloadReader = ::reloadReader,
                 onClick = { viewModel.showReaderInfoView = !viewModel.showReaderInfoView },
             )
@@ -266,8 +266,8 @@ class ReaderActivity : BaseActivity() {
 
                 // Reader info
                 ReaderInfoView(
-                    chapterTitle = viewModel.readingPosStats?.run { first.chapter.title } ?: "",
-                    chapterCurrentNumber = viewModel.readingPosStats?.run { first.chapterIndex + 1 }
+                    chapterTitle = viewModel.readingPosStats?.chapterTitle ?: "",
+                    chapterCurrentNumber = viewModel.readingPosStats?.run { chapterIndex + 1 }
                         ?: 0,
                     chapterPercentageProgress = viewModel.chapterPercentageProgress,
                     chaptersTotalSize = viewModel.orderedChapters.size,
@@ -429,11 +429,8 @@ class ReaderActivity : BaseActivity() {
 
     fun updateInfoView() {
         val lastVisiblePosition = viewBind.listView.lastVisiblePosition
-        if (lastVisiblePosition < 0) return
-        val item = viewAdapter.listView.getItem(lastVisiblePosition)
-        if (item !is ReaderItem.Position) return
-
-        viewModel.updateInfoViewTo(item.chapterUrl, item.chapterItemIndex)
+        val itemIndex = viewAdapter.listView.fromPositionToIndex(lastVisiblePosition)
+        viewModel.updateInfoViewTo(itemIndex)
     }
 
     override fun onPause() {

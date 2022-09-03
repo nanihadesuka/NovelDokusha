@@ -43,6 +43,9 @@ interface LibraryDao {
     @Query("UPDATE Book SET description = :description WHERE url == :bookUrl")
     suspend fun updateDescription(bookUrl: String, description: String)
 
+    @Query("UPDATE Book SET lastReadChapter = :chapterUrl WHERE url == :bookUrl")
+    suspend fun updateLastReadChapter(bookUrl: String, chapterUrl: String)
+
     @Query("SELECT * FROM Book WHERE url = :url")
     suspend fun get(url: String): Book?
 

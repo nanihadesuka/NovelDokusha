@@ -9,6 +9,7 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.take
 import my.noveldokusha.AppPreferences
@@ -43,7 +44,7 @@ class ReaderViewModel @Inject constructor(
         val offset: Int
     )
 
-    data class ChapterStats(val itemCount: Int, val chapter: Chapter, val chapterIndex: Int)
+    data class ChapterStats(val itemsCount: Int, val chapter: Chapter, val chapterIndex: Int)
 
     override var bookUrl by StateExtra_String(state)
     override var chapterUrl by StateExtra_String(state)
@@ -79,16 +80,31 @@ class ReaderViewModel @Inject constructor(
     var showReaderInfoView by mutableStateOf(false)
     val orderedChapters = mutableListOf<Chapter>()
 
-    var readingPosStats by mutableStateOf<Pair<ChapterStats, Int>?>(null)
+    data class ReadingChapterPosStats(
+        val chapterIndex: Int,
+        val chapterItemIndex: Int,
+        val chapterItemsCount: Int,
+        val chapterTitle: String,
+    )
+
+    var readingPosStats by mutableStateOf<ReadingChapterPosStats?>(null)
     val chapterPercentageProgress by derivedStateOf {
-        val (info, itemPos) = readingPosStats ?: return@derivedStateOf 0f
-        when (info.itemCount) {
+        val data = readingPosStats ?: return@derivedStateOf 0f
+        when (data.chapterItemsCount) {
             0 -> 100f
-            else -> ceil((itemPos.toFloat() / info.itemCount.toFloat()) * 100f)
+            else -> ceil((data.chapterItemIndex.toFloat() / data.chapterItemsCount.toFloat()) * 100f)
         }
     }
 
-    val readRoutine = ChaptersIsReadRoutine(repository)
+    private val readRoutine = ChaptersIsReadRoutine(repository)
+
+    fun markChapterStartAsSeen(chapterUrl: String) {
+        readRoutine.setReadStart(chapterUrl = chapterUrl)
+    }
+
+    fun markChapterEndAsSeen(chapterUrl: String) {
+        readRoutine.setReadEnd(chapterUrl = chapterUrl)
+    }
 
     @Volatile
     var forceUpdateListViewState: (suspend () -> Unit)? = null
@@ -197,6 +213,36 @@ class ReaderViewModel @Inject constructor(
                 }
             }
         }
+
+        viewModelScope.launch {
+            readerSpeaker
+                .currentReaderItemFlow
+                .debounce(timeoutMillis = 5_000)
+                .filter { isReaderInSpeakMode }
+                .collect {
+                    saveLastReadPositionFromCurrentSpeakItem()
+                }
+        }
+
+        viewModelScope.launch {
+            readerSpeaker
+                .currentReaderItemFlow
+                .filter { isReaderInSpeakMode }
+                .collect {
+                    val itemIndex = indexOfReaderItem(
+                        list = items,
+                        chapterIndex = it.chapterIndex,
+                        chapterItemIndex = it.chapterItemIndex
+                    )
+                    val item = items.getOrNull(itemIndex) ?: return@collect
+                    if (item !is ReaderItem.ParagraphLocation) return@collect
+                    when (item.location) {
+                        ReaderItem.LOCATION.FIRST -> markChapterStartAsSeen(chapterUrl = item.chapterUrl)
+                        ReaderItem.LOCATION.LAST -> markChapterEndAsSeen(chapterUrl = item.chapterUrl)
+                        ReaderItem.LOCATION.MIDDLE -> Unit
+                    }
+                }
+        }
     }
 
     fun startSpeaker(itemIndex: Int) {
@@ -214,9 +260,32 @@ class ReaderViewModel @Inject constructor(
         readerSpeaker.onClose()
     }
 
+    private val isReaderInSpeakMode by derivedStateOf {
+        readerSpeaker.settings.isThereActiveItem.value &&
+                readerSpeaker.settings.isPlaying.value
+    }
+
+    private fun saveLastReadPositionFromCurrentSpeakItem() {
+        val state = readerSpeaker.settings.currentActiveItemState.value
+        val chapter = chaptersLoader.orderedChapters.getOrNull(state.chapterIndex) ?: return
+        saveLastReadPositionState(
+            repository = repository,
+            bookUrl = bookUrl,
+            chapter = ChapterState(
+                chapterUrl = chapter.url,
+                chapterItemIndex = state.chapterItemIndex,
+                offset = 0
+            )
+        )
+    }
+
     override fun onCleared() {
         chaptersLoader.coroutineContext.cancelChildren()
-        saveLastReadPositionState(repository, bookUrl, currentChapter)
+        if (isReaderInSpeakMode) {
+            saveLastReadPositionFromCurrentSpeakItem()
+        } else {
+            saveLastReadPositionState(repository, bookUrl, currentChapter)
+        }
         super.onCleared()
     }
 
@@ -225,8 +294,15 @@ class ReaderViewModel @Inject constructor(
         readerSpeaker.stop()
     }
 
-    fun updateInfoViewTo(chapterUrl: String, itemPos: Int) {
-        val chapter = chaptersLoader.chaptersStats[chapterUrl] ?: return
-        readingPosStats = Pair(chapter, itemPos)
+    fun updateInfoViewTo(itemIndex: Int) {
+        val item = items.getOrNull(itemIndex) ?: return
+        if (item !is ReaderItem.Position) return
+        val stats = chaptersLoader.chaptersStats[chapterUrl] ?: return
+        readingPosStats = ReadingChapterPosStats(
+            chapterIndex = item.chapterIndex,
+            chapterItemIndex = item.chapterItemIndex,
+            chapterItemsCount = stats.itemsCount,
+            chapterTitle = stats.chapter.title
+        )
     }
 }

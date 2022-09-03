@@ -455,7 +455,7 @@ class ChaptersLoader(
                 withContext(Dispatchers.Main.immediate) {
                     chaptersStats[chapter.url] = ReaderViewModel.ChapterStats(
                         chapter = chapter,
-                        itemCount = items.size,
+                        itemsCount = items.size,
                         chapterIndex = index
                     )
                 }
@@ -485,7 +485,7 @@ class ChaptersLoader(
                 withContext(Dispatchers.Main.immediate) {
                     chaptersStats[chapter.url] = ReaderViewModel.ChapterStats(
                         chapter = chapter,
-                        itemCount = 1,
+                        itemsCount = 1,
                         chapterIndex = index
                     )
                 }

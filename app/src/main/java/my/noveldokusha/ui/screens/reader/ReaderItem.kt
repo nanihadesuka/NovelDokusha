@@ -10,13 +10,16 @@ sealed interface ReaderItem {
         val chapterItemIndex: Int
     }
 
+    enum class LOCATION { FIRST, MIDDLE, LAST }
+    interface ParagraphLocation {
+        val location: LOCATION
+    }
+
     interface Text {
         val text: String
         val textTranslated: String?
         val textToDisplay get() = textTranslated ?: text
     }
-
-    enum class LOCATION { FIRST, MIDDLE, LAST }
 
     data class GoogleTranslateAttribution(
         override val chapterUrl: String,
@@ -36,18 +39,18 @@ sealed interface ReaderItem {
         override val chapterIndex: Int,
         override val chapterItemIndex: Int,
         override val text: String,
-        val location: LOCATION,
+        override val location: LOCATION,
         override val textTranslated: String? = null
-    ) : ReaderItem, Position, Text
+    ) : ReaderItem, Position, Text, ParagraphLocation
 
     data class Image(
         override val chapterUrl: String,
         override val chapterIndex: Int,
         override val chapterItemIndex: Int,
+        override val location: LOCATION,
         val text: String,
-        val location: LOCATION,
         val image: BookTextMapper.ImgEntry
-    ) : ReaderItem, Position
+    ) : ReaderItem, Position, ParagraphLocation
 
     class Translating(
         override val chapterUrl: String,
