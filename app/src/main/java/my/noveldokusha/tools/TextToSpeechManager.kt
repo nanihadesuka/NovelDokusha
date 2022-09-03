@@ -42,6 +42,8 @@ class TextToSpeechManager @Inject constructor(
     private val _queueList = mutableMapOf<String, TextSynthesis>()
     private val _currentTextSpeakFlow = MutableSharedFlow<TextSynthesis>()
     val availableVoices = mutableStateListOf<VoiceData>()
+    val voiceSpeed = mutableStateOf<Float>(1f)
+    val voicePitch = mutableStateOf<Float>(1f)
     val activeVoice = mutableStateOf<VoiceData?>(null)
     val serviceLoadedFlow = MutableSharedFlow<Unit>(replay = 1)
 
@@ -74,16 +76,6 @@ class TextToSpeechManager @Inject constructor(
 
     val isThereActiveItem = derivedStateOf { currentActiveItemState.value.chapterIndex != -1 }
 
-    fun setVoiceById(id: String) {
-        service
-            .voices
-            .find { it.name == id }
-            ?.let {
-                service.voice = it
-                updateActiveVoice()
-            }
-    }
-
     fun stop() {
         service.stop()
         _queueList.clear()
@@ -100,6 +92,33 @@ class TextToSpeechManager @Inject constructor(
     fun setCurrentSpeakState(textSynthesis: TextSynthesis) {
         currentActiveItemState.value = textSynthesis
         scope.launch { _currentTextSpeakFlow.emit(textSynthesis) }
+    }
+
+    fun trySetVoiceById(id: String): Boolean {
+        val voice = service.voices.find { it.name == id } ?: return false
+        service.voice = voice
+        updateActiveVoice()
+        return true
+    }
+
+    fun trySetVoicePitch(value: Float): Boolean {
+        if (value < 0.1 || value > 5) return false
+        val result = service.setPitch(value)
+        if (result == TextToSpeech.SUCCESS) {
+            voicePitch.value = value
+            return true
+        }
+        return false
+    }
+
+    fun trySetVoiceSpeed(value: Float): Boolean {
+        if (value < 0.1 || value > 5) return false
+        val result = service.setSpeechRate(value)
+        if (result == TextToSpeech.SUCCESS) {
+            voiceSpeed.value = value
+            return true
+        }
+        return false
     }
 
     private fun updateActiveVoice() {

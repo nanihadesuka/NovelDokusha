@@ -31,6 +31,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import com.smarttoolfactory.slider.ColorfulSlider
+import com.smarttoolfactory.slider.MaterialSliderDefaults
+import com.smarttoolfactory.slider.SliderBrushColor
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.debounce
@@ -45,15 +48,18 @@ import my.noveldokusha.ui.theme.InternalThemeObject
 import my.noveldokusha.ui.theme.Themes
 import my.noveldokusha.utils.debouncedClickable
 import my.noveldokusha.utils.ifCase
+import my.noveldokusha.utils.mix
 
 
-@OptIn(ExperimentalAnimationApi::class)
+@OptIn(ExperimentalAnimationApi::class, ExperimentalMaterialApi::class)
 @Composable
 fun TextToSpeechSetting(
     isPlaying: Boolean,
     isLoadingChapter: Boolean,
     currentVoice: VoiceData?,
     isActive: Boolean,
+    voiceSpeed: Float,
+    voicePitch: Float,
     setPlaying: (Boolean) -> Unit,
     playPreviousItem: () -> Unit,
     playPreviousChapter: () -> Unit,
@@ -63,7 +69,11 @@ fun TextToSpeechSetting(
     onSelectVoice: (VoiceData) -> Unit,
     playFirstVisibleItem: () -> Unit,
     scrollToActiveItem: () -> Unit,
+    setVoiceSpeed: (Float) -> Unit,
+    setVoicePitch: (Float) -> Unit,
 ) {
+    var openVoicesDialog by rememberSaveable { mutableStateOf(false) }
+
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier.fillMaxWidth()
@@ -84,7 +94,7 @@ fun TextToSpeechSetting(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
                 .padding(4.dp)
-                .background(MaterialTheme.colors.primaryVariant.copy(alpha = 0.8f), CircleShape)
+                .background(MaterialTheme.colors.primaryVariant, CircleShape)
                 .padding(4.dp)
         ) {
             val alpha by animateFloatAsState(targetValue = if (isActive) 1f else 0.5f)
@@ -168,7 +178,6 @@ fun TextToSpeechSetting(
             }
         }
 
-        var openVoicesDialog by rememberSaveable { mutableStateOf(false) }
         Row(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
             modifier = Modifier.padding(8.dp)
@@ -215,6 +224,22 @@ fun TextToSpeechSetting(
             }
         }
 
+        MySlider(
+            value = voicePitch,
+            valueRange = 0.1f..5f,
+            onValueChange = setVoicePitch,
+            modifier = Modifier.padding(horizontal = 12.dp),
+            text = stringResource(R.string.voice_pitch) + ": %.2f".format(voicePitch),
+        )
+
+        MySlider(
+            value = voiceSpeed,
+            valueRange = 0.1f..5f,
+            onValueChange = setVoiceSpeed,
+            modifier = Modifier.padding(horizontal = 12.dp),
+            text = stringResource(R.string.voice_speed) + ": %.2f".format(voiceSpeed),
+        )
+
         VoiceSelectorDialog(
             availableVoices = availableVoices,
             currentVoice = currentVoice,
@@ -223,6 +248,38 @@ fun TextToSpeechSetting(
             isDialogOpen = openVoicesDialog,
             setDialogOpen = { openVoicesDialog = it }
         )
+    }
+}
+
+@Composable
+fun MySlider(
+    value: Float,
+    valueRange: ClosedFloatingPointRange<Float>,
+    onValueChange: (Float) -> Unit,
+    modifier: Modifier,
+    text: String,
+) {
+    Box(modifier) {
+        ColorfulSlider(
+            value = value,
+            valueRange = valueRange,
+            onValueChange = { value -> onValueChange(value) },
+            coerceThumbInTrack = true,
+            modifier = Modifier.padding(horizontal = 12.dp),
+            colors = MaterialSliderDefaults.defaultColors(
+                activeTrackColor = SliderBrushColor(ColorAccent),
+                thumbColor = SliderBrushColor(ColorAccent),
+                inactiveTrackColor = SliderBrushColor(
+                    MaterialTheme.colors.primaryVariant.mix(
+                        ColorAccent,
+                        0.5f
+                    )
+                )
+            ),
+            trackHeight = 30.dp,
+            thumbRadius = 15.dp,
+        )
+        Text(text = text, modifier = Modifier.align(Alignment.Center))
     }
 }
 
@@ -448,6 +505,9 @@ fun TextToSpeechSettingPreview() {
                 needsInternet = false,
                 quality = 100
             ),
+            voiceSpeed = 1f,
+            voicePitch = 1f,
+            isActive = false,
             playPreviousItem = {},
             playPreviousChapter = {},
             playNextItem = {},
@@ -463,7 +523,8 @@ fun TextToSpeechSettingPreview() {
             },
             scrollToActiveItem = {},
             playFirstVisibleItem = {},
-            isActive = false
+            setVoicePitch = {},
+            setVoiceSpeed = {},
         )
     }
 }

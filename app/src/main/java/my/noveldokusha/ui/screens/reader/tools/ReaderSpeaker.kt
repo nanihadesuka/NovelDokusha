@@ -17,7 +17,9 @@ import my.noveldokusha.ui.screens.reader.ReaderItem
 data class TextToSpeechSettingData(
     val isPlaying: MutableState<Boolean>,
     val isLoadingChapter: MutableState<Boolean>,
-    val activeVoice: MutableState<VoiceData?>,
+    val activeVoice: State<VoiceData?>,
+    val voiceSpeed: State<Float>,
+    val voicePitch: State<Float>,
     val availableVoices: SnapshotStateList<VoiceData>,
     val currentActiveItemState: State<TextSynthesis>,
     val isThereActiveItem: State<Boolean>,
@@ -29,6 +31,8 @@ data class TextToSpeechSettingData(
     val playNextChapter: () -> Unit,
     val onSelectVoice: (VoiceData) -> Unit,
     val scrollToActiveItem: () -> Unit,
+    val setVoiceSpeed: (Float) -> Unit,
+    val setVoicePitch: (Float) -> Unit,
 )
 
 class ReaderSpeaker(
@@ -44,6 +48,10 @@ class ReaderSpeaker(
     private val loadNextChapter: () -> Unit,
     private val getPreferredVoiceId: () -> String,
     private val setPreferredVoiceId: (voiceId: String) -> Unit,
+    private val getPreferredVoicePitch: () -> Float,
+    private val setPreferredVoicePitch: (voiceId: Float) -> Unit,
+    private val getPreferredVoiceSpeed: () -> Float,
+    private val setPreferredVoiceSpeed: (voiceId: Float) -> Unit,
 ) {
     val currentReaderItem = textToSpeechManager.currentTextSpeakFlow.asLiveData()
     val currentTextPlaying = textToSpeechManager.currentActiveItemState as State<TextSynthesis>
@@ -59,14 +67,18 @@ class ReaderSpeaker(
         availableVoices = textToSpeechManager.availableVoices,
         currentActiveItemState = textToSpeechManager.currentActiveItemState,
         isThereActiveItem = textToSpeechManager.isThereActiveItem,
-        onSelectVoice = ::onSelectVoice,
+        voicePitch = textToSpeechManager.voicePitch,
+        voiceSpeed = textToSpeechManager.voiceSpeed,
+        onSelectVoice = ::setVoice,
         playFirstVisibleItem = ::playFirstVisibleItem,
         playNextChapter = ::playNextChapter,
         playPreviousChapter = ::playPreviousChapter,
         playNextItem = ::playNextItem,
         playPreviousItem = ::playPreviousItem,
         setPlaying = ::setPlaying,
-        scrollToActiveItem = ::scrollToActiveItem
+        scrollToActiveItem = ::scrollToActiveItem,
+        setVoicePitch = ::setVoicePitch,
+        setVoiceSpeed = ::setVoiceSpeed,
     )
 
     private val halfBuffer = 2
@@ -78,10 +90,9 @@ class ReaderSpeaker(
                 .serviceLoadedFlow
                 .take(1)
                 .collect {
-                    val voiceId = getPreferredVoiceId()
-                    if (voiceId.isNotBlank()) {
-                        textToSpeechManager.setVoiceById(voiceId)
-                    }
+                    textToSpeechManager.trySetVoiceById(getPreferredVoiceId())
+                    textToSpeechManager.trySetVoicePitch(getPreferredVoicePitch())
+                    textToSpeechManager.trySetVoiceSpeed(getPreferredVoiceSpeed())
                 }
         }
     }
@@ -118,7 +129,6 @@ class ReaderSpeaker(
         }
     }
 
-
     @Synchronized
     fun stop() {
         settings.isPlaying.value = false
@@ -140,7 +150,7 @@ class ReaderSpeaker(
         )
     }
 
-    suspend fun readChapterStartingFromChapterItemIndex(
+    private suspend fun readChapterStartingFromChapterItemIndex(
         chapterIndex: Int,
         chapterItemIndex: Int,
     ) {
@@ -369,10 +379,31 @@ class ReaderSpeaker(
         }
     }
 
+    private fun setVoice(voiceData: VoiceData) {
+        val success = textToSpeechManager.trySetVoiceById(id = voiceData.id)
+        if (success) {
+            setPreferredVoiceId(voiceData.id)
+            resumeFromCurrentState()
+        }
+    }
 
-    private fun onSelectVoice(voiceData: VoiceData) {
-        setPreferredVoiceId(voiceData.id)
-        textToSpeechManager.setVoiceById(id = voiceData.id)
+    private fun setVoicePitch(value: Float) {
+        val success = textToSpeechManager.trySetVoicePitch(value)
+        if (success) {
+            setPreferredVoicePitch(value)
+            resumeFromCurrentState()
+        }
+    }
+
+    private fun setVoiceSpeed(value: Float) {
+        val success = textToSpeechManager.trySetVoiceSpeed(value)
+        if (success) {
+            setPreferredVoiceSpeed(value)
+            resumeFromCurrentState()
+        }
+    }
+
+    private fun resumeFromCurrentState() {
         if (!settings.isPlaying.value) {
             return
         }

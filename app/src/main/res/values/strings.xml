@@ -136,4 +136,6 @@
 	<string name="no_matches">No matches</string>
     <string name="start_here">Start here</string>
 	<string name="focus">Focus</string>
+    <string name="voice_pitch">Voice pitch</string>
+    <string name="voice_speed">Voice speed</string>
 </resources>

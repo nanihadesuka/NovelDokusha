@@ -137,6 +137,10 @@ private fun Settings(
                     CurrentSettingVisible.TextToSpeech -> TextToSpeechSetting(
                         isPlaying = textToSpeechSettingData.isPlaying.value,
                         isLoadingChapter = textToSpeechSettingData.isLoadingChapter.value,
+                        voicePitch = textToSpeechSettingData.voicePitch.value,
+                        voiceSpeed = textToSpeechSettingData.voiceSpeed.value,
+                        setVoicePitch = textToSpeechSettingData.setVoicePitch,
+                        setVoiceSpeed = textToSpeechSettingData.setVoiceSpeed,
                         currentVoice = textToSpeechSettingData.activeVoice.value,
                         isActive = textToSpeechSettingData.isThereActiveItem.value,
                         availableVoices = textToSpeechSettingData.availableVoices,
@@ -407,6 +411,8 @@ private fun ViewsPreview() {
     val textToSpeechSettingData = TextToSpeechSettingData(
         isPlaying = remember { mutableStateOf(false) },
         isLoadingChapter = remember { mutableStateOf(false) },
+        voicePitch = remember { mutableStateOf(1f) },
+        voiceSpeed = remember { mutableStateOf(1f) },
         availableVoices = remember { mutableStateListOf() },
         activeVoice = remember {
             mutableStateOf(
@@ -436,6 +442,8 @@ private fun ViewsPreview() {
         onSelectVoice = {},
         playFirstVisibleItem = {},
         scrollToActiveItem = {},
+        setVoiceSpeed = {},
+        setVoicePitch = {},
     )
 
     InternalTheme {
