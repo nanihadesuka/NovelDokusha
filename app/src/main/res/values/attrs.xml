@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-	<declare-styleable name="myFastScroll">
-		<attr name="attachedRecyclerView" format="reference|enum" />
-	</declare-styleable>
+    <declare-styleable name="myFastScroll">
+        <attr name="attachedRecyclerView" format="reference|enum" />
+    </declare-styleable>
 
-	<declare-styleable name="Checkbox3StatesView">
-		<attr name="android:text" format="string"/>
-	</declare-styleable>
+    <declare-styleable name="Checkbox3StatesView">
+        <attr name="android:text" format="string" />
+    </declare-styleable>
+
+    <attr name="colorAccentTransparent" format="color" />
 
 </resources>

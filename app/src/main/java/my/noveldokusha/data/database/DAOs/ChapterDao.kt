@@ -32,6 +32,18 @@ interface ChapterDao {
     @Query("UPDATE Chapter SET read = 1 WHERE url in (:chaptersUrl)")
     suspend fun setAsRead(chaptersUrl: List<String>)
 
+    @Query("UPDATE Chapter SET read = :read WHERE url = :chapterUrl")
+    suspend fun setAsRead(chapterUrl: String, read: Boolean)
+
+    @Query(
+        """
+        UPDATE Chapter 
+        SET lastReadPosition = :lastReadPosition, lastReadOffset = :lastReadOffset
+        WHERE url = :chapterUrl
+    """
+    )
+    suspend fun updatePosition(chapterUrl: String, lastReadPosition: Int, lastReadOffset: Int)
+
     @Query("UPDATE Chapter SET title = :title WHERE url == :url")
     suspend fun updateTitle(url: String, title: String)
 

@@ -1,7 +1,6 @@
 package my.noveldokusha.scraper.databases
 
 import android.net.Uri
-import android.util.Log
 import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.network.NetworkClient
 import my.noveldokusha.network.PagedList
@@ -190,8 +189,6 @@ class BakaUpdates(
             tags = tags,
             authors = authors,
             coverImageUrl = coverImageUrl
-        ).also {
-            Log.e(">>>DATA", it.toString())
-        }
+        )
     }
 }

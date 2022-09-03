@@ -31,12 +31,12 @@ fun View.fadeOutVertical(displacement: Float = 0f, duration: Long = 150) = apply
     }
 }
 
-fun View.fadeIn(duration: Long = 150) = apply {
+fun View.fadeIn(durationMillis: Long = 150) = apply {
     alpha = 0f
     visibility = View.VISIBLE
     animate().also {
         it.alpha(1f)
-        it.duration = duration
+        it.duration = durationMillis
         it.interpolator = DecelerateInterpolator()
     }
 }

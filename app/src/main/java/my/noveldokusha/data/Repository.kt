@@ -87,6 +87,13 @@ class Repository @Inject constructor(
             db.libraryDao().updateDescription(bookUrl, description)
 
         suspend fun get(url: String) = db.libraryDao().get(url)
+
+        suspend fun updateLastReadChapter(bookUrl: String, lastReadChapterUrl: String) =
+            db.libraryDao().updateLastReadChapter(
+                bookUrl = bookUrl,
+                chapterUrl = lastReadChapterUrl
+            )
+
         suspend fun getAll() = db.libraryDao().getAll()
         suspend fun getAllInLibrary() = db.libraryDao().getAllInLibrary()
         suspend fun existInLibrary(url: String) = db.libraryDao().existInLibrary(url)
@@ -104,6 +111,16 @@ class Repository @Inject constructor(
             db.chapterDao().numberOfUnreadChaptersFlow(bookUrl)
 
         suspend fun update(chapter: Chapter) = db.chapterDao().update(chapter)
+        suspend fun updatePosition(chapterUrl: String, lastReadPosition: Int, lastReadOffset: Int) =
+            db.chapterDao().updatePosition(
+                chapterUrl = chapterUrl,
+                lastReadPosition = lastReadPosition,
+                lastReadOffset = lastReadOffset
+            )
+
+        suspend fun setAsRead(chapterUrl: String, read: Boolean) =
+            db.chapterDao().setAsRead(chapterUrl, read)
+
         suspend fun get(url: String) = db.chapterDao().get(url)
         suspend fun hasChapters(bookUrl: String) = db.chapterDao().hasChapters(bookUrl)
         suspend fun getAll() = db.chapterDao().getAll()

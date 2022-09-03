@@ -126,4 +126,19 @@
     <string name="text_selection">Text selection</string>
     <string name="allow_text_selection">Allow text selection</string>
 	<string name="last_read">Last read</string>
+    <string name="text_to_speech">Text to speech</string>
+    <string name="voices">Voices</string>
+	<string name="enable">Enable</string>
+    <string name="search_voice_by_language">Search voice by language</string>
+	<string name="language">Language</string>
+	<string name="quality">Quality</string>
+	<string name="needs_internet">Needs Internet</string>
+	<string name="no_matches">No matches</string>
+    <string name="start_here">Start here</string>
+	<string name="focus">Focus</string>
+    <string name="voice_pitch">Voice pitch</string>
+    <string name="voice_speed">Voice speed</string>
+	<string name="chapter_x_over_n">Chapter: %1$d/%2$d</string>
+	<string name="progress_x_percentage">Progress: %1$.0f%%</string>
+	<string name="text_size">Text size</string>
 </resources>

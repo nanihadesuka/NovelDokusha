@@ -20,7 +20,7 @@ interface NetworkClient {
     suspend fun get(url: Uri.Builder): Response
 }
 
-class ScrapperNetworkClient(
+class ScraperNetworkClient(
     cacheDir: File,
     cacheSize: Long,
     @ApplicationContext private val appContext: Context

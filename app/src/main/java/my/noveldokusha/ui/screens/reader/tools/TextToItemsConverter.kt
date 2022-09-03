@@ -9,6 +9,8 @@ import my.noveldokusha.ui.screens.reader.ReaderItem
 
 suspend fun textToItemsConverter(
     chapterUrl: String,
+    chapterPos: Int,
+    initialChapterItemIndex: Int,
     text: String
 ): List<ReaderItem> = withContext(Dispatchers.Default) {
     val paragraphs = text
@@ -19,46 +21,39 @@ suspend fun textToItemsConverter(
     return@withContext paragraphs
         .mapIndexed { index, paragraph ->
             async {
-                when (index) {
-                    0 -> generateITEM(
-                        chapterUrl,
-                        index + 1,
-                        paragraph,
-                        ReaderItem.LOCATION.FIRST
-                    )
-                    paragraphs.lastIndex -> generateITEM(
-                        chapterUrl,
-                        index + 1,
-                        paragraph,
-                        ReaderItem.LOCATION.LAST
-                    )
-                    else -> generateITEM(
-                        chapterUrl,
-                        index + 1,
-                        paragraph,
-                        ReaderItem.LOCATION.MIDDLE
-                    )
-                }
+                generateITEM(
+                    chapterUrl = chapterUrl,
+                    chapterIndex = chapterPos,
+                    chapterItemIndex = index + initialChapterItemIndex,
+                    text = paragraph,
+                    location = when (index) {
+                        0 -> ReaderItem.Location.FIRST
+                        paragraphs.lastIndex -> ReaderItem.Location.LAST
+                        else -> ReaderItem.Location.MIDDLE
+                    }
+                )
             }
-        }
-        .awaitAll()
+        }.awaitAll()
 }
 
 private fun generateITEM(
     chapterUrl: String,
-    pos: Int,
+    chapterIndex: Int,
+    chapterItemIndex: Int,
     text: String,
-    location: ReaderItem.LOCATION
+    location: ReaderItem.Location
 ): ReaderItem = when (val imgEntry = BookTextMapper.ImgEntry.fromXMLString(text)) {
-    null -> ReaderItem.BODY(
+    null -> ReaderItem.Body(
         chapterUrl = chapterUrl,
-        pos = pos,
+        chapterIndex = chapterIndex,
+        chapterItemIndex = chapterItemIndex,
         text = text,
         location = location
     )
-    else -> ReaderItem.BODY_IMAGE(
+    else -> ReaderItem.Image(
         chapterUrl = chapterUrl,
-        pos = pos,
+        chapterIndex = chapterIndex,
+        chapterItemIndex = chapterItemIndex,
         text = text,
         location = location,
         image = imgEntry

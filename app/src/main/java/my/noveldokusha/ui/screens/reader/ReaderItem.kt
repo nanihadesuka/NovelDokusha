@@ -2,58 +2,75 @@ package my.noveldokusha.ui.screens.reader
 
 import my.noveldokusha.tools.BookTextMapper
 
-sealed class ReaderItem {
-    abstract val chapterUrl: String
+sealed interface ReaderItem {
+    val chapterUrl: String
+    val chapterIndex: Int
 
-    interface Position {
-        val pos: Int
+    sealed interface Position : ReaderItem {
+        val chapterItemIndex: Int
     }
 
-    enum class LOCATION { FIRST, MIDDLE, LAST }
+    enum class Location { FIRST, MIDDLE, LAST }
+    sealed interface ParagraphLocation : ReaderItem {
+        val location: Location
+    }
 
-    data class GOOGLE_TRANSLATE_ATTRIBUTION(
-        override val chapterUrl: String,
-    ) : ReaderItem()
-
-    data class TITLE(
-        override val chapterUrl: String,
-        override val pos: Int,
-        val text: String,
-        val textTranslated: String? = null
-    ) : ReaderItem(), Position {
+    sealed interface Text : ReaderItem, Position {
+        val text: String
+        val textTranslated: String?
         val textToDisplay get() = textTranslated ?: text
     }
 
-    data class BODY(
+    data class GoogleTranslateAttribution(
         override val chapterUrl: String,
-        override val pos: Int,
-        val text: String,
-        val location: LOCATION,
-        val textTranslated: String? = null
-    ) : ReaderItem(), Position {
-        val textToDisplay get() = textTranslated ?: text
-    }
+        override val chapterIndex: Int,
+    ) : ReaderItem
 
-    data class BODY_IMAGE(
+    data class Title(
         override val chapterUrl: String,
-        override val pos: Int,
+        override val chapterIndex: Int,
+        override val chapterItemIndex: Int,
+        override val text: String,
+        override val textTranslated: String? = null
+    ) : ReaderItem, Text, Position
+
+    data class Body(
+        override val chapterUrl: String,
+        override val chapterIndex: Int,
+        override val chapterItemIndex: Int,
+        override val text: String,
+        override val location: Location,
+        override val textTranslated: String? = null
+    ) : ReaderItem, Text, Position, ParagraphLocation
+
+    data class Image(
+        override val chapterUrl: String,
+        override val chapterIndex: Int,
+        override val chapterItemIndex: Int,
+        override val location: Location,
         val text: String,
-        val location: LOCATION,
         val image: BookTextMapper.ImgEntry
-    ) : ReaderItem(), Position
+    ) : ReaderItem, Position, ParagraphLocation
 
-    class TRANSLATING(
+    class Translating(
         override val chapterUrl: String,
+        override val chapterIndex: Int,
         val sourceLang: String,
         val targetLang: String
-    ) : ReaderItem()
+    ) : ReaderItem
 
-    class PROGRESSBAR(override val chapterUrl: String) : ReaderItem()
+    class Progressbar(override val chapterUrl: String, override val chapterIndex: Int) :
+        ReaderItem
 
-    class DIVIDER(override val chapterUrl: String) : ReaderItem()
-    class BOOK_END(override val chapterUrl: String) : ReaderItem()
-    class BOOK_START(override val chapterUrl: String) : ReaderItem()
-    class ERROR(override val chapterUrl: String, val text: String) : ReaderItem()
-    class PADDING(override val chapterUrl: String) : ReaderItem()
+    class Divider(override val chapterUrl: String, override val chapterIndex: Int) : ReaderItem
+    class BookEnd(override val chapterUrl: String, override val chapterIndex: Int) : ReaderItem
+    class BookStart(override val chapterUrl: String, override val chapterIndex: Int) : ReaderItem
+    class Error(
+        override val chapterUrl: String,
+        override val chapterIndex: Int,
+        val text: String
+    ) : ReaderItem
+
+    class Padding(override val chapterUrl: String, override val chapterIndex: Int) : ReaderItem
 }
 
