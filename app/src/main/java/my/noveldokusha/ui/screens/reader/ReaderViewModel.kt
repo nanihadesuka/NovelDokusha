@@ -130,9 +130,9 @@ class ReaderViewModel @Inject constructor(
     val items get() = chaptersLoader.getItems()
 
     val readerSpeaker = ReaderSpeaker(
+        coroutineScope = viewModelScope,
         textToSpeechManager = textToSpeechManager,
         items = items,
-        coroutineScope = viewModelScope,
         chapterLoadedFlow = chaptersLoader.chapterLoadedFlow,
         isChapterIndexLoaded = chaptersLoader::isChapterIndexLoaded,
         isChapterIndexValid = chaptersLoader::isChapterIndexValid,
@@ -140,6 +140,8 @@ class ReaderViewModel @Inject constructor(
         loadNextChapter = chaptersLoader::tryLoadNext,
         scrollToTheTop = scrollToTheTop,
         scrollToTheBottom = scrollToTheBottom,
+        getPreferredVoiceId = { appPreferences.READER_TEXT_TO_SPEECH_VOICE_ID.value },
+        setPreferredVoiceId = { appPreferences.READER_TEXT_TO_SPEECH_VOICE_ID.value = it },
     )
 
     init {

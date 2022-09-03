@@ -3,6 +3,7 @@ package my.noveldokusha.ui.screens.reader.settingsViews
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -86,10 +87,11 @@ fun TextToSpeechSetting(
                 .background(MaterialTheme.colors.primaryVariant.copy(alpha = 0.8f), CircleShape)
                 .padding(4.dp)
         ) {
+            val alpha by animateFloatAsState(targetValue = if (isActive) 1f else 0.5f)
             IconButton(
                 onClick = debouncedAction { playPreviousChapter() },
                 enabled = isActive,
-                modifier = Modifier.ifCase(!isActive) { alpha(0.5f) },
+                modifier = Modifier.alpha(alpha),
             ) {
                 Icon(
                     imageVector = Icons.Rounded.FastRewind,
@@ -103,7 +105,7 @@ fun TextToSpeechSetting(
             IconButton(
                 onClick = debouncedAction(waitMillis = 50) { playPreviousItem() },
                 enabled = isActive,
-                modifier = Modifier.ifCase(!isActive) { alpha(0.5f) },
+                modifier = Modifier.alpha(alpha),
             ) {
                 Icon(
                     imageVector = Icons.Rounded.NavigateBefore,
@@ -139,7 +141,7 @@ fun TextToSpeechSetting(
             IconButton(
                 onClick = debouncedAction(waitMillis = 50) { playNextItem() },
                 enabled = isActive,
-                modifier = Modifier.ifCase(!isActive) { alpha(0.5f) },
+                modifier = Modifier.alpha(alpha),
             ) {
                 Icon(
                     Icons.Rounded.NavigateNext,
@@ -153,7 +155,7 @@ fun TextToSpeechSetting(
             IconButton(
                 onClick = debouncedAction { playNextChapter() },
                 enabled = isActive,
-                modifier = Modifier.ifCase(!isActive) { alpha(0.5f) },
+                modifier = Modifier.alpha(alpha),
             ) {
                 Icon(
                     Icons.Rounded.FastForward,

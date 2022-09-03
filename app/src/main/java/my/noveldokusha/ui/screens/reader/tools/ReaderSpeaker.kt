@@ -32,9 +32,9 @@ data class TextToSpeechSettingData(
 )
 
 class ReaderSpeaker(
+    private val coroutineScope: CoroutineScope,
     private val textToSpeechManager: TextToSpeechManager,
     private val items: List<ReaderItem>,
-    private val coroutineScope: CoroutineScope,
     private val chapterLoadedFlow: Flow<ChaptersLoader.ChapterLoaded>,
     private val scrollToTheTop: MutableSharedFlow<Unit>,
     private val scrollToTheBottom: MutableSharedFlow<Unit>,
@@ -42,6 +42,8 @@ class ReaderSpeaker(
     private val isChapterIndexLoaded: (chapterIndex: Int) -> Boolean,
     private val tryLoadPreviousChapter: () -> Unit,
     private val loadNextChapter: () -> Unit,
+    private val getPreferredVoiceId: () -> String,
+    private val setPreferredVoiceId: (voiceId: String) -> Unit,
 ) {
     val currentReaderItem = textToSpeechManager.currentTextSpeakFlow.asLiveData()
     val currentTextPlaying = textToSpeechManager.currentActiveItemState as State<TextSynthesis>
@@ -69,6 +71,20 @@ class ReaderSpeaker(
 
     private val halfBuffer = 2
     private var updateJob: Job? = null
+
+    init {
+        coroutineScope.launch {
+            textToSpeechManager
+                .serviceLoadedFlow
+                .take(1)
+                .collect {
+                    val voiceId = getPreferredVoiceId()
+                    if (voiceId.isNotBlank()) {
+                        textToSpeechManager.setVoiceById(voiceId)
+                    }
+                }
+        }
+    }
 
     @Synchronized
     fun start() {
@@ -350,6 +366,7 @@ class ReaderSpeaker(
 
 
     private fun onSelectVoice(voiceData: VoiceData) {
+        setPreferredVoiceId(voiceData.id)
         textToSpeechManager.setVoiceById(id = voiceData.id)
         if (!settings.isPlaying.value) {
             return

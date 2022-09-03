@@ -38,12 +38,18 @@ data class VoiceData(
 class TextToSpeechManager @Inject constructor(
     val context: Context,
 ) {
+    private val scope = CoroutineScope(Dispatchers.Default)
     private val _queueList = mutableMapOf<String, TextSynthesis>()
-    val queueList = _queueList as Map<String, TextSynthesis>
+    private val _currentTextSpeakFlow = MutableSharedFlow<TextSynthesis>()
     val availableVoices = mutableStateListOf<VoiceData>()
     val activeVoice = mutableStateOf<VoiceData?>(null)
+    val serviceLoadedFlow = MutableSharedFlow<Unit>(replay = 1)
 
-    private val scope = CoroutineScope(Dispatchers.Default)
+    val queueList = _queueList as Map<String, TextSynthesis>
+    val currentTextSpeakFlow = _currentTextSpeakFlow.shareIn(
+        scope = scope,
+        started = SharingStarted.WhileSubscribed()
+    )
 
     val service = TextToSpeech(context) {
         when (it) {
@@ -51,18 +57,12 @@ class TextToSpeechManager @Inject constructor(
                 listenToUtterances()
                 availableVoices.addAll(getAvailableVoices())
                 updateActiveVoice()
+                scope.launch { serviceLoadedFlow.emit(Unit) }
             }
             TextToSpeech.ERROR -> Unit
             else -> Unit
         }
     }
-
-
-    private val _currentTextSpeakFlow = MutableSharedFlow<TextSynthesis>()
-    val currentTextSpeakFlow = _currentTextSpeakFlow.shareIn(
-        scope = CoroutineScope(Dispatchers.Default),
-        started = SharingStarted.WhileSubscribed()
-    )
 
     val currentActiveItemState = mutableStateOf(
         TextSynthesis(
