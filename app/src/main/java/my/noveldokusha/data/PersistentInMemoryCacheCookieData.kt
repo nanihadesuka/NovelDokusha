@@ -20,6 +20,7 @@ private typealias CHMap = ConcurrentHashMap<String, ConcurrentHashMap<String, St
 private typealias MM = MutableMap<String, MutableMap<String, String>>
 
 // TODO() make it work with okhttp
+@OptIn(FlowPreview::class)
 class PersistentInMemoryCacheCookieData(
     val name: String,
     private val coroutineScope: CoroutineScope,

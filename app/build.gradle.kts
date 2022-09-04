@@ -19,7 +19,7 @@ android {
     val hasDefaultSigningConfigData = defaultSigningConfigData.hasProperty("storeFile")
     println("hasDefaultSigningConfigData: $hasDefaultSigningConfigData")
 
-    compileSdk = 32
+    compileSdk = 33
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
@@ -50,7 +50,7 @@ android {
     defaultConfig {
         applicationId = "my.noveldokusha"
         minSdk = 26
-        targetSdk = 32
+        targetSdk = 33
         versionCode = 9
         versionName = "1.7.0"
         setProperty("archivesBaseName", "NovelDokusha_v$versionName")
@@ -103,7 +103,7 @@ android {
                 fullImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.6.4")
 
                 // Android ML Translation Kit
-                fullImplementation("com.google.mlkit:translate:17.0.0")
+                fullImplementation("com.google.mlkit:translate:17.0.1")
             }
         }
 
@@ -148,16 +148,16 @@ dependencies {
     implementation("androidx.preference:preference-ktx:1.2.0")
 
     // UI
-    implementation("androidx.appcompat:appcompat:1.4.2")
-    implementation("androidx.core:core-ktx:1.9.0-alpha05")
+    implementation("androidx.appcompat:appcompat:1.5.0")
+    implementation("androidx.core:core-ktx:1.9.0-rc01")
     implementation("androidx.navigation:navigation-fragment-ktx:2.5.1")
     implementation("androidx.navigation:navigation-ui-ktx:2.5.1")
     implementation("androidx.activity:activity-ktx:1.5.1")
-    implementation("androidx.fragment:fragment-ktx:1.5.1")
+    implementation("androidx.fragment:fragment-ktx:1.5.2")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
     implementation("androidx.recyclerview:recyclerview:1.2.1")
     implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
-    implementation("com.google.android.material:material:1.7.0-alpha03")
+    implementation("com.google.android.material:material:1.8.0-alpha01")
     implementation("com.l4digital.fastscroll:fastscroll:2.0.1")
     implementation("com.afollestad.material-dialogs:core:3.3.0")
 
@@ -187,20 +187,20 @@ dependencies {
 
     // Jetpack compose
     implementation("androidx.activity:activity-compose:1.5.1")
-    implementation("androidx.compose.material:material:1.2.0")
-    implementation("androidx.compose.animation:animation:1.2.0")
-    implementation("androidx.compose.ui:ui-tooling:1.2.0")
+    implementation("androidx.compose.material:material:1.2.1")
+    implementation("androidx.compose.animation:animation:1.2.1")
+    implementation("androidx.compose.ui:ui-tooling:1.2.1")
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.5.1")
-    implementation("androidx.compose.runtime:runtime-livedata:1.2.0")
+    implementation("androidx.compose.runtime:runtime-livedata:1.2.1")
     implementation("androidx.constraintlayout:constraintlayout-compose:1.0.1")
-    implementation("androidx.compose.material:material-icons-extended:1.2.0")
+    implementation("androidx.compose.material:material-icons-extended:1.2.1")
     implementation("com.google.accompanist:accompanist-systemuicontroller:0.25.0")
     implementation("com.google.accompanist:accompanist-swiperefresh:0.25.0")
     implementation("com.google.accompanist:accompanist-insets:0.25.0")
     implementation("com.google.accompanist:accompanist-pager:0.25.0")
     implementation("com.google.accompanist:accompanist-pager-indicators:0.25.0")
 
-    androidTestImplementation("androidx.compose.ui:ui-test-junit4:1.2.0")
+    androidTestImplementation("androidx.compose.ui:ui-test-junit4:1.2.1")
 
     // Networking
     implementation("com.squareup.okhttp3:okhttp:4.10.0")
