@@ -6,6 +6,8 @@ plugins {
     id("kotlin-android")
     id("kotlin-kapt")
     id("dagger.hilt.android.plugin")
+    kotlin("plugin.serialization") version("1.7.10")
+
 }
 
 android {
@@ -167,8 +169,9 @@ dependencies {
     androidTestImplementation("androidx.test.espresso:espresso-core:3.4.0")
     testImplementation("org.mockito.kotlin:mockito-kotlin:4.0.0")
 
-    // GSON
+    // Serialization
     implementation("com.google.code.gson:gson:2.9.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.3")
 
     // Retrofit
     implementation("com.squareup.retrofit2:retrofit:2.9.0")

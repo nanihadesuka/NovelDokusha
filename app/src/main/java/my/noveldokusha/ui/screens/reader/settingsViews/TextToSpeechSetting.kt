@@ -16,10 +16,12 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.StarRate
+import androidx.compose.material.icons.outlined.FormatListBulleted
 import androidx.compose.material.icons.rounded.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
@@ -36,12 +38,16 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.withContext
 import my.noveldokusha.R
+import my.noveldokusha.VoicePredefineState
 import my.noveldokusha.composableActions.debouncedAction
 import my.noveldokusha.tools.VoiceData
+import my.noveldokusha.ui.composeViews.MyOutlinedTextField
 import my.noveldokusha.ui.composeViews.MySlider
 import my.noveldokusha.ui.theme.*
+import my.noveldokusha.uiViews.MyButton
 import my.noveldokusha.utils.debouncedClickable
 import my.noveldokusha.utils.ifCase
+import my.noveldokusha.utils.rememberMutableStateOf
 import my.noveldokusha.utils.roundedOutline
 
 
@@ -54,19 +60,22 @@ fun TextToSpeechSetting(
     isActive: Boolean,
     voiceSpeed: Float,
     voicePitch: Float,
-    setPlaying: (Boolean) -> Unit,
+    playCurrent: (Boolean) -> Unit,
     playPreviousItem: () -> Unit,
     playPreviousChapter: () -> Unit,
     playNextItem: () -> Unit,
     playNextChapter: () -> Unit,
-    availableVoices: List<VoiceData>,
-    onSelectVoice: (VoiceData) -> Unit,
     playFirstVisibleItem: () -> Unit,
     scrollToActiveItem: () -> Unit,
+    availableVoices: List<VoiceData>,
+    customSavedVoicesStates: List<VoicePredefineState>,
+    setVoice: (voiceId: String) -> Unit,
     setVoiceSpeed: (Float) -> Unit,
     setVoicePitch: (Float) -> Unit,
+    setCustomSavedVoices: (List<VoicePredefineState>) -> Unit,
 ) {
     var openVoicesDialog by rememberSaveable { mutableStateOf(false) }
+    val dropdownCustomSavedVoicesExpanded = rememberSaveable { mutableStateOf(false) }
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -120,7 +129,7 @@ fun TextToSpeechSetting(
                         .background(ColorAccent, CircleShape),
                 )
             }
-            IconButton(onClick = { setPlaying(!isPlaying) }) {
+            IconButton(onClick = { playCurrent(!isPlaying) }) {
                 AnimatedContent(
                     targetState = isPlaying,
                     modifier = Modifier
@@ -175,14 +184,12 @@ fun TextToSpeechSetting(
         Row(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
-
             Surface(
                 color = MaterialTheme.colors.primary,
                 modifier = Modifier
                     .height(selectableMinHeight)
                     .roundedOutline()
                     .debouncedClickable { playFirstVisibleItem() }
-                    .widthIn(min = 76.dp)
             ) {
                 Text(
                     text = stringResource(R.string.start_here),
@@ -198,7 +205,6 @@ fun TextToSpeechSetting(
                     .height(selectableMinHeight)
                     .roundedOutline()
                     .debouncedClickable { scrollToActiveItem() }
-                    .widthIn(min = 76.dp)
             ) {
                 Text(
                     text = stringResource(R.string.focus),
@@ -214,7 +220,6 @@ fun TextToSpeechSetting(
                     .height(selectableMinHeight)
                     .roundedOutline()
                     .clickable { openVoicesDialog = !openVoicesDialog }
-                    .widthIn(min = 76.dp)
             ) {
                 Text(
                     text = stringResource(id = R.string.voices),
@@ -222,6 +227,39 @@ fun TextToSpeechSetting(
                         .padding(12.dp)
                         .wrapContentHeight(Alignment.CenterVertically),
                     textAlign = TextAlign.Center
+                )
+            }
+            Surface(
+                color = MaterialTheme.colors.primary,
+                modifier = Modifier
+                    .size(selectableMinHeight)
+                    .roundedOutline()
+                    .clickable {
+                        dropdownCustomSavedVoicesExpanded.value =
+                            !dropdownCustomSavedVoicesExpanded.value
+                    }
+            ) {
+                Box(
+                    contentAlignment = Center,
+                    modifier = Modifier.size(16.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Outlined.FormatListBulleted,
+                        contentDescription = stringResource(R.string.custom_predefined_voices),
+                    )
+                }
+                DropdownCustomSavedVoices(
+                    expanded = dropdownCustomSavedVoicesExpanded,
+                    list = customSavedVoicesStates,
+                    currentVoice = currentVoice,
+                    currentVoiceSpeed = voiceSpeed,
+                    currentVoicePitch = voicePitch,
+                    onPredefinedSelected = {
+                        setVoiceSpeed(it.speed)
+                        setVoicePitch(it.pitch)
+                        setVoice(it.voiceId)
+                    },
+                    setCustomSavedVoices = setCustomSavedVoices
                 )
             }
         }
@@ -244,7 +282,7 @@ fun TextToSpeechSetting(
             availableVoices = availableVoices,
             currentVoice = currentVoice,
             inputTextFilter = rememberSaveable { mutableStateOf("") },
-            setVoice = onSelectVoice,
+            setVoice = setVoice,
             isDialogOpen = openVoicesDialog,
             setDialogOpen = { openVoicesDialog = it }
         )
@@ -257,7 +295,7 @@ private fun VoiceSelectorDialog(
     availableVoices: List<VoiceData>,
     currentVoice: VoiceData?,
     inputTextFilter: MutableState<String>,
-    setVoice: (VoiceData) -> Unit,
+    setVoice: (voiceId: String) -> Unit,
     isDialogOpen: Boolean,
     setDialogOpen: (Boolean) -> Unit,
 ) {
@@ -311,24 +349,10 @@ private fun VoiceSelectorDialog(
                         verticalArrangement = Arrangement.spacedBy(4.dp),
                         modifier = Modifier.padding(bottom = 2.dp),
                     ) {
-                        OutlinedTextField(
+                        MyOutlinedTextField(
                             value = inputTextFilter.value,
                             onValueChange = { inputTextFilter.value = it },
-                            singleLine = true,
-                            placeholder = {
-                                Text(
-                                    text = stringResource(R.string.search_voice_by_language),
-                                    modifier = Modifier.alpha(0.7f),
-                                    style = MaterialTheme.typography.subtitle2
-                                )
-                            },
-                            modifier = Modifier
-                                .heightIn(min = 42.dp)
-                                .fillMaxWidth(),
-                            shape = CircleShape,
-                            colors = TextFieldDefaults.outlinedTextFieldColors(
-                                focusedBorderColor = MaterialTheme.colors.onPrimary
-                            )
+                            placeHolderText = stringResource(R.string.search_voice_by_language)
                         )
                         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                             Text(
@@ -366,7 +390,7 @@ private fun VoiceSelectorDialog(
                             CircleShape
                         )
                         .clip(CircleShape)
-                        .clickable(enabled = !selected) { setVoice(it) }
+                        .clickable(enabled = !selected) { setVoice(it.id) }
                         .ifCase(selected) { border(2.dp, ColorAccent, CircleShape) }
                         .padding(horizontal = 16.dp)
                         .padding(4.dp)
@@ -433,6 +457,112 @@ private fun VoiceSelectorDialog(
     }
 }
 
+
+@Composable
+fun DropdownCustomSavedVoices(
+    expanded: MutableState<Boolean>,
+    list: List<VoicePredefineState>,
+    currentVoice: VoiceData?,
+    currentVoiceSpeed: Float,
+    currentVoicePitch: Float,
+    onPredefinedSelected: (VoicePredefineState) -> Unit,
+    setCustomSavedVoices: (List<VoicePredefineState>) -> Unit,
+) {
+
+    var expandedAddNextEntry by rememberMutableStateOf(false)
+    var deleteEntryExpand by rememberMutableStateOf(false)
+    DropdownMenu(
+        expanded = expanded.value,
+        onDismissRequest = { expanded.value = !expanded.value }) {
+        Column(
+            verticalArrangement = Arrangement.spacedBy(4.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            MyButton(
+                text = stringResource(R.string.save_current_voice),
+                onClick = { expandedAddNextEntry = true },
+                textAlign = TextAlign.Center,
+            )
+            list.forEachIndexed { index, predefinedVoice ->
+                MyButton(
+                    text = predefinedVoice.savedName,
+                    onClick = { onPredefinedSelected(predefinedVoice) },
+                    onLongClick = { deleteEntryExpand = true },
+                    shape = CircleShape,
+                    modifier = Modifier.widthIn(min = 46.dp),
+                )
+                if (deleteEntryExpand) AlertDialog(
+                    onDismissRequest = { deleteEntryExpand = false },
+                    title = {
+                        Text(
+                            text = predefinedVoice.savedName,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(bottom = 8.dp),
+                            textAlign = TextAlign.Center
+                        )
+                    },
+                    buttons = {
+                        MyButton(
+                            text = "Delete",
+                            onClick = {
+                                setCustomSavedVoices(
+                                    list.toMutableList().also { it.removeAt(index) }
+                                )
+                                deleteEntryExpand = false
+                            },
+                            modifier = Modifier.fillMaxWidth(),
+                            textAlign = TextAlign.Center
+                        )
+                    }
+                )
+            }
+        }
+    }
+
+    if (expandedAddNextEntry) Dialog(
+        onDismissRequest = { expandedAddNextEntry = !expandedAddNextEntry }
+    ) {
+        var name by rememberMutableStateOf(value = "")
+        Surface(
+            shape = MaterialTheme.shapes.large
+        ) {
+            Column(
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier.padding(12.dp)
+            ) {
+                Text(
+                    text = stringResource(R.string.save_current_voice_parameters),
+                    textAlign = TextAlign.Center
+                )
+                MyOutlinedTextField(
+                    value = name,
+                    onValueChange = { name = it },
+                    placeHolderText = stringResource(R.string.name)
+                )
+                MyButton(
+                    text = stringResource(id = R.string.save),
+                    onClick = click@{
+                        val voice = currentVoice ?: return@click
+                        val state = VoicePredefineState(
+                            savedName = name,
+                            voiceId = voice.id,
+                            speed = currentVoiceSpeed,
+                            pitch = currentVoicePitch
+                        )
+                        setCustomSavedVoices(list + state)
+                        expandedAddNextEntry = false
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                    textAlign = TextAlign.Center
+                )
+            }
+        }
+    }
+}
+
+
 @Preview(group = "dialog")
 @Composable
 fun VoiceSelectorDialogContentPreview() {
@@ -467,7 +597,7 @@ fun TextToSpeechSettingPreview() {
         TextToSpeechSetting(
             isPlaying = true,
             isLoadingChapter = true,
-            setPlaying = {},
+            playCurrent = {},
             currentVoice = VoiceData(
                 id = "",
                 language = "",
@@ -481,7 +611,7 @@ fun TextToSpeechSettingPreview() {
             playPreviousChapter = {},
             playNextItem = {},
             playNextChapter = {},
-            onSelectVoice = {},
+            setVoice = {},
             availableVoices = (0..7).map {
                 VoiceData(
                     id = "$it",
@@ -494,6 +624,8 @@ fun TextToSpeechSettingPreview() {
             playFirstVisibleItem = {},
             setVoicePitch = {},
             setVoiceSpeed = {},
+            customSavedVoicesStates = listOf(),
+            setCustomSavedVoices = {},
         )
     }
 }

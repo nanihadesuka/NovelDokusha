@@ -3,6 +3,26 @@ package my.noveldokusha.utils
 import android.content.SharedPreferences
 import kotlin.reflect.KProperty
 
+class SharedPreference_Serializable<T>(
+    val name: String,
+    val sharedPreferences: SharedPreferences,
+    val defaultValue: T,
+    val encode: (T) -> String,
+    val decode: (String) -> T,
+) {
+
+    operator fun setValue(thisRef: Any?, property: KProperty<*>, value: T) {
+        sharedPreferences.edit().putString(name, encode(value)).apply()
+    }
+
+    operator fun getValue(thisRef: Any?, property: KProperty<*>): T {
+        return sharedPreferences
+            .getString(name, null)
+            ?.let { kotlin.runCatching { decode(it) }.getOrNull() }
+            ?: defaultValue
+    }
+}
+
 class SharedPreference_Enum<T : Enum<T>>(
     val name: String,
     val sharedPreferences: SharedPreferences,

@@ -38,6 +38,7 @@ import my.noveldokusha.ui.theme.InternalTheme
 import my.noveldokusha.ui.theme.Themes
 import my.noveldokusha.uiViews.MyButton
 import my.noveldokusha.uiViews.MyIconButton
+import my.noveldokusha.utils.rememberMutableStateOf
 
 private enum class CurrentSettingVisible {
     None, TextSize, TextFont, LiveTranslation, TextToSpeech, Theme, SelectableText
@@ -144,15 +145,17 @@ private fun Settings(
                         setVoiceSpeed = textToSpeechSettingData.setVoiceSpeed,
                         currentVoice = textToSpeechSettingData.activeVoice.value,
                         isActive = textToSpeechSettingData.isThereActiveItem.value,
+                        customSavedVoicesStates = textToSpeechSettingData.customSavedVoices.value,
                         availableVoices = textToSpeechSettingData.availableVoices,
-                        setPlaying = textToSpeechSettingData.setPlaying,
+                        playCurrent = textToSpeechSettingData.setPlaying,
                         playPreviousItem = textToSpeechSettingData.playPreviousItem,
                         playPreviousChapter = textToSpeechSettingData.playPreviousChapter,
                         playNextItem = textToSpeechSettingData.playNextItem,
                         playNextChapter = textToSpeechSettingData.playNextChapter,
-                        onSelectVoice = textToSpeechSettingData.onSelectVoice,
+                        setVoice = textToSpeechSettingData.setVoiceId,
                         playFirstVisibleItem = textToSpeechSettingData.playFirstVisibleItem,
                         scrollToActiveItem = textToSpeechSettingData.scrollToActiveItem,
+                        setCustomSavedVoices = textToSpeechSettingData.setCustomSavedVoices,
                     )
                     CurrentSettingVisible.None -> Unit
                 }
@@ -253,7 +256,6 @@ private fun SettingsRowList(
         }
     }
 }
-
 
 
 @Composable
@@ -388,10 +390,10 @@ private fun ViewsPreview() {
     )
 
     val textToSpeechSettingData = TextToSpeechSettingData(
-        isPlaying = remember { mutableStateOf(false) },
-        isLoadingChapter = remember { mutableStateOf(false) },
-        voicePitch = remember { mutableStateOf(1f) },
-        voiceSpeed = remember { mutableStateOf(1f) },
+        isPlaying = rememberMutableStateOf(false),
+        isLoadingChapter = rememberMutableStateOf(false),
+        voicePitch = rememberMutableStateOf(1f),
+        voiceSpeed = rememberMutableStateOf(1f),
         availableVoices = remember { mutableStateListOf() },
         activeVoice = remember {
             mutableStateOf(
@@ -416,17 +418,19 @@ private fun ViewsPreview() {
                 )
             )
         },
-        isThereActiveItem = remember { mutableStateOf(true) },
+        isThereActiveItem = rememberMutableStateOf(true),
         setPlaying = {},
         playPreviousItem = {},
         playPreviousChapter = {},
         playNextItem = {},
         playNextChapter = {},
-        onSelectVoice = {},
+        setVoiceId = {},
         playFirstVisibleItem = {},
         scrollToActiveItem = {},
         setVoiceSpeed = {},
         setVoicePitch = {},
+        setCustomSavedVoices = {},
+        customSavedVoices = rememberMutableStateOf(value = listOf())
     )
 
     InternalTheme {

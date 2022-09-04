@@ -9,6 +9,7 @@ import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.lifecycle.asLiveData
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
+import my.noveldokusha.VoicePredefineState
 import my.noveldokusha.tools.TextToSpeechManager
 import my.noveldokusha.tools.Utterance
 import my.noveldokusha.tools.VoiceData
@@ -23,14 +24,16 @@ data class TextToSpeechSettingData(
     val availableVoices: SnapshotStateList<VoiceData>,
     val currentActiveItemState: State<TextSynthesis>,
     val isThereActiveItem: State<Boolean>,
+    val customSavedVoices: State<List<VoicePredefineState>>,
+    val setCustomSavedVoices: (List<VoicePredefineState>) -> Unit,
     val setPlaying: (Boolean) -> Unit,
     val playFirstVisibleItem: () -> Unit,
     val playPreviousItem: () -> Unit,
     val playPreviousChapter: () -> Unit,
     val playNextItem: () -> Unit,
     val playNextChapter: () -> Unit,
-    val onSelectVoice: (VoiceData) -> Unit,
     val scrollToActiveItem: () -> Unit,
+    val setVoiceId: (voiceId: String) -> Unit,
     val setVoiceSpeed: (Float) -> Unit,
     val setVoicePitch: (Float) -> Unit,
 )
@@ -52,6 +55,8 @@ class ReaderSpeaker(
     private val chapterLoadedFlow: Flow<ChaptersLoader.ChapterLoaded>,
     private val scrollToTheTop: MutableSharedFlow<Unit>,
     private val scrollToTheBottom: MutableSharedFlow<Unit>,
+    private val customSavedVoices: State<List<VoicePredefineState>>,
+    private val setCustomSavedVoices: (List<VoicePredefineState>) -> Unit,
     private val isChapterIndexValid: (chapterIndex: Int) -> Boolean,
     private val isChapterIndexLoaded: (chapterIndex: Int) -> Boolean,
     private val tryLoadPreviousChapter: () -> Unit,
@@ -95,7 +100,9 @@ class ReaderSpeaker(
         isThereActiveItem = derivedStateOf { manager.currentActiveItemState.value.item.chapterIndex != -1 },
         voicePitch = manager.voicePitch,
         voiceSpeed = manager.voiceSpeed,
-        onSelectVoice = ::setVoice,
+        customSavedVoices = customSavedVoices,
+        setCustomSavedVoices = setCustomSavedVoices,
+        setVoiceId = ::setVoice,
         playFirstVisibleItem = ::playFirstVisibleItem,
         playNextChapter = ::playNextChapter,
         playPreviousChapter = ::playPreviousChapter,
@@ -403,10 +410,10 @@ class ReaderSpeaker(
         }
     }
 
-    private fun setVoice(voiceData: VoiceData) {
-        val success = manager.trySetVoiceById(id = voiceData.id)
+    private fun setVoice(voiceId: String) {
+        val success = manager.trySetVoiceById(id = voiceId)
         if (success) {
-            setPreferredVoiceId(voiceData.id)
+            setPreferredVoiceId(voiceId)
             resumeFromCurrentState()
         }
     }

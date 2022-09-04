@@ -141,4 +141,8 @@
 	<string name="chapter_x_over_n">Chapter: %1$d/%2$d</string>
 	<string name="progress_x_percentage">Progress: %1$.0f%%</string>
 	<string name="text_size">Text size</string>
+    <string name="custom_predefined_voices">Custom predefined voices</string>
+    <string name="name">Name</string>
+	<string name="save_current_voice">Save current voice</string>
+	<string name="save_current_voice_parameters">Save current voice and parameters and give it a name</string>
 </resources>

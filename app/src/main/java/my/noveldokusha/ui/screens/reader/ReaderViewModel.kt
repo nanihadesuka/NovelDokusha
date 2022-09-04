@@ -29,6 +29,7 @@ interface ReaderStateBundle {
     var chapterUrl: String
 }
 
+@OptIn(FlowPreview::class)
 @HiltViewModel
 class ReaderViewModel @Inject constructor(
     private val repository: Repository,
@@ -157,6 +158,8 @@ class ReaderViewModel @Inject constructor(
         loadNextChapter = chaptersLoader::tryLoadNext,
         scrollToTheTop = scrollToTheTop,
         scrollToTheBottom = scrollToTheBottom,
+        customSavedVoices = appPreferences.READER_TEXT_TO_SPEECH_SAVED_PREDEFINED_LIST.state(viewModelScope),
+        setCustomSavedVoices = { appPreferences.READER_TEXT_TO_SPEECH_SAVED_PREDEFINED_LIST.value = it},
         getPreferredVoiceId = { appPreferences.READER_TEXT_TO_SPEECH_VOICE_ID.value },
         setPreferredVoiceId = { appPreferences.READER_TEXT_TO_SPEECH_VOICE_ID.value = it },
         getPreferredVoiceSpeed = { appPreferences.READER_TEXT_TO_SPEECH_VOICE_SPEED.value },
