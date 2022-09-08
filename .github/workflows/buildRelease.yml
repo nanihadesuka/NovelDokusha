@@ -3,13 +3,11 @@ name: Publish Release
 on:
   workflow_dispatch: # Allows you to run this workflow manually from the Actions tab
 
-jobs: # A workflow run is made up of one or more jobs that can run sequentially or in parallel
-  buildRelease: # Job
+jobs:
+  buildRelease:
     name: Build Release APK
-    runs-on: ubuntu-latest # The type of runner that the job will run on   
-    steps: # Steps represent a sequence of tasks that will be executed as part of the job
-      
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+    runs-on: ubuntu-latest
+    steps:
       - name: Clone repo
         uses: actions/checkout@v2
         
@@ -22,40 +20,28 @@ jobs: # A workflow run is made up of one or more jobs that can run sequentially 
         uses: actions/setup-python@v2
         with:
           python-version: 3.8.5
-          
-      - name: Build app
-        uses: eskatos/gradle-command-action@v1.3.3
-        with:
-          arguments: assembleRelease
-          wrapper-cache-enabled: true
-          dependencies-cache-enabled: true
-          configuration-cache-enabled: true
-          gradle-version: current
 
-      - name: Sign APK
-        uses: r0adkll/sign-android-release@v1
-        with:
-          releaseDirectory: app/build/outputs/apk/release
-          signingKeyBase64: ${{ secrets.SIGNING_KEY }}
-          alias: ${{ secrets.ALIAS }}
-          keyStorePassword: ${{ secrets.KEY_STORE_PASSWORD }}
-          keyPassword: ${{ secrets.KEY_PASSWORD }}
-      
-      - name: Move APK
+      - name: Setup APK signing
         run: |
-          mkdir ./github_release
-          cp ${{ env.SIGNED_RELEASE_FILE }} ./github_release/
+          echo -n ${{ secrets.SIGNING_KEY }} | base64 -d > app/storeFile.jsk
+          echo storeFile=storeFile.jsk > custom.properties
+          echo storePassword=${{ secrets.KEY_STORE_PASSWORD }} >> custom.properties
+          echo keyAlias=${{ secrets.ALIAS }} >> custom.properties
+          echo keyPassword=${{ secrets.KEY_PASSWORD }} >> custom.properties
+
+      - name: Build app
+        run: |
+          gradle assembleRelease -PlocalPropertiesFilePath=custom.properties
 
       - name: Create apk env info entries, move APK
         run: |
           python .github/build_scripts/extract_info.py
-      
+
       - name: Create Release
         uses: softprops/action-gh-release@v1
         with:
-          name: NovelDokusha v${{ env.APP_RELEASE_VERSION }}
-          tag_name: v${{ env.APP_RELEASE_VERSION }}
+          name: NovelDokusha v${{ env.APP_VERSION }}
+          tag_name: v${{ env.APP_VERSION }}
           files: |
-            ${{ env.APP_RELEASE_FILE }}
-          
-        
+            ${{ env.APK_FILE_PATH_full }}
+            ${{ env.APK_FILE_PATH_foss }}

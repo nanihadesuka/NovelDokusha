@@ -1,38 +1,41 @@
 import os
-import shutil
 import re
+import shutil
 
 mainDir = os.getcwd()
-workDir = os.path.join(mainDir, "github_release")
+workDir = os.path.join(mainDir, "app", "build", "outputs", "apk")
 
 extension = ".apk"
-apkFile = None
-for file in os.listdir(workDir):
-    if os.path.isfile(os.path.join(workDir, file)):
-        if file.endswith(extension):
-            apkFile = file
 
-name, version = re.match("^(.+)_v(\d+\.\d+\.\d+).*\.apk$",apkFile).groups() 
-
-newFileName = f"NovelDokusha_v{version}.apk"
-
-currentPath = os.path.join(workDir,apkFile)
-destinationPath = os.path.join(mainDir,newFileName)
-
-print(f"{name=}")
-print(f"{version=}")
-print(f"{newFileName=}")
-
-print("Moving apk")
-print(f"{currentPath=}")
-print(f"{destinationPath=}")
-
-shutil.move(currentPath, destinationPath)
 
 def setEnvValue(key, value):
     print(f"Setting env varaible: {key}={value}")
     os.system(f"echo \"{key}={value}\" >> $GITHUB_ENV ")
 
 
-setEnvValue("APP_RELEASE_VERSION", version)
-setEnvValue("APP_RELEASE_FILE", newFileName)
+def getAPKs():
+    list = []
+    for root, dirs, files in os.walk(workDir):
+        for file in files:
+            if file.endswith(extension):
+                list.append([root, file])
+    return list
+
+
+def processAPK(path, fileName):
+    fileNamePath = os.path.join(path, fileName)
+    name, version, flavour = re.match(
+        "^(.+)_v(\d+\.\d+\.\d+)-(.+)-.*\.apk$", fileName).groups()
+    newFileName = f"NovelDokusha_v{version}_{flavour}.apk"
+    newFileNamePath = os.path.join(path, newFileName)
+
+    shutil.move(fileNamePath, newFileNamePath)
+
+    print(f"{name=} {version=} {newFileName=}")
+
+    setEnvValue("APP_VERSION", version)
+    setEnvValue(f"APK_FILE_PATH_{flavour}", newFileNamePath)
+
+
+for [path, fileName] in getAPKs():
+    processAPK(path, fileName)

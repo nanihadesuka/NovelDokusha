@@ -6,13 +6,29 @@ plugins {
     id("kotlin-android")
     id("kotlin-kapt")
     id("dagger.hilt.android.plugin")
-    kotlin("plugin.serialization") version("1.7.10")
+    kotlin("plugin.serialization") version ("1.7.10")
 
 }
 
+inner class CLICustomSettings {
+    val splitByAbi = propExist(key = "splitByAbi")
+    val splitByAbiDoUniversal = splitByAbi && propExist(key = "splitByAbiDoUniversal")
+    val localPropertiesFilePath = propString(
+        key = "localPropertiesFilePath",
+        default = "local.properties"
+    )
+
+    private fun propExist(key: String) = project.hasProperty(key)
+    private fun propString(key: String, default: String) =
+        project.properties[key]?.toString()?.ifBlank { default } ?: default
+}
+
+val cliCustomSettings = CLICustomSettings()
+
 android {
 
-    val localPropertiesFile = file("../local.properties")
+    val localPropertiesFile = rootProject.file(cliCustomSettings.localPropertiesFilePath)
+    println("localPropertiesFilePath: ${cliCustomSettings.localPropertiesFilePath}")
 
     val defaultSigningConfigData = Properties().apply {
         if (localPropertiesFile.exists())
@@ -42,10 +58,10 @@ android {
         kotlinCompilerExtensionVersion = "1.2.0"
     }
 
-    splits {
+    if (cliCustomSettings.splitByAbi) splits {
         abi {
             isEnable = true
-            isUniversalApk = true
+            isUniversalApk = cliCustomSettings.splitByAbiDoUniversal
         }
     }
 
@@ -100,6 +116,7 @@ android {
 
         create("full") {
             dimension = "dependencies"
+            // Having the dependencies here the same in the main scope, visually separated
             dependencies {
                 // Needed to have the Task -> await extension.
                 fullImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.6.4")
