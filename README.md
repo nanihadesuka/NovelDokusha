@@ -10,6 +10,11 @@ Search from a large catalog of content, open your pick and just enjoy.
     - Custom font
     - Custom font size
     - Live translation to more than 40 languages
+    - Text to speech with:
+      - Champter play controls
+      - Custom coice selection
+        - Voice, pitch, speed
+        - Option to save prefered combinations
   - Light and dark themes
   - Epubs importer (format won't be preserved)
   - Easy backup and restore (zip file of a database + images folder)
