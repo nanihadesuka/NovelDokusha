@@ -12,7 +12,7 @@ Search from a large catalog of content, open your pick and just enjoy.
     - Live translation to more than 40 languages
     - Text to speech with:
       - Champter play controls
-      - Custom coice selection
+      - Custom voice selection
         - Voice, pitch, speed
         - Option to save prefered combinations
   - Light and dark themes
