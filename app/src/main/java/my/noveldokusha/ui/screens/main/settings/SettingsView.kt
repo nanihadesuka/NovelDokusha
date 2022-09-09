@@ -12,7 +12,7 @@ import my.noveldokusha.composableActions.onDoRestore
 fun SettingsView() {
     val viewModel = viewModel<SettingsViewModel>()
     Column {
-        ToolbarMain(title = stringResource(id = R.string.app_name))
+        ToolbarMain(title = stringResource(id = R.string.title_settings))
         SettingsBody(
             currentFollowSystem = viewModel.followsSystem,
             currentTheme = viewModel.theme,

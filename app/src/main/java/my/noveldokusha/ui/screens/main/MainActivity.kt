@@ -2,6 +2,7 @@ package my.noveldokusha.ui.screens.main
 
 import android.os.Bundle
 import androidx.activity.compose.setContent
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -27,9 +28,11 @@ import my.noveldokusha.ui.screens.main.library.LibraryView
 import my.noveldokusha.ui.screens.main.library.LibraryViewModel
 import my.noveldokusha.ui.screens.main.settings.SettingsView
 import my.noveldokusha.ui.theme.Theme
+import my.noveldokusha.uiViews.AnimatedTransition
 import my.noveldokusha.utils.drawTopLine
 import my.noveldokusha.utils.mix
 
+@OptIn(ExperimentalAnimationApi::class)
 @AndroidEntryPoint
 open class MainActivity : BaseActivity() {
     enum class PAGE {
@@ -45,10 +48,12 @@ open class MainActivity : BaseActivity() {
                 BottomSheetMain {
                     Column(Modifier.fillMaxSize()) {
                         Box(Modifier.weight(1f)) {
-                            when (page) {
-                                PAGE.LIBRARY -> LibraryView()
-                                PAGE.FINDER -> FinderView()
-                                PAGE.SETTINGS -> SettingsView()
+                            AnimatedTransition(targetState = page) {
+                                when (it) {
+                                    PAGE.LIBRARY -> LibraryView()
+                                    PAGE.FINDER -> FinderView()
+                                    PAGE.SETTINGS -> SettingsView()
+                                }
                             }
                         }
                         Row(

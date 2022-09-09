@@ -60,7 +60,7 @@ import okhttp3.Response
 fun FinderView() {
     val context by rememberUpdatedState(newValue = LocalContext.current)
     val viewModel = viewModel<FinderViewModel>()
-    val title = stringResource(id = R.string.app_name)
+    val title = stringResource(id = R.string.title_finder)
     var searchText by rememberSaveable { mutableStateOf("") }
     val focusRequester = remember { FocusRequester() }
     val toolbarMode = rememberSaveable { mutableStateOf(ToolbarMode.MAIN) }
