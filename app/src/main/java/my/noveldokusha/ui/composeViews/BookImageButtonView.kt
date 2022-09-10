@@ -17,7 +17,6 @@ import androidx.compose.ui.unit.dp
 import my.noveldokusha.R
 import my.noveldokusha.ui.theme.ImageBorderRadius
 import my.noveldokusha.ui.theme.InternalTheme
-import my.noveldokusha.uiViews.MyButton
 
 @Composable
 fun BookImageButtonView(

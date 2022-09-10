@@ -19,7 +19,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import my.noveldokusha.R
 import my.noveldokusha.services.BackupDataService
-import my.noveldokusha.uiViews.MyButton
+import my.noveldokusha.ui.composeViews.MyButton
 import java.text.SimpleDateFormat
 import java.util.*
 

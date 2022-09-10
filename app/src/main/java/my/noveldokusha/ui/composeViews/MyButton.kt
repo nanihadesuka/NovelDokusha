@@ -1,4 +1,4 @@
-package my.noveldokusha.uiViews
+package my.noveldokusha.ui.composeViews
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.animateContentSize
@@ -27,6 +27,7 @@ import androidx.compose.ui.unit.dp
 import my.noveldokusha.ui.theme.ColorAccent
 import my.noveldokusha.ui.theme.InternalThemeObject
 import my.noveldokusha.ui.theme.Themes
+import my.noveldokusha.ui.theme.selectableMinHeight
 import my.noveldokusha.utils.ifCase
 
 @Composable
@@ -38,9 +39,10 @@ fun MyButton(
     textAlign: TextAlign = TextAlign.Start,
     outerPadding: Dp = 4.dp,
     contentPadding: Dp = 12.dp,
-    minHeight: Dp = 48.dp,
+    minHeight: Dp = selectableMinHeight,
     shape: Shape = MaterialTheme.shapes.large,
     borderWidth: Dp = Dp.Hairline,
+    borderColor: Color = MaterialTheme.colors.onSurface.copy(alpha = 0.2f),
     backgroundColor: Color = MaterialTheme.colors.primary,
     textStyle: TextStyle = LocalTextStyle.current,
     selected: Boolean = false,
@@ -74,6 +76,7 @@ fun MyButton(
         minWidth = Dp.Unspecified,
         shape = shape,
         borderWidth = borderWidth,
+        borderColor = borderColor,
         backgroundColor = backgroundColor,
         selectedBackgroundColor = selectedBackgroundColor,
         selected = selected,
@@ -92,9 +95,10 @@ fun MyIconButton(
     contentDescription: String? = null,
     outerPadding: Dp = 4.dp,
     contentPadding: Dp = 12.dp,
-    minSize: Dp = 48.dp,
+    minSize: Dp = selectableMinHeight,
     shape: Shape = MaterialTheme.shapes.large,
     borderWidth: Dp = Dp.Hairline,
+    borderColor: Color = MaterialTheme.colors.onSurface.copy(alpha = 0.2f),
     backgroundColor: Color = MaterialTheme.colors.primary,
     selectedBackgroundColor: Color = ColorAccent,
     selected: Boolean = false,
@@ -119,6 +123,7 @@ fun MyIconButton(
         minWidth = minSize,
         shape = shape,
         borderWidth = borderWidth,
+        borderColor = borderColor,
         backgroundColor = backgroundColor,
         selectedBackgroundColor = selectedBackgroundColor,
         selected = selected,
@@ -139,6 +144,7 @@ private fun InternalButton(
     minWidth: Dp,
     shape: Shape,
     borderWidth: Dp,
+    borderColor: Color,
     backgroundColor: Color,
     selectedBackgroundColor: Color,
     selected: Boolean,
@@ -155,7 +161,7 @@ private fun InternalButton(
             .padding(outerPadding)
             .heightIn(min = minHeight)
             .widthIn(min = minWidth)
-            .border(borderWidth, MaterialTheme.colors.onSurface.copy(alpha = 0.2f), shape)
+            .border(borderWidth, borderColor, shape)
             .clip(shape)
             .combinedClickable(
                 enabled = enabled,

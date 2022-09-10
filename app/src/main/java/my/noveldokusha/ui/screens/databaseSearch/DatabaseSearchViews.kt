@@ -33,7 +33,7 @@ import my.noveldokusha.ui.screens.sourceCatalog.ToolbarMode
 import my.noveldokusha.ui.theme.InternalTheme
 import my.noveldokusha.ui.theme.Themes
 import my.noveldokusha.uiViews.AnimatedTransition
-import my.noveldokusha.uiViews.MyButton
+import my.noveldokusha.ui.composeViews.MyButton
 
 @Composable
 fun CheckBoxCategory(

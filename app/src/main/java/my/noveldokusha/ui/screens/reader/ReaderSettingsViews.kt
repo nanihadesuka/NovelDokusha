@@ -36,8 +36,8 @@ import my.noveldokusha.ui.screens.reader.tools.TextSynthesis
 import my.noveldokusha.ui.screens.reader.tools.TextToSpeechSettingData
 import my.noveldokusha.ui.theme.InternalTheme
 import my.noveldokusha.ui.theme.Themes
-import my.noveldokusha.uiViews.MyButton
-import my.noveldokusha.uiViews.MyIconButton
+import my.noveldokusha.ui.composeViews.MyButton
+import my.noveldokusha.ui.composeViews.MyIconButton
 import my.noveldokusha.utils.rememberMutableStateOf
 
 private enum class CurrentSettingVisible {

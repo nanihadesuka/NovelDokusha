@@ -1,8 +1,6 @@
 package my.noveldokusha.ui.screens.reader.settingsViews
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
@@ -20,14 +18,17 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.toSize
 import my.noveldokusha.R
 import my.noveldokusha.tools.TranslationModelState
-import my.noveldokusha.ui.theme.ColorAccent
-import my.noveldokusha.ui.theme.selectableMinHeight
-import my.noveldokusha.utils.*
+import my.noveldokusha.ui.composeViews.MyButton
+import my.noveldokusha.utils.blockInteraction
+import my.noveldokusha.utils.clickableWithUnboundedIndicator
+import my.noveldokusha.utils.ifCase
+import my.noveldokusha.utils.roundedOutline
 
 @Composable
 fun LiveTranslationSetting(
@@ -55,29 +56,19 @@ fun LiveTranslationSetting(
     ) {
         Row(
             modifier = Modifier
-                .height(selectableMinHeight)
                 .roundedOutline()
                 .blockInteraction(),
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Surface(
-                modifier = Modifier
-                    .height(selectableMinHeight)
-                    .roundedOutline()
-                    .clickable { onEnable(!enable) },
-                color = if (enable) MaterialTheme.colors.primary.mix(
-                    ColorAccent,
-                    fraction = 0.8f
-                ) else MaterialTheme.colors.primary
-            ) {
-                Text(
-                    text = stringResource(R.string.live_translation),
-                    modifier = Modifier
-                        .padding(12.dp)
-                        .wrapContentHeight(Alignment.CenterVertically)
-                )
-            }
+            MyButton(
+                text = stringResource(id = R.string.live_translation),
+                onClick = { onEnable(!enable) },
+                shape = CircleShape,
+                selected = enable,
+                outerPadding = 2.dp,
+                borderWidth = Dp.Unspecified,
+            )
             AnimatedVisibility(visible = enable) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
@@ -133,18 +124,14 @@ fun LiveTranslationSetting(
                     else onSourceChange(null)
                 }
             ) {
-                Box(Modifier.weight(1f)) {
-                    Text(
-                        text = stringResource(R.string.language_clear_selection),
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier
-                            .padding(4.dp)
-                            .background(MaterialTheme.colors.secondary, CircleShape)
-                            .padding(8.dp)
-                            .align(Alignment.Center)
-                    )
-                }
+                Text(
+                    text = stringResource(R.string.language_clear_selection),
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.weight(1f)
+                )
             }
+
+            Divider()
 
             listOfAvailableModels.forEach { item ->
                 val isAlreadySelected =

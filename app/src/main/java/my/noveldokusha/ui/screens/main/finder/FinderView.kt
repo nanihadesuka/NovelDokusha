@@ -6,7 +6,6 @@ import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -49,7 +48,7 @@ import my.noveldokusha.ui.theme.ColorAccent
 import my.noveldokusha.ui.theme.ImageBorderRadius
 import my.noveldokusha.ui.theme.InternalTheme
 import my.noveldokusha.uiViews.AnimatedTransition
-import my.noveldokusha.uiViews.MyButton
+import my.noveldokusha.ui.composeViews.MyButton
 import my.noveldokusha.utils.drawBottomLine
 import okhttp3.Request
 import okhttp3.Response
@@ -235,40 +234,34 @@ fun LanguagesDropDown(
         expanded = expanded,
         onDismissRequest = onDismiss
     ) {
-        Column {
-            Text(
-                text = stringResource(R.string.sources_languages),
-                Modifier
-                    .padding(8.dp)
-                    .fillMaxWidth(),
-                textAlign = TextAlign.Center
-            )
-            Column(
-                Modifier
-                    .padding(horizontal = 8.dp)
-                    .border(
-                        Dp.Hairline,
-                        MaterialTheme.colors.onPrimary.copy(alpha = 0.5f),
-                        RoundedCornerShape(8.dp)
-                    )
-                    .clip(RoundedCornerShape(8.dp))
-            ) {
-                list.forEach { lang ->
-                    Box(
-                        Modifier
-                            .background(colorBackground(lang.active))
-                            .clickable { onToggleLanguage(lang) }
-                    ) {
-                        Text(
-                            text = lang.language,
-                            modifier = Modifier
-                                .padding(12.dp)
-                                .fillMaxWidth(),
-                            textAlign = TextAlign.Center,
-                            color = colorText(lang.active)
-                        )
-                    }
-                }
+        Text(
+            text = stringResource(R.string.sources_languages),
+            Modifier
+                .padding(8.dp)
+                .fillMaxWidth(),
+            textAlign = TextAlign.Center
+        )
+        Column(
+            Modifier
+                .padding(horizontal = 8.dp)
+                .border(
+                    Dp.Hairline,
+                    MaterialTheme.colors.onPrimary.copy(alpha = 0.5f),
+                    RoundedCornerShape(8.dp)
+                )
+                .clip(RoundedCornerShape(8.dp))
+        ) {
+            list.forEach { lang ->
+                MyButton(
+                    text = lang.language,
+                    onClick = { onToggleLanguage(lang) },
+                    selected = lang.active,
+                    borderWidth = Dp.Unspecified,
+                    textAlign = TextAlign.Center,
+                    outerPadding = 0.dp,
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(0.dp)
+                )
             }
         }
     }

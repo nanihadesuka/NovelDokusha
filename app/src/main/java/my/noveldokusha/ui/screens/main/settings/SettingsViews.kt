@@ -35,7 +35,7 @@ import my.noveldokusha.ui.composeViews.SettingsTranslationModels
 import my.noveldokusha.ui.theme.ColorAccent
 import my.noveldokusha.ui.theme.InternalTheme
 import my.noveldokusha.ui.theme.Themes
-import my.noveldokusha.uiViews.MyButton
+import my.noveldokusha.ui.composeViews.MyButton
 import my.noveldokusha.utils.drawBottomLine
 
 @OptIn(ExperimentalAnimationApi::class)

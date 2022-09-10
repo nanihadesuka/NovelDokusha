@@ -25,7 +25,7 @@ import my.noveldokusha.ui.composeViews.ImageView
 import my.noveldokusha.ui.theme.ColorAccent
 import my.noveldokusha.ui.theme.ImageBorderRadius
 import my.noveldokusha.ui.theme.InternalTheme
-import my.noveldokusha.uiViews.MyButton
+import my.noveldokusha.ui.composeViews.MyButton
 
 @Composable
 private fun Title(name: String) {

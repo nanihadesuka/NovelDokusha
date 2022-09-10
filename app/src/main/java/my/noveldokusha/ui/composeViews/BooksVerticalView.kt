@@ -23,7 +23,6 @@ import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.network.IteratorState
 import my.noveldokusha.ui.theme.ColorAccent
 import my.noveldokusha.uiViews.ErrorView
-import my.noveldokusha.uiViews.MyButton
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable

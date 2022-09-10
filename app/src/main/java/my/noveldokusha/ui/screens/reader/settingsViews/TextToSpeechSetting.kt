@@ -21,7 +21,6 @@ import androidx.compose.material.icons.rounded.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
@@ -41,14 +40,16 @@ import my.noveldokusha.R
 import my.noveldokusha.VoicePredefineState
 import my.noveldokusha.composableActions.debouncedAction
 import my.noveldokusha.tools.VoiceData
+import my.noveldokusha.ui.composeViews.MyButton
+import my.noveldokusha.ui.composeViews.MyIconButton
 import my.noveldokusha.ui.composeViews.MyOutlinedTextField
 import my.noveldokusha.ui.composeViews.MySlider
-import my.noveldokusha.ui.theme.*
-import my.noveldokusha.uiViews.MyButton
-import my.noveldokusha.utils.debouncedClickable
+import my.noveldokusha.ui.theme.ColorAccent
+import my.noveldokusha.ui.theme.InternalTheme
+import my.noveldokusha.ui.theme.InternalThemeObject
+import my.noveldokusha.ui.theme.Themes
 import my.noveldokusha.utils.ifCase
 import my.noveldokusha.utils.rememberMutableStateOf
-import my.noveldokusha.utils.roundedOutline
 
 
 @OptIn(ExperimentalAnimationApi::class, ExperimentalMaterialApi::class)
@@ -96,7 +97,6 @@ fun TextToSpeechSetting(
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
-                .padding(4.dp)
                 .background(MaterialTheme.colors.primaryVariant, CircleShape)
                 .padding(4.dp)
         ) {
@@ -149,7 +149,6 @@ fun TextToSpeechSetting(
                         )
                     }
                 }
-
             }
             IconButton(
                 onClick = debouncedAction(waitMillis = 100) { playNextItem() },
@@ -184,84 +183,52 @@ fun TextToSpeechSetting(
         Row(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
-            Surface(
-                color = MaterialTheme.colors.primary,
-                modifier = Modifier
-                    .height(selectableMinHeight)
-                    .roundedOutline()
-                    .debouncedClickable { playFirstVisibleItem() }
-            ) {
-                Text(
-                    text = stringResource(R.string.start_here),
-                    modifier = Modifier
-                        .padding(12.dp)
-                        .wrapContentHeight(Alignment.CenterVertically),
-                    textAlign = TextAlign.Center
-                )
-            }
-            Surface(
-                color = MaterialTheme.colors.primary,
-                modifier = Modifier
-                    .height(selectableMinHeight)
-                    .roundedOutline()
-                    .debouncedClickable { scrollToActiveItem() }
-            ) {
-                Text(
-                    text = stringResource(R.string.focus),
-                    modifier = Modifier
-                        .padding(12.dp)
-                        .wrapContentHeight(Alignment.CenterVertically),
-                    textAlign = TextAlign.Center
-                )
-            }
-            Surface(
-                color = MaterialTheme.colors.primary,
-                modifier = Modifier
-                    .height(selectableMinHeight)
-                    .roundedOutline()
-                    .clickable { openVoicesDialog = !openVoicesDialog }
-            ) {
-                Text(
-                    text = stringResource(id = R.string.voices),
-                    modifier = Modifier
-                        .padding(12.dp)
-                        .wrapContentHeight(Alignment.CenterVertically),
-                    textAlign = TextAlign.Center
-                )
-            }
-            Surface(
-                color = MaterialTheme.colors.primary,
-                modifier = Modifier
-                    .size(selectableMinHeight)
-                    .roundedOutline()
-                    .clickable {
-                        dropdownCustomSavedVoicesExpanded.value =
-                            !dropdownCustomSavedVoicesExpanded.value
-                    }
-            ) {
-                Box(
-                    contentAlignment = Center,
-                    modifier = Modifier.size(16.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.Outlined.FormatListBulleted,
-                        contentDescription = stringResource(R.string.custom_predefined_voices),
-                    )
-                }
-                DropdownCustomSavedVoices(
-                    expanded = dropdownCustomSavedVoicesExpanded,
-                    list = customSavedVoicesStates,
-                    currentVoice = currentVoice,
-                    currentVoiceSpeed = voiceSpeed,
-                    currentVoicePitch = voicePitch,
-                    onPredefinedSelected = {
-                        setVoiceSpeed(it.speed)
-                        setVoicePitch(it.pitch)
-                        setVoice(it.voiceId)
-                    },
-                    setCustomSavedVoices = setCustomSavedVoices
-                )
-            }
+            MyButton(
+                text = stringResource(id = R.string.start_here),
+                onClick = debouncedAction { playFirstVisibleItem() },
+                borderWidth = 1.dp,
+                borderColor = MaterialTheme.colors.onSurface.copy(alpha = 0.5f),
+                outerPadding = 0.dp,
+                shape = CircleShape
+            )
+            MyButton(
+                text = stringResource(id = R.string.focus),
+                onClick = debouncedAction { scrollToActiveItem() },
+                borderWidth = 1.dp,
+                borderColor = MaterialTheme.colors.onSurface.copy(alpha = 0.5f),
+                outerPadding = 0.dp,
+                shape = CircleShape
+            )
+            MyButton(
+                text = stringResource(id = R.string.voices),
+                onClick = { openVoicesDialog = !openVoicesDialog },
+                borderWidth = 1.dp,
+                borderColor = MaterialTheme.colors.onSurface.copy(alpha = 0.5f),
+                outerPadding = 0.dp,
+                shape = CircleShape
+            )
+            MyIconButton(
+                icon = Icons.Outlined.FormatListBulleted,
+                onClick = { dropdownCustomSavedVoicesExpanded.let { it.value = !it.value } },
+                contentDescription = stringResource(R.string.custom_predefined_voices),
+                borderWidth = 1.dp,
+                borderColor = MaterialTheme.colors.onSurface.copy(alpha = 0.5f),
+                outerPadding = 0.dp,
+                shape = CircleShape
+            )
+            DropdownCustomSavedVoices(
+                expanded = dropdownCustomSavedVoicesExpanded,
+                list = customSavedVoicesStates,
+                currentVoice = currentVoice,
+                currentVoiceSpeed = voiceSpeed,
+                currentVoicePitch = voicePitch,
+                onPredefinedSelected = {
+                    setVoiceSpeed(it.speed)
+                    setVoicePitch(it.pitch)
+                    setVoice(it.voiceId)
+                },
+                setCustomSavedVoices = setCustomSavedVoices
+            )
         }
 
         MySlider(
