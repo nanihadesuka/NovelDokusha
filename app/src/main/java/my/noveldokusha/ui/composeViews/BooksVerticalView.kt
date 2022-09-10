@@ -1,7 +1,6 @@
 package my.noveldokusha.ui.composeViews
 
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -23,7 +22,6 @@ import my.noveldokusha.composableActions.ListGridLoadWatcher
 import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.network.IteratorState
 import my.noveldokusha.ui.theme.ColorAccent
-import my.noveldokusha.uiViews.BookImageButtonView
 import my.noveldokusha.uiViews.ErrorView
 import my.noveldokusha.uiViews.MyButton
 
@@ -69,12 +67,8 @@ fun BooksVerticalView(
                 AppPreferences.LIST_LAYOUT_MODE.verticalList -> MyButton(
                     text = it.title,
                     onClick = { onBookClicked(it) },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .combinedClickable(
-                            onClick = { onBookClicked(it) },
-                            onLongClick = { onBookLongClicked(it) }
-                        )
+                    onLongClick = { onBookLongClicked(it) },
+                    modifier = Modifier.fillMaxWidth()
                 )
                 AppPreferences.LIST_LAYOUT_MODE.verticalGrid -> BookImageButtonView(
                     title = it.title,

@@ -1,4 +1,4 @@
-package my.noveldokusha.uiViews
+package my.noveldokusha.ui.composeViews
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -15,9 +15,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import my.noveldokusha.R
-import my.noveldokusha.ui.composeViews.ImageView
 import my.noveldokusha.ui.theme.ImageBorderRadius
 import my.noveldokusha.ui.theme.InternalTheme
+import my.noveldokusha.uiViews.MyButton
 
 @Composable
 fun BookImageButtonView(
@@ -31,14 +31,13 @@ fun BookImageButtonView(
         onClick = onClick,
         onLongClick = onLongClick,
         shape = RoundedCornerShape(ImageBorderRadius),
-        borderWidth = 0.dp,
         modifier = Modifier.fillMaxWidth()
-    ) { _, radius, _, _, _ ->
+    ) {
         Box(
             Modifier
                 .fillMaxWidth()
                 .aspectRatio(1 / 1.45f)
-                .clip(radius)
+                .clip(MaterialTheme.shapes.medium)
         ) {
             ImageView(
                 imageModel = coverImageUrl,

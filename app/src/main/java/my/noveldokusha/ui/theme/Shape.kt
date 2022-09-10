@@ -7,7 +7,7 @@ import androidx.compose.ui.unit.dp
 val Shapes = Shapes(
     small = RoundedCornerShape(4.dp),
     medium = RoundedCornerShape(8.dp),
-    large = RoundedCornerShape(12.dp)
+    large = RoundedCornerShape(14.dp)
 )
 
 val ImageBorderRadius = 4.dp

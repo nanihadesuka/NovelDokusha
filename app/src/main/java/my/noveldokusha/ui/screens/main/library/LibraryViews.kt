@@ -28,7 +28,7 @@ import my.noveldokusha.R
 import my.noveldokusha.data.BookWithContext
 import my.noveldokusha.rememberResolvedBookImagePath
 import my.noveldokusha.ui.theme.ColorAccent
-import my.noveldokusha.uiViews.BookImageButtonView
+import my.noveldokusha.ui.composeViews.BookImageButtonView
 
 @OptIn(ExperimentalPagerApi::class)
 @Composable

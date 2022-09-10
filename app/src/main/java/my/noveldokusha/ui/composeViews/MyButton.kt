@@ -5,12 +5,10 @@ import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.border
 import androidx.compose.foundation.combinedClickable
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Home
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -18,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.TextStyle
@@ -30,30 +29,6 @@ import my.noveldokusha.ui.theme.InternalThemeObject
 import my.noveldokusha.ui.theme.Themes
 import my.noveldokusha.utils.ifCase
 
-private val defaultButtonContent =
-    @Composable { text: String, shape: Shape, textAlign: TextAlign, textStyle: TextStyle, contentPadding: Dp ->
-        Text(
-            text = text,
-            modifier = Modifier
-                .padding(contentPadding)
-                .wrapContentHeight(Alignment.CenterVertically),
-            textAlign = textAlign,
-            style = textStyle
-        )
-    }
-
-private val defaultIconButtonContent =
-    @Composable { icon: ImageVector, contentPadding: Dp, contentDescription: String? ->
-        Icon(
-            icon,
-            contentDescription = contentDescription,
-            modifier = Modifier
-                .padding(contentPadding)
-                .wrapContentHeight(Alignment.CenterVertically),
-        )
-    }
-
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun MyButton(
     text: String,
@@ -63,38 +38,51 @@ fun MyButton(
     textAlign: TextAlign = TextAlign.Start,
     outerPadding: Dp = 4.dp,
     contentPadding: Dp = 12.dp,
-    shape: Shape = RoundedCornerShape(4.dp),
-    borderWidth: Dp = 1.dp,
+    minHeight: Dp = 48.dp,
+    shape: Shape = MaterialTheme.shapes.large,
+    borderWidth: Dp = Dp.Hairline,
     backgroundColor: Color = MaterialTheme.colors.primary,
-    selectedBackgroundColor: Color = ColorAccent,
     textStyle: TextStyle = LocalTextStyle.current,
     selected: Boolean = false,
+    selectedBackgroundColor: Color = ColorAccent,
     onClick: () -> Unit,
     onLongClick: (() -> Unit)? = null,
-    content: @Composable (String, Shape, TextAlign, TextStyle, Dp) -> Unit = defaultButtonContent
-) {
-    val background by animateColorAsState(
-        targetValue = if (selected) selectedBackgroundColor else backgroundColor
-    )
-    Surface(
-        modifier = modifier
-            .ifCase(animate) { animateContentSize() }
-            .padding(outerPadding)
-            .border(borderWidth, MaterialTheme.colors.onSurface.copy(alpha = 0.2f), shape)
-            .clip(shape)
-            .combinedClickable(
-                enabled = enabled,
-                role = Role.Button,
-                onClick = onClick,
-                onLongClick = onLongClick
-            ),
-        color = background,
-    ) {
-        content(text, shape, textAlign, textStyle, contentPadding)
+    content: @Composable BoxScope.() -> Unit = {
+
+        val color = when {
+            selected && (textStyle.color.luminance() < 0.5) -> Color.White
+            else -> textStyle.color
+        }
+        Text(
+            text = text,
+            style = textStyle,
+            color = color,
+            textAlign = textAlign,
+            modifier = Modifier
+                .padding(contentPadding)
+                .wrapContentHeight()
+                .align(Alignment.Center),
+        )
     }
+) {
+    InternalButton(
+        modifier = modifier,
+        enabled = enabled,
+        animate = animate,
+        outerPadding = outerPadding,
+        minHeight = minHeight,
+        minWidth = Dp.Unspecified,
+        shape = shape,
+        borderWidth = borderWidth,
+        backgroundColor = backgroundColor,
+        selectedBackgroundColor = selectedBackgroundColor,
+        selected = selected,
+        onClick = onClick,
+        onLongClick = onLongClick,
+        content = content,
+    )
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun MyIconButton(
     icon: ImageVector,
@@ -104,14 +92,59 @@ fun MyIconButton(
     contentDescription: String? = null,
     outerPadding: Dp = 4.dp,
     contentPadding: Dp = 12.dp,
-    shape: Shape = RoundedCornerShape(4.dp),
-    borderWidth: Dp = 1.dp,
+    minSize: Dp = 48.dp,
+    shape: Shape = MaterialTheme.shapes.large,
+    borderWidth: Dp = Dp.Hairline,
     backgroundColor: Color = MaterialTheme.colors.primary,
     selectedBackgroundColor: Color = ColorAccent,
     selected: Boolean = false,
     onClick: () -> Unit,
     onLongClick: (() -> Unit)? = null,
-    content: @Composable (ImageVector, Dp, String?) -> Unit = defaultIconButtonContent
+    content: @Composable BoxScope.() -> Unit = {
+        Icon(
+            imageVector = icon,
+            contentDescription = contentDescription,
+            modifier = Modifier
+                .padding(contentPadding)
+                .align(Alignment.Center),
+        )
+    }
+) {
+    InternalButton(
+        modifier = modifier,
+        enabled = enabled,
+        animate = animate,
+        outerPadding = outerPadding,
+        minHeight = minSize,
+        minWidth = minSize,
+        shape = shape,
+        borderWidth = borderWidth,
+        backgroundColor = backgroundColor,
+        selectedBackgroundColor = selectedBackgroundColor,
+        selected = selected,
+        onClick = onClick,
+        onLongClick = onLongClick,
+        content = content,
+    )
+}
+
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+private fun InternalButton(
+    modifier: Modifier,
+    enabled: Boolean,
+    animate: Boolean,
+    outerPadding: Dp,
+    minHeight: Dp,
+    minWidth: Dp,
+    shape: Shape,
+    borderWidth: Dp,
+    backgroundColor: Color,
+    selectedBackgroundColor: Color,
+    selected: Boolean,
+    onClick: () -> Unit,
+    onLongClick: (() -> Unit)?,
+    content: @Composable BoxScope.() -> Unit
 ) {
     val background by animateColorAsState(
         targetValue = if (selected) selectedBackgroundColor else backgroundColor
@@ -120,6 +153,8 @@ fun MyIconButton(
         modifier = modifier
             .ifCase(animate) { animateContentSize() }
             .padding(outerPadding)
+            .heightIn(min = minHeight)
+            .widthIn(min = minWidth)
             .border(borderWidth, MaterialTheme.colors.onSurface.copy(alpha = 0.2f), shape)
             .clip(shape)
             .combinedClickable(
@@ -130,7 +165,9 @@ fun MyIconButton(
             ),
         color = background
     ) {
-        content(icon, contentPadding, contentDescription)
+        Box(propagateMinConstraints = true) {
+            content(this)
+        }
     }
 }
 
@@ -142,6 +179,20 @@ fun Preview() {
         for (theme in Themes.values()) InternalThemeObject(theme) {
             MyButton(
                 text = "Theme ${theme.name}",
+                modifier = Modifier.fillMaxWidth(),
+                onClick = {},
+            )
+        }
+    }
+}
+
+@Preview
+@Composable
+fun PreviewIcon() {
+    Column {
+        for (theme in Themes.values()) InternalThemeObject(theme) {
+            MyIconButton(
+                icon = Icons.Default.Home,
                 modifier = Modifier.fillMaxWidth(),
                 onClick = {}
             )

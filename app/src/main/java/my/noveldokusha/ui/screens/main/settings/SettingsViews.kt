@@ -10,6 +10,7 @@ import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Icon
+import androidx.compose.material.LocalTextStyle
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
@@ -106,20 +107,9 @@ fun SettingsTheme(
                         textAlign = TextAlign.Center,
                         modifier = Modifier.weight(1f),
                         outerPadding = 0.dp,
-                        selected = currentTheme == theme
-                    ) { _, _, _, _, _ ->
-                        val textColor = when (currentTheme == theme) {
-                            true -> Color.White
-                            false -> MaterialTheme.colors.onPrimary
-                        }
-                        Text(
-                            text = themeName,
-                            modifier = Modifier.padding(12.dp).fillMaxWidth(),
-                            textAlign = TextAlign.Center,
-                            fontWeight = FontWeight.Bold,
-                            color = textColor
-                        )
-                    }
+                        selected = currentTheme == theme,
+                        textStyle = LocalTextStyle.current.copy(fontWeight = FontWeight.Bold),
+                    )
                 }
             }
         }

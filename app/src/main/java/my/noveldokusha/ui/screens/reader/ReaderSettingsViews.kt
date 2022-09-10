@@ -200,7 +200,6 @@ private fun SettingsRowList(
                 selected = visibleSetting == CurrentSettingVisible.TextSize,
                 shape = CircleShape,
                 contentPadding = 8.dp,
-                modifier = Modifier.size(50.dp),
                 onClick = { toggleOrOpen(CurrentSettingVisible.TextSize) },
             )
         }
@@ -210,7 +209,6 @@ private fun SettingsRowList(
                 selected = visibleSetting == CurrentSettingVisible.TextFont,
                 shape = CircleShape,
                 contentPadding = 8.dp,
-                modifier = Modifier.size(50.dp),
                 onClick = { toggleOrOpen(CurrentSettingVisible.TextFont) },
             )
         }
@@ -220,7 +218,6 @@ private fun SettingsRowList(
                 selected = visibleSetting == CurrentSettingVisible.LiveTranslation,
                 shape = CircleShape,
                 contentPadding = 8.dp,
-                modifier = Modifier.height(50.dp),
                 onClick = { toggleOrOpen(CurrentSettingVisible.LiveTranslation) },
             )
         }
@@ -230,7 +227,6 @@ private fun SettingsRowList(
                 selected = visibleSetting == CurrentSettingVisible.TextToSpeech,
                 shape = CircleShape,
                 contentPadding = 8.dp,
-                modifier = Modifier.height(50.dp),
                 onClick = { toggleOrOpen(CurrentSettingVisible.TextToSpeech) },
             )
         }
@@ -240,7 +236,6 @@ private fun SettingsRowList(
                 selected = visibleSetting == CurrentSettingVisible.Theme,
                 shape = CircleShape,
                 contentPadding = 8.dp,
-                modifier = Modifier.height(50.dp),
                 onClick = { toggleOrOpen(CurrentSettingVisible.Theme) },
             )
         }
@@ -250,7 +245,6 @@ private fun SettingsRowList(
                 selected = visibleSetting == CurrentSettingVisible.SelectableText,
                 shape = CircleShape,
                 contentPadding = 8.dp,
-                modifier = Modifier.height(50.dp),
                 onClick = { toggleOrOpen(CurrentSettingVisible.SelectableText) },
             )
         }

@@ -21,10 +21,10 @@ import androidx.compose.ui.unit.dp
 import my.noveldokusha.R
 import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.scraper.DatabaseInterface
+import my.noveldokusha.ui.composeViews.ImageView
 import my.noveldokusha.ui.theme.ColorAccent
 import my.noveldokusha.ui.theme.ImageBorderRadius
 import my.noveldokusha.ui.theme.InternalTheme
-import my.noveldokusha.ui.composeViews.ImageView
 import my.noveldokusha.uiViews.MyButton
 
 @Composable
@@ -89,33 +89,29 @@ fun DatabaseBookInfoView(
                 )
             }
             Column(
-                Modifier
+                modifier = Modifier
+                    .fillMaxWidth()
                     .padding(horizontal = 8.dp)
-                    .padding(top = 50.dp)
+                    .padding(top = 50.dp),
+                verticalArrangement = Arrangement.spacedBy(4.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 Text(
                     text = data.title,
                     style = MaterialTheme.typography.h5,
                     fontWeight = FontWeight.Bold,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.fillMaxWidth(),
+                    textAlign = TextAlign.Center
                 )
                 ImageView(
                     imageModel = coverImg,
                     contentScale = ContentScale.FillHeight,
                     modifier = Modifier
                         .height(340.dp)
-                        .align(Alignment.CenterHorizontally)
-                        .padding(top = 8.dp)
                         .clip(RoundedCornerShape(ImageBorderRadius))
                 )
                 MyButton(
                     text = stringResource(R.string.search_for_sources),
                     onClick = onSourcesClick,
-                    modifier = Modifier
-                        .align(Alignment.CenterHorizontally)
-                        .padding(top = 8.dp),
-                    outerPadding = 0.dp
                 )
             }
         }
@@ -138,8 +134,8 @@ fun DatabaseBookInfoView(
                 for (author in data.authors) MyButton(
                     text = author.name,
                     enabled = author.url != null,
+                    onClick = { onAuthorsClick(author) },
                     outerPadding = 0.dp,
-                    onClick = { onAuthorsClick(author) }
                 )
             }
 
@@ -149,8 +145,8 @@ fun DatabaseBookInfoView(
             Title(stringResource(R.string.genres))
             MyButton(
                 text = data.genres.joinToString(" · "),
+                onClick = { onGenresClick(data.genres) },
                 outerPadding = 0.dp,
-                onClick = { onGenresClick(data.genres) }
             )
 
             Title(stringResource(R.string.type))

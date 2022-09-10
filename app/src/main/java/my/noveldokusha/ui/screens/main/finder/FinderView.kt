@@ -22,12 +22,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -290,8 +288,7 @@ private fun Button(
         outerPadding = 0.dp,
         backgroundColor = MaterialTheme.colors.primary,
         modifier = modifier.fillMaxWidth(),
-        textStyle = LocalTextStyle.current.copy(fontWeight = FontWeight.Bold)
-    ) { text: String, shape: Shape, textAlign: TextAlign, textStyle: TextStyle, contentPadding: Dp ->
+    ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.padding(horizontal = 12.dp),
@@ -306,8 +303,7 @@ private fun Button(
             )
             Text(
                 text = text,
-                textAlign = textAlign,
-                style = textStyle,
+                fontWeight = FontWeight.Bold
             )
             pinContent(this)
         }

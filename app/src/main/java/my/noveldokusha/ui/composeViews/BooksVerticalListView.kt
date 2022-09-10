@@ -1,7 +1,6 @@
 package my.noveldokusha.uiViews
 
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -50,12 +49,8 @@ fun BooksVerticalListView(
             MyButton(
                 text = it.title,
                 onClick = { onBookClicked(it) },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .combinedClickable(
-                        onClick = { onBookClicked(it) },
-                        onLongClick = { onBookLongClicked(it) }
-                    )
+                onLongClick = { onBookLongClicked(it) },
+                modifier = Modifier.fillMaxWidth()
             )
         }
 
