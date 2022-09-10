@@ -11,8 +11,8 @@ import kotlinx.coroutines.launch
 import my.noveldokusha.AppPreferences
 import my.noveldokusha.network.PagedListIteratorState
 import my.noveldokusha.ui.BaseViewModel
-import my.noveldokusha.ui.repositories.ScraperRepository
-import my.noveldokusha.ui.repositories.SourceCatalogItem
+import my.noveldokusha.repository.ScraperRepository
+import my.noveldokusha.repository.SourceCatalogItem
 import my.noveldokusha.utils.StateExtra_String
 import javax.inject.Inject
 

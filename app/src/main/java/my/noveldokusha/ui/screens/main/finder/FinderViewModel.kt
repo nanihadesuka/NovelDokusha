@@ -5,7 +5,7 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import my.noveldokusha.AppPreferences
 import my.noveldokusha.ui.BaseViewModel
-import my.noveldokusha.ui.repositories.ScraperRepository
+import my.noveldokusha.repository.ScraperRepository
 import my.noveldokusha.utils.toState
 import javax.inject.Inject
 

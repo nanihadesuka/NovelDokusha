@@ -15,7 +15,7 @@ import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.take
 import my.noveldokusha.AppPreferences
-import my.noveldokusha.data.Repository
+import my.noveldokusha.repository.Repository
 import my.noveldokusha.data.database.tables.Chapter
 import my.noveldokusha.ui.BaseViewModel
 import my.noveldokusha.ui.screens.reader.tools.*
@@ -170,10 +170,10 @@ class ReaderViewModel @Inject constructor(
 
     init {
         viewModelScope.launch(Dispatchers.Default) {
-            val chapter = async(Dispatchers.IO) { repository.bookChapter.get(chapterUrl) }
+            val chapter = async(Dispatchers.IO) { repository.bookChapters.get(chapterUrl) }
             val loadTranslator = async(Dispatchers.IO) { liveTranslation.init() }
             val chaptersList = async(Dispatchers.Default) {
-                orderedChapters.also { it.addAll(repository.bookChapter.chapters(bookUrl)) }
+                orderedChapters.also { it.addAll(repository.bookChapters.chapters(bookUrl)) }
             }
             val chapterIndex = async(Dispatchers.Default) {
                 chaptersList.await().indexOfFirst { it.url == chapterUrl }
@@ -190,7 +190,7 @@ class ReaderViewModel @Inject constructor(
         }
 
         viewModelScope.launch {
-            repository.bookLibrary.updateLastReadEpochTimeMilli(bookUrl, System.currentTimeMillis())
+            repository.libraryBooks.updateLastReadEpochTimeMilli(bookUrl, System.currentTimeMillis())
         }
 
         viewModelScope.launch {

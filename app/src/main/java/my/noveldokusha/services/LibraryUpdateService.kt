@@ -11,7 +11,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.actor
 import my.noveldokusha.R
-import my.noveldokusha.data.Repository
+import my.noveldokusha.repository.Repository
 import my.noveldokusha.data.database.tables.Book
 import my.noveldokusha.network.NetworkClient
 import my.noveldokusha.network.Response
@@ -136,7 +136,7 @@ class LibraryUpdateService : Service() {
             title = getString(R.string.updaing_library)
         }
 
-        repository.bookLibrary.getAllInLibrary()
+        repository.libraryBooks.getAllInLibrary()
             .filter { it.completed == completedCategory }
             .filter { !it.url.startsWith("local://") }
             .also { launch(Dispatchers.IO) { updateActorCounter.send(Pair(it.size, true)) } }
@@ -172,7 +172,7 @@ class LibraryUpdateService : Service() {
             val hasFailed = mutableListOf<String>()
             for (book in books) {
                 val oldChaptersList = async(Dispatchers.IO) {
-                    repository.bookChapter.chapters(book.url).map { it.url }.toSet()
+                    repository.bookChapters.chapters(book.url).map { it.url }.toSet()
                 }
 
                 launch(Dispatchers.IO) {
@@ -183,7 +183,7 @@ class LibraryUpdateService : Service() {
                     is Response.Success -> {
                         oldChaptersList.join()
                         launch(Dispatchers.IO) {
-                            repository.bookChapter.merge(res.data, book.url)
+                            repository.bookChapters.merge(res.data, book.url)
                         }
                         val hasNewChapters = res.data.any { it.url !in oldChaptersList.await() }
                         if (hasNewChapters)

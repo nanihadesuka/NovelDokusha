@@ -12,9 +12,12 @@ import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.*
 import my.noveldokusha.R
-import my.noveldokusha.data.Repository
 import my.noveldokusha.data.database.AppDatabase
 import my.noveldokusha.network.NetworkClient
+import my.noveldokusha.repository.ChapterBodyRepository
+import my.noveldokusha.repository.BookChaptersRepository
+import my.noveldokusha.repository.LibraryBooksRepository
+import my.noveldokusha.repository.Repository
 import my.noveldokusha.scraper.Scraper
 import my.noveldokusha.ui.Toasty
 import my.noveldokusha.utils.*
@@ -133,20 +136,37 @@ class RestoreDataService : Service() {
             try {
                 builder.showNotification(channel_id) { text = getString(R.string.loading_database) }
                 val backupDatabase = inputStream.use {
+                    val newDatabase = AppDatabase.createRoomFromStream(context, "temp_database", it)
+                    val bookChaptersRepository = BookChaptersRepository(
+                        chapterDao = newDatabase.chapterDao(),
+                        operations = newDatabase
+                    )
                     Repository(
-                        db = AppDatabase.createRoomFromStream(context, "temp_database", it),
+                        db = newDatabase,
                         context = context,
                         name = "temp_database",
-                        scraper = scraper,
-                        networkClient = networkClient
+                        bookChaptersRepository = bookChaptersRepository,
+                        chapterBodyRepository = ChapterBodyRepository(
+                            chapterBodyDao = newDatabase.chapterBodyDao(),
+                            operations = newDatabase,
+                            bookChaptersRepository = bookChaptersRepository,
+                            scraper = scraper,
+                            networkClient = networkClient
+                        ),
+                        libraryBooksRepository = LibraryBooksRepository(
+                            libraryDao = newDatabase.libraryDao(),
+                            operations = newDatabase
+                        )
                     )
                 }
                 builder.showNotification(channel_id) { text = getString(R.string.adding_books) }
-                repository.bookLibrary.insertReplace(backupDatabase.bookLibrary.getAll())
+                repository.libraryBooks.insertReplace(backupDatabase.libraryBooks.getAll())
                 builder.showNotification(channel_id) { text = getString(R.string.adding_chapters) }
-                repository.bookChapter.insert(backupDatabase.bookChapter.getAll())
-                builder.showNotification(channel_id) { text = getString(R.string.adding_chapters_text) }
-                repository.bookChapterBody.insertReplace(backupDatabase.bookChapterBody.getAll())
+                repository.bookChapters.insert(backupDatabase.bookChapters.getAll())
+                builder.showNotification(channel_id) {
+                    text = getString(R.string.adding_chapters_text)
+                }
+                repository.chapterBody.insertReplace(backupDatabase.chapterBody.getAll())
                 toasty.show(R.string.database_restored)
                 backupDatabase.close()
                 backupDatabase.delete()

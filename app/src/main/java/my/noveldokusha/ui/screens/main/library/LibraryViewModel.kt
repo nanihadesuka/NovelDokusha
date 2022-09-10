@@ -13,8 +13,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
 import my.noveldokusha.AppPreferences
-import my.noveldokusha.data.Repository
 import my.noveldokusha.data.database.tables.Book
+import my.noveldokusha.repository.Repository
 import my.noveldokusha.ui.BaseViewModel
 import javax.inject.Inject
 
@@ -27,7 +27,7 @@ class LibraryViewModel @Inject constructor(
     val bottomSheetState = ModalBottomSheetState(ModalBottomSheetValue.Hidden)
 
     fun setBookAsCompleted(book: Book, completed: Boolean) = CoroutineScope(Dispatchers.IO).launch {
-        repository.bookLibrary.update(book.copy(completed = completed))
+        repository.libraryBooks.update(book.copy(completed = completed))
     }
 
     var optionsBookDialogState by mutableStateOf<OptionsBookDialogState>(OptionsBookDialogState.Hide)
@@ -45,12 +45,12 @@ class LibraryViewModel @Inject constructor(
 
     fun bookCompletedToggle(bookUrl: String) {
         viewModelScope.launch {
-            val book = repository.BookLibrary().get(bookUrl) ?: return@launch
-            repository.BookLibrary().update(book.copy(completed = !book.completed))
+            val book = repository.libraryBooks.get(bookUrl) ?: return@launch
+            repository.libraryBooks.update(book.copy(completed = !book.completed))
         }
     }
 
-    fun getBook(bookUrl: String) = repository.BookLibrary().getFlow(bookUrl).filterNotNull()
+    fun getBook(bookUrl: String) = repository.libraryBooks.getFlow(bookUrl).filterNotNull()
 }
 
 sealed interface OptionsBookDialogState {

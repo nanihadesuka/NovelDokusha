@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import my.noveldokusha.AppPreferences
 import my.noveldokusha.R
-import my.noveldokusha.data.Repository
+import my.noveldokusha.repository.Repository
 import my.noveldokusha.services.LibraryUpdateService
 import my.noveldokusha.ui.BaseViewModel
 import my.noveldokusha.ui.Toasty
@@ -30,7 +30,7 @@ class LibraryPageViewModel @Inject constructor(
     val listReading by createPageList(isShowCompleted = false)
     val listCompleted by createPageList(isShowCompleted = true)
 
-    private fun createPageList(isShowCompleted: Boolean) = repository.bookLibrary
+    private fun createPageList(isShowCompleted: Boolean) = repository.libraryBooks
         .getBooksInLibraryWithContextFlow
         .map { it.filter { book -> book.book.completed == isShowCompleted } }
         .combine(preferences.LIBRARY_FILTER_READ.flow()) { list, filterRead ->

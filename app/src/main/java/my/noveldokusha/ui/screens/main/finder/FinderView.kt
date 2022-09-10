@@ -39,8 +39,8 @@ import my.noveldokusha.scraper.SourceInterface
 import my.noveldokusha.ui.composeViews.ImageViewGlide
 import my.noveldokusha.ui.composeViews.MyButton
 import my.noveldokusha.ui.composeViews.ToolbarModeSearch
-import my.noveldokusha.ui.repositories.SourceCatalogItem
-import my.noveldokusha.ui.repositories.SourceLanguageItem
+import my.noveldokusha.repository.SourceCatalogItem
+import my.noveldokusha.repository.SourceLanguageItem
 import my.noveldokusha.ui.screens.databaseSearch.DatabaseSearchActivity
 import my.noveldokusha.ui.screens.globalSourceSearch.GlobalSourceSearchActivity
 import my.noveldokusha.ui.screens.sourceCatalog.SourceCatalogActivity

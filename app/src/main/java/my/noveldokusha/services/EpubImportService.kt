@@ -15,7 +15,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import my.noveldokusha.R
 import my.noveldokusha.createEpubBook
-import my.noveldokusha.data.Repository
+import my.noveldokusha.repository.Repository
 import my.noveldokusha.importEpubToRepository
 import my.noveldokusha.utils.*
 import javax.inject.Inject

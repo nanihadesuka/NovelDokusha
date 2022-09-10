@@ -26,7 +26,7 @@ import my.noveldokusha.network.IteratorState
 import my.noveldokusha.network.NetworkClient
 import my.noveldokusha.scraper.Scraper
 import my.noveldokusha.ui.composeViews.ImageView
-import my.noveldokusha.ui.repositories.SourceCatalogItem
+import my.noveldokusha.repository.SourceCatalogItem
 import my.noveldokusha.ui.theme.ColorAccent
 import my.noveldokusha.ui.theme.ImageBorderShape
 import my.noveldokusha.ui.theme.InternalTheme

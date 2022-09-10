@@ -3,7 +3,7 @@ package my.noveldokusha.ui.screens.reader.tools
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
-import my.noveldokusha.data.Repository
+import my.noveldokusha.repository.Repository
 import my.noveldokusha.data.database.tables.Chapter
 import my.noveldokusha.network.Response
 import my.noveldokusha.ui.screens.reader.ReaderItem
@@ -419,7 +419,7 @@ class ChaptersLoader(
             forceUpdateListViewState()
         }
 
-        when (val res = repository.bookChapterBody.fetchBody(chapter.url)) {
+        when (val res = repository.chapterBody.fetchBody(chapter.url)) {
             is Response.Success -> {
                 // Split chapter text into items
                 val itemsOriginal = textToItemsConverter(

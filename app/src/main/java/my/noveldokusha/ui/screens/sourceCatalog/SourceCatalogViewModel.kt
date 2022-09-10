@@ -12,7 +12,7 @@ import kotlinx.coroutines.launch
 import my.noveldokusha.AppPreferences
 import my.noveldokusha.R
 import my.noveldokusha.data.BookMetadata
-import my.noveldokusha.data.Repository
+import my.noveldokusha.repository.Repository
 import my.noveldokusha.network.PagedList
 import my.noveldokusha.network.PagedListIteratorState
 import my.noveldokusha.network.Response
@@ -70,8 +70,8 @@ class SourceCatalogViewModel @Inject constructor(
 
     fun addToLibraryToggle(book: BookMetadata) = viewModelScope.launch(Dispatchers.IO)
     {
-        repository.bookLibrary.toggleBookmark(book)
-        val isInLibrary = repository.bookLibrary.existInLibrary(book.url)
+        repository.libraryBooks.toggleBookmark(book)
+        val isInLibrary = repository.libraryBooks.existInLibrary(book.url)
         val res = if (isInLibrary) R.string.added_to_library else R.string.removed_from_library
         toasty.show(res)
     }

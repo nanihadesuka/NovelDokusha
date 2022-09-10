@@ -1,4 +1,4 @@
-package my.noveldokusha.ui.repositories
+package my.noveldokusha.repository
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow

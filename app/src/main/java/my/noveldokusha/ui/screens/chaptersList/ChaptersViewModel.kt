@@ -12,7 +12,7 @@ import my.noveldokusha.AppPreferences
 import my.noveldokusha.R
 import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.data.ChapterWithContext
-import my.noveldokusha.data.Repository
+import my.noveldokusha.repository.Repository
 import my.noveldokusha.data.database.tables.Book
 import my.noveldokusha.network.NetworkClient
 import my.noveldokusha.network.Response
@@ -83,17 +83,17 @@ class ChaptersViewModel @Inject constructor(
 
     init {
         viewModelScope.launch(Dispatchers.IO) {
-            if (!repository.bookChapter.hasChapters(bookMetadata.url))
+            if (!repository.bookChapters.hasChapters(bookMetadata.url))
                 updateChaptersList()
 
-            val book = repository.bookLibrary.get(bookMetadata.url)
+            val book = repository.libraryBooks.get(bookMetadata.url)
             if (book != null)
                 return@launch
 
             val coverUrl = async { downloadBookCoverImageUrl(scraper, networkClient, bookUrl) }
             val description = async { downloadBookDescription(scraper, networkClient, bookUrl) }
 
-            repository.bookLibrary.insert(
+            repository.libraryBooks.insert(
                 Book(
                     title = bookMetadata.title,
                     url = bookMetadata.url,
@@ -104,7 +104,7 @@ class ChaptersViewModel @Inject constructor(
         }
     }
 
-    val book by repository.bookLibrary.getFlow(bookUrl)
+    val book by repository.libraryBooks.getFlow(bookUrl)
         .filterNotNull()
         .map(::BookDataView)
         .toState(
@@ -120,7 +120,7 @@ class ChaptersViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            repository.bookChapter.getChaptersWithContexFlow(bookMetadata.url)
+            repository.bookChapters.getChaptersWithContexFlow(bookMetadata.url)
                 .map { removeCommonTextFromTitles(it) }
                 // Sort the chapters given the order preference
                 .combine(appPreferences.CHAPTERS_SORT_ASCENDING.flow()) { chapters, sorted ->
@@ -161,13 +161,13 @@ class ChaptersViewModel @Inject constructor(
     fun updateCover() = viewModelScope.launch(Dispatchers.IO) {
         val res = downloadBookCoverImageUrl(scraper, networkClient, bookUrl)
         if (res is Response.Success)
-            repository.bookLibrary.updateCover(bookUrl, res.data)
+            repository.libraryBooks.updateCover(bookUrl, res.data)
     }
 
     fun updateDescription() = viewModelScope.launch(Dispatchers.IO) {
         val res = downloadBookDescription(scraper, networkClient, bookUrl)
         if (res is Response.Success)
-            repository.bookLibrary.updateDescription(bookUrl, res.data)
+            repository.libraryBooks.updateDescription(bookUrl, res.data)
     }
 
     private var loadChaptersJob: Job? = null
@@ -192,7 +192,7 @@ class ChaptersViewModel @Inject constructor(
                         toasty.show(R.string.no_chapters_found)
 
                     withContext(Dispatchers.IO) {
-                        repository.bookChapter.merge(res.data, url)
+                        repository.bookChapters.merge(res.data, url)
                     }
                 }
                 is Response.Error -> {
@@ -212,40 +212,40 @@ class ChaptersViewModel @Inject constructor(
     }
 
     suspend fun toggleBookmark() = withContext(Dispatchers.IO) {
-        repository.bookLibrary.toggleBookmark(bookMetadata)
-        repository.bookLibrary.get(bookMetadata.url)?.inLibrary ?: false
+        repository.libraryBooks.toggleBookmark(bookMetadata)
+        repository.libraryBooks.get(bookMetadata.url)?.inLibrary ?: false
     }
 
     suspend fun getLastReadChapter() = withContext(Dispatchers.IO) {
-        repository.bookLibrary.get(bookUrl)?.lastReadChapter
-            ?: repository.bookChapter.getFirstChapter(bookUrl)?.url
+        repository.libraryBooks.get(bookUrl)?.lastReadChapter
+            ?: repository.bookChapters.getFirstChapter(bookUrl)?.url
     }
 
     fun setSelectedAsUnread() {
         val list = selectedChaptersUrl.toList()
         appScope.launch(Dispatchers.IO) {
-            repository.bookChapter.setAsUnread(list.map { it.first })
+            repository.bookChapters.setAsUnread(list.map { it.first })
         }
     }
 
     fun setSelectedAsRead() {
         val list = selectedChaptersUrl.toList()
         appScope.launch(Dispatchers.IO) {
-            repository.bookChapter.setAsRead(list.map { it.first })
+            repository.bookChapters.setAsRead(list.map { it.first })
         }
     }
 
     fun downloadSelected() {
         val list = selectedChaptersUrl.toList()
         appScope.launch(Dispatchers.IO) {
-            list.forEach { repository.bookChapterBody.fetchBody(it.first) }
+            list.forEach { repository.chapterBody.fetchBody(it.first) }
         }
     }
 
     fun deleteDownloadSelected() {
         val list = selectedChaptersUrl.toList()
         appScope.launch(Dispatchers.IO) {
-            repository.bookChapterBody.removeRows(list.map { it.first })
+            repository.chapterBody.removeRows(list.map { it.first })
         }
     }
 

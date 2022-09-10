@@ -10,15 +10,15 @@ import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
-import my.noveldokusha.data.Repository
 import my.noveldokusha.data.database.AppDatabase
+import my.noveldokusha.data.database.AppDatabaseOperations
 import my.noveldokusha.network.NetworkClient
 import my.noveldokusha.network.ScraperNetworkClient
+import my.noveldokusha.repository.*
 import my.noveldokusha.scraper.Scraper
 import my.noveldokusha.tools.TranslationManager
 import my.noveldokusha.ui.Toasty
 import my.noveldokusha.ui.ToastyToast
-import my.noveldokusha.ui.repositories.ScraperRepository
 import my.noveldokusha.ui.screens.reader.tools.LiveTranslation
 import java.io.File
 import javax.inject.Singleton
@@ -35,19 +35,63 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideRepository(
-        database: AppDatabase,
-        @ApplicationContext context: Context,
-        networkClient: NetworkClient,
-        scraper: Scraper,
-    ): Repository {
-        return Repository(database, context, mainDatabaseName, scraper, networkClient)
+    fun provideAppDatabase(@ApplicationContext context: Context): AppDatabase {
+        return AppDatabase.createRoom(context, mainDatabaseName)
     }
 
     @Provides
     @Singleton
-    fun provideAppDatabase(@ApplicationContext context: Context): AppDatabase {
-        return AppDatabase.createRoom(context, mainDatabaseName)
+    fun provideRepository(
+        database: AppDatabase,
+        @ApplicationContext context: Context,
+        libraryBooksRepository: LibraryBooksRepository,
+        bookChaptersRepository: BookChaptersRepository,
+        chapterBodyRepository: ChapterBodyRepository,
+    ): Repository {
+        return Repository(
+            database,
+            context,
+            mainDatabaseName,
+            libraryBooksRepository,
+            bookChaptersRepository,
+            chapterBodyRepository,
+        )
+    }
+
+    @Provides
+    @Singleton
+    fun provideAppDatabaseOperations(database: AppDatabase): AppDatabaseOperations {
+        return database
+    }
+
+    @Provides
+    @Singleton
+    fun provideLibraryBooksRepository(database: AppDatabase): LibraryBooksRepository {
+        return LibraryBooksRepository(libraryDao = database.libraryDao(), database)
+    }
+
+    @Provides
+    @Singleton
+    fun provideChapterBooksRepository(database: AppDatabase): BookChaptersRepository {
+        return BookChaptersRepository(chapterDao = database.chapterDao(), database)
+    }
+
+    @Provides
+    @Singleton
+    fun provideChapterBodyRepository(
+        database: AppDatabase,
+        networkClient: NetworkClient,
+        scraper: Scraper,
+        bookChaptersRepository: BookChaptersRepository,
+
+        ): ChapterBodyRepository {
+        return ChapterBodyRepository(
+            chapterBodyDao = database.chapterBodyDao(),
+            networkClient = networkClient,
+            scraper = scraper,
+            bookChaptersRepository = bookChaptersRepository,
+            operations = database
+        )
     }
 
     @Provides

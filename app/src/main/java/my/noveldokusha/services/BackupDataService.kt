@@ -10,7 +10,7 @@ import androidx.core.app.NotificationCompat
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.*
 import my.noveldokusha.R
-import my.noveldokusha.data.Repository
+import my.noveldokusha.repository.Repository
 import my.noveldokusha.utils.*
 import okhttp3.internal.closeQuietly
 import java.util.zip.ZipEntry

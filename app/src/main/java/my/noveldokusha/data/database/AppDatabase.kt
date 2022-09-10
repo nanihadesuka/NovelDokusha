@@ -5,6 +5,7 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.migration.Migration
+import androidx.room.withTransaction
 import androidx.sqlite.db.SupportSQLiteDatabase
 import my.noveldokusha.data.database.DAOs.ChapterBodyDao
 import my.noveldokusha.data.database.DAOs.ChapterDao
@@ -13,6 +14,14 @@ import my.noveldokusha.data.database.tables.Book
 import my.noveldokusha.data.database.tables.Chapter
 import my.noveldokusha.data.database.tables.ChapterBody
 import java.io.InputStream
+
+
+interface AppDatabaseOperations {
+    /**
+     * Execute the whole database calls as an atomic operation
+     */
+    suspend fun <T> transaction(block: suspend () -> T): T
+}
 
 @Database(
     entities = [
@@ -23,10 +32,12 @@ import java.io.InputStream
     version = 5,
     exportSchema = false
 )
-abstract class AppDatabase : RoomDatabase() {
+abstract class AppDatabase : RoomDatabase(), AppDatabaseOperations {
     abstract fun libraryDao(): LibraryDao
     abstract fun chapterDao(): ChapterDao
     abstract fun chapterBodyDao(): ChapterBodyDao
+
+    override suspend fun <T> transaction(block: suspend () -> T): T = withTransaction(block)
 
     companion object {
         fun createRoom(ctx: Context, name: String) = Room

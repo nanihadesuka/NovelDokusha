@@ -17,7 +17,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import my.noveldokusha.App
 import my.noveldokusha.AppPreferences
-import my.noveldokusha.data.Repository
+import my.noveldokusha.repository.Repository
 import my.noveldokusha.tools.TranslationManager
 import my.noveldokusha.ui.BaseViewModel
 import my.noveldokusha.ui.theme.Themes
@@ -81,7 +81,7 @@ class SettingsViewModel @Inject constructor(
     }
 
     fun cleanImagesFolder() = appScope.launch(Dispatchers.IO) {
-        val libraryFolders = repository.bookLibrary.getAllInLibrary()
+        val libraryFolders = repository.libraryBooks.getAllInLibrary()
             .mapNotNull { """^local://(.+)$""".toRegex().find(it.url)?.destructured?.component1() }
             .toSet()
 
