@@ -11,7 +11,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.runtime.*
@@ -35,12 +34,12 @@ import androidx.compose.ui.unit.dp
 import my.noveldokusha.R
 import my.noveldokusha.data.ChapterWithContext
 import my.noveldokusha.data.database.tables.Chapter
+import my.noveldokusha.ui.composeViews.ImageView
 import my.noveldokusha.ui.theme.ColorAccent
-import my.noveldokusha.ui.theme.ImageBorderRadius
+import my.noveldokusha.ui.theme.ImageBorderShape
 import my.noveldokusha.ui.theme.InternalTheme
 import my.noveldokusha.ui.theme.Themes
 import my.noveldokusha.uiViews.ErrorView
-import my.noveldokusha.ui.composeViews.ImageView
 import my.noveldokusha.utils.ifCase
 import my.noveldokusha.utils.mix
 
@@ -92,7 +91,7 @@ fun HeaderView(
                         contentScale = ContentScale.FillHeight,
                         modifier = Modifier
                             .fillMaxHeight()
-                            .clip(RoundedCornerShape(ImageBorderRadius))
+                            .clip(ImageBorderShape)
                     )
                 }
                 Column(

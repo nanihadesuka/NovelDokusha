@@ -37,6 +37,7 @@ import my.noveldokusha.scraper.DatabaseInterface
 import my.noveldokusha.scraper.Scraper
 import my.noveldokusha.scraper.SourceInterface
 import my.noveldokusha.ui.composeViews.ImageViewGlide
+import my.noveldokusha.ui.composeViews.MyButton
 import my.noveldokusha.ui.composeViews.ToolbarModeSearch
 import my.noveldokusha.ui.repositories.SourceCatalogItem
 import my.noveldokusha.ui.repositories.SourceLanguageItem
@@ -45,10 +46,9 @@ import my.noveldokusha.ui.screens.globalSourceSearch.GlobalSourceSearchActivity
 import my.noveldokusha.ui.screens.sourceCatalog.SourceCatalogActivity
 import my.noveldokusha.ui.screens.sourceCatalog.ToolbarMode
 import my.noveldokusha.ui.theme.ColorAccent
-import my.noveldokusha.ui.theme.ImageBorderRadius
+import my.noveldokusha.ui.theme.ImageBorderShape
 import my.noveldokusha.ui.theme.InternalTheme
 import my.noveldokusha.uiViews.AnimatedTransition
-import my.noveldokusha.ui.composeViews.MyButton
 import my.noveldokusha.utils.drawBottomLine
 import okhttp3.Request
 import okhttp3.Response
@@ -292,7 +292,7 @@ private fun Button(
                 modifier = Modifier
                     .padding(vertical = 12.dp)
                     .size(18.dp)
-                    .clip(RoundedCornerShape(ImageBorderRadius))
+                    .clip(ImageBorderShape)
             )
             Text(
                 text = text,

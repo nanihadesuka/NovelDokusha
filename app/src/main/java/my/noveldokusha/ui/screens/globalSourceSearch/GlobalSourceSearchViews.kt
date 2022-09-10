@@ -9,7 +9,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
@@ -29,7 +28,7 @@ import my.noveldokusha.scraper.Scraper
 import my.noveldokusha.ui.composeViews.ImageView
 import my.noveldokusha.ui.repositories.SourceCatalogItem
 import my.noveldokusha.ui.theme.ColorAccent
-import my.noveldokusha.ui.theme.ImageBorderRadius
+import my.noveldokusha.ui.theme.ImageBorderShape
 import my.noveldokusha.ui.theme.InternalTheme
 import my.noveldokusha.utils.capitalize
 import okhttp3.Request
@@ -106,9 +105,9 @@ fun SourceListView(
                         .border(
                             0.dp,
                             MaterialTheme.colors.onSurface.copy(alpha = 0.2f),
-                            RoundedCornerShape(ImageBorderRadius)
+                            ImageBorderShape
                         )
-                        .clip(RoundedCornerShape(ImageBorderRadius)),
+                        .clip(ImageBorderShape),
                 )
                 Text(
                     text = it.title,

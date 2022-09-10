@@ -3,7 +3,6 @@ package my.noveldokusha.ui.screens.databaseBookInfo
 import androidx.compose.animation.*
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -22,10 +21,10 @@ import my.noveldokusha.R
 import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.scraper.DatabaseInterface
 import my.noveldokusha.ui.composeViews.ImageView
-import my.noveldokusha.ui.theme.ColorAccent
-import my.noveldokusha.ui.theme.ImageBorderRadius
-import my.noveldokusha.ui.theme.InternalTheme
 import my.noveldokusha.ui.composeViews.MyButton
+import my.noveldokusha.ui.theme.ColorAccent
+import my.noveldokusha.ui.theme.ImageBorderShape
+import my.noveldokusha.ui.theme.InternalTheme
 
 @Composable
 private fun Title(name: String) {
@@ -107,7 +106,7 @@ fun DatabaseBookInfoView(
                     contentScale = ContentScale.FillHeight,
                     modifier = Modifier
                         .height(340.dp)
-                        .clip(RoundedCornerShape(ImageBorderRadius))
+                        .clip(ImageBorderShape)
                 )
                 MyButton(
                     text = stringResource(R.string.search_for_sources),
