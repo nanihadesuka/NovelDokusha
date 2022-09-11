@@ -7,13 +7,11 @@ import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import dagger.hilt.android.qualifiers.ApplicationContext
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import okhttp3.Interceptor
 import okhttp3.Request
 import okhttp3.Response
+import java.io.IOException
 import java.util.concurrent.locks.ReentrantLock
 import javax.net.ssl.HttpsURLConnection
 import kotlin.concurrent.withLock
@@ -44,25 +42,33 @@ class CloudFareVerificationInterceptor(
         }
 
         return lock.withLock {
-            response.close()
-            // Remove old cf_clearance from the cookie
-            val cookie = CookieManager
-                .getInstance()
-                .getCookie(request.url.toString())
-                .splitToSequence(";")
-                .map { it.split("=").map(String::trim) }
-                .filter { it[0] != "cf_clearance" }
-                .joinToString(";") { it.joinToString("=") }
+            try {
 
-            CookieManager
-                .getInstance()
-                .setCookie(request.url.toString(), cookie)
+                response.close()
+                // Remove old cf_clearance from the cookie
+                val cookie = CookieManager
+                    .getInstance()
+                    .getCookie(request.url.toString())
+                    .splitToSequence(";")
+                    .map { it.split("=").map(String::trim) }
+                    .filter { it[0] != "cf_clearance" }
+                    .joinToString(";") { it.joinToString("=") }
 
-            runBlocking(Dispatchers.IO) {
-                resolveWithWebView(request)
+                CookieManager
+                    .getInstance()
+                    .setCookie(request.url.toString(), cookie)
+
+                runBlocking(Dispatchers.IO) {
+                    resolveWithWebView(request)
+                }
+
+                chain.proceed(request)
+            } catch (e: Exception) {
+                when (e) {
+                    is CancellationException -> throw e
+                    else -> throw IOException(e)
+                }
             }
-
-            chain.proceed(request)
         }
     }
 
