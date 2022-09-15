@@ -16,6 +16,7 @@ import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import my.noveldokusha.composableActions.debouncedAction
 
@@ -25,24 +26,31 @@ fun Modifier.ifCase(condition: Boolean, fn: @Composable Modifier.() -> Modifier)
 }
 
 @Composable
-fun Modifier.drawBottomLine(color: Color = MaterialTheme.colors.onPrimary.copy(alpha = 0.3f)) =
-    drawBehind {
-        drawLine(
-            color,
-            start = Offset(0f, size.height),
-            end = Offset(size.width, size.height)
-        )
-    }
+fun Modifier.drawBottomLine(
+    color: Color = MaterialTheme.colors.onPrimary.copy(alpha = 0.3f),
+    thickness: Dp = Dp.Hairline
+) = drawBehind {
+    val thicknessPx = thickness.toPx()
+    drawLine(
+        color,
+        start = Offset(0f, size.height - thicknessPx),
+        end = Offset(size.width, size.height - thicknessPx),
+        strokeWidth = thicknessPx
+    )
+}
 
 @Composable
-fun Modifier.drawTopLine(color: Color = MaterialTheme.colors.onPrimary.copy(alpha = 0.3f)) =
-    drawBehind {
-        drawLine(
-            color,
-            start = Offset(0f, 0f),
-            end = Offset(size.width, 0f)
-        )
-    }
+fun Modifier.drawTopLine(
+    color: Color = MaterialTheme.colors.onPrimary.copy(alpha = 0.3f),
+    thickness: Dp = Dp.Hairline
+) = drawBehind {
+    drawLine(
+        color,
+        start = Offset(0f, 0f),
+        end = Offset(size.width, 0f),
+        strokeWidth = thickness.toPx()
+    )
+}
 
 
 /**

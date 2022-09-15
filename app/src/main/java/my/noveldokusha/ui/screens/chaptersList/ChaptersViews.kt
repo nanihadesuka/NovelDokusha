@@ -173,32 +173,56 @@ fun ChaptersListView(
     onClick: (ChapterWithContext) -> Unit,
     onLongClick: (ChapterWithContext) -> Unit
 ) {
+
+    val backgroundColorSelected =
+        MaterialTheme.colors.onPrimary.mix(MaterialTheme.colors.surface, 0.1f)
+    val backgroundColorUnselected =
+        MaterialTheme.colors.onPrimary.mix(MaterialTheme.colors.surface, 0.5f)
+    val colorTextRead = MaterialTheme.colors.onPrimary.copy(alpha = 0.5f)
+    val colorTextNotRead = MaterialTheme.colors.onPrimary
+    val colorIconSeenRead = MaterialTheme.colors.onPrimary.copy(alpha = 0.5f)
+    val colorIconSeenNotRead = MaterialTheme.colors.onPrimary.copy(alpha = 0f)
+    val colorIconDownloadedRead = MaterialTheme.colors.onPrimary.copy(alpha = 0.5f)
+    val colorIconDownloadedNotRead = MaterialTheme.colors.onPrimary.copy(alpha = 0f)
+
+    val backgroundColorNotSelectedRead = MaterialTheme.colors.surface.mix(ColorAccent, 0.8f)
+    val backgroundColorNotSelectedNotRead = MaterialTheme.colors.surface
+    val backgroundColorSelectedRead = backgroundColorSelected.mix(ColorAccent, 0.8f)
+    val backgroundColorSelectedNotRead = backgroundColorSelected
+
     LazyColumn(
         state = listState,
         contentPadding = PaddingValues(bottom = 240.dp)
     ) {
-        item { header() }
-        items(list) {
+        item(key = "header") { header() }
+        items(
+            items = list,
+            key = { "_" + it.chapter.url }
+        ) {
             val selected by remember {
                 derivedStateOf { selectedChapters.containsKey(it.chapter.url) }
             }
 
             val backgroundColor by animateColorAsState(
-                targetValue = when (selected) {
-                    false -> MaterialTheme.colors.surface
-                    true -> MaterialTheme.colors.onPrimary.mix(MaterialTheme.colors.surface, 0.1f)
+                targetValue = if (selected) {
+                    if (it.lastReadChapter) backgroundColorSelectedRead
+                    else backgroundColorSelectedNotRead
+                } else {
+                    if (it.lastReadChapter) backgroundColorNotSelectedRead
+                    else backgroundColorNotSelectedNotRead
                 }
             )
 
             val indicatorColor = when (selected) {
                 true -> MaterialTheme.colors.surface
-                false -> MaterialTheme.colors.onPrimary.mix(MaterialTheme.colors.surface, 0.5f)
+                false -> backgroundColorUnselected
             }
 
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(16.dp),
                 modifier = Modifier
+                    .height(68.dp)
                     .background(backgroundColor)
                     .combinedClickable(
                         interactionSource = remember { MutableInteractionSource() },
@@ -210,32 +234,16 @@ fun ChaptersListView(
                     .padding(horizontal = 8.dp, vertical = 16.dp),
             ) {
 
-                val tintColor by animateColorAsState(
-                    targetValue = when (it.lastReadChapter) {
-                        true -> ColorAccent
-                        false -> MaterialTheme.colors.onPrimary
-                    }
+                val colorText by animateColorAsState(
+                    targetValue = if (it.chapter.read) colorTextRead else colorTextNotRead
                 )
 
-                val readColorText by animateColorAsState(
-                    targetValue = when (it.chapter.read) {
-                        true -> tintColor.copy(alpha = 0.5f)
-                        false -> tintColor.copy(alpha = 1f)
-                    }
+                val colorIconSeen by animateColorAsState(
+                    targetValue = if (it.chapter.read) colorIconSeenRead else colorIconSeenNotRead
                 )
 
-                val readColor by animateColorAsState(
-                    targetValue = when (it.chapter.read) {
-                        true -> tintColor.copy(alpha = 0.5f)
-                        false -> tintColor.copy(alpha = 0f)
-                    }
-                )
-
-                val downloadedColor by animateColorAsState(
-                    targetValue = when (it.downloaded) {
-                        true -> tintColor.copy(alpha = 0.5f)
-                        false -> tintColor.copy(alpha = 0f)
-                    }
+                val colorIconDownloaded by animateColorAsState(
+                    targetValue = if (it.downloaded) colorIconDownloadedRead else colorIconDownloadedNotRead
                 )
 
                 AnimatedContent(
@@ -251,18 +259,18 @@ fun ChaptersListView(
                     Text(
                         text = targetText,
                         modifier = Modifier.fillMaxWidth(),
-                        color = readColorText
+                        color = colorText
                     )
                 }
                 Icon(
                     painter = painterResource(id = R.drawable.ic_looking_24),
                     contentDescription = null,
-                    tint = readColor
+                    tint = colorIconSeen
                 )
                 Icon(
                     painter = painterResource(id = R.drawable.ic_outline_cloud_download_24),
                     contentDescription = null,
-                    tint = downloadedColor
+                    tint = colorIconDownloaded
                 )
             }
         }
