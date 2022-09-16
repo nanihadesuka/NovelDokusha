@@ -87,7 +87,7 @@ class BestLightNovel(
                 val bookCover = it.selectFirst("img[src]")?.attr("src") ?: ""
                 BookMetadata(
                     title = link.attr("title"),
-                    url = baseUrl + link.attr("href"),
+                    url = link.attr("href"),
                     coverImageUrl = bookCover
                 )
             }
