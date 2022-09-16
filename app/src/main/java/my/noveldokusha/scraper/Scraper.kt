@@ -25,7 +25,6 @@ class Scraper(
         _1stKissNovel(networkClient),
         Sousetsuka(networkClient),
         Saikai(networkClient),
-        WebNovelLight(networkClient),
         BoxNovel(networkClient),
         LightNovelWorld(networkClient),
         NovelHall(networkClient),
