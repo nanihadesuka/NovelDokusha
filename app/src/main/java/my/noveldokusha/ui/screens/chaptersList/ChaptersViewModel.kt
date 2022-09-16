@@ -7,15 +7,18 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
 import my.noveldokusha.AppPreferences
 import my.noveldokusha.R
 import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.data.ChapterWithContext
-import my.noveldokusha.repository.Repository
 import my.noveldokusha.data.database.tables.Book
 import my.noveldokusha.network.NetworkClient
 import my.noveldokusha.network.Response
+import my.noveldokusha.repository.Repository
 import my.noveldokusha.scraper.Scraper
 import my.noveldokusha.scraper.downloadBookCoverImageUrl
 import my.noveldokusha.scraper.downloadBookDescription
@@ -53,7 +56,6 @@ data class BookDataView(
     )
 }
 
-@OptIn(FlowPreview::class)
 @HiltViewModel
 class ChaptersViewModel @Inject constructor(
     private val repository: Repository,
@@ -132,9 +134,7 @@ class ChaptersViewModel @Inject constructor(
                 }
                 // Filter the chapters if search is active
                 .combine(
-                    snapshotFlow { searchText }
-                        .debounce(500)
-                        .flowOn(Dispatchers.Main)
+                    snapshotFlow { searchText }.flowOn(Dispatchers.Main)
                 ) { chapters, searchText ->
                     if (searchText.isBlank()) chapters
                     else chapters.filter {
