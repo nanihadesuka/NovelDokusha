@@ -90,14 +90,14 @@ fun Modifier.outlineRounded(width: Dp = 1.dp): Modifier = composed {
     ).clip(MaterialTheme.shapes.medium)
 }
 
-fun Modifier.backgroundCircle(width: Dp = 1.dp): Modifier = composed {
+fun Modifier.backgroundCircle(): Modifier = composed {
     background(
         color = MaterialTheme.colors.primary,
         shape = CircleShape
     )
 }
 
-fun Modifier.backgroundRounded(width: Dp = 1.dp): Modifier = composed {
+fun Modifier.backgroundRounded(): Modifier = composed {
     background(
         color = MaterialTheme.colors.primary,
         shape = MaterialTheme.shapes.medium
