@@ -6,7 +6,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import my.noveldokusha.utils.roundedOutline
+import my.noveldokusha.utils.backgroundCircle
+import my.noveldokusha.utils.outlineCircle
 
 @Composable
 fun RoundedContentLayout(
@@ -17,7 +18,8 @@ fun RoundedContentLayout(
         verticalAlignment = Alignment.CenterVertically,
         modifier = modifier
             .fillMaxWidth()
-            .roundedOutline()
+            .backgroundCircle()
+            .outlineCircle()
             .then(modifier)
     ) {
         content(this)

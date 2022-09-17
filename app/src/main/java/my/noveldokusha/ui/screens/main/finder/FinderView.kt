@@ -5,7 +5,6 @@ import android.net.Uri
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -20,7 +19,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
@@ -33,14 +31,14 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import my.noveldokusha.R
 import my.noveldokusha.network.NetworkClient
+import my.noveldokusha.repository.SourceCatalogItem
+import my.noveldokusha.repository.SourceLanguageItem
 import my.noveldokusha.scraper.DatabaseInterface
 import my.noveldokusha.scraper.Scraper
 import my.noveldokusha.scraper.SourceInterface
 import my.noveldokusha.ui.composeViews.ImageViewGlide
 import my.noveldokusha.ui.composeViews.MyButton
 import my.noveldokusha.ui.composeViews.ToolbarModeSearch
-import my.noveldokusha.repository.SourceCatalogItem
-import my.noveldokusha.repository.SourceLanguageItem
 import my.noveldokusha.ui.screens.databaseSearch.DatabaseSearchActivity
 import my.noveldokusha.ui.screens.globalSourceSearch.GlobalSourceSearchActivity
 import my.noveldokusha.ui.screens.sourceCatalog.SourceCatalogActivity
@@ -49,7 +47,9 @@ import my.noveldokusha.ui.theme.ColorAccent
 import my.noveldokusha.ui.theme.ImageBorderShape
 import my.noveldokusha.ui.theme.InternalTheme
 import my.noveldokusha.uiViews.AnimatedTransition
+import my.noveldokusha.utils.backgroundRounded
 import my.noveldokusha.utils.drawBottomLine
+import my.noveldokusha.utils.outlineRounded
 import okhttp3.Request
 import okhttp3.Response
 
@@ -222,34 +222,23 @@ fun LanguagesDropDown(
     onDismiss: () -> Unit,
     onToggleLanguage: (SourceLanguageItem) -> Unit
 ) {
-    @Composable
-    fun colorBackground(active: Boolean) =
-        if (active) ColorAccent else MaterialTheme.colors.surface
-
-    @Composable
-    fun colorText(active: Boolean) =
-        if (active) Color.White else MaterialTheme.colors.onPrimary
-
     DropdownMenu(
         expanded = expanded,
         onDismissRequest = onDismiss
     ) {
         Text(
             text = stringResource(R.string.sources_languages),
-            Modifier
+            textAlign = TextAlign.Center,
+            modifier = Modifier
                 .padding(8.dp)
                 .fillMaxWidth(),
-            textAlign = TextAlign.Center
         )
         Column(
             Modifier
                 .padding(horizontal = 8.dp)
-                .border(
-                    Dp.Hairline,
-                    MaterialTheme.colors.onPrimary.copy(alpha = 0.5f),
-                    RoundedCornerShape(8.dp)
-                )
-                .clip(RoundedCornerShape(8.dp))
+                .backgroundRounded()
+                .outlineRounded(width = Dp.Hairline)
+                .widthIn(min = 128.dp)
         ) {
             list.forEach { lang ->
                 MyButton(
@@ -260,7 +249,7 @@ fun LanguagesDropDown(
                     textAlign = TextAlign.Center,
                     outerPadding = 0.dp,
                     modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(0.dp)
+                    shape = RoundedCornerShape(0.dp),
                 )
             }
         }

@@ -25,10 +25,7 @@ import androidx.compose.ui.unit.toSize
 import my.noveldokusha.R
 import my.noveldokusha.tools.TranslationModelState
 import my.noveldokusha.ui.composeViews.MyButton
-import my.noveldokusha.utils.blockInteraction
-import my.noveldokusha.utils.clickableWithUnboundedIndicator
-import my.noveldokusha.utils.ifCase
-import my.noveldokusha.utils.roundedOutline
+import my.noveldokusha.utils.*
 
 @Composable
 fun LiveTranslationSetting(
@@ -56,7 +53,8 @@ fun LiveTranslationSetting(
     ) {
         Row(
             modifier = Modifier
-                .roundedOutline()
+                .backgroundCircle()
+                .outlineCircle()
                 .blockInteraction(),
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically,

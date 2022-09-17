@@ -2,8 +2,6 @@ package my.noveldokusha.ui.screens.sourceCatalog
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
@@ -14,8 +12,6 @@ import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -23,13 +19,15 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import my.noveldokusha.AppPreferences
+import my.noveldokusha.AppPreferences.LIST_LAYOUT_MODE
 import my.noveldokusha.R
 import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.network.IteratorState
 import my.noveldokusha.ui.composeViews.BooksVerticalView
-import my.noveldokusha.ui.theme.ColorAccent
+import my.noveldokusha.ui.composeViews.MyButton
 import my.noveldokusha.ui.theme.InternalTheme
+import my.noveldokusha.utils.backgroundRounded
+import my.noveldokusha.utils.outlineRounded
 
 enum class ToolbarMode { MAIN, SEARCH }
 
@@ -94,69 +92,47 @@ fun ToolbarMain(
 fun OptionsDropDown(
     expanded: Boolean,
     onDismiss: () -> Unit,
-    listLayoutMode: AppPreferences.LIST_LAYOUT_MODE,
-    onSelectListLayout: (mode: AppPreferences.LIST_LAYOUT_MODE) -> Unit
+    listLayoutMode: LIST_LAYOUT_MODE,
+    onSelectListLayout: (mode: LIST_LAYOUT_MODE) -> Unit
 ) {
     DropdownMenu(
         expanded = expanded,
         onDismissRequest = onDismiss
     ) {
-        Column(Modifier.padding(horizontal = 8.dp)) {
-            Text(
-                text = stringResource(R.string.books_layout),
-                Modifier
-                    .padding(8.dp)
-                    .fillMaxWidth(),
-                textAlign = TextAlign.Center
+        Text(
+            text = stringResource(R.string.layout),
+            textAlign = TextAlign.Center,
+            modifier = Modifier
+                .padding(8.dp)
+                .fillMaxWidth(),
+        )
+        Column(
+            Modifier
+                .padding(horizontal = 8.dp)
+                .backgroundRounded()
+                .outlineRounded(width = Dp.Hairline)
+                .widthIn(min = 128.dp)
+        ) {
+            MyButton(
+                text = stringResource(id = R.string.list),
+                onClick = { onSelectListLayout(LIST_LAYOUT_MODE.verticalList) },
+                selected = listLayoutMode == LIST_LAYOUT_MODE.verticalList,
+                borderWidth = Dp.Unspecified,
+                textAlign = TextAlign.Center,
+                outerPadding = 0.dp,
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(0.dp),
             )
-            Row(
-                Modifier
-                    .padding(4.dp)
-                    .border(
-                        Dp.Hairline,
-                        MaterialTheme.colors.onPrimary.copy(alpha = 0.5f),
-                        RoundedCornerShape(8.dp)
-                    )
-                    .clip(RoundedCornerShape(8.dp))
-            ) {
-                @Composable
-                fun colorBackground(state: AppPreferences.LIST_LAYOUT_MODE) =
-                    if (listLayoutMode == state) ColorAccent else MaterialTheme.colors.surface
-
-                @Composable
-                fun colorText(state: AppPreferences.LIST_LAYOUT_MODE) =
-                    if (listLayoutMode == state) Color.White else MaterialTheme.colors.onPrimary
-                Box(
-                    Modifier
-                        .weight(1f)
-                        .background(colorBackground(AppPreferences.LIST_LAYOUT_MODE.verticalList))
-                        .clickable { onSelectListLayout(AppPreferences.LIST_LAYOUT_MODE.verticalList) }
-                ) {
-                    Text(
-                        text = stringResource(R.string.list),
-                        modifier = Modifier
-                            .padding(18.dp)
-                            .fillMaxWidth(),
-                        textAlign = TextAlign.Center,
-                        color = colorText(AppPreferences.LIST_LAYOUT_MODE.verticalList)
-                    )
-                }
-                Box(
-                    Modifier
-                        .weight(1f)
-                        .background(colorBackground(AppPreferences.LIST_LAYOUT_MODE.verticalGrid))
-                        .clickable { onSelectListLayout(AppPreferences.LIST_LAYOUT_MODE.verticalGrid) }
-                ) {
-                    Text(
-                        text = stringResource(R.string.grid),
-                        Modifier
-                            .padding(18.dp)
-                            .fillMaxWidth(),
-                        textAlign = TextAlign.Center,
-                        color = colorText(AppPreferences.LIST_LAYOUT_MODE.verticalGrid)
-                    )
-                }
-            }
+            MyButton(
+                text = stringResource(id = R.string.grid),
+                onClick = { onSelectListLayout(LIST_LAYOUT_MODE.verticalGrid) },
+                selected = listLayoutMode == LIST_LAYOUT_MODE.verticalGrid,
+                borderWidth = Dp.Unspecified,
+                textAlign = TextAlign.Center,
+                outerPadding = 0.dp,
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(0.dp),
+            )
         }
     }
 }
@@ -174,7 +150,7 @@ fun PreviewList() {
             onBookClicked = {},
             onBookLongClicked = {},
             state = rememberLazyGridState(),
-            layoutMode = AppPreferences.LIST_LAYOUT_MODE.verticalList
+            layoutMode = LIST_LAYOUT_MODE.verticalList
         )
     }
 }
@@ -193,7 +169,7 @@ fun PreviewGrid() {
             onBookClicked = {},
             onBookLongClicked = {},
             state = rememberLazyGridState(),
-            layoutMode = AppPreferences.LIST_LAYOUT_MODE.verticalGrid
+            layoutMode = LIST_LAYOUT_MODE.verticalGrid
         )
     }
 }

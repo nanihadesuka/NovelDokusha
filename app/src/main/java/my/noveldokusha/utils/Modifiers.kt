@@ -74,15 +74,32 @@ fun Modifier.debouncedClickable(waitMillis: Long = 250, action: () -> Unit) = co
     )
 }
 
-fun Modifier.roundedOutline(): Modifier = composed {
+fun Modifier.outlineCircle(width: Dp = 1.dp): Modifier = composed {
     border(
-        width = 1.dp,
+        width = width,
         color = MaterialTheme.colors.onPrimary.copy(alpha = 0.5f),
         shape = CircleShape
+    ).clip(CircleShape)
+}
+
+fun Modifier.outlineRounded(width: Dp = 1.dp): Modifier = composed {
+    border(
+        width = width,
+        color = MaterialTheme.colors.onPrimary.copy(alpha = 0.5f),
+        shape = MaterialTheme.shapes.medium
+    ).clip(MaterialTheme.shapes.medium)
+}
+
+fun Modifier.backgroundCircle(width: Dp = 1.dp): Modifier = composed {
+    background(
+        color = MaterialTheme.colors.primary,
+        shape = CircleShape
     )
-        .background(
-            color = MaterialTheme.colors.primary,
-            shape = CircleShape
-        )
-        .clip(CircleShape)
+}
+
+fun Modifier.backgroundRounded(width: Dp = 1.dp): Modifier = composed {
+    background(
+        color = MaterialTheme.colors.primary,
+        shape = MaterialTheme.shapes.medium
+    )
 }

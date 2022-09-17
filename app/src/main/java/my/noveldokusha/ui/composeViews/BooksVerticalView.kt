@@ -1,6 +1,5 @@
 package my.noveldokusha.ui.composeViews
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -24,7 +23,6 @@ import my.noveldokusha.network.IteratorState
 import my.noveldokusha.ui.theme.ColorAccent
 import my.noveldokusha.uiViews.ErrorView
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun BooksVerticalView(
     list: List<BookMetadata>,
