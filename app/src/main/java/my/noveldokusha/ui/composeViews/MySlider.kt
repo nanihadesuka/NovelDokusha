@@ -91,9 +91,9 @@ private fun MySliderBase(
                 .draggable(
                     orientation = Orientation.Horizontal,
                     state = rememberDraggableState { deltaPx ->
-                        val delta = deltaPx *
-                                (range.endInclusive - range.start) /
-                                (constraints.maxWidth.toFloat() - heightPx)
+                        val valueSize = (constraints.maxWidth.toFloat() - heightPx)
+                        if (valueSize <= 0f) return@rememberDraggableState
+                        val delta = deltaPx * (range.endInclusive - range.start) / valueSize
 
                         val newValue = (valueUpdate + delta).coerceIn(
                             minimumValue = range.start,
