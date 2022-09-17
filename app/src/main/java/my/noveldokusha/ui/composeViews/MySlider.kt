@@ -67,7 +67,7 @@ private fun MySliderBase(
     backgroundColor: Color = ColorAccent.mix(MaterialTheme.colors.primaryVariant, 0.5f),
     trackColor: Color = ColorAccent,
 ) {
-    val valueUpdate by rememberUpdatedState(newValue = value)
+    val curentValue by rememberUpdatedState(newValue = value)
     BoxWithConstraints {
         val currentDensity by rememberUpdatedState(newValue = LocalDensity.current)
         val heightPx = with(currentDensity) { height.toPx() }
@@ -77,7 +77,7 @@ private fun MySliderBase(
          * of the user to guarantee the range is correct
          */
         val offsetPx by derivedStateOf {
-            val normalizedValue = (valueUpdate - range.start) / (range.endInclusive - range.start)
+            val normalizedValue = (curentValue - range.start) / (range.endInclusive - range.start)
             val sliderSizePx = constraints.maxWidth.toFloat() - heightPx
             normalizedValue * sliderSizePx + heightPx
         }
@@ -95,11 +95,13 @@ private fun MySliderBase(
                         if (valueSize <= 0f) return@rememberDraggableState
                         val delta = deltaPx * (range.endInclusive - range.start) / valueSize
 
-                        val newValue = (valueUpdate + delta).coerceIn(
+                        val newValue = (curentValue + delta).coerceIn(
                             minimumValue = range.start,
                             maximumValue = range.endInclusive
                         )
-                        onValueChange(newValue)
+                        if (newValue != curentValue) {
+                            onValueChange(newValue)
+                        }
                     }
                 )
         ) {
