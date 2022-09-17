@@ -8,6 +8,7 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
+import androidx.compose.material.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.runtime.*
@@ -27,8 +28,8 @@ import kotlinx.coroutines.launch
 import my.noveldokusha.R
 import my.noveldokusha.data.BookWithContext
 import my.noveldokusha.rememberResolvedBookImagePath
-import my.noveldokusha.ui.theme.ColorAccent
 import my.noveldokusha.ui.composeViews.BookImageButtonView
+import my.noveldokusha.ui.theme.ColorAccent
 
 @OptIn(ExperimentalPagerApi::class)
 @Composable
@@ -51,20 +52,36 @@ fun LibraryBody(
         }
     ) {
         Column {
-            TabRow(selectedTabIndex = pageIndex) {
-                tabs.forEachIndexed { index, title ->
-                    val selected by remember {
-                        derivedStateOf { pageIndex == index }
+            TabRow(
+                selectedTabIndex = pageIndex,
+                indicator = {
+                    val tabPos = it[pageIndex]
+                    Box(
+                        modifier = Modifier.tabIndicatorOffset(tabPos),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        Box(
+                            Modifier
+                                .width(tabPos.width * 0.5f)
+                                .height(3.dp)
+                                .background(
+                                    ColorAccent,
+                                    RoundedCornerShape(topEndPercent = 100, topStartPercent = 100)
+                                )
+                        )
                     }
-                    Tab(
-                        text = { Text(title) },
-                        selected = selected,
-                        onClick = {
-                            scope.launch { pagerState.animateScrollToPage(index) }
-                        }
-                    )
+                },
+                tabs = {
+                    tabs.forEachIndexed { index, title ->
+                        val selected by remember { derivedStateOf { pageIndex == index } }
+                        Tab(
+                            text = { Text(title) },
+                            selected = selected,
+                            onClick = { scope.launch { pagerState.animateScrollToPage(index) } }
+                        )
+                    }
                 }
-            }
+            )
             HorizontalPager(
                 count = tabs.size,
                 state = pagerState
