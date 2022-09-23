@@ -146,4 +146,5 @@
 	<string name="save_current_voice">Save current voice</string>
 	<string name="save_current_voice_parameters">Save current voice and parameters and give it a name</string>
     <string name="layout">Layout</string>
+    <string name="open_translation_models_manager">Open translation models manager</string>
 </resources>

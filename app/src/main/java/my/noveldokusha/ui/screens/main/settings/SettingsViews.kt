@@ -3,7 +3,6 @@ package my.noveldokusha.ui.screens.main.settings
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.toggleable
@@ -30,12 +29,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import my.noveldokusha.R
 import my.noveldokusha.tools.TranslationModelState
+import my.noveldokusha.ui.composeViews.ClickableOption
+import my.noveldokusha.ui.composeViews.MyButton
 import my.noveldokusha.ui.composeViews.Section
 import my.noveldokusha.ui.composeViews.SettingsTranslationModels
 import my.noveldokusha.ui.theme.ColorAccent
 import my.noveldokusha.ui.theme.InternalTheme
 import my.noveldokusha.ui.theme.Themes
-import my.noveldokusha.ui.composeViews.MyButton
 import my.noveldokusha.utils.drawBottomLine
 
 @OptIn(ExperimentalAnimationApi::class)
@@ -133,38 +133,6 @@ fun ToolbarMain(title: String) {
             style = MaterialTheme.typography.h6,
             fontWeight = FontWeight.Bold,
             modifier = Modifier.weight(1f)
-        )
-    }
-}
-
-@Composable
-private fun ClickableOption(
-    title: String,
-    subtitle: String,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-    info: String = "",
-) {
-    Column(
-        modifier = Modifier
-            .clickable(onClick = onClick)
-            .then(modifier)
-            .fillMaxWidth()
-            .heightIn(min = 60.dp)
-            .padding(horizontal = 8.dp),
-        verticalArrangement = Arrangement.Center
-    ) {
-        Text(
-            text = title,
-            style = MaterialTheme.typography.subtitle1,
-        )
-        Text(
-            text = subtitle,
-            style = MaterialTheme.typography.caption,
-        )
-        if (info.isNotBlank()) Text(
-            text = info,
-            style = MaterialTheme.typography.caption
         )
     }
 }
