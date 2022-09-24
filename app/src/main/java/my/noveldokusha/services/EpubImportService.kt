@@ -5,7 +5,6 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.IBinder
-import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import dagger.hilt.android.AndroidEntryPoint
@@ -15,15 +14,24 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import my.noveldokusha.R
 import my.noveldokusha.createEpubBook
-import my.noveldokusha.repository.Repository
 import my.noveldokusha.importEpubToRepository
-import my.noveldokusha.utils.*
+import my.noveldokusha.repository.Repository
+import my.noveldokusha.utils.Extra_Uri
+import my.noveldokusha.utils.NotificationsCenter
+import my.noveldokusha.utils.isServiceRunning
+import my.noveldokusha.utils.removeProgressBar
+import my.noveldokusha.utils.text
+import my.noveldokusha.utils.title
+import timber.log.Timber
 import javax.inject.Inject
 
 @AndroidEntryPoint
 class EpubImportService : Service() {
     @Inject
     lateinit var repository: Repository
+
+    @Inject
+    lateinit var notificationsCenter: NotificationsCenter
 
     private class IntentData : Intent {
         var uri by Extra_Uri()
@@ -40,11 +48,12 @@ class EpubImportService : Service() {
                 ContextCompat.startForegroundService(ctx, IntentData(ctx, uri))
         }
 
-        fun isRunning(context: Context): Boolean =
+        private fun isRunning(context: Context): Boolean =
             context.isServiceRunning(EpubImportService::class.java)
     }
 
     private val channel_id = "Import EPUB"
+    private val channel_id_error = "epub import error"
     private lateinit var notificationBuilder: NotificationCompat.Builder
     private var job: Job? = null
 
@@ -52,7 +61,7 @@ class EpubImportService : Service() {
 
     override fun onCreate() {
         super.onCreate()
-        notificationBuilder = showNotification(this, channel_id) {}
+        notificationBuilder = notificationsCenter.showNotification(channel_id)
         startForeground(channel_id.hashCode(), notificationBuilder.build())
     }
 
@@ -66,14 +75,14 @@ class EpubImportService : Service() {
         val intentData = IntentData(intent)
         job = CoroutineScope(Dispatchers.IO).launch {
             try {
-                notificationBuilder.showNotification(channel_id) {
+                notificationsCenter.modifyNotification(notificationBuilder, channel_id) {
                     title = getString(R.string.import_epub)
                     foregroundServiceBehavior = NotificationCompat.FOREGROUND_SERVICE_IMMEDIATE
                     setProgress(100, 0, true)
                 }
                 val inputStream = contentResolver.openInputStream(intentData.uri)
                 if (inputStream == null) {
-                    notificationBuilder.showNotification("epub import error") {
+                    notificationsCenter.showNotification(channel_id_error) {
                         text = getString(R.string.failed_get_file)
                         removeProgressBar()
                     }
@@ -81,19 +90,19 @@ class EpubImportService : Service() {
                 }
                 val epub = inputStream.use { createEpubBook(it) }
 
-                notificationBuilder.showNotification(channel_id) {
+                notificationsCenter.modifyNotification(notificationBuilder, channel_id) {
                     text = getString(R.string.importing_epub)
                 }
                 importEpubToRepository(repository, epub)
 
-                notificationBuilder.showNotification(channel_id) {
+                notificationsCenter.modifyNotification(notificationBuilder, channel_id) {
                     text = getString(R.string.epub_added_to_library)
                     removeProgressBar()
                 }
             } catch (e: Exception) {
-                Log.e(this::class.simpleName, "Failed to start command")
-                Log.e("EPUB IMPORT FAILED", e.stackTraceToString())
-                notificationBuilder.showNotification("epub import error") {
+                Timber.i("Failed to start command")
+                Timber.i(e.stackTraceToString())
+                notificationsCenter.showNotification(channel_id_error) {
                     text = getString(R.string.failed_to_import_epub)
                     removeProgressBar()
                 }

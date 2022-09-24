@@ -8,16 +8,28 @@ import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.ObsoleteCoroutinesApi
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.channels.actor
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import my.noveldokusha.R
-import my.noveldokusha.repository.Repository
 import my.noveldokusha.data.database.tables.Book
 import my.noveldokusha.network.NetworkClient
 import my.noveldokusha.network.Response
+import my.noveldokusha.repository.Repository
 import my.noveldokusha.scraper.Scraper
 import my.noveldokusha.scraper.downloadChaptersList
-import my.noveldokusha.utils.*
+import my.noveldokusha.utils.Extra_Boolean
+import my.noveldokusha.utils.NotificationsCenter
+import my.noveldokusha.utils.isServiceRunning
+import my.noveldokusha.utils.removeProgressBar
+import my.noveldokusha.utils.text
+import my.noveldokusha.utils.title
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import javax.inject.Inject
 
@@ -32,6 +44,9 @@ class LibraryUpdateService : Service() {
 
     @Inject
     lateinit var scraper: Scraper
+
+    @Inject
+    lateinit var notificationsCenter: NotificationsCenter
 
     private class IntentData : Intent {
         var completedCategory by Extra_Boolean()
@@ -68,8 +83,10 @@ class LibraryUpdateService : Service() {
         val books = mutableSetOf<Book>()
         for ((book, add) in channel) {
             if (add) books.add(book) else books.remove(book)
-            if (books.isNotEmpty()) notification.showNotification(channel_id) {
-                text = books.joinToString("\n") { it.title }
+            if (books.isNotEmpty()) {
+                notificationsCenter.modifyNotification(notification, channel_id) {
+                    text = books.joinToString("\n") { it.title }
+                }
             }
         }
     }
@@ -87,7 +104,7 @@ class LibraryUpdateService : Service() {
                     totalCount = value
                 } else count += 1
 
-                notification.showNotification(channel_id) {
+                notificationsCenter.modifyNotification(notification, channel_id) {
                     title = "Updating library ($count/$totalCount)"
                     setProgress(totalCount, count, false)
                 }
@@ -98,7 +115,7 @@ class LibraryUpdateService : Service() {
 
     override fun onCreate() {
         super.onCreate()
-        notification = showNotification(this, channel_id) {}
+        notification = notificationsCenter.showNotification(channel_id)
         startForeground(channel_id.hashCode(), notification.build())
     }
 
@@ -131,7 +148,7 @@ class LibraryUpdateService : Service() {
      */
     suspend fun updateLibrary(completedCategory: Boolean) = withContext(Dispatchers.IO) {
 
-        notification.showNotification(channel_id) {
+        notificationsCenter.showNotification(channel_id) {
             setStyle(NotificationCompat.BigTextStyle())
             title = getString(R.string.updaing_library)
         }
@@ -148,21 +165,22 @@ class LibraryUpdateService : Service() {
                 val updates = hasUpdates.flatten()
                 val failed = hasFailed.flatten()
 
-                if (updates.isNotEmpty()) notification.showNotification("New chapters found for") {
-                    title = "New chapters found for"
+
+                if (updates.isNotEmpty()) notificationsCenter.showNotification("New chapters found for") {
+                    title = getString(R.string.new_chapters_found_for)
                     text = updates.joinToString("\n")
                     setStyle(NotificationCompat.BigTextStyle().bigText(text))
                     removeProgressBar()
                 }
 
-                if (failed.isNotEmpty()) notification.showNotification("Update error") {
-                    title = "Update error"
+                if (failed.isNotEmpty()) notificationsCenter.showNotification("Update error") {
+                    title = getString(R.string.update_error)
                     text = failed.joinToString("\n")
                     setStyle(NotificationCompat.BigTextStyle().bigText(text))
                     removeProgressBar()
                 }
             }
-        notification.close(this@LibraryUpdateService, channel_id)
+        notificationsCenter.close(channel_id)
     }
 
     private suspend fun updateBooks(books: List<Book>): Pair<List<String>, List<String>> =
@@ -189,6 +207,7 @@ class LibraryUpdateService : Service() {
                         if (hasNewChapters)
                             hasUpdates.add(book.title)
                     }
+
                     is Response.Error -> hasFailed.add(book.title)
                 }
 

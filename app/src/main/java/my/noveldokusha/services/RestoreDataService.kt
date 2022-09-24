@@ -10,17 +10,26 @@ import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.qualifiers.ApplicationContext
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import my.noveldokusha.R
 import my.noveldokusha.data.database.AppDatabase
 import my.noveldokusha.network.NetworkClient
-import my.noveldokusha.repository.ChapterBodyRepository
 import my.noveldokusha.repository.BookChaptersRepository
+import my.noveldokusha.repository.ChapterBodyRepository
 import my.noveldokusha.repository.LibraryBooksRepository
 import my.noveldokusha.repository.Repository
 import my.noveldokusha.scraper.Scraper
 import my.noveldokusha.ui.Toasty
-import my.noveldokusha.utils.*
+import my.noveldokusha.utils.Extra_Uri
+import my.noveldokusha.utils.NotificationsCenter
+import my.noveldokusha.utils.isServiceRunning
+import my.noveldokusha.utils.removeProgressBar
+import my.noveldokusha.utils.text
+import my.noveldokusha.utils.title
 import okhttp3.internal.closeQuietly
 import java.io.File
 import java.io.InputStream
@@ -45,6 +54,9 @@ class RestoreDataService : Service() {
 
     @Inject
     lateinit var toasty: Toasty
+
+    @Inject
+    lateinit var notificationsCenter: NotificationsCenter
 
     private class IntentData : Intent {
         var uri by Extra_Uri()
@@ -73,7 +85,7 @@ class RestoreDataService : Service() {
 
     override fun onCreate() {
         super.onCreate()
-        notificationBuilder = showNotification(this, channel_id) {}
+        notificationBuilder = notificationsCenter.showNotification(channel_id)
         startForeground(channel_id.hashCode(), notificationBuilder.build())
     }
 
@@ -110,7 +122,7 @@ class RestoreDataService : Service() {
      */
     suspend fun restoreData(uri: Uri) = withContext(Dispatchers.IO) {
 
-        val builder = showNotification(this@RestoreDataService, channel_id) {
+        val builder = notificationsCenter.showNotification(channel_id) {
             title = getString(R.string.restore_data)
             text = getString(R.string.loading_data)
             setProgress(100, 0, true)
@@ -118,7 +130,7 @@ class RestoreDataService : Service() {
 
         val inputStream = context.contentResolver.openInputStream(uri)
         if (inputStream == null) {
-            builder.showNotification(channel_id) {
+            notificationsCenter.modifyNotification(builder, channel_id) {
                 removeProgressBar()
                 text = getString(R.string.failed_to_restore_cant_access_file)
             }
@@ -134,7 +146,9 @@ class RestoreDataService : Service() {
 
         suspend fun mergeToDatabase(inputStream: InputStream) {
             try {
-                builder.showNotification(channel_id) { text = getString(R.string.loading_database) }
+                notificationsCenter.modifyNotification(builder, channel_id) {
+                    text = getString(R.string.loading_database)
+                }
                 val backupDatabase = inputStream.use {
                     val newDatabase = AppDatabase.createRoomFromStream(context, "temp_database", it)
                     val bookChaptersRepository = BookChaptersRepository(
@@ -159,11 +173,15 @@ class RestoreDataService : Service() {
                         )
                     )
                 }
-                builder.showNotification(channel_id) { text = getString(R.string.adding_books) }
+                notificationsCenter.modifyNotification(builder, channel_id) {
+                    text = getString(R.string.adding_books)
+                }
                 repository.libraryBooks.insertReplace(backupDatabase.libraryBooks.getAll())
-                builder.showNotification(channel_id) { text = getString(R.string.adding_chapters) }
+                notificationsCenter.modifyNotification(builder, channel_id) {
+                    text = getString(R.string.adding_chapters)
+                }
                 repository.bookChapters.insert(backupDatabase.bookChapters.getAll())
-                builder.showNotification(channel_id) {
+                notificationsCenter.modifyNotification(builder, channel_id) {
                     text = getString(R.string.adding_chapters_text)
                 }
                 repository.chapterBody.insertReplace(backupDatabase.chapterBody.getAll())
@@ -171,7 +189,7 @@ class RestoreDataService : Service() {
                 backupDatabase.close()
                 backupDatabase.delete()
             } catch (e: Exception) {
-                builder.showNotification(channel_id) {
+                notificationsCenter.modifyNotification(builder, channel_id) {
                     removeProgressBar()
                     text = getString(R.string.failed_to_restore_invalid_backup_database)
                 }
@@ -188,14 +206,16 @@ class RestoreDataService : Service() {
             }
         }
 
-        builder.showNotification(channel_id) { text = getString(R.string.adding_images) }
+        notificationsCenter.modifyNotification(builder, channel_id) {
+            text = getString(R.string.adding_images)
+        }
         for ((entry, file) in zipSequence) when {
             entry.name == "database.sqlite3" -> mergeToDatabase(file.inputStream())
             entry.name.startsWith("books/") -> mergeToBookFolder(entry, file.inputStream())
         }
 
         inputStream.closeQuietly()
-        builder.showNotification(channel_id) {
+        notificationsCenter.modifyNotification(builder, channel_id) {
             removeProgressBar()
             text = getString(R.string.data_restored)
         }

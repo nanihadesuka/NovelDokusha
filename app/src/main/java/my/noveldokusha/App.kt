@@ -21,21 +21,13 @@ import javax.inject.Inject
 
 
 @HiltAndroidApp
-class App @Inject constructor(
-
-) : Application(), ImageLoaderFactory {
+class App @Inject constructor() : Application(), ImageLoaderFactory {
 
     @Inject
     lateinit var networkClient: NetworkClient
 
     override fun onCreate() {
-        _instance = this
         super.onCreate()
-    }
-
-    companion object {
-        private var _instance: App? = null
-        val instance get() = _instance!!
     }
 
     override fun newImageLoader(): ImageLoader = when (val networkClient = networkClient) {
@@ -43,6 +35,7 @@ class App @Inject constructor(
             .Builder(this)
             .okHttpClient(networkClient.client)
             .build()
+
         else -> ImageLoader(this)
     }
 }

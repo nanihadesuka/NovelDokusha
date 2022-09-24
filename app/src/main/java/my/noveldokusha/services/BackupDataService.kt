@@ -8,10 +8,20 @@ import android.os.IBinder
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import my.noveldokusha.R
 import my.noveldokusha.repository.Repository
-import my.noveldokusha.utils.*
+import my.noveldokusha.utils.Extra_Boolean
+import my.noveldokusha.utils.Extra_Uri
+import my.noveldokusha.utils.NotificationsCenter
+import my.noveldokusha.utils.isServiceRunning
+import my.noveldokusha.utils.removeProgressBar
+import my.noveldokusha.utils.text
+import my.noveldokusha.utils.title
 import okhttp3.internal.closeQuietly
 import java.util.zip.ZipEntry
 import java.util.zip.ZipOutputStream
@@ -21,6 +31,9 @@ import javax.inject.Inject
 class BackupDataService : Service() {
     @Inject
     lateinit var repository: Repository
+
+    @Inject
+    lateinit var notificationsCenter: NotificationsCenter
 
     private class IntentData : Intent {
         var uri by Extra_Uri()
@@ -54,7 +67,7 @@ class BackupDataService : Service() {
 
     override fun onCreate() {
         super.onCreate()
-        notificationBuilder = showNotification(this, channel_id) {}
+        notificationsCenter.showNotification(channel_id)
         startForeground(channel_id.hashCode(), notificationBuilder.build())
     }
 
@@ -90,7 +103,7 @@ class BackupDataService : Service() {
      */
     suspend fun backupData(uri: Uri, backupImages: Boolean) = withContext(Dispatchers.IO) {
 
-        notificationBuilder.showNotification(channel_id) {
+        notificationsCenter.showNotification(channel_id) {
             title = getString(R.string.backup)
             text = getString(R.string.creating_backup)
             setProgress(100, 0, true)
@@ -99,7 +112,7 @@ class BackupDataService : Service() {
         contentResolver.openOutputStream(uri)?.use { outputStream ->
             val zip = ZipOutputStream(outputStream)
 
-            notificationBuilder.showNotification(channel_id) {
+            notificationsCenter.modifyNotification(notificationBuilder, channel_id) {
                 text = getString(R.string.copying_database)
             }
 
@@ -116,7 +129,7 @@ class BackupDataService : Service() {
 
             // Save books extra data (like images)
             if (backupImages) {
-                notificationBuilder.showNotification(channel_id) {
+                notificationsCenter.modifyNotification(notificationBuilder, channel_id) {
                     text = getString(R.string.copying_images)
                 }
                 val basePath = repository.settings.folderBooks.toPath().parent
@@ -133,11 +146,11 @@ class BackupDataService : Service() {
             }
 
             zip.closeQuietly()
-            notificationBuilder.showNotification(channel_id) {
+            notificationsCenter.modifyNotification(notificationBuilder, channel_id) {
                 removeProgressBar()
                 text = getString(R.string.backup_saved)
             }
-        } ?: notificationBuilder.showNotification(channel_id) {
+        } ?: notificationsCenter.modifyNotification(notificationBuilder, channel_id) {
             removeProgressBar()
             text = getString(R.string.failed_to_make_backup)
         }
