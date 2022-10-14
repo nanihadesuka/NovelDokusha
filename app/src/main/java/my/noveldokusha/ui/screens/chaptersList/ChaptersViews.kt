@@ -34,6 +34,7 @@ import androidx.compose.ui.unit.dp
 import my.noveldokusha.R
 import my.noveldokusha.data.ChapterWithContext
 import my.noveldokusha.data.database.tables.Chapter
+import my.noveldokusha.rememberResolvedBookImagePath
 import my.noveldokusha.ui.composeViews.ImageView
 import my.noveldokusha.ui.theme.ColorAccent
 import my.noveldokusha.ui.theme.ImageBorderShape
@@ -50,11 +51,19 @@ fun HeaderView(
     bookTitle: String,
     sourceName: String,
     numberOfChapters: Int,
-    bookCover: Any?,
+    bookCoverUrl: String?,
+    bookUrl: String,
     description: String,
     onSearchBookInDatabase: () -> Unit,
     onOpenInBrowser: () -> Unit
 ) {
+    val bookCover = bookCoverUrl?.let {
+        rememberResolvedBookImagePath(
+            bookUrl = bookUrl,
+            imagePath = it
+        ).value
+    } ?: R.drawable.ic_baseline_empty_24
+
     Box {
         Box {
             ImageView(
@@ -316,7 +325,8 @@ private fun Preview(@PreviewParameter(SampleProvider::class) theme: Themes) {
                         bookTitle = "Book title",
                         sourceName = "Novel Web Name",
                         numberOfChapters = 34,
-                        bookCover = R.drawable.ic_baseline_empty_24,
+                        bookCoverUrl = null,
+                        bookUrl = "",
                         description = "In a very far land, there was a web novel being written.",
                         onSearchBookInDatabase = { },
                         onOpenInBrowser = { }
