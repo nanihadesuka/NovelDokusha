@@ -9,6 +9,7 @@ import androidx.compose.material.icons.filled.ArrowRightAlt
 import androidx.compose.material.icons.filled.CloudDownload
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -30,9 +31,9 @@ import my.noveldokusha.utils.*
 @Composable
 fun LiveTranslationSetting(
     enable: Boolean,
-    listOfAvailableModels: List<TranslationModelState>,
-    source: TranslationModelState?,
-    target: TranslationModelState?,
+    listOfAvailableModels: SnapshotStateList<TranslationModelState>,
+    source: State<TranslationModelState?>,
+    target: State<TranslationModelState?>,
     onEnable: (Boolean) -> Unit,
     onSourceChange: (TranslationModelState?) -> Unit,
     onTargetChange: (TranslationModelState?) -> Unit,
@@ -80,7 +81,7 @@ fun LiveTranslationSetting(
                             }
                     ) {
                         Text(
-                            text = source?.locale?.displayLanguage
+                            text = source.value?.locale?.displayLanguage
                                 ?: stringResource(R.string.language_source_empty_text),
                             modifier = Modifier
                                 .padding(6.dp)
@@ -96,7 +97,7 @@ fun LiveTranslationSetting(
                             }
                     ) {
                         Text(
-                            text = target?.locale?.displayLanguage
+                            text = target.value?.locale?.displayLanguage
                                 ?: stringResource(R.string.language_target_empty_text),
                             modifier = Modifier
                                 .padding(6.dp)
@@ -133,8 +134,8 @@ fun LiveTranslationSetting(
 
             listOfAvailableModels.forEach { item ->
                 val isAlreadySelected =
-                    if (modelSelectorExpandedForTarget) item.language == target?.language
-                    else item.language == source?.language
+                    if (modelSelectorExpandedForTarget) item.language == target.value?.language
+                    else item.language == source.value?.language
                 DropdownMenuItem(
                     onClick = {
                         if (modelSelectorExpandedForTarget) onTargetChange(item)

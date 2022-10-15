@@ -29,6 +29,8 @@ import my.noveldokusha.R
 import my.noveldokusha.tools.TranslationModelState
 import my.noveldokusha.tools.Utterance
 import my.noveldokusha.tools.VoiceData
+import my.noveldokusha.ui.composeViews.MyButton
+import my.noveldokusha.ui.composeViews.MyIconButton
 import my.noveldokusha.ui.screens.main.settings.SettingsTheme
 import my.noveldokusha.ui.screens.reader.settingsViews.*
 import my.noveldokusha.ui.screens.reader.tools.LiveTranslationSettingData
@@ -36,8 +38,6 @@ import my.noveldokusha.ui.screens.reader.tools.TextSynthesis
 import my.noveldokusha.ui.screens.reader.tools.TextToSpeechSettingData
 import my.noveldokusha.ui.theme.InternalTheme
 import my.noveldokusha.ui.theme.Themes
-import my.noveldokusha.ui.composeViews.MyButton
-import my.noveldokusha.ui.composeViews.MyIconButton
 import my.noveldokusha.utils.rememberMutableStateOf
 
 private enum class CurrentSettingVisible {
@@ -119,8 +119,8 @@ private fun Settings(
                     CurrentSettingVisible.LiveTranslation -> LiveTranslationSetting(
                         enable = liveTranslationSettingData.enable.value,
                         listOfAvailableModels = liveTranslationSettingData.listOfAvailableModels,
-                        source = liveTranslationSettingData.source.value,
-                        target = liveTranslationSettingData.target.value,
+                        source = liveTranslationSettingData.source,
+                        target = liveTranslationSettingData.target,
                         onEnable = liveTranslationSettingData.onEnable,
                         onSourceChange = liveTranslationSettingData.onSourceChange,
                         onTargetChange = liveTranslationSettingData.onTargetChange,
