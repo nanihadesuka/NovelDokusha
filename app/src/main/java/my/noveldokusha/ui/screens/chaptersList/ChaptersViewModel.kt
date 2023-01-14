@@ -17,7 +17,7 @@ import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.data.ChapterWithContext
 import my.noveldokusha.data.database.tables.Book
 import my.noveldokusha.network.NetworkClient
-import my.noveldokusha.network.Response
+import my.noveldokusha.data.Response
 import my.noveldokusha.repository.Repository
 import my.noveldokusha.scraper.Scraper
 import my.noveldokusha.scraper.downloadBookCoverImageUrl

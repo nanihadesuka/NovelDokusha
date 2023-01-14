@@ -57,7 +57,8 @@ class BackupDataService : Service() {
 
     override fun onCreate() {
         super.onCreate()
-        notificationsCenter.showNotification(channel_id)
+        notificationBuilder = notificationsCenter.showNotification(channel_id)
+
         startForeground(channel_id.hashCode(), notificationBuilder.build())
     }
 
@@ -71,10 +72,10 @@ class BackupDataService : Service() {
         val intentData = IntentData(intent)
 
         job = CoroutineScope(Dispatchers.IO).launch {
-            try {
+            tryAsResult {
                 backupData(intentData.uri, intentData.backupImages)
-            } catch (e: Exception) {
-                Timber.e(e)
+            }.onError {
+                Timber.e(it.exception)
             }
 
             stopSelf(startId)

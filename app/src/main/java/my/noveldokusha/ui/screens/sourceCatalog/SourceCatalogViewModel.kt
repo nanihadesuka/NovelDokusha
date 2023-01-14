@@ -12,9 +12,9 @@ import kotlinx.coroutines.launch
 import my.noveldokusha.AppPreferences
 import my.noveldokusha.R
 import my.noveldokusha.data.BookMetadata
+import my.noveldokusha.data.Response
 import my.noveldokusha.network.PagedList
 import my.noveldokusha.network.PagedListIteratorState
-import my.noveldokusha.network.Response
 import my.noveldokusha.repository.Repository
 import my.noveldokusha.scraper.Scraper
 import my.noveldokusha.ui.BaseViewModel

@@ -5,7 +5,6 @@ import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import my.noveldokusha.network.Response
 import my.noveldokusha.scraper.DatabaseInterface
 import java.io.File
 

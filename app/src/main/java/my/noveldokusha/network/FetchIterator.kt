@@ -2,6 +2,7 @@ package my.noveldokusha.network
 
 import androidx.lifecycle.MutableLiveData
 import kotlinx.coroutines.*
+import my.noveldokusha.data.Response
 
 /**
  * Used to fetch data that needs multiple request.

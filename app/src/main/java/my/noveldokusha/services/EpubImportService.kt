@@ -69,7 +69,7 @@ class EpubImportService : Service() {
         if (intent == null) return START_NOT_STICKY
         val intentData = IntentData(intent)
         job = CoroutineScope(Dispatchers.IO).launch {
-            try {
+            tryAsResult {
                 notificationsCenter.modifyNotification(notificationBuilder, channel_id) {
                     title = getString(R.string.import_epub)
                     foregroundServiceBehavior = NotificationCompat.FOREGROUND_SERVICE_IMMEDIATE
@@ -81,7 +81,7 @@ class EpubImportService : Service() {
                         text = getString(R.string.failed_get_file)
                         removeProgressBar()
                     }
-                    return@launch
+                    return@tryAsResult
                 }
                 val epub = inputStream.use { createEpubBook(it) }
 
@@ -94,8 +94,8 @@ class EpubImportService : Service() {
                     text = getString(R.string.epub_added_to_library)
                     removeProgressBar()
                 }
-            } catch (e: Exception) {
-                Timber.e(e)
+            }.onError {
+                Timber.e(it.exception)
                 notificationsCenter.showNotification(channel_id_error) {
                     text = getString(R.string.failed_to_import_epub)
                     removeProgressBar()

@@ -90,11 +90,11 @@ class RestoreDataService : Service() {
         val intentData = IntentData(intent)
 
         job = CoroutineScope(Dispatchers.IO).launch {
-            try {
+            tryAsResult {
                 restoreData(intentData.uri)
                 repository.eventDataRestored.postValue(Unit)
-            } catch (e: Exception) {
-                Timber.e(e)
+            }.onError {
+                Timber.e(it.exception)
             }
 
             stopSelf(startId)
@@ -136,7 +136,7 @@ class RestoreDataService : Service() {
 
 
         suspend fun mergeToDatabase(inputStream: InputStream) {
-            try {
+            tryAsResult {
                 notificationsCenter.modifyNotification(builder, channel_id) {
                     text = getString(R.string.loading_database)
                 }
@@ -179,7 +179,7 @@ class RestoreDataService : Service() {
                 toasty.show(R.string.database_restored)
                 backupDatabase.close()
                 backupDatabase.delete()
-            } catch (e: Exception) {
+            }.onError {
                 notificationsCenter.modifyNotification(builder, channel_id) {
                     removeProgressBar()
                     text = getString(R.string.failed_to_restore_invalid_backup_database)

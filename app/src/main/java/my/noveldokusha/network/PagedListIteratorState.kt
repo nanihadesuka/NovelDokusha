@@ -6,6 +6,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import kotlinx.coroutines.*
+import my.noveldokusha.data.Response
 
 /**
  * Used to fetch data that needs multiple request for jetpack compose.

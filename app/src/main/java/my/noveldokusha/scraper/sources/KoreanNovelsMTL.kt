@@ -2,9 +2,9 @@ package my.noveldokusha.scraper.sources
 
 import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.data.ChapterMetadata
+import my.noveldokusha.data.Response
 import my.noveldokusha.network.NetworkClient
 import my.noveldokusha.network.PagedList
-import my.noveldokusha.network.Response
 import my.noveldokusha.network.tryConnect
 import my.noveldokusha.scraper.SourceInterface
 import my.noveldokusha.utils.toDocument

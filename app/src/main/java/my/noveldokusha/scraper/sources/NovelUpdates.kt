@@ -3,6 +3,7 @@ package my.noveldokusha.scraper.sources
 import android.net.Uri
 import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.data.ChapterMetadata
+import my.noveldokusha.data.Response
 import my.noveldokusha.network.*
 import my.noveldokusha.scraper.SourceInterface
 import my.noveldokusha.scraper.TextExtractor

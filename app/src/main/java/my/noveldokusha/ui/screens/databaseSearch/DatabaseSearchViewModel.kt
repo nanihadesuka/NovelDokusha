@@ -14,7 +14,7 @@ import kotlinx.coroutines.withContext
 import my.noveldokusha.App
 import my.noveldokusha.repository.Repository
 import my.noveldokusha.data.persistentCacheDatabaseSearchGenres
-import my.noveldokusha.network.Response
+import my.noveldokusha.data.Response
 import my.noveldokusha.scraper.Scraper
 import my.noveldokusha.ui.BaseViewModel
 import my.noveldokusha.utils.StateExtra_String

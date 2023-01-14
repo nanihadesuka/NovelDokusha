@@ -2,8 +2,8 @@ package my.noveldokusha.scraper
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import my.noveldokusha.data.Response
 import my.noveldokusha.network.NetworkClient
-import my.noveldokusha.network.Response
 import my.noveldokusha.network.getRequest
 import my.noveldokusha.network.tryConnect
 import my.noveldokusha.utils.toDocument

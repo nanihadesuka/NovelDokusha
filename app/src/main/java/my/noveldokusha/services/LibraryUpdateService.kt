@@ -10,9 +10,9 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.actor
 import my.noveldokusha.R
+import my.noveldokusha.data.Response
 import my.noveldokusha.data.database.tables.Book
 import my.noveldokusha.network.NetworkClient
-import my.noveldokusha.network.Response
 import my.noveldokusha.repository.Repository
 import my.noveldokusha.scraper.Scraper
 import my.noveldokusha.scraper.downloadChaptersList
@@ -60,7 +60,7 @@ class LibraryUpdateService : Service() {
         const val channel_id = "Library update"
     }
 
-    private lateinit var notification: NotificationCompat.Builder
+    private lateinit var notificationBuilder: NotificationCompat.Builder
     private var job: Job? = null
 
 
@@ -72,7 +72,7 @@ class LibraryUpdateService : Service() {
         for ((book, add) in channel) {
             if (add) books.add(book) else books.remove(book)
             if (books.isNotEmpty()) {
-                notificationsCenter.modifyNotification(notification, channel_id) {
+                notificationsCenter.modifyNotification(notificationBuilder, channel_id) {
                     text = books.joinToString("\n") { it.title }
                 }
             }
@@ -92,7 +92,7 @@ class LibraryUpdateService : Service() {
                     totalCount = value
                 } else count += 1
 
-                notificationsCenter.modifyNotification(notification, channel_id) {
+                notificationsCenter.modifyNotification(notificationBuilder, channel_id) {
                     title = "Updating library ($count/$totalCount)"
                     setProgress(totalCount, count, false)
                 }
@@ -103,8 +103,8 @@ class LibraryUpdateService : Service() {
 
     override fun onCreate() {
         super.onCreate()
-        notification = notificationsCenter.showNotification(channel_id)
-        startForeground(channel_id.hashCode(), notification.build())
+        notificationBuilder = notificationsCenter.showNotification(channel_id)
+        startForeground(channel_id.hashCode(), notificationBuilder.build())
     }
 
     override fun onDestroy() {
@@ -119,10 +119,10 @@ class LibraryUpdateService : Service() {
         val intentData = IntentData(intent)
 
         job = CoroutineScope(Dispatchers.IO).launch {
-            try {
+            tryAsResult {
                 updateLibrary(intentData.completedCategory)
-            } catch (e: Exception) {
-                Timber.e(e)
+            }.onError {
+                Timber.e(it.exception)
             }
 
             stopSelf(startId)

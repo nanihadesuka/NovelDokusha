@@ -43,7 +43,6 @@ class CloudFareVerificationInterceptor(
 
         return lock.withLock {
             try {
-
                 response.close()
                 // Remove old cf_clearance from the cookie
                 val cookie = CookieManager
@@ -63,6 +62,8 @@ class CloudFareVerificationInterceptor(
                 }
 
                 chain.proceed(request)
+            } catch (e: CancellationException) {
+                throw e
             } catch (e: Exception) {
                 when (e) {
                     is CancellationException -> throw e

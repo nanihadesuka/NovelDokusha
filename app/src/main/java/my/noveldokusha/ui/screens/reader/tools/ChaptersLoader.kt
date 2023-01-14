@@ -4,7 +4,7 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import my.noveldokusha.data.database.tables.Chapter
-import my.noveldokusha.network.Response
+import my.noveldokusha.data.Response
 import my.noveldokusha.repository.Repository
 import my.noveldokusha.ui.screens.reader.ReaderItem
 import my.noveldokusha.ui.screens.reader.ReaderViewModel
