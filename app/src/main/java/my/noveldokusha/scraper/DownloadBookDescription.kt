@@ -23,12 +23,12 @@ suspend fun downloadBookDescription(
 
     // Return if can't find compatible source for url
     val scrap = scraper.getCompatibleSourceCatalog(bookUrl)
-        ?: return@withContext Response.Error(error)
+        ?: return@withContext Response.Error(error, Exception())
 
     tryConnect {
         val doc = networkClient.get(bookUrl).toDocument()
         scrap.getBookDescription(doc)
             ?.let { Response.Success(it) }
-            ?: Response.Error("")
+            ?: Response.Error("", Exception())
     }
 }

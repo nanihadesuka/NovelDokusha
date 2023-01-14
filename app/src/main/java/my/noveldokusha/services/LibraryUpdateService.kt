@@ -4,19 +4,11 @@ import android.app.Service
 import android.content.Context
 import android.content.Intent
 import android.os.IBinder
-import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.ObsoleteCoroutinesApi
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.actor
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import my.noveldokusha.R
 import my.noveldokusha.data.database.tables.Book
 import my.noveldokusha.network.NetworkClient
@@ -24,13 +16,9 @@ import my.noveldokusha.network.Response
 import my.noveldokusha.repository.Repository
 import my.noveldokusha.scraper.Scraper
 import my.noveldokusha.scraper.downloadChaptersList
-import my.noveldokusha.utils.Extra_Boolean
-import my.noveldokusha.utils.NotificationsCenter
-import my.noveldokusha.utils.isServiceRunning
-import my.noveldokusha.utils.removeProgressBar
-import my.noveldokusha.utils.text
-import my.noveldokusha.utils.title
+import my.noveldokusha.utils.*
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
+import timber.log.Timber
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -134,7 +122,7 @@ class LibraryUpdateService : Service() {
             try {
                 updateLibrary(intentData.completedCategory)
             } catch (e: Exception) {
-                Log.e(this::class.simpleName, "Failed to start command")
+                Timber.e(e)
             }
 
             stopSelf(startId)

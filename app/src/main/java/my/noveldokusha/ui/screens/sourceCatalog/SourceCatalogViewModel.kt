@@ -12,10 +12,10 @@ import kotlinx.coroutines.launch
 import my.noveldokusha.AppPreferences
 import my.noveldokusha.R
 import my.noveldokusha.data.BookMetadata
-import my.noveldokusha.repository.Repository
 import my.noveldokusha.network.PagedList
 import my.noveldokusha.network.PagedListIteratorState
 import my.noveldokusha.network.Response
+import my.noveldokusha.repository.Repository
 import my.noveldokusha.scraper.Scraper
 import my.noveldokusha.ui.BaseViewModel
 import my.noveldokusha.ui.Toasty
@@ -52,7 +52,7 @@ class SourceCatalogViewModel @Inject constructor(
     val listLayout by appPreferences.BOOKS_LIST_LAYOUT_MODE.state(viewModelScope)
 
     private fun Response<PagedList<BookMetadata>>.transform() = when (val res = this) {
-        is Response.Error -> Response.Error(res.message)
+        is Response.Error -> res
         is Response.Success -> Response.Success(res.data)
     }
 

@@ -23,7 +23,7 @@ class FetchIterator<T>(
     val onSuccess = MutableLiveData<List<T>>()
     val onCompleted = MutableLiveData<Unit>()
     val onCompletedEmpty = MutableLiveData<Unit>()
-    val onError = MutableLiveData<Response.Error<List<T>>>()
+    val onError = MutableLiveData<Response.Error>()
     val onFetching = MutableLiveData<Boolean>()
     val onReset = MutableLiveData<Unit>()
 

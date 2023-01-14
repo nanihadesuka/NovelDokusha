@@ -16,12 +16,7 @@ import my.noveldokusha.R
 import my.noveldokusha.createEpubBook
 import my.noveldokusha.importEpubToRepository
 import my.noveldokusha.repository.Repository
-import my.noveldokusha.utils.Extra_Uri
-import my.noveldokusha.utils.NotificationsCenter
-import my.noveldokusha.utils.isServiceRunning
-import my.noveldokusha.utils.removeProgressBar
-import my.noveldokusha.utils.text
-import my.noveldokusha.utils.title
+import my.noveldokusha.utils.*
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -100,8 +95,7 @@ class EpubImportService : Service() {
                     removeProgressBar()
                 }
             } catch (e: Exception) {
-                Timber.i("Failed to start command")
-                Timber.i(e.stackTraceToString())
+                Timber.e(e)
                 notificationsCenter.showNotification(channel_id_error) {
                     text = getString(R.string.failed_to_import_epub)
                     removeProgressBar()

@@ -1,6 +1,7 @@
 package my.noveldokusha.network
 
 import java.net.SocketTimeoutException
+import kotlin.coroutines.cancellation.CancellationException
 
 suspend fun <T> tryConnect(
     extraErrorInfo: String = "",
@@ -18,7 +19,7 @@ suspend fun <T> tryConnect(
         e.message
     ).joinToString("\n")
 
-    Response.Error(error)
+    Response.Error(error, e)
 } catch (e: Exception) {
     val error = listOf(
         "Unknown error.",
@@ -33,5 +34,5 @@ suspend fun <T> tryConnect(
         e.stackTraceToString()
     ).joinToString("\n")
 
-    Response.Error(error)
+    Response.Error(error, e)
 }

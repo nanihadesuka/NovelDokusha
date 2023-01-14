@@ -5,24 +5,14 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.IBinder
-import android.util.Log
 import androidx.core.app.NotificationCompat
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import my.noveldokusha.R
 import my.noveldokusha.repository.Repository
-import my.noveldokusha.utils.Extra_Boolean
-import my.noveldokusha.utils.Extra_Uri
-import my.noveldokusha.utils.NotificationsCenter
-import my.noveldokusha.utils.isServiceRunning
-import my.noveldokusha.utils.removeProgressBar
-import my.noveldokusha.utils.text
-import my.noveldokusha.utils.title
+import my.noveldokusha.utils.*
 import okhttp3.internal.closeQuietly
+import timber.log.Timber
 import java.util.zip.ZipEntry
 import java.util.zip.ZipOutputStream
 import javax.inject.Inject
@@ -84,7 +74,7 @@ class BackupDataService : Service() {
             try {
                 backupData(intentData.uri, intentData.backupImages)
             } catch (e: Exception) {
-                Log.e(this::class.simpleName, "Failed to start command")
+                Timber.e(e)
             }
 
             stopSelf(startId)

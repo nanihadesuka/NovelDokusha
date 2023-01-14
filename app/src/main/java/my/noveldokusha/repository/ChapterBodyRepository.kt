@@ -5,6 +5,7 @@ import my.noveldokusha.data.database.DAOs.ChapterBodyDao
 import my.noveldokusha.data.database.tables.ChapterBody
 import my.noveldokusha.network.NetworkClient
 import my.noveldokusha.network.Response
+import my.noveldokusha.network.map
 import my.noveldokusha.scraper.Scraper
 import my.noveldokusha.scraper.downloadChapter
 
@@ -43,21 +44,17 @@ class ChapterBodyRepository(
                 $urlChapter
                 
                 Source is local but chapter content missing.
-            """.trimIndent()
+            """.trimIndent(), Exception()
             )
         }
 
-        return when (val res = downloadChapter(scraper, networkClient, urlChapter)) {
-            is Response.Success -> {
+        return downloadChapter(scraper, networkClient, urlChapter)
+            .map {
                 insertWithTitle(
-                    ChapterBody(url = urlChapter, body = res.data.body),
-                    res.data.title
+                    chapterBody = ChapterBody(url = urlChapter, body = it.body),
+                    title = it.title
                 )
-                return Response.Success(res.data.body)
+                it.body
             }
-            is Response.Error -> {
-                Response.Error(res.message)
-            }
-        }
     }
 }

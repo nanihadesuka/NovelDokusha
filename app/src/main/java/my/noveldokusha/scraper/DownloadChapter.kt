@@ -47,7 +47,7 @@ suspend fun downloadChapter(
         // If no predefined source is found try extracting text with heuristic extraction
         val chapter = heuristicChapterExtraction(realUrl, networkClient.get(realUrl).toDocument())
         when (chapter) {
-            null -> Response.Error(error)
+            null -> Response.Error(error, Exception())
             else -> Response.Success(chapter)
         }
     }

@@ -2,7 +2,6 @@ package my.noveldokusha.network
 
 import android.content.Context
 import android.net.Uri
-import android.util.Log
 import dagger.hilt.android.qualifiers.ApplicationContext
 import my.noveldokusha.BuildConfig
 import my.noveldokusha.utils.call
@@ -11,6 +10,7 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
 import okhttp3.logging.HttpLoggingInterceptor
+import timber.log.Timber
 import java.io.File
 import java.util.concurrent.TimeUnit
 
@@ -28,7 +28,7 @@ class ScraperNetworkClient(
     private val cookieJar = ScraperCookieJar()
 
     private val okhttpLoggingInterceptor = HttpLoggingInterceptor {
-        Log.v("OkHttp", it)
+        Timber.v(it)
     }.apply {
         level = HttpLoggingInterceptor.Level.BODY
     }

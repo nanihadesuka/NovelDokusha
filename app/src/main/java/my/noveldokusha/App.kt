@@ -16,6 +16,7 @@ import dagger.hilt.android.EntryPointAccessors
 import dagger.hilt.android.HiltAndroidApp
 import my.noveldokusha.network.NetworkClient
 import my.noveldokusha.network.ScraperNetworkClient
+import timber.log.Timber
 import java.io.InputStream
 import javax.inject.Inject
 
@@ -27,6 +28,9 @@ class App @Inject constructor() : Application(), ImageLoaderFactory {
     lateinit var networkClient: NetworkClient
 
     override fun onCreate() {
+        if (BuildConfig.DEBUG) {
+            Timber.plant(Timber.DebugTree())
+        }
         super.onCreate()
     }
 

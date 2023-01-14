@@ -65,7 +65,7 @@ class DatabaseBookInfoViewModel @Inject constructor(
                     bookData = data
                 }
             } catch (e: Exception) {
-                Timber.d("getBookData", e)
+                Timber.d(e)
             }
         }
     }

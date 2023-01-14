@@ -3,11 +3,12 @@ package my.noveldokusha.ui.screens.reader.tools
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
-import my.noveldokusha.repository.Repository
 import my.noveldokusha.data.database.tables.Chapter
 import my.noveldokusha.network.Response
+import my.noveldokusha.repository.Repository
 import my.noveldokusha.ui.screens.reader.ReaderItem
 import my.noveldokusha.ui.screens.reader.ReaderViewModel
+import timber.log.Timber
 import kotlin.coroutines.CoroutineContext
 
 class ChaptersLoader(
@@ -493,6 +494,7 @@ class ChaptersLoader(
                 }
             }
             is Response.Error -> {
+                Timber.d(res.exception)
                 withContext(Dispatchers.Main.immediate) {
                     chaptersStats[chapter.url] = ReaderViewModel.ChapterStats(
                         chapter = chapter,

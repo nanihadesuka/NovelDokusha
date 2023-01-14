@@ -24,7 +24,7 @@ suspend fun downloadChaptersList(
 
     // Return if can't find compatible source for url
     val scrap = scraper.getCompatibleSourceCatalog(bookUrl)
-        ?: return@withContext Response.Error(error)
+        ?: return@withContext Response.Error(error,Exception())
 
     tryConnect {
         val doc = networkClient.get(bookUrl).toDocument()
