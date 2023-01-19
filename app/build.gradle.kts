@@ -1,3 +1,4 @@
+
 import org.jetbrains.kotlin.konan.properties.hasProperty
 import java.util.*
 
@@ -74,6 +75,12 @@ android {
         setProperty("archivesBaseName", "NovelDokusha_v$versionName")
     }
 
+    lint {
+        textReport = true
+        textOutput = File("stdout")
+    }
+
+
     signingConfigs {
         if (hasDefaultSigningConfigData) create("default") {
             storeFile = file(defaultSigningConfigData.getProperty("storeFile"))
@@ -145,6 +152,9 @@ fun DependencyHandler.fossImplementation(dependencyNotation: Any): Dependency? =
     add("fossImplementation", dependencyNotation)
 
 dependencies {
+
+    // Linter
+    lintChecks(project(":app-linter"))
 
     // Kotlin
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
