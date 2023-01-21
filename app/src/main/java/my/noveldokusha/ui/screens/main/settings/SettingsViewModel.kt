@@ -1,7 +1,7 @@
 package my.noveldokusha.ui.screens.main.settings
 
 import android.text.format.Formatter
-import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -11,8 +11,6 @@ import com.bumptech.glide.Glide
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import my.noveldokusha.App
@@ -32,19 +30,13 @@ class SettingsViewModel @Inject constructor(
     private val app: App,
     val translationManager: TranslationManager,
 ) : BaseViewModel() {
-    fun <T> stateCreator(theFlow: Flow<T>, initialValue: T): MutableState<T> {
-        val value = mutableStateOf(initialValue)
-        viewModelScope.launch(Dispatchers.IO) {
-            theFlow.collect { withContext(Dispatchers.Main) { value.value = it } }
-        }
-        return value
-    }
 
     val followsSystem by appPreferences.THEME_FOLLOW_SYSTEM.state(viewModelScope)
-    val theme by stateCreator(
-        appPreferences.THEME_ID.flow().mapNotNull { Themes.fromIDTheme(it) },
-        Themes.fromIDTheme(appPreferences.THEME_ID.value) ?: Themes.LIGHT
-    )
+
+    val theme by derivedStateOf {
+        val themeId by appPreferences.THEME_ID.state(viewModelScope)
+        Themes.fromIDTheme(themeId) ?: Themes.LIGHT
+    }
 
     var databaseSize by mutableStateOf("")
     var imageFolderSize by mutableStateOf("")
