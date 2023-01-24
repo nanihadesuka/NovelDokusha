@@ -174,7 +174,7 @@ class ReaderSpeaker(
 
     suspend fun readChapterStartingFromStart(
         chapterIndex: Int
-    ) {
+    ) = withContext(Dispatchers.Main.immediate) {
         readChapterStartingFromChapterItemIndex(
             chapterIndex = chapterIndex,
             chapterItemIndex = 0
@@ -184,7 +184,7 @@ class ReaderSpeaker(
     private suspend fun readChapterStartingFromChapterItemIndex(
         chapterIndex: Int,
         chapterItemIndex: Int,
-    ) {
+    ) = withContext(Dispatchers.Main.immediate) {
         val itemIndex = indexOfReaderItem(
             list = items,
             chapterIndex = chapterIndex,
@@ -192,7 +192,7 @@ class ReaderSpeaker(
         )
         if (itemIndex == -1) {
             reachedChapterEndFlowChapterIndex.emit(chapterIndex)
-            return
+            return@withContext
         }
         readChapterStartingFromItemIndex(
             itemIndex = itemIndex,
@@ -203,7 +203,7 @@ class ReaderSpeaker(
     suspend fun readChapterStartingFromItemIndex(
         itemIndex: Int,
         chapterIndex: Int,
-    ) {
+    ) = withContext(Dispatchers.Main.immediate) {
         val nextItems = getChapterNextItems(
             itemIndex = itemIndex,
             chapterIndex = chapterIndex,
@@ -212,7 +212,7 @@ class ReaderSpeaker(
 
         if (nextItems.isEmpty()) {
             reachedChapterEndFlowChapterIndex.emit(chapterIndex)
-            return
+            return@withContext
         }
 
         val firstItem = nextItems.first()

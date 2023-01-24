@@ -4,13 +4,13 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import my.noveldokusha.repository.Repository
-import my.noveldokusha.ui.screens.reader.ReaderViewModel
+import my.noveldokusha.ui.screens.reader.ChapterState
 
 fun saveLastReadPositionState(
     repository: Repository,
     bookUrl: String,
-    chapter: ReaderViewModel.ChapterState,
-    oldChapter: ReaderViewModel.ChapterState? = null
+    chapter: ChapterState,
+    oldChapter: ChapterState? = null
 ) = CoroutineScope(Dispatchers.IO).launch {
     repository.withTransaction {
         repository.libraryBooks.updateLastReadChapter(

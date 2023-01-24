@@ -14,15 +14,12 @@ import my.noveldokusha.data.database.AppDatabase
 import my.noveldokusha.data.database.AppDatabaseOperations
 import my.noveldokusha.network.NetworkClient
 import my.noveldokusha.network.ScraperNetworkClient
-import my.noveldokusha.repository.BookChaptersRepository
-import my.noveldokusha.repository.ChapterBodyRepository
-import my.noveldokusha.repository.LibraryBooksRepository
-import my.noveldokusha.repository.Repository
-import my.noveldokusha.repository.ScraperRepository
+import my.noveldokusha.repository.*
 import my.noveldokusha.scraper.Scraper
 import my.noveldokusha.tools.TranslationManager
 import my.noveldokusha.ui.Toasty
 import my.noveldokusha.ui.ToastyToast
+import my.noveldokusha.ui.screens.reader.ReaderManager
 import my.noveldokusha.ui.screens.reader.tools.LiveTranslation
 import my.noveldokusha.utils.NotificationsCenter
 import java.io.File
@@ -125,6 +122,17 @@ object AppModule {
     @Singleton
     fun provideScrapper(networkClient: NetworkClient): Scraper {
         return Scraper(networkClient)
+    }
+
+    @Provides
+    @Singleton
+    fun provideReaderManager(
+        repository: Repository,
+        liveTranslation: LiveTranslation,
+        appPreferences: AppPreferences,
+        @ApplicationContext context: Context
+    ): ReaderManager {
+        return ReaderManager(repository, liveTranslation, appPreferences, context)
     }
 
     @Provides

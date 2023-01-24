@@ -89,17 +89,12 @@ class ReaderActivity : BaseActivity() {
     }
 
     override fun onBackPressed() {
-        viewModel.onClose()
+        viewModel.onBackPressed()
         super.onBackPressed()
     }
 
     override fun onDestroy() {
-        viewModel.onTranslatorChanged = null
-        viewModel.forceUpdateListViewState = null
-        viewModel.maintainStartPosition = null
-        viewModel.maintainLastVisiblePosition = null
-        viewModel.setInitialPosition = null
-        viewModel.showInvalidChapterDialog = null
+        viewModel.onViewDestroyed()
         super.onDestroy()
     }
 
@@ -115,8 +110,10 @@ class ReaderActivity : BaseActivity() {
             }
         }
 
-        viewModel.onTranslatorChanged = {
-            reloadReader()
+        lifecycleScope.launch {
+            viewModel.onTranslatorChanged.collect {
+                reloadReader()
+            }
         }
 
         viewModel.forceUpdateListViewState = {
@@ -170,7 +167,7 @@ class ReaderActivity : BaseActivity() {
             }
         }
 
-        viewModel.scrollToTheTop.asLiveData().observe(this) {
+        viewModel.ttsScrolledToTheTop.asLiveData().observe(this) {
             viewAdapter.listView.notifyDataSetChanged()
             if (viewAdapter.listView.count < 1) {
                 return@observe
@@ -182,7 +179,7 @@ class ReaderActivity : BaseActivity() {
             )
         }
 
-        viewModel.scrollToTheBottom.asLiveData().observe(this) {
+        viewModel.ttsScrolledToTheBottom.asLiveData().observe(this) {
             viewAdapter.listView.notifyDataSetChanged()
             if (viewAdapter.listView.count < 2) {
                 return@observe
@@ -396,7 +393,7 @@ class ReaderActivity : BaseActivity() {
             visibleItemCount != 0 && (firstVisibleItem + visibleItemCount) >= totalItemCount - 1
 
         when (viewModel.chaptersLoader.readerState) {
-            ReaderViewModel.ReaderState.IDLE -> {
+            ReaderState.IDLE -> {
                 if (isBottom) {
                     viewModel.chaptersLoader.tryLoadNext()
                 }
@@ -404,8 +401,8 @@ class ReaderActivity : BaseActivity() {
                     viewModel.chaptersLoader.tryLoadPrevious()
                 }
             }
-            ReaderViewModel.ReaderState.LOADING -> run {}
-            ReaderViewModel.ReaderState.INITIAL_LOAD -> run {}
+            ReaderState.LOADING -> run {}
+            ReaderState.INITIAL_LOAD -> run {}
         }
     }
 
@@ -446,7 +443,7 @@ class ReaderActivity : BaseActivity() {
         val item = viewModel.items.getOrNull(firstVisibleItemIndex) ?: return
         if (item is ReaderItem.Position) {
             val offset = viewBind.listView.run { getChildAt(0).top - paddingTop }
-            viewModel.currentChapter = ReaderViewModel.ChapterState(
+            viewModel.currentChapter = ChapterState(
                 chapterUrl = item.chapterUrl,
                 chapterItemIndex = item.chapterItemIndex,
                 offset = offset

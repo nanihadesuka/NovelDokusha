@@ -3,6 +3,7 @@ package my.noveldokusha.ui.screens.reader.tools
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.snapshots.SnapshotStateList
+import kotlinx.coroutines.flow.MutableSharedFlow
 import my.noveldokusha.AppPreferences
 import my.noveldokusha.tools.TranslationManager
 import my.noveldokusha.tools.TranslationModelState
@@ -39,7 +40,7 @@ class LiveTranslation(
     var translator: TranslatorState? = null
         private set
 
-    var onTranslatorChanged: (() -> Unit)? = null
+    val onTranslatorChanged = MutableSharedFlow<Unit>()
 
     suspend fun init() {
         val source = appPreferences.GLOBAL_TRANSLATION_PREFERRED_SOURCE.value
@@ -81,20 +82,20 @@ class LiveTranslation(
         settingsState.enable.value = it
         appPreferences.GLOBAL_TRANSLATION_ENABLED.value = it
         updateTranslatorState()
-        onTranslatorChanged?.invoke()
+        onTranslatorChanged.tryEmit(Unit)
     }
 
     private fun oSourceChange(it: TranslationModelState?) {
         settingsState.source.value = it
         appPreferences.GLOBAL_TRANSLATION_PREFERRED_SOURCE.value = it?.language ?: ""
         updateTranslatorState()
-        onTranslatorChanged?.invoke()
+        onTranslatorChanged.tryEmit(Unit)
     }
 
     private fun onTargetChange(it: TranslationModelState?) {
         settingsState.target.value = it
         appPreferences.GLOBAL_TRANSLATION_PREFERRED_TARGET.value = it?.language ?: ""
         updateTranslatorState()
-        onTranslatorChanged?.invoke()
+        onTranslatorChanged.tryEmit(Unit)
     }
 }

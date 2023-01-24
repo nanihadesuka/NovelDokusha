@@ -3,11 +3,13 @@ package my.noveldokusha.ui.screens.reader.tools
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
-import my.noveldokusha.data.database.tables.Chapter
 import my.noveldokusha.data.Response
+import my.noveldokusha.data.database.tables.Chapter
 import my.noveldokusha.repository.Repository
+import my.noveldokusha.ui.screens.reader.ChapterState
+import my.noveldokusha.ui.screens.reader.ChapterStats
 import my.noveldokusha.ui.screens.reader.ReaderItem
-import my.noveldokusha.ui.screens.reader.ReaderViewModel
+import my.noveldokusha.ui.screens.reader.ReaderState
 import timber.log.Timber
 import kotlin.coroutines.CoroutineContext
 
@@ -19,7 +21,7 @@ class ChaptersLoader(
     private val translationTargetLanguageOrNull: () -> String?,
     private val bookUrl: String,
     val orderedChapters: List<Chapter>,
-    @Volatile var readerState: ReaderViewModel.ReaderState,
+    @Volatile var readerState: ReaderState,
     val forceUpdateListViewState: suspend () -> Unit,
     val maintainLastVisiblePosition: suspend (suspend () -> Unit) -> Unit,
     val maintainStartPosition: suspend (suspend () -> Unit) -> Unit,
@@ -35,13 +37,13 @@ class ChaptersLoader(
 
     private sealed interface LoadChapter {
         enum class Type { RestartInitial, Initial, Previous, Next }
-        data class RestartInitialChapter(val state: ReaderViewModel.ChapterState) : LoadChapter
+        data class RestartInitialChapter(val state: ChapterState) : LoadChapter
         data class Initial(val chapterIndex: Int) : LoadChapter
         object Previous : LoadChapter
         object Next : LoadChapter
     }
 
-    val chaptersStats = mutableMapOf<String, ReaderViewModel.ChapterStats>()
+    val chaptersStats = mutableMapOf<String, ChapterStats>()
     val loadedChapters = mutableSetOf<String>()
     val chapterLoadedFlow = MutableSharedFlow<ChapterLoaded>()
     private val items: MutableList<ReaderItem> = ArrayList()
@@ -75,7 +77,7 @@ class ChaptersLoader(
     }
 
     @Synchronized
-    fun tryLoadRestartedInitial(chapterLastState: ReaderViewModel.ChapterState) {
+    fun tryLoadRestartedInitial(chapterLastState: ChapterState) {
         if (LoadChapter.Type.RestartInitial in loaderQueue) return
         loaderQueue.add(LoadChapter.Type.RestartInitial)
         launch {
@@ -104,7 +106,7 @@ class ChaptersLoader(
             items.clear()
             forceUpdateListViewState()
             loadedChapters.clear()
-            readerState = ReaderViewModel.ReaderState.INITIAL_LOAD
+            readerState = ReaderState.INITIAL_LOAD
             startChapterLoaderWatcher()
         }
     }
@@ -141,9 +143,9 @@ class ChaptersLoader(
     }
 
     private suspend fun loadRestartedInitialChapter(
-        chapterLastState: ReaderViewModel.ChapterState
+        chapterLastState: ChapterState
     ) = withContext(Dispatchers.Main.immediate) {
-        readerState = ReaderViewModel.ReaderState.INITIAL_LOAD
+        readerState = ReaderState.INITIAL_LOAD
         items.clear()
         forceUpdateListViewState()
 
@@ -188,7 +190,7 @@ class ChaptersLoader(
             )
         )
 
-        readerState = ReaderViewModel.ReaderState.IDLE
+        readerState = ReaderState.IDLE
 
         chapterLoadedFlow.emit(
             ChapterLoaded(
@@ -201,7 +203,7 @@ class ChaptersLoader(
     private suspend fun loadInitialChapter(
         chapterIndex: Int
     ) = withContext(Dispatchers.Main.immediate) {
-        readerState = ReaderViewModel.ReaderState.INITIAL_LOAD
+        readerState = ReaderState.INITIAL_LOAD
         items.clear()
         forceUpdateListViewState()
 
@@ -257,15 +259,15 @@ class ChaptersLoader(
             )
         )
 
-        readerState = ReaderViewModel.ReaderState.IDLE
+        readerState = ReaderState.IDLE
     }
 
     private suspend fun loadPreviousChapter() = withContext(Dispatchers.Main.immediate) {
-        readerState = ReaderViewModel.ReaderState.LOADING
+        readerState = ReaderState.LOADING
 
         val firstItem = items.firstOrNull()!!
         if (firstItem is ReaderItem.BookStart) {
-            readerState = ReaderViewModel.ReaderState.IDLE
+            readerState = ReaderState.IDLE
             return@withContext
         }
 
@@ -305,7 +307,7 @@ class ChaptersLoader(
                 )
                 forceUpdateListViewState()
             }
-            readerState = ReaderViewModel.ReaderState.IDLE
+            readerState = ReaderState.IDLE
             return@withContext
         }
 
@@ -324,15 +326,15 @@ class ChaptersLoader(
                 type = ChapterLoaded.Type.Previous
             )
         )
-        readerState = ReaderViewModel.ReaderState.IDLE
+        readerState = ReaderState.IDLE
     }
 
     private suspend fun loadNextChapter() = withContext(Dispatchers.Main.immediate) {
-        readerState = ReaderViewModel.ReaderState.LOADING
+        readerState = ReaderState.LOADING
 
         val lastItem = items.lastOrNull()!!
         if (lastItem is ReaderItem.BookEnd) {
-            readerState = ReaderViewModel.ReaderState.IDLE
+            readerState = ReaderState.IDLE
             return@withContext
         }
         val nextIndex = lastItem.chapterIndex + 1
@@ -364,7 +366,7 @@ class ChaptersLoader(
                 )
             )
             forceUpdateListViewState()
-            readerState = ReaderViewModel.ReaderState.IDLE
+            readerState = ReaderState.IDLE
             return@withContext
         }
 
@@ -382,7 +384,7 @@ class ChaptersLoader(
             )
         )
 
-        readerState = ReaderViewModel.ReaderState.IDLE
+        readerState = ReaderState.IDLE
     }
 
     private suspend fun addChapter(
@@ -465,7 +467,7 @@ class ChaptersLoader(
                 }
 
                 withContext(Dispatchers.Main.immediate) {
-                    chaptersStats[chapter.url] = ReaderViewModel.ChapterStats(
+                    chaptersStats[chapter.url] = ChapterStats(
                         chapter = chapter,
                         itemsCount = items.size,
                         chapterIndex = index
@@ -496,7 +498,7 @@ class ChaptersLoader(
             is Response.Error -> {
                 Timber.d(res.exception)
                 withContext(Dispatchers.Main.immediate) {
-                    chaptersStats[chapter.url] = ReaderViewModel.ChapterStats(
+                    chaptersStats[chapter.url] = ChapterStats(
                         chapter = chapter,
                         itemsCount = 1,
                         chapterIndex = index
