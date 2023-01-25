@@ -20,7 +20,6 @@ import my.noveldokusha.tools.TranslationManager
 import my.noveldokusha.ui.Toasty
 import my.noveldokusha.ui.ToastyToast
 import my.noveldokusha.ui.screens.reader.ReaderManager
-import my.noveldokusha.ui.screens.reader.tools.LiveTranslation
 import my.noveldokusha.utils.NotificationsCenter
 import java.io.File
 import javax.inject.Singleton
@@ -128,19 +127,11 @@ object AppModule {
     @Singleton
     fun provideReaderManager(
         repository: Repository,
-        liveTranslation: LiveTranslation,
+        translationManager: TranslationManager,
         appPreferences: AppPreferences,
         @ApplicationContext context: Context
     ): ReaderManager {
-        return ReaderManager(repository, liveTranslation, appPreferences, context)
-    }
-
-    @Provides
-    fun provideLiveTranslation(
-        translationManager: TranslationManager,
-        appPreferences: AppPreferences,
-    ): LiveTranslation {
-        return LiveTranslation(translationManager, appPreferences)
+        return ReaderManager(repository, translationManager, appPreferences, context)
     }
 
     @Provides

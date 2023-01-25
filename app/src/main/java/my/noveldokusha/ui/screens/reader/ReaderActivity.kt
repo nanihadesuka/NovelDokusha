@@ -23,8 +23,11 @@ import androidx.lifecycle.distinctUntilChanged
 import androidx.lifecycle.lifecycleScope
 import com.afollestad.materialdialogs.MaterialDialog
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.drop
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import my.noveldokusha.R
 import my.noveldokusha.databinding.ActivityReaderBinding
 import my.noveldokusha.ui.BaseActivity
@@ -83,7 +86,6 @@ class ReaderActivity : BaseActivity() {
 
     private fun reloadReader() {
         val currentChapter = viewModel.currentChapter.copy()
-        lifecycleScope.coroutineContext.cancelChildren()
         viewModel.reloadReader()
         viewModel.chaptersLoader.tryLoadRestartedInitial(currentChapter)
     }
@@ -263,10 +265,10 @@ class ReaderActivity : BaseActivity() {
 
                 // Reader info
                 ReaderInfoView(
-                    chapterTitle = viewModel.readingPosStats?.chapterTitle ?: "",
-                    chapterCurrentNumber = viewModel.readingPosStats?.run { chapterIndex + 1 }
+                    chapterTitle = viewModel.readingPosStats.value?.chapterTitle ?: "",
+                    chapterCurrentNumber = viewModel.readingPosStats.value?.run { chapterIndex + 1 }
                         ?: 0,
-                    chapterPercentageProgress = viewModel.chapterPercentageProgress,
+                    chapterPercentageProgress = viewModel.chapterPercentageProgress.value,
                     chaptersTotalSize = viewModel.orderedChapters.size,
                     textFont = viewModel.textFont,
                     textSize = viewModel.textSize,

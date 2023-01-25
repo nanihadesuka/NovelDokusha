@@ -53,8 +53,6 @@ class ReaderSpeaker(
     private val context: Context,
     private val items: List<ReaderItem>,
     private val chapterLoadedFlow: Flow<ChaptersLoader.ChapterLoaded>,
-    private val scrollToTheTop: MutableSharedFlow<Unit>,
-    private val scrollToTheBottom: MutableSharedFlow<Unit>,
     private val customSavedVoices: State<List<VoicePredefineState>>,
     private val setCustomSavedVoices: (List<VoicePredefineState>) -> Unit,
     private val isChapterIndexValid: (chapterIndex: Int) -> Boolean,
@@ -83,6 +81,8 @@ class ReaderSpeaker(
         )
     )
 
+    val scrolledToTheTop = MutableSharedFlow<Unit>()
+    val scrolledToTheBottom = MutableSharedFlow<Unit>()
     val currentReaderItemFlow = manager.currentTextSpeakFlow
     val currentReaderItemLiveData = currentReaderItemFlow.asLiveData()
     val currentTextPlaying = manager.currentActiveItemState as State<TextSynthesis>
@@ -350,7 +350,7 @@ class ReaderSpeaker(
                     playState = Utterance.PlayState.FINISHED,
                     item = item
                 )
-                scrollToTheBottom.emit(Unit)
+                scrolledToTheBottom.emit(Unit)
             }
             return
         }
@@ -390,7 +390,7 @@ class ReaderSpeaker(
                 manager.currentActiveItemState.value = settings.currentActiveItemState.value.copy(
                     playState = Utterance.PlayState.FINISHED
                 )
-                scrollToTheTop.emit(Unit)
+                scrolledToTheTop.emit(Unit)
             }
             return
         }

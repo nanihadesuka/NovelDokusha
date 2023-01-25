@@ -4,8 +4,8 @@ import android.content.Context
 import kotlinx.coroutines.*
 import my.noveldokusha.AppPreferences
 import my.noveldokusha.repository.Repository
+import my.noveldokusha.tools.TranslationManager
 import my.noveldokusha.ui.screens.reader.tools.ItemPosition
-import my.noveldokusha.ui.screens.reader.tools.LiveTranslation
 
 interface ReaderManagerViewCallReferences {
     var forceUpdateListViewState: (suspend () -> Unit)?
@@ -17,16 +17,16 @@ interface ReaderManagerViewCallReferences {
 
 class ReaderManager(
     private val repository: Repository,
-    private val liveTranslation: LiveTranslation,
+    private val translationManager: TranslationManager,
     private val appPreferences: AppPreferences,
-    private val context: Context
-) : ReaderManagerViewCallReferences {
-    lateinit var session: ReaderSession
-        private set
-
-    private val sessionScope = CoroutineScope(
+    private val context: Context,
+    private val scope: CoroutineScope = CoroutineScope(
         SupervisorJob() + Dispatchers.Default + CoroutineName("Reader")
     )
+) : ReaderManagerViewCallReferences {
+
+    var session: ReaderSession? = null
+
 
     @Volatile
     override var forceUpdateListViewState: (suspend () -> Unit)? = null
@@ -46,21 +46,15 @@ class ReaderManager(
     fun initiateOrGetSession(
         bookUrl: String,
         chapterUrl: String,
-    ) {
-        if (::session.isInitialized) {
-            if (session.bookUrl == bookUrl) {
-                return
-            } else {
-                session.close()
-            }
-        }
+    ): ReaderSession {
+        session?.let { return it }
 
-        session = ReaderSession(
+        return ReaderSession(
             bookUrl = bookUrl,
             initialChapterUrl = chapterUrl,
-            scope = sessionScope,
+            scope = scope,
             repository = repository,
-            liveTranslation = liveTranslation,
+            translationManager = translationManager,
             appPreferences = appPreferences,
             forceUpdateListViewState = { withMainNow { forceUpdateListViewState?.invoke() } },
             maintainLastVisiblePosition = { withMainNow { maintainLastVisiblePosition?.invoke(it) } },
@@ -68,9 +62,10 @@ class ReaderManager(
             setInitialPosition = { withMainNow { setInitialPosition?.invoke(it) } },
             showInvalidChapterDialog = { withMainNow { showInvalidChapterDialog?.invoke() } },
             context = context
-        )
-
-        session.init()
+        ).also {
+            it.init()
+            session = it
+        }
     }
 
     fun invalidateViewsHandlers() {
@@ -79,6 +74,11 @@ class ReaderManager(
         maintainStartPosition = null
         setInitialPosition = null
         showInvalidChapterDialog = null
+    }
+
+    fun close() {
+        session?.close()
+        session = null
     }
 }
 

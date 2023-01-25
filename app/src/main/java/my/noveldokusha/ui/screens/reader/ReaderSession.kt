@@ -2,17 +2,15 @@ package my.noveldokusha.ui.screens.reader
 
 import android.content.Context
 import androidx.compose.runtime.derivedStateOf
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.take
 import my.noveldokusha.AppPreferences
 import my.noveldokusha.data.database.tables.Chapter
 import my.noveldokusha.repository.Repository
+import my.noveldokusha.tools.TranslationManager
 import my.noveldokusha.ui.screens.reader.tools.*
 import kotlin.math.ceil
 import kotlin.properties.Delegates
@@ -22,7 +20,7 @@ class ReaderSession(
     private val initialChapterUrl: String,
     private val scope: CoroutineScope,
     private val repository: Repository,
-    private val liveTranslation: LiveTranslation,
+    private val translationManager: TranslationManager,
     private val appPreferences: AppPreferences,
     private val context: Context,
     val forceUpdateListViewState: suspend () -> Unit,
@@ -31,8 +29,6 @@ class ReaderSession(
     val setInitialPosition: suspend (ItemPosition) -> Unit,
     val showInvalidChapterDialog: suspend () -> Unit,
 ) {
-    val ttsScrolledToTheTop = MutableSharedFlow<Unit>()
-    val ttsScrolledToTheBottom = MutableSharedFlow<Unit>()
 
     var chapterUrl: String = initialChapterUrl
 
@@ -54,26 +50,31 @@ class ReaderSession(
         )
     }
 
-    var readingPosStats by mutableStateOf<ReadingChapterPosStats?>(null)
-    val chapterPercentageProgress by derivedStateOf {
-        val data = readingPosStats ?: return@derivedStateOf 0f
+    val readingPosStats = mutableStateOf<ReadingChapterPosStats?>(null)
+    val chapterPercentageProgress = derivedStateOf {
+        val data = readingPosStats.value ?: return@derivedStateOf 0f
         when (data.chapterItemsCount) {
             0 -> 100f
             else -> ceil((data.chapterItemIndex.toFloat() / data.chapterItemsCount.toFloat()) * 100f)
         }
     }
 
-    val isReaderInSpeakMode by derivedStateOf {
+    val isReaderInSpeakMode = derivedStateOf {
         readerSpeaker.settings.isThereActiveItem.value &&
                 readerSpeaker.settings.isPlaying.value
     }
 
+    val liveTranslation = LiveTranslation(
+        translationManager = translationManager,
+        appPreferences = appPreferences
+    )
+
     val chaptersLoader = ChaptersLoader(
         repository = repository,
-        translateOrNull = { liveTranslation.translator?.translate?.invoke(it) },
-        translationIsActive = { liveTranslation.translator != null },
-        translationSourceLanguageOrNull = { liveTranslation.translator?.sourceLocale?.displayLanguage },
-        translationTargetLanguageOrNull = { liveTranslation.translator?.targetLocale?.displayLanguage },
+        translateOrNull = { liveTranslation.translatorState?.translate?.invoke(it) },
+        translationIsActive = { liveTranslation.translatorState != null },
+        translationSourceLanguageOrNull = { liveTranslation.translatorState?.sourceLocale?.displayLanguage },
+        translationTargetLanguageOrNull = { liveTranslation.translatorState?.targetLocale?.displayLanguage },
         bookUrl = bookUrl,
         orderedChapters = orderedChapters,
         readerState = ReaderState.INITIAL_LOAD,
@@ -95,8 +96,6 @@ class ReaderSession(
         isChapterIndexValid = chaptersLoader::isChapterIndexValid,
         tryLoadPreviousChapter = chaptersLoader::tryLoadPrevious,
         loadNextChapter = chaptersLoader::tryLoadNext,
-        scrollToTheTop = ttsScrolledToTheTop,
-        scrollToTheBottom = ttsScrolledToTheBottom,
         customSavedVoices = appPreferences.READER_TEXT_TO_SPEECH_SAVED_PREDEFINED_LIST.state(scope),
         setCustomSavedVoices = {
             appPreferences.READER_TEXT_TO_SPEECH_SAVED_PREDEFINED_LIST.value = it
@@ -172,7 +171,7 @@ class ReaderSession(
             readerSpeaker
                 .currentReaderItemFlow
                 .debounce(timeoutMillis = 5_000)
-                .filter { isReaderInSpeakMode }
+                .filter { isReaderInSpeakMode.value }
                 .collect {
                     saveLastReadPositionFromCurrentSpeakItem()
                 }
@@ -181,7 +180,7 @@ class ReaderSession(
         scope.launch(Dispatchers.Main.immediate) {
             readerSpeaker
                 .currentReaderItemFlow
-                .filter { isReaderInSpeakMode }
+                .filter { isReaderInSpeakMode.value }
                 .collect {
                     val item = it.item
                     if (item !is ReaderItem.ParagraphLocation) return@collect
@@ -207,7 +206,7 @@ class ReaderSession(
 
     fun close() {
         chaptersLoader.coroutineContext.cancelChildren()
-        if (isReaderInSpeakMode) {
+        if (isReaderInSpeakMode.value) {
             saveLastReadPositionFromCurrentSpeakItem()
         } else {
             saveLastReadPositionState(repository, bookUrl, currentChapter)
@@ -225,7 +224,7 @@ class ReaderSession(
         val item = items.getOrNull(itemIndex) ?: return
         if (item !is ReaderItem.Position) return
         val stats = chaptersLoader.chaptersStats[chapterUrl] ?: return
-        readingPosStats = ReadingChapterPosStats(
+        readingPosStats.value = ReadingChapterPosStats(
             chapterIndex = item.chapterIndex,
             chapterItemIndex = item.chapterItemIndex,
             chapterItemsCount = stats.itemsCount,

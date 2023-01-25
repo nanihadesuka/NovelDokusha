@@ -1,7 +1,6 @@
 package my.noveldokusha.ui.screens.reader.tools
 
 import kotlinx.coroutines.*
-import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import my.noveldokusha.data.Response
 import my.noveldokusha.data.database.tables.Chapter
@@ -48,9 +47,7 @@ class ChaptersLoader(
     val chapterLoadedFlow = MutableSharedFlow<ChapterLoaded>()
     private val items: MutableList<ReaderItem> = ArrayList()
     private val loaderQueue = mutableSetOf<LoadChapter.Type>()
-    private val chapterLoaderFlow = MutableSharedFlow<LoadChapter>(
-        onBufferOverflow = BufferOverflow.SUSPEND
-    )
+    private val chapterLoaderFlow = MutableSharedFlow<LoadChapter>()
 
     init {
         startChapterLoaderWatcher()

@@ -1,9 +1,12 @@
 package my.noveldokusha.ui.screens.reader.tools
 
+import android.util.Log
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.snapshots.SnapshotStateList
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import my.noveldokusha.AppPreferences
 import my.noveldokusha.tools.TranslationManager
 import my.noveldokusha.tools.TranslationModelState
@@ -24,6 +27,9 @@ data class LiveTranslationSettingData(
 class LiveTranslation(
     private val translationManager: TranslationManager,
     private val appPreferences: AppPreferences,
+    private val scope: CoroutineScope = CoroutineScope(
+        SupervisorJob() + Dispatchers.Default + CoroutineName("LiveTranslator")
+    )
 ) {
     val settingsState = LiveTranslationSettingData(
         isAvailable = translationManager.available,
@@ -32,15 +38,16 @@ class LiveTranslation(
         source = mutableStateOf(null),
         target = mutableStateOf(null),
         onEnable = ::onEnable,
-        onSourceChange = ::oSourceChange,
+        onSourceChange = ::onSourceChange,
         onTargetChange = ::onTargetChange,
         onDownloadTranslationModel = translationManager::downloadModel
     )
 
-    var translator: TranslatorState? = null
+    var translatorState: TranslatorState? = null
         private set
 
-    val onTranslatorChanged = MutableSharedFlow<Unit>()
+    private val _onTranslatorChanged = MutableSharedFlow<Unit>()
+    val onTranslatorChanged = _onTranslatorChanged.asSharedFlow()
 
     suspend fun init() {
         val source = appPreferences.GLOBAL_TRANSLATION_PREFERRED_SOURCE.value
@@ -59,16 +66,16 @@ class LiveTranslation(
         val isEnabled = settingsState.enable.value
         val source = settingsState.source.value
         val target = settingsState.target.value
-        translator = if (
+        translatorState = if (
             !isEnabled ||
             source == null ||
             target == null ||
             source.language == target.language
         ) {
-            if (translator == null) return
+            if (translatorState == null) return
             null
         } else {
-            val old = translator
+            val old = translatorState
             if (old != null && old.source == source.language && old.target == target.language)
                 return
             translationManager.getTranslator(
@@ -82,20 +89,26 @@ class LiveTranslation(
         settingsState.enable.value = it
         appPreferences.GLOBAL_TRANSLATION_ENABLED.value = it
         updateTranslatorState()
-        onTranslatorChanged.tryEmit(Unit)
+        scope.launch {
+            _onTranslatorChanged.emit(Unit)
+        }
     }
 
-    private fun oSourceChange(it: TranslationModelState?) {
+    private fun onSourceChange(it: TranslationModelState?) {
         settingsState.source.value = it
         appPreferences.GLOBAL_TRANSLATION_PREFERRED_SOURCE.value = it?.language ?: ""
         updateTranslatorState()
-        onTranslatorChanged.tryEmit(Unit)
+        scope.launch {
+            _onTranslatorChanged.emit(Unit)
+        }
     }
 
     private fun onTargetChange(it: TranslationModelState?) {
         settingsState.target.value = it
         appPreferences.GLOBAL_TRANSLATION_PREFERRED_TARGET.value = it?.language ?: ""
         updateTranslatorState()
-        onTranslatorChanged.tryEmit(Unit)
+        scope.launch {
+            _onTranslatorChanged.emit(Unit)
+        }
     }
 }
