@@ -4,9 +4,16 @@ import my.noveldokusha.tools.BookTextMapper
 
 sealed interface ReaderItem {
     val chapterUrl: String
+
+    /**
+     * Index corresponding to items of the same chapter.
+     */
     val chapterIndex: Int
 
     sealed interface Position : ReaderItem {
+        /**
+         * Index for the items of each [chapterIndex].
+         */
         val chapterItemIndex: Int
     }
 

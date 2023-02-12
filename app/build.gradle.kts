@@ -181,6 +181,11 @@ dependencies {
     implementation("com.l4digital.fastscroll:fastscroll:2.0.1")
     implementation("com.afollestad.material-dialogs:core:3.3.0")
 
+    // Media session controls
+    implementation("androidx.media3:media3-common:1.0.0-beta02")
+    implementation("androidx.media3:media3-session:1.0.0-beta02")
+    implementation("androidx.media:media:1.6.0")
+
     // Test
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")

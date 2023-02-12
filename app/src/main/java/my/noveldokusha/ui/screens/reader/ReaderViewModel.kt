@@ -44,12 +44,12 @@ class ReaderViewModel @Inject constructor(
     val chaptersLoader = readerSession.chaptersLoader
     val textToSpeechSettingData = readerSession.readerSpeaker.settings
     val readerSpeaker = readerSession.readerSpeaker
-    val chapterPercentageProgress = readerSession.chapterPercentageProgress
+    val chapterPercentageProgress = readerSession.screenScrollChapterPercentageProgress
     val orderedChapters = readerSession.orderedChapters.toList()
     var currentChapter by Delegates.observable(readerSession.currentChapter) { _, _, new ->
         readerSession.currentChapter = new
     }
-    val readingPosStats = readerSession.readingPosStats
+    val readingPosStats = readerSession.screenScrollReadingPosStats
 
     val liveTranslationSettingState = readerSession.liveTranslation.settingsState
     val onTranslatorChanged = readerSession.liveTranslation.onTranslatorChanged
