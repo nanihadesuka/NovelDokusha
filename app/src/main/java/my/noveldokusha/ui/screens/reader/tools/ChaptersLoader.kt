@@ -5,10 +5,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import my.noveldokusha.data.Response
 import my.noveldokusha.data.database.tables.Chapter
 import my.noveldokusha.repository.Repository
-import my.noveldokusha.ui.screens.reader.ChapterState
-import my.noveldokusha.ui.screens.reader.ChapterStats
-import my.noveldokusha.ui.screens.reader.ReaderItem
-import my.noveldokusha.ui.screens.reader.ReaderState
+import my.noveldokusha.ui.screens.reader.*
 import timber.log.Timber
 import kotlin.coroutines.CoroutineContext
 
@@ -54,6 +51,37 @@ class ChaptersLoader(
     }
 
     fun getItems(): List<ReaderItem> = items
+    fun getItemContext(itemIndex: Int, chapterUrl: String): ReadingChapterPosStats? {
+        val item = items.getOrNull(itemIndex) ?: return null
+        if (item !is ReaderItem.Position) return null
+        val chapterStats = chaptersStats[chapterUrl] ?: return null
+        return ReadingChapterPosStats(
+            chapterPosition = item.chapterPosition,
+            chapterCount = orderedChapters.size,
+            chapterItemPosition = item.chapterItemPosition,
+            chapterItemsCount = chapterStats.itemsCount,
+            chapterTitle = chapterStats.chapter.title
+        )
+    }
+    fun getItemContext(chapterPosition: Int, chapterItemPosition: Int): ReadingChapterPosStats? {
+        val itemIndex = indexOfReaderItem(
+            list = items,
+            chapterPosition = chapterPosition,
+            chapterItemPosition = chapterItemPosition
+        )
+        val item = items.getOrNull(itemIndex) ?: return null
+        if (item !is ReaderItem.Position) return null
+        val chapterStats = chaptersStats[item.chapterUrl] ?: return null
+        return ReadingChapterPosStats(
+            chapterPosition = item.chapterPosition,
+            chapterCount = orderedChapters.size,
+            chapterItemPosition = item.chapterItemPosition,
+            chapterItemsCount = chapterStats.itemsCount,
+            chapterTitle = chapterStats.chapter.title
+        )
+    }
+
+
     fun isLastChapter(chapterIndex: Int): Boolean = chapterIndex == orderedChapters.lastIndex
     fun isChapterIndexLoaded(chapterIndex: Int): Boolean {
         return orderedChapters.getOrNull(chapterIndex)?.url
@@ -293,13 +321,13 @@ class ChaptersLoader(
             }
         }
 
-        val previousIndex = firstItem.chapterIndex - 1
+        val previousIndex = firstItem.chapterPosition - 1
         if (previousIndex < 0) {
             maintainLastVisiblePosition {
                 insert(
                     ReaderItem.BookStart(
                         chapterUrl = firstItem.chapterUrl,
-                        chapterIndex = previousIndex
+                        chapterPosition = previousIndex
                     )
                 )
                 forceUpdateListViewState()
@@ -334,7 +362,7 @@ class ChaptersLoader(
             readerState = ReaderState.IDLE
             return@withContext
         }
-        val nextIndex = lastItem.chapterIndex + 1
+        val nextIndex = lastItem.chapterPosition + 1
 
         val insert: suspend (ReaderItem) -> Unit = {
             withContext(Dispatchers.Main.immediate) {
@@ -359,7 +387,7 @@ class ChaptersLoader(
             insert(
                 ReaderItem.BookEnd(
                     chapterUrl = lastItem.chapterUrl,
-                    chapterIndex = nextIndex,
+                    chapterPosition = nextIndex,
                 )
             )
             forceUpdateListViewState()
@@ -394,14 +422,14 @@ class ChaptersLoader(
         val chapter = orderedChapters[index]
         val itemProgressBar = ReaderItem.Progressbar(
             chapterUrl = chapter.url,
-            chapterIndex = index,
+            chapterPosition = index,
         )
         var chapterItemIndex = 0
         val itemTitle = ReaderItem.Title(
             chapterUrl = chapter.url,
-            chapterIndex = index,
+            chapterPosition = index,
             text = chapter.title,
-            chapterItemIndex = chapterItemIndex,
+            chapterItemPosition = chapterItemIndex,
         ).copy(
             textTranslated = translateOrNull(chapter.title) ?: chapter.title
         )
@@ -411,7 +439,7 @@ class ChaptersLoader(
             insert(
                 ReaderItem.Divider(
                     chapterUrl = chapter.url,
-                    chapterIndex = index,
+                    chapterPosition = index,
                 )
             )
             insert(itemTitle)
@@ -433,14 +461,14 @@ class ChaptersLoader(
                 val itemTranslationAttribution = if (translationIsActive()) {
                     ReaderItem.GoogleTranslateAttribution(
                         chapterUrl = chapter.url,
-                        chapterIndex = index,
+                        chapterPosition = index,
                     )
                 } else null
 
                 val itemTranslating = if (translationIsActive()) {
                     ReaderItem.Translating(
                         chapterUrl = chapter.url,
-                        chapterIndex = index,
+                        chapterPosition = index,
                         sourceLang = translationSourceLanguageOrNull() ?: "",
                         targetLang = translationTargetLanguageOrNull() ?: "",
                     )
@@ -467,7 +495,7 @@ class ChaptersLoader(
                     chaptersStats[chapter.url] = ChapterStats(
                         chapter = chapter,
                         itemsCount = items.size,
-                        chapterIndex = index
+                        orderedChaptersIndex = index
                     )
                 }
 
@@ -483,7 +511,7 @@ class ChaptersLoader(
                     insert(
                         ReaderItem.Divider(
                             chapterUrl = chapter.url,
-                            chapterIndex = index,
+                            chapterPosition = index,
                         )
                     )
                     forceUpdateListViewState()
@@ -498,7 +526,7 @@ class ChaptersLoader(
                     chaptersStats[chapter.url] = ChapterStats(
                         chapter = chapter,
                         itemsCount = 1,
-                        chapterIndex = index
+                        orderedChaptersIndex = index
                     )
                 }
                 maintainPosition {
@@ -506,7 +534,7 @@ class ChaptersLoader(
                     insert(
                         ReaderItem.Error(
                             chapterUrl = chapter.url,
-                            chapterIndex = index,
+                            chapterPosition = index,
                             text = res.message,
                         )
                     )

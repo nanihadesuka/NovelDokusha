@@ -403,10 +403,10 @@ private fun ViewsPreview() {
             mutableStateOf(
                 TextSynthesis(
                     playState = Utterance.PlayState.PLAYING,
-                    item = ReaderItem.Title(
+                    itemPos = ReaderItem.Title(
                         chapterUrl = "",
-                        chapterItemIndex = 1,
-                        chapterIndex = 1,
+                        chapterItemPosition = 1,
+                        chapterPosition = 1,
                         text = ""
                     )
                 )

@@ -45,15 +45,15 @@ private fun generateITEM(
 ): ReaderItem = when (val imgEntry = BookTextMapper.ImgEntry.fromXMLString(text)) {
     null -> ReaderItem.Body(
         chapterUrl = chapterUrl,
-        chapterIndex = chapterIndex,
-        chapterItemIndex = chapterItemIndex,
+        chapterPosition = chapterIndex,
+        chapterItemPosition = chapterItemIndex,
         text = text,
         location = location
     )
     else -> ReaderItem.Image(
         chapterUrl = chapterUrl,
-        chapterIndex = chapterIndex,
-        chapterItemIndex = chapterItemIndex,
+        chapterPosition = chapterIndex,
+        chapterItemPosition = chapterItemIndex,
         text = text,
         location = location,
         image = imgEntry

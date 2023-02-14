@@ -15,7 +15,6 @@ import my.noveldokusha.repository.Repository
 import my.noveldokusha.services.NarratorMediaPlayerService
 import my.noveldokusha.tools.TranslationManager
 import my.noveldokusha.ui.screens.reader.tools.*
-import kotlin.math.ceil
 import kotlin.properties.Delegates
 
 class ReaderSession(
@@ -32,10 +31,11 @@ class ReaderSession(
     val setInitialPosition: suspend (ItemPosition) -> Unit,
     val showInvalidChapterDialog: suspend () -> Unit,
 ) {
+    private var bookCoverUrl: String? = null
+    private var chapterUrl: String = initialChapterUrl
 
-    var chapterUrl: String = initialChapterUrl
-
-    val orderedChapters = mutableListOf<Chapter>()
+    private val readRoutine = ChaptersIsReadRoutine(repository)
+    private val orderedChapters = mutableListOf<Chapter>()
 
     var currentChapter: ChapterState by Delegates.observable(
         ChapterState(
@@ -53,33 +53,17 @@ class ReaderSession(
         )
     }
 
-    val screenScrollReadingPosStats = mutableStateOf<ReadingChapterPosStats?>(null)
-    val screenScrollChapterPercentageProgress = derivedStateOf {
-        val stats = screenScrollReadingPosStats.value ?: return@derivedStateOf 0f
-        when (stats.chapterItemsCount) {
-            0 -> 100f
-            else -> ceil((stats.chapterItemIndex.toFloat() / stats.chapterItemsCount.toFloat()) * 100f)
-        }
+    val readingStats = mutableStateOf<ReadingChapterPosStats?>(null)
+    val readingChapterProgressPercentage = derivedStateOf {
+        readingStats.value?.chapterReadPercentage() ?: 0f
     }
 
-    val speakerChapterPercentageProgress = derivedStateOf {
-        val item = readerSpeaker.currentTextPlaying.value.item
-        val stats = getItemPosStats(itemIndex = item.chapterItemIndex, chapterUrl = item.chapterUrl)
-            ?: return@derivedStateOf 0f
-        when (stats.chapterItemsCount) {
-            0 -> 100f
-            else -> ceil((stats.chapterItemIndex.toFloat() / stats.chapterItemsCount.toFloat()) * 100f)
-        }
-    }
-
-    val isReaderInSpeakModeStarted =  derivedStateOf {
-        readerSpeaker.settings.isThereActiveItem.value ||
-                readerSpeaker.settings.isPlaying.value
-    }
-
-    val isReaderInSpeakMode = derivedStateOf {
-        readerSpeaker.settings.isThereActiveItem.value &&
-                readerSpeaker.settings.isPlaying.value
+    val speakerStats = derivedStateOf {
+        val item = readerSpeaker.currentTextPlaying.value.itemPos
+        chaptersLoader.getItemContext(
+            chapterPosition = item.chapterPosition,
+            chapterItemPosition = item.chapterItemPosition
+        )
     }
 
     val liveTranslation = LiveTranslation(
@@ -139,6 +123,7 @@ class ReaderSession(
 
     private fun initLoadData() {
         scope.launch {
+            val book = async(Dispatchers.IO) { repository.libraryBooks.get(bookUrl) }
             val chapter = async(Dispatchers.IO) { repository.bookChapters.get(chapterUrl) }
             val loadTranslator = async(Dispatchers.IO) { liveTranslation.init() }
             val chaptersList = async(Dispatchers.Default) {
@@ -149,6 +134,7 @@ class ReaderSession(
             }
             chaptersList.await()
             loadTranslator.await()
+            bookCoverUrl = book.await()?.coverImageUrl
             currentChapter = ChapterState(
                 chapterUrl = chapterUrl,
                 chapterItemIndex = chapter.await()?.lastReadPosition ?: 0,
@@ -186,7 +172,7 @@ class ReaderSession(
         }
 
         scope.launch(Dispatchers.Main.immediate) {
-            snapshotFlow { isReaderInSpeakModeStarted.value }
+            snapshotFlow { readerSpeaker.isActive.value }
                 .filter { it }
                 .collectLatest {
                     NarratorMediaPlayerService.start(context)
@@ -195,9 +181,9 @@ class ReaderSession(
 
         scope.launch(Dispatchers.Main.immediate) {
             readerSpeaker
-                .currentReaderItemFlow
+                .currentReaderItem
                 .debounce(timeoutMillis = 5_000)
-                .filter { isReaderInSpeakMode.value }
+                .filter { readerSpeaker.isSpeaking.value }
                 .collect {
                     saveLastReadPositionFromCurrentSpeakItem()
                 }
@@ -205,10 +191,10 @@ class ReaderSession(
 
         scope.launch(Dispatchers.Main.immediate) {
             readerSpeaker
-                .currentReaderItemFlow
-                .filter { isReaderInSpeakMode.value }
+                .currentReaderItem
+                .filter { readerSpeaker.isSpeaking.value }
                 .collect {
-                    val item = it.item
+                    val item = it.itemPos
                     if (item !is ReaderItem.ParagraphLocation) return@collect
                     when (item.location) {
                         ReaderItem.Location.FIRST -> markChapterStartAsSeen(chapterUrl = item.chapterUrl)
@@ -224,7 +210,7 @@ class ReaderSession(
         readerSpeaker.start()
         scope.launch {
             readerSpeaker.readChapterStartingFromItemIndex(
-                chapterIndex = startingItem.chapterIndex,
+                chapterIndex = startingItem.chapterPosition,
                 itemIndex = itemIndex
             )
         }
@@ -232,13 +218,14 @@ class ReaderSession(
 
     fun close() {
         chaptersLoader.coroutineContext.cancelChildren()
-        if (isReaderInSpeakMode.value) {
+        if (readerSpeaker.isSpeaking.value) {
             saveLastReadPositionFromCurrentSpeakItem()
         } else {
             saveLastReadPositionState(repository, bookUrl, currentChapter)
         }
         readerSpeaker.onClose()
         scope.coroutineContext.cancelChildren()
+        NarratorMediaPlayerService.stop(context)
     }
 
     fun reloadReader() {
@@ -247,23 +234,13 @@ class ReaderSession(
     }
 
     fun updateInfoViewTo(itemIndex: Int) {
-        val stats = getItemPosStats(itemIndex = itemIndex, chapterUrl = chapterUrl) ?: return
-        screenScrollReadingPosStats.value = stats
+        val stats = chaptersLoader.getItemContext(
+            itemIndex = itemIndex,
+            chapterUrl = chapterUrl
+        ) ?: return
+        readingStats.value = stats
     }
 
-    fun getItemPosStats(itemIndex: Int, chapterUrl: String) : ReadingChapterPosStats? {
-        val item = items.getOrNull(itemIndex) ?: return null
-        if (item !is ReaderItem.Position) return null
-        val stats = chaptersLoader.chaptersStats[chapterUrl] ?: return null
-        return ReadingChapterPosStats(
-            chapterIndex = item.chapterIndex,
-            chapterItemIndex = item.chapterItemIndex,
-            chapterItemsCount = stats.itemsCount,
-            chapterTitle = stats.chapter.title
-        )
-    }
-
-    private val readRoutine = ChaptersIsReadRoutine(repository)
 
     fun markChapterStartAsSeen(chapterUrl: String) {
         readRoutine.setReadStart(chapterUrl = chapterUrl)
@@ -274,13 +251,13 @@ class ReaderSession(
     }
 
     private fun saveLastReadPositionFromCurrentSpeakItem() {
-        val item = readerSpeaker.settings.currentActiveItemState.value.item
+        val item = readerSpeaker.settings.currentActiveItemState.value.itemPos
         saveLastReadPositionState(
             repository = repository,
             bookUrl = bookUrl,
             chapter = ChapterState(
                 chapterUrl = item.chapterUrl,
-                chapterItemIndex = item.chapterItemIndex,
+                chapterItemIndex = item.chapterItemPosition,
                 offset = 0
             )
         )

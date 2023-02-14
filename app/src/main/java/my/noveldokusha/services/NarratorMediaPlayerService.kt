@@ -17,9 +17,11 @@ import androidx.media3.session.SessionResult
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.mapNotNull
 import my.noveldokusha.R
 import my.noveldokusha.ui.screens.reader.ReaderManager
+import my.noveldokusha.ui.screens.reader.chapterReadPercentage
 import my.noveldokusha.utils.NotificationsCenter
 import my.noveldokusha.utils.isServiceRunning
 import my.noveldokusha.utils.text
@@ -42,6 +44,10 @@ class NarratorMediaPlayerService : Service(), CoroutineScope {
                     ctx,
                     Intent(ctx, NarratorMediaPlayerService::class.java)
                 )
+        }
+
+        fun stop(ctx: Context) {
+            ctx.stopService(Intent(ctx, NarratorMediaPlayerService::class.java))
         }
 
         fun isRunning(context: Context): Boolean =
@@ -107,19 +113,29 @@ class NarratorMediaPlayerService : Service(), CoroutineScope {
 
         launch {
             snapshotFlow { readerSession.readerSpeaker.currentTextPlaying.value }
-                .mapNotNull { readerSession.orderedChapters.getOrNull(it.item.chapterIndex) }
+                .mapNotNull { readerSession.chaptersLoader.chaptersStats[it.itemPos.chapterUrl] }
                 .collectLatest {
                     notificationsCenter.modifyNotification(notificationBuilder, channel_id) {
-                        title = it.title
+                        title = it.chapter.title
                     }
                 }
         }
 
         launch {
-            snapshotFlow { readerSession.speakerChapterPercentageProgress.value }
+            snapshotFlow { readerSession.speakerStats.value }
+                .filterNotNull()
                 .collectLatest {
+                    val chapterPos = getString(
+                        R.string.chapter_x_over_n,
+                        it.chapterPosition + 1,
+                        it.chapterCount
+                    )
+                    val progress = getString(
+                        R.string.progress_x_percentage,
+                        it.chapterReadPercentage()
+                    )
                     notificationsCenter.modifyNotification(notificationBuilder, channel_id) {
-                        text = getString(R.string.progress_x_percentage, it)
+                        text = "$chapterPos  $progress"
                     }
                 }
         }

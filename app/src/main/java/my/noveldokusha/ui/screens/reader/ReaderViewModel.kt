@@ -38,18 +38,17 @@ class ReaderViewModel @Inject constructor(
     val textSize by appPreferences.READER_FONT_SIZE.state(viewModelScope)
     val isTextSelectable by appPreferences.READER_SELECTABLE_TEXT.state(viewModelScope)
 
-    var showReaderInfoView by mutableStateOf(false)
+    var showReaderInfoAndSettings by mutableStateOf(false)
 
     val items = readerSession.items
     val chaptersLoader = readerSession.chaptersLoader
     val textToSpeechSettingData = readerSession.readerSpeaker.settings
     val readerSpeaker = readerSession.readerSpeaker
-    val chapterPercentageProgress = readerSession.screenScrollChapterPercentageProgress
-    val orderedChapters = readerSession.orderedChapters.toList()
-    var currentChapter by Delegates.observable(readerSession.currentChapter) { _, _, new ->
+    val chapterPercentageProgress = readerSession.readingChapterProgressPercentage
+    var readingCurrentChapter by Delegates.observable(readerSession.currentChapter) { _, _, new ->
         readerSession.currentChapter = new
     }
-    val readingPosStats = readerSession.screenScrollReadingPosStats
+    val readingPosStats = readerSession.readingStats
 
     val liveTranslationSettingState = readerSession.liveTranslation.settingsState
     val onTranslatorChanged = readerSession.liveTranslation.onTranslatorChanged
@@ -58,7 +57,9 @@ class ReaderViewModel @Inject constructor(
     val ttsScrolledToTheBottom = readerSession.readerSpeaker.scrolledToTheBottom
 
     fun onBackPressed() {
-        readerManager.close()
+        if (!showReaderInfoAndSettings) {
+            readerManager.close()
+        }
     }
 
     fun onViewDestroyed() {

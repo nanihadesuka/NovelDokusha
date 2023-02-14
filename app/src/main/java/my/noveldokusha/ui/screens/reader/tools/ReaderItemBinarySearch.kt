@@ -4,18 +4,18 @@ import my.noveldokusha.ui.screens.reader.ReaderItem
 
 fun indexOfReaderItem(
     list: List<ReaderItem>,
-    chapterIndex: Int,
-    chapterItemIndex: Int
+    chapterPosition: Int,
+    chapterItemPosition: Int
 ): Int = when {
     list.size < 128 -> indexOfReaderItemLinearSearch(
         list = list,
-        chapterIndex = chapterIndex,
-        chapterItemIndex = chapterItemIndex
+        chapterPosition = chapterPosition,
+        chapterItemPosition = chapterItemPosition
     )
     else -> indexOfReaderItemBinarySearch(
         list = list,
-        chapterIndex = chapterIndex,
-        chapterItemIndex = chapterItemIndex
+        chapterPosition = chapterPosition,
+        chapterItemPosition = chapterItemPosition
     )
 }
 
@@ -24,12 +24,12 @@ fun indexOfReaderItem(
  */
 fun indexOfReaderItemLinearSearch(
     list: List<ReaderItem>,
-    chapterIndex: Int,
-    chapterItemIndex: Int
+    chapterPosition: Int,
+    chapterItemPosition: Int
 ) = list.indexOfFirst {
-    it.chapterIndex == chapterIndex &&
+    it.chapterPosition == chapterPosition &&
             it is ReaderItem.Position &&
-            it.chapterItemIndex == chapterItemIndex
+            it.chapterItemPosition == chapterItemPosition
 }
 
 /**
@@ -37,8 +37,8 @@ fun indexOfReaderItemLinearSearch(
  */
 fun indexOfReaderItemBinarySearch(
     list: List<ReaderItem>,
-    chapterIndex: Int,
-    chapterItemIndex: Int
+    chapterPosition: Int,
+    chapterItemPosition: Int
 ): Int {
     var low = 0
     var high = list.lastIndex
@@ -46,14 +46,14 @@ fun indexOfReaderItemBinarySearch(
     while (low < high) {
         var mid = low + (high - low) / 2
         val it = list[mid]
-        val compare = when (val compareChapter = it.chapterIndex.compareTo(chapterIndex)) {
+        val compare = when (val compareChapter = it.chapterPosition.compareTo(chapterPosition)) {
             0 -> when (it) {
-                is ReaderItem.Position -> it.chapterItemIndex.compareTo(chapterItemIndex)
+                is ReaderItem.Position -> it.chapterItemPosition.compareTo(chapterItemPosition)
                 else -> {
                     // We don't have a position, try to find one and make that the mid point
                     val index = list.subList(mid, high)
                         .asSequence()
-                        .takeWhile { it.chapterIndex == chapterIndex }
+                        .takeWhile { it.chapterPosition == chapterPosition }
                         .indexOfFirst { it is ReaderItem.Position }
 
                     if (index == -1) {
@@ -61,7 +61,7 @@ fun indexOfReaderItemBinarySearch(
                     } else {
                         mid += index
                         val item = list[mid] as ReaderItem.Position
-                        item.chapterItemIndex.compareTo(chapterItemIndex)
+                        item.chapterItemPosition.compareTo(chapterItemPosition)
                     }
                 }
             }

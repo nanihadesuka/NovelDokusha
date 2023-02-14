@@ -77,7 +77,7 @@ class ReaderActivity : BaseActivity() {
                 onChapterStartVisible = viewModel::markChapterStartAsSeen,
                 onChapterEndVisible = viewModel::markChapterEndAsSeen,
                 onReloadReader = ::reloadReader,
-                onClick = { viewModel.showReaderInfoView = !viewModel.showReaderInfoView },
+                onClick = { viewModel.showReaderInfoAndSettings = !viewModel.showReaderInfoAndSettings },
             )
         }
     }
@@ -85,7 +85,7 @@ class ReaderActivity : BaseActivity() {
     private val fontsLoader = FontsLoader()
 
     private fun reloadReader() {
-        val currentChapter = viewModel.currentChapter.copy()
+        val currentChapter = viewModel.readingCurrentChapter.copy()
         viewModel.reloadReader()
         viewModel.chaptersLoader.tryLoadRestartedInitial(currentChapter)
     }
@@ -193,18 +193,18 @@ class ReaderActivity : BaseActivity() {
             )
         }
 
-        viewModel.readerSpeaker.currentReaderItemLiveData.observe(this) {
+        viewModel.readerSpeaker.currentReaderItem.asLiveData().observe(this) {
             scrollToReadingPositionOptional(
-                chapterIndex = it.item.chapterIndex,
-                chapterItemIndex = it.item.chapterItemIndex,
+                chapterIndex = it.itemPos.chapterPosition,
+                chapterItemIndex = it.itemPos.chapterItemPosition,
             )
         }
 
         viewModel.readerSpeaker.scrollToReaderItem.asLiveData().observe(this) {
             if (it !is ReaderItem.Position) return@observe
             scrollToReadingPositionForced(
-                chapterIndex = it.chapterIndex,
-                chapterItemIndex = it.chapterItemIndex,
+                chapterIndex = it.chapterPosition,
+                chapterItemIndex = it.chapterItemPosition,
             )
         }
 
@@ -259,20 +259,20 @@ class ReaderActivity : BaseActivity() {
                 }
 
                 // Capture back action when viewing info
-                BackHandler(enabled = viewModel.showReaderInfoView) {
-                    viewModel.showReaderInfoView = false
+                BackHandler(enabled = viewModel.showReaderInfoAndSettings) {
+                    viewModel.showReaderInfoAndSettings = false
                 }
 
                 // Reader info
                 ReaderInfoView(
                     chapterTitle = viewModel.readingPosStats.value?.chapterTitle ?: "",
-                    chapterCurrentNumber = viewModel.readingPosStats.value?.run { chapterIndex + 1 }
+                    chapterCurrentNumber = viewModel.readingPosStats.value?.run { chapterPosition + 1 }
                         ?: 0,
                     chapterPercentageProgress = viewModel.chapterPercentageProgress.value,
-                    chaptersTotalSize = viewModel.orderedChapters.size,
+                    chaptersTotalSize = viewModel.readingPosStats.value?.chapterCount ?: 0,
                     textFont = viewModel.textFont,
                     textSize = viewModel.textSize,
-                    visible = viewModel.showReaderInfoView,
+                    visible = viewModel.showReaderInfoAndSettings,
                     onTextFontChanged = { appPreferences.READER_FONT_FAMILY.value = it },
                     onTextSizeChanged = { appPreferences.READER_FONT_SIZE.value = it },
                     liveTranslationSettingData = viewModel.liveTranslationSettingState,
@@ -290,7 +290,7 @@ class ReaderActivity : BaseActivity() {
         }
 
         viewBind.listView.setOnItemClickListener { _, _, _, _ ->
-            viewModel.showReaderInfoView = !viewModel.showReaderInfoView
+            viewModel.showReaderInfoAndSettings = !viewModel.showReaderInfoAndSettings
         }
 
         viewBind.listView.setOnScrollListener(
@@ -349,9 +349,9 @@ class ReaderActivity : BaseActivity() {
         for (index in firstIndex..lastIndex) {
             val item = viewAdapter.listView.getItem(index)
             if (
-                item.chapterIndex == chapterIndex &&
+                item.chapterPosition == chapterIndex &&
                 item is ReaderItem.Position &&
-                item.chapterItemIndex == chapterItemIndex
+                item.chapterItemPosition == chapterItemIndex
             ) {
                 val viewIndex = index - viewBind.listView.firstVisiblePosition
                 val currentOffsetPx =
@@ -372,8 +372,8 @@ class ReaderActivity : BaseActivity() {
         // Search for the item being read otherwise do nothing
         val itemIndex = indexOfReaderItem(
             list = viewModel.items,
-            chapterIndex = chapterIndex,
-            chapterItemIndex = chapterItemIndex
+            chapterPosition = chapterIndex,
+            chapterItemPosition = chapterItemIndex
         )
         if (itemIndex == -1) return
         val itemPosition = viewAdapter.listView.fromIndexToPosition(itemIndex)
@@ -415,8 +415,8 @@ class ReaderActivity : BaseActivity() {
     ) {
         val index = indexOfReaderItem(
             list = viewModel.items,
-            chapterIndex = chapterIndex,
-            chapterItemIndex = chapterItemIndex
+            chapterPosition = chapterIndex,
+            chapterItemPosition = chapterItemIndex
         )
         val position = viewAdapter.listView.fromIndexToPosition(index)
         if (index != -1) {
@@ -445,9 +445,9 @@ class ReaderActivity : BaseActivity() {
         val item = viewModel.items.getOrNull(firstVisibleItemIndex) ?: return
         if (item is ReaderItem.Position) {
             val offset = viewBind.listView.run { getChildAt(0).top - paddingTop }
-            viewModel.currentChapter = ChapterState(
+            viewModel.readingCurrentChapter = ChapterState(
                 chapterUrl = item.chapterUrl,
-                chapterItemIndex = item.chapterItemIndex,
+                chapterItemIndex = item.chapterItemPosition,
                 offset = offset
             )
         }

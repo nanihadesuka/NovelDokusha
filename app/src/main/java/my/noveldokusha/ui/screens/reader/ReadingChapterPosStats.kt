@@ -1,6 +1,7 @@
 package my.noveldokusha.ui.screens.reader
 
 import my.noveldokusha.data.database.tables.Chapter
+import kotlin.math.ceil
 
 enum class ReaderState {
     IDLE,
@@ -11,7 +12,7 @@ enum class ReaderState {
 data class ChapterStats(
     val itemsCount: Int,
     val chapter: Chapter,
-    val chapterIndex: Int
+    val orderedChaptersIndex: Int
 )
 
 data class ChapterState(
@@ -21,8 +22,14 @@ data class ChapterState(
 )
 
 data class ReadingChapterPosStats(
-    val chapterIndex: Int,
-    val chapterItemIndex: Int,
+    val chapterPosition: Int,
+    val chapterCount: Int,
+    val chapterItemPosition: Int,
     val chapterItemsCount: Int,
     val chapterTitle: String,
 )
+
+fun ReadingChapterPosStats.chapterReadPercentage() = when(chapterItemsCount) {
+    0 -> 100f
+    else -> ceil((chapterItemPosition.toFloat() / chapterItemsCount.toFloat()) * 100f)
+}
