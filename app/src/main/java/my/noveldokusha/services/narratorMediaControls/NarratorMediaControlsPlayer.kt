@@ -1,4 +1,4 @@
-package my.noveldokusha.services
+package my.noveldokusha.services.narratorMediaControls
 
 import android.os.Looper
 import android.view.Surface
@@ -10,7 +10,7 @@ import androidx.media3.common.text.CueGroup
 import timber.log.Timber
 
 @androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
-fun createNarratorSessionPlayer(): Player = object : BasePlayer() {
+fun createNarratorMediaControlsPlayer(): Player = object : BasePlayer() {
 
     val readerAvailableCommands = Player.Commands.Builder()
         .add(Player.COMMAND_PLAY_PAUSE)

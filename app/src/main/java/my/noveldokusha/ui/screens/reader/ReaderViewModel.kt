@@ -8,6 +8,7 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import my.noveldokusha.AppPreferences
 import my.noveldokusha.ui.BaseViewModel
+import my.noveldokusha.utils.StateExtra_Boolean
 import my.noveldokusha.utils.StateExtra_String
 import javax.inject.Inject
 import kotlin.properties.Delegates
@@ -15,6 +16,7 @@ import kotlin.properties.Delegates
 interface ReaderStateBundle {
     var bookUrl: String
     var chapterUrl: String
+    var introScrollToSpeaker: Boolean
 }
 
 @HiltViewModel
@@ -28,6 +30,7 @@ class ReaderViewModel @Inject constructor(
 
     override var bookUrl by StateExtra_String(state)
     override var chapterUrl by StateExtra_String(state)
+    override var introScrollToSpeaker by StateExtra_Boolean(state)
 
     private val readerSession = readerManager.initiateOrGetSession(
         bookUrl = bookUrl,

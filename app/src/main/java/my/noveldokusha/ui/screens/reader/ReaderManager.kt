@@ -26,7 +26,7 @@ class ReaderManager(
 ) : ReaderManagerViewCallReferences {
 
     var session: ReaderSession? = null
-
+        private set
 
     @Volatile
     override var forceUpdateListViewState: (suspend () -> Unit)? = null
@@ -47,7 +47,13 @@ class ReaderManager(
         bookUrl: String,
         chapterUrl: String,
     ): ReaderSession {
-        session?.let { return it }
+        session?.let {
+            if (bookUrl == it.bookUrl) {
+                return it
+            } else {
+                it.close()
+            }
+        }
 
         return ReaderSession(
             bookUrl = bookUrl,
@@ -63,8 +69,8 @@ class ReaderManager(
             showInvalidChapterDialog = { withMainNow { showInvalidChapterDialog?.invoke() } },
             context = context
         ).also {
-            it.init()
             session = it
+            it.init()
         }
     }
 

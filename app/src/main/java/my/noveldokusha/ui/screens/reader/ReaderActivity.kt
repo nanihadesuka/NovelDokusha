@@ -35,24 +35,28 @@ import my.noveldokusha.ui.screens.main.settings.SettingsViewModel
 import my.noveldokusha.ui.screens.reader.tools.FontsLoader
 import my.noveldokusha.ui.screens.reader.tools.indexOfReaderItem
 import my.noveldokusha.ui.theme.Theme
-import my.noveldokusha.utils.Extra_String
-import my.noveldokusha.utils.colorAttrRes
-import my.noveldokusha.utils.dpToPx
-import my.noveldokusha.utils.fadeIn
+import my.noveldokusha.utils.*
 
 @AndroidEntryPoint
 class ReaderActivity : BaseActivity() {
     class IntentData : Intent, ReaderStateBundle {
         override var bookUrl by Extra_String()
         override var chapterUrl by Extra_String()
+        override var introScrollToSpeaker by Extra_Boolean()
 
         constructor(intent: Intent) : super(intent)
-        constructor(ctx: Context, bookUrl: String, chapterUrl: String) : super(
+        constructor(
+            ctx: Context,
+            bookUrl: String,
+            chapterUrl: String,
+            scrollToSpeakingItem: Boolean = false
+        ) : super(
             ctx,
             ReaderActivity::class.java
         ) {
             this.bookUrl = bookUrl
             this.chapterUrl = chapterUrl
+            this.introScrollToSpeaker = scrollToSpeakingItem
         }
     }
 
@@ -77,7 +81,9 @@ class ReaderActivity : BaseActivity() {
                 onChapterStartVisible = viewModel::markChapterStartAsSeen,
                 onChapterEndVisible = viewModel::markChapterEndAsSeen,
                 onReloadReader = ::reloadReader,
-                onClick = { viewModel.showReaderInfoAndSettings = !viewModel.showReaderInfoAndSettings },
+                onClick = {
+                    viewModel.showReaderInfoAndSettings = !viewModel.showReaderInfoAndSettings
+                },
             )
         }
     }
@@ -335,6 +341,15 @@ class ReaderActivity : BaseActivity() {
             delay(200)
             fadeInTextLiveData.postValue(true)
         }
+
+        if (viewModel.introScrollToSpeaker) {
+            viewModel.introScrollToSpeaker = false
+            val itemPos = viewModel.readerSpeaker.currentTextPlaying.value.itemPos
+            scrollToReadingPositionImmediately(
+                chapterIndex = itemPos.chapterPosition,
+                chapterItemIndex = itemPos.chapterItemPosition,
+            )
+        }
     }
 
     private fun scrollToReadingPositionOptional(chapterIndex: Int, chapterItemIndex: Int) {
@@ -380,6 +395,21 @@ class ReaderActivity : BaseActivity() {
         val newOffsetPx = 200.dpToPx(this@ReaderActivity)
         viewAdapter.listView.notifyDataSetChanged()
         viewBind.listView.smoothScrollToPositionFromTop(itemPosition, newOffsetPx, 500)
+        viewAdapter.listView.notifyDataSetChanged()
+    }
+
+    private fun scrollToReadingPositionImmediately(chapterIndex: Int, chapterItemIndex: Int) {
+        // Search for the item being read otherwise do nothing
+        val itemIndex = indexOfReaderItem(
+            list = viewModel.items,
+            chapterPosition = chapterIndex,
+            chapterItemPosition = chapterItemIndex
+        )
+        if (itemIndex == -1) return
+        val itemPosition = viewAdapter.listView.fromIndexToPosition(itemIndex)
+        val newOffsetPx = 200.dpToPx(this@ReaderActivity)
+        viewAdapter.listView.notifyDataSetChanged()
+        viewBind.listView.setSelectionFromTop(itemPosition, newOffsetPx)
         viewAdapter.listView.notifyDataSetChanged()
     }
 

@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.take
 import my.noveldokusha.AppPreferences
 import my.noveldokusha.data.database.tables.Chapter
 import my.noveldokusha.repository.Repository
-import my.noveldokusha.services.NarratorMediaPlayerService
+import my.noveldokusha.services.narratorMediaControls.NarratorMediaControlsService
 import my.noveldokusha.tools.TranslationManager
 import my.noveldokusha.ui.screens.reader.tools.*
 import kotlin.properties.Delegates
@@ -175,7 +175,7 @@ class ReaderSession(
             snapshotFlow { readerSpeaker.isActive.value }
                 .filter { it }
                 .collectLatest {
-                    NarratorMediaPlayerService.start(context)
+                    NarratorMediaControlsService.start(context)
                 }
         }
 
@@ -225,7 +225,7 @@ class ReaderSession(
         }
         readerSpeaker.onClose()
         scope.coroutineContext.cancelChildren()
-        NarratorMediaPlayerService.stop(context)
+        NarratorMediaControlsService.stop(context)
     }
 
     fun reloadReader() {

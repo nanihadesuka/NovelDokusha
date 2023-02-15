@@ -56,7 +56,7 @@
 			android:exported="false"
 			/>
 		<service
-			android:name=".services.NarratorMediaPlayerService"
+			android:name=".services.narratorMediaControls.NarratorMediaControlsService"
 			android:exported="false"
 			android:foregroundServiceType="mediaPlayback"
 			></service>
