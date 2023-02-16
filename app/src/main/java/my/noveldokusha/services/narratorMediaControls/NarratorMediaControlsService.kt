@@ -25,8 +25,8 @@ import my.noveldokusha.services.BackupDataService
 import my.noveldokusha.ui.screens.chaptersList.ChaptersActivity
 import my.noveldokusha.ui.screens.main.MainActivity
 import my.noveldokusha.ui.screens.reader.ReaderActivity
-import my.noveldokusha.ui.screens.reader.ReaderManager
-import my.noveldokusha.ui.screens.reader.ReaderSession
+import my.noveldokusha.ui.screens.reader.manager.ReaderManager
+import my.noveldokusha.ui.screens.reader.manager.ReaderSession
 import my.noveldokusha.ui.screens.reader.chapterReadPercentage
 import my.noveldokusha.utils.NotificationsCenter
 import my.noveldokusha.utils.isServiceRunning
@@ -121,8 +121,8 @@ class NarratorMediaControlsService : Service(), CoroutineScope {
 
         // Update chapter notification title
         launch {
-            snapshotFlow { readerSession.readerSpeaker.currentTextPlaying.value }
-                .mapNotNull { readerSession.chaptersLoader.chaptersStats[it.itemPos.chapterUrl] }
+            snapshotFlow { readerSession.readerTextToSpeech.currentTextPlaying.value }
+                .mapNotNull { readerSession.readerChaptersLoader.chaptersStats[it.itemPos.chapterUrl] }
                 .map { it.chapter.title }
                 .distinctUntilChanged()
                 .collectLatest { chapterTitle ->
@@ -134,8 +134,8 @@ class NarratorMediaControlsService : Service(), CoroutineScope {
 
         // Update chapter notification intent
         launch {
-            snapshotFlow { readerSession.readerSpeaker.currentTextPlaying.value }
-                .mapNotNull { readerSession.chaptersLoader.chaptersStats[it.itemPos.chapterUrl] }
+            snapshotFlow { readerSession.readerTextToSpeech.currentTextPlaying.value }
+                .mapNotNull { readerSession.readerChaptersLoader.chaptersStats[it.itemPos.chapterUrl] }
                 .map { it.chapter.url }
                 .distinctUntilChanged()
                 .mapNotNull { chapterUrl ->

@@ -1,4 +1,4 @@
-package my.noveldokusha.ui.screens.reader
+package my.noveldokusha.ui.screens.reader.manager
 
 import android.content.Context
 import androidx.compose.runtime.derivedStateOf
@@ -14,6 +14,8 @@ import my.noveldokusha.data.database.tables.Chapter
 import my.noveldokusha.repository.Repository
 import my.noveldokusha.services.narratorMediaControls.NarratorMediaControlsService
 import my.noveldokusha.tools.TranslationManager
+import my.noveldokusha.ui.screens.reader.*
+import my.noveldokusha.ui.screens.reader.features.ReaderChaptersLoader
 import my.noveldokusha.ui.screens.reader.tools.*
 import kotlin.properties.Delegates
 
@@ -59,24 +61,24 @@ class ReaderSession(
     }
 
     val speakerStats = derivedStateOf {
-        val item = readerSpeaker.currentTextPlaying.value.itemPos
-        chaptersLoader.getItemContext(
+        val item = readerTextToSpeech.currentTextPlaying.value.itemPos
+        readerChaptersLoader.getItemContext(
             chapterPosition = item.chapterPosition,
             chapterItemPosition = item.chapterItemPosition
         )
     }
 
-    val liveTranslation = LiveTranslation(
+    val readerLiveTranslation = ReaderLiveTranslation(
         translationManager = translationManager,
         appPreferences = appPreferences
     )
 
-    val chaptersLoader = ChaptersLoader(
+    val readerChaptersLoader = ReaderChaptersLoader(
         repository = repository,
-        translateOrNull = { liveTranslation.translatorState?.translate?.invoke(it) },
-        translationIsActive = { liveTranslation.translatorState != null },
-        translationSourceLanguageOrNull = { liveTranslation.translatorState?.sourceLocale?.displayLanguage },
-        translationTargetLanguageOrNull = { liveTranslation.translatorState?.targetLocale?.displayLanguage },
+        translateOrNull = { readerLiveTranslation.translatorState?.translate?.invoke(it) },
+        translationIsActive = { readerLiveTranslation.translatorState != null },
+        translationSourceLanguageOrNull = { readerLiveTranslation.translatorState?.sourceLocale?.displayLanguage },
+        translationTargetLanguageOrNull = { readerLiveTranslation.translatorState?.targetLocale?.displayLanguage },
         bookUrl = bookUrl,
         orderedChapters = orderedChapters,
         readerState = ReaderState.INITIAL_LOAD,
@@ -87,17 +89,17 @@ class ReaderSession(
         showInvalidChapterDialog = showInvalidChapterDialog,
     )
 
-    val items = chaptersLoader.getItems()
+    val items = readerChaptersLoader.getItems()
 
-    val readerSpeaker = ReaderSpeaker(
+    val readerTextToSpeech = ReaderTextToSpeech(
         coroutineScope = scope,
         context = context,
         items = items,
-        chapterLoadedFlow = chaptersLoader.chapterLoadedFlow,
-        isChapterIndexLoaded = chaptersLoader::isChapterIndexLoaded,
-        isChapterIndexValid = chaptersLoader::isChapterIndexValid,
-        tryLoadPreviousChapter = chaptersLoader::tryLoadPrevious,
-        loadNextChapter = chaptersLoader::tryLoadNext,
+        chapterLoadedFlow = readerChaptersLoader.chapterLoadedFlow,
+        isChapterIndexLoaded = readerChaptersLoader::isChapterIndexLoaded,
+        isChapterIndexValid = readerChaptersLoader::isChapterIndexValid,
+        tryLoadPreviousChapter = readerChaptersLoader::tryLoadPrevious,
+        loadNextChapter = readerChaptersLoader::tryLoadNext,
         customSavedVoices = appPreferences.READER_TEXT_TO_SPEECH_SAVED_PREDEFINED_LIST.state(scope),
         setCustomSavedVoices = {
             appPreferences.READER_TEXT_TO_SPEECH_SAVED_PREDEFINED_LIST.value = it
@@ -125,7 +127,7 @@ class ReaderSession(
         scope.launch {
             val book = async(Dispatchers.IO) { repository.libraryBooks.get(bookUrl) }
             val chapter = async(Dispatchers.IO) { repository.bookChapters.get(chapterUrl) }
-            val loadTranslator = async(Dispatchers.IO) { liveTranslation.init() }
+            val loadTranslator = async(Dispatchers.IO) { readerLiveTranslation.init() }
             val chaptersList = async(Dispatchers.Default) {
                 orderedChapters.also { it.addAll(repository.bookChapters.chapters(bookUrl)) }
             }
@@ -141,28 +143,28 @@ class ReaderSession(
                 offset = chapter.await()?.lastReadOffset ?: 0,
             )
             // All data prepared! Let's load the current chapter
-            chaptersLoader.tryLoadInitial(chapterIndex = chapterIndex.await())
+            readerChaptersLoader.tryLoadInitial(chapterIndex = chapterIndex.await())
         }
     }
 
     private fun initReaderTTSObservers() {
         scope.launch {
-            readerSpeaker.reachedChapterEndFlowChapterIndex.collect { chapterIndex ->
+            readerTextToSpeech.reachedChapterEndFlowChapterIndex.collect { chapterIndex ->
                 withContext(Dispatchers.Main.immediate) {
-                    if (chaptersLoader.isLastChapter(chapterIndex)) return@withContext
+                    if (readerChaptersLoader.isLastChapter(chapterIndex)) return@withContext
                     val nextChapterIndex = chapterIndex + 1
-                    val chapterItem = chaptersLoader.orderedChapters[nextChapterIndex]
-                    if (chaptersLoader.loadedChapters.contains(chapterItem.url)) {
-                        readerSpeaker.readChapterStartingFromStart(
+                    val chapterItem = readerChaptersLoader.orderedChapters[nextChapterIndex]
+                    if (readerChaptersLoader.loadedChapters.contains(chapterItem.url)) {
+                        readerTextToSpeech.readChapterStartingFromStart(
                             chapterIndex = nextChapterIndex
                         )
                     } else launch {
-                        chaptersLoader.tryLoadNext()
-                        chaptersLoader.chapterLoadedFlow
-                            .filter { it.type == ChaptersLoader.ChapterLoaded.Type.Next }
+                        readerChaptersLoader.tryLoadNext()
+                        readerChaptersLoader.chapterLoadedFlow
+                            .filter { it.type == ReaderChaptersLoader.ChapterLoaded.Type.Next }
                             .take(1)
                             .collect {
-                                readerSpeaker.readChapterStartingFromStart(
+                                readerTextToSpeech.readChapterStartingFromStart(
                                     chapterIndex = nextChapterIndex
                                 )
                             }
@@ -172,7 +174,7 @@ class ReaderSession(
         }
 
         scope.launch(Dispatchers.Main.immediate) {
-            snapshotFlow { readerSpeaker.isActive.value }
+            snapshotFlow { readerTextToSpeech.isActive.value }
                 .filter { it }
                 .collectLatest {
                     NarratorMediaControlsService.start(context)
@@ -180,19 +182,19 @@ class ReaderSession(
         }
 
         scope.launch(Dispatchers.Main.immediate) {
-            readerSpeaker
+            readerTextToSpeech
                 .currentReaderItem
                 .debounce(timeoutMillis = 5_000)
-                .filter { readerSpeaker.isSpeaking.value }
+                .filter { readerTextToSpeech.isSpeaking.value }
                 .collect {
                     saveLastReadPositionFromCurrentSpeakItem()
                 }
         }
 
         scope.launch(Dispatchers.Main.immediate) {
-            readerSpeaker
+            readerTextToSpeech
                 .currentReaderItem
-                .filter { readerSpeaker.isSpeaking.value }
+                .filter { readerTextToSpeech.isSpeaking.value }
                 .collect {
                     val item = it.itemPos
                     if (item !is ReaderItem.ParagraphLocation) return@collect
@@ -207,9 +209,9 @@ class ReaderSession(
 
     fun startSpeaker(itemIndex: Int) {
         val startingItem = items.getOrNull(itemIndex) ?: return
-        readerSpeaker.start()
+        readerTextToSpeech.start()
         scope.launch {
-            readerSpeaker.readChapterStartingFromItemIndex(
+            readerTextToSpeech.readChapterStartingFromItemIndex(
                 chapterIndex = startingItem.chapterPosition,
                 itemIndex = itemIndex
             )
@@ -217,24 +219,24 @@ class ReaderSession(
     }
 
     fun close() {
-        chaptersLoader.coroutineContext.cancelChildren()
-        if (readerSpeaker.isSpeaking.value) {
+        readerChaptersLoader.coroutineContext.cancelChildren()
+        if (readerTextToSpeech.isSpeaking.value) {
             saveLastReadPositionFromCurrentSpeakItem()
         } else {
             saveLastReadPositionState(repository, bookUrl, currentChapter)
         }
-        readerSpeaker.onClose()
+        readerTextToSpeech.onClose()
         scope.coroutineContext.cancelChildren()
         NarratorMediaControlsService.stop(context)
     }
 
     fun reloadReader() {
-        chaptersLoader.reload()
-        readerSpeaker.stop()
+        readerChaptersLoader.reload()
+        readerTextToSpeech.stop()
     }
 
     fun updateInfoViewTo(itemIndex: Int) {
-        val stats = chaptersLoader.getItemContext(
+        val stats = readerChaptersLoader.getItemContext(
             itemIndex = itemIndex,
             chapterUrl = chapterUrl
         ) ?: return
@@ -251,7 +253,7 @@ class ReaderSession(
     }
 
     private fun saveLastReadPositionFromCurrentSpeakItem() {
-        val item = readerSpeaker.settings.currentActiveItemState.value.itemPos
+        val item = readerTextToSpeech.settings.currentActiveItemState.value.itemPos
         saveLastReadPositionState(
             repository = repository,
             bookUrl = bookUrl,

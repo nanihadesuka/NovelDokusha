@@ -8,6 +8,8 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import my.noveldokusha.AppPreferences
 import my.noveldokusha.ui.BaseViewModel
+import my.noveldokusha.ui.screens.reader.manager.ReaderManager
+import my.noveldokusha.ui.screens.reader.manager.ReaderManagerViewCallReferences
 import my.noveldokusha.utils.StateExtra_Boolean
 import my.noveldokusha.utils.StateExtra_String
 import javax.inject.Inject
@@ -44,20 +46,20 @@ class ReaderViewModel @Inject constructor(
     var showReaderInfoAndSettings by mutableStateOf(false)
 
     val items = readerSession.items
-    val chaptersLoader = readerSession.chaptersLoader
-    val textToSpeechSettingData = readerSession.readerSpeaker.settings
-    val readerSpeaker = readerSession.readerSpeaker
+    val chaptersLoader = readerSession.readerChaptersLoader
+    val textToSpeechSettingData = readerSession.readerTextToSpeech.settings
+    val readerSpeaker = readerSession.readerTextToSpeech
     val chapterPercentageProgress = readerSession.readingChapterProgressPercentage
     var readingCurrentChapter by Delegates.observable(readerSession.currentChapter) { _, _, new ->
         readerSession.currentChapter = new
     }
     val readingPosStats = readerSession.readingStats
 
-    val liveTranslationSettingState = readerSession.liveTranslation.settingsState
-    val onTranslatorChanged = readerSession.liveTranslation.onTranslatorChanged
+    val liveTranslationSettingState = readerSession.readerLiveTranslation.settingsState
+    val onTranslatorChanged = readerSession.readerLiveTranslation.onTranslatorChanged
 
-    val ttsScrolledToTheTop = readerSession.readerSpeaker.scrolledToTheTop
-    val ttsScrolledToTheBottom = readerSession.readerSpeaker.scrolledToTheBottom
+    val ttsScrolledToTheTop = readerSession.readerTextToSpeech.scrolledToTheTop
+    val ttsScrolledToTheBottom = readerSession.readerTextToSpeech.scrolledToTheBottom
 
     fun onBackPressed() {
         if (!showReaderInfoAndSettings) {

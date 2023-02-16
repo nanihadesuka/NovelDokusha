@@ -3,6 +3,11 @@ package my.noveldokusha.ui.screens.reader
 import my.noveldokusha.data.database.tables.Chapter
 import kotlin.math.ceil
 
+typealias ItemIndex = Int // refers to [items]
+typealias ChapterIndex = Int // refers to [orderedChapters]
+typealias ChapterPosition = Int
+typealias ChapterItemPosition = Int
+
 enum class ReaderState {
     IDLE,
     LOADING,

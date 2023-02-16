@@ -1,6 +1,5 @@
 package my.noveldokusha.ui.screens.reader.tools
 
-import android.util.Log
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.snapshots.SnapshotStateList
@@ -24,7 +23,7 @@ data class LiveTranslationSettingData(
     val onDownloadTranslationModel: (language: String) -> Unit,
 )
 
-class LiveTranslation(
+class ReaderLiveTranslation(
     private val translationManager: TranslationManager,
     private val appPreferences: AppPreferences,
     private val scope: CoroutineScope = CoroutineScope(

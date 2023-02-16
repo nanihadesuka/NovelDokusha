@@ -1,4 +1,4 @@
-package my.noveldokusha.ui.screens.reader
+package my.noveldokusha.ui.screens.reader.settingsViews
 
 import androidx.compose.animation.*
 import androidx.compose.foundation.background
@@ -32,6 +32,7 @@ import my.noveldokusha.tools.VoiceData
 import my.noveldokusha.ui.composeViews.MyButton
 import my.noveldokusha.ui.composeViews.MyIconButton
 import my.noveldokusha.ui.screens.main.settings.SettingsTheme
+import my.noveldokusha.ui.screens.reader.ReaderItem
 import my.noveldokusha.ui.screens.reader.settingsViews.*
 import my.noveldokusha.ui.screens.reader.tools.LiveTranslationSettingData
 import my.noveldokusha.ui.screens.reader.tools.TextSynthesis

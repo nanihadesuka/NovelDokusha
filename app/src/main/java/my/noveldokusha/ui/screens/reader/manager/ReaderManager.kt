@@ -1,4 +1,4 @@
-package my.noveldokusha.ui.screens.reader
+package my.noveldokusha.ui.screens.reader.manager
 
 import android.content.Context
 import kotlinx.coroutines.*

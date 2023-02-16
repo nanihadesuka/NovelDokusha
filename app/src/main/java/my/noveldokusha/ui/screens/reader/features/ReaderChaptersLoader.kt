@@ -1,4 +1,4 @@
-package my.noveldokusha.ui.screens.reader.tools
+package my.noveldokusha.ui.screens.reader.features
 
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -6,10 +6,14 @@ import my.noveldokusha.data.Response
 import my.noveldokusha.data.database.tables.Chapter
 import my.noveldokusha.repository.Repository
 import my.noveldokusha.ui.screens.reader.*
+import my.noveldokusha.ui.screens.reader.tools.ItemPosition
+import my.noveldokusha.ui.screens.reader.tools.getChapterInitialPosition
+import my.noveldokusha.ui.screens.reader.tools.indexOfReaderItem
+import my.noveldokusha.ui.screens.reader.tools.textToItemsConverter
 import timber.log.Timber
 import kotlin.coroutines.CoroutineContext
 
-class ChaptersLoader(
+class ReaderChaptersLoader(
     private val repository: Repository,
     private val translateOrNull: suspend (text: String) -> String?,
     private val translationIsActive: () -> Boolean,
@@ -209,9 +213,9 @@ class ChaptersLoader(
         forceUpdateListViewState()
         setInitialPosition(
             ItemPosition(
-                chapterIndex = index,
-                chapterItemIndex = chapterLastState.chapterItemIndex,
-                itemOffset = chapterLastState.offset
+                chapterPosition = index,
+                chapterItemPosition = chapterLastState.chapterItemIndex,
+                chapterItemOffset = chapterLastState.offset
             )
         )
 
@@ -267,11 +271,13 @@ class ChaptersLoader(
             maintainPosition = maintainStartPosition,
         )
 
+
+        val chapter = orderedChapters[chapterIndex]
         val initialPosition = getChapterInitialPosition(
             repository = repository,
             bookUrl = bookUrl,
-            chapterIndex = chapterIndex,
-            chapter = orderedChapters[chapterIndex],
+            chapterPosition = chapter.position,
+            chapter = chapter,
         )
 
         forceUpdateListViewState()

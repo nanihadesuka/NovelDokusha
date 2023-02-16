@@ -32,6 +32,7 @@ import my.noveldokusha.R
 import my.noveldokusha.databinding.ActivityReaderBinding
 import my.noveldokusha.ui.BaseActivity
 import my.noveldokusha.ui.screens.main.settings.SettingsViewModel
+import my.noveldokusha.ui.screens.reader.settingsViews.ReaderInfoView
 import my.noveldokusha.ui.screens.reader.tools.FontsLoader
 import my.noveldokusha.ui.screens.reader.tools.indexOfReaderItem
 import my.noveldokusha.ui.theme.Theme
@@ -156,9 +157,9 @@ class ReaderActivity : BaseActivity() {
         viewModel.setInitialPosition = {
             withContext(Dispatchers.Main.immediate) {
                 setInitialChapterPosition(
-                    chapterIndex = it.chapterIndex,
-                    chapterItemIndex = it.chapterItemIndex,
-                    offset = it.itemOffset
+                    chapterPosition = it.chapterPosition,
+                    chapterItemPosition = it.chapterItemPosition,
+                    offset = it.chapterItemOffset
                 )
             }
         }
@@ -342,6 +343,8 @@ class ReaderActivity : BaseActivity() {
             fadeInTextLiveData.postValue(true)
         }
 
+
+        // Use case: user opens app from media control intent
         if (viewModel.introScrollToSpeaker) {
             viewModel.introScrollToSpeaker = false
             val itemPos = viewModel.readerSpeaker.currentTextPlaying.value.itemPos
@@ -439,14 +442,14 @@ class ReaderActivity : BaseActivity() {
     }
 
     private fun setInitialChapterPosition(
-        chapterIndex: Int,
-        chapterItemIndex: Int,
+        chapterPosition: Int,
+        chapterItemPosition: Int,
         offset: Int
     ) {
         val index = indexOfReaderItem(
             list = viewModel.items,
-            chapterPosition = chapterIndex,
-            chapterItemPosition = chapterItemIndex
+            chapterPosition = chapterPosition,
+            chapterItemPosition = chapterItemPosition
         )
         val position = viewAdapter.listView.fromIndexToPosition(index)
         if (index != -1) {

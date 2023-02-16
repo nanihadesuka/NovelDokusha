@@ -12,7 +12,9 @@ import my.noveldokusha.VoicePredefineState
 import my.noveldokusha.tools.TextToSpeechManager
 import my.noveldokusha.tools.Utterance
 import my.noveldokusha.tools.VoiceData
+import my.noveldokusha.ui.screens.reader.ChapterIndex
 import my.noveldokusha.ui.screens.reader.ReaderItem
+import my.noveldokusha.ui.screens.reader.features.ReaderChaptersLoader
 
 data class TextToSpeechSettingData(
     val isPlaying: MutableState<Boolean>,
@@ -45,13 +47,11 @@ data class TextSynthesis(
     override fun copyWithState(playState: Utterance.PlayState) = copy(playState = playState)
 }
 
-typealias ChapterIndex = Int
-
-class ReaderSpeaker(
+class ReaderTextToSpeech(
     private val coroutineScope: CoroutineScope,
     private val context: Context,
     private val items: List<ReaderItem>,
-    private val chapterLoadedFlow: Flow<ChaptersLoader.ChapterLoaded>,
+    private val chapterLoadedFlow: Flow<ReaderChaptersLoader.ChapterLoaded>,
     private val customSavedVoices: State<List<VoicePredefineState>>,
     private val setCustomSavedVoices: (List<VoicePredefineState>) -> Unit,
     private val isChapterIndexValid: (chapterIndex: Int) -> Boolean,
