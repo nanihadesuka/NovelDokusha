@@ -1,4 +1,4 @@
-package my.noveldokusha.ui.screens.reader.tools
+package my.noveldokusha.ui.screens.reader.features
 
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf

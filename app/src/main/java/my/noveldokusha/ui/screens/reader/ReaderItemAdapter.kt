@@ -18,7 +18,7 @@ import my.noveldokusha.R
 import my.noveldokusha.databinding.*
 import my.noveldokusha.resolvedBookImagePath
 import my.noveldokusha.tools.Utterance
-import my.noveldokusha.ui.screens.reader.tools.TextSynthesis
+import my.noveldokusha.ui.screens.reader.features.TextSynthesis
 import my.noveldokusha.utils.inflater
 
 class ReaderItemAdapter(
@@ -48,7 +48,7 @@ class ReaderItemAdapter(
         else -> -1
     }
 
-    fun fromIndexToPosition(index: Int): Int = when (index) {
+    fun fromIndexToPosition(index: ItemIndex): Int = when (index) {
         in 0 until super.getCount() -> index + 1
         else -> -1
     }

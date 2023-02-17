@@ -20,13 +20,13 @@ fun saveLastReadPositionState(
 
         if (oldChapter?.chapterUrl != null) repository.bookChapters.updatePosition(
             chapterUrl = oldChapter.chapterUrl,
-            lastReadPosition = oldChapter.chapterItemIndex,
+            lastReadPosition = oldChapter.chapterItemPosition,
             lastReadOffset = oldChapter.offset
         )
 
         repository.bookChapters.updatePosition(
             chapterUrl = chapter.chapterUrl,
-            lastReadPosition = chapter.chapterItemIndex,
+            lastReadPosition = chapter.chapterItemPosition,
             lastReadOffset = chapter.offset
         )
     }

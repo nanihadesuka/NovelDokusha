@@ -5,17 +5,21 @@ import kotlinx.coroutines.coroutineScope
 import my.noveldokusha.data.database.tables.Chapter
 import my.noveldokusha.repository.Repository
 
-data class ItemPosition(val chapterPosition: Int, val chapterItemPosition: Int, val chapterItemOffset: Int)
+data class InitialPositionChapter(
+    val chapterPosition: Int,
+    val chapterItemPosition: Int,
+    val chapterItemOffset: Int
+)
 
-suspend fun getChapterInitialPosition(
+suspend fun getInitialChapterItemPosition(
     repository: Repository,
     bookUrl: String,
     chapterPosition: Int,
     chapter: Chapter,
-): ItemPosition = coroutineScope {
-    val titleChapterItemPosition = 0
+): InitialPositionChapter = coroutineScope {
+    val titleChapterItemPosition = 0 // Hardcode or no?
     val book = async { repository.libraryBooks.get(bookUrl) }
-    val position = ItemPosition(
+    val position = InitialPositionChapter(
         chapterPosition = chapterPosition,
         chapterItemPosition = chapter.lastReadPosition,
         chapterItemOffset = chapter.lastReadOffset,
@@ -23,7 +27,7 @@ suspend fun getChapterInitialPosition(
 
     when {
         chapter.url == book.await()?.lastReadChapter -> position
-        chapter.read -> ItemPosition(
+        chapter.read -> InitialPositionChapter(
             chapterPosition = chapterPosition,
             chapterItemPosition = titleChapterItemPosition,
             chapterItemOffset = 0,

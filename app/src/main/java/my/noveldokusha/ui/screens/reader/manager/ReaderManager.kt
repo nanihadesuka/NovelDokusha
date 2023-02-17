@@ -5,13 +5,13 @@ import kotlinx.coroutines.*
 import my.noveldokusha.AppPreferences
 import my.noveldokusha.repository.Repository
 import my.noveldokusha.tools.TranslationManager
-import my.noveldokusha.ui.screens.reader.tools.ItemPosition
+import my.noveldokusha.ui.screens.reader.tools.InitialPositionChapter
 
 interface ReaderManagerViewCallReferences {
     var forceUpdateListViewState: (suspend () -> Unit)?
     var maintainLastVisiblePosition: (suspend (suspend () -> Unit) -> Unit)?
     var maintainStartPosition: (suspend (suspend () -> Unit) -> Unit)?
-    var setInitialPosition: (suspend (ItemPosition) -> Unit)?
+    var setInitialPosition: (suspend (InitialPositionChapter) -> Unit)?
     var showInvalidChapterDialog: (suspend () -> Unit)?
 }
 
@@ -38,7 +38,7 @@ class ReaderManager(
     override var maintainStartPosition: (suspend (suspend () -> Unit) -> Unit)? = null
 
     @Volatile
-    override var setInitialPosition: (suspend (ItemPosition) -> Unit)? = null
+    override var setInitialPosition: (suspend (InitialPositionChapter) -> Unit)? = null
 
     @Volatile
     override var showInvalidChapterDialog: (suspend () -> Unit)? = null

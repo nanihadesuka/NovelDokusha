@@ -9,8 +9,8 @@ import my.noveldokusha.ui.screens.reader.ReaderItem
 
 suspend fun textToItemsConverter(
     chapterUrl: String,
-    chapterPos: Int,
-    initialChapterItemIndex: Int,
+    chapterPosition: Int,
+    chapterItemPositionDisplacement: Int,
     text: String
 ): List<ReaderItem> = withContext(Dispatchers.Default) {
     val paragraphs = text
@@ -19,14 +19,14 @@ suspend fun textToItemsConverter(
         .toList()
 
     return@withContext paragraphs
-        .mapIndexed { index, paragraph ->
+        .mapIndexed { position, paragraph ->
             async {
                 generateITEM(
                     chapterUrl = chapterUrl,
-                    chapterIndex = chapterPos,
-                    chapterItemIndex = index + initialChapterItemIndex,
+                    chapterPosition = chapterPosition,
+                    chapterItemPosition = position + chapterItemPositionDisplacement,
                     text = paragraph,
-                    location = when (index) {
+                    location = when (position) {
                         0 -> ReaderItem.Location.FIRST
                         paragraphs.lastIndex -> ReaderItem.Location.LAST
                         else -> ReaderItem.Location.MIDDLE
@@ -38,22 +38,22 @@ suspend fun textToItemsConverter(
 
 private fun generateITEM(
     chapterUrl: String,
-    chapterIndex: Int,
-    chapterItemIndex: Int,
+    chapterPosition: Int,
+    chapterItemPosition: Int,
     text: String,
     location: ReaderItem.Location
 ): ReaderItem = when (val imgEntry = BookTextMapper.ImgEntry.fromXMLString(text)) {
     null -> ReaderItem.Body(
         chapterUrl = chapterUrl,
-        chapterPosition = chapterIndex,
-        chapterItemPosition = chapterItemIndex,
+        chapterPosition = chapterPosition,
+        chapterItemPosition = chapterItemPosition,
         text = text,
         location = location
     )
     else -> ReaderItem.Image(
         chapterUrl = chapterUrl,
-        chapterPosition = chapterIndex,
-        chapterItemPosition = chapterItemIndex,
+        chapterPosition = chapterPosition,
+        chapterItemPosition = chapterItemPosition,
         text = text,
         location = location,
         image = imgEntry

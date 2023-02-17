@@ -6,8 +6,8 @@ import my.noveldokusha.data.Response
 import my.noveldokusha.data.database.tables.Chapter
 import my.noveldokusha.repository.Repository
 import my.noveldokusha.ui.screens.reader.*
-import my.noveldokusha.ui.screens.reader.tools.ItemPosition
-import my.noveldokusha.ui.screens.reader.tools.getChapterInitialPosition
+import my.noveldokusha.ui.screens.reader.tools.InitialPositionChapter
+import my.noveldokusha.ui.screens.reader.tools.getInitialChapterItemPosition
 import my.noveldokusha.ui.screens.reader.tools.indexOfReaderItem
 import my.noveldokusha.ui.screens.reader.tools.textToItemsConverter
 import timber.log.Timber
@@ -15,17 +15,17 @@ import kotlin.coroutines.CoroutineContext
 
 class ReaderChaptersLoader(
     private val repository: Repository,
-    private val translateOrNull: suspend (text: String) -> String?,
-    private val translationIsActive: () -> Boolean,
-    private val translationSourceLanguageOrNull: () -> String?,
-    private val translationTargetLanguageOrNull: () -> String?,
+    private val translatorTranslateOrNull: suspend (text: String) -> String?,
+    private val translatorIsActive: () -> Boolean,
+    private val translatorSourceLanguageOrNull: () -> String?,
+    private val translatorTargetLanguageOrNull: () -> String?,
     private val bookUrl: String,
     val orderedChapters: List<Chapter>,
     @Volatile var readerState: ReaderState,
     val forceUpdateListViewState: suspend () -> Unit,
     val maintainLastVisiblePosition: suspend (suspend () -> Unit) -> Unit,
     val maintainStartPosition: suspend (suspend () -> Unit) -> Unit,
-    val setInitialPosition: suspend (ItemPosition) -> Unit,
+    val setInitialPosition: suspend (InitialPositionChapter) -> Unit,
     val showInvalidChapterDialog: suspend () -> Unit,
 ) : CoroutineScope {
 
@@ -43,8 +43,8 @@ class ReaderChaptersLoader(
         object Next : LoadChapter
     }
 
-    val chaptersStats = mutableMapOf<String, ChapterStats>()
-    val loadedChapters = mutableSetOf<String>()
+    val chaptersStats = mutableMapOf<ChapterUrl, ChapterStats>()
+    val loadedChapters = mutableSetOf<ChapterUrl>()
     val chapterLoadedFlow = MutableSharedFlow<ChapterLoaded>()
     private val items: MutableList<ReaderItem> = ArrayList()
     private val loaderQueue = mutableSetOf<LoadChapter.Type>()
@@ -212,9 +212,9 @@ class ReaderChaptersLoader(
 
         forceUpdateListViewState()
         setInitialPosition(
-            ItemPosition(
+            InitialPositionChapter(
                 chapterPosition = index,
-                chapterItemPosition = chapterLastState.chapterItemIndex,
+                chapterItemPosition = chapterLastState.chapterItemPosition,
                 chapterItemOffset = chapterLastState.offset
             )
         )
@@ -273,7 +273,7 @@ class ReaderChaptersLoader(
 
 
         val chapter = orderedChapters[chapterIndex]
-        val initialPosition = getChapterInitialPosition(
+        val initialPosition = getInitialChapterItemPosition(
             repository = repository,
             bookUrl = bookUrl,
             chapterPosition = chapter.position,
@@ -437,7 +437,7 @@ class ReaderChaptersLoader(
             text = chapter.title,
             chapterItemPosition = chapterItemIndex,
         ).copy(
-            textTranslated = translateOrNull(chapter.title) ?: chapter.title
+            textTranslated = translatorTranslateOrNull(chapter.title) ?: chapter.title
         )
         chapterItemIndex += 1
 
@@ -458,25 +458,25 @@ class ReaderChaptersLoader(
                 // Split chapter text into items
                 val itemsOriginal = textToItemsConverter(
                     chapterUrl = chapter.url,
-                    chapterPos = index,
-                    initialChapterItemIndex = chapterItemIndex,
+                    chapterPosition = index,
+                    chapterItemPositionDisplacement = chapterItemIndex,
                     text = res.data,
                 )
                 chapterItemIndex += itemsOriginal.size
 
-                val itemTranslationAttribution = if (translationIsActive()) {
+                val itemTranslationAttribution = if (translatorIsActive()) {
                     ReaderItem.GoogleTranslateAttribution(
                         chapterUrl = chapter.url,
                         chapterPosition = index,
                     )
                 } else null
 
-                val itemTranslating = if (translationIsActive()) {
+                val itemTranslating = if (translatorIsActive()) {
                     ReaderItem.Translating(
                         chapterUrl = chapter.url,
                         chapterPosition = index,
-                        sourceLang = translationSourceLanguageOrNull() ?: "",
-                        targetLang = translationTargetLanguageOrNull() ?: "",
+                        sourceLang = translatorSourceLanguageOrNull() ?: "",
+                        targetLang = translatorTargetLanguageOrNull() ?: "",
                     )
                 } else null
 
@@ -489,9 +489,9 @@ class ReaderChaptersLoader(
 
                 // Translate if necessary
                 val items = when {
-                    translationIsActive() -> itemsOriginal.map {
+                    translatorIsActive() -> itemsOriginal.map {
                         if (it is ReaderItem.Body) {
-                            it.copy(textTranslated = translateOrNull(it.text))
+                            it.copy(textTranslated = translatorTranslateOrNull(it.text))
                         } else it
                     }
                     else -> itemsOriginal

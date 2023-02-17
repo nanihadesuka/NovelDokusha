@@ -16,21 +16,25 @@ import my.noveldokusha.services.narratorMediaControls.NarratorMediaControlsServi
 import my.noveldokusha.tools.TranslationManager
 import my.noveldokusha.ui.screens.reader.*
 import my.noveldokusha.ui.screens.reader.features.ReaderChaptersLoader
-import my.noveldokusha.ui.screens.reader.tools.*
+import my.noveldokusha.ui.screens.reader.features.ReaderLiveTranslation
+import my.noveldokusha.ui.screens.reader.features.ReaderTextToSpeech
+import my.noveldokusha.ui.screens.reader.tools.ChaptersIsReadRoutine
+import my.noveldokusha.ui.screens.reader.tools.InitialPositionChapter
+import my.noveldokusha.ui.screens.reader.tools.saveLastReadPositionState
 import kotlin.properties.Delegates
 
 class ReaderSession(
     val bookUrl: String,
-    private val initialChapterUrl: String,
+    initialChapterUrl: String,
     private val scope: CoroutineScope,
     private val repository: Repository,
-    private val translationManager: TranslationManager,
+    translationManager: TranslationManager,
     private val appPreferences: AppPreferences,
     private val context: Context,
     val forceUpdateListViewState: suspend () -> Unit,
     val maintainLastVisiblePosition: suspend (suspend () -> Unit) -> Unit,
     val maintainStartPosition: suspend (suspend () -> Unit) -> Unit,
-    val setInitialPosition: suspend (ItemPosition) -> Unit,
+    val setInitialPosition: suspend (InitialPositionChapter) -> Unit,
     val showInvalidChapterDialog: suspend () -> Unit,
 ) {
     private var bookCoverUrl: String? = null
@@ -42,7 +46,7 @@ class ReaderSession(
     var currentChapter: ChapterState by Delegates.observable(
         ChapterState(
             chapterUrl = chapterUrl,
-            chapterItemIndex = 0,
+            chapterItemPosition = 0,
             offset = 0
         )
     ) { _, old, new ->
@@ -75,10 +79,10 @@ class ReaderSession(
 
     val readerChaptersLoader = ReaderChaptersLoader(
         repository = repository,
-        translateOrNull = { readerLiveTranslation.translatorState?.translate?.invoke(it) },
-        translationIsActive = { readerLiveTranslation.translatorState != null },
-        translationSourceLanguageOrNull = { readerLiveTranslation.translatorState?.sourceLocale?.displayLanguage },
-        translationTargetLanguageOrNull = { readerLiveTranslation.translatorState?.targetLocale?.displayLanguage },
+        translatorTranslateOrNull = { readerLiveTranslation.translatorState?.translate?.invoke(it) },
+        translatorIsActive = { readerLiveTranslation.translatorState != null },
+        translatorSourceLanguageOrNull = { readerLiveTranslation.translatorState?.sourceLocale?.displayLanguage },
+        translatorTargetLanguageOrNull = { readerLiveTranslation.translatorState?.targetLocale?.displayLanguage },
         bookUrl = bookUrl,
         orderedChapters = orderedChapters,
         readerState = ReaderState.INITIAL_LOAD,
@@ -139,7 +143,7 @@ class ReaderSession(
             bookCoverUrl = book.await()?.coverImageUrl
             currentChapter = ChapterState(
                 chapterUrl = chapterUrl,
-                chapterItemIndex = chapter.await()?.lastReadPosition ?: 0,
+                chapterItemPosition = chapter.await()?.lastReadPosition ?: 0,
                 offset = chapter.await()?.lastReadOffset ?: 0,
             )
             // All data prepared! Let's load the current chapter
@@ -243,7 +247,6 @@ class ReaderSession(
         readingStats.value = stats
     }
 
-
     fun markChapterStartAsSeen(chapterUrl: String) {
         readRoutine.setReadStart(chapterUrl = chapterUrl)
     }
@@ -259,7 +262,7 @@ class ReaderSession(
             bookUrl = bookUrl,
             chapter = ChapterState(
                 chapterUrl = item.chapterUrl,
-                chapterItemIndex = item.chapterItemPosition,
+                chapterItemPosition = item.chapterItemPosition,
                 offset = 0
             )
         )

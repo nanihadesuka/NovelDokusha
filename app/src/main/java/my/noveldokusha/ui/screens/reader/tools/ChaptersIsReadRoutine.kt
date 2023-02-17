@@ -4,6 +4,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import my.noveldokusha.repository.Repository
+import my.noveldokusha.ui.screens.reader.ChapterUrl
 
 class ChaptersIsReadRoutine(val repository: Repository) {
     fun setReadStart(chapterUrl: String) = checkLoadStatus(chapterUrl) { it.copy(startSeen = true) }
@@ -12,7 +13,7 @@ class ChaptersIsReadRoutine(val repository: Repository) {
     private data class ChapterReadStatus(val startSeen: Boolean, val endSeen: Boolean)
 
     private val scope = CoroutineScope(Dispatchers.IO)
-    private val chapterRead = mutableMapOf<String, ChapterReadStatus>()
+    private val chapterRead = mutableMapOf<ChapterUrl, ChapterReadStatus>()
 
     private fun checkLoadStatus(chapterUrl: String, fn: (ChapterReadStatus) -> ChapterReadStatus) =
         scope.launch {

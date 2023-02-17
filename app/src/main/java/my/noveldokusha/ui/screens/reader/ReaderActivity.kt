@@ -476,13 +476,13 @@ class ReaderActivity : BaseActivity() {
 
     private fun updateCurrentReadingPosSavingState(firstVisibleItemIndex: Int) {
         val item = viewModel.items.getOrNull(firstVisibleItemIndex) ?: return
-        if (item is ReaderItem.Position) {
-            val offset = viewBind.listView.run { getChildAt(0).top - paddingTop }
-            viewModel.readingCurrentChapter = ChapterState(
-                chapterUrl = item.chapterUrl,
-                chapterItemIndex = item.chapterItemPosition,
-                offset = offset
-            )
-        }
+        if (item !is ReaderItem.Position) return
+
+        val offset = viewBind.listView.run { getChildAt(0).top - paddingTop }
+        viewModel.readingCurrentChapter = ChapterState(
+            chapterUrl = item.chapterUrl,
+            chapterItemPosition = item.chapterItemPosition,
+            offset = offset
+        )
     }
 }

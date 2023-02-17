@@ -1,4 +1,4 @@
-package my.noveldokusha.ui.screens.reader.tools
+package my.noveldokusha.ui.screens.reader.features
 
 import android.content.Context
 import androidx.compose.runtime.MutableState
@@ -14,7 +14,7 @@ import my.noveldokusha.tools.Utterance
 import my.noveldokusha.tools.VoiceData
 import my.noveldokusha.ui.screens.reader.ChapterIndex
 import my.noveldokusha.ui.screens.reader.ReaderItem
-import my.noveldokusha.ui.screens.reader.features.ReaderChaptersLoader
+import my.noveldokusha.ui.screens.reader.tools.indexOfReaderItem
 
 data class TextToSpeechSettingData(
     val isPlaying: MutableState<Boolean>,
@@ -87,7 +87,7 @@ class ReaderTextToSpeech(
     val reachedChapterEndFlowChapterIndex = MutableSharedFlow<ChapterIndex>() // chapter pos
     val startReadingFromFirstVisibleItem = MutableSharedFlow<Unit>()
     val scrollToReaderItem = MutableSharedFlow<ReaderItem>()
-    val scrollToFirstChapterItemIndex = MutableSharedFlow<Int>()
+    val scrollToFirstChapterItemIndex = MutableSharedFlow<ChapterIndex>()
 
     val settings = TextToSpeechSettingData(
         isPlaying = mutableStateOf(false),
@@ -95,7 +95,9 @@ class ReaderTextToSpeech(
         activeVoice = manager.activeVoice as State<VoiceData?>,
         availableVoices = manager.availableVoices,
         currentActiveItemState = manager.currentActiveItemState,
-        isThereActiveItem = derivedStateOf { manager.currentActiveItemState.value.itemPos.chapterPosition != -1 },
+        isThereActiveItem = derivedStateOf {
+            manager.currentActiveItemState.value.itemPos.chapterPosition != -1
+        },
         voicePitch = manager.voicePitch,
         voiceSpeed = manager.voiceSpeed,
         customSavedVoices = customSavedVoices,
@@ -151,7 +153,14 @@ class ReaderTextToSpeech(
                                 )
                             }
                             0 -> {
-                                launch { reachedChapterEndFlowChapterIndex.emit(it.itemPos.chapterPosition) }
+                                launch {
+                                    val itemIndex = indexOfReaderItem(
+                                        list = items,
+                                        chapterItemPosition = it.itemPos.chapterItemPosition,
+                                        chapterPosition = it.itemPos.chapterPosition
+                                    )
+                                    reachedChapterEndFlowChapterIndex.emit(itemIndex)
+                                }
                             }
                             else -> Unit
                         }
