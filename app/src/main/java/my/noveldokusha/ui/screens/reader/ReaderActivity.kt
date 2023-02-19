@@ -26,10 +26,12 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.drop
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import my.noveldokusha.R
 import my.noveldokusha.databinding.ActivityReaderBinding
+import my.noveldokusha.tools.Utterance
 import my.noveldokusha.ui.BaseActivity
 import my.noveldokusha.ui.screens.main.settings.SettingsViewModel
 import my.noveldokusha.ui.screens.reader.settingsViews.ReaderInfoView
@@ -200,12 +202,14 @@ class ReaderActivity : BaseActivity() {
             )
         }
 
-        viewModel.readerSpeaker.currentReaderItem.asLiveData().observe(this) {
-            scrollToReadingPositionOptional(
-                chapterIndex = it.itemPos.chapterIndex,
-                chapterItemPosition = it.itemPos.chapterItemPosition,
-            )
-        }
+        viewModel.readerSpeaker.currentReaderItem
+            .filter { it.playState == Utterance.PlayState.PLAYING || it.playState == Utterance.PlayState.LOADING }
+            .asLiveData().observe(this) {
+                scrollToReadingPositionOptional(
+                    chapterIndex = it.itemPos.chapterIndex,
+                    chapterItemPosition = it.itemPos.chapterItemPosition,
+                )
+            }
 
         viewModel.readerSpeaker.scrollToReaderItem.asLiveData().observe(this) {
             if (it !is ReaderItem.Position) return@observe

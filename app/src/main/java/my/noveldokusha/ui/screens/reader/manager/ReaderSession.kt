@@ -6,7 +6,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.snapshotFlow
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.take
 import my.noveldokusha.AppPreferences
@@ -14,13 +13,13 @@ import my.noveldokusha.data.database.tables.Chapter
 import my.noveldokusha.repository.Repository
 import my.noveldokusha.services.narratorMediaControls.NarratorMediaControlsService
 import my.noveldokusha.tools.TranslationManager
+import my.noveldokusha.tools.Utterance
 import my.noveldokusha.ui.screens.reader.*
 import my.noveldokusha.ui.screens.reader.features.ReaderChaptersLoader
 import my.noveldokusha.ui.screens.reader.features.ReaderLiveTranslation
 import my.noveldokusha.ui.screens.reader.features.ReaderTextToSpeech
 import my.noveldokusha.ui.screens.reader.tools.ChaptersIsReadRoutine
 import my.noveldokusha.ui.screens.reader.tools.InitialPositionChapter
-import my.noveldokusha.ui.screens.reader.tools.saveLastReadPositionState
 import kotlin.properties.Delegates
 
 class ReaderSession(
@@ -51,12 +50,18 @@ class ReaderSession(
         )
     ) { _, old, new ->
         chapterUrl = new.chapterUrl
-        if (old.chapterUrl != new.chapterUrl) saveLastReadPositionState(
-            repository,
-            bookUrl,
-            new,
-            old
-        )
+        if (
+            old.chapterUrl != new.chapterUrl &&
+            savePositionMode.value == SavePositionMode.Reading
+        ) {
+            saveLastReadPositionState(new, old)
+        }
+    }
+
+    private enum class SavePositionMode { Reading, Speaking }
+
+    private val savePositionMode = derivedStateOf<SavePositionMode> {
+        if (readerTextToSpeech.isSpeaking.value) SavePositionMode.Speaking else SavePositionMode.Reading
     }
 
     val readingStats = mutableStateOf<ReadingChapterPosStats?>(null)
@@ -188,17 +193,16 @@ class ReaderSession(
         scope.launch(Dispatchers.Main.immediate) {
             readerTextToSpeech
                 .currentReaderItem
-                .debounce(timeoutMillis = 5_000)
-                .filter { readerTextToSpeech.isSpeaking.value }
-                .collect {
-                    saveLastReadPositionFromCurrentSpeakItem()
-                }
+                .filter { it.playState == Utterance.PlayState.PLAYING }
+                .filter { savePositionMode.value == SavePositionMode.Speaking }
+                .collect { saveLastReadPositionStateSpeaker(it.itemPos) }
         }
 
         scope.launch(Dispatchers.Main.immediate) {
             readerTextToSpeech
                 .currentReaderItem
-                .filter { readerTextToSpeech.isSpeaking.value }
+                .filter { it.playState == Utterance.PlayState.PLAYING }
+                .filter { savePositionMode.value == SavePositionMode.Speaking }
                 .collect {
                     val item = it.itemPos
                     if (item !is ReaderItem.ParagraphLocation) return@collect
@@ -224,10 +228,11 @@ class ReaderSession(
 
     fun close() {
         readerChaptersLoader.coroutineContext.cancelChildren()
-        if (readerTextToSpeech.isSpeaking.value) {
-            saveLastReadPositionFromCurrentSpeakItem()
-        } else {
-            saveLastReadPositionState(repository, bookUrl, currentChapter)
+        when (savePositionMode.value) {
+            SavePositionMode.Reading -> saveLastReadPositionState(currentChapter)
+            SavePositionMode.Speaking -> saveLastReadPositionStateSpeaker(
+                item = readerTextToSpeech.currentTextPlaying.value.itemPos
+            )
         }
         readerTextToSpeech.onClose()
         scope.coroutineContext.cancelChildren()
@@ -255,16 +260,40 @@ class ReaderSession(
         readRoutine.setReadEnd(chapterUrl = chapterUrl)
     }
 
-    private fun saveLastReadPositionFromCurrentSpeakItem() {
-        val item = readerTextToSpeech.settings.currentActiveItemState.value.itemPos
+    private fun saveLastReadPositionStateSpeaker(item: ReaderItem.Position) {
         saveLastReadPositionState(
-            repository = repository,
-            bookUrl = bookUrl,
-            chapter = ChapterState(
+            ChapterState(
                 chapterUrl = item.chapterUrl,
                 chapterItemPosition = item.chapterItemPosition,
                 offset = 0
             )
         )
+    }
+
+    private fun saveLastReadPositionState(
+        newChapter: ChapterState,
+        oldChapter: ChapterState? = null,
+        scope: CoroutineScope = CoroutineScope(Dispatchers.IO) // We want it to survive
+    ) {
+        scope.launch {
+            repository.withTransaction {
+                repository.libraryBooks.updateLastReadChapter(
+                    bookUrl = bookUrl,
+                    lastReadChapterUrl = newChapter.chapterUrl
+                )
+
+                if (oldChapter?.chapterUrl != null) repository.bookChapters.updatePosition(
+                    chapterUrl = oldChapter.chapterUrl,
+                    lastReadPosition = oldChapter.chapterItemPosition,
+                    lastReadOffset = oldChapter.offset
+                )
+
+                repository.bookChapters.updatePosition(
+                    chapterUrl = newChapter.chapterUrl,
+                    lastReadPosition = newChapter.chapterItemPosition,
+                    lastReadOffset = newChapter.offset
+                )
+            }
+        }
     }
 }
