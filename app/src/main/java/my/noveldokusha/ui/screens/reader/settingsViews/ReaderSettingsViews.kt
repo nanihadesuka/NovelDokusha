@@ -33,10 +33,10 @@ import my.noveldokusha.ui.composeViews.MyButton
 import my.noveldokusha.ui.composeViews.MyIconButton
 import my.noveldokusha.ui.screens.main.settings.SettingsTheme
 import my.noveldokusha.ui.screens.reader.ReaderItem
-import my.noveldokusha.ui.screens.reader.settingsViews.*
 import my.noveldokusha.ui.screens.reader.features.LiveTranslationSettingData
 import my.noveldokusha.ui.screens.reader.features.TextSynthesis
 import my.noveldokusha.ui.screens.reader.features.TextToSpeechSettingData
+import my.noveldokusha.ui.screens.reader.settingsViews.*
 import my.noveldokusha.ui.theme.InternalTheme
 import my.noveldokusha.ui.theme.Themes
 import my.noveldokusha.utils.rememberMutableStateOf
@@ -406,6 +406,7 @@ private fun ViewsPreview() {
                     playState = Utterance.PlayState.PLAYING,
                     itemPos = ReaderItem.Title(
                         chapterUrl = "",
+                        chapterIndex = 0,
                         chapterItemPosition = 1,
                         chapterPosition = 1,
                         text = ""

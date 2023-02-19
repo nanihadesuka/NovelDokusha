@@ -72,6 +72,7 @@ class ReaderTextToSpeech(
         initialItemState = TextSynthesis(
             itemPos = ReaderItem.Title(
                 chapterUrl = "",
+                chapterIndex = -1,
                 chapterPosition = -1,
                 chapterItemPosition = 0,
                 text = ""
@@ -87,7 +88,7 @@ class ReaderTextToSpeech(
     val reachedChapterEndFlowChapterIndex = MutableSharedFlow<ChapterIndex>() // chapter pos
     val startReadingFromFirstVisibleItem = MutableSharedFlow<Unit>()
     val scrollToReaderItem = MutableSharedFlow<ReaderItem>()
-    val scrollToFirstChapterItemIndex = MutableSharedFlow<ChapterIndex>()
+    val scrollToChapterTop = MutableSharedFlow<ChapterIndex>()
 
     val settings = TextToSpeechSettingData(
         isPlaying = mutableStateOf(false),
@@ -147,8 +148,8 @@ class ReaderTextToSpeech(
                                     .asSequence()
                                     .last().value
                                 readChapterNextChunk(
-                                    chapterIndex = lastUtterance.itemPos.chapterPosition,
-                                    chapterItemIndex = lastUtterance.itemPos.chapterItemPosition,
+                                    chapterIndex = lastUtterance.itemPos.chapterIndex,
+                                    chapterItemPosition = lastUtterance.itemPos.chapterItemPosition,
                                     quantity = halfBuffer
                                 )
                             }
@@ -156,8 +157,8 @@ class ReaderTextToSpeech(
                                 launch {
                                     val itemIndex = indexOfReaderItem(
                                         list = items,
+                                        chapterIndex = it.itemPos.chapterIndex,
                                         chapterItemPosition = it.itemPos.chapterItemPosition,
-                                        chapterPosition = it.itemPos.chapterPosition
                                     )
                                     reachedChapterEndFlowChapterIndex.emit(itemIndex)
                                 }
@@ -184,20 +185,20 @@ class ReaderTextToSpeech(
     suspend fun readChapterStartingFromStart(
         chapterIndex: Int
     ) = withContext(Dispatchers.Main.immediate) {
-        readChapterStartingFromChapterItemIndex(
+        readChapterStartingFromChapterItemPosition(
             chapterIndex = chapterIndex,
-            chapterItemIndex = 0
+            chapterItemPosition = 0
         )
     }
 
-    private suspend fun readChapterStartingFromChapterItemIndex(
+    private suspend fun readChapterStartingFromChapterItemPosition(
         chapterIndex: Int,
-        chapterItemIndex: Int,
+        chapterItemPosition: Int,
     ) = withContext(Dispatchers.Main.immediate) {
         val itemIndex = indexOfReaderItem(
             list = items,
-            chapterPosition = chapterIndex,
-            chapterItemPosition = chapterItemIndex
+            chapterIndex = chapterIndex,
+            chapterItemPosition = chapterItemPosition
         )
         if (itemIndex == -1) {
             reachedChapterEndFlowChapterIndex.emit(chapterIndex)
@@ -225,14 +226,12 @@ class ReaderTextToSpeech(
         }
 
         val firstItem = nextItems.first()
-        if (firstItem is ReaderItem.Position) {
-            manager.setCurrentSpeakState(
-                TextSynthesis(
-                    itemPos = firstItem,
-                    playState = Utterance.PlayState.LOADING
-                )
+        manager.setCurrentSpeakState(
+            TextSynthesis(
+                itemPos = firstItem,
+                playState = Utterance.PlayState.LOADING
             )
-        }
+        )
 
         nextItems.forEach(::speakItem)
     }
@@ -240,10 +239,11 @@ class ReaderTextToSpeech(
     @Synchronized
     private fun scrollToActiveItem() {
         coroutineScope.launch {
+            val currentItemPos = settings.currentActiveItemState.value.itemPos
             val itemIndex = indexOfReaderItem(
                 list = items,
-                chapterPosition = settings.currentActiveItemState.value.itemPos.chapterPosition,
-                chapterItemPosition = settings.currentActiveItemState.value.itemPos.chapterItemPosition,
+                chapterIndex = currentItemPos.chapterIndex,
+                chapterItemPosition = currentItemPos.chapterItemPosition,
             )
             val item = items.getOrNull(itemIndex) ?: return@launch
             scrollToReaderItem.emit(item)
@@ -269,9 +269,9 @@ class ReaderTextToSpeech(
         val state = settings.currentActiveItemState.value
         if (state.itemPos.chapterPosition != -1) {
             coroutineScope.launch {
-                readChapterStartingFromChapterItemIndex(
-                    chapterIndex = state.itemPos.chapterPosition,
-                    chapterItemIndex = state.itemPos.chapterItemPosition
+                readChapterStartingFromChapterItemPosition(
+                    chapterIndex = state.itemPos.chapterIndex,
+                    chapterItemPosition = state.itemPos.chapterItemPosition
                 )
             }
         } else {
@@ -288,10 +288,11 @@ class ReaderTextToSpeech(
         }
 
         coroutineScope.launch {
+            val currentItemPos = settings.currentActiveItemState.value.itemPos
             val itemIndex = indexOfReaderItem(
                 list = items,
-                chapterPosition = settings.currentActiveItemState.value.itemPos.chapterPosition,
-                chapterItemPosition = settings.currentActiveItemState.value.itemPos.chapterItemPosition,
+                chapterIndex = currentItemPos.chapterIndex,
+                chapterItemPosition = currentItemPos.chapterItemPosition,
             )
             if (itemIndex <= -1 || itemIndex >= items.lastIndex) return@launch
             val nextItemRelativeIndex = items
@@ -299,12 +300,12 @@ class ReaderTextToSpeech(
                 .indexOfFirst { it is ReaderItem.Position }
             if (nextItemRelativeIndex == -1) return@launch
             val nextItemIndex = itemIndex + 1 + nextItemRelativeIndex
-            val nextItem = items.getOrNull(nextItemIndex) ?: return@launch
+            val nextItem = items.getOrNull(nextItemIndex) as? ReaderItem.Position ?: return@launch
             stop()
             start()
             readChapterStartingFromItemIndex(
                 itemIndex = nextItemIndex,
-                chapterIndex = nextItem.chapterPosition
+                chapterIndex = nextItem.chapterIndex
             )
             scrollToReaderItem.emit(nextItem)
         }
@@ -317,10 +318,11 @@ class ReaderTextToSpeech(
         }
 
         coroutineScope.launch {
+            val currentItemPos = settings.currentActiveItemState.value.itemPos
             val itemIndex = indexOfReaderItem(
                 list = items,
-                chapterPosition = settings.currentActiveItemState.value.itemPos.chapterPosition,
-                chapterItemPosition = settings.currentActiveItemState.value.itemPos.chapterItemPosition,
+                chapterIndex = currentItemPos.chapterIndex,
+                chapterItemPosition = currentItemPos.chapterItemPosition,
             )
             if (itemIndex <= 0) return@launch
             val previousItemRelativeIndex = items
@@ -334,7 +336,7 @@ class ReaderTextToSpeech(
             start()
             readChapterStartingFromItemIndex(
                 itemIndex = previousItemIndex,
-                chapterIndex = previousItem.chapterPosition
+                chapterIndex = previousItem.chapterIndex
             )
             scrollToReaderItem.emit(previousItem)
         }
@@ -346,16 +348,16 @@ class ReaderTextToSpeech(
             return
         }
 
-        val nextChapterIndex = settings.currentActiveItemState.value.itemPos.chapterPosition + 1
+        val currentState = settings.currentActiveItemState.value
+        val nextChapterIndex = currentState.itemPos.chapterIndex + 1
         stop()
         if (!isChapterIndexValid(nextChapterIndex)) {
             coroutineScope.launch {
-                val state = settings.currentActiveItemState.value
                 val item = items.findLast {
-                    it is ReaderItem.Position && it.chapterPosition == state.itemPos.chapterPosition
+                    it is ReaderItem.Position && it.chapterPosition == currentState.itemPos.chapterPosition
                 } as? ReaderItem.Position ?: return@launch
 
-                manager.currentActiveItemState.value = state.copy(
+                manager.currentActiveItemState.value = currentState.copy(
                     playState = Utterance.PlayState.FINISHED,
                     itemPos = item
                 )
@@ -375,7 +377,7 @@ class ReaderTextToSpeech(
                 settings.isLoadingChapter.value = false
             }
             readChapterStartingFromStart(nextChapterIndex)
-            scrollToFirstChapterItemIndex.emit(nextChapterIndex)
+            scrollToChapterTop.emit(nextChapterIndex)
         }
     }
 
@@ -385,18 +387,16 @@ class ReaderTextToSpeech(
             return
         }
 
-        val currentChapterIndex = settings.currentActiveItemState.value.itemPos.chapterPosition
-        val currentChapterItemIndex = settings.currentActiveItemState.value.itemPos.chapterItemPosition
+        val currentItemState = settings.currentActiveItemState.value
         // Scroll to current chapter top if not already otherwise scroll to previous top
-        val targetChapterIndex = when (currentChapterItemIndex == 0) {
-            true -> currentChapterIndex - 1
-            false -> currentChapterIndex
+        val targetChapterIndex = when (currentItemState.itemPos is ReaderItem.Title) {
+            true -> currentItemState.itemPos.chapterIndex - 1
+            false -> currentItemState.itemPos.chapterIndex
         }
-
         stop()
         if (!isChapterIndexValid(targetChapterIndex)) {
             coroutineScope.launch {
-                manager.currentActiveItemState.value = settings.currentActiveItemState.value.copy(
+                manager.currentActiveItemState.value = currentItemState.copy(
                     playState = Utterance.PlayState.FINISHED
                 )
                 scrolledToTheTop.emit(Unit)
@@ -415,7 +415,7 @@ class ReaderTextToSpeech(
                 settings.isLoadingChapter.value = false
             }
             readChapterStartingFromStart(targetChapterIndex)
-            scrollToFirstChapterItemIndex.emit(targetChapterIndex)
+            scrollToChapterTop.emit(targetChapterIndex)
         }
     }
 
@@ -452,9 +452,9 @@ class ReaderTextToSpeech(
         val state = manager.currentActiveItemState.value
         if (state.itemPos.chapterPosition != -1) {
             coroutineScope.launch {
-                readChapterStartingFromChapterItemIndex(
-                    chapterIndex = state.itemPos.chapterPosition,
-                    chapterItemIndex = state.itemPos.chapterItemPosition
+                readChapterStartingFromChapterItemPosition(
+                    chapterIndex = state.itemPos.chapterIndex,
+                    chapterItemPosition = state.itemPos.chapterItemPosition
                 )
             }
         }
@@ -462,13 +462,13 @@ class ReaderTextToSpeech(
 
     private fun readChapterNextChunk(
         chapterIndex: Int,
-        chapterItemIndex: Int,
+        chapterItemPosition: Int,
         quantity: Int
     ) {
         val itemIndex = indexOfReaderItem(
             list = items,
-            chapterPosition = chapterIndex,
-            chapterItemPosition = chapterItemIndex
+            chapterIndex = chapterIndex,
+            chapterItemPosition = chapterItemPosition
         )
         if (itemIndex == -1) return
         val nextItems = getChapterNextItems(
@@ -484,12 +484,13 @@ class ReaderTextToSpeech(
         itemIndex: Int,
         chapterIndex: Int,
         quantity: Int
-    ): List<ReaderItem> {
+    ): List<ReaderItem.Position> {
         return items
             .subList(itemIndex.coerceAtMost(items.lastIndex), items.size)
             .asSequence()
             .filter { it is ReaderItem.Title || it is ReaderItem.Body }
-            .takeWhile { it.chapterPosition == chapterIndex }
+            .filterIsInstance<ReaderItem.Position>()
+            .takeWhile { it.chapterIndex == chapterIndex }
             .take(quantity)
             .toList()
     }

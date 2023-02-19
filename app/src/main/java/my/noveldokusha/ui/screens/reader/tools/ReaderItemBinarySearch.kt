@@ -4,17 +4,17 @@ import my.noveldokusha.ui.screens.reader.ReaderItem
 
 fun indexOfReaderItem(
     list: List<ReaderItem>,
-    chapterPosition: Int,
+    chapterIndex: Int,
     chapterItemPosition: Int
 ): Int = when {
     list.size < 128 -> indexOfReaderItemLinearSearch(
         list = list,
-        chapterPosition = chapterPosition,
+        chapterIndex = chapterIndex,
         chapterItemPosition = chapterItemPosition
     )
     else -> indexOfReaderItemBinarySearch(
         list = list,
-        chapterPosition = chapterPosition,
+        chapterIndex = chapterIndex,
         chapterItemPosition = chapterItemPosition
     )
 }
@@ -24,10 +24,10 @@ fun indexOfReaderItem(
  */
 fun indexOfReaderItemLinearSearch(
     list: List<ReaderItem>,
-    chapterPosition: Int,
+    chapterIndex: Int,
     chapterItemPosition: Int
 ) = list.indexOfFirst {
-    it.chapterPosition == chapterPosition &&
+    it.chapterIndex == chapterIndex &&
             it is ReaderItem.Position &&
             it.chapterItemPosition == chapterItemPosition
 }
@@ -37,7 +37,7 @@ fun indexOfReaderItemLinearSearch(
  */
 fun indexOfReaderItemBinarySearch(
     list: List<ReaderItem>,
-    chapterPosition: Int,
+    chapterIndex: Int,
     chapterItemPosition: Int
 ): Int {
     var low = 0
@@ -46,14 +46,14 @@ fun indexOfReaderItemBinarySearch(
     while (low < high) {
         var mid = low + (high - low) / 2
         val it = list[mid]
-        val compare = when (val compareChapter = it.chapterPosition.compareTo(chapterPosition)) {
+        val compare = when (val compareChapter = it.chapterIndex.compareTo(chapterIndex)) {
             0 -> when (it) {
                 is ReaderItem.Position -> it.chapterItemPosition.compareTo(chapterItemPosition)
                 else -> {
                     // We don't have a position, try to find one and make that the mid point
                     val index = list.subList(mid, high)
                         .asSequence()
-                        .takeWhile { it.chapterPosition == chapterPosition }
+                        .takeWhile { it.chapterIndex == chapterIndex }
                         .indexOfFirst { it is ReaderItem.Position }
 
                     if (index == -1) {

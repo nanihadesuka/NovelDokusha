@@ -67,7 +67,7 @@ class ReaderSession(
     val speakerStats = derivedStateOf {
         val item = readerTextToSpeech.currentTextPlaying.value.itemPos
         readerChaptersLoader.getItemContext(
-            chapterPosition = item.chapterPosition,
+            chapterIndex = item.chapterIndex,
             chapterItemPosition = item.chapterItemPosition
         )
     }
@@ -216,8 +216,8 @@ class ReaderSession(
         readerTextToSpeech.start()
         scope.launch {
             readerTextToSpeech.readChapterStartingFromItemIndex(
-                chapterIndex = startingItem.chapterPosition,
-                itemIndex = itemIndex
+                itemIndex = itemIndex,
+                chapterIndex = startingItem.chapterIndex
             )
         }
     }

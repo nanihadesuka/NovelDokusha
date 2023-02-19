@@ -133,7 +133,7 @@ class NarratorMediaControlsNotification(
                 .collectLatest {
                     val chapterPos = context.getString(
                         R.string.chapter_x_over_n,
-                        it.chapterPosition + 1,
+                        it.chapterIndex + 1,
                         it.chapterCount
                     )
                     val progress = context.getString(

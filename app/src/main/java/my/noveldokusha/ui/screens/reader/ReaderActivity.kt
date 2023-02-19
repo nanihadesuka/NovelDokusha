@@ -203,7 +203,7 @@ class ReaderActivity : BaseActivity() {
         viewModel.readerSpeaker.currentReaderItem.asLiveData().observe(this) {
             scrollToReadingPositionOptional(
                 chapterIndex = it.itemPos.chapterPosition,
-                chapterItemIndex = it.itemPos.chapterItemPosition,
+                chapterItemPosition = it.itemPos.chapterItemPosition,
             )
         }
 
@@ -211,15 +211,15 @@ class ReaderActivity : BaseActivity() {
             if (it !is ReaderItem.Position) return@observe
             scrollToReadingPositionForced(
                 chapterIndex = it.chapterPosition,
-                chapterItemIndex = it.chapterItemPosition,
+                chapterItemPosition = it.chapterItemPosition,
             )
         }
 
-        viewModel.readerSpeaker.scrollToFirstChapterItemIndex.asLiveData()
+        viewModel.readerSpeaker.scrollToChapterTop.asLiveData()
             .observe(this) { chapterIndex ->
                 scrollToReadingPositionForced(
                     chapterIndex = chapterIndex,
-                    chapterItemIndex = 0,
+                    chapterItemPosition = 0,
                 )
             }
 
@@ -273,7 +273,7 @@ class ReaderActivity : BaseActivity() {
                 // Reader info
                 ReaderInfoView(
                     chapterTitle = viewModel.readingPosStats.value?.chapterTitle ?: "",
-                    chapterCurrentNumber = viewModel.readingPosStats.value?.run { chapterPosition + 1 }
+                    chapterCurrentNumber = viewModel.readingPosStats.value?.run { chapterIndex + 1 }
                         ?: 0,
                     chapterPercentageProgress = viewModel.chapterPercentageProgress.value,
                     chaptersTotalSize = viewModel.readingPosStats.value?.chapterCount ?: 0,
@@ -350,12 +350,12 @@ class ReaderActivity : BaseActivity() {
             val itemPos = viewModel.readerSpeaker.currentTextPlaying.value.itemPos
             scrollToReadingPositionImmediately(
                 chapterIndex = itemPos.chapterPosition,
-                chapterItemIndex = itemPos.chapterItemPosition,
+                chapterItemPosition = itemPos.chapterItemPosition,
             )
         }
     }
 
-    private fun scrollToReadingPositionOptional(chapterIndex: Int, chapterItemIndex: Int) {
+    private fun scrollToReadingPositionOptional(chapterIndex: Int, chapterItemPosition: Int) {
         // If user already scrolling ignore
         if (listIsScrolling) {
             viewAdapter.listView.notifyDataSetChanged()
@@ -367,9 +367,9 @@ class ReaderActivity : BaseActivity() {
         for (index in firstIndex..lastIndex) {
             val item = viewAdapter.listView.getItem(index)
             if (
-                item.chapterPosition == chapterIndex &&
+                item.chapterIndex == chapterIndex &&
                 item is ReaderItem.Position &&
-                item.chapterItemPosition == chapterItemIndex
+                item.chapterItemPosition == chapterItemPosition
             ) {
                 val viewIndex = index - viewBind.listView.firstVisiblePosition
                 val currentOffsetPx =
@@ -386,12 +386,12 @@ class ReaderActivity : BaseActivity() {
         viewAdapter.listView.notifyDataSetChanged()
     }
 
-    private fun scrollToReadingPositionForced(chapterIndex: Int, chapterItemIndex: Int) {
+    private fun scrollToReadingPositionForced(chapterIndex: Int, chapterItemPosition: Int) {
         // Search for the item being read otherwise do nothing
         val itemIndex = indexOfReaderItem(
             list = viewModel.items,
-            chapterPosition = chapterIndex,
-            chapterItemPosition = chapterItemIndex
+            chapterIndex = chapterIndex,
+            chapterItemPosition = chapterItemPosition
         )
         if (itemIndex == -1) return
         val itemPosition = viewAdapter.listView.fromIndexToPosition(itemIndex)
@@ -401,12 +401,12 @@ class ReaderActivity : BaseActivity() {
         viewAdapter.listView.notifyDataSetChanged()
     }
 
-    private fun scrollToReadingPositionImmediately(chapterIndex: Int, chapterItemIndex: Int) {
+    private fun scrollToReadingPositionImmediately(chapterIndex: Int, chapterItemPosition: Int) {
         // Search for the item being read otherwise do nothing
         val itemIndex = indexOfReaderItem(
             list = viewModel.items,
-            chapterPosition = chapterIndex,
-            chapterItemPosition = chapterItemIndex
+            chapterIndex = chapterIndex,
+            chapterItemPosition = chapterItemPosition
         )
         if (itemIndex == -1) return
         val itemPosition = viewAdapter.listView.fromIndexToPosition(itemIndex)
@@ -448,7 +448,7 @@ class ReaderActivity : BaseActivity() {
     ) {
         val index = indexOfReaderItem(
             list = viewModel.items,
-            chapterPosition = chapterPosition,
+            chapterIndex = chapterPosition,
             chapterItemPosition = chapterItemPosition
         )
         val position = viewAdapter.listView.fromIndexToPosition(index)

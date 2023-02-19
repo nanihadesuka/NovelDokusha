@@ -53,8 +53,8 @@ class ReaderItemAdapter(
         else -> -1
     }
 
-    private val topPadding = ReaderItem.Padding(chapterUrl = "", chapterPosition = Int.MIN_VALUE)
-    private val bottomPadding = ReaderItem.Padding(chapterUrl = "", chapterPosition = Int.MAX_VALUE)
+    private val topPadding = ReaderItem.Padding(chapterIndex = Int.MIN_VALUE)
+    private val bottomPadding = ReaderItem.Padding(chapterIndex = Int.MAX_VALUE)
 
     override fun getViewTypeCount(): Int = 11
     override fun getItemViewType(position: Int) = when (getItem(position)) {

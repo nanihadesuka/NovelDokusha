@@ -63,8 +63,12 @@ class ReaderManager(
             translationManager = translationManager,
             appPreferences = appPreferences,
             forceUpdateListViewState = { withMainNow { forceUpdateListViewState?.invoke() } },
-            maintainLastVisiblePosition = { withMainNow { maintainLastVisiblePosition?.invoke(it) } },
-            maintainStartPosition = { withMainNow { maintainStartPosition?.invoke(it) } },
+            maintainLastVisiblePosition = {
+                withMainNow { maintainLastVisiblePosition?.invoke(it) ?: it() }
+            },
+            maintainStartPosition = {
+                withMainNow { maintainStartPosition?.invoke(it) ?: it() }
+            },
             setInitialPosition = { withMainNow { setInitialPosition?.invoke(it) } },
             showInvalidChapterDialog = { withMainNow { showInvalidChapterDialog?.invoke() } },
             context = context

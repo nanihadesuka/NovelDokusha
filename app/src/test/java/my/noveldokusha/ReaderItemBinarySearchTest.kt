@@ -13,82 +13,82 @@ import org.mockito.junit.MockitoJUnitRunner
 class ReaderItemBinarySearchTest {
 
     private val list = listOf<ReaderItem>(
-        ReaderItem.BookEnd(chapterUrl = "", chapterPosition = -1),
+        ReaderItem.BookEnd(chapterIndex = -1),
 
-        ReaderItem.Divider(chapterUrl = "", chapterPosition = 0),
-        ReaderItem.Title(chapterUrl = "", chapterPosition = 0, chapterItemPosition = 0, text = ""),
-        ReaderItem.GoogleTranslateAttribution(chapterUrl = "", chapterPosition = 0),
-        ReaderItem.Error(chapterUrl = "", chapterPosition = 0, text = ""),
-        ReaderItem.Progressbar(chapterUrl = "", chapterPosition = 0),
-        ReaderItem.Padding(chapterUrl = "", chapterPosition = 0),
+        ReaderItem.Divider(chapterIndex = 0),
+        ReaderItem.Title(chapterUrl = "", chapterIndex = 0, chapterPosition = 0, chapterItemPosition = 0, text = ""),
+        ReaderItem.GoogleTranslateAttribution(chapterIndex = 0),
+        ReaderItem.Error(chapterIndex = 0, text = ""),
+        ReaderItem.Progressbar(chapterIndex = 0),
+        ReaderItem.Padding(chapterIndex = 0),
 
-        ReaderItem.Divider(chapterUrl = "", chapterPosition = 1),
-        ReaderItem.Title(chapterUrl = "", chapterPosition = 1, chapterItemPosition = 0, text = ""),
-        ReaderItem.GoogleTranslateAttribution(chapterUrl = "", chapterPosition = 1),
-        ReaderItem.Progressbar(chapterUrl = "", chapterPosition = 1),
-        ReaderItem.Body(chapterUrl = "", chapterPosition = 1, chapterItemPosition = 1, text = "", location = ReaderItem.Location.MIDDLE),
-        ReaderItem.Body(chapterUrl = "", chapterPosition = 1, chapterItemPosition = 2, text = "", location = ReaderItem.Location.FIRST),
-        ReaderItem.Body(chapterUrl = "", chapterPosition = 1, chapterItemPosition = 3, text = "", location = ReaderItem.Location.MIDDLE),
-        ReaderItem.Image(chapterUrl = "", chapterPosition = 1, chapterItemPosition = 4, text = "", location = ReaderItem.Location.MIDDLE, image = BookTextMapper.ImgEntry("",1f)),
-        ReaderItem.Body(chapterUrl = "", chapterPosition = 1, chapterItemPosition = 5, text = "", location = ReaderItem.Location.MIDDLE),
-        ReaderItem.Body(chapterUrl = "", chapterPosition = 1, chapterItemPosition = 6, text = "", location = ReaderItem.Location.LAST),
-        ReaderItem.Image(chapterUrl = "", chapterPosition = 1, chapterItemPosition = 7, text = "", location = ReaderItem.Location.MIDDLE, image = BookTextMapper.ImgEntry("",1f)),
-        ReaderItem.Error(chapterUrl = "", chapterPosition = 1, text = ""),
-        ReaderItem.Padding(chapterUrl = "", chapterPosition = 1),
+        ReaderItem.Divider(chapterIndex = 1),
+        ReaderItem.Title(chapterUrl = "", chapterIndex = 1, chapterPosition = 1, chapterItemPosition = 0, text = ""),
+        ReaderItem.GoogleTranslateAttribution(chapterIndex = 1),
+        ReaderItem.Progressbar(chapterIndex = 1),
+        ReaderItem.Body(chapterUrl = "", chapterIndex = 1, chapterPosition = 1, chapterItemPosition = 1, text = "", location = ReaderItem.Location.MIDDLE),
+        ReaderItem.Body(chapterUrl = "", chapterIndex = 1, chapterPosition = 1, chapterItemPosition = 2, text = "", location = ReaderItem.Location.FIRST),
+        ReaderItem.Body(chapterUrl = "", chapterIndex = 1, chapterPosition = 1, chapterItemPosition = 3, text = "", location = ReaderItem.Location.MIDDLE),
+        ReaderItem.Image(chapterUrl = "", chapterIndex = 1, chapterPosition = 1, chapterItemPosition = 4, text = "", location = ReaderItem.Location.MIDDLE, image = BookTextMapper.ImgEntry("",1f)),
+        ReaderItem.Body(chapterUrl = "", chapterIndex = 1, chapterPosition = 1, chapterItemPosition = 5, text = "", location = ReaderItem.Location.MIDDLE),
+        ReaderItem.Body(chapterUrl = "", chapterIndex = 1, chapterPosition = 1, chapterItemPosition = 6, text = "", location = ReaderItem.Location.LAST),
+        ReaderItem.Image(chapterUrl = "", chapterIndex = 1, chapterPosition = 1, chapterItemPosition = 7, text = "", location = ReaderItem.Location.MIDDLE, image = BookTextMapper.ImgEntry("",1f)),
+        ReaderItem.Error(chapterIndex = 1, text = ""),
+        ReaderItem.Padding(chapterIndex = 1),
 
-        ReaderItem.Divider(chapterUrl = "", chapterPosition = 2),
-        ReaderItem.Title(chapterUrl = "", chapterPosition = 2, chapterItemPosition = 0, text = ""),
-        ReaderItem.GoogleTranslateAttribution(chapterUrl = "", chapterPosition = 2),
-        ReaderItem.Progressbar(chapterUrl = "", chapterPosition = 2),
-        ReaderItem.Body(chapterUrl = "", chapterPosition = 2, chapterItemPosition = 1, text = "", location = ReaderItem.Location.MIDDLE),
-        ReaderItem.Body(chapterUrl = "", chapterPosition = 2, chapterItemPosition = 2, text = "", location = ReaderItem.Location.FIRST),
-        ReaderItem.Body(chapterUrl = "", chapterPosition = 2, chapterItemPosition = 3, text = "", location = ReaderItem.Location.MIDDLE),
-        ReaderItem.Image(chapterUrl = "", chapterPosition = 2, chapterItemPosition = 4, text = "", location = ReaderItem.Location.MIDDLE, image = BookTextMapper.ImgEntry("",1f)),
-        ReaderItem.Body(chapterUrl = "", chapterPosition = 2, chapterItemPosition = 5, text = "", location = ReaderItem.Location.MIDDLE),
-        ReaderItem.Body(chapterUrl = "", chapterPosition = 2, chapterItemPosition = 6, text = "", location = ReaderItem.Location.LAST),
-        ReaderItem.Image(chapterUrl = "", chapterPosition = 2, chapterItemPosition = 7, text = "", location = ReaderItem.Location.MIDDLE, image = BookTextMapper.ImgEntry("",1f)),
-        ReaderItem.Error(chapterUrl = "", chapterPosition = 2, text = ""),
-        ReaderItem.Padding(chapterUrl = "", chapterPosition = 2),
+        ReaderItem.Divider(chapterIndex = 2),
+        ReaderItem.Title(chapterUrl = "", chapterIndex = 2, chapterPosition = 2, chapterItemPosition = 0, text = ""),
+        ReaderItem.GoogleTranslateAttribution(chapterIndex = 2),
+        ReaderItem.Progressbar(chapterIndex = 2),
+        ReaderItem.Body(chapterUrl = "", chapterIndex = 2, chapterPosition = 2, chapterItemPosition = 1, text = "", location = ReaderItem.Location.MIDDLE),
+        ReaderItem.Body(chapterUrl = "", chapterIndex = 2, chapterPosition = 2, chapterItemPosition = 2, text = "", location = ReaderItem.Location.FIRST),
+        ReaderItem.Body(chapterUrl = "", chapterIndex = 2, chapterPosition = 2, chapterItemPosition = 3, text = "", location = ReaderItem.Location.MIDDLE),
+        ReaderItem.Image(chapterUrl = "", chapterIndex = 2, chapterPosition = 2, chapterItemPosition = 4, text = "", location = ReaderItem.Location.MIDDLE, image = BookTextMapper.ImgEntry("",1f)),
+        ReaderItem.Body(chapterUrl = "", chapterIndex = 2, chapterPosition = 2, chapterItemPosition = 5, text = "", location = ReaderItem.Location.MIDDLE),
+        ReaderItem.Body(chapterUrl = "", chapterIndex = 2, chapterPosition = 2, chapterItemPosition = 6, text = "", location = ReaderItem.Location.LAST),
+        ReaderItem.Image(chapterUrl = "", chapterIndex = 2, chapterPosition = 2, chapterItemPosition = 7, text = "", location = ReaderItem.Location.MIDDLE, image = BookTextMapper.ImgEntry("",1f)),
+        ReaderItem.Error(chapterIndex = 2, text = ""),
+        ReaderItem.Padding(chapterIndex = 2),
 
-        ReaderItem.Divider(chapterUrl = "", chapterPosition = 3),
-        ReaderItem.Title(chapterUrl = "", chapterPosition = 3, chapterItemPosition = 0, text = ""),
-        ReaderItem.GoogleTranslateAttribution(chapterUrl = "", chapterPosition = 3),
-        ReaderItem.Progressbar(chapterUrl = "", chapterPosition = 3),
-        ReaderItem.Body(chapterUrl = "", chapterPosition = 3, chapterItemPosition = 1, text = "", location = ReaderItem.Location.MIDDLE),
-        ReaderItem.Body(chapterUrl = "", chapterPosition = 3, chapterItemPosition = 2, text = "", location = ReaderItem.Location.FIRST),
-        ReaderItem.Body(chapterUrl = "", chapterPosition = 3, chapterItemPosition = 3, text = "", location = ReaderItem.Location.MIDDLE),
-        ReaderItem.Image(chapterUrl = "", chapterPosition = 3, chapterItemPosition = 4, text = "", location = ReaderItem.Location.MIDDLE, image = BookTextMapper.ImgEntry("",1f)),
-        ReaderItem.Body(chapterUrl = "", chapterPosition = 3, chapterItemPosition = 5, text = "", location = ReaderItem.Location.MIDDLE),
-        ReaderItem.Body(chapterUrl = "", chapterPosition = 3, chapterItemPosition = 6, text = "", location = ReaderItem.Location.LAST),
-        ReaderItem.Image(chapterUrl = "", chapterPosition = 3, chapterItemPosition = 7, text = "", location = ReaderItem.Location.MIDDLE, image = BookTextMapper.ImgEntry("",1f)),
-        ReaderItem.Error(chapterUrl = "", chapterPosition = 3, text = ""),
-        ReaderItem.Padding(chapterUrl = "", chapterPosition = 3),
+        ReaderItem.Divider(chapterIndex = 3),
+        ReaderItem.Title(chapterUrl = "", chapterIndex = 3, chapterPosition = 3, chapterItemPosition = 0, text = ""),
+        ReaderItem.GoogleTranslateAttribution(chapterIndex = 3),
+        ReaderItem.Progressbar(chapterIndex = 3),
+        ReaderItem.Body(chapterUrl = "", chapterIndex = 3, chapterPosition = 3, chapterItemPosition = 1, text = "", location = ReaderItem.Location.MIDDLE),
+        ReaderItem.Body(chapterUrl = "", chapterIndex = 3, chapterPosition = 3, chapterItemPosition = 2, text = "", location = ReaderItem.Location.FIRST),
+        ReaderItem.Body(chapterUrl = "", chapterIndex = 3, chapterPosition = 3, chapterItemPosition = 3, text = "", location = ReaderItem.Location.MIDDLE),
+        ReaderItem.Image(chapterUrl = "", chapterIndex = 3, chapterPosition = 3, chapterItemPosition = 4, text = "", location = ReaderItem.Location.MIDDLE, image = BookTextMapper.ImgEntry("",1f)),
+        ReaderItem.Body(chapterUrl = "", chapterIndex = 3, chapterPosition = 3, chapterItemPosition = 5, text = "", location = ReaderItem.Location.MIDDLE),
+        ReaderItem.Body(chapterUrl = "", chapterIndex = 3, chapterPosition = 3, chapterItemPosition = 6, text = "", location = ReaderItem.Location.LAST),
+        ReaderItem.Image(chapterUrl = "", chapterIndex = 3, chapterPosition = 3, chapterItemPosition = 7, text = "", location = ReaderItem.Location.MIDDLE, image = BookTextMapper.ImgEntry("",1f)),
+        ReaderItem.Error( chapterIndex = 3 , text = ""),
+        ReaderItem.Padding( chapterIndex = 3),
 
-        ReaderItem.BookEnd(chapterUrl = "", chapterPosition = 4),
+        ReaderItem.BookEnd(chapterIndex = 4),
     )
 
     // Compare against the naive linear search as the gold standard, indices should return the same
-    private fun assertEqualsIndices(chapterIndex: Int, chapterItemIndex: Int) {
-        val indexExpected = indexOfReaderItemLinearSearch(list, chapterPosition = chapterIndex, chapterItemPosition = chapterItemIndex)
-        val indexGot = indexOfReaderItemBinarySearch(list, chapterPosition = chapterIndex, chapterItemPosition = chapterItemIndex)
+    private fun assertEqualsIndices(chapterIndex: Int, chapterItemPosition: Int) {
+        val indexExpected = indexOfReaderItemLinearSearch(list, chapterIndex = chapterIndex, chapterItemPosition = chapterItemPosition)
+        val indexGot = indexOfReaderItemBinarySearch(list, chapterIndex = chapterIndex, chapterItemPosition = chapterItemPosition)
         assertEquals(
-            "Indices not matching for chapterPos:$chapterIndex pos:$chapterItemIndex",
+            "Indices not matching for chapterPos:$chapterIndex pos:$chapterItemPosition",
             indexExpected,
             indexGot
         )
     }
 
-    @Test fun findItem0() {     assertEqualsIndices(chapterIndex = -1, chapterItemIndex = 0)   }
-    @Test fun findItem1() {     assertEqualsIndices(chapterIndex = 0, chapterItemIndex = 1)    }
-    @Test fun findItem2() {     assertEqualsIndices(chapterIndex = 0, chapterItemIndex = 1)    }
-    @Test fun findItem3() {     assertEqualsIndices(chapterIndex = 1, chapterItemIndex = 0)    }
-    @Test fun findItem4() {     assertEqualsIndices(chapterIndex = 1, chapterItemIndex = 4)    }
-    @Test fun findItem5() {     assertEqualsIndices(chapterIndex = 1, chapterItemIndex = 7)    }
-    @Test fun findItem6() {     assertEqualsIndices(chapterIndex = 1, chapterItemIndex = 8)    }
-    @Test fun findItem7() {     assertEqualsIndices(chapterIndex = 2, chapterItemIndex = 0)    }
-    @Test fun findItem8() {     assertEqualsIndices(chapterIndex = 2, chapterItemIndex = 3)    }
-    @Test fun findItem9() {     assertEqualsIndices(chapterIndex = 3, chapterItemIndex = 2)    }
-    @Test fun findItem10() {    assertEqualsIndices(chapterIndex = 4, chapterItemIndex = 2)    }
-    @Test fun findItem11() {    assertEqualsIndices(chapterIndex = 7, chapterItemIndex = 2)    }
-    @Test fun findItem12() {    assertEqualsIndices(chapterIndex = 3, chapterItemIndex = -5)   }
+    @Test fun findItem0() {     assertEqualsIndices(chapterIndex = -1, chapterItemPosition = 0)   }
+    @Test fun findItem1() {     assertEqualsIndices(chapterIndex = 0, chapterItemPosition = 1)    }
+    @Test fun findItem2() {     assertEqualsIndices(chapterIndex = 0, chapterItemPosition = 1)    }
+    @Test fun findItem3() {     assertEqualsIndices(chapterIndex = 1, chapterItemPosition = 0)    }
+    @Test fun findItem4() {     assertEqualsIndices(chapterIndex = 1, chapterItemPosition = 4)    }
+    @Test fun findItem5() {     assertEqualsIndices(chapterIndex = 1, chapterItemPosition = 7)    }
+    @Test fun findItem6() {     assertEqualsIndices(chapterIndex = 1, chapterItemPosition = 8)    }
+    @Test fun findItem7() {     assertEqualsIndices(chapterIndex = 2, chapterItemPosition = 0)    }
+    @Test fun findItem8() {     assertEqualsIndices(chapterIndex = 2, chapterItemPosition = 3)    }
+    @Test fun findItem9() {     assertEqualsIndices(chapterIndex = 3, chapterItemPosition = 2)    }
+    @Test fun findItem10() {    assertEqualsIndices(chapterIndex = 4, chapterItemPosition = 2)    }
+    @Test fun findItem11() {    assertEqualsIndices(chapterIndex = 7, chapterItemPosition = 2)    }
+    @Test fun findItem12() {    assertEqualsIndices(chapterIndex = 3, chapterItemPosition = -5)   }
 }

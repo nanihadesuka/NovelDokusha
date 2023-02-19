@@ -32,6 +32,7 @@ data class ChapterState(
 )
 
 data class ReadingChapterPosStats(
+    val chapterIndex: Int,
     val chapterPosition: Int,
     val chapterCount: Int,
     val chapterItemPosition: Int,

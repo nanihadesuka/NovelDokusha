@@ -12,6 +12,7 @@ import my.noveldokusha.ui.screens.reader.manager.ReaderManager
 import my.noveldokusha.ui.screens.reader.manager.ReaderManagerViewCallReferences
 import my.noveldokusha.utils.StateExtra_Boolean
 import my.noveldokusha.utils.StateExtra_String
+import timber.log.Timber
 import javax.inject.Inject
 import kotlin.properties.Delegates
 
@@ -63,6 +64,7 @@ class ReaderViewModel @Inject constructor(
 
     fun onBackPressed() {
         if (!showReaderInfoAndSettings) {
+            Timber.d("Close reader screen manually")
             readerManager.close()
         }
     }

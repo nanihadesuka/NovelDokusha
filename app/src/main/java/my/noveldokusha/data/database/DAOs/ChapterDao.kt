@@ -10,7 +10,13 @@ interface ChapterDao {
     @Query("SELECT * FROM Chapter")
     suspend fun getAll(): List<Chapter>
 
-    @Query("SELECT * FROM Chapter WHERE bookUrl = :bookUrl")
+    @Query(
+        """
+        SELECT * FROM Chapter
+        WHERE Chapter.bookUrl == :bookUrl
+        ORDER BY Chapter.position ASC
+    """
+    )
     suspend fun chapters(bookUrl: String): List<Chapter>
 
     @Update
