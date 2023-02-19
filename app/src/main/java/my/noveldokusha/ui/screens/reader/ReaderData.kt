@@ -10,7 +10,6 @@ import kotlin.math.ceil
 typealias ChapterUrl = String
 typealias ItemIndex = Int // refers to [items]
 typealias ChapterIndex = Int // refers to [orderedChapters]
-typealias ChapterPosition = Int
 typealias ChapterItemPosition = Int
 
 enum class ReaderState {
@@ -33,7 +32,6 @@ data class ChapterState(
 
 data class ReadingChapterPosStats(
     val chapterIndex: Int,
-    val chapterPosition: Int,
     val chapterCount: Int,
     val chapterItemPosition: Int,
     val chapterItemsCount: Int,

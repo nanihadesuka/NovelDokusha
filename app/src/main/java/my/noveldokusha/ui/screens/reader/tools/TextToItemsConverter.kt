@@ -10,7 +10,6 @@ import my.noveldokusha.ui.screens.reader.ReaderItem
 suspend fun textToItemsConverter(
     chapterUrl: String,
     chapterIndex: Int,
-    chapterPosition: Int,
     chapterItemPositionDisplacement: Int,
     text: String
 ): List<ReaderItem> = withContext(Dispatchers.Default) {
@@ -25,7 +24,6 @@ suspend fun textToItemsConverter(
                 generateITEM(
                     chapterUrl = chapterUrl,
                     chapterIndex = chapterIndex,
-                    chapterPosition = chapterPosition,
                     chapterItemPosition = position + chapterItemPositionDisplacement,
                     text = paragraph,
                     location = when (position) {
@@ -41,7 +39,6 @@ suspend fun textToItemsConverter(
 private fun generateITEM(
     chapterUrl: String,
     chapterIndex: Int,
-    chapterPosition: Int,
     chapterItemPosition: Int,
     text: String,
     location: ReaderItem.Location
@@ -49,7 +46,6 @@ private fun generateITEM(
     null -> ReaderItem.Body(
         chapterUrl = chapterUrl,
         chapterIndex = chapterIndex,
-        chapterPosition = chapterPosition,
         chapterItemPosition = chapterItemPosition,
         text = text,
         location = location
@@ -57,7 +53,6 @@ private fun generateITEM(
     else -> ReaderItem.Image(
         chapterUrl = chapterUrl,
         chapterIndex = chapterIndex,
-        chapterPosition = chapterPosition,
         chapterItemPosition = chapterItemPosition,
         text = text,
         location = location,

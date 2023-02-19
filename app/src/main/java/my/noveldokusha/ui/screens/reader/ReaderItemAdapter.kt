@@ -291,7 +291,7 @@ class ReaderItemAdapter(
     private fun getItemReadingStateBackground(item: ReaderItem): Drawable? {
         val textSynthesis = currentSpeakerActiveItem()
         val isReadingItem = item is ReaderItem.Position &&
-                textSynthesis.itemPos.chapterPosition == item.chapterPosition &&
+                textSynthesis.itemPos.chapterIndex == item.chapterIndex &&
                 textSynthesis.itemPos.chapterItemPosition == item.chapterItemPosition
 
         if (!isReadingItem) return null

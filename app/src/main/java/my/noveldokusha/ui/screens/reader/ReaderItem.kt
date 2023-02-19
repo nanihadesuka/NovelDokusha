@@ -11,17 +11,11 @@ sealed interface ReaderItem {
 
     sealed interface Chapter : ReaderItem {
         val chapterUrl: String
-
-        /**
-         * Value corresponding to items of the same chapter.
-         * Multiple chapter rows can have same position.
-         */
-        val chapterPosition: Int
     }
 
     sealed interface Position : ReaderItem, Chapter {
         /**
-         * Index for the items of each [chapterPosition].
+         * Index for the items of each [chapterIndex].
          * Unique by chapter
          */
         val chapterItemPosition: Int
@@ -41,7 +35,6 @@ sealed interface ReaderItem {
     data class Title(
         override val chapterUrl: String,
         override val chapterIndex: Int,
-        override val chapterPosition: Int,
         override val chapterItemPosition: Int,
         override val text: String,
         override val textTranslated: String? = null
@@ -50,7 +43,6 @@ sealed interface ReaderItem {
     data class Body(
         override val chapterUrl: String,
         override val chapterIndex: Int,
-        override val chapterPosition: Int,
         override val chapterItemPosition: Int,
         override val text: String,
         override val location: Location,
@@ -60,7 +52,6 @@ sealed interface ReaderItem {
     data class Image(
         override val chapterUrl: String,
         override val chapterIndex: Int,
-        override val chapterPosition: Int,
         override val chapterItemPosition: Int,
         override val location: Location,
         val text: String,

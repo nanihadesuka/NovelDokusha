@@ -61,7 +61,6 @@ class ReaderChaptersLoader(
         val chapterStats = chaptersStats[chapterUrl] ?: return null
         return ReadingChapterPosStats(
             chapterIndex = item.chapterIndex,
-            chapterPosition = item.chapterPosition,
             chapterCount = orderedChapters.size,
             chapterItemPosition = item.chapterItemPosition,
             chapterItemsCount = chapterStats.itemsCount,
@@ -80,7 +79,6 @@ class ReaderChaptersLoader(
         val chapterStats = chaptersStats[item.chapterUrl] ?: return null
         return ReadingChapterPosStats(
             chapterIndex = chapterIndex,
-            chapterPosition = item.chapterPosition,
             chapterCount = orderedChapters.size,
             chapterItemPosition = item.chapterItemPosition,
             chapterItemsCount = chapterStats.itemsCount,
@@ -216,7 +214,7 @@ class ReaderChaptersLoader(
         forceUpdateListViewState()
         setInitialPosition(
             InitialPositionChapter(
-                chapterPosition = index,
+                chapterIndex = index,
                 chapterItemPosition = chapterLastState.chapterItemPosition,
                 chapterItemOffset = chapterLastState.offset
             )
@@ -279,7 +277,7 @@ class ReaderChaptersLoader(
         val initialPosition = getInitialChapterItemPosition(
             repository = repository,
             bookUrl = bookUrl,
-            chapterPosition = chapter.position,
+            chapterIndex = chapter.position,
             chapter = chapter,
         )
 
@@ -424,7 +422,6 @@ class ReaderChaptersLoader(
         val itemTitle = ReaderItem.Title(
             chapterUrl = chapter.url,
             chapterIndex = chapterIndex,
-            chapterPosition = chapter.position,
             text = chapter.title,
             chapterItemPosition = chapterItemPosition,
         ).copy(
@@ -445,7 +442,6 @@ class ReaderChaptersLoader(
                 val itemsOriginal = textToItemsConverter(
                     chapterUrl = chapter.url,
                     chapterIndex = chapterIndex,
-                    chapterPosition = chapter.position,
                     chapterItemPositionDisplacement = chapterItemPosition,
                     text = res.data,
                 )

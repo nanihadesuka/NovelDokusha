@@ -43,7 +43,7 @@ data class TextSynthesis(
     val itemPos: ReaderItem.Position,
     override val playState: Utterance.PlayState
 ) : Utterance<TextSynthesis> {
-    override val utteranceId = "${itemPos.chapterItemPosition}-${itemPos.chapterPosition}"
+    override val utteranceId = "${itemPos.chapterItemPosition}-${itemPos.chapterIndex}"
     override fun copyWithState(playState: Utterance.PlayState) = copy(playState = playState)
 }
 
@@ -73,7 +73,6 @@ class ReaderTextToSpeech(
             itemPos = ReaderItem.Title(
                 chapterUrl = "",
                 chapterIndex = -1,
-                chapterPosition = -1,
                 chapterItemPosition = 0,
                 text = ""
             ),
@@ -97,7 +96,7 @@ class ReaderTextToSpeech(
         availableVoices = manager.availableVoices,
         currentActiveItemState = manager.currentActiveItemState,
         isThereActiveItem = derivedStateOf {
-            manager.currentActiveItemState.value.itemPos.chapterPosition != -1
+            manager.currentActiveItemState.value.itemPos.chapterIndex > 0
         },
         voicePitch = manager.voicePitch,
         voiceSpeed = manager.voiceSpeed,
@@ -267,7 +266,7 @@ class ReaderTextToSpeech(
         }
         start()
         val state = settings.currentActiveItemState.value
-        if (state.itemPos.chapterPosition != -1) {
+        if (state.itemPos.chapterIndex > 0) {
             coroutineScope.launch {
                 readChapterStartingFromChapterItemPosition(
                     chapterIndex = state.itemPos.chapterIndex,
@@ -354,7 +353,7 @@ class ReaderTextToSpeech(
         if (!isChapterIndexValid(nextChapterIndex)) {
             coroutineScope.launch {
                 val item = items.findLast {
-                    it is ReaderItem.Position && it.chapterPosition == currentState.itemPos.chapterPosition
+                    it is ReaderItem.Position && it.chapterIndex == currentState.itemPos.chapterIndex
                 } as? ReaderItem.Position ?: return@launch
 
                 manager.currentActiveItemState.value = currentState.copy(
@@ -450,7 +449,7 @@ class ReaderTextToSpeech(
         stop()
         start()
         val state = manager.currentActiveItemState.value
-        if (state.itemPos.chapterPosition != -1) {
+        if (state.itemPos.chapterIndex > 0) {
             coroutineScope.launch {
                 readChapterStartingFromChapterItemPosition(
                     chapterIndex = state.itemPos.chapterIndex,

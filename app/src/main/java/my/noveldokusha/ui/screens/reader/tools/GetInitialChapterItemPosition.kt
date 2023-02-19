@@ -6,7 +6,7 @@ import my.noveldokusha.data.database.tables.Chapter
 import my.noveldokusha.repository.Repository
 
 data class InitialPositionChapter(
-    val chapterPosition: Int,
+    val chapterIndex: Int,
     val chapterItemPosition: Int,
     val chapterItemOffset: Int
 )
@@ -14,13 +14,13 @@ data class InitialPositionChapter(
 suspend fun getInitialChapterItemPosition(
     repository: Repository,
     bookUrl: String,
-    chapterPosition: Int,
+    chapterIndex: Int,
     chapter: Chapter,
 ): InitialPositionChapter = coroutineScope {
     val titleChapterItemPosition = 0 // Hardcode or no?
     val book = async { repository.libraryBooks.get(bookUrl) }
     val position = InitialPositionChapter(
-        chapterPosition = chapterPosition,
+        chapterIndex = chapterIndex,
         chapterItemPosition = chapter.lastReadPosition,
         chapterItemOffset = chapter.lastReadOffset,
     )
@@ -28,7 +28,7 @@ suspend fun getInitialChapterItemPosition(
     when {
         chapter.url == book.await()?.lastReadChapter -> position
         chapter.read -> InitialPositionChapter(
-            chapterPosition = chapterPosition,
+            chapterIndex = chapterIndex,
             chapterItemPosition = titleChapterItemPosition,
             chapterItemOffset = 0,
         )

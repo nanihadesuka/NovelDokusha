@@ -156,8 +156,8 @@ class ReaderActivity : BaseActivity() {
 
         viewModel.setInitialPosition = {
             withContext(Dispatchers.Main.immediate) {
-                setInitialChapterPosition(
-                    chapterPosition = it.chapterPosition,
+                initialScrollToChapterItemPosition(
+                    chapterIndex = it.chapterIndex,
                     chapterItemPosition = it.chapterItemPosition,
                     offset = it.chapterItemOffset
                 )
@@ -202,7 +202,7 @@ class ReaderActivity : BaseActivity() {
 
         viewModel.readerSpeaker.currentReaderItem.asLiveData().observe(this) {
             scrollToReadingPositionOptional(
-                chapterIndex = it.itemPos.chapterPosition,
+                chapterIndex = it.itemPos.chapterIndex,
                 chapterItemPosition = it.itemPos.chapterItemPosition,
             )
         }
@@ -210,7 +210,7 @@ class ReaderActivity : BaseActivity() {
         viewModel.readerSpeaker.scrollToReaderItem.asLiveData().observe(this) {
             if (it !is ReaderItem.Position) return@observe
             scrollToReadingPositionForced(
-                chapterIndex = it.chapterPosition,
+                chapterIndex = it.chapterIndex,
                 chapterItemPosition = it.chapterItemPosition,
             )
         }
@@ -349,7 +349,7 @@ class ReaderActivity : BaseActivity() {
             viewModel.introScrollToSpeaker = false
             val itemPos = viewModel.readerSpeaker.currentTextPlaying.value.itemPos
             scrollToReadingPositionImmediately(
-                chapterIndex = itemPos.chapterPosition,
+                chapterIndex = itemPos.chapterIndex,
                 chapterItemPosition = itemPos.chapterItemPosition,
             )
         }
@@ -441,14 +441,14 @@ class ReaderActivity : BaseActivity() {
         }
     }
 
-    private fun setInitialChapterPosition(
-        chapterPosition: Int,
+    private fun initialScrollToChapterItemPosition(
+        chapterIndex: Int,
         chapterItemPosition: Int,
         offset: Int
     ) {
         val index = indexOfReaderItem(
             list = viewModel.items,
-            chapterIndex = chapterPosition,
+            chapterIndex = chapterIndex,
             chapterItemPosition = chapterItemPosition
         )
         val position = viewAdapter.listView.fromIndexToPosition(index)

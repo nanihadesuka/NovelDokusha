@@ -408,7 +408,6 @@ private fun ViewsPreview() {
                         chapterUrl = "",
                         chapterIndex = 0,
                         chapterItemPosition = 1,
-                        chapterPosition = 1,
                         text = ""
                     )
                 )
