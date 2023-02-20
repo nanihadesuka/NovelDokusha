@@ -36,11 +36,13 @@ class ReaderSession(
     val setInitialPosition: suspend (InitialPositionChapter) -> Unit,
     val showInvalidChapterDialog: suspend () -> Unit,
 ) {
-    private var bookCoverUrl: String? = null
     private var chapterUrl: String = initialChapterUrl
 
     private val readRoutine = ChaptersIsReadRoutine(repository)
     private val orderedChapters = mutableListOf<Chapter>()
+
+    var bookTitle: String? = null
+    var bookCoverUrl: String? = null
 
     var currentChapter: ChapterState by Delegates.observable(
         ChapterState(
@@ -146,6 +148,7 @@ class ReaderSession(
             chaptersList.await()
             loadTranslator.await()
             bookCoverUrl = book.await()?.coverImageUrl
+            bookTitle = book.await()?.title
             currentChapter = ChapterState(
                 chapterUrl = chapterUrl,
                 chapterItemPosition = chapter.await()?.lastReadPosition ?: 0,

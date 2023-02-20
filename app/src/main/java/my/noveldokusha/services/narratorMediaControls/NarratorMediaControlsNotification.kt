@@ -51,7 +51,7 @@ class NarratorMediaControlsNotification(
             it.addNextIntent(
                 ChaptersActivity.IntentData(
                     context,
-                    BookMetadata(url = readerSession.bookUrl, title = readerSession.bookUrl)
+                    BookMetadata(url = readerSession.bookUrl, title = readerSession.bookTitle ?: "")
                 )
             )
             it.addNextIntent(
