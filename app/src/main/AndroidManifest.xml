@@ -59,7 +59,7 @@
 			android:name=".services.narratorMediaControls.NarratorMediaControlsService"
 			android:exported="false"
 			android:foregroundServiceType="mediaPlayback"
-			></service>
+			/>
 	</application>
 
 </manifest>

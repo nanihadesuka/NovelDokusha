@@ -39,8 +39,7 @@ class NarratorMediaControlsNotification(
         val readerSession = readerManager.session ?: return null
 
         val mediaSession = MediaSession
-            .Builder(context, createNarratorMediaControlsPlayer())
-            .setCallback(createNarratorMediaControlsCommands(readerSession))
+            .Builder(context, createNarratorMediaControlsPlayer(readerSession))
             .build()
             .also { mediaSession = it }
 
