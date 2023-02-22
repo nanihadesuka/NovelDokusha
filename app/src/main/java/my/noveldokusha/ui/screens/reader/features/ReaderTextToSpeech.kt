@@ -114,6 +114,11 @@ class ReaderTextToSpeech(
         setVoiceSpeed = ::setVoiceSpeed,
     )
 
+    val isAtFirstItem = derivedStateOf { currentTextPlaying.value.itemPos.chapterIndex == 0 }
+    val isAtLastItem = derivedStateOf {
+        !isAtFirstItem.value && !isChapterIndexValid(currentTextPlaying.value.itemPos.chapterIndex + 1)
+    }
+
     val isActive = derivedStateOf { settings.isThereActiveItem.value || settings.isPlaying.value }
     val isSpeaking = derivedStateOf { settings.isThereActiveItem.value && settings.isPlaying.value }
 
@@ -154,12 +159,7 @@ class ReaderTextToSpeech(
                             }
                             0 -> {
                                 launch {
-                                    val itemIndex = indexOfReaderItem(
-                                        list = items,
-                                        chapterIndex = it.itemPos.chapterIndex,
-                                        chapterItemPosition = it.itemPos.chapterItemPosition,
-                                    )
-                                    reachedChapterEndFlowChapterIndex.emit(itemIndex)
+                                    reachedChapterEndFlowChapterIndex.emit(it.itemPos.chapterIndex)
                                 }
                             }
                             else -> Unit
