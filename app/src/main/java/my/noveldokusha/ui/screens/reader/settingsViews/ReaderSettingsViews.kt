@@ -1,4 +1,4 @@
-package my.noveldokusha.ui.screens.reader
+package my.noveldokusha.ui.screens.reader.settingsViews
 
 import androidx.compose.animation.*
 import androidx.compose.foundation.background
@@ -32,10 +32,11 @@ import my.noveldokusha.tools.VoiceData
 import my.noveldokusha.ui.composeViews.MyButton
 import my.noveldokusha.ui.composeViews.MyIconButton
 import my.noveldokusha.ui.screens.main.settings.SettingsTheme
+import my.noveldokusha.ui.screens.reader.ReaderItem
+import my.noveldokusha.ui.screens.reader.features.LiveTranslationSettingData
+import my.noveldokusha.ui.screens.reader.features.TextSynthesis
+import my.noveldokusha.ui.screens.reader.features.TextToSpeechSettingData
 import my.noveldokusha.ui.screens.reader.settingsViews.*
-import my.noveldokusha.ui.screens.reader.tools.LiveTranslationSettingData
-import my.noveldokusha.ui.screens.reader.tools.TextSynthesis
-import my.noveldokusha.ui.screens.reader.tools.TextToSpeechSettingData
 import my.noveldokusha.ui.theme.InternalTheme
 import my.noveldokusha.ui.theme.Themes
 import my.noveldokusha.utils.rememberMutableStateOf
@@ -403,10 +404,10 @@ private fun ViewsPreview() {
             mutableStateOf(
                 TextSynthesis(
                     playState = Utterance.PlayState.PLAYING,
-                    item = ReaderItem.Title(
+                    itemPos = ReaderItem.Title(
                         chapterUrl = "",
-                        chapterItemIndex = 1,
-                        chapterIndex = 1,
+                        chapterIndex = 0,
+                        chapterItemPosition = 1,
                         text = ""
                     )
                 )

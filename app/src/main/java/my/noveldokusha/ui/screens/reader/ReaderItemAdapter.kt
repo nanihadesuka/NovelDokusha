@@ -18,7 +18,7 @@ import my.noveldokusha.R
 import my.noveldokusha.databinding.*
 import my.noveldokusha.resolvedBookImagePath
 import my.noveldokusha.tools.Utterance
-import my.noveldokusha.ui.screens.reader.tools.TextSynthesis
+import my.noveldokusha.ui.screens.reader.features.TextSynthesis
 import my.noveldokusha.utils.inflater
 
 class ReaderItemAdapter(
@@ -48,13 +48,13 @@ class ReaderItemAdapter(
         else -> -1
     }
 
-    fun fromIndexToPosition(index: Int): Int = when (index) {
+    fun fromIndexToPosition(index: ItemIndex): Int = when (index) {
         in 0 until super.getCount() -> index + 1
         else -> -1
     }
 
-    private val topPadding = ReaderItem.Padding(chapterUrl = "", chapterIndex = Int.MIN_VALUE)
-    private val bottomPadding = ReaderItem.Padding(chapterUrl = "", chapterIndex = Int.MAX_VALUE)
+    private val topPadding = ReaderItem.Padding(chapterIndex = Int.MIN_VALUE)
+    private val bottomPadding = ReaderItem.Padding(chapterIndex = Int.MAX_VALUE)
 
     override fun getViewTypeCount(): Int = 11
     override fun getItemViewType(position: Int) = when (getItem(position)) {
@@ -291,8 +291,8 @@ class ReaderItemAdapter(
     private fun getItemReadingStateBackground(item: ReaderItem): Drawable? {
         val textSynthesis = currentSpeakerActiveItem()
         val isReadingItem = item is ReaderItem.Position &&
-                textSynthesis.item.chapterIndex == item.chapterIndex &&
-                textSynthesis.item.chapterItemIndex == item.chapterItemIndex
+                textSynthesis.itemPos.chapterIndex == item.chapterIndex &&
+                textSynthesis.itemPos.chapterItemPosition == item.chapterItemPosition
 
         if (!isReadingItem) return null
 

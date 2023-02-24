@@ -45,7 +45,7 @@ class NotificationsCenter(
             builder(this)
 
             val channel = NotificationChannel(channel_id, channel_name, NotificationManager.IMPORTANCE_DEFAULT)
-            manager.createNotificationChannel(channel)
+             manager.createNotificationChannel(channel)
         }
     }
 

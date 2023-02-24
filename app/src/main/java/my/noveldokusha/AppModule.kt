@@ -16,10 +16,11 @@ import my.noveldokusha.network.NetworkClient
 import my.noveldokusha.network.ScraperNetworkClient
 import my.noveldokusha.repository.*
 import my.noveldokusha.scraper.Scraper
+import my.noveldokusha.services.narratorMediaControls.NarratorMediaControlsNotification
 import my.noveldokusha.tools.TranslationManager
 import my.noveldokusha.ui.Toasty
 import my.noveldokusha.ui.ToastyToast
-import my.noveldokusha.ui.screens.reader.ReaderManager
+import my.noveldokusha.ui.screens.reader.manager.ReaderManager
 import my.noveldokusha.utils.NotificationsCenter
 import java.io.File
 import javax.inject.Singleton
@@ -155,5 +156,13 @@ object AppModule {
         @ApplicationContext context: Context,
     ): NotificationsCenter {
         return NotificationsCenter(context)
+    }
+
+    @Provides
+    fun provideNarratorMediaControlsNotification(
+        notificationsCenter: NotificationsCenter,
+        readerManager: ReaderManager
+    ): NarratorMediaControlsNotification {
+        return NarratorMediaControlsNotification(notificationsCenter, readerManager)
     }
 }

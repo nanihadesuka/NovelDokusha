@@ -8,13 +8,18 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import my.noveldokusha.AppPreferences
 import my.noveldokusha.ui.BaseViewModel
+import my.noveldokusha.ui.screens.reader.manager.ReaderManager
+import my.noveldokusha.ui.screens.reader.manager.ReaderManagerViewCallReferences
+import my.noveldokusha.utils.StateExtra_Boolean
 import my.noveldokusha.utils.StateExtra_String
+import timber.log.Timber
 import javax.inject.Inject
 import kotlin.properties.Delegates
 
 interface ReaderStateBundle {
     var bookUrl: String
     var chapterUrl: String
+    var introScrollToSpeaker: Boolean
 }
 
 @HiltViewModel
@@ -28,6 +33,7 @@ class ReaderViewModel @Inject constructor(
 
     override var bookUrl by StateExtra_String(state)
     override var chapterUrl by StateExtra_String(state)
+    override var introScrollToSpeaker by StateExtra_Boolean(state)
 
     private val readerSession = readerManager.initiateOrGetSession(
         bookUrl = bookUrl,
@@ -38,27 +44,29 @@ class ReaderViewModel @Inject constructor(
     val textSize by appPreferences.READER_FONT_SIZE.state(viewModelScope)
     val isTextSelectable by appPreferences.READER_SELECTABLE_TEXT.state(viewModelScope)
 
-    var showReaderInfoView by mutableStateOf(false)
+    var showReaderInfoAndSettings by mutableStateOf(false)
 
     val items = readerSession.items
-    val chaptersLoader = readerSession.chaptersLoader
-    val textToSpeechSettingData = readerSession.readerSpeaker.settings
-    val readerSpeaker = readerSession.readerSpeaker
-    val chapterPercentageProgress = readerSession.chapterPercentageProgress
-    val orderedChapters = readerSession.orderedChapters.toList()
-    var currentChapter by Delegates.observable(readerSession.currentChapter) { _, _, new ->
+    val chaptersLoader = readerSession.readerChaptersLoader
+    val textToSpeechSettingData = readerSession.readerTextToSpeech.settings
+    val readerSpeaker = readerSession.readerTextToSpeech
+    val chapterPercentageProgress = readerSession.readingChapterProgressPercentage
+    var readingCurrentChapter by Delegates.observable(readerSession.currentChapter) { _, _, new ->
         readerSession.currentChapter = new
     }
-    val readingPosStats = readerSession.readingPosStats
+    val readingPosStats = readerSession.readingStats
 
-    val liveTranslationSettingState = readerSession.liveTranslation.settingsState
-    val onTranslatorChanged = readerSession.liveTranslation.onTranslatorChanged
+    val liveTranslationSettingState = readerSession.readerLiveTranslation.settingsState
+    val onTranslatorChanged = readerSession.readerLiveTranslation.onTranslatorChanged
 
-    val ttsScrolledToTheTop = readerSession.readerSpeaker.scrolledToTheTop
-    val ttsScrolledToTheBottom = readerSession.readerSpeaker.scrolledToTheBottom
+    val ttsScrolledToTheTop = readerSession.readerTextToSpeech.scrolledToTheTop
+    val ttsScrolledToTheBottom = readerSession.readerTextToSpeech.scrolledToTheBottom
 
     fun onBackPressed() {
-        readerManager.close()
+        if (!showReaderInfoAndSettings) {
+            Timber.d("Close reader screen manually")
+            readerManager.close()
+        }
     }
 
     fun onViewDestroyed() {

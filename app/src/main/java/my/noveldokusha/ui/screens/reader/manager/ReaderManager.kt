@@ -1,17 +1,17 @@
-package my.noveldokusha.ui.screens.reader
+package my.noveldokusha.ui.screens.reader.manager
 
 import android.content.Context
 import kotlinx.coroutines.*
 import my.noveldokusha.AppPreferences
 import my.noveldokusha.repository.Repository
 import my.noveldokusha.tools.TranslationManager
-import my.noveldokusha.ui.screens.reader.tools.ItemPosition
+import my.noveldokusha.ui.screens.reader.tools.InitialPositionChapter
 
 interface ReaderManagerViewCallReferences {
     var forceUpdateListViewState: (suspend () -> Unit)?
     var maintainLastVisiblePosition: (suspend (suspend () -> Unit) -> Unit)?
     var maintainStartPosition: (suspend (suspend () -> Unit) -> Unit)?
-    var setInitialPosition: (suspend (ItemPosition) -> Unit)?
+    var setInitialPosition: (suspend (InitialPositionChapter) -> Unit)?
     var showInvalidChapterDialog: (suspend () -> Unit)?
 }
 
@@ -26,7 +26,7 @@ class ReaderManager(
 ) : ReaderManagerViewCallReferences {
 
     var session: ReaderSession? = null
-
+        private set
 
     @Volatile
     override var forceUpdateListViewState: (suspend () -> Unit)? = null
@@ -38,7 +38,7 @@ class ReaderManager(
     override var maintainStartPosition: (suspend (suspend () -> Unit) -> Unit)? = null
 
     @Volatile
-    override var setInitialPosition: (suspend (ItemPosition) -> Unit)? = null
+    override var setInitialPosition: (suspend (InitialPositionChapter) -> Unit)? = null
 
     @Volatile
     override var showInvalidChapterDialog: (suspend () -> Unit)? = null
@@ -47,7 +47,13 @@ class ReaderManager(
         bookUrl: String,
         chapterUrl: String,
     ): ReaderSession {
-        session?.let { return it }
+        session?.let {
+            if (bookUrl == it.bookUrl) {
+                return it
+            } else {
+                it.close()
+            }
+        }
 
         return ReaderSession(
             bookUrl = bookUrl,
@@ -57,14 +63,18 @@ class ReaderManager(
             translationManager = translationManager,
             appPreferences = appPreferences,
             forceUpdateListViewState = { withMainNow { forceUpdateListViewState?.invoke() } },
-            maintainLastVisiblePosition = { withMainNow { maintainLastVisiblePosition?.invoke(it) } },
-            maintainStartPosition = { withMainNow { maintainStartPosition?.invoke(it) } },
+            maintainLastVisiblePosition = {
+                withMainNow { maintainLastVisiblePosition?.invoke(it) ?: it() }
+            },
+            maintainStartPosition = {
+                withMainNow { maintainStartPosition?.invoke(it) ?: it() }
+            },
             setInitialPosition = { withMainNow { setInitialPosition?.invoke(it) } },
             showInvalidChapterDialog = { withMainNow { showInvalidChapterDialog?.invoke() } },
             context = context
         ).also {
-            it.init()
             session = it
+            it.init()
         }
     }
 
