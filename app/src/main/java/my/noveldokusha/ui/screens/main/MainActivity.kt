@@ -19,7 +19,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.state.ToggleableState
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.media3.common.util.UnstableApi
 import dagger.hilt.android.AndroidEntryPoint
 import my.noveldokusha.AppPreferences
 import my.noveldokusha.R
@@ -33,7 +32,6 @@ import my.noveldokusha.uiViews.AnimatedTransition
 import my.noveldokusha.utils.drawTopLine
 import my.noveldokusha.utils.mix
 
-@UnstableApi
 @OptIn(ExperimentalAnimationApi::class)
 @AndroidEntryPoint
 open class MainActivity : BaseActivity() {

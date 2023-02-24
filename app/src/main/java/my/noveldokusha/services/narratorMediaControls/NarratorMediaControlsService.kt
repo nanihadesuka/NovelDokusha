@@ -39,6 +39,7 @@ class NarratorMediaControlsService : Service() {
     @Inject
     lateinit var narratorNotification: NarratorMediaControlsNotification
 
+
     override fun onCreate() {
         super.onCreate()
 
@@ -54,6 +55,7 @@ class NarratorMediaControlsService : Service() {
 
     @SuppressLint("MissingSuperCall")
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        narratorNotification.handleCommand(intent)
         if (intent == null) return START_NOT_STICKY
         return START_NOT_STICKY
     }
