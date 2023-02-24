@@ -95,7 +95,7 @@ class NarratorMediaControlsNotification(
 
         val actionIntentPrevious = NotificationCompat.Action(
             R.drawable.ic_media_control_previous,
-            "previous",
+            context.getString(R.string.media_control_previous),
             MediaButtonReceiver.buildMediaButtonPendingIntent(
                 context,
                 PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS
@@ -103,35 +103,35 @@ class NarratorMediaControlsNotification(
         )
         val actionIntentRewind = NotificationCompat.Action(
             R.drawable.ic_media_control_rewind,
-            "rewind",
+            context.getString(R.string.media_control_rewind),
             MediaButtonReceiver.buildMediaButtonPendingIntent(
                 context, PlaybackStateCompat.ACTION_REWIND
             )
         )
         val actionIntentPause = NotificationCompat.Action(
             R.drawable.ic_media_control_pause,
-            "play",
+            context.getString(R.string.media_control_play),
             MediaButtonReceiver.buildMediaButtonPendingIntent(
                 context, PlaybackStateCompat.ACTION_PAUSE
             )
         )
         val actionIntentPlay = NotificationCompat.Action(
             R.drawable.ic_media_control_play,
-            "pause",
+            context.getString(R.string.media_control_pause),
             MediaButtonReceiver.buildMediaButtonPendingIntent(
                 context, PlaybackStateCompat.ACTION_PLAY
             )
         )
         val actionIntentFastForward = NotificationCompat.Action(
             R.drawable.ic_media_control_fast_forward,
-            "fast_forward",
+            context.getString(R.string.media_control_fast_forward),
             MediaButtonReceiver.buildMediaButtonPendingIntent(
                 context, PlaybackStateCompat.ACTION_FAST_FORWARD
             )
         )
         val actionIntentNext = NotificationCompat.Action(
             R.drawable.ic_media_control_next,
-            "next",
+            context.getString(R.string.media_control_next),
             MediaButtonReceiver.buildMediaButtonPendingIntent(
                 context, PlaybackStateCompat.ACTION_SKIP_TO_NEXT
             )

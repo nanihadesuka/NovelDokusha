@@ -149,4 +149,10 @@
     <string name="open_translation_models_manager">Open translation models manager</string>
     <string name="new_chapters_found_for">New chapters found for</string>
 	<string name="update_error">Update error</string>
+	<string name="media_control_previous">previous</string>
+	<string name="media_control_rewind">rewind</string>
+	<string name="media_control_play">play</string>
+	<string name="media_control_pause">pause</string>
+	<string name="media_control_fast_forward">fast_forward</string>
+	<string name="media_control_next">next</string>
 </resources>
