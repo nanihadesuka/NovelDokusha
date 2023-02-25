@@ -21,6 +21,11 @@ jobs:
         with:
           python-version: 3.11
 
+      - name: Setup Gradle version to 7.3.3
+      - uses: gradle/gradle-build-action@v2
+        with:
+          gradle-version: 7.3.3
+
       - name: Setup APK signing
         run: |
           echo -n ${{ secrets.SIGNING_KEY }} | base64 -d > app/storeFile.jsk
