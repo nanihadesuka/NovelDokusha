@@ -19,7 +19,7 @@ jobs:
       - name: Setup Python enviroment
         uses: actions/setup-python@v2
         with:
-          python-version: 3.8.5
+          python-version: 3.11
 
       - name: Setup APK signing
         run: |
