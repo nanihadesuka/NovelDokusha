@@ -18,8 +18,8 @@ import my.noveldokusha.ui.theme.ColorAccent
 
 @Composable
 fun Section(
-    title: String,
     modifier: Modifier = Modifier,
+    title: String? = null,
     content: @Composable () -> Unit
 ) {
     Surface(
@@ -30,18 +30,20 @@ fun Section(
         Column(
             modifier = Modifier.padding(vertical = 16.dp)
         ) {
-            Text(
-                text = title,
-                style = MaterialTheme.typography.subtitle1,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 8.dp)
-                    .padding(bottom = 16.dp),
-                color = ColorAccent,
-                textAlign = TextAlign.Center,
-            )
-            Divider(color = MaterialTheme.colors.secondary)
+            if (title != null) {
+                Text(
+                    text = title,
+                    style = MaterialTheme.typography.subtitle1,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 8.dp)
+                        .padding(bottom = 16.dp),
+                    color = ColorAccent,
+                    textAlign = TextAlign.Center,
+                )
+                Divider(color = MaterialTheme.colors.secondary)
+            }
             content()
         }
     }

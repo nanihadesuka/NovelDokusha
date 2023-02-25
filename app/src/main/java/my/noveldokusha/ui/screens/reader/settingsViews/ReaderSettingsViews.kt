@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
@@ -199,7 +198,6 @@ private fun SettingsRowList(
             MyIconButton(
                 icon = Icons.TwoTone.FormatSize,
                 selected = visibleSetting == CurrentSettingVisible.TextSize,
-                shape = CircleShape,
                 contentPadding = 8.dp,
                 onClick = { toggleOrOpen(CurrentSettingVisible.TextSize) },
             )
@@ -208,7 +206,6 @@ private fun SettingsRowList(
             MyIconButton(
                 icon = Icons.Default.FontDownload,
                 selected = visibleSetting == CurrentSettingVisible.TextFont,
-                shape = CircleShape,
                 contentPadding = 8.dp,
                 onClick = { toggleOrOpen(CurrentSettingVisible.TextFont) },
             )
@@ -217,7 +214,6 @@ private fun SettingsRowList(
             MyButton(
                 text = stringResource(id = R.string.live_translation),
                 selected = visibleSetting == CurrentSettingVisible.LiveTranslation,
-                shape = CircleShape,
                 contentPadding = 8.dp,
                 onClick = { toggleOrOpen(CurrentSettingVisible.LiveTranslation) },
             )
@@ -226,7 +222,6 @@ private fun SettingsRowList(
             MyButton(
                 text = stringResource(R.string.text_to_speech),
                 selected = visibleSetting == CurrentSettingVisible.TextToSpeech,
-                shape = CircleShape,
                 contentPadding = 8.dp,
                 onClick = { toggleOrOpen(CurrentSettingVisible.TextToSpeech) },
             )
@@ -235,7 +230,6 @@ private fun SettingsRowList(
             MyButton(
                 text = stringResource(id = R.string.theme),
                 selected = visibleSetting == CurrentSettingVisible.Theme,
-                shape = CircleShape,
                 contentPadding = 8.dp,
                 onClick = { toggleOrOpen(CurrentSettingVisible.Theme) },
             )
@@ -244,7 +238,6 @@ private fun SettingsRowList(
             MyButton(
                 text = stringResource(R.string.text_selection),
                 selected = visibleSetting == CurrentSettingVisible.SelectableText,
-                shape = CircleShape,
                 contentPadding = 8.dp,
                 onClick = { toggleOrOpen(CurrentSettingVisible.SelectableText) },
             )

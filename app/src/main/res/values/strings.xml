@@ -144,7 +144,7 @@
     <string name="custom_predefined_voices">Custom predefined voices</string>
     <string name="name">Name</string>
 	<string name="save_current_voice">Save current voice</string>
-	<string name="save_current_voice_parameters">Save current voice and parameters and give it a name</string>
+	<string name="save_current_voice_parameters">Save current voice and parameters</string>
     <string name="layout">Layout</string>
     <string name="open_translation_models_manager">Open translation models manager</string>
     <string name="new_chapters_found_for">New chapters found for</string>
@@ -155,4 +155,5 @@
 	<string name="media_control_pause">pause</string>
 	<string name="media_control_fast_forward">fast_forward</string>
 	<string name="media_control_next">next</string>
+	<string name="delete">Delete</string>
 </resources>

@@ -13,6 +13,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.StarRate
@@ -24,15 +25,19 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.withContext
@@ -40,15 +45,14 @@ import my.noveldokusha.R
 import my.noveldokusha.VoicePredefineState
 import my.noveldokusha.composableActions.debouncedAction
 import my.noveldokusha.tools.VoiceData
-import my.noveldokusha.ui.composeViews.MyButton
-import my.noveldokusha.ui.composeViews.MyIconButton
-import my.noveldokusha.ui.composeViews.MyOutlinedTextField
-import my.noveldokusha.ui.composeViews.MySlider
+import my.noveldokusha.ui.composeViews.*
 import my.noveldokusha.ui.theme.ColorAccent
 import my.noveldokusha.ui.theme.InternalTheme
 import my.noveldokusha.ui.theme.InternalThemeObject
 import my.noveldokusha.ui.theme.Themes
+import my.noveldokusha.utils.backgroundRounded
 import my.noveldokusha.utils.ifCase
+import my.noveldokusha.utils.outlineRounded
 import my.noveldokusha.utils.rememberMutableStateOf
 
 
@@ -78,181 +82,192 @@ fun TextToSpeechSetting(
     var openVoicesDialog by rememberSaveable { mutableStateOf(false) }
     val dropdownCustomSavedVoicesExpanded = rememberSaveable { mutableStateOf(false) }
 
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(8.dp),
-        modifier = Modifier.fillMaxWidth()
-    ) {
+    Column {
         AnimatedVisibility(visible = isLoadingChapter) {
-            CircularProgressIndicator(
-                strokeWidth = 6.dp,
-                color = ColorAccent,
-                modifier = Modifier.background(
-                    MaterialTheme.colors.surface.copy(alpha = 0.7f),
-                    CircleShape
+            Box(
+                modifier = Modifier.fillMaxWidth(),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator(
+                    strokeWidth = 6.dp,
+                    color = ColorAccent,
+                    modifier = Modifier.background(
+                        MaterialTheme.colors.surface.copy(alpha = 0.7f),
+                        CircleShape
+                    )
                 )
-            )
+            }
         }
-        Row(
-            horizontalArrangement = Arrangement.Center,
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier
-                .background(MaterialTheme.colors.primaryVariant, CircleShape)
-                .padding(4.dp)
-        ) {
-            val alpha by animateFloatAsState(targetValue = if (isActive) 1f else 0.5f)
-            IconButton(
-                onClick = debouncedAction(waitMillis = 1000) { playPreviousChapter() },
-                enabled = isActive,
-                modifier = Modifier.alpha(alpha),
+        Section {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 8.dp)
             ) {
-                Icon(
-                    imageVector = Icons.Rounded.FastRewind,
-                    contentDescription = null,
+                Row(
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier
-                        .size(32.dp)
-                        .background(ColorAccent, CircleShape),
-                    tint = Color.White,
-                )
-            }
-            IconButton(
-                onClick = debouncedAction(waitMillis = 100) { playPreviousItem() },
-                enabled = isActive,
-                modifier = Modifier.alpha(alpha),
-            ) {
-                Icon(
-                    imageVector = Icons.Rounded.NavigateBefore,
-                    contentDescription = null,
-                    tint = Color.White,
-                    modifier = Modifier
-                        .size(38.dp)
-                        .background(ColorAccent, CircleShape),
-                )
-            }
-            IconButton(onClick = { playCurrent(!isPlaying) }) {
-                AnimatedContent(
-                    targetState = isPlaying,
-                    modifier = Modifier
-                        .size(56.dp)
-                        .background(ColorAccent, CircleShape)
-                ) { target ->
-                    when (target) {
-                        true -> Icon(
-                            Icons.Rounded.Pause,
+                        .background(MaterialTheme.colors.primaryVariant, CircleShape)
+                ) {
+                    val alpha by animateFloatAsState(targetValue = if (isActive) 1f else 0.5f)
+                    IconButton(
+                        onClick = debouncedAction(waitMillis = 1000) { playPreviousChapter() },
+                        enabled = isActive,
+                        modifier = Modifier.alpha(alpha),
+                    ) {
+                        Icon(
+                            imageVector = Icons.Rounded.FastRewind,
                             contentDescription = null,
-                            tint = Color.White,
-                        )
-                        false -> Icon(
-                            Icons.Rounded.PlayArrow,
-                            contentDescription = null,
+                            modifier = Modifier
+                                .size(32.dp)
+                                .background(ColorAccent, CircleShape),
                             tint = Color.White,
                         )
                     }
+                    IconButton(
+                        onClick = debouncedAction(waitMillis = 100) { playPreviousItem() },
+                        enabled = isActive,
+                        modifier = Modifier.alpha(alpha),
+                    ) {
+                        Icon(
+                            imageVector = Icons.Rounded.NavigateBefore,
+                            contentDescription = null,
+                            tint = Color.White,
+                            modifier = Modifier
+                                .size(38.dp)
+                                .background(ColorAccent, CircleShape),
+                        )
+                    }
+                    IconButton(onClick = { playCurrent(!isPlaying) }) {
+                        AnimatedContent(
+                            targetState = isPlaying,
+                            modifier = Modifier
+                                .size(56.dp)
+                                .background(ColorAccent, CircleShape)
+                        ) { target ->
+                            when (target) {
+                                true -> Icon(
+                                    Icons.Rounded.Pause,
+                                    contentDescription = null,
+                                    tint = Color.White,
+                                )
+                                false -> Icon(
+                                    Icons.Rounded.PlayArrow,
+                                    contentDescription = null,
+                                    tint = Color.White,
+                                )
+                            }
+                        }
+                    }
+                    IconButton(
+                        onClick = debouncedAction(waitMillis = 100) { playNextItem() },
+                        enabled = isActive,
+                        modifier = Modifier.alpha(alpha),
+                    ) {
+                        Icon(
+                            Icons.Rounded.NavigateNext,
+                            contentDescription = null,
+                            tint = Color.White,
+                            modifier = Modifier
+                                .size(38.dp)
+                                .background(ColorAccent, CircleShape),
+                        )
+                    }
+                    IconButton(
+                        onClick = debouncedAction(waitMillis = 1000) { playNextChapter() },
+                        enabled = isActive,
+                        modifier = Modifier.alpha(alpha),
+                    ) {
+                        Icon(
+                            Icons.Rounded.FastForward,
+                            contentDescription = null,
+                            tint = Color.White,
+                            modifier = Modifier
+                                .size(32.dp)
+                                .background(ColorAccent, CircleShape),
+                        )
+                    }
                 }
-            }
-            IconButton(
-                onClick = debouncedAction(waitMillis = 100) { playNextItem() },
-                enabled = isActive,
-                modifier = Modifier.alpha(alpha),
-            ) {
-                Icon(
-                    Icons.Rounded.NavigateNext,
-                    contentDescription = null,
-                    tint = Color.White,
-                    modifier = Modifier
-                        .size(38.dp)
-                        .background(ColorAccent, CircleShape),
+
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                    MyButton(
+                        text = stringResource(id = R.string.start_here),
+                        onClick = debouncedAction { playFirstVisibleItem() },
+                        borderWidth = 1.dp,
+                        borderColor = MaterialTheme.colors.onSurface.copy(alpha = 0.5f),
+                        outerPadding = 0.dp,
+                    )
+                    MyButton(
+                        text = stringResource(id = R.string.focus),
+                        onClick = debouncedAction { scrollToActiveItem() },
+                        borderWidth = 1.dp,
+                        borderColor = MaterialTheme.colors.onSurface.copy(alpha = 0.5f),
+                        outerPadding = 0.dp,
+                    )
+                    MyButton(
+                        text = stringResource(id = R.string.voices),
+                        onClick = { openVoicesDialog = !openVoicesDialog },
+                        borderWidth = 1.dp,
+                        borderColor = MaterialTheme.colors.onSurface.copy(alpha = 0.5f),
+                        outerPadding = 0.dp,
+                    )
+                    MyIconButton(
+                        icon = Icons.Outlined.FormatListBulleted,
+                        onClick = {
+                            dropdownCustomSavedVoicesExpanded.let {
+                                it.value = !it.value
+                            }
+                        },
+                        contentDescription = stringResource(R.string.custom_predefined_voices),
+                        borderWidth = 1.dp,
+                        borderColor = MaterialTheme.colors.onSurface.copy(alpha = 0.5f),
+                        outerPadding = 0.dp,
+                    )
+                    Box {
+                        DropdownCustomSavedVoices(
+                            expanded = dropdownCustomSavedVoicesExpanded,
+                            list = customSavedVoicesStates,
+                            currentVoice = currentVoice,
+                            currentVoiceSpeed = voiceSpeed,
+                            currentVoicePitch = voicePitch,
+                            onPredefinedSelected = {
+                                setVoiceSpeed(it.speed)
+                                setVoicePitch(it.pitch)
+                                setVoice(it.voiceId)
+                            },
+                            setCustomSavedVoices = setCustomSavedVoices
+                        )
+                        VoiceSelectorDialog(
+                            availableVoices = availableVoices,
+                            currentVoice = currentVoice,
+                            inputTextFilter = rememberSaveable { mutableStateOf("") },
+                            setVoice = setVoice,
+                            isDialogOpen = openVoicesDialog,
+                            setDialogOpen = { openVoicesDialog = it }
+                        )
+                    }
+                }
+
+                MySlider(
+                    value = voicePitch,
+                    valueRange = 0.1f..5f,
+                    onValueChange = setVoicePitch,
+                    text = stringResource(R.string.voice_pitch) + ": %.2f".format(voicePitch),
                 )
-            }
-            IconButton(
-                onClick = debouncedAction(waitMillis = 1000) { playNextChapter() },
-                enabled = isActive,
-                modifier = Modifier.alpha(alpha),
-            ) {
-                Icon(
-                    Icons.Rounded.FastForward,
-                    contentDescription = null,
-                    tint = Color.White,
-                    modifier = Modifier
-                        .size(32.dp)
-                        .background(ColorAccent, CircleShape),
+
+                MySlider(
+                    value = voiceSpeed,
+                    valueRange = 0.1f..5f,
+                    onValueChange = setVoiceSpeed,
+                    text = stringResource(R.string.voice_speed) + ": %.2f".format(voiceSpeed),
                 )
             }
         }
-
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-        ) {
-            MyButton(
-                text = stringResource(id = R.string.start_here),
-                onClick = debouncedAction { playFirstVisibleItem() },
-                borderWidth = 1.dp,
-                borderColor = MaterialTheme.colors.onSurface.copy(alpha = 0.5f),
-                outerPadding = 0.dp,
-                shape = CircleShape
-            )
-            MyButton(
-                text = stringResource(id = R.string.focus),
-                onClick = debouncedAction { scrollToActiveItem() },
-                borderWidth = 1.dp,
-                borderColor = MaterialTheme.colors.onSurface.copy(alpha = 0.5f),
-                outerPadding = 0.dp,
-                shape = CircleShape
-            )
-            MyButton(
-                text = stringResource(id = R.string.voices),
-                onClick = { openVoicesDialog = !openVoicesDialog },
-                borderWidth = 1.dp,
-                borderColor = MaterialTheme.colors.onSurface.copy(alpha = 0.5f),
-                outerPadding = 0.dp,
-                shape = CircleShape
-            )
-            MyIconButton(
-                icon = Icons.Outlined.FormatListBulleted,
-                onClick = { dropdownCustomSavedVoicesExpanded.let { it.value = !it.value } },
-                contentDescription = stringResource(R.string.custom_predefined_voices),
-                borderWidth = 1.dp,
-                borderColor = MaterialTheme.colors.onSurface.copy(alpha = 0.5f),
-                outerPadding = 0.dp,
-                shape = CircleShape
-            )
-            DropdownCustomSavedVoices(
-                expanded = dropdownCustomSavedVoicesExpanded,
-                list = customSavedVoicesStates,
-                currentVoice = currentVoice,
-                currentVoiceSpeed = voiceSpeed,
-                currentVoicePitch = voicePitch,
-                onPredefinedSelected = {
-                    setVoiceSpeed(it.speed)
-                    setVoicePitch(it.pitch)
-                    setVoice(it.voiceId)
-                },
-                setCustomSavedVoices = setCustomSavedVoices
-            )
-        }
-
-        MySlider(
-            value = voicePitch,
-            valueRange = 0.1f..5f,
-            onValueChange = setVoicePitch,
-            text = stringResource(R.string.voice_pitch) + ": %.2f".format(voicePitch),
-        )
-
-        MySlider(
-            value = voiceSpeed,
-            valueRange = 0.1f..5f,
-            onValueChange = setVoiceSpeed,
-            text = stringResource(R.string.voice_speed) + ": %.2f".format(voiceSpeed),
-        )
-
-        VoiceSelectorDialog(
-            availableVoices = availableVoices,
-            currentVoice = currentVoice,
-            inputTextFilter = rememberSaveable { mutableStateOf("") },
-            setVoice = setVoice,
-            isDialogOpen = openVoicesDialog,
-            setDialogOpen = { openVoicesDialog = it }
-        )
     }
 }
 
@@ -301,41 +316,39 @@ private fun VoiceSelectorDialog(
 
     val listState = rememberLazyListState()
 
-    if (isDialogOpen) Dialog(onDismissRequest = { setDialogOpen(false) }) {
+    val inputFocusRequester = remember { FocusRequester() }
+
+    if (isDialogOpen) Dialog(
+        onDismissRequest = { setDialogOpen(false) }
+    ) {
         LazyColumn(
             state = listState,
             verticalArrangement = Arrangement.spacedBy(8.dp),
             modifier = Modifier
-                .padding(bottom = 8.dp)
+                .padding(4.dp)
+                .clip(MaterialTheme.shapes.large)
                 .background(MaterialTheme.colors.background, MaterialTheme.shapes.large)
-                .padding(8.dp),
         ) {
             stickyHeader {
                 Surface(color = MaterialTheme.colors.background) {
-                    Column(
-                        verticalArrangement = Arrangement.spacedBy(4.dp),
-                        modifier = Modifier.padding(bottom = 2.dp),
-                    ) {
+                    Column {
                         MyOutlinedTextField(
                             value = inputTextFilter.value,
                             onValueChange = { inputTextFilter.value = it },
-                            placeHolderText = stringResource(R.string.search_voice_by_language)
+                            placeHolderText = stringResource(R.string.search_voice_by_language),
+                            modifier = Modifier
+                                .padding(12.dp)
+                                .focusRequester(inputFocusRequester)
                         )
-                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                            Text(
-                                text = stringResource(R.string.language),
-                                modifier = Modifier
-                                    .widthIn(min = 84.dp)
-                                    .padding(start = 20.dp)
-                            )
-                            Text(
-                                text = stringResource(R.string.quality),
-                                modifier = Modifier.padding(horizontal = 20.dp)
-                            )
-                        }
+                        Divider(Modifier.padding(top = 0.dp))
                     }
                 }
+                LaunchedEffect(Unit) {
+                    delay(300)
+                    inputFocusRequester.requestFocus()
+                }
             }
+
 
             if (voicesFiltered.isEmpty()) item {
                 Text(
@@ -351,6 +364,7 @@ private fun VoiceSelectorDialog(
                 val selected = it.id == currentVoice?.id
                 Row(
                     modifier = Modifier
+                        .padding(horizontal = 4.dp)
                         .heightIn(min = 54.dp)
                         .background(
                             if (selected) MaterialTheme.colors.secondaryVariant else MaterialTheme.colors.secondaryVariant,
@@ -437,26 +451,40 @@ fun DropdownCustomSavedVoices(
 ) {
 
     var expandedAddNextEntry by rememberMutableStateOf(false)
-    var deleteEntryExpand by rememberMutableStateOf(false)
     DropdownMenu(
         expanded = expanded.value,
-        onDismissRequest = { expanded.value = !expanded.value }) {
+        onDismissRequest = { expanded.value = !expanded.value },
+    ) {
+        MyButton(
+            text = stringResource(R.string.save_current_voice),
+            onClick = { expandedAddNextEntry = true },
+            textAlign = TextAlign.Center,
+            modifier = Modifier
+                .align(Alignment.CenterHorizontally)
+                .padding(8.dp),
+            outerPadding = 0.dp,
+            shape = MaterialTheme.shapes.medium,
+            borderWidth = 1.dp,
+            borderColor = MaterialTheme.colors.onPrimary.copy(alpha = 0.5f)
+        )
         Column(
-            verticalArrangement = Arrangement.spacedBy(4.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+            Modifier
+                .padding(horizontal = 8.dp)
+                .backgroundRounded()
+                .outlineRounded(width = Dp.Hairline)
+                .widthIn(min = 128.dp)
         ) {
-            MyButton(
-                text = stringResource(R.string.save_current_voice),
-                onClick = { expandedAddNextEntry = true },
-                textAlign = TextAlign.Center,
-            )
             list.forEachIndexed { index, predefinedVoice ->
+                var deleteEntryExpand by rememberMutableStateOf(false)
                 MyButton(
                     text = predefinedVoice.savedName,
                     onClick = { onPredefinedSelected(predefinedVoice) },
                     onLongClick = { deleteEntryExpand = true },
-                    shape = CircleShape,
-                    modifier = Modifier.widthIn(min = 46.dp),
+                    borderWidth = Dp.Unspecified,
+                    textAlign = TextAlign.Center,
+                    outerPadding = 0.dp,
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(0.dp),
                 )
                 if (deleteEntryExpand) AlertDialog(
                     onDismissRequest = { deleteEntryExpand = false },
@@ -470,18 +498,19 @@ fun DropdownCustomSavedVoices(
                         )
                     },
                     buttons = {
-                        MyButton(
-                            text = "Delete",
-                            onClick = {
-                                setCustomSavedVoices(
-                                    list.toMutableList().also { it.removeAt(index) }
-                                )
-                                deleteEntryExpand = false
-                            },
-                            modifier = Modifier.fillMaxWidth(),
-                            textAlign = TextAlign.Center
-                        )
-                    }
+                        Box(Modifier.padding(8.dp)) {
+                            MyButton(
+                                text = stringResource(R.string.delete),
+                                onClick = {
+                                    deleteEntryExpand = false
+                                    setCustomSavedVoices(
+                                        list.toMutableList().also { it.removeAt(index) }
+                                    )
+                                },
+                                modifier = Modifier.fillMaxWidth(),
+                                textAlign = TextAlign.Center
+                            )
+                        }                    }
                 )
             }
         }
@@ -491,13 +520,14 @@ fun DropdownCustomSavedVoices(
         onDismissRequest = { expandedAddNextEntry = !expandedAddNextEntry }
     ) {
         var name by rememberMutableStateOf(value = "")
+        val focusRequester = remember { FocusRequester() }
         Surface(
             shape = MaterialTheme.shapes.large
         ) {
             Column(
-                verticalArrangement = Arrangement.spacedBy(8.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier.padding(12.dp)
+                modifier = Modifier.padding(16.dp)
             ) {
                 Text(
                     text = stringResource(R.string.save_current_voice_parameters),
@@ -506,7 +536,8 @@ fun DropdownCustomSavedVoices(
                 MyOutlinedTextField(
                     value = name,
                     onValueChange = { name = it },
-                    placeHolderText = stringResource(R.string.name)
+                    placeHolderText = stringResource(R.string.name),
+                    modifier = Modifier.focusRequester(focusRequester)
                 )
                 MyButton(
                     text = stringResource(id = R.string.save),
@@ -522,9 +553,14 @@ fun DropdownCustomSavedVoices(
                         expandedAddNextEntry = false
                     },
                     modifier = Modifier.fillMaxWidth(),
+                    outerPadding = 0.dp,
                     textAlign = TextAlign.Center
                 )
             }
+        }
+        LaunchedEffect(Unit) {
+            delay(300)
+            focusRequester.requestFocus()
         }
     }
 }
