@@ -2,6 +2,9 @@
 Android web novel reader. Reader focused on simplicity, improving read immersion.
 Search from a large catalog of content, open your pick and just enjoy.
 
+# License
+Copyright © 2023, [nani](https://github.com/nanihadesuka), Released under [GPL-3](LICENSE) FOSS
+
 ## Features
   - Two databases to search for web novels (by title or categories)
   - Multiple sources from where to read
@@ -33,7 +36,8 @@ Reader |
 
 ## Tech stack
   - Kotlin
-  - Jetpack compose  
+  - XML views
+  - Jetpack compose
   - Coroutines
   - LiveData
   - Room (SQLite)
@@ -41,6 +45,4 @@ Reader |
   - Coil  
   - Gson
   - Google MLKit for translation
-
-## License
-  - GPL-3 FOSS
+  - Android TTS
