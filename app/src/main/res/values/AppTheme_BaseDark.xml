@@ -6,20 +6,20 @@
 		<item name="android:windowLightStatusBar">false</item>
 		<item name="android:statusBarColor">?colorPrimary</item>
 
-		<item name="colorAccent">#2A59B6</item>
-		<item name="colorAccentTransparent">#332A59B6</item>
+		<item name="colorAccent">@color/colorAccent</item>
+		<item name="colorAccentTransparent">@color/colorAccent_transparent</item>
 
-		<item name="colorPrimary">@color/dark_20</item>
-		<item name="colorPrimaryTransparent">#00202020</item>
-		<item name="colorPrimaryDark">#303030</item>
-		<item name="colorOnPrimary">#eee</item>
-		<item name="colorSecondary">@color/dark_24</item>
+		<item name="colorPrimary">@color/color_20</item>
+		<item name="colorPrimaryTransparent">@color/color_20_transparent</item>
+		<item name="colorPrimaryDark">@color/color_30</item>
+		<item name="colorOnPrimary">@color/color_ee</item>
+		<item name="colorSecondary">@color/color_24</item>
 		<item name="colorOnSecondary">?colorOnPrimary</item>
-		<item name="colorSurface">@color/dark_18</item>
+		<item name="colorSurface">@color/color_18</item>
 		<item name="colorOnSurface">?colorOnPrimary</item>
 		<item name="colorOnBackground">?colorOnPrimary</item>
 
-		<item name="android:colorBackground">@color/dark_18</item>
+		<item name="android:colorBackground">@color/color_18</item>
 		<item name="android:colorEdgeEffect">?colorAccent</item>
 
 		<item name="md_background_color">?colorSurface</item>
@@ -33,10 +33,10 @@
 		<item name="tabStyle">@style/myTabLayout</item>
 		<item name="appBarLayoutStyle">@style/myAppBarLayoutStyle</item>
 
-		<item name="noneStateTint">#ddd</item>
-		<item name="positiveStateTint">#71A30E</item>
-		<item name="negativeStateTint">#C81414</item>
-		<item name="myColorControlNormalPale">#666</item>
+		<item name="noneStateTint">@color/color_dd</item>
+		<item name="positiveStateTint">@color/dark_green</item>
+		<item name="negativeStateTint">@color/dark_red</item>
+		<item name="myColorControlNormalPale">@color/color_66</item>
 
 		<item name="android:scrollbarThumbVertical">@drawable/scrollbar_thumb</item>
 
@@ -48,7 +48,7 @@
 
 	<style name="myBottomSheetStyle.BaseDark">
 		<!-- Using tint instead of background color (works for unknown reasons) -->
-		<item name="backgroundTint">@color/dark_18</item>
+		<item name="backgroundTint">@color/color_18</item>
 	</style>
 
 	<style name="myBottomSheetDialogStyle.BaseDark">
@@ -56,7 +56,7 @@
 	</style>
 
 	<style name="myReaderTextStyle.BaseDark">
-		<item name="android:textColor">#ddd</item>
+		<item name="android:textColor">@color/color_dd</item>
 	</style>
 
 </resources>

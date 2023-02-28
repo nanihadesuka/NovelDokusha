@@ -6,20 +6,20 @@
 		<item name="android:windowLightStatusBar">true</item>
 		<item name="android:statusBarColor">?colorPrimary</item>
 
-		<item name="colorAccent">#2A59B6</item>
-		<item name="colorAccentTransparent">#332A59B6</item>
+		<item name="colorAccent">@color/colorAccent</item>
+		<item name="colorAccentTransparent">@color/colorAccent_transparent</item>
 
-		<item name="colorPrimary">#fbfbfb</item>
-		<item name="colorPrimaryTransparent">#00fbfbfb</item>
-		<item name="colorPrimaryDark">#e0e0e0</item>
-		<item name="colorOnPrimary">#111</item>
+		<item name="colorPrimary">@color/color_fb</item>
+		<item name="colorPrimaryTransparent">@color/color_fb_transparent</item>
+		<item name="colorPrimaryDark">@color/color_e0</item>
+		<item name="colorOnPrimary">@color/color_11</item>
 		<item name="colorSecondary">?colorPrimary</item>
 		<item name="colorOnSecondary">?colorOnPrimary</item>
 		<item name="colorSurface">?colorPrimary</item>
 		<item name="colorOnSurface">?colorOnPrimary</item>
 		<item name="colorOnBackground">?colorOnPrimary</item>
 
-		<item name="android:colorBackground">#fff</item>
+		<item name="android:colorBackground">@color/color_ff</item>
 		<item name="android:colorEdgeEffect">?colorAccent</item>
 
 		<item name="md_background_color">?colorSurface</item>
@@ -32,11 +32,11 @@
 		<item name="myReaderTextStyle">@style/myReaderTextStyle.Light</item>
 		<item name="tabStyle">@style/myTabLayout</item>
 		<item name="appBarLayoutStyle">@style/myAppBarLayoutStyle</item>
-		s
-		<item name="noneStateTint">#333</item>
-		<item name="positiveStateTint">#71A30E</item>
-		<item name="negativeStateTint">#C81414</item>
-		<item name="myColorControlNormalPale">#aaa</item>
+
+		<item name="noneStateTint">@color/color_33</item>
+		<item name="positiveStateTint">@color/dark_green</item>
+		<item name="negativeStateTint">@color/dark_red</item>
+		<item name="myColorControlNormalPale">@color/color_aa</item>
 
 		<item name="android:scrollbarThumbVertical">@drawable/scrollbar_thumb</item>
 
@@ -46,7 +46,7 @@
 	</style>
 
 	<style name="myReaderTextStyle.Light">
-		<item name="android:textColor">#333</item>
+		<item name="android:textColor">@color/color_33</item>
 	</style>
 
 	<style name="myBottomNavigationStyle.Light" parent="myBottomNavigationStyle">
@@ -56,7 +56,7 @@
 
 	<style name="myBottomSheetStyle.Light">
 		<!-- Using tint instead of background color (works for unknown reasons) -->
-		<item name="backgroundTint">#fbfbfb</item>
+		<item name="backgroundTint">@color/color_fb</item>
 	</style>
 
 	<style name="myBottomSheetDialogStyle.Light">

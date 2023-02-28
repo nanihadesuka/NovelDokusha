@@ -35,7 +35,7 @@ fun MainToolbar(
 ) {
     val bookmarkColor by animateColorAsState(
         targetValue = when (isBookmarked) {
-            true -> colorResource(id = R.color.dark_orange_red)
+            true -> colorResource(id = R.color.dark_orange)
             false -> Color.Gray
         }
     )

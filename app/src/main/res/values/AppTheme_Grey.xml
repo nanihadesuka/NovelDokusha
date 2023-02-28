@@ -2,26 +2,26 @@
 <resources>
 
 	<style name="AppTheme.BaseDark.Grey">
-		<item name="colorPrimary">#333</item>
-		<item name="colorPrimaryTransparent">#0333</item>
-		<item name="colorPrimaryDark">#444</item>
-		<item name="colorOnPrimary">#eee</item>
-		<item name="colorSecondary">#444</item>
+		<item name="colorPrimary">@color/color_33</item>
+		<item name="colorPrimaryTransparent">@color/color_33_transparent</item>
+		<item name="colorPrimaryDark">@color/color_44</item>
+		<item name="colorOnPrimary">@color/color_ee</item>
+		<item name="colorSecondary">@color/color_44</item>
 		<item name="colorOnSecondary">?colorOnPrimary</item>
-		<item name="colorSurface">#555</item>
+		<item name="colorSurface">@color/color_55</item>
 		<item name="colorOnSurface">?colorOnPrimary</item>
 		<item name="colorOnBackground">?colorOnPrimary</item>
 
-		<item name="android:colorBackground">@color/dark_24</item>
+		<item name="android:colorBackground">@color/color_24</item>
 
-		<item name="myColorControlNormalPale">#777</item>
+		<item name="myColorControlNormalPale">@color/color_77</item>
 
 		<item name="bottomSheetDialogTheme">@style/myBottomSheetDialogStyle.BaseDark.Grey</item>
 	</style>
 
 	<style name="myBottomSheetStyle.BaseDark.Grey">
 		<!-- Using tint instead of background color (works for unknown reasons) -->
-		<item name="backgroundTint">#222</item>
+		<item name="backgroundTint">@color/color_22</item>
 	</style>
 
 	<style name="myBottomSheetDialogStyle.BaseDark.Grey">

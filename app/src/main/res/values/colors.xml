@@ -1,16 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 	<color name="red">#ff0000</color>
-	<color name="dark_green">#4caf50</color>
+	<color name="dark_green">#71A30E</color>
+	<color name="dark_red">#C81414</color>
 	<color name="light_blue">#3D504D</color>
-	<color name="dark_orange_red">#A3593C</color>
-	<color name="dark_aa">#aaaaaa</color>
-	<color name="dark_18">#181818</color>
-	<color name="dark_20">#202020</color>
-	<color name="dark_24">#242424</color>
-	<color name="dark_28">#282828</color>
-	<color name="dark_0">#000000</color>
+	<color name="dark_orange">#A3593C</color>
 	<color name="pink">#BB00FF</color>
-	
+
+	<color name="color_ff">#ffffff</color>
+	<color name="color_fb">#fbfbfb</color>
+	<color name="color_ee">#eeeeee</color>
+	<color name="color_e0">#e0e0e0</color>
+	<color name="color_dd">#dddddd</color>
+	<color name="color_aa">#aaaaaa</color>
+	<color name="color_77">#777777</color>
+	<color name="color_66">#666666</color>
+	<color name="color_55">#555555</color>
+	<color name="color_44">#444444</color>
+	<color name="color_33">#333333</color>
+	<color name="color_30">#303030</color>
+	<color name="color_28">#282828</color>
+	<color name="color_24">#242424</color>
+	<color name="color_22">#222222</color>
+	<color name="color_20">#202020</color>
+	<color name="color_18">#181818</color>
+	<color name="color_12">#121212</color>
+	<color name="color_11">#111111</color>
+	<color name="color_01">#010101</color>
+	<color name="color_00">#000000</color>
+
+	<color name="color_ff_transparent">#00ffffff</color>
+	<color name="color_fb_transparent">#00fbfbfb</color>
+	<color name="color_33_transparent">#00333333</color>
+	<color name="color_20_transparent">#00202020</color>
+	<color name="color_00_transparent">#00000000</color>
+
 	<color name="colorError">#EC4427</color>
+	<color name="colorAccent">#2A59B6</color>
+	<color name="colorAccent_transparent">#332A59B6</color>
 </resources>
