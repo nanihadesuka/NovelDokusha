@@ -230,7 +230,7 @@ class ReaderActivity : BaseActivity() {
         viewModel.readerSpeaker.startReadingFromFirstVisibleItem.asLiveData().observe(this) {
             val firstPosition = viewBind.listView.firstVisiblePosition
             viewModel.startSpeaker(
-                itemIndex = viewAdapter.listView.fromPositionToIndex(firstPosition)
+                itemIndex = viewAdapter.listView.getFirstVisibleItemIndexGivenPosition(firstPosition)
             )
         }
 

@@ -42,6 +42,15 @@ class ReaderItemAdapter(
         else -> super.getItem(position - 1)!!
     }
 
+    // Ignores paddings as items that are visible
+    fun getFirstVisibleItemIndexGivenPosition(firstVisiblePosition: Int): Int =
+        when (firstVisiblePosition) {
+            in 1 until (count - 1) -> firstVisiblePosition - 1
+            0 -> 0
+            count - 1 -> count - 1
+            else -> -1
+        }
+
     // Get list index from current position
     fun fromPositionToIndex(position: Int): Int = when (position) {
         in 1 until (count - 1) -> position - 1

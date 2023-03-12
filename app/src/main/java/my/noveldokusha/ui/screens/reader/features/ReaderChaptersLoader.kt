@@ -97,6 +97,9 @@ class ReaderChaptersLoader(
     fun isChapterIndexValid(chapterIndex: Int) =
         0 <= chapterIndex && chapterIndex < orderedChapters.size
 
+    fun isChapterIndexTheLast(chapterIndex: Int) =
+        chapterIndex != -1 && chapterIndex == orderedChapters.lastIndex
+
     @Synchronized
     fun tryLoadInitial(chapterIndex: Int) {
         if (LoadChapter.Type.Initial in loaderQueue) return

@@ -55,6 +55,7 @@ class ReaderTextToSpeech(
     private val customSavedVoices: State<List<VoicePredefineState>>,
     private val setCustomSavedVoices: (List<VoicePredefineState>) -> Unit,
     private val isChapterIndexValid: (chapterIndex: Int) -> Boolean,
+    private val isChapterIndexTheLast: (chapterIndex: Int) -> Boolean,
     private val isChapterIndexLoaded: (chapterIndex: Int) -> Boolean,
     private val tryLoadPreviousChapter: () -> Unit,
     private val loadNextChapter: () -> Unit,
@@ -96,7 +97,7 @@ class ReaderTextToSpeech(
         availableVoices = manager.availableVoices,
         currentActiveItemState = manager.currentActiveItemState,
         isThereActiveItem = derivedStateOf {
-            manager.currentActiveItemState.value.itemPos.chapterIndex > 0
+            isChapterIndexValid(manager.currentActiveItemState.value.itemPos.chapterIndex)
         },
         voicePitch = manager.voicePitch,
         voiceSpeed = manager.voiceSpeed,
@@ -114,9 +115,11 @@ class ReaderTextToSpeech(
         setVoiceSpeed = ::setVoiceSpeed,
     )
 
-    val isAtFirstItem = derivedStateOf { currentTextPlaying.value.itemPos.chapterIndex == 0 }
+    val isAtFirstItem = derivedStateOf {
+        currentTextPlaying.value.itemPos.chapterIndex == 0
+    }
     val isAtLastItem = derivedStateOf {
-        !isAtFirstItem.value && !isChapterIndexValid(currentTextPlaying.value.itemPos.chapterIndex + 1)
+        !isAtFirstItem.value && isChapterIndexTheLast(currentTextPlaying.value.itemPos.chapterIndex)
     }
 
     val isActive = derivedStateOf { settings.isThereActiveItem.value || settings.isPlaying.value }
@@ -266,7 +269,8 @@ class ReaderTextToSpeech(
         }
         start()
         val state = settings.currentActiveItemState.value
-        if (state.itemPos.chapterIndex > 0) {
+
+        if (isChapterIndexValid(state.itemPos.chapterIndex)) {
             coroutineScope.launch {
                 readChapterStartingFromChapterItemPosition(
                     chapterIndex = state.itemPos.chapterIndex,
