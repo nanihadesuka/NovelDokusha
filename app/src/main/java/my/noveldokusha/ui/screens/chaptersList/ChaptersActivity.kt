@@ -37,7 +37,7 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import my.nanihadesuka.compose.LazyColumnScrollbar
+import my.nanihadesuka.compose.InternalLazyColumnScrollbar
 import my.noveldokusha.R
 import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.data.ChapterWithContext
@@ -143,7 +143,7 @@ class ChaptersActivity : BaseActivity() {
                             .fillMaxHeight()
                             .padding(top = 100.dp, bottom = 0.dp)
                     ) {
-                        LazyColumnScrollbar(listState)
+                        InternalLazyColumnScrollbar(listState)
                     }
 
                     when (toolbarMode) {

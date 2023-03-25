@@ -11,10 +11,9 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.painterResource
-import coil.compose.rememberAsyncImagePainter
-import coil.request.ImageRequest
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
+import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.glide.GlideImage
 import my.noveldokusha.R
 
@@ -44,26 +43,22 @@ fun ImageViewGlide(
             modifier = modifier
         )
     } else {
-
         GlideImage(
-            imageModel = model,
+            imageModel = { model },
             requestBuilder = {
                 Glide
                     .with(LocalContext.current)
                     .asDrawable()
                     .transition(DrawableTransitionOptions.withCrossFade(fadeInDurationMillis))
             },
-            contentDescription = contentDescription,
-            contentScale = contentScale,
+            imageOptions = ImageOptions(
+                contentDescription = contentDescription,
+                contentScale = contentScale,
+            ),
             modifier = modifier,
-            error = rememberAsyncImagePainter(
-                model = ImageRequest
-                    .Builder(LocalContext.current)
-                    .data(error)
-                    .crossfade(fadeInDurationMillis)
-                    .build(),
-                contentScale = contentScale
-            )
+            failure = {
+                GlideImage(imageModel = { error })
+            }
         )
     }
 }
