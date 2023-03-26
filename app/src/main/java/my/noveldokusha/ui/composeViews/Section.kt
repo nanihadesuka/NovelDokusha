@@ -4,10 +4,10 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Divider
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
+import androidx.compose.material3.Divider
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -22,18 +22,12 @@ fun Section(
     title: String? = null,
     content: @Composable () -> Unit
 ) {
-    Surface(
-        color = MaterialTheme.colors.primaryVariant,
-        modifier = modifier
-            .clip(RoundedCornerShape(16.dp))
-    ) {
-        Column(
-            modifier = Modifier.padding(vertical = 16.dp)
-        ) {
+    Surface(modifier = modifier.clip(RoundedCornerShape(16.dp))) {
+        Column(modifier = Modifier.padding(vertical = 16.dp)) {
             if (title != null) {
                 Text(
                     text = title,
-                    style = MaterialTheme.typography.subtitle1,
+                    style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier
                         .fillMaxWidth()
@@ -42,7 +36,7 @@ fun Section(
                     color = ColorAccent,
                     textAlign = TextAlign.Center,
                 )
-                Divider(color = MaterialTheme.colors.secondary)
+                Divider(color = MaterialTheme.colorScheme.secondary)
             }
             content()
         }

@@ -5,12 +5,12 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
@@ -37,8 +37,8 @@ fun ToolbarModeSearch(
     onSearchTextChange: (String) -> Unit,
     onClose: () -> Unit,
     onTextDone: (String) -> Unit,
-    color: Color = MaterialTheme.colors.surface,
-    borderColor: Color = MaterialTheme.colors.onPrimary.copy(alpha = 0.3f),
+    color: Color = MaterialTheme.colorScheme.surface,
+    borderColor: Color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.3f),
     placeholderText: String = stringResource(R.string.search_here),
     showUnderline: Boolean = false,
     topPadding: Dp = 8.dp,
@@ -76,8 +76,8 @@ fun ToolbarModeSearch(
             onValueChange = onSearchTextChange,
             singleLine = true,
             maxLines = 1,
-            textStyle = MaterialTheme.typography.h6.copy(
-                color = MaterialTheme.colors.onPrimary,
+            textStyle = MaterialTheme.typography.headlineMedium.copy(
+                color = MaterialTheme.colorScheme.onPrimary,
                 textAlign = TextAlign.Center
             ),
             cursorBrush = SolidColor(ColorAccent),
@@ -87,8 +87,8 @@ fun ToolbarModeSearch(
             decorationBox = {
                 if (searchText.isBlank()) Text(
                     text = placeholderText,
-                    style = MaterialTheme.typography.h6.copy(
-                        color = MaterialTheme.colors.onPrimary.copy(alpha = 0.3f)
+                    style = MaterialTheme.typography.headlineMedium.copy(
+                        color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.3f)
                     ),
                     modifier = Modifier.weight(1f)
                 ) else it()

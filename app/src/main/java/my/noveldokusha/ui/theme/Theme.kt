@@ -3,80 +3,86 @@ package my.noveldokusha.ui.theme
 import androidx.annotation.StyleRes
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material.Colors
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
+import androidx.compose.material3.ColorScheme
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.luminance
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import kotlinx.coroutines.flow.mapNotNull
 import my.noveldokusha.AppPreferences
 import my.noveldokusha.R
 
-private val light_ColorPalette = Colors(
-    primary = Color(0xFFFBFBFB),
-    primaryVariant = Color(0xFFF0F0F0),
-    secondary = Color(0xFFE0E0E0),
-    secondaryVariant = Color(0xFFD0D0D0),
-    background = Color(0xFFFBFBFB),
-    surface = Color(0xFFFBFBFB),
-    error = Color(0xFFFBFBFB),
-    onPrimary = Color(0xFF111111),
-    onSecondary = Color(0xFF111111),
-    onBackground = Color(0xFF111111),
-    onSurface = Color(0xFF111111),
-    onError = Color.Red,
-    isLight = true
+@Composable
+fun ColorScheme.isDark() = this.background.luminance() <= 0.5
+
+private val light_ColorPalette = ColorScheme(
+    primary = Grey25,
+    onPrimary = Grey900,
+    primaryContainer = Grey50,
+    onPrimaryContainer = Grey800,
+    inversePrimary = Grey900,
+    secondary = Grey25,
+    onSecondary = Grey900,
+    secondaryContainer = Grey50,
+    onSecondaryContainer = Grey800,
+    tertiary = Grey25,
+    onTertiary = Grey900,
+    tertiaryContainer = Grey50,
+    onTertiaryContainer = Grey800,
+    background = Grey25,
+    onBackground = Grey900,
+    surface = Grey25,
+    onSurface = Grey900,
+    surfaceVariant = Grey25,
+    onSurfaceVariant = Grey900,
+    surfaceTint = Grey300,
+    inverseSurface = Grey900,
+    inverseOnSurface = Grey50,
+    error = Error100,
+    onError = Grey900,
+    errorContainer = Error50,
+    onErrorContainer = Grey800,
+    outline = Grey1000,
+    outlineVariant = Grey800,
+    scrim = Grey300,
 )
 
-private val dark_ColorPalette = Colors(
-    primary = Color(0xFF202020),
-    primaryVariant = Color(0xFF202020),
-    secondary = Color(0xFF242424),
-    secondaryVariant = Color(0xFF242424),
-    background = Color(0xFF181818),
-    surface = Color(0xFF181818),
-    error = Color(0xFF181818),
-    onPrimary = Color(0xFFEEEEEE),
-    onSecondary = Color(0xFFEEEEEE),
-    onBackground = Color(0xFFEEEEEE),
-    onSurface = Color(0xFFEEEEEE),
-    onError = Color.Red,
-    isLight = false
+private val dark_ColorPalette = ColorScheme(
+    primary = Grey900,
+    onPrimary = Grey25,
+    primaryContainer = Grey800,
+    onPrimaryContainer = Grey100,
+    inversePrimary = Grey25,
+    secondary = Grey900,
+    onSecondary = Grey25,
+    secondaryContainer = Grey800,
+    onSecondaryContainer = Grey50,
+    tertiary = Grey900,
+    onTertiary = Grey25,
+    tertiaryContainer = Grey800,
+    onTertiaryContainer = Grey50,
+    background = Grey900,
+    onBackground = Grey25,
+    surface = Grey900,
+    onSurface = Grey25,
+    surfaceVariant = Grey900,
+    onSurfaceVariant = Grey25,
+    surfaceTint = Grey700,
+    inverseSurface = Grey25,
+    inverseOnSurface = Grey800,
+    error = Error900,
+    onError = Grey25,
+    errorContainer = Error1000,
+    onErrorContainer = Grey50,
+    outline = Grey0,
+    outlineVariant = Grey25,
+    scrim = Grey800,
 )
 
-private val grey_ColorPalette = Colors(
-    primary = Color(0xFF333333),
-    primaryVariant = Color(0xFF303030),
-    secondary = Color(0xFF252525),
-    secondaryVariant = Color(0xFF202020),
-    background = Color(0xFF242424),
-    surface = Color(0xFF242424),
-    error = Color(0xFF242424),
-    onPrimary = Color(0xFFEEEEEE),
-    onSecondary = Color(0xFFEEEEEE),
-    onBackground = Color(0xFFEEEEEE),
-    onSurface = Color(0xFFEEEEEE),
-    onError = Color.Red,
-    isLight = false
-)
-
-private val black_ColorPalette = Colors(
-    primary = Color.Black,
-    primaryVariant = Color(0xFF080808),
-    secondary = Color(0xFF151515),
-    secondaryVariant = Color(0xFF202020),
-    background = Color.Black,
-    surface = Color.Black,
-    error = Color.Black,
-    onPrimary = Color(0xFFEEEEEE),
-    onSecondary = Color(0xFFEEEEEE),
-    onBackground = Color(0xFFEEEEEE),
-    onSurface = Color(0xFFEEEEEE),
-    onError = Color.Red,
-    isLight = false
-)
+private val grey_ColorPalette = dark_ColorPalette
+private val black_ColorPalette = dark_ColorPalette
 
 enum class Themes {
     LIGHT,
@@ -108,6 +114,8 @@ enum class Themes {
             BLACK to "Black"
         )
     }
+
+    val isDark get() = this != LIGHT
 }
 
 @Composable
@@ -133,8 +141,10 @@ fun Theme(
     }.collectAsState(initialThemeType)
 
     val isSystemThemeLight = !isSystemInDarkTheme()
-    val isThemeLight by derivedStateOf {
-        themeType !in setOf(Themes.DARK, Themes.GREY, Themes.BLACK)
+    val isThemeLight by remember {
+        derivedStateOf {
+            themeType !in setOf(Themes.DARK, Themes.GREY, Themes.BLACK)
+        }
     }
 
     val theme: Themes = when (themeFollowSystem) {
@@ -169,13 +179,13 @@ fun InternalTheme(
     val systemUiController = rememberSystemUiController()
     systemUiController.setSystemBarsColor(
         color = palette.surface,
-        darkIcons = palette.isLight
+        darkIcons = theme.isDark
     )
 
     MaterialTheme(
-        colors = palette,
-        typography = Typography,
-        shapes = Shapes,
+        colorScheme = palette,
+        typography = typography,
+        shapes = shapes,
         content = { wrapper { content() } }
     )
 }
@@ -197,13 +207,13 @@ fun InternalThemeObject(
     val systemUiController = rememberSystemUiController()
     systemUiController.setSystemBarsColor(
         color = palette.surface,
-        darkIcons = palette.isLight
+        darkIcons = theme.isDark
     )
 
     MaterialTheme(
-        colors = palette,
-        typography = Typography,
-        shapes = Shapes,
+        colorScheme = palette,
+        typography = typography,
+        shapes = shapes,
         content = { wrapper { content() } }
     )
 }

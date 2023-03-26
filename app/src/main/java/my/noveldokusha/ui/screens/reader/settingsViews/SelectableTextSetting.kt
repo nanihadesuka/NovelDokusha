@@ -6,12 +6,10 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.Icon
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Cancel
 import androidx.compose.material.icons.outlined.CheckCircle
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -37,7 +35,7 @@ fun SelectableTextSetting(
 
         val textColor = when (enable) {
             true -> Color.White
-            false -> MaterialTheme.colors.onPrimary
+            false -> MaterialTheme.colorScheme.onPrimary
         }
 
         Row(
@@ -52,7 +50,7 @@ fun SelectableTextSetting(
                 )
                 .background(
                     if (enable) ColorAccent
-                    else MaterialTheme.colors.secondary
+                    else MaterialTheme.colorScheme.secondary
                 )
                 .padding(8.dp)
                 .padding(start = 6.dp)

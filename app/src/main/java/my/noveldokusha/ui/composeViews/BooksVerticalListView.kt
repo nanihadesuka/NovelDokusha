@@ -1,4 +1,4 @@
-package my.noveldokusha.uiViews
+package my.noveldokusha.ui.composeViews
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Box
@@ -8,8 +8,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.Text
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -20,7 +20,6 @@ import my.noveldokusha.R
 import my.noveldokusha.composableActions.ListLoadWatcher
 import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.network.IteratorState
-import my.noveldokusha.ui.composeViews.MyButton
 import my.noveldokusha.ui.theme.ColorAccent
 
 @ExperimentalFoundationApi

@@ -8,8 +8,8 @@ import android.view.WindowManager
 import android.widget.AbsListView
 import androidx.activity.compose.BackHandler
 import androidx.activity.viewModels
-import androidx.compose.material.LocalContentColor
-import androidx.compose.material.MaterialTheme
+import androidx.compose.material3.LocalContentColor
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.snapshotFlow
@@ -241,7 +241,7 @@ class ReaderActivity : BaseActivity() {
                     // Necessary so that text knows what color it must be given that the
                     // background is transparent (no Surface parent)
                     CompositionLocalProvider(
-                        LocalContentColor provides MaterialTheme.colors.onSecondary
+                        LocalContentColor provides MaterialTheme.colorScheme.onSecondary
                     ) { it() }
                 }
             ) {

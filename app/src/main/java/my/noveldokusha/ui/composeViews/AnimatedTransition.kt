@@ -1,4 +1,4 @@
-package my.noveldokusha.uiViews
+package my.noveldokusha.ui.composeViews
 
 import androidx.compose.animation.*
 import androidx.compose.animation.core.tween

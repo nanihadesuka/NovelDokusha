@@ -3,15 +3,15 @@ package my.noveldokusha.composableActions
 import android.Manifest
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.animation.animateColorAsState
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.*
+import androidx.compose.material3.Card
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -62,7 +62,7 @@ fun onDoBackup(): () -> Unit {
                     Text(
                         text = stringResource(R.string.backup_options),
                         modifier = Modifier.padding(16.dp),
-                        style = MaterialTheme.typography.h6
+                        style = MaterialTheme.typography.headlineMedium
                     )
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
@@ -72,24 +72,9 @@ fun onDoBackup(): () -> Unit {
                             .fillMaxWidth()
                             .padding(16.dp)
                     ) {
-                        val checkState by remember {
-                            derivedStateOf { if (saveImages) Color.Green else Color.Transparent }
-                        }
-                        val checkedColor by animateColorAsState(
-                            targetValue = checkState,
-                            animationSpec = tween(250)
-                        )
                         Checkbox(
                             checked = saveImages,
-                            onCheckedChange = null,
-                            colors = CheckboxDefaults.colors(
-                                checkedColor = checkedColor,
-                                uncheckedColor = MaterialTheme.colors.onPrimary.copy(alpha = 0.5f),
-                                disabledColor = MaterialTheme.colors.onPrimary.copy(alpha = 0.25f),
-                                disabledIndeterminateColor = MaterialTheme.colors.onPrimary.copy(
-                                    alpha = 0.25f
-                                ),
-                            )
+                            onCheckedChange = null
                         )
                         Text(
                             text = stringResource(R.string.save_images),

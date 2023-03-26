@@ -9,9 +9,9 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -24,9 +24,9 @@ import my.noveldokusha.composableActions.ListLoadWatcher
 import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.network.IteratorState
 import my.noveldokusha.network.NetworkClient
+import my.noveldokusha.repository.SourceCatalogItem
 import my.noveldokusha.scraper.Scraper
 import my.noveldokusha.ui.composeViews.ImageView
-import my.noveldokusha.repository.SourceCatalogItem
 import my.noveldokusha.ui.theme.ColorAccent
 import my.noveldokusha.ui.theme.ImageBorderShape
 import my.noveldokusha.ui.theme.InternalTheme
@@ -46,7 +46,7 @@ fun GlobalSourceSearchView(
         items(listSources) { entry ->
             Text(
                 text = entry.source.catalog.name.capitalize(Locale.ROOT),
-                style = MaterialTheme.typography.h6,
+                style = MaterialTheme.typography.headlineMedium,
                 modifier = Modifier.padding(vertical = 4.dp, horizontal = 8.dp)
             )
             SourceListView(
@@ -104,7 +104,7 @@ fun SourceListView(
                         .aspectRatio(1 / 1.45f)
                         .border(
                             0.dp,
-                            MaterialTheme.colors.onSurface.copy(alpha = 0.2f),
+                            MaterialTheme.colorScheme.onSurface.copy(alpha = 0.2f),
                             ImageBorderShape
                         )
                         .clip(ImageBorderShape),
@@ -112,7 +112,7 @@ fun SourceListView(
                 Text(
                     text = it.title,
                     maxLines = 2,
-                    style = MaterialTheme.typography.caption,
+                    style = MaterialTheme.typography.labelMedium,
                     modifier = Modifier
                         .height(40.dp)
                         .padding(4.dp)
@@ -134,7 +134,7 @@ fun SourceListView(
                     IteratorState.CONSUMED -> when {
                         error != null -> Text(
                             text = stringResource(R.string.error_loading),
-                            color = MaterialTheme.colors.onError,
+                            color = MaterialTheme.colorScheme.onError,
                         )
                         list.isEmpty() -> Text(
                             text = stringResource(R.string.no_results_found),

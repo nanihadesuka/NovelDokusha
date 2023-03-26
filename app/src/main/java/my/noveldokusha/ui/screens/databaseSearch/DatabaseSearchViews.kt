@@ -3,14 +3,13 @@ package my.noveldokusha.ui.screens.databaseSearch
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.itemsIndexed
-import androidx.compose.material.*
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.snapshots.SnapshotStateList
@@ -28,12 +27,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import my.noveldokusha.R
+import my.noveldokusha.ui.composeViews.AnimatedTransition
+import my.noveldokusha.ui.composeViews.MyButton
 import my.noveldokusha.ui.composeViews.ToolbarModeSearch
 import my.noveldokusha.ui.screens.sourceCatalog.ToolbarMode
 import my.noveldokusha.ui.theme.InternalTheme
 import my.noveldokusha.ui.theme.Themes
-import my.noveldokusha.uiViews.AnimatedTransition
-import my.noveldokusha.ui.composeViews.MyButton
 
 @Composable
 fun CheckBoxCategory(
@@ -69,9 +68,10 @@ fun CheckBoxCategory(
             onClick = onClick,
             colors = CheckboxDefaults.colors(
                 checkedColor = checkedColor,
-                uncheckedColor = MaterialTheme.colors.onPrimary.copy(alpha = 0.5f),
-                disabledColor = MaterialTheme.colors.onPrimary.copy(alpha = 0.25f),
-                disabledIndeterminateColor = MaterialTheme.colors.onPrimary.copy(alpha = 0.25f),
+                uncheckedColor = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.5f),
+                disabledCheckedColor = checkedColor.copy(alpha = 0.25f),
+                disabledUncheckedColor = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.25f),
+                disabledIndeterminateColor = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.25f),
             )
         )
         Text(
@@ -83,7 +83,6 @@ fun CheckBoxCategory(
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun SearchGenres(
     list: SnapshotStateList<GenreItem>,
@@ -130,7 +129,7 @@ private fun ToolbarMain(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
             .fillMaxWidth()
-            .background(MaterialTheme.colors.surface)
+            .background(MaterialTheme.colorScheme.surface)
             .padding(top = topPadding, bottom = 0.dp, start = 12.dp, end = 12.dp)
             .height(height)
     ) {
@@ -141,12 +140,12 @@ private fun ToolbarMain(
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Text(
                 text = title,
-                style = MaterialTheme.typography.h6,
+                style = MaterialTheme.typography.headlineMedium,
                 fontWeight = FontWeight.Bold
             )
             Text(
                 text = subtitle,
-                style = MaterialTheme.typography.subtitle1
+                style = MaterialTheme.typography.titleMedium
             )
         }
 

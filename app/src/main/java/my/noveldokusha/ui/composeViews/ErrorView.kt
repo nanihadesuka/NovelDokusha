@@ -1,4 +1,4 @@
-package my.noveldokusha.uiViews
+package my.noveldokusha.ui.composeViews
 
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -6,10 +6,10 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.selection.SelectionContainer
-import androidx.compose.material.Divider
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
 import androidx.compose.material.ripple.rememberRipple
+import androidx.compose.material3.Divider
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -30,7 +30,7 @@ fun ErrorView(
     @Composable
     fun Modifier.click(onClick: () -> Unit) = clickable(
         interactionSource = remember { MutableInteractionSource() },
-        indication = rememberRipple(color = MaterialTheme.colors.onError),
+        indication = rememberRipple(color = MaterialTheme.colorScheme.onError),
         onClick = onClick
     )
 
@@ -44,7 +44,7 @@ fun ErrorView(
                 if (onReload != null)
                     Text(
                         text = stringResource(R.string.reload),
-                        color = MaterialTheme.colors.onError,
+                        color = MaterialTheme.colorScheme.onError,
                         modifier = Modifier
                             .click(onReload)
                             .weight(1f)
@@ -53,13 +53,13 @@ fun ErrorView(
                     )
                 if (onReload != null && onCopyError != null)
                     DividerVertical(
-                        color = MaterialTheme.colors.onError,
+                        color = MaterialTheme.colorScheme.onError,
                         thickness = 0.5.dp,
                     )
                 if (onCopyError != null)
                     Text(
                         text = stringResource(R.string.copy_error),
-                        color = MaterialTheme.colors.onError,
+                        color = MaterialTheme.colorScheme.onError,
                         modifier = Modifier
                             .click(onClick = { onCopyError(error) })
                             .weight(1f)
@@ -67,7 +67,7 @@ fun ErrorView(
                         textAlign = TextAlign.Center,
                     )
             }
-            Divider(color = MaterialTheme.colors.onError)
+            Divider(color = MaterialTheme.colorScheme.onError)
         }
         SelectionContainer {
             Text(
@@ -75,7 +75,7 @@ fun ErrorView(
                 fontFamily = FontFamily.Monospace,
                 fontSize = 10.sp,
                 letterSpacing = 0.sp,
-                color = MaterialTheme.colors.onError,
+                color = MaterialTheme.colorScheme.onError,
                 modifier = Modifier.padding(8.dp)
             )
         }

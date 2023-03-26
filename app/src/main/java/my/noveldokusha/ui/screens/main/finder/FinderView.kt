@@ -3,16 +3,15 @@ package my.noveldokusha.ui.screens.main.finder
 import android.content.Context
 import android.net.Uri
 import androidx.compose.animation.ExperimentalAnimationApi
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.PushPin
 import androidx.compose.material.icons.outlined.PushPin
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
@@ -36,6 +35,7 @@ import my.noveldokusha.repository.SourceLanguageItem
 import my.noveldokusha.scraper.DatabaseInterface
 import my.noveldokusha.scraper.Scraper
 import my.noveldokusha.scraper.SourceInterface
+import my.noveldokusha.ui.composeViews.AnimatedTransition
 import my.noveldokusha.ui.composeViews.ImageViewGlide
 import my.noveldokusha.ui.composeViews.MyButton
 import my.noveldokusha.ui.composeViews.ToolbarModeSearch
@@ -46,7 +46,6 @@ import my.noveldokusha.ui.screens.sourceCatalog.ToolbarMode
 import my.noveldokusha.ui.theme.ColorAccent
 import my.noveldokusha.ui.theme.ImageBorderShape
 import my.noveldokusha.ui.theme.InternalTheme
-import my.noveldokusha.uiViews.AnimatedTransition
 import my.noveldokusha.utils.backgroundRounded
 import my.noveldokusha.utils.drawBottomLine
 import my.noveldokusha.utils.outlineRounded
@@ -108,7 +107,7 @@ fun FinderView() {
     }
 }
 
-@OptIn(ExperimentalAnimationApi::class, ExperimentalFoundationApi::class)
+@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun FinderBody(
     databasesList: List<DatabaseInterface>,
@@ -125,7 +124,7 @@ fun FinderBody(
             Text(
                 text = stringResource(id = R.string.database),
                 fontWeight = FontWeight.Bold,
-                style = MaterialTheme.typography.subtitle1,
+                style = MaterialTheme.typography.titleMedium,
                 color = ColorAccent,
                 modifier = Modifier.padding(top = 8.dp, bottom = 4.dp),
             )
@@ -143,7 +142,7 @@ fun FinderBody(
             Text(
                 text = stringResource(id = R.string.sources),
                 fontWeight = FontWeight.Bold,
-                style = MaterialTheme.typography.subtitle1,
+                style = MaterialTheme.typography.titleMedium,
                 color = ColorAccent,
                 modifier = Modifier.padding(top = 8.dp, bottom = 4.dp),
             )
@@ -187,7 +186,7 @@ fun ToolbarMain(
         horizontalArrangement = Arrangement.End,
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
-            .background(MaterialTheme.colors.surface)
+            .background(MaterialTheme.colorScheme.surface)
             .fillMaxWidth()
             .drawBottomLine()
             .padding(top = 8.dp, bottom = 0.dp, start = 12.dp, end = 12.dp)
@@ -195,7 +194,7 @@ fun ToolbarMain(
     ) {
         Text(
             text = title,
-            style = MaterialTheme.typography.h6,
+            style = MaterialTheme.typography.headlineMedium,
             fontWeight = FontWeight.Bold,
             modifier = Modifier.weight(1f)
         )
@@ -268,7 +267,7 @@ private fun Button(
         text = text,
         onClick = onClick,
         outerPadding = 0.dp,
-        backgroundColor = MaterialTheme.colors.primary,
+        backgroundColor = MaterialTheme.colorScheme.primary,
         modifier = modifier.fillMaxWidth(),
     ) {
         Row(

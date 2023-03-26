@@ -4,11 +4,12 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material.*
+import androidx.compose.material.LocalContentAlpha
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CloudDownload
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.outlined.Done
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -97,7 +98,7 @@ fun SettingsTranslationModelsDialog(
                                 it.downloading -> IconButton(onClick = { }, enabled = false) {
                                     CircularProgressIndicator(
                                         modifier = Modifier.size(22.dp),
-                                        color = MaterialTheme.colors.onPrimary
+                                        color = MaterialTheme.colorScheme.onPrimary
                                     )
                                 }
                                 else -> IconButton(

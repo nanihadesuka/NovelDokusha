@@ -3,10 +3,10 @@ package my.noveldokusha.ui.screens.chaptersList
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -40,8 +40,8 @@ fun MainToolbar(
         }
     )
 
-    val primary = MaterialTheme.colors.primary
-    val onPrimary = MaterialTheme.colors.onPrimary
+    val primary = MaterialTheme.colorScheme.primary
+    val onPrimary = MaterialTheme.colorScheme.onPrimary
 
     val backgroundColor by remember(alpha) { derivedStateOf { primary.copy(alpha = alpha) } }
     val borderColor by remember(alpha) { derivedStateOf { onPrimary.copy(alpha = alpha * 0.3f) } }
@@ -62,7 +62,7 @@ fun MainToolbar(
             text = bookTitle,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
-            style = MaterialTheme.typography.h6,
+            style = MaterialTheme.typography.headlineMedium,
             modifier = Modifier
                 .padding(16.dp)
                 .weight(1f),

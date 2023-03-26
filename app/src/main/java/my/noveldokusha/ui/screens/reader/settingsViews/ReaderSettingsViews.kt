@@ -6,12 +6,10 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.FontDownload
 import androidx.compose.material.icons.twotone.FormatSize
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
@@ -55,7 +53,7 @@ private fun CurrentBookInfo(
     Column(modifier) {
         Text(
             text = chapterTitle,
-            style = MaterialTheme.typography.h5,
+            style = MaterialTheme.typography.headlineMedium,
             fontWeight = FontWeight.Bold,
             modifier = Modifier
                 .padding()
@@ -67,13 +65,13 @@ private fun CurrentBookInfo(
                 chapterCurrentNumber,
                 chaptersTotalSize
             ),
-            style = MaterialTheme.typography.body1,
+            style = MaterialTheme.typography.bodyMedium,
             fontWeight = FontWeight.Bold,
             modifier = Modifier.padding()
         )
         Text(
             text = stringResource(id = R.string.progress_x_percentage, chapterPercentageProgress),
-            style = MaterialTheme.typography.body1,
+            style = MaterialTheme.typography.bodyMedium,
             fontWeight = FontWeight.Bold,
             modifier = Modifier.padding()
         )
@@ -186,7 +184,7 @@ private fun SettingsRowList(
         horizontalArrangement = Arrangement.spacedBy(4.dp),
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
-            .background(MaterialTheme.colors.secondary),
+            .background(MaterialTheme.colorScheme.secondary),
         contentPadding = PaddingValues(
             start = 16.dp,
             end = 16.dp + 200.dp,
@@ -287,10 +285,10 @@ fun ReaderInfoView(
                     .background(
                         brush = Brush.verticalGradient(
                             colors = listOf(
-                                MaterialTheme.colors.primary,
-                                MaterialTheme.colors.primary,
-                                MaterialTheme.colors.primary,
-                                MaterialTheme.colors.primary.copy(alpha = 0f)
+                                MaterialTheme.colorScheme.primary,
+                                MaterialTheme.colorScheme.primary,
+                                MaterialTheme.colorScheme.primary,
+                                MaterialTheme.colorScheme.primary.copy(alpha = 0f)
                             )
                         )
                     )

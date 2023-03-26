@@ -3,8 +3,8 @@ package my.noveldokusha.ui.screens.databaseBookInfo
 import androidx.compose.animation.*
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -32,7 +32,7 @@ private fun Title(name: String) {
         text = name,
         fontWeight = FontWeight.Bold,
         color = ColorAccent,
-        style = MaterialTheme.typography.subtitle1,
+        style = MaterialTheme.typography.titleMedium,
         modifier = Modifier.padding(top = 16.dp, bottom = 4.dp),
     )
 }
@@ -81,8 +81,8 @@ fun DatabaseBookInfoView(
                         .align(Alignment.BottomCenter)
                         .background(
                             Brush.verticalGradient(
-                                0f to MaterialTheme.colors.surface.copy(alpha = 0f),
-                                1f to MaterialTheme.colors.surface,
+                                0f to MaterialTheme.colorScheme.surface.copy(alpha = 0f),
+                                1f to MaterialTheme.colorScheme.surface,
                             )
                         )
                 )
@@ -97,8 +97,7 @@ fun DatabaseBookInfoView(
             ) {
                 Text(
                     text = data.title,
-                    style = MaterialTheme.typography.h5,
-                    fontWeight = FontWeight.Bold,
+                    style = MaterialTheme.typography.titleMedium,
                     textAlign = TextAlign.Center
                 )
                 ImageView(

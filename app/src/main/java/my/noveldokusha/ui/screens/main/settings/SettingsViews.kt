@@ -8,13 +8,10 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.Icon
-import androidx.compose.material.LocalTextStyle
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Cancel
 import androidx.compose.material.icons.outlined.CheckCircle
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -59,7 +56,7 @@ fun SettingsTheme(
 
                 val textColor = when (currentFollowSystem) {
                     true -> Color.White
-                    false -> MaterialTheme.colors.onPrimary
+                    false -> MaterialTheme.colorScheme.onPrimary
                 }
 
                 Row(
@@ -74,7 +71,7 @@ fun SettingsTheme(
                         )
                         .background(
                             if (currentFollowSystem) ColorAccent
-                            else MaterialTheme.colors.onPrimary.copy(alpha = 0.15f)
+                            else MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.15f)
                         )
                         .padding(8.dp)
                         .padding(start = 6.dp)
@@ -122,7 +119,7 @@ fun ToolbarMain(title: String) {
         horizontalArrangement = Arrangement.End,
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
-            .background(MaterialTheme.colors.surface)
+            .background(MaterialTheme.colorScheme.surface)
             .fillMaxWidth()
             .drawBottomLine()
             .padding(top = 8.dp, bottom = 0.dp, start = 12.dp, end = 12.dp)
@@ -130,7 +127,7 @@ fun ToolbarMain(title: String) {
     ) {
         Text(
             text = title,
-            style = MaterialTheme.typography.h6,
+            style = MaterialTheme.typography.headlineMedium,
             fontWeight = FontWeight.Bold,
             modifier = Modifier.weight(1f)
         )
@@ -236,7 +233,7 @@ fun SettingsBody(
                 .fillMaxWidth(),
             fontFamily = FontFamily.Monospace,
             fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colors.onPrimary.copy(alpha = 0.8f),
+            color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.8f),
             textAlign = TextAlign.Center
         )
         Spacer(modifier = Modifier.height(120.dp))

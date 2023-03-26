@@ -7,8 +7,8 @@ import androidx.compose.foundation.gestures.rememberDraggableState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -64,7 +64,7 @@ private fun MySliderBase(
     value: Float,
     onValueChange: (Float) -> Unit,
     height: Dp = selectableMinHeight,
-    backgroundColor: Color = ColorAccent.mix(MaterialTheme.colors.primaryVariant, 0.5f),
+    backgroundColor: Color = ColorAccent.mix(MaterialTheme.colorScheme.surface, 0.5f),
     trackColor: Color = ColorAccent,
 ) {
     val currentValue by rememberUpdatedState(newValue = value)
@@ -76,10 +76,13 @@ private fun MySliderBase(
          * Don't check for 1/0 Exception as is responsibility
          * of the user to guarantee the range is correct
          */
-        val offsetPx by derivedStateOf {
-            val normalizedValue = (currentValue - range.start) / (range.endInclusive - range.start)
-            val sliderSizePx = constraints.maxWidth.toFloat() - heightPx
-            normalizedValue * sliderSizePx + heightPx
+        val offsetPx by remember {
+            derivedStateOf {
+                val normalizedValue =
+                    (currentValue - range.start) / (range.endInclusive - range.start)
+                val sliderSizePx = constraints.maxWidth.toFloat() - heightPx
+                normalizedValue * sliderSizePx + heightPx
+            }
         }
 
         Box(

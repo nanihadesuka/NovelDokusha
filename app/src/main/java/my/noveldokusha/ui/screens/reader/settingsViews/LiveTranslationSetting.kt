@@ -3,10 +3,11 @@ package my.noveldokusha.ui.screens.reader.settingsViews
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.*
+import androidx.compose.material.LocalContentAlpha
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowRightAlt
 import androidx.compose.material.icons.filled.CloudDownload
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.snapshots.SnapshotStateList
@@ -85,7 +86,7 @@ fun LiveTranslationSetting(
                                 ?: stringResource(R.string.language_source_empty_text),
                             modifier = Modifier
                                 .padding(6.dp)
-                                .ifCase(source == null) { alpha(0.5f) },
+                                .ifCase(source.value == null) { alpha(0.5f) },
                         )
                     }
                     Icon(Icons.Default.ArrowRightAlt, contentDescription = null)
@@ -101,7 +102,7 @@ fun LiveTranslationSetting(
                                 ?: stringResource(R.string.language_target_empty_text),
                             modifier = Modifier
                                 .padding(6.dp)
-                                .ifCase(target == null) { alpha(0.5f) },
+                                .ifCase(target.value == null) { alpha(0.5f) },
                         )
                     }
                 }
@@ -121,14 +122,15 @@ fun LiveTranslationSetting(
                 onClick = {
                     if (modelSelectorExpandedForTarget) onTargetChange(null)
                     else onSourceChange(null)
+                },
+                text = {
+                    Text(
+                        text = stringResource(R.string.language_clear_selection),
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.weight(1f)
+                    )
                 }
-            ) {
-                Text(
-                    text = stringResource(R.string.language_clear_selection),
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.weight(1f)
-                )
-            }
+            )
 
             Divider()
 
@@ -142,44 +144,45 @@ fun LiveTranslationSetting(
                         else onSourceChange(item)
                         modelSelectorExpanded = false
                     },
-                    enabled = !isAlreadySelected && item.available
-                ) {
-                    Box(Modifier.weight(1f)) {
-                        Text(
-                            text = item.locale.displayLanguage,
-                            textAlign = TextAlign.Center,
-                            modifier = Modifier
-                                .padding(4.dp)
-                                .fillMaxWidth()
-                                .align(Alignment.Center)
-                        )
-                        if (!item.available) Box(
-                            contentAlignment = Alignment.Center,
-                            modifier = Modifier
-                                .widthIn(min = 22.dp)
-                                .height(22.dp)
-                                .align(Alignment.CenterEnd)
-                        ) {
-                            when {
-                                item.downloading -> IconButton(onClick = { }, enabled = false) {
-                                    CircularProgressIndicator(
-                                        modifier = Modifier.size(22.dp),
-                                        color = MaterialTheme.colors.onPrimary
-                                    )
-                                }
-                                else -> IconButton(
-                                    onClick = { onDownloadTranslationModel(item.language) }) {
-                                    Icon(
-                                        Icons.Default.CloudDownload,
-                                        contentDescription = null,
-                                        tint = if (item.downloadingFailed) Color.Red
-                                        else LocalContentColor.current.copy(alpha = LocalContentAlpha.current)
-                                    )
+                    enabled = !isAlreadySelected && item.available,
+                    text = {
+                        Box(Modifier.weight(1f)) {
+                            Text(
+                                text = item.locale.displayLanguage,
+                                textAlign = TextAlign.Center,
+                                modifier = Modifier
+                                    .padding(4.dp)
+                                    .fillMaxWidth()
+                                    .align(Alignment.Center)
+                            )
+                            if (!item.available) Box(
+                                contentAlignment = Alignment.Center,
+                                modifier = Modifier
+                                    .widthIn(min = 22.dp)
+                                    .height(22.dp)
+                                    .align(Alignment.CenterEnd)
+                            ) {
+                                when {
+                                    item.downloading -> IconButton(onClick = { }, enabled = false) {
+                                        CircularProgressIndicator(
+                                            modifier = Modifier.size(22.dp),
+                                            color = MaterialTheme.colorScheme.onPrimary
+                                        )
+                                    }
+                                    else -> IconButton(
+                                        onClick = { onDownloadTranslationModel(item.language) }) {
+                                        Icon(
+                                            Icons.Default.CloudDownload,
+                                            contentDescription = null,
+                                            tint = if (item.downloadingFailed) Color.Red
+                                            else LocalContentColor.current.copy(alpha = LocalContentAlpha.current)
+                                        )
+                                    }
                                 }
                             }
                         }
                     }
-                }
+                )
             }
         }
     }

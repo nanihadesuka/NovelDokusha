@@ -2,9 +2,9 @@ package my.noveldokusha.ui.screens.reader.settingsViews
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.FontDownload
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Size
@@ -42,7 +42,7 @@ fun TextFontSetting(
         )
         Text(
             text = textFont,
-            style = MaterialTheme.typography.h6,
+            style = MaterialTheme.typography.headlineMedium,
             fontFamily = fontLoader.getFontFamily(textFont),
             modifier = Modifier
                 .padding(end = 50.dp)
@@ -59,18 +59,19 @@ fun TextFontSetting(
         ) {
             FontsLoader.availableFonts.forEach { item ->
                 DropdownMenuItem(
-                    onClick = { onTextFontChanged(item) }
-                ) {
-                    Text(
-                        text = item,
-                        fontFamily = fontLoader.getFontFamily(item),
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier
-                            .padding(4.dp)
-                            .fillMaxWidth()
-                            .weight(1f)
-                    )
-                }
+                    onClick = { onTextFontChanged(item) },
+                    text = {
+                        Text(
+                            text = item,
+                            fontFamily = fontLoader.getFontFamily(item),
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier
+                                .padding(4.dp)
+                                .fillMaxWidth()
+                                .weight(1f)
+                        )
+                    }
+                )
             }
         }
     }

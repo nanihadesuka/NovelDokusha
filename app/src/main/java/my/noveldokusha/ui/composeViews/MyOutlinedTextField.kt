@@ -3,10 +3,7 @@ package my.noveldokusha.ui.composeViews
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.OutlinedTextField
-import androidx.compose.material.Text
-import androidx.compose.material.TextFieldDefaults
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -15,6 +12,7 @@ import androidx.compose.ui.unit.dp
 import my.noveldokusha.ui.theme.InternalThemeObject
 import my.noveldokusha.ui.theme.Themes
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MyOutlinedTextField(
     value: String,
@@ -30,7 +28,7 @@ fun MyOutlinedTextField(
             Text(
                 text = placeHolderText,
                 modifier = Modifier.alpha(0.7f),
-                style = MaterialTheme.typography.subtitle2
+                style = MaterialTheme.typography.titleSmall
             )
         },
         modifier = modifier
@@ -38,7 +36,7 @@ fun MyOutlinedTextField(
             .fillMaxWidth(),
         shape = MaterialTheme.shapes.large,
         colors = TextFieldDefaults.outlinedTextFieldColors(
-            focusedBorderColor = MaterialTheme.colors.onPrimary
+            focusedBorderColor = MaterialTheme.colorScheme.onPrimary
         ),
         interactionSource = MutableInteractionSource()
     )

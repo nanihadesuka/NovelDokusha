@@ -6,9 +6,9 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.border
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -42,8 +42,8 @@ fun MyButton(
     minHeight: Dp = selectableMinHeight,
     shape: Shape = MaterialTheme.shapes.large,
     borderWidth: Dp = 1.dp,
-    borderColor: Color = MaterialTheme.colors.onSurface.copy(alpha = 0.2f),
-    backgroundColor: Color = MaterialTheme.colors.primary,
+    borderColor: Color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.2f),
+    backgroundColor: Color = MaterialTheme.colorScheme.primary,
     textStyle: TextStyle = LocalTextStyle.current,
     selected: Boolean = false,
     selectedBackgroundColor: Color = ColorAccent,
@@ -98,8 +98,8 @@ fun MyIconButton(
     minSize: Dp = selectableMinHeight,
     shape: Shape = MaterialTheme.shapes.large,
     borderWidth: Dp = 1.dp,
-    borderColor: Color = MaterialTheme.colors.onSurface.copy(alpha = 0.2f),
-    backgroundColor: Color = MaterialTheme.colors.primary,
+    borderColor: Color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.2f),
+    backgroundColor: Color = MaterialTheme.colorScheme.primary,
     selectedBackgroundColor: Color = ColorAccent,
     selected: Boolean = false,
     onClick: () -> Unit,

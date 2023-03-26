@@ -12,9 +12,13 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.FloatingActionButton
-import androidx.compose.material.Icon
-import androidx.compose.material.MaterialTheme
+import androidx.compose.material.pullrefresh.PullRefreshIndicator
+import androidx.compose.material.pullrefresh.pullRefresh
+import androidx.compose.material.pullrefresh.rememberPullRefreshState
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
@@ -27,8 +31,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowCompat
 import androidx.lifecycle.lifecycleScope
-import com.google.accompanist.swiperefresh.SwipeRefresh
-import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
@@ -48,9 +50,11 @@ import my.noveldokusha.ui.screens.databaseSearchResults.DatabaseSearchResultsAct
 import my.noveldokusha.ui.screens.reader.ReaderActivity
 import my.noveldokusha.ui.theme.ColorAccent
 import my.noveldokusha.ui.theme.Theme
+import my.noveldokusha.ui.theme.isDark
 import my.noveldokusha.utils.Extra_String
 import javax.inject.Inject
 
+@OptIn(ExperimentalMaterialApi::class)
 @AndroidEntryPoint
 class ChaptersActivity : BaseActivity() {
     class IntentData : Intent, ChapterStateBundle {
@@ -86,7 +90,7 @@ class ChaptersActivity : BaseActivity() {
 
             Theme(appPreferences = appPreferences) {
                 val systemUiController = rememberSystemUiController()
-                val useDarkIcons = MaterialTheme.colors.isLight
+                val useDarkIcons = MaterialTheme.colorScheme.isDark()
                 SideEffect {
                     systemUiController.setSystemBarsColor(
                         color = Color.Transparent,
@@ -108,14 +112,15 @@ class ChaptersActivity : BaseActivity() {
                 }
 
                 Box {
-                    SwipeRefresh(
-                        state = rememberSwipeRefreshState(isRefreshingDelayed),
+                    val pullRefreshState = rememberPullRefreshState(
+                        refreshing = isRefreshingDelayed,
                         onRefresh = {
-                            isRefreshingDelayed = true
                             toasty.show(R.string.updating_book_info)
                             viewModel.reloadAll()
                         }
-                    ) {
+                    )
+
+                    Box(modifier = Modifier.pullRefresh(pullRefreshState)) {
                         ChaptersListView(
                             header = {
                                 HeaderView(
@@ -135,6 +140,12 @@ class ChaptersActivity : BaseActivity() {
                             listState = listState,
                             onClick = ::onClickChapter,
                             onLongClick = ::onLongClickChapter,
+                        )
+
+                        PullRefreshIndicator(
+                            refreshing = isRefreshingDelayed,
+                            state = pullRefreshState,
+                            modifier = Modifier.align(Alignment.TopCenter)
                         )
                     }
 
@@ -181,7 +192,7 @@ class ChaptersActivity : BaseActivity() {
                                 toolbarMode = ToolbarMode.MAIN
                             },
                             onTextDone = {},
-                            color = MaterialTheme.colors.primary,
+                            color = MaterialTheme.colorScheme.primary,
                             showUnderline = true,
                             topPadding = 38.dp,
                             height = 56.dp,

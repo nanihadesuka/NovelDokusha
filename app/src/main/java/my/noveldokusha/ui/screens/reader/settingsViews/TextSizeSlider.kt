@@ -1,10 +1,7 @@
 package my.noveldokusha.ui.screens.reader.settingsViews
 
-import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.*
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import my.noveldokusha.R
 import my.noveldokusha.ui.composeViews.MySlider
 

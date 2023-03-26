@@ -14,11 +14,13 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.*
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.LocalContentAlpha
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.StarRate
 import androidx.compose.material.icons.outlined.FormatListBulleted
 import androidx.compose.material.icons.rounded.*
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
@@ -92,7 +94,7 @@ fun TextToSpeechSetting(
                     strokeWidth = 6.dp,
                     color = ColorAccent,
                     modifier = Modifier.background(
-                        MaterialTheme.colors.surface.copy(alpha = 0.7f),
+                        MaterialTheme.colorScheme.surface.copy(alpha = 0.7f),
                         CircleShape
                     )
                 )
@@ -110,7 +112,7 @@ fun TextToSpeechSetting(
                     horizontalArrangement = Arrangement.Center,
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier
-                        .background(MaterialTheme.colors.primaryVariant, CircleShape)
+                        .background(MaterialTheme.colorScheme.background, CircleShape)
                 ) {
                     val alpha by animateFloatAsState(targetValue = if (isActive) 1f else 0.5f)
                     IconButton(
@@ -199,21 +201,21 @@ fun TextToSpeechSetting(
                         text = stringResource(id = R.string.start_here),
                         onClick = debouncedAction { playFirstVisibleItem() },
                         borderWidth = 1.dp,
-                        borderColor = MaterialTheme.colors.onSurface.copy(alpha = 0.5f),
+                        borderColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
                         outerPadding = 0.dp,
                     )
                     MyButton(
                         text = stringResource(id = R.string.focus),
                         onClick = debouncedAction { scrollToActiveItem() },
                         borderWidth = 1.dp,
-                        borderColor = MaterialTheme.colors.onSurface.copy(alpha = 0.5f),
+                        borderColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
                         outerPadding = 0.dp,
                     )
                     MyButton(
                         text = stringResource(id = R.string.voices),
                         onClick = { openVoicesDialog = !openVoicesDialog },
                         borderWidth = 1.dp,
-                        borderColor = MaterialTheme.colors.onSurface.copy(alpha = 0.5f),
+                        borderColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
                         outerPadding = 0.dp,
                     )
                     MyIconButton(
@@ -225,7 +227,7 @@ fun TextToSpeechSetting(
                         },
                         contentDescription = stringResource(R.string.custom_predefined_voices),
                         borderWidth = 1.dp,
-                        borderColor = MaterialTheme.colors.onSurface.copy(alpha = 0.5f),
+                        borderColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
                         outerPadding = 0.dp,
                     )
                     Box {
@@ -327,10 +329,10 @@ private fun VoiceSelectorDialog(
             modifier = Modifier
                 .padding(4.dp)
                 .clip(MaterialTheme.shapes.large)
-                .background(MaterialTheme.colors.background, MaterialTheme.shapes.large)
+                .background(MaterialTheme.colorScheme.background, MaterialTheme.shapes.large)
         ) {
             stickyHeader {
-                Surface(color = MaterialTheme.colors.background) {
+                Surface(color = MaterialTheme.colorScheme.background) {
                     Column {
                         MyOutlinedTextField(
                             value = inputTextFilter.value,
@@ -367,7 +369,7 @@ private fun VoiceSelectorDialog(
                         .padding(horizontal = 4.dp)
                         .heightIn(min = 54.dp)
                         .background(
-                            if (selected) MaterialTheme.colors.secondaryVariant else MaterialTheme.colors.secondaryVariant,
+                            if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.secondary,
                             CircleShape
                         )
                         .clip(CircleShape)
@@ -410,12 +412,12 @@ private fun VoiceSelectorDialog(
                             text = it.id,
                             modifier = Modifier
                                 .background(
-                                    MaterialTheme.colors.primary,
+                                    MaterialTheme.colorScheme.primary,
                                     MaterialTheme.shapes.medium
                                 )
                                 .padding(horizontal = 4.dp, vertical = 2.dp),
                             fontWeight = FontWeight.Bold,
-                            style = MaterialTheme.typography.body1,
+                            style = MaterialTheme.typography.bodyMedium,
                             fontSize = 10.sp,
                         )
                         if (it.needsInternet) {
@@ -423,12 +425,12 @@ private fun VoiceSelectorDialog(
                                 text = stringResource(R.string.needs_internet),
                                 modifier = Modifier
                                     .background(
-                                        MaterialTheme.colors.primary,
+                                        MaterialTheme.colorScheme.primary,
                                         MaterialTheme.shapes.medium
                                     )
                                     .padding(horizontal = 4.dp, vertical = 2.dp),
                                 fontSize = 10.sp,
-                                style = MaterialTheme.typography.body1
+                                style = MaterialTheme.typography.bodyMedium
                             )
                         }
                     }
@@ -439,6 +441,7 @@ private fun VoiceSelectorDialog(
 }
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DropdownCustomSavedVoices(
     expanded: MutableState<Boolean>,
@@ -465,7 +468,7 @@ fun DropdownCustomSavedVoices(
             outerPadding = 0.dp,
             shape = MaterialTheme.shapes.medium,
             borderWidth = 1.dp,
-            borderColor = MaterialTheme.colors.onPrimary.copy(alpha = 0.5f)
+            borderColor = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.5f)
         )
         Column(
             Modifier
@@ -488,29 +491,30 @@ fun DropdownCustomSavedVoices(
                 )
                 if (deleteEntryExpand) AlertDialog(
                     onDismissRequest = { deleteEntryExpand = false },
-                    title = {
-                        Text(
-                            text = predefinedVoice.savedName,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(bottom = 8.dp),
-                            textAlign = TextAlign.Center
-                        )
-                    },
-                    buttons = {
-                        Box(Modifier.padding(8.dp)) {
-                            MyButton(
-                                text = stringResource(R.string.delete),
-                                onClick = {
-                                    deleteEntryExpand = false
-                                    setCustomSavedVoices(
-                                        list.toMutableList().also { it.removeAt(index) }
-                                    )
-                                },
-                                modifier = Modifier.fillMaxWidth(),
+                    content = {
+                        Column {
+                            Text(
+                                text = predefinedVoice.savedName,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(bottom = 8.dp),
                                 textAlign = TextAlign.Center
                             )
-                        }                    }
+                            Box(Modifier.padding(8.dp)) {
+                                MyButton(
+                                    text = stringResource(R.string.delete),
+                                    onClick = {
+                                        deleteEntryExpand = false
+                                        setCustomSavedVoices(
+                                            list.toMutableList().also { it.removeAt(index) }
+                                        )
+                                    },
+                                    modifier = Modifier.fillMaxWidth(),
+                                    textAlign = TextAlign.Center
+                                )
+                            }
+                        }
+                    }
                 )
             }
         }

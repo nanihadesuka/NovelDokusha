@@ -6,11 +6,11 @@ import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDownward
 import androidx.compose.material.icons.filled.ArrowUpward
 import androidx.compose.material.icons.filled.SwapVert
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -61,9 +61,10 @@ fun OptionsSheetLibrary() {
                 onClick = null,
                 colors = CheckboxDefaults.colors(
                     checkedColor = checkedColor,
-                    uncheckedColor = MaterialTheme.colors.onPrimary.copy(alpha = 0.5f),
-                    disabledColor = MaterialTheme.colors.onPrimary.copy(alpha = 0.25f),
-                    disabledIndeterminateColor = MaterialTheme.colors.onPrimary.copy(alpha = 0.25f),
+                    uncheckedColor = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.5f),
+                    disabledCheckedColor = checkedColor.copy(alpha = 0.25f),
+                    disabledUncheckedColor = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.25f),
+                    disabledIndeterminateColor = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.25f),
                 )
             )
             Text(text = stringResource(id = R.string.read), modifier = Modifier.padding(8.dp))

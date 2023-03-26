@@ -16,12 +16,12 @@ import dagger.hilt.android.AndroidEntryPoint
 import my.noveldokusha.R
 import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.ui.BaseActivity
+import my.noveldokusha.ui.composeViews.AnimatedTransition
 import my.noveldokusha.ui.composeViews.BooksVerticalView
 import my.noveldokusha.ui.composeViews.ToolbarModeSearch
 import my.noveldokusha.ui.screens.chaptersList.ChaptersActivity
 import my.noveldokusha.ui.screens.webView.WebViewActivity
 import my.noveldokusha.ui.theme.Theme
-import my.noveldokusha.uiViews.AnimatedTransition
 import my.noveldokusha.utils.Extra_String
 import my.noveldokusha.utils.capitalize
 import my.noveldokusha.utils.copyToClipboard

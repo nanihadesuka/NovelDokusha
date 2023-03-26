@@ -5,8 +5,8 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.MaterialTheme
 import androidx.compose.material.ripple.rememberRipple
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -27,7 +27,7 @@ fun Modifier.ifCase(condition: Boolean, fn: @Composable Modifier.() -> Modifier)
 
 @Composable
 fun Modifier.drawBottomLine(
-    color: Color = MaterialTheme.colors.onPrimary.copy(alpha = 0.3f),
+    color: Color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.3f),
     thickness: Dp = Dp.Hairline
 ) = drawBehind {
     val thicknessPx = thickness.toPx()
@@ -41,7 +41,7 @@ fun Modifier.drawBottomLine(
 
 @Composable
 fun Modifier.drawTopLine(
-    color: Color = MaterialTheme.colors.onPrimary.copy(alpha = 0.3f),
+    color: Color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.3f),
     thickness: Dp = Dp.Hairline
 ) = drawBehind {
     drawLine(
@@ -77,7 +77,7 @@ fun Modifier.debouncedClickable(waitMillis: Long = 250, action: () -> Unit) = co
 fun Modifier.outlineCircle(width: Dp = 1.dp): Modifier = composed {
     border(
         width = width,
-        color = MaterialTheme.colors.onPrimary.copy(alpha = 0.5f),
+        color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.5f),
         shape = CircleShape
     ).clip(CircleShape)
 }
@@ -85,21 +85,21 @@ fun Modifier.outlineCircle(width: Dp = 1.dp): Modifier = composed {
 fun Modifier.outlineRounded(width: Dp = 1.dp): Modifier = composed {
     border(
         width = width,
-        color = MaterialTheme.colors.onPrimary.copy(alpha = 0.5f),
+        color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.5f),
         shape = MaterialTheme.shapes.medium
     ).clip(MaterialTheme.shapes.medium)
 }
 
 fun Modifier.backgroundCircle(): Modifier = composed {
     background(
-        color = MaterialTheme.colors.primary,
+        color = MaterialTheme.colorScheme.primary,
         shape = CircleShape
     )
 }
 
 fun Modifier.backgroundRounded(): Modifier = composed {
     background(
-        color = MaterialTheme.colors.primary,
+        color = MaterialTheme.colorScheme.primary,
         shape = MaterialTheme.shapes.medium
     )
 }

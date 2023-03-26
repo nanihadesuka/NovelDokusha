@@ -7,8 +7,12 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.*
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.ModalBottomSheetLayout
 import androidx.compose.material.ripple.rememberRipple
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
@@ -23,12 +27,12 @@ import dagger.hilt.android.AndroidEntryPoint
 import my.noveldokusha.AppPreferences
 import my.noveldokusha.R
 import my.noveldokusha.ui.BaseActivity
+import my.noveldokusha.ui.composeViews.AnimatedTransition
 import my.noveldokusha.ui.screens.main.finder.FinderView
 import my.noveldokusha.ui.screens.main.library.LibraryView
 import my.noveldokusha.ui.screens.main.library.LibraryViewModel
 import my.noveldokusha.ui.screens.main.settings.SettingsView
 import my.noveldokusha.ui.theme.Theme
-import my.noveldokusha.uiViews.AnimatedTransition
 import my.noveldokusha.utils.drawTopLine
 import my.noveldokusha.utils.mix
 
@@ -59,7 +63,7 @@ open class MainActivity : BaseActivity() {
                         Row(
                             horizontalArrangement = Arrangement.SpaceEvenly,
                             modifier = Modifier
-                                .background(MaterialTheme.colors.surface)
+                                .background(MaterialTheme.colorScheme.surface)
                                 .drawTopLine()
                         ) {
                             NavItem(
@@ -94,9 +98,9 @@ fun BottomSheetMain(body: @Composable () -> Unit) {
     val model = viewModel<LibraryViewModel>()
     ModalBottomSheetLayout(
         sheetState = model.bottomSheetState,
-        sheetBackgroundColor = MaterialTheme.colors.primary,
-        scrimColor = MaterialTheme.colors.primary.copy(alpha = 0.4f),
-        sheetContentColor = MaterialTheme.colors.onPrimary,
+        sheetBackgroundColor = MaterialTheme.colorScheme.primary,
+        scrimColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.4f),
+        sheetContentColor = MaterialTheme.colorScheme.onPrimary,
         modifier = Modifier
             .fillMaxWidth()
             .navigationBarsPadding(),
@@ -132,8 +136,8 @@ private fun RowScope.NavItem(
             .padding(vertical = 8.dp)
             .weight(1f)
     ) {
-        val color = MaterialTheme.colors.onPrimary.mix(
-            color = MaterialTheme.colors.primary,
+        val color = MaterialTheme.colorScheme.onPrimary.mix(
+            color = MaterialTheme.colorScheme.primary,
             fraction = if (selected) 1f else 0.5f
         )
         Icon(

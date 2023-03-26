@@ -11,8 +11,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material.*
 import androidx.compose.material.ripple.rememberRipple
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.snapshots.SnapshotStateList
@@ -40,7 +40,7 @@ import my.noveldokusha.ui.theme.ColorAccent
 import my.noveldokusha.ui.theme.ImageBorderShape
 import my.noveldokusha.ui.theme.InternalTheme
 import my.noveldokusha.ui.theme.Themes
-import my.noveldokusha.uiViews.ErrorView
+import my.noveldokusha.ui.composeViews.ErrorView
 import my.noveldokusha.utils.ifCase
 import my.noveldokusha.utils.mix
 
@@ -81,8 +81,8 @@ fun HeaderView(
                     .align(Alignment.BottomCenter)
                     .background(
                         Brush.verticalGradient(
-                            0f to MaterialTheme.colors.surface.copy(alpha = 0f),
-                            1f to MaterialTheme.colors.surface,
+                            0f to MaterialTheme.colorScheme.surface.copy(alpha = 0f),
+                            1f to MaterialTheme.colorScheme.surface,
                         )
                     )
             )
@@ -110,19 +110,19 @@ fun HeaderView(
                 ) {
                     Text(
                         text = bookTitle,
-                        style = MaterialTheme.typography.h6,
+                        style = MaterialTheme.typography.headlineMedium,
                         fontWeight = FontWeight.Bold,
                         modifier = Modifier.padding(bottom = 10.dp)
                     )
                     Text(
                         text = sourceName,
-                        style = MaterialTheme.typography.caption,
+                        style = MaterialTheme.typography.labelMedium,
                         fontWeight = FontWeight.Bold,
                         modifier = Modifier.padding(bottom = 2.dp)
                     )
                     Text(
                         text = stringResource(id = R.string.chapters) + " " + numberOfChapters.toString(),
-                        style = MaterialTheme.typography.caption,
+                        style = MaterialTheme.typography.labelLarge,
                         fontWeight = FontWeight.Bold,
                         modifier = Modifier.padding(bottom = 8.dp)
                     )
@@ -184,18 +184,18 @@ fun ChaptersListView(
 ) {
 
     val backgroundColorSelected =
-        MaterialTheme.colors.onPrimary.mix(MaterialTheme.colors.surface, 0.1f)
+        MaterialTheme.colorScheme.onPrimary.mix(MaterialTheme.colorScheme.surface, 0.1f)
     val backgroundColorUnselected =
-        MaterialTheme.colors.onPrimary.mix(MaterialTheme.colors.surface, 0.5f)
-    val colorTextRead = MaterialTheme.colors.onPrimary.copy(alpha = 0.5f)
-    val colorTextNotRead = MaterialTheme.colors.onPrimary
-    val colorIconSeenRead = MaterialTheme.colors.onPrimary.copy(alpha = 0.5f)
-    val colorIconSeenNotRead = MaterialTheme.colors.onPrimary.copy(alpha = 0f)
-    val colorIconDownloadedRead = MaterialTheme.colors.onPrimary.copy(alpha = 0.5f)
-    val colorIconDownloadedNotRead = MaterialTheme.colors.onPrimary.copy(alpha = 0f)
+        MaterialTheme.colorScheme.onPrimary.mix(MaterialTheme.colorScheme.surface, 0.5f)
+    val colorTextRead = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.5f)
+    val colorTextNotRead = MaterialTheme.colorScheme.onPrimary
+    val colorIconSeenRead = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.5f)
+    val colorIconSeenNotRead = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0f)
+    val colorIconDownloadedRead = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.5f)
+    val colorIconDownloadedNotRead = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0f)
 
-    val backgroundColorNotSelectedRead = MaterialTheme.colors.surface.mix(ColorAccent, 0.8f)
-    val backgroundColorNotSelectedNotRead = MaterialTheme.colors.surface
+    val backgroundColorNotSelectedRead = MaterialTheme.colorScheme.surface.mix(ColorAccent, 0.8f)
+    val backgroundColorNotSelectedNotRead = MaterialTheme.colorScheme.surface
     val backgroundColorSelectedRead = backgroundColorSelected.mix(ColorAccent, 0.8f)
     val backgroundColorSelectedNotRead = backgroundColorSelected
 
@@ -223,7 +223,7 @@ fun ChaptersListView(
             )
 
             val indicatorColor = when (selected) {
-                true -> MaterialTheme.colors.surface
+                true -> MaterialTheme.colorScheme.surface
                 false -> backgroundColorUnselected
             }
 
