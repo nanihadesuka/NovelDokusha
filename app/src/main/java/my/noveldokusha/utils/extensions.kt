@@ -15,6 +15,7 @@ import androidx.annotation.ColorInt
 import androidx.annotation.ColorRes
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.state.ToggleableState
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.use
 import androidx.lifecycle.LifecycleOwner
@@ -24,6 +25,7 @@ import androidx.recyclerview.widget.RecyclerView
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
+import my.noveldokusha.AppPreferences
 import my.noveldokusha.ui.BaseFragment
 import java.util.*
 
@@ -110,3 +112,9 @@ fun String.capitalize(locale: Locale): String = this.replaceFirstChar {
 
 fun <T> List<T>.hasValidIndex(index: Int): Boolean = (0 >= index) && (index <= lastIndex)
 fun <T> List<T>.hasNotValidIndex(index: Int): Boolean = !hasValidIndex(index = index)
+
+fun AppPreferences.TERNARY_STATE.toToggleableState() = when (this) {
+    AppPreferences.TERNARY_STATE.active -> ToggleableState.On
+    AppPreferences.TERNARY_STATE.inverse -> ToggleableState.Indeterminate
+    AppPreferences.TERNARY_STATE.inactive -> ToggleableState.Off
+}

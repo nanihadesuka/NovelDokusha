@@ -21,9 +21,10 @@ class NotificationsCenter(
     fun showNotification(
         channel_id: String,
         channel_name: String = channel_id,
+        importance: Int = NotificationManager.IMPORTANCE_DEFAULT,
         builder: NotificationCompat.Builder.() -> Unit = {}
     ) = run {
-        buildNotification(context, channel_id, channel_name, builder).apply {
+        buildNotification(context, channel_id, channel_name, importance, builder).apply {
             NotificationManagerCompat
                 .from(context)
                 .notify(channel_id.hashCode(), build())
@@ -36,7 +37,8 @@ class NotificationsCenter(
         context: Context,
         channel_id: String,
         channel_name: String = channel_id,
-        builder: NotificationCompat.Builder.() -> Unit
+        importance: Int = NotificationManager.IMPORTANCE_DEFAULT,
+        builder: NotificationCompat.Builder.() -> Unit,
     ) = run {
         NotificationCompat.Builder(context, channel_id).apply {
             setSmallIcon(R.mipmap.ic_logo)
@@ -44,8 +46,8 @@ class NotificationsCenter(
             priority = NotificationCompat.PRIORITY_DEFAULT
             builder(this)
 
-            val channel = NotificationChannel(channel_id, channel_name, NotificationManager.IMPORTANCE_DEFAULT)
-             manager.createNotificationChannel(channel)
+            val channel = NotificationChannel(channel_id, channel_name, importance)
+            manager.createNotificationChannel(channel)
         }
     }
 

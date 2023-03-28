@@ -1,6 +1,7 @@
 package my.noveldokusha.services.narratorMediaControls
 
 import android.app.Notification
+import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.TaskStackBuilder
 import android.content.ComponentName
@@ -153,7 +154,10 @@ class NarratorMediaControlsNotification(
         }
 
         val notificationBuilder =
-            notificationsCenter.showNotification(NarratorMediaControlsService.channel_id) {
+            notificationsCenter.showNotification(
+                NarratorMediaControlsService.channel_id,
+                importance = NotificationManager.IMPORTANCE_LOW
+            ) {
                 title = ""
                 text = ""
                 defineActions(isPlaying = readerSession.readerTextToSpeech.settings.isPlaying.value)
@@ -162,7 +166,6 @@ class NarratorMediaControlsNotification(
                 priority = NotificationCompat.PRIORITY_HIGH
                 setLargeIcon(BitmapFactory.decodeResource(context.resources, R.mipmap.ic_logo))
                 setStyle(mediaStyle)
-                setSilent(true)
                 setDeleteIntent(cancelButton)
                 color = Color.CYAN
                 setContentIntent(

@@ -2,7 +2,8 @@ package my.noveldokusha.ui.composeViews
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.material3.*
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -29,7 +30,7 @@ fun BookImageButtonView(
         onClick = onClick,
         onLongClick = onLongClick,
         shape = ImageBorderShape,
-        borderWidth = Dp.Hairline,
+        borderWidth = Dp.Unspecified,
         modifier = Modifier.fillMaxWidth(),
     ) {
         Box(
@@ -37,12 +38,12 @@ fun BookImageButtonView(
                 .fillMaxWidth()
                 .aspectRatio(1 / 1.45f)
                 .clip(ImageBorderShape)
+                .background(MaterialTheme.colorScheme.background)
         ) {
             ImageView(
                 imageModel = coverImageUrl,
                 contentDescription = title,
-                modifier = Modifier
-                    .fillMaxSize(),
+                modifier = Modifier.fillMaxSize(),
                 error = R.drawable.default_book_cover,
             )
             Text(
@@ -70,11 +71,13 @@ fun BookImageButtonView(
 @Composable
 private fun PreviewView() {
     InternalTheme {
-        BookImageButtonView(
-            title = "Hello there",
-            coverImageUrl = "",
-            onClick = { },
-            onLongClick = { }
-        )
+        Box(contentAlignment = Alignment.Center) {
+            BookImageButtonView(
+                title = "Hello there",
+                coverImageUrl = "",
+                onClick = { },
+                onLongClick = { }
+            )
+        }
     }
 }

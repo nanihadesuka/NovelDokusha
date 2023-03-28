@@ -11,6 +11,6 @@ val shapes = Shapes(
     large = RoundedCornerShape(14.dp)
 )
 
-val ImageBorderShape = shapes.small
+val ImageBorderShape = shapes.medium
 
 val selectableMinHeight = 48.dp

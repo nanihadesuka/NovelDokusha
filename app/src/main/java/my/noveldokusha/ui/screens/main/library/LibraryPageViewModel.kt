@@ -2,8 +2,9 @@ package my.noveldokusha.ui.screens.main.library
 
 import android.content.Context
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewModelScope
-import com.google.accompanist.swiperefresh.SwipeRefreshState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.delay
@@ -26,7 +27,7 @@ class LibraryPageViewModel @Inject constructor(
     private val toasty: Toasty,
     @ApplicationContext private val context: Context
 ) : BaseViewModel() {
-    val refreshState = SwipeRefreshState(false)
+    var isPullRefreshing by mutableStateOf(false)
     val listReading by createPageList(isShowCompleted = false)
     val listCompleted by createPageList(isShowCompleted = true)
 
@@ -52,9 +53,9 @@ class LibraryPageViewModel @Inject constructor(
     private fun showLoadingSpinner() {
         viewModelScope.launch {
             // Keep for 3 seconds so the user can notice the refresh has been triggered.
-            refreshState.isRefreshing = true
+            isPullRefreshing = true
             delay(3000L)
-            refreshState.isRefreshing = false
+            isPullRefreshing = false
         }
     }
 

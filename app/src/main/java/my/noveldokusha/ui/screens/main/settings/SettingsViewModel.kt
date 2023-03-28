@@ -9,12 +9,12 @@ import androidx.lifecycle.asFlow
 import androidx.lifecycle.viewModelScope
 import com.bumptech.glide.Glide
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import my.noveldokusha.App
 import my.noveldokusha.AppPreferences
+import my.noveldokusha.di.AppCoroutineScope
 import my.noveldokusha.repository.Repository
 import my.noveldokusha.tools.TranslationManager
 import my.noveldokusha.ui.BaseViewModel
@@ -25,7 +25,7 @@ import javax.inject.Inject
 @HiltViewModel
 class SettingsViewModel @Inject constructor(
     private val repository: Repository,
-    private val appScope: CoroutineScope,
+    private val appScope: AppCoroutineScope,
     private val appPreferences: AppPreferences,
     private val app: App,
     val translationManager: TranslationManager,

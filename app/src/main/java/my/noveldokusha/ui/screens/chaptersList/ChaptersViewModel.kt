@@ -15,9 +15,10 @@ import my.noveldokusha.AppPreferences
 import my.noveldokusha.R
 import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.data.ChapterWithContext
-import my.noveldokusha.data.database.tables.Book
-import my.noveldokusha.network.NetworkClient
 import my.noveldokusha.data.Response
+import my.noveldokusha.data.database.tables.Book
+import my.noveldokusha.di.AppCoroutineScope
+import my.noveldokusha.network.NetworkClient
 import my.noveldokusha.repository.Repository
 import my.noveldokusha.scraper.Scraper
 import my.noveldokusha.scraper.downloadBookCoverImageUrl
@@ -59,7 +60,7 @@ data class BookDataView(
 @HiltViewModel
 class ChaptersViewModel @Inject constructor(
     private val repository: Repository,
-    private val appScope: CoroutineScope,
+    private val appScope: AppCoroutineScope,
     private val networkClient: NetworkClient,
     private val scraper: Scraper,
     private val toasty: Toasty,

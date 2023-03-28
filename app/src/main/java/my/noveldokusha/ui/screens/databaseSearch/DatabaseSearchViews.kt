@@ -16,7 +16,6 @@ import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -32,6 +31,7 @@ import my.noveldokusha.ui.composeViews.MyButton
 import my.noveldokusha.ui.composeViews.ToolbarModeSearch
 import my.noveldokusha.ui.screens.sourceCatalog.ToolbarMode
 import my.noveldokusha.ui.theme.InternalTheme
+import my.noveldokusha.ui.theme.Success500
 import my.noveldokusha.ui.theme.Themes
 
 @Composable
@@ -43,9 +43,9 @@ fun CheckBoxCategory(
 ) {
     val checkedColor by animateColorAsState(
         targetValue = when (state) {
-            ToggleableState.Off -> Color.Green
-            ToggleableState.On -> Color.Green
-            ToggleableState.Indeterminate -> Color.Red
+            ToggleableState.Off -> Success500
+            ToggleableState.On -> Success500
+            ToggleableState.Indeterminate -> MaterialTheme.colorScheme.errorContainer
         },
         animationSpec = tween(250)
     )
@@ -72,6 +72,7 @@ fun CheckBoxCategory(
                 disabledCheckedColor = checkedColor.copy(alpha = 0.25f),
                 disabledUncheckedColor = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.25f),
                 disabledIndeterminateColor = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.25f),
+                checkmarkColor = MaterialTheme.colorScheme.inverseOnSurface,
             )
         )
         Text(
@@ -235,7 +236,7 @@ fun PreviewView() {
     }
     var searchText by remember { mutableStateOf("hero") }
 
-    InternalTheme(Themes.LIGHT) {
+    InternalTheme(Themes.DARK) {
         DatabaseSearchView(
             title = "Database",
             subtitle = "Baka-Updates",

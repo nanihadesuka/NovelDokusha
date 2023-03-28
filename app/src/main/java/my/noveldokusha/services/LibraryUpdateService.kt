@@ -1,5 +1,6 @@
 package my.noveldokusha.services
 
+import android.app.NotificationManager
 import android.app.Service
 import android.content.Context
 import android.content.Intent
@@ -36,6 +37,7 @@ class LibraryUpdateService : Service() {
     @Inject
     lateinit var notificationsCenter: NotificationsCenter
 
+
     private class IntentData : Intent {
         var completedCategory by Extra_Boolean()
 
@@ -65,7 +67,7 @@ class LibraryUpdateService : Service() {
 
 
     /**
-     * Updates in the notification what books are currently in this instant being updated.
+     * Updates in the notification which books are currently in this instant being updated.
      */
     val updateActor = CoroutineScope(Dispatchers.IO).actor<Pair<Book, Boolean>> {
         val books = mutableSetOf<Book>()
@@ -103,7 +105,10 @@ class LibraryUpdateService : Service() {
 
     override fun onCreate() {
         super.onCreate()
-        notificationBuilder = notificationsCenter.showNotification(channel_id)
+        notificationBuilder = notificationsCenter.showNotification(
+            channel_id = channel_id,
+            importance = NotificationManager.IMPORTANCE_LOW
+        )
         startForeground(channel_id.hashCode(), notificationBuilder.build())
     }
 
@@ -134,7 +139,7 @@ class LibraryUpdateService : Service() {
      * Library update function. Will update non completed books or completed books.
      * This function will also show a status notificaton of the update progress.
      */
-    suspend fun updateLibrary(completedCategory: Boolean) = withContext(Dispatchers.IO) {
+    private suspend fun updateLibrary(completedCategory: Boolean) = withContext(Dispatchers.IO) {
 
         notificationsCenter.showNotification(channel_id) {
             setStyle(NotificationCompat.BigTextStyle())
@@ -154,7 +159,10 @@ class LibraryUpdateService : Service() {
                 val failed = hasFailed.flatten()
 
 
-                if (updates.isNotEmpty()) notificationsCenter.showNotification("New chapters found for") {
+                if (updates.isNotEmpty()) notificationsCenter.showNotification(
+                    channel_id = "New chapters found for",
+                    importance = NotificationManager.IMPORTANCE_DEFAULT
+                ) {
                     title = getString(R.string.new_chapters_found_for)
                     text = updates.joinToString("\n")
                     setStyle(NotificationCompat.BigTextStyle().bigText(text))

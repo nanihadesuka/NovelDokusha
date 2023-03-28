@@ -1,91 +1,94 @@
 package my.noveldokusha.ui.screens.main.library
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.pullrefresh.PullRefreshIndicator
+import androidx.compose.material.pullrefresh.pullRefresh
+import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.*
 import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.google.accompanist.pager.ExperimentalPagerApi
-import com.google.accompanist.pager.HorizontalPager
-import com.google.accompanist.pager.rememberPagerState
-import com.google.accompanist.swiperefresh.SwipeRefresh
 import kotlinx.coroutines.launch
-import my.noveldokusha.R
 import my.noveldokusha.data.BookWithContext
 import my.noveldokusha.rememberResolvedBookImagePath
 import my.noveldokusha.ui.composeViews.BookImageButtonView
 import my.noveldokusha.ui.theme.ColorAccent
+import my.noveldokusha.ui.theme.ImageBorderShape
 
-@OptIn(ExperimentalPagerApi::class)
+@OptIn(ExperimentalMaterialApi::class, ExperimentalFoundationApi::class)
 @Composable
-fun LibraryBody(
+fun LibraryScreenBody(
     tabs: List<String>,
+    innerPadding: PaddingValues,
     onBookClick: (BookWithContext) -> Unit,
-    onBookLongClick: (BookWithContext) -> Unit
+    onBookLongClick: (BookWithContext) -> Unit,
+    viewModel: LibraryPageViewModel = viewModel()
 ) {
-    val viewModel = viewModel<LibraryPageViewModel>()
     val pagerState = rememberPagerState()
     val scope = rememberCoroutineScope()
-    val pageIndex by remember {
-        derivedStateOf { pagerState.currentPage }
-    }
-    val updateCompleted = rememberUpdatedState(newValue = pageIndex)
-    SwipeRefresh(
-        state = viewModel.refreshState,
+    val updateCompleted = rememberUpdatedState(newValue = pagerState.currentPage)
+
+    val pullRefreshState = rememberPullRefreshState(
+        refreshing = viewModel.isPullRefreshing,
         onRefresh = {
-            viewModel.onLibraryCategoryRefresh(updateCompleted.value == 1)
+            viewModel.onLibraryCategoryRefresh(isCompletedCategory = updateCompleted.value == 1)
         }
+    )
+    Box(
+        modifier = Modifier
+            .pullRefresh(state = pullRefreshState)
+            .padding(innerPadding),
     ) {
         Column {
             TabRow(
-                selectedTabIndex = pageIndex,
+                selectedTabIndex = pagerState.currentPage,
                 indicator = {
-                    val tabPos = it[pageIndex]
+                    val tabPos = it[pagerState.currentPage]
                     Box(
-                        modifier = Modifier.tabIndicatorOffset(tabPos),
-                        contentAlignment = Alignment.Center,
-                    ) {
-                        Box(
-                            Modifier
-                                .width(tabPos.width * 0.5f)
-                                .height(3.dp)
-                                .background(
-                                    ColorAccent,
-                                    RoundedCornerShape(topEndPercent = 100, topStartPercent = 100)
-                                )
-                        )
-                    }
+                        modifier = Modifier
+                            .tabIndicatorOffset(tabPos)
+                            .fillMaxSize()
+                            .padding(6.dp)
+                            .background(MaterialTheme.colorScheme.background, CircleShape)
+                            .zIndex(-1f)
+                    )
                 },
                 tabs = {
                     tabs.forEachIndexed { index, title ->
-                        val selected by remember { derivedStateOf { pageIndex == index } }
+                        val selected by remember { derivedStateOf { pagerState.currentPage == index } }
                         Tab(
-                            text = { Text(title) },
                             selected = selected,
+                            text = { Text(title, color = MaterialTheme.colorScheme.onPrimary) },
                             onClick = { scope.launch { pagerState.animateScrollToPage(index) } }
                         )
                     }
-                }
+                },
+                divider = { Divider(thickness = Dp.Hairline) }
             )
             HorizontalPager(
-                count = tabs.size,
+                pageCount = tabs.size,
                 state = pagerState
             ) { page ->
+
+                // TODO: improve + make more generic (use database table?)
                 val showCompleted by remember {
                     derivedStateOf {
                         tabs[page] == "Completed"
@@ -106,11 +109,16 @@ fun LibraryBody(
                 )
             }
         }
+        PullRefreshIndicator(
+            refreshing = viewModel.isPullRefreshing,
+            state = pullRefreshState,
+            modifier = Modifier.align(Alignment.TopCenter),
+        )
     }
 }
 
 @Composable
-fun LibraryPageBody(
+private fun LibraryPageBody(
     list: List<BookWithContext>,
     onClick: (BookWithContext) -> Unit,
     onLongClick: (BookWithContext) -> Unit,
@@ -119,7 +127,10 @@ fun LibraryPageBody(
         columns = GridCells.Fixed(2),
         contentPadding = PaddingValues(top = 4.dp, bottom = 400.dp, start = 4.dp, end = 4.dp)
     ) {
-        items(list) {
+        items(
+            items = list,
+            key = { it.book.url }
+        ) {
             val coverImageUrl by rememberResolvedBookImagePath(
                 bookUrl = it.book.url,
                 imagePath = it.book.coverImageUrl
@@ -132,56 +143,21 @@ fun LibraryPageBody(
                     onLongClick = { onLongClick(it) }
                 )
                 val notReadCount = it.chaptersCount - it.chaptersReadCount
-                AnimatedVisibility(visible = notReadCount != 0) {
+                AnimatedVisibility(
+                    visible = notReadCount != 0,
+                    enter = fadeIn(),
+                    exit = fadeOut()
+                ) {
                     Text(
                         text = notReadCount.toString(),
                         color = Color.White,
                         modifier = Modifier
                             .padding(8.dp)
-                            .background(ColorAccent, RoundedCornerShape(4.dp))
+                            .background(ColorAccent, ImageBorderShape)
                             .padding(4.dp),
                     )
                 }
             }
-        }
-    }
-}
-
-@Composable
-fun ToolbarMain(
-    title: String,
-    onOpenBottomSheetOptionsPress: () -> Unit,
-    onOptionsDropDownPress: () -> Unit,
-    onOptionsDropDownView: @Composable () -> Unit
-) {
-    Row(
-        horizontalArrangement = Arrangement.End,
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier
-            .background(MaterialTheme.colorScheme.surface)
-            .fillMaxWidth()
-            .padding(top = 8.dp, bottom = 0.dp, start = 12.dp, end = 12.dp)
-            .height(56.dp)
-    ) {
-        Text(
-            text = title,
-            style = MaterialTheme.typography.headlineMedium,
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier.weight(1f)
-        )
-        IconButton(onClick = onOpenBottomSheetOptionsPress) {
-            Icon(
-                painter = painterResource(id = R.drawable.ic_baseline_filter_list_24),
-                contentDescription = stringResource(R.string.options_panel)
-            )
-        }
-
-        IconButton(onClick = onOptionsDropDownPress) {
-            Icon(
-                Icons.Default.MoreVert,
-                contentDescription = stringResource(R.string.open_for_more_options)
-            )
-            onOptionsDropDownView()
         }
     }
 }

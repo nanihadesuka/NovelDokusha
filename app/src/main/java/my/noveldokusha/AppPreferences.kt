@@ -1,3 +1,5 @@
+@file:Suppress("PropertyName")
+
 package my.noveldokusha
 
 import android.content.Context
@@ -138,7 +140,9 @@ class AppPreferences @Inject constructor(
         }
 
     enum class TERNARY_STATE {
-        active, inverse, inactive;
+        active,
+        inverse,
+        inactive;
 
         fun next() = when (this) {
             active -> inverse
