@@ -1,4 +1,4 @@
-package my.noveldokusha.ui.screens.main
+package my.noveldokusha.ui.screens.main.library
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -16,7 +16,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import my.noveldokusha.R
 import my.noveldokusha.ui.composeViews.PosNegCheckbox
 import my.noveldokusha.ui.composeViews.TernaryStateToggle
-import my.noveldokusha.ui.screens.main.library.LibraryViewModel
 import my.noveldokusha.ui.theme.ColorAccent
 import my.noveldokusha.utils.toToggleableState
 

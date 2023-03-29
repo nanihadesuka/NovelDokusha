@@ -16,7 +16,6 @@ import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.ui.screens.chaptersList.ChaptersActivity
 import my.noveldokusha.ui.screens.main.BookSettingsDialog
 import my.noveldokusha.ui.screens.main.BookSettingsDialogState
-import my.noveldokusha.ui.screens.main.LibraryBottomSheet
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

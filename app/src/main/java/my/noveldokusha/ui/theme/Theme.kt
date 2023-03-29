@@ -6,7 +6,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.luminance
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
@@ -15,7 +20,7 @@ import my.noveldokusha.AppPreferences
 import my.noveldokusha.R
 
 @Composable
-fun ColorScheme.isDark() = this.background.luminance() <= 0.5
+fun ColorScheme.isLight() = this.background.luminance() > 0.5
 
 private val light_ColorPalette = ColorScheme(
     primary = Grey25,
@@ -63,8 +68,8 @@ private val dark_ColorPalette = ColorScheme(
     onTertiary = Grey25,
     tertiaryContainer = Grey800,
     onTertiaryContainer = Grey50,
-    background = Grey900,
-    onBackground = Grey25,
+    background = Grey800,
+    onBackground = Grey50,
     surface = Grey900,
     onSurface = Grey25,
     surfaceVariant = Grey900,
@@ -179,7 +184,7 @@ fun InternalTheme(
     val systemUiController = rememberSystemUiController()
     systemUiController.setSystemBarsColor(
         color = palette.surface,
-        darkIcons = theme.isDark
+        darkIcons = !theme.isDark
     )
 
     MaterialTheme(
@@ -207,7 +212,7 @@ fun InternalThemeObject(
     val systemUiController = rememberSystemUiController()
     systemUiController.setSystemBarsColor(
         color = palette.surface,
-        darkIcons = theme.isDark
+        darkIcons = !theme.isDark
     )
 
     MaterialTheme(

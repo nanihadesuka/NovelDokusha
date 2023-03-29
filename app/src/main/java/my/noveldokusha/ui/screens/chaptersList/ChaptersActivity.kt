@@ -50,7 +50,7 @@ import my.noveldokusha.ui.screens.databaseSearchResults.DatabaseSearchResultsAct
 import my.noveldokusha.ui.screens.reader.ReaderActivity
 import my.noveldokusha.ui.theme.ColorAccent
 import my.noveldokusha.ui.theme.Theme
-import my.noveldokusha.ui.theme.isDark
+import my.noveldokusha.ui.theme.isLight
 import my.noveldokusha.utils.Extra_String
 import javax.inject.Inject
 
@@ -90,7 +90,7 @@ class ChaptersActivity : BaseActivity() {
 
             Theme(appPreferences = appPreferences) {
                 val systemUiController = rememberSystemUiController()
-                val useDarkIcons = MaterialTheme.colorScheme.isDark()
+                val useDarkIcons = MaterialTheme.colorScheme.isLight()
                 SideEffect {
                     systemUiController.setSystemBarsColor(
                         color = Color.Transparent,
