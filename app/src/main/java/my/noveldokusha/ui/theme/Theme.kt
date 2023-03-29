@@ -63,7 +63,7 @@ private val dark_ColorPalette = ColorScheme(
     secondary = Grey900,
     onSecondary = Grey25,
     secondaryContainer = Grey800,
-    onSecondaryContainer = Grey50,
+    onSecondaryContainer = Grey75,
     tertiary = Grey900,
     onTertiary = Grey25,
     tertiaryContainer = Grey800,
@@ -82,7 +82,7 @@ private val dark_ColorPalette = ColorScheme(
     errorContainer = Error800,
     onErrorContainer = Grey50,
     outline = Grey0,
-    outlineVariant = Grey25,
+    outlineVariant = Grey700,
     scrim = Grey800,
 )
 

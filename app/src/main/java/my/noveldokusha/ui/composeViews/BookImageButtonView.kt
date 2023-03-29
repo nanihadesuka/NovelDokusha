@@ -12,10 +12,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Shadow
+import androidx.compose.ui.graphics.StrokeJoin
+import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -23,9 +23,11 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import my.noveldokusha.R
 import my.noveldokusha.ui.theme.Grey25
+import my.noveldokusha.ui.theme.Grey800
 import my.noveldokusha.ui.theme.ImageBorderShape
 import my.noveldokusha.ui.theme.InternalTheme
 
+@OptIn(ExperimentalTextApi::class)
 @Composable
 fun BookImageButtonView(
     title: String,
@@ -62,23 +64,37 @@ fun BookImageButtonView(
                     .align(Alignment.BottomCenter)
                     .background(
                         Brush.verticalGradient(
-                            0f to Color.Black.copy(alpha = 0.0f),
-                            0.4f to Color.Black.copy(alpha = 0.2f),
-                            1f to Color.Black.copy(alpha = 0.4f),
+                            0f to MaterialTheme.colorScheme.background.copy(alpha = 0.0f),
+                            0.4f to MaterialTheme.colorScheme.background.copy(alpha = 0.2f),
+                            1f to MaterialTheme.colorScheme.background.copy(alpha = 0.4f),
                         )
                     )
                     .padding(top = 30.dp, bottom = 8.dp)
                     .padding(horizontal = 8.dp),
                 style = MaterialTheme.typography.bodySmall.copy(
-                    shadow = Shadow(
-                        color = Color.Black,
-                        offset = Offset.Zero,
-                        blurRadius = 7f
-                    ),
                     fontWeight = FontWeight.ExtraBold,
-                    color = Grey25
+                    color = Grey800,
+                    drawStyle = Stroke(
+                        miter = 4f,
+                        width = 4f,
+                        join = StrokeJoin.Miter
+                    )
                 )
             )
+            Text(
+                text = title,
+                textAlign = TextAlign.Center,
+                modifier = Modifier
+                    .fillMaxWidth(1f)
+                    .align(Alignment.BottomCenter)
+                    .padding(top = 30.dp, bottom = 8.dp)
+                    .padding(horizontal = 8.dp),
+                style = MaterialTheme.typography.bodySmall.copy(
+                    fontWeight = FontWeight.ExtraBold,
+                    color = Grey25,
+                )
+            )
+
         }
     }
 }
