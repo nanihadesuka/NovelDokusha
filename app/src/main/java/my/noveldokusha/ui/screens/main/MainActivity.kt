@@ -16,7 +16,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import my.noveldokusha.R
 import my.noveldokusha.ui.BaseActivity
 import my.noveldokusha.ui.composeViews.AnimatedTransition
-import my.noveldokusha.ui.screens.main.finder.FinderView
+import my.noveldokusha.ui.screens.main.finder.FinderScreen
 import my.noveldokusha.ui.screens.main.library.LibraryScreen
 import my.noveldokusha.ui.screens.main.settings.SettingsView
 import my.noveldokusha.ui.theme.Theme
@@ -48,7 +48,7 @@ open class MainActivity : BaseActivity() {
                         AnimatedTransition(targetState = activePageIndex) {
                             when (it) {
                                 0 -> LibraryScreen()
-                                1 -> FinderView()
+                                1 -> FinderScreen()
                                 2 -> SettingsView()
                             }
                         }

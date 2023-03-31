@@ -1,6 +1,8 @@
 package my.noveldokusha.ui.composeViews
 
+import android.content.res.Configuration
 import androidx.compose.foundation.background
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
@@ -25,7 +27,8 @@ import my.noveldokusha.R
 import my.noveldokusha.ui.theme.Grey25
 import my.noveldokusha.ui.theme.Grey800
 import my.noveldokusha.ui.theme.ImageBorderShape
-import my.noveldokusha.ui.theme.InternalTheme
+import my.noveldokusha.ui.theme.InternalThemeObject
+import my.noveldokusha.ui.theme.Themes
 
 @OptIn(ExperimentalTextApi::class)
 @Composable
@@ -99,10 +102,11 @@ fun BookImageButtonView(
     }
 }
 
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Preview
 @Composable
 private fun PreviewView() {
-    InternalTheme {
+    InternalThemeObject(theme = if (isSystemInDarkTheme()) Themes.DARK else Themes.LIGHT) {
         Box(contentAlignment = Alignment.Center) {
             BookImageButtonView(
                 title = "Hello there",

@@ -193,7 +193,6 @@ class ChaptersActivity : BaseActivity() {
                             },
                             onTextDone = {},
                             color = MaterialTheme.colorScheme.primary,
-                            showUnderline = true,
                             topPadding = 38.dp,
                             height = 56.dp,
                             placeholderText = stringResource(id = R.string.search_chapter_title)

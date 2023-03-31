@@ -1,8 +1,6 @@
 package my.noveldokusha.ui.screens.main.library
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.animateColorAsState
-import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -11,7 +9,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyGridState
@@ -25,7 +22,6 @@ import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
-import androidx.compose.material3.Divider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
@@ -47,6 +43,7 @@ import kotlinx.coroutines.launch
 import my.noveldokusha.data.BookWithContext
 import my.noveldokusha.rememberResolvedBookImagePath
 import my.noveldokusha.ui.composeViews.BookImageButtonView
+import my.noveldokusha.ui.composeViews.CollapsibleDivider
 import my.noveldokusha.ui.theme.ColorAccent
 import my.noveldokusha.ui.theme.ImageBorderShape
 
@@ -100,29 +97,7 @@ fun LibraryScreenBody(
                     }
                 },
                 divider = {
-                    val isAtTop by remember {
-                        derivedStateOf {
-                            if (lazyGridState.firstVisibleItemIndex > 0) return@derivedStateOf false
-                            val item = lazyGridState.layoutInfo.visibleItemsInfo.firstOrNull()
-                                ?: return@derivedStateOf true
-                            item.offset.y > -10
-                        }
-                    }
-                    val alpha by animateColorAsState(
-                        targetValue = if (isAtTop) {
-                            MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0f)
-                        } else {
-                            MaterialTheme.colorScheme.outlineVariant
-                        },
-                        label = "divider opacity",
-                    )
-                    val padding by animateDpAsState(
-                        targetValue = if (isAtTop) 10.dp else 0.dp,
-                        label = "divider fill width fraction",
-                    )
-                    Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-                        Divider(color = alpha, modifier = Modifier.padding(horizontal = padding))
-                    }
+                    CollapsibleDivider(lazyGridState)
                 }
             )
             HorizontalPager(

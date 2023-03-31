@@ -35,7 +35,10 @@ fun LibraryScreen(
         topBar = {
             TopAppBar(
                 scrollBehavior = scrollBehavior,
-                colors = TopAppBarDefaults.topAppBarColors(scrolledContainerColor = Color.Unspecified),
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = Color.Unspecified,
+                    scrolledContainerColor = Color.Unspecified,
+                ),
                 title = {
                     Text(
                         text = stringResource(id = R.string.app_name),
@@ -89,6 +92,7 @@ fun LibraryScreen(
                 model = libraryModel
             )
         }
+
         else -> Unit
     }
 
