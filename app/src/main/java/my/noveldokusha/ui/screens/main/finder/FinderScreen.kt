@@ -66,7 +66,7 @@ fun FinderScreen(
                         title = {
                             Text(
                                 text = stringResource(id = R.string.title_finder),
-                                style = MaterialTheme.typography.headlineMedium
+                                style = MaterialTheme.typography.headlineSmall
                             )
                         },
                         actions = {
@@ -92,7 +92,6 @@ fun FinderScreen(
                             }
                         }
                     )
-
                     ToolbarMode.SEARCH -> ToolbarModeSearch(
                         focusRequester = focusRequester,
                         searchText = searchText,

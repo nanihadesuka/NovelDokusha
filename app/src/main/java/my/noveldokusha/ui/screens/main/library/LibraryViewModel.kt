@@ -20,6 +20,7 @@ class LibraryViewModel @Inject constructor(
 ) : BaseViewModel() {
 
     var bookSettingsDialogState by mutableStateOf<BookSettingsDialogState>(BookSettingsDialogState.Hide)
+    var showBottomSheet by mutableStateOf(false)
 
     val readFilter by appPreferences.LIBRARY_FILTER_READ.state(viewModelScope)
     val readSort by appPreferences.LIBRARY_SORT_LAST_READ.state(viewModelScope)

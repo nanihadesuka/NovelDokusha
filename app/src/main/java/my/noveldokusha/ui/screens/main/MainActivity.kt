@@ -64,7 +64,9 @@ open class MainActivity : BaseActivity() {
                                 },
                                 label = { Text(stringResource(id = page.stringRes)) },
                                 selected = activePageIndex == pageIndex,
-                                onClick = { activePageIndex = pageIndex },
+                                onClick = {
+                                    activePageIndex = pageIndex
+                                },
                             )
                         }
                     }

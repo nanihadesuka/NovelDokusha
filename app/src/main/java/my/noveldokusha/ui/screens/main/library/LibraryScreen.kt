@@ -25,7 +25,6 @@ fun LibraryScreen(
 ) {
     val context by rememberUpdatedState(LocalContext.current)
     var showDropDown by remember { mutableStateOf(false) }
-    var showBottomSheet by remember { mutableStateOf(false) }
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(snapAnimationSpec = null)
 
     Scaffold(
@@ -41,11 +40,11 @@ fun LibraryScreen(
                 title = {
                     Text(
                         text = stringResource(id = R.string.app_name),
-                        style = MaterialTheme.typography.headlineMedium
+                        style = MaterialTheme.typography.headlineSmall
                     )
                 },
                 actions = {
-                    IconButton(onClick = { showBottomSheet = !showBottomSheet }) {
+                    IconButton(onClick = { libraryModel.showBottomSheet = !libraryModel.showBottomSheet }) {
                         Icon(
                             painter = painterResource(id = R.drawable.ic_baseline_filter_list_24),
                             contentDescription = stringResource(R.string.options_panel)
@@ -95,7 +94,7 @@ fun LibraryScreen(
     }
 
     LibraryBottomSheet(
-        visible = showBottomSheet,
-        onDismiss = { showBottomSheet = false }
+        visible = libraryModel.showBottomSheet,
+        onDismiss = { libraryModel.showBottomSheet = false }
     )
 }

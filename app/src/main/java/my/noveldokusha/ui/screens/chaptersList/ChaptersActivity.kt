@@ -192,9 +192,7 @@ class ChaptersActivity : BaseActivity() {
                                 toolbarMode = ToolbarMode.MAIN
                             },
                             onTextDone = {},
-                            color = MaterialTheme.colorScheme.primary,
-                            topPadding = 38.dp,
-                            height = 56.dp,
+                            modifier = Modifier.padding(top = 30.dp),
                             placeholderText = stringResource(id = R.string.search_chapter_title)
                         )
                     }
@@ -241,8 +239,10 @@ class ChaptersActivity : BaseActivity() {
         when {
             viewModel.selectedChaptersUrl.containsKey(chapter.chapter.url) ->
                 viewModel.selectedChaptersUrl.remove(chapter.chapter.url)
+
             viewModel.selectedChaptersUrl.isNotEmpty() ->
                 viewModel.selectedChaptersUrl[chapter.chapter.url] = Unit
+
             else -> openBookAtChapter(chapter.chapter.url)
         }
     }
@@ -251,6 +251,7 @@ class ChaptersActivity : BaseActivity() {
         when {
             viewModel.selectedChaptersUrl.containsKey(chapter.chapter.url) ->
                 viewModel.selectedChaptersUrl.remove(chapter.chapter.url)
+
             else ->
                 viewModel.selectedChaptersUrl[chapter.chapter.url] = Unit
         }

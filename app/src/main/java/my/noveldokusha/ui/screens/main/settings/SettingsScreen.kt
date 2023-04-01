@@ -41,7 +41,7 @@ fun SettingsScreen(
                     title = {
                         Text(
                             text = stringResource(id = R.string.title_settings),
-                            style = MaterialTheme.typography.headlineMedium
+                            style = MaterialTheme.typography.headlineSmall
                         )
                     }
                 )

@@ -195,8 +195,6 @@ fun DatabaseSearchView(
                     },
                     onTextDone = { onTitleSearchClick(searchText) },
                     placeholderText = stringResource(R.string.search_by_title),
-                    topPadding = 8.dp,
-                    height = 56.dp
                 )
             }
         }
