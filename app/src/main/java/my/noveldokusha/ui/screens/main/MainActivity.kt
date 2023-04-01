@@ -18,7 +18,7 @@ import my.noveldokusha.ui.BaseActivity
 import my.noveldokusha.ui.composeViews.AnimatedTransition
 import my.noveldokusha.ui.screens.main.finder.FinderScreen
 import my.noveldokusha.ui.screens.main.library.LibraryScreen
-import my.noveldokusha.ui.screens.main.settings.SettingsView
+import my.noveldokusha.ui.screens.main.settings.SettingsScreen
 import my.noveldokusha.ui.theme.Theme
 
 private data class Page(
@@ -49,7 +49,7 @@ open class MainActivity : BaseActivity() {
                             when (it) {
                                 0 -> LibraryScreen()
                                 1 -> FinderScreen()
-                                2 -> SettingsView()
+                                2 -> SettingsScreen()
                             }
                         }
                     }

@@ -3,10 +3,9 @@ package my.noveldokusha.ui.screens.main.finder
 import android.net.Uri
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
@@ -16,13 +15,12 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.PushPin
 import androidx.compose.material.icons.outlined.PushPin
-import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -62,31 +60,34 @@ fun FinderScreenBody(
                 text = stringResource(id = R.string.database),
                 style = MaterialTheme.typography.titleLarge,
                 color = ColorAccent,
-                modifier = Modifier.padding(start = 24.dp, top = 16.dp, bottom = 8.dp),
+                modifier = Modifier.padding(start = 8.dp, top = 16.dp),
             )
         }
 
         items(databasesList) {
-            Button(
-                onClick = { onDatabaseClick(it) },
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(16.dp)
-                ) {
+            ListItem(
+                modifier = Modifier
+                    .clickable { onDatabaseClick(it) },
+                headlineContent = {
+                    Text(
+                        text = it.name,
+                        style = MaterialTheme.typography.titleMedium,
+                    )
+                },
+                supportingContent = {
+                    Text(
+                        text = stringResource(R.string.english),
+                        style = MaterialTheme.typography.bodySmall,
+                    )
+                },
+                leadingContent = {
                     ImageViewGlide(
                         imageModel = it.iconUrl,
                         modifier = Modifier.size(28.dp),
                         error = R.drawable.default_icon
                     )
-                    Text(
-                        text = it.name,
-                        style = MaterialTheme.typography.bodyLarge,
-                        modifier = Modifier.weight(1f),
-                    )
                 }
-            }
+            )
         }
 
         item {
@@ -94,7 +95,7 @@ fun FinderScreenBody(
                 text = stringResource(id = R.string.sources),
                 style = MaterialTheme.typography.titleLarge,
                 color = ColorAccent,
-                modifier = Modifier.padding(start = 24.dp, top = 16.dp, bottom = 8.dp),
+                modifier = Modifier.padding(start = 8.dp, top = 16.dp),
             )
         }
 
@@ -102,26 +103,30 @@ fun FinderScreenBody(
             items = sourcesList,
             key = { it.catalog.id }
         ) {
-            Button(
-                onClick = { onSourceClick(it.catalog) },
+            ListItem(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .animateItemPlacement()
-            ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(16.dp)
-                ) {
+                    .clickable { onSourceClick(it.catalog) }
+                    .animateItemPlacement(),
+                headlineContent = {
+                    Text(
+                        text = it.catalog.name,
+                        style = MaterialTheme.typography.titleMedium,
+                    )
+                },
+                supportingContent = {
+                    Text(
+                        text = it.catalog.language,
+                        style = MaterialTheme.typography.bodySmall,
+                    )
+                },
+                leadingContent = {
                     ImageViewGlide(
                         imageModel = it.catalog.iconUrl,
                         modifier = Modifier.size(28.dp),
                         error = R.drawable.default_icon
                     )
-                    Text(
-                        text = it.catalog.name,
-                        style = MaterialTheme.typography.bodyLarge,
-                        modifier = Modifier.weight(1f),
-                    )
+                },
+                trailingContent = {
                     IconButton(
                         onClick = { onSourceSetPinned(it.catalog.id, !it.pinned) },
                     ) {
@@ -133,7 +138,7 @@ fun FinderScreenBody(
                         }
                     }
                 }
-            }
+            )
         }
     }
 }

@@ -2,6 +2,7 @@ package my.noveldokusha.ui.composeViews
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -58,6 +59,34 @@ fun CollapsibleDivider(
             val item = lazyListState.layoutInfo.visibleItemsInfo.firstOrNull()
                 ?: return@derivedStateOf true
             item.offset > -10
+        }
+    }
+    val alpha by animateColorAsState(
+        targetValue = if (isAtTop) {
+            MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0f)
+        } else {
+            MaterialTheme.colorScheme.outlineVariant
+        },
+        label = "divider opacity",
+    )
+    val padding by animateDpAsState(
+        targetValue = if (isAtTop) 10.dp else 0.dp,
+        label = "divider fill width fraction",
+    )
+    Box(modifier = modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+        Divider(color = alpha, modifier = Modifier.padding(horizontal = padding))
+    }
+}
+
+
+@Composable
+fun CollapsibleDivider(
+    scrollState: ScrollState,
+    modifier: Modifier = Modifier,
+) {
+    val isAtTop by remember {
+        derivedStateOf {
+            scrollState.value < 10
         }
     }
     val alpha by animateColorAsState(

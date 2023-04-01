@@ -2,7 +2,9 @@ package my.noveldokusha.ui.screens.main.settings
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.toggleable
@@ -21,8 +23,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Devices
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import my.noveldokusha.R
 import my.noveldokusha.tools.TranslationModelState
@@ -32,8 +32,8 @@ import my.noveldokusha.ui.composeViews.Section
 import my.noveldokusha.ui.composeViews.SettingsTranslationModels
 import my.noveldokusha.ui.theme.ColorAccent
 import my.noveldokusha.ui.theme.InternalTheme
+import my.noveldokusha.ui.theme.PreviewThemes
 import my.noveldokusha.ui.theme.Themes
-import my.noveldokusha.utils.drawBottomLine
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
@@ -46,7 +46,9 @@ fun SettingsTheme(
     Section(title = stringResource(id = R.string.theme)) {
         Column(
             verticalArrangement = Arrangement.spacedBy(8.dp),
-            modifier = Modifier.padding(horizontal = 8.dp),
+            modifier = Modifier
+                .padding(horizontal = 8.dp)
+                .padding(bottom = 8.dp),
         ) {
             Spacer(modifier = Modifier.height(0.dp))
             Box(
@@ -81,7 +83,7 @@ fun SettingsTheme(
                         fontWeight = FontWeight.Bold,
                         color = textColor
                     )
-                    AnimatedContent(targetState = currentFollowSystem) { follow ->
+                    AnimatedContent(targetState = currentFollowSystem, label = "") { follow ->
                         Icon(
                             if (follow) Icons.Outlined.CheckCircle else Icons.Outlined.Cancel,
                             contentDescription = null,
@@ -114,27 +116,6 @@ fun SettingsTheme(
 }
 
 @Composable
-fun ToolbarMain(title: String) {
-    Row(
-        horizontalArrangement = Arrangement.End,
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier
-            .background(MaterialTheme.colorScheme.surface)
-            .fillMaxWidth()
-            .drawBottomLine()
-            .padding(top = 8.dp, bottom = 0.dp, start = 12.dp, end = 12.dp)
-            .height(56.dp)
-    ) {
-        Text(
-            text = title,
-            style = MaterialTheme.typography.headlineMedium,
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier.weight(1f)
-        )
-    }
-}
-
-@Composable
 private fun SettingsData(
     databaseSize: String,
     imagesFolderSize: String,
@@ -142,20 +123,18 @@ private fun SettingsData(
     onCleanImageFolder: () -> Unit
 ) {
     Section(title = stringResource(id = R.string.data)) {
-        Column {
-            ClickableOption(
-                title = stringResource(id = R.string.clean_database),
-                subtitle = stringResource(id = R.string.preserve_only_library_books_data),
-                info = stringResource(id = R.string.database_size) + " " + databaseSize,
-                onClick = onCleanDatabase
-            )
-            ClickableOption(
-                title = stringResource(id = R.string.clean_images_folder),
-                subtitle = stringResource(id = R.string.preserve_only_images_from_library_books),
-                info = stringResource(id = R.string.images_total_size) + " " + imagesFolderSize,
-                onClick = onCleanImageFolder
-            )
-        }
+        ClickableOption(
+            title = stringResource(id = R.string.clean_database),
+            subtitle = stringResource(id = R.string.preserve_only_library_books_data),
+            info = stringResource(id = R.string.database_size) + " " + databaseSize,
+            onClick = onCleanDatabase
+        )
+        ClickableOption(
+            title = stringResource(id = R.string.clean_images_folder),
+            subtitle = stringResource(id = R.string.preserve_only_images_from_library_books),
+            info = stringResource(id = R.string.images_total_size) + " " + imagesFolderSize,
+            onClick = onCleanImageFolder
+        )
     }
 }
 
@@ -165,23 +144,21 @@ private fun SettingsBackup(
     onRestoreData: () -> Unit = {},
 ) {
     Section(title = stringResource(id = R.string.backup)) {
-        Column {
-            ClickableOption(
-                title = stringResource(id = R.string.backup_data),
-                subtitle = stringResource(id = R.string.opens_the_file_explorer_to_select_the_backup_saving_location),
-                onClick = onBackupData
-            )
-            ClickableOption(
-                title = stringResource(id = R.string.restore_data),
-                subtitle = stringResource(id = R.string.opens_the_file_explorer_to_select_the_backup_file),
-                onClick = onRestoreData
-            )
-        }
+        ClickableOption(
+            title = stringResource(id = R.string.backup_data),
+            subtitle = stringResource(id = R.string.opens_the_file_explorer_to_select_the_backup_saving_location),
+            onClick = onBackupData
+        )
+        ClickableOption(
+            title = stringResource(id = R.string.restore_data),
+            subtitle = stringResource(id = R.string.opens_the_file_explorer_to_select_the_backup_file),
+            onClick = onRestoreData
+        )
     }
 }
 
 @Composable
-fun SettingsBody(
+fun SettingsScreenBody(
     currentFollowSystem: Boolean,
     currentTheme: Themes,
     onFollowSystem: (Boolean) -> Unit,
@@ -190,6 +167,8 @@ fun SettingsBody(
     imagesFolderSize: String,
     isTranslationSettingsVisible: Boolean,
     translationModelsStates: List<TranslationModelState>,
+    scrollState: ScrollState,
+    modifier: Modifier = Modifier,
     onCleanDatabase: () -> Unit,
     onCleanImageFolder: () -> Unit,
     onBackupData: () -> Unit,
@@ -199,9 +178,9 @@ fun SettingsBody(
 ) {
     Column(
         verticalArrangement = Arrangement.spacedBy(8.dp),
-        modifier = Modifier
+        modifier = modifier
             .padding(horizontal = 8.dp)
-            .verticalScroll(rememberScrollState()),
+            .verticalScroll(scrollState),
     ) {
         Spacer(modifier = Modifier.height(0.dp))
         SettingsTheme(
@@ -240,14 +219,13 @@ fun SettingsBody(
     }
 }
 
-@Preview(device = Devices.PIXEL_4_XL)
+@PreviewThemes
 @Composable
 private fun Preview() {
-    val currentTheme = Themes.DARK
-    InternalTheme(currentTheme) {
-        SettingsBody(
+    InternalTheme {
+        SettingsScreenBody(
             currentFollowSystem = true,
-            currentTheme = currentTheme,
+            currentTheme = if (isSystemInDarkTheme()) Themes.DARK else Themes.LIGHT,
             onFollowSystem = { },
             onThemeSelected = { },
             databaseSize = "1 MB",
@@ -260,6 +238,7 @@ private fun Preview() {
             onRestoreData = { },
             onDownloadTranslationModel = {},
             onRemoveTranslationModel = {},
+            scrollState = rememberScrollState()
         )
     }
 }

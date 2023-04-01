@@ -26,8 +26,7 @@ fun LibraryScreen(
     val context by rememberUpdatedState(LocalContext.current)
     var showDropDown by remember { mutableStateOf(false) }
     var showBottomSheet by remember { mutableStateOf(false) }
-    val appBarState = rememberTopAppBarState()
-    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(appBarState)
+    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(snapAnimationSpec = null)
 
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
@@ -89,7 +88,6 @@ fun LibraryScreen(
             BookSettingsDialog(
                 currentBook = state.book,
                 onDismiss = { libraryModel.bookSettingsDialogState = BookSettingsDialogState.Hide },
-                model = libraryModel
             )
         }
 
