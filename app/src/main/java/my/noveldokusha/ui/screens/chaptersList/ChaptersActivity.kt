@@ -2,7 +2,6 @@ package my.noveldokusha.ui.screens.chaptersList
 
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
@@ -17,6 +16,7 @@ import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
@@ -45,9 +45,10 @@ import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.data.ChapterWithContext
 import my.noveldokusha.scraper.Scraper
 import my.noveldokusha.ui.BaseActivity
-import my.noveldokusha.ui.composeViews.ToolbarModeSearch
-import my.noveldokusha.ui.screens.databaseSearchResults.DatabaseSearchResultsActivity
-import my.noveldokusha.ui.screens.reader.ReaderActivity
+import my.noveldokusha.ui.composeViews.TopAppBarSearch
+import my.noveldokusha.ui.goToDatabaseSearchResults
+import my.noveldokusha.ui.goToReader
+import my.noveldokusha.ui.goToWebBrowser
 import my.noveldokusha.ui.theme.ColorAccent
 import my.noveldokusha.ui.theme.Theme
 import my.noveldokusha.ui.theme.isLight
@@ -76,6 +77,7 @@ class ChaptersActivity : BaseActivity() {
 
     val viewModel by viewModels<ChaptersViewModel>()
 
+    @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         WindowCompat.setDecorFitsSystemWindows(window, false)
@@ -183,7 +185,8 @@ class ChaptersActivity : BaseActivity() {
                                 height = 56.dp
                             )
                         }
-                        ToolbarMode.SEARCH -> ToolbarModeSearch(
+
+                        ToolbarMode.SEARCH -> TopAppBarSearch(
                             focusRequester = focusRequester,
                             searchText = viewModel.searchText,
                             onSearchTextChange = { viewModel.searchText = it },
@@ -235,7 +238,7 @@ class ChaptersActivity : BaseActivity() {
         }
     }
 
-    fun onClickChapter(chapter: ChapterWithContext) {
+    private fun onClickChapter(chapter: ChapterWithContext) {
         when {
             viewModel.selectedChaptersUrl.containsKey(chapter.chapter.url) ->
                 viewModel.selectedChaptersUrl.remove(chapter.chapter.url)
@@ -247,7 +250,7 @@ class ChaptersActivity : BaseActivity() {
         }
     }
 
-    fun onLongClickChapter(chapter: ChapterWithContext) {
+    private fun onLongClickChapter(chapter: ChapterWithContext) {
         when {
             viewModel.selectedChaptersUrl.containsKey(chapter.chapter.url) ->
                 viewModel.selectedChaptersUrl.remove(chapter.chapter.url)
@@ -257,7 +260,7 @@ class ChaptersActivity : BaseActivity() {
         }
     }
 
-    fun onOpenLastActiveChapter() {
+    private fun onOpenLastActiveChapter() {
         val bookUrl = viewModel.bookMetadata.url
         lifecycleScope.launch(Dispatchers.IO) {
             val lastReadChapter = viewModel.getLastReadChapter()
@@ -265,54 +268,26 @@ class ChaptersActivity : BaseActivity() {
                 toasty.show(R.string.no_chapters)
                 return@launch
             }
-
             withContext(Dispatchers.Main) {
-                ReaderActivity
-                    .IntentData(
-                        this@ChaptersActivity,
-                        bookUrl = bookUrl,
-                        chapterUrl = lastReadChapter
-                    )
-                    .let(this@ChaptersActivity::startActivity)
+                openBookAtChapter(chapterUrl = lastReadChapter)
             }
         }
     }
 
 
-    fun bookmarkToggle() {
+    private fun bookmarkToggle() {
         lifecycleScope.launch {
             val isBookmarked = viewModel.toggleBookmark()
             val msg = if (isBookmarked) R.string.added_to_library else R.string.removed_from_library
-            withContext(Dispatchers.Main) {
-                toasty.show(msg)
-            }
+            toasty.show(msg)
         }
     }
 
-    fun searchBookInDatabase() {
-        DatabaseSearchResultsActivity
-            .IntentData(
-                this,
-                "https://www.novelupdates.com/",
-                DatabaseSearchResultsActivity.SearchMode.Text(viewModel.bookTitle)
-            )
-            .let(this::startActivity)
-    }
+    private fun searchBookInDatabase() = goToDatabaseSearchResults(inputText = viewModel.bookTitle)
 
-    fun openInBrowser() {
-        Intent(Intent.ACTION_VIEW).also {
-            it.data = Uri.parse(viewModel.bookMetadata.url)
-        }.let(this::startActivity)
-    }
+    private fun openInBrowser() = goToWebBrowser(url = viewModel.bookMetadata.url)
 
-
-    fun openBookAtChapter(chapterUrl: String) {
-        ReaderActivity
-            .IntentData(
-                this,
-                bookUrl = viewModel.bookMetadata.url,
-                chapterUrl = chapterUrl
-            )
-            .let(::startActivity)
-    }
+    private fun openBookAtChapter(chapterUrl: String) = goToReader(
+        bookUrl = viewModel.bookMetadata.url, chapterUrl = chapterUrl
+    )
 }

@@ -12,13 +12,13 @@ import my.noveldokusha.R
 import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.ui.BaseActivity
 import my.noveldokusha.ui.composeViews.BooksVerticalView
-import my.noveldokusha.ui.screens.databaseBookInfo.DatabaseBookInfoActivity
+import my.noveldokusha.ui.goToDatabaseBookInfo
 import my.noveldokusha.ui.theme.Theme
 import my.noveldokusha.utils.Extra_String
 import my.noveldokusha.utils.Extra_StringArrayList
 import my.noveldokusha.utils.capitalize
 import my.noveldokusha.utils.copyToClipboard
-import java.util.*
+import java.util.Locale
 
 @AndroidEntryPoint
 class DatabaseSearchResultsActivity : BaseActivity() {
@@ -84,9 +84,8 @@ class DatabaseSearchResultsActivity : BaseActivity() {
         }
     }
 
-    fun openBookInfoPage(book: BookMetadata) {
-        DatabaseBookInfoActivity
-            .IntentData(this, databaseUrlBase = viewModel.databaseUrlBase, bookMetadata = book)
-            .let(::startActivity)
-    }
+    private fun openBookInfoPage(book: BookMetadata) = goToDatabaseBookInfo(
+        databaseUrlBase = viewModel.databaseUrlBase,
+        book = book
+    )
 }

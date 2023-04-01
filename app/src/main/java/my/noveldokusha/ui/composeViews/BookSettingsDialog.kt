@@ -1,9 +1,18 @@
-package my.noveldokusha.ui.screens.main
+package my.noveldokusha.ui.composeViews
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.*
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.CheckboxDefaults
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -16,7 +25,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import my.noveldokusha.R
 import my.noveldokusha.data.database.tables.Book
 import my.noveldokusha.rememberResolvedBookImagePath
-import my.noveldokusha.ui.composeViews.ImageView
 import my.noveldokusha.ui.screens.main.library.LibraryViewModel
 import my.noveldokusha.ui.theme.ImageBorderShape
 import my.noveldokusha.ui.theme.Success500

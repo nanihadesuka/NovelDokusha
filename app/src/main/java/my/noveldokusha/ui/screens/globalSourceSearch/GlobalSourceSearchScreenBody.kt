@@ -2,22 +2,25 @@ package my.noveldokusha.ui.screens.globalSourceSearch
 
 import android.net.Uri
 import androidx.compose.animation.animateContentSize
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import my.noveldokusha.R
 import my.noveldokusha.composableActions.ListLoadWatcher
@@ -26,28 +29,35 @@ import my.noveldokusha.network.IteratorState
 import my.noveldokusha.network.NetworkClient
 import my.noveldokusha.repository.SourceCatalogItem
 import my.noveldokusha.scraper.Scraper
-import my.noveldokusha.ui.composeViews.ImageView
+import my.noveldokusha.ui.composeViews.BookImageButtonView
+import my.noveldokusha.ui.composeViews.BookTitlePosition
 import my.noveldokusha.ui.theme.ColorAccent
-import my.noveldokusha.ui.theme.ImageBorderShape
 import my.noveldokusha.ui.theme.InternalTheme
+import my.noveldokusha.ui.theme.PreviewThemes
 import my.noveldokusha.utils.capitalize
 import okhttp3.Request
 import okhttp3.Response
-import java.util.*
+import java.util.Locale
 
 @Composable
-fun GlobalSourceSearchView(
+fun GlobalSourceSearchScreenBody(
     listSources: List<SourceResults>,
+    lazyListState: LazyListState,
+    contentPadding: PaddingValues,
     onBookClick: (book: BookMetadata) -> Unit
 ) {
     LazyColumn(
-        contentPadding = PaddingValues(bottom = 260.dp)
+        state = lazyListState,
+        contentPadding = contentPadding,
+        verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         items(listSources) { entry ->
             Text(
                 text = entry.source.catalog.name.capitalize(Locale.ROOT),
-                style = MaterialTheme.typography.headlineMedium,
-                modifier = Modifier.padding(vertical = 4.dp, horizontal = 8.dp)
+                style = MaterialTheme.typography.titleMedium,
+                modifier = Modifier
+                    .padding(start = 12.dp)
+                    .padding(vertical = 2.dp)
             )
             SourceListView(
                 list = entry.fetchIterator.list,
@@ -55,14 +65,13 @@ fun GlobalSourceSearchView(
                 error = entry.fetchIterator.error,
                 onBookClick = onBookClick,
                 onLoadNext = { entry.fetchIterator.fetchNext() },
-                modifier = Modifier.padding(bottom = 4.dp)
             )
         }
     }
 }
 
 @Composable
-fun SourceListView(
+private fun SourceListView(
     list: List<BookMetadata>,
     loadState: IteratorState,
     error: String?,
@@ -74,12 +83,6 @@ fun SourceListView(
 
     ListLoadWatcher(listState = state, loadState = loadState, onLoadNext = onLoadNext)
 
-    val noResults by remember(loadState, list.isEmpty()) {
-        derivedStateOf {
-            (loadState == IteratorState.CONSUMED) && list.isEmpty()
-        }
-    }
-
     LazyRow(
         state = state,
         contentPadding = PaddingValues(
@@ -88,63 +91,51 @@ fun SourceListView(
         ),
         modifier = modifier
             .animateContentSize()
-            .fillMaxWidth()
+            .fillMaxWidth(),
     ) {
         items(list) {
-            Column(
-                Modifier
-                    .width(130.dp)
-                    .padding(end = 8.dp)
-            ) {
-                ImageView(
-                    imageModel = it.coverImageUrl,
-                    modifier = Modifier
-                        .clickable { onBookClick(it) }
-                        .fillMaxWidth()
-                        .aspectRatio(1 / 1.45f)
-                        .border(
-                            0.dp,
-                            MaterialTheme.colorScheme.onSurface.copy(alpha = 0.2f),
-                            ImageBorderShape
-                        )
-                        .clip(ImageBorderShape),
-                )
-                Text(
-                    text = it.title,
-                    maxLines = 2,
-                    style = MaterialTheme.typography.labelMedium,
-                    modifier = Modifier
-                        .height(40.dp)
-                        .padding(4.dp)
-                        .fillMaxWidth()
-                )
-            }
+            BookImageButtonView(
+                title = it.title,
+                coverImageUrl = it.coverImageUrl,
+                onClick = { onBookClick(it) },
+                onLongClick = { },
+                modifier = Modifier.width(130.dp),
+                bookTitlePosition = BookTitlePosition.Outside,
+            )
         }
 
         item {
+            fun Modifier.topPadding() = padding(top = (130 / 1.45f).dp - 8.dp)
+            
             Box(
-                contentAlignment = if (noResults) Alignment.CenterStart else Alignment.Center,
-                modifier = Modifier.width(160.dp)
+                contentAlignment = Alignment.TopStart,
+                modifier = Modifier.padding(start = 4.dp)
             ) {
                 when (loadState) {
                     IteratorState.LOADING -> CircularProgressIndicator(
                         color = ColorAccent,
-                        modifier = Modifier.padding(12.dp)
+                        modifier = Modifier.padding(36.dp)
                     )
+
                     IteratorState.CONSUMED -> when {
                         error != null -> Text(
                             text = stringResource(R.string.error_loading),
-                            color = MaterialTheme.colorScheme.onError,
+                            color = MaterialTheme.colorScheme.error,
+                            modifier = if (list.isEmpty()) Modifier else Modifier.topPadding()
                         )
+
                         list.isEmpty() -> Text(
                             text = stringResource(R.string.no_results_found),
                             color = ColorAccent,
                         )
+
                         else -> Text(
                             text = stringResource(R.string.no_more_results),
                             color = ColorAccent,
+                            modifier = Modifier.topPadding()
                         )
                     }
+
                     IteratorState.IDLE -> {}
                 }
             }
@@ -152,9 +143,9 @@ fun SourceListView(
     }
 }
 
-@Preview
+@PreviewThemes
 @Composable
-fun Preview() {
+private fun PreviewView() {
     val scraper = Scraper(object : NetworkClient {
         override suspend fun get(url: String) = Response.Builder().build()
         override suspend fun get(url: Uri.Builder) = Response.Builder().build()
@@ -162,18 +153,42 @@ fun Preview() {
             Response.Builder().build()
     })
 
-    val list = scraper.sourcesListCatalog.map { source ->
-        SourceCatalogItem(
+    val list = scraper.sourcesListCatalog.mapIndexed { index, source ->
+        val (catalog, books) = SourceCatalogItem(
             catalog = source,
             pinned = false
         ) to (0..5).map { BookMetadata(title = "Book $it", url = "") }
-    }.map { (source, books) ->
-        val sr = SourceResults(source, "", rememberCoroutineScope())
-        sr.fetchIterator.list.addAll(books)
+
+        val sr = SourceResults(catalog, "", rememberCoroutineScope())
+        when (index) {
+            0 -> {
+                sr.fetchIterator.state = IteratorState.CONSUMED
+            }
+
+            1 -> {
+                sr.fetchIterator.list.addAll(books.take(2))
+                sr.fetchIterator.state = IteratorState.CONSUMED
+            }
+
+            2 -> {
+                sr.fetchIterator.error = "Error here"
+            }
+
+            else -> {
+                sr.fetchIterator.list.addAll(books.take(2))
+                sr.fetchIterator.state = IteratorState.CONSUMED
+                sr.fetchIterator.error = "Error here"
+            }
+        }
         sr
     }
 
     InternalTheme {
-        GlobalSourceSearchView(listSources = list, onBookClick = {})
+        GlobalSourceSearchScreenBody(
+            listSources = list,
+            lazyListState = rememberLazyListState(),
+            onBookClick = {},
+            contentPadding = PaddingValues(),
+        )
     }
 }

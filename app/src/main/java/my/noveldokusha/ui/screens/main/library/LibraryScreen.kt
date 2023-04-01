@@ -14,9 +14,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.viewmodel.compose.viewModel
 import my.noveldokusha.R
 import my.noveldokusha.data.BookMetadata
+import my.noveldokusha.ui.composeViews.BookSettingsDialog
+import my.noveldokusha.ui.composeViews.BookSettingsDialogState
 import my.noveldokusha.ui.screens.chaptersList.ChaptersActivity
-import my.noveldokusha.ui.screens.main.BookSettingsDialog
-import my.noveldokusha.ui.screens.main.BookSettingsDialogState
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

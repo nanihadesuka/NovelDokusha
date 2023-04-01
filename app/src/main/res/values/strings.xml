@@ -157,4 +157,5 @@
 	<string name="media_control_next">next</string>
 	<string name="delete">Delete</string>
     <string name="english">English</string>
+    <string name="clear_input_text">Clear input text</string>
 </resources>

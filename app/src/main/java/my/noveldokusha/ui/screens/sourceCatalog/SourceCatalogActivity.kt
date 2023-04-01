@@ -7,8 +7,13 @@ import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.layout.Column
-import androidx.compose.runtime.*
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
@@ -18,14 +23,14 @@ import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.ui.BaseActivity
 import my.noveldokusha.ui.composeViews.AnimatedTransition
 import my.noveldokusha.ui.composeViews.BooksVerticalView
-import my.noveldokusha.ui.composeViews.ToolbarModeSearch
+import my.noveldokusha.ui.composeViews.TopAppBarSearch
 import my.noveldokusha.ui.screens.chaptersList.ChaptersActivity
 import my.noveldokusha.ui.screens.webView.WebViewActivity
 import my.noveldokusha.ui.theme.Theme
 import my.noveldokusha.utils.Extra_String
 import my.noveldokusha.utils.capitalize
 import my.noveldokusha.utils.copyToClipboard
-import java.util.*
+import java.util.Locale
 
 
 @AndroidEntryPoint
@@ -44,7 +49,7 @@ class SourceCatalogActivity : BaseActivity() {
 
     private val viewModel by viewModels<SourceCatalogViewModel>()
 
-    @OptIn(ExperimentalAnimationApi::class)
+    @OptIn(ExperimentalAnimationApi::class, ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -77,7 +82,7 @@ class SourceCatalogActivity : BaseActivity() {
                                     )
                                 }
                             )
-                            ToolbarMode.SEARCH -> ToolbarModeSearch(
+                            ToolbarMode.SEARCH -> TopAppBarSearch(
                                 focusRequester = focusRequester,
                                 searchText = viewModel.searchText,
                                 onClose = {

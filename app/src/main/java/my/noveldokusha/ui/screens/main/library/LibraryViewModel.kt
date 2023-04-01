@@ -10,7 +10,7 @@ import kotlinx.coroutines.launch
 import my.noveldokusha.AppPreferences
 import my.noveldokusha.repository.Repository
 import my.noveldokusha.ui.BaseViewModel
-import my.noveldokusha.ui.screens.main.BookSettingsDialogState
+import my.noveldokusha.ui.composeViews.BookSettingsDialogState
 import javax.inject.Inject
 
 @HiltViewModel
