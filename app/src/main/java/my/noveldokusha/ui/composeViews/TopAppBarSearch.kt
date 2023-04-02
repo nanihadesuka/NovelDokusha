@@ -47,7 +47,8 @@ fun TopAppBarSearch(
     onTextDone: (String) -> Unit,
     containerColor: Color = MaterialTheme.colorScheme.primaryContainer,
     placeholderText: String = stringResource(R.string.search_here),
-    scrollBehavior: TopAppBarScrollBehavior? = null
+    scrollBehavior: TopAppBarScrollBehavior? = null,
+    inputEnabled: Boolean = true
 ) {
     // Many hacks going on here to make it scrollBehavior compatible
     Box {
@@ -81,11 +82,13 @@ fun TopAppBarSearch(
                     textStyle = MaterialTheme.typography.bodyLarge,
                     singleLine = true,
                     maxLines = 1,
+                    enabled = inputEnabled,
                     colors = TextFieldDefaults.textFieldColors(
                         cursorColor = ColorAccent,
                         containerColor = Color.Transparent,
                         focusedIndicatorColor = Color.Transparent,
                         unfocusedIndicatorColor = Color.Transparent,
+                        disabledIndicatorColor = Color.Transparent,
                         focusedLabelColor = Color.Transparent,
                         unfocusedLabelColor = Color.Transparent,
                         focusedPlaceholderColor = MaterialTheme.colorScheme.onTertiary,

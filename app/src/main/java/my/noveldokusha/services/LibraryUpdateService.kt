@@ -124,7 +124,7 @@ class LibraryUpdateService : Service() {
         val intentData = IntentData(intent)
 
         job = CoroutineScope(Dispatchers.IO).launch {
-            tryAsResult {
+            tryAsResponse {
                 updateLibrary(intentData.completedCategory)
             }.onError {
                 Timber.e(it.exception)

@@ -16,7 +16,7 @@ import my.noveldokusha.scraper.Scraper
 import my.noveldokusha.ui.BaseViewModel
 import my.noveldokusha.utils.StateExtra_String
 import my.noveldokusha.utils.toDocument
-import my.noveldokusha.utils.tryAsResult
+import my.noveldokusha.utils.tryAsResponse
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -57,7 +57,7 @@ class DatabaseBookInfoViewModel @Inject constructor(
 
     init {
         viewModelScope.launch(Dispatchers.IO) {
-            tryAsResult {
+            tryAsResponse {
                 val doc = networkClient.get(bookMetadata.url).toDocument()
                 val data = withContext(Dispatchers.Default) {
                     scraper.getCompatibleDatabase(databaseUrlBase)!!.getBookData(doc)

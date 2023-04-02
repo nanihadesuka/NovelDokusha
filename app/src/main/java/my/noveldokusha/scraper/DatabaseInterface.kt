@@ -5,6 +5,8 @@ import my.noveldokusha.data.Response
 import my.noveldokusha.network.PagedList
 import org.jsoup.nodes.Document
 
+data class SearchGenre(val id: String, val genreName: String)
+
 interface DatabaseInterface {
 
     val id: String
@@ -12,14 +14,14 @@ interface DatabaseInterface {
     val baseUrl: String
     val iconUrl: String get() = "$baseUrl/favicon.ico"
 
-    val searchGenresCacheFileName get() = "database_search_genres__$id"
+    val searchGenresCacheFileName get() = "database_search_genres_v2_$id"
 
     suspend fun getSearchAuthorSeries(
         index: Int,
         urlAuthorPage: String
     ): Response<PagedList<BookMetadata>>
 
-    suspend fun getSearchGenres(): Response<Map<String, String>>
+    suspend fun getSearchGenres(): Response<List<SearchGenre>>
     suspend fun getSearch(index: Int, input: String): Response<PagedList<BookMetadata>>
     suspend fun getSearchAdvanced(
         index: Int,

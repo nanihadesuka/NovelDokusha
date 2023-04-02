@@ -29,9 +29,9 @@ import my.noveldokusha.ui.theme.Success500
 import my.noveldokusha.ui.theme.Themes
 
 fun ToggleableState.next() = when (this) {
-    ToggleableState.On -> ToggleableState.Off
-    ToggleableState.Off -> ToggleableState.Indeterminate
-    ToggleableState.Indeterminate -> ToggleableState.On
+    ToggleableState.On -> ToggleableState.Indeterminate
+    ToggleableState.Indeterminate -> ToggleableState.Off
+    ToggleableState.Off -> ToggleableState.On
 }
 
 @Composable
@@ -60,7 +60,7 @@ fun PosNegCheckbox(
                 ToggleableState.On -> Success500
                 ToggleableState.Indeterminate -> Error500
             },
-            animationSpec = tween(250)
+            animationSpec = tween(250), label = ""
         )
         TriStateCheckbox(
             state = updatedState,

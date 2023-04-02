@@ -9,7 +9,6 @@ import my.noveldokusha.scraper.SourceInterface
 import my.noveldokusha.ui.screens.chaptersList.ChaptersActivity
 import my.noveldokusha.ui.screens.databaseBookInfo.DatabaseBookInfoActivity
 import my.noveldokusha.ui.screens.databaseSearch.DatabaseSearchActivity
-import my.noveldokusha.ui.screens.databaseSearchResults.DatabaseSearchResultsActivity
 import my.noveldokusha.ui.screens.globalSourceSearch.GlobalSourceSearchActivity
 import my.noveldokusha.ui.screens.reader.ReaderActivity
 import my.noveldokusha.ui.screens.sourceCatalog.SourceCatalogActivity
@@ -48,12 +47,8 @@ fun Context.goToDatabaseSearchResults(
     inputText: String,
     databaseUrlBase: String = "https://www.novelupdates.com/"
 ) {
-    DatabaseSearchResultsActivity
-        .IntentData(
-            this,
-            databaseUrlBase = databaseUrlBase,
-            DatabaseSearchResultsActivity.SearchMode.Text(inputText)
-        )
+    DatabaseSearchActivity
+        .IntentData(this, databaseBaseUrl = databaseUrlBase)
         .let(::startActivity)
 }
 

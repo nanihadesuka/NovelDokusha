@@ -7,6 +7,7 @@ import my.noveldokusha.network.NetworkClient
 import my.noveldokusha.network.PagedList
 import my.noveldokusha.network.tryConnect
 import my.noveldokusha.scraper.DatabaseInterface
+import my.noveldokusha.scraper.SearchGenre
 import my.noveldokusha.scraper.TextExtractor
 import my.noveldokusha.utils.add
 import my.noveldokusha.utils.toDocument
@@ -45,13 +46,14 @@ class NovelUpdates(
         }
     }
 
-    override suspend fun getSearchGenres(): Response<Map<String, String>> {
+    override suspend fun getSearchGenres(): Response<List<SearchGenre>> {
         return tryConnect {
             return@tryConnect networkClient
                 .get("https://www.novelupdates.com/series-finder/")
                 .toDocument()
                 .select(".genreme")
                 .associate { it.text().trim() to it.attr("genreid") }
+                .map { (genre, id) -> SearchGenre(id = id, genreName = genre) }
                 .let { Response.Success(it) }
         }
     }

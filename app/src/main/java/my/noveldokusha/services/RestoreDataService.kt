@@ -90,7 +90,7 @@ class RestoreDataService : Service() {
         val intentData = IntentData(intent)
 
         job = CoroutineScope(Dispatchers.IO).launch {
-            tryAsResult {
+            tryAsResponse {
                 restoreData(intentData.uri)
                 repository.eventDataRestored.postValue(Unit)
             }.onError {
@@ -136,7 +136,7 @@ class RestoreDataService : Service() {
 
 
         suspend fun mergeToDatabase(inputStream: InputStream) {
-            tryAsResult {
+            tryAsResponse {
                 notificationsCenter.modifyNotification(builder, channel_id) {
                     text = getString(R.string.loading_database)
                 }

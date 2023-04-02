@@ -8,13 +8,14 @@ import androidx.activity.viewModels
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.core.view.WindowCompat
 import dagger.hilt.android.AndroidEntryPoint
 import my.noveldokusha.composableActions.SetSystemBarTransparent
 import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.scraper.DatabaseInterface
 import my.noveldokusha.ui.BaseActivity
-import my.noveldokusha.ui.screens.databaseSearchResults.DatabaseSearchResultsActivity
+import my.noveldokusha.ui.screens.databaseSearch.DatabaseSearchActivity
 import my.noveldokusha.ui.screens.globalSourceSearch.GlobalSourceSearchActivity
 import my.noveldokusha.ui.theme.Theme
 import my.noveldokusha.utils.Extra_String
@@ -45,10 +46,12 @@ class DatabaseBookInfoActivity : BaseActivity() {
         WindowCompat.setDecorFitsSystemWindows(window, false)
         setContent {
             val scrollState = rememberScrollState()
-            val alpha by derivedStateOf {
-                val value = (scrollState.value - 50).coerceIn(0, 200).toFloat()
-                val maxvalue = (scrollState.maxValue).coerceIn(1, 200).toFloat()
-                value / maxvalue
+            val alpha by remember {
+                derivedStateOf {
+                    val value = (scrollState.value - 50).coerceIn(0, 200).toFloat()
+                    val maxvalue = (scrollState.maxValue).coerceIn(1, 200).toFloat()
+                    value / maxvalue
+                }
             }
 
             Theme(appPreferences = appPreferences) {
@@ -76,28 +79,15 @@ class DatabaseBookInfoActivity : BaseActivity() {
     fun openSearchPageByAuthor(author: DatabaseInterface.BookAuthor) {
         if (author.url == null)
             return
-        val input = DatabaseSearchResultsActivity.SearchMode.AuthorSeries(
-            authorName = author.name, urlAuthorPage = author.url
-        )
-        val intent = DatabaseSearchResultsActivity.IntentData(
-            this@DatabaseBookInfoActivity,
-            viewModel.database.baseUrl,
-            input
-        )
-        startActivity(intent)
+        DatabaseSearchActivity
+            .IntentData(this, databaseBaseUrl = viewModel.database.baseUrl)
+            .let(::startActivity)
     }
 
     fun openSearchPageByGenres(genres: List<String>) {
-        val input = DatabaseSearchResultsActivity.SearchMode.Genres(
-            genresIncludeId = ArrayList(genres),
-            genresExcludeId = arrayListOf()
-        )
-        val intent = DatabaseSearchResultsActivity.IntentData(
-            this@DatabaseBookInfoActivity,
-            viewModel.database.baseUrl,
-            input
-        )
-        startActivity(intent)
+        DatabaseSearchActivity
+            .IntentData(this, databaseBaseUrl = viewModel.database.baseUrl)
+            .let(::startActivity)
     }
 
     fun openSearchPageByTitle(book: BookMetadata) {

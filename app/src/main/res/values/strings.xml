@@ -158,4 +158,9 @@
 	<string name="delete">Delete</string>
     <string name="english">English</string>
     <string name="clear_input_text">Clear input text</string>
+    <string name="filter_title">Title</string>
+	<string name="filter_genres">Genres</string>
+	<string name="filter_author">Author</string>
+    <string name="search_filter_action">Filter</string>
+    <string name="clear_filters">Clear</string>
 </resources>

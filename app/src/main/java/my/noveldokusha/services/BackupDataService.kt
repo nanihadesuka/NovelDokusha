@@ -72,7 +72,7 @@ class BackupDataService : Service() {
         val intentData = IntentData(intent)
 
         job = CoroutineScope(Dispatchers.IO).launch {
-            tryAsResult {
+            tryAsResponse {
                 backupData(intentData.uri, intentData.backupImages)
             }.onError {
                 Timber.e(it.exception)
