@@ -11,10 +11,8 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
@@ -22,11 +20,13 @@ import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -47,11 +47,14 @@ import my.noveldokusha.ui.composeViews.CollapsibleDivider
 import my.noveldokusha.ui.theme.ColorAccent
 import my.noveldokusha.ui.theme.ImageBorderShape
 
-@OptIn(ExperimentalMaterialApi::class, ExperimentalFoundationApi::class)
+@OptIn(ExperimentalMaterialApi::class, ExperimentalFoundationApi::class,
+    ExperimentalMaterial3Api::class
+)
 @Composable
 fun LibraryScreenBody(
     tabs: List<String>,
     innerPadding: PaddingValues,
+    topAppBarState: TopAppBarState,
     onBookClick: (BookWithContext) -> Unit,
     onBookLongClick: (BookWithContext) -> Unit,
     viewModel: LibraryPageViewModel = viewModel()
@@ -65,7 +68,6 @@ fun LibraryScreenBody(
             viewModel.onLibraryCategoryRefresh(isCompletedCategory = updateCompleted.value == 1)
         }
     )
-    val lazyGridState = rememberLazyGridState()
 
     Box(
         modifier = Modifier
@@ -97,14 +99,13 @@ fun LibraryScreenBody(
                     }
                 },
                 divider = {
-                    CollapsibleDivider(lazyGridState)
+                    CollapsibleDivider(topAppBarState)
                 }
             )
             HorizontalPager(
                 pageCount = tabs.size,
                 state = pagerState
             ) { page ->
-
                 // TODO: improve + make more generic (use database table?)
                 val showCompleted by remember {
                     derivedStateOf {
@@ -121,7 +122,6 @@ fun LibraryScreenBody(
                 }
                 LibraryPageBody(
                     list = list,
-                    lazyGridState = lazyGridState,
                     onClick = onBookClick,
                     onLongClick = onBookLongClick
                 )
@@ -138,12 +138,10 @@ fun LibraryScreenBody(
 @Composable
 private fun LibraryPageBody(
     list: List<BookWithContext>,
-    lazyGridState: LazyGridState,
     onClick: (BookWithContext) -> Unit,
     onLongClick: (BookWithContext) -> Unit,
 ) {
     LazyVerticalGrid(
-        state = lazyGridState,
         columns = GridCells.Fixed(2),
         contentPadding = PaddingValues(top = 4.dp, bottom = 400.dp, start = 4.dp, end = 4.dp)
     ) {

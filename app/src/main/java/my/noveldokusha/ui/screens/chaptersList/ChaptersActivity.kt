@@ -19,6 +19,7 @@ import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
@@ -186,18 +187,19 @@ class ChaptersActivity : BaseActivity() {
                             )
                         }
 
-                        ToolbarMode.SEARCH -> TopAppBarSearch(
-                            focusRequester = focusRequester,
-                            searchText = viewModel.searchText,
-                            onSearchTextChange = { viewModel.searchText = it },
-                            onClose = {
-                                focusManager.clearFocus()
-                                toolbarMode = ToolbarMode.MAIN
-                            },
-                            onTextDone = {},
-                            modifier = Modifier.padding(top = 30.dp),
-                            placeholderText = stringResource(id = R.string.search_chapter_title)
-                        )
+                        ToolbarMode.SEARCH -> Surface(color = MaterialTheme.colorScheme.primary) {
+                            TopAppBarSearch(
+                                focusRequester = focusRequester,
+                                searchText = viewModel.searchText,
+                                onSearchTextChange = { viewModel.searchText = it },
+                                onClose = {
+                                    focusManager.clearFocus()
+                                    toolbarMode = ToolbarMode.MAIN
+                                },
+                                onTextDone = {},
+                                placeholderText = stringResource(id = R.string.search_chapter_title)
+                            )
+                        }
                     }
 
                     FloatingActionButton(

@@ -2,7 +2,6 @@ package my.noveldokusha.ui.screens.main.settings
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -25,8 +24,11 @@ import my.noveldokusha.ui.composeViews.CollapsibleDivider
 fun SettingsScreen(
     viewModel: SettingsViewModel = viewModel()
 ) {
-    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(snapAnimationSpec = null)
-    val scrollState = rememberScrollState()
+    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(
+        snapAnimationSpec = null,
+        flingAnimationSpec = null
+    )
+
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         containerColor = MaterialTheme.colorScheme.surface,
@@ -45,7 +47,7 @@ fun SettingsScreen(
                         )
                     }
                 )
-                CollapsibleDivider(scrollState)
+                CollapsibleDivider(scrollBehavior.state)
             }
         },
         content = { innerPadding ->
@@ -65,7 +67,6 @@ fun SettingsScreen(
                 onDownloadTranslationModel = viewModel.translationManager::downloadModel,
                 onRemoveTranslationModel = viewModel.translationManager::removeModel,
                 modifier = Modifier.padding(innerPadding),
-                scrollState = scrollState
             )
         }
     )

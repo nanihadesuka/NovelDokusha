@@ -25,7 +25,10 @@ fun LibraryScreen(
 ) {
     val context by rememberUpdatedState(LocalContext.current)
     var showDropDown by remember { mutableStateOf(false) }
-    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(snapAnimationSpec = null)
+    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(
+        snapAnimationSpec = null,
+        flingAnimationSpec = null
+    )
 
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
@@ -67,6 +70,7 @@ fun LibraryScreen(
             LibraryScreenBody(
                 tabs = listOf("Default", "Completed"),
                 innerPadding = innerPadding,
+                topAppBarState = scrollBehavior.state,
                 onBookClick = { book ->
                     val intent = ChaptersActivity.IntentData(
                         context,

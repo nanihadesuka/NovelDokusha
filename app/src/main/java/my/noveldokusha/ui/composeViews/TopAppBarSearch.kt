@@ -9,6 +9,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material.icons.Icons
@@ -44,7 +45,6 @@ fun TopAppBarSearch(
     onSearchTextChange: (String) -> Unit,
     onClose: () -> Unit,
     onTextDone: (String) -> Unit,
-    modifier: Modifier = Modifier,
     containerColor: Color = MaterialTheme.colorScheme.primaryContainer,
     placeholderText: String = stringResource(R.string.search_here),
     scrollBehavior: TopAppBarScrollBehavior? = null
@@ -52,8 +52,9 @@ fun TopAppBarSearch(
     // Many hacks going on here to make it scrollBehavior compatible
     Box {
         Box(
-            modifier
+            Modifier
                 .padding(8.dp)
+                .systemBarsPadding()
                 .background(containerColor, CircleShape)
                 .matchParentSize()
         )
@@ -65,7 +66,7 @@ fun TopAppBarSearch(
 
                 ),
             navigationIcon = {
-                IconButton(onClick = onClose) {
+                IconButton(onClick = onClose, modifier = Modifier.padding(start = 2.dp)) {
                     Icon(
                         Icons.Default.ArrowBack,
                         contentDescription = null

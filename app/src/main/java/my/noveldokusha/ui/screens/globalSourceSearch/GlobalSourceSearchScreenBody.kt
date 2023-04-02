@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -42,12 +41,10 @@ import java.util.Locale
 @Composable
 fun GlobalSourceSearchScreenBody(
     listSources: List<SourceResults>,
-    lazyListState: LazyListState,
     contentPadding: PaddingValues,
     onBookClick: (book: BookMetadata) -> Unit
 ) {
     LazyColumn(
-        state = lazyListState,
         contentPadding = contentPadding,
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
@@ -186,7 +183,6 @@ private fun PreviewView() {
     InternalTheme {
         GlobalSourceSearchScreenBody(
             listSources = list,
-            lazyListState = rememberLazyListState(),
             onBookClick = {},
             contentPadding = PaddingValues(),
         )

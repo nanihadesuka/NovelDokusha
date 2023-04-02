@@ -1,7 +1,6 @@
 package my.noveldokusha.ui.screens.main.finder
 
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -36,8 +35,10 @@ fun FinderScreen(
 ) {
     val context by rememberUpdatedState(newValue = LocalContext.current)
     var languagesOptionsExpanded by remember { mutableStateOf(false) }
-    val lazyListState = rememberLazyListState()
-    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(snapAnimationSpec = null)
+    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(
+        snapAnimationSpec = null,
+        flingAnimationSpec = null
+    )
 
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
@@ -79,12 +80,11 @@ fun FinderScreen(
                         }
                     }
                 )
-                CollapsibleDivider(lazyListState)
+                CollapsibleDivider(scrollBehavior.state)
             }
         },
         content = { innerPadding ->
             FinderScreenBody(
-                lazyListState = lazyListState,
                 innerPadding = innerPadding,
                 databasesList = viewModel.databaseList,
                 sourcesList = viewModel.sourcesList,

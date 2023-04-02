@@ -9,9 +9,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.PushPin
 import androidx.compose.material.icons.outlined.PushPin
@@ -41,7 +39,6 @@ import okhttp3.Response
 @OptIn(ExperimentalAnimationApi::class, ExperimentalFoundationApi::class)
 @Composable
 fun FinderScreenBody(
-    lazyListState: LazyListState,
     innerPadding: PaddingValues,
     databasesList: List<DatabaseInterface>,
     sourcesList: List<SourceCatalogItem>,
@@ -50,7 +47,6 @@ fun FinderScreenBody(
     onSourceSetPinned: (id: String, pinned: Boolean) -> Unit,
 ) {
     LazyColumn(
-        state = lazyListState,
         contentPadding = PaddingValues(start = 8.dp, end = 8.dp, bottom = 200.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp),
         modifier = Modifier.padding(paddingValues = innerPadding)
@@ -162,7 +158,6 @@ private fun PreviewView() {
 
     InternalTheme {
         FinderScreenBody(
-            lazyListState = rememberLazyListState(),
             innerPadding = PaddingValues(),
             databasesList = scraper.databasesList.toList(),
             sourcesList = sourcesList,

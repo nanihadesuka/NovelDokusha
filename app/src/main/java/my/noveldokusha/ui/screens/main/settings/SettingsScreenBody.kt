@@ -167,7 +167,6 @@ fun SettingsScreenBody(
     imagesFolderSize: String,
     isTranslationSettingsVisible: Boolean,
     translationModelsStates: List<TranslationModelState>,
-    scrollState: ScrollState,
     modifier: Modifier = Modifier,
     onCleanDatabase: () -> Unit,
     onCleanImageFolder: () -> Unit,
@@ -180,7 +179,7 @@ fun SettingsScreenBody(
         verticalArrangement = Arrangement.spacedBy(8.dp),
         modifier = modifier
             .padding(horizontal = 8.dp)
-            .verticalScroll(scrollState),
+            .verticalScroll(rememberScrollState()),
     ) {
         Spacer(modifier = Modifier.height(0.dp))
         SettingsTheme(
@@ -238,7 +237,6 @@ private fun Preview() {
             onRestoreData = { },
             onDownloadTranslationModel = {},
             onRemoveTranslationModel = {},
-            scrollState = rememberScrollState()
         )
     }
 }

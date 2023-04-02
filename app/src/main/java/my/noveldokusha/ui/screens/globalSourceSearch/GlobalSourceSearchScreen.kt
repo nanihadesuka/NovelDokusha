@@ -2,7 +2,6 @@ package my.noveldokusha.ui.screens.globalSourceSearch
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
@@ -36,8 +35,10 @@ fun GlobalSourceSearchScreen(
     onPressBack: () -> Unit
 ) {
     val focusRequester = remember { FocusRequester() }
-    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(snapAnimationSpec = null)
-    val lazyListState = rememberLazyListState()
+    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(
+        snapAnimationSpec = null,
+        flingAnimationSpec = null
+    )
 
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
@@ -72,7 +73,6 @@ fun GlobalSourceSearchScreen(
         content = { innerPadding ->
             GlobalSourceSearchScreenBody(
                 listSources = listSources,
-                lazyListState = lazyListState,
                 contentPadding = innerPadding,
                 onBookClick = onBookClick
             )
@@ -87,7 +87,7 @@ private fun PreviewView() {
         GlobalSourceSearchScreen(
             searchInput = "Some text here",
             listSources = listOf(),
-            onSearchInputChange = {},
+            onSearchInputChange = { },
             onSearchInputSubmit = { },
             onBookClick = { },
             onPressBack = { },
