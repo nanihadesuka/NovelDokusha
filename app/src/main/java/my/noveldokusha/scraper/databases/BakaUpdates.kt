@@ -1,8 +1,10 @@
 package my.noveldokusha.scraper.databases
 
 import android.net.Uri
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import my.noveldokusha.data.BookMetadata
-import my.noveldokusha.data.Response
+import my.noveldokusha.data.Response.Success
 import my.noveldokusha.network.NetworkClient
 import my.noveldokusha.network.PagedList
 import my.noveldokusha.network.tryConnect
@@ -12,7 +14,6 @@ import my.noveldokusha.scraper.TextExtractor
 import my.noveldokusha.utils.add
 import my.noveldokusha.utils.toDocument
 import my.noveldokusha.utils.toUrlBuilderSafe
-import org.jsoup.nodes.Document
 
 /**
  * Novel main page example:
@@ -27,30 +28,38 @@ class BakaUpdates(
 
     private fun String.removeNovelTag() = this.removeSuffix("(Novel)").trim()
 
-    override suspend fun getSearchAuthorSeries(
-        index: Int,
-        urlAuthorPage: String
-    ): Response<PagedList<BookMetadata>> {
-        if (index > 0)
-            return Response.Success(PagedList.createEmpty(index = index))
+    override suspend fun getAuthorData(authorUrl: String) = withContext(Dispatchers.Default) {
+        tryConnect {
+            val doc = networkClient.get(authorUrl).toDocument()
+            fun entry(header: String) =
+                doc.selectFirst("div.sCat > b:containsOwn($header)")!!.parent()!!
+                    .nextElementSibling()!!
 
-        return tryConnect {
-            networkClient.get(urlAuthorPage)
-                .toDocument()
-                .select("div.pl-2.col-md-5.col-7.text-truncate.text a[href]")
-                .map { it }
-                .filter { it.text().endsWith("(Novel)") }
-                .map { BookMetadata(title = it.text(), url = it.attr("href")) }
-                .let {
-                    Response.Success(
-                        PagedList(list = it, index = index, isLastPage = true)
-                    )
-                }
+            val coverImageUrl = entry("Image")
+                .selectFirst("img[src]")!!
+                .attr("src")
+            val description = entry("Comments").text()
+            val genres = entry("Genres").select("a").dropLast(1).map { it.text() }
+            val books = doc
+                .select(".pl-2.col-md-5.col-7.text-truncate.text > a[href]")
+                .filter { it -> it.text().endsWith("(Novel)") }
+                .map { BookMetadata(title = it.text().removeNovelTag(), url = it.attr("href")) }
+            val name = doc.selectFirst(".releasestitle.tabletitle")!!.text().removeNovelTag()
+            val associatedNames = TextExtractor.get(entry("Associated Names")).split("\n\n")
+
+            DatabaseInterface.AuthorData(
+                name = name,
+                description = description,
+                associatedNames = associatedNames,
+                books = books,
+                genres = genres,
+                coverImageUrl = coverImageUrl
+            ).let(::Success)
         }
     }
 
-    override suspend fun getSearchGenres(): Response<List<SearchGenre>> {
-        return tryConnect {
+    override suspend fun getSearchFilters() = withContext(Dispatchers.Default) {
+        tryConnect {
             return@tryConnect networkClient
                 .get("https://www.mangaupdates.com/series.html?act=genresearch")
                 .toDocument()
@@ -58,11 +67,14 @@ class BakaUpdates(
                 .map { it.text().trim() }
                 .associateWith { it.replace(" ", "+") }
                 .map { (id, genre) -> SearchGenre(id = id, genreName = genre) }
-                .let { Response.Success(it) }
+                .let { Success(it) }
         }
     }
 
-    override suspend fun getSearch(index: Int, input: String): Response<PagedList<BookMetadata>> {
+    override suspend fun searchByTitle(
+        index: Int,
+        input: String
+    ) = withContext(Dispatchers.Default) {
         val page = index + 1
         val url = "https://www.mangaupdates.com/series.html".toUrlBuilderSafe().apply {
             if (page > 1) add("page", page)
@@ -71,14 +83,14 @@ class BakaUpdates(
             add("search", input)
         }
 
-        return getSearchList(page, url)
+        getSearchList(page, url)
     }
 
-    override suspend fun getSearchAdvanced(
+    override suspend fun searchByFilters(
         index: Int,
         genresIncludedId: List<String>,
         genresExcludedId: List<String>
-    ): Response<PagedList<BookMetadata>> {
+    ) = withContext(Dispatchers.Default) {
         val page = index + 1
         val url = "https://www.mangaupdates.com/series.html".toUrlBuilderSafe().apply {
             if (page > 1) add("page", page)
@@ -91,10 +103,13 @@ class BakaUpdates(
             add("perpage", 50)
         }
 
-        return getSearchList(index, url)
+        getSearchList(index, url)
     }
 
-    private suspend fun getSearchList(index: Int, url: Uri.Builder) =
+    private suspend fun getSearchList(
+        index: Int,
+        url: Uri.Builder
+    ) = withContext(Dispatchers.Default) {
         tryConnect("index: $index\n\nurl: $url") {
             val doc = networkClient.get(url).toDocument()
             doc.select(".col-12.col-lg-6.p-3.text")
@@ -111,7 +126,7 @@ class BakaUpdates(
                     )
                 }
                 .let {
-                    Response.Success(
+                    Success(
                         PagedList(
                             list = it,
                             index = index,
@@ -120,77 +135,84 @@ class BakaUpdates(
                     )
                 }
         }
+    }
 
-    override fun getBookData(doc: Document): DatabaseInterface.BookData {
-        fun entry(header: String) =
-            doc.selectFirst("div.sCat > b:containsOwn($header)")!!.parent()!!.nextElementSibling()!!
+    override suspend fun getBookData(
+        bookUrl: String
+    ) = withContext(Dispatchers.Default) {
+        tryConnect {
+            val doc = networkClient.get(bookUrl).toDocument()
+            fun entry(header: String) =
+                doc.selectFirst("div.sCat > b:containsOwn($header)")!!.parent()!!
+                    .nextElementSibling()!!
 
-        val relatedBooks = entry("Category Recommendations")
-            .select("a[href]")
-            .map {
-                BookMetadata(
-                    title = it.text().removeNovelTag(),
-                    url = it.attr("href")
-                )
-            }
-            .toList()
-
-        val similarRecommended = entry("Recommendations")
-            .select("a[href]")
-            .map {
-                BookMetadata(
-                    title = it.text().removeNovelTag(),
-                    url = it.attr("href")
-                )
-            }
-            .toList()
-
-        val authors = entry("Author\\(s\\)")
-            .select("a[href]")
-            .mapNotNull {
-                val url = it.attr("href")
-                if (url.startsWith("https://www.mangaupdates.com/author/"))
-                    return@mapNotNull DatabaseInterface.BookAuthor(
-                        name = it.text(),
+            val relatedBooks = entry("Category Recommendations")
+                .select("a[href]")
+                .map {
+                    BookMetadata(
+                        title = it.text().removeNovelTag(),
                         url = it.attr("href")
                     )
+                }
+                .toList()
 
-                if (url.startsWith("https://www.mangaupdates.com/submit.html?act=add_author")) {
-                    val name = url.toUrlBuilderSafe().build().getQueryParameter("author")
-                        ?: return@mapNotNull null
-                    return@mapNotNull DatabaseInterface.BookAuthor(
-                        name = name,
-                        url = null
+            val similarRecommended = entry("Recommendations")
+                .select("a[href]")
+                .map {
+                    BookMetadata(
+                        title = it.text().removeNovelTag(),
+                        url = it.attr("href")
                     )
                 }
-                return@mapNotNull null
-            }
+                .toList()
 
-        val description = entry("Description").let {
-            it.selectFirst("[id=div_desc_more]") ?: it.selectFirst("div")
-        }.also {
-            it?.select("a")?.remove()
-        }.let { TextExtractor.get(it!!) }
+            val authors = entry("Author\\(s\\)")
+                .select("a[href]")
+                .mapNotNull {
+                    val url = it.attr("href")
+                    if (url.startsWith("https://www.mangaupdates.com/author/"))
+                        return@mapNotNull DatabaseInterface.AuthorMetadata(
+                            name = it.text(),
+                            url = it.attr("href")
+                        )
 
-        val tags = entry("Categories")
-            .select("li > a")
-            .map { it.text() }
+                    if (url.startsWith("https://www.mangaupdates.com/submit.html?act=add_author")) {
+                        val name = url.toUrlBuilderSafe().build().getQueryParameter("author")
+                            ?: return@mapNotNull null
+                        return@mapNotNull DatabaseInterface.AuthorMetadata(
+                            name = name,
+                            url = null
+                        )
+                    }
+                    return@mapNotNull null
+                }
 
-        val coverImageUrl = entry("Image")
-            .selectFirst("img[src]")!!
-            .attr("src")
+            val description = entry("Description").let {
+                it.selectFirst("[id=div_desc_more]") ?: it.selectFirst("div")
+            }.also {
+                it?.select("a")?.remove()
+            }.let { TextExtractor.get(it!!) }
 
-        return DatabaseInterface.BookData(
-            title = doc.selectFirst(".releasestitle.tabletitle")!!.text().removeNovelTag(),
-            description = description,
-            alternativeTitles = TextExtractor.get(entry("Associated Names")).split("\n\n"),
-            relatedBooks = relatedBooks,
-            similarRecommended = similarRecommended,
-            bookType = entry("Type").text(),
-            genres = entry("Genre").select("a").dropLast(1).map { it.text() },
-            tags = tags,
-            authors = authors,
-            coverImageUrl = coverImageUrl
-        )
+            val tags = entry("Categories")
+                .select("li > a")
+                .map { it.text() }
+
+            val coverImageUrl = entry("Image")
+                .selectFirst("img[src]")!!
+                .attr("src")
+
+            DatabaseInterface.BookData(
+                title = doc.selectFirst(".releasestitle.tabletitle")!!.text().removeNovelTag(),
+                description = description,
+                alternativeTitles = TextExtractor.get(entry("Associated Names")).split("\n\n"),
+                relatedBooks = relatedBooks,
+                similarRecommended = similarRecommended,
+                bookType = entry("Type").text(),
+                genres = entry("Genre").select("a").dropLast(1).map { it.text() },
+                tags = tags,
+                authors = authors,
+                coverImageUrl = coverImageUrl
+            ).let(::Success)
+        }
     }
 }

@@ -1,8 +1,11 @@
 package my.noveldokusha.scraper.databases
 
 import android.net.Uri
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.data.Response
+import my.noveldokusha.data.Response.Success
 import my.noveldokusha.network.NetworkClient
 import my.noveldokusha.network.PagedList
 import my.noveldokusha.network.tryConnect
@@ -10,6 +13,7 @@ import my.noveldokusha.scraper.DatabaseInterface
 import my.noveldokusha.scraper.SearchGenre
 import my.noveldokusha.scraper.TextExtractor
 import my.noveldokusha.utils.add
+import my.noveldokusha.utils.runCatchingAsResponse
 import my.noveldokusha.utils.toDocument
 import my.noveldokusha.utils.toUrlBuilderSafe
 import org.jsoup.nodes.Document
@@ -26,42 +30,23 @@ class NovelUpdates(
     override val baseUrl = "https://www.novelupdates.com/"
     override val iconUrl = "https://www.novelupdates.com/favicon.ico"
 
-    override suspend fun getSearchAuthorSeries(
-        index: Int,
-        urlAuthorPage: String
-    ): Response<PagedList<BookMetadata>> {
-        if (index > 0)
-            return Response.Success(PagedList.createEmpty(index = index))
-
-        return tryConnect {
-            networkClient.get(urlAuthorPage)
-                .toDocument()
-                .select("div.search_title > a[href]")
-                .map { BookMetadata(title = it.text(), url = it.attr("href")) }
-                .let {
-                    Response.Success(
-                        PagedList(list = it, index = index, isLastPage = true)
-                    )
-                }
+    override suspend fun getSearchFilters(): Response<List<SearchGenre>> =
+        withContext(Dispatchers.Default) {
+            tryConnect {
+                networkClient
+                    .get("https://www.novelupdates.com/series-finder/")
+                    .toDocument()
+                    .select(".genreme")
+                    .associate { it.text().trim() to it.attr("genreid") }
+                    .map { (genre, id) -> SearchGenre(id = id, genreName = genre) }
+                    .let { Success(it) }
+            }
         }
-    }
 
-    override suspend fun getSearchGenres(): Response<List<SearchGenre>> {
-        return tryConnect {
-            return@tryConnect networkClient
-                .get("https://www.novelupdates.com/series-finder/")
-                .toDocument()
-                .select(".genreme")
-                .associate { it.text().trim() to it.attr("genreid") }
-                .map { (genre, id) -> SearchGenre(id = id, genreName = genre) }
-                .let { Response.Success(it) }
-        }
-    }
-
-    override suspend fun getSearch(
+    override suspend fun searchByTitle(
         index: Int,
         input: String
-    ): Response<PagedList<BookMetadata>> {
+    ): Response<PagedList<BookMetadata>> = withContext(Dispatchers.Default) {
         val page = index + 1
         val url = baseUrl.toUrlBuilderSafe().apply {
             if (page > 1) appendPath("page").appendPath(page.toString())
@@ -69,14 +54,14 @@ class NovelUpdates(
             add("post_type", "seriesplans")
         }
 
-        return getSearchList(page, url)
+        getSearchList(page, url)
     }
 
-    override suspend fun getSearchAdvanced(
+    override suspend fun searchByFilters(
         index: Int,
         genresIncludedId: List<String>,
         genresExcludedId: List<String>
-    ): Response<PagedList<BookMetadata>> {
+    ): Response<PagedList<BookMetadata>> = withContext(Dispatchers.Default) {
         val page = index + 1
         val url = "https://www.novelupdates.com/series-finder/?sf=1"
             .toUrlBuilderSafe()
@@ -92,35 +77,64 @@ class NovelUpdates(
                 if (page > 1) add("pg", page)
             }
 
-        return getSearchList(index, url)
+        getSearchList(index, url)
     }
 
-    private suspend fun getSearchList(index: Int, url: Uri.Builder) = tryConnect(
-        extraErrorInfo = "index: $index\n\nurl: $url"
-    ) {
-        val doc = networkClient.get(url).toDocument()
-        doc.select(".search_main_box_nu")
-            .mapNotNull {
-                val title = it.selectFirst(".search_title > a[href]") ?: return@mapNotNull null
-                val image = it.selectFirst(".search_img_nu > img[src]")?.attr("src") ?: ""
-                BookMetadata(
-                    title = title.text(),
-                    url = title.attr("href"),
-                    coverImageUrl = image
-                )
-            }
-            .let {
-                Response.Success(
-                    PagedList(
-                        list = it,
-                        index = index,
-                        isLastPage = isLastPage(doc)
+
+    override suspend fun getBookData(
+        bookUrl: String
+    ): Response<DatabaseInterface.BookData> = withContext(Dispatchers.Default) {
+        networkClient.get(bookUrl).toDocument().let(::parseBookData)
+    }
+
+    override suspend fun getAuthorData(authorUrl: String):
+            Response<DatabaseInterface.AuthorData> = withContext(Dispatchers.Default) {
+        tryConnect {
+            val doc = networkClient.get(authorUrl).toDocument()
+            val books = doc.select(".search_main_box_nu")
+                .mapNotNull {
+                    val title =
+                        it.selectFirst(".search_title > a[href]") ?: return@mapNotNull null
+                    val image = it.selectFirst(".search_img_nu > img[src]")?.attr("src") ?: ""
+                    BookMetadata(
+                        title = title.text(),
+                        url = title.attr("href"),
+                        coverImageUrl = image
                     )
-                )
-            }
+                }
+            val authorName = doc.selectFirst("h3.mypage.followauthor")!!.text()
+
+            DatabaseInterface.AuthorData(
+                name = authorName,
+                books = books
+            ).let(::Success)
+        }
     }
 
-    override fun getBookData(doc: Document): DatabaseInterface.BookData {
+    private suspend fun getSearchList(
+        index: Int,
+        url: Uri.Builder
+    ) = withContext(Dispatchers.Default) {
+        tryConnect(extraErrorInfo = "index: $index\n\nurl: $url") {
+            val doc = networkClient.get(url).toDocument()
+            doc.select(".search_main_box_nu")
+                .mapNotNull {
+                    val title =
+                        it.selectFirst(".search_title > a[href]") ?: return@mapNotNull null
+                    val image = it.selectFirst(".search_img_nu > img[src]")?.attr("src") ?: ""
+                    BookMetadata(
+                        title = title.text(),
+                        url = title.attr("href"),
+                        coverImageUrl = image
+                    )
+                }
+                .let { Success(PagedList(list = it, index = index, isLastPage = isLastPage(doc))) }
+        }
+    }
+
+    private fun parseBookData(
+        doc: Document
+    ): Response<DatabaseInterface.BookData> = runCatchingAsResponse {
         val relatedBooks = doc
             .select("h5")
             .find { it.hasClass("seriesother") && it.text() == "Related Series" }
@@ -142,12 +156,13 @@ class NovelUpdates(
         val authors = doc
             .selectFirst("#showauthors")!!
             .select("a[href]")
-            .map { DatabaseInterface.BookAuthor(name = it.text(), url = it.attr("href")) }
+            .map { DatabaseInterface.AuthorMetadata(name = it.text(), url = it.attr("href")) }
 
-        return DatabaseInterface.BookData(
+        DatabaseInterface.BookData(
             title = doc.selectFirst(".seriestitlenu")?.text() ?: "",
             description = TextExtractor.get(doc.selectFirst("#editdescription")).trim(),
-            alternativeTitles = TextExtractor.get(doc.selectFirst("#editassociated")).split("\n"),
+            alternativeTitles = TextExtractor.get(doc.selectFirst("#editassociated"))
+                .split("\n"),
             relatedBooks = relatedBooks,
             similarRecommended = similarRecommended,
             bookType = doc.selectFirst(".genre, .type")?.text() ?: "",

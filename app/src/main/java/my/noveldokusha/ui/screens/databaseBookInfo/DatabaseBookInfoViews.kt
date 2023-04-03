@@ -55,7 +55,7 @@ private fun TextAnimated(text: String) {
 fun DatabaseBookInfoView(
     data: DatabaseInterface.BookData,
     onSourcesClick: () -> Unit,
-    onAuthorsClick: (author: DatabaseInterface.BookAuthor) -> Unit,
+    onAuthorsClick: (author: DatabaseInterface.AuthorMetadata) -> Unit,
     onGenresClick: (genres: List<String>) -> Unit,
     onBookClick: (book: BookMetadata) -> Unit,
     scrollState: ScrollState,
@@ -196,7 +196,7 @@ fun Preview() {
                 description = "Novel description goes here and here to and a little more to fill lines",
                 coverImageUrl = "",
                 alternativeTitles = listOf("Title 1", "Title 2", "Title 3"),
-                authors = (1..3).map { DatabaseInterface.BookAuthor("Author $it", "page url") },
+                authors = (1..3).map { DatabaseInterface.AuthorMetadata("Author $it", "page url") },
                 tags = (1..20).map { "tag $it" },
                 genres = (1..5).map { "genre $it" },
                 bookType = "Web novel",

@@ -67,7 +67,6 @@ fun DatabaseSearchScreen(
     val searchPlaceholderText = when (searchMode) {
         SearchMode.BookTitle -> stringResource(id = R.string.search_by_title)
         SearchMode.BookGenres -> stringResource(id = R.string.search_by_genre)
-        SearchMode.AuthorName -> stringResource(id = R.string.search_by_author)
     }
 
     Scaffold(
@@ -101,16 +100,6 @@ fun DatabaseSearchScreen(
                         },
                         label = {
                             Text(text = stringResource(R.string.filter_title))
-                        }
-                    )
-                    FilterChip(
-                        selected = searchMode == SearchMode.AuthorName,
-                        onClick = {
-                            onSearchModeChange(SearchMode.AuthorName)
-                            focusRequester.requestFocus() // Doesn't work
-                        },
-                        label = {
-                            Text(text = stringResource(R.string.filter_author))
                         }
                     )
                     FilterChip(

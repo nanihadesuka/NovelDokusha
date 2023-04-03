@@ -26,12 +26,11 @@ interface DatabaseSearchStateBundle {
 
 data class GenreItem(val genre: String, val genreId: String, val state: ToggleableState)
 enum class SearchMode {
-    BookTitle, BookGenres, AuthorName
+    BookTitle, BookGenres
 }
 
-sealed interface SearchInputState {
+private sealed interface SearchInputState {
     data class BookTitle(val text: String) : SearchInputState
-    data class BookAuthor(val authorName: String) : SearchInputState
     data class Filters(
         val genresIncludedId: List<String>,
         val genresExcludedId: List<String>,
@@ -52,22 +51,19 @@ class DatabaseSearchViewModel @Inject constructor(
     val listLayout by appPreferences.BOOKS_LIST_LAYOUT_MODE.state(viewModelScope)
 
     @Volatile
-    var inputState: SearchInputState = SearchInputState.BookTitle("")
-    val searchMode = mutableStateOf<SearchMode>(SearchMode.BookTitle)
+    private var booksSearch: SearchInputState = SearchInputState.BookTitle("")
+
+    val searchMode = mutableStateOf(SearchMode.BookTitle)
     val inputSearch = mutableStateOf("")
     val filtersSearch = mutableStateListOf<GenreItem>()
 
     val fetchIterator = PagedListIteratorState(viewModelScope) { index ->
-        when (val input = inputState) {
-            is SearchInputState.BookAuthor -> database.getSearchAuthorSeries(
-                index = index,
-                urlAuthorPage = input.authorName
-            )
-            is SearchInputState.BookTitle -> database.getSearch(
+        when (val input = booksSearch) {
+            is SearchInputState.BookTitle -> database.searchByTitle(
                 index = index,
                 input = input.text
             )
-            is SearchInputState.Filters -> database.getSearchAdvanced(
+            is SearchInputState.Filters -> database.searchByFilters(
                 index = index,
                 genresIncludedId = input.genresIncludedId,
                 genresExcludedId = input.genresExcludedId
@@ -81,7 +77,7 @@ class DatabaseSearchViewModel @Inject constructor(
         viewModelScope.launch {
             getGenres().onSuccess { filtersSearch.addAll(it) }
             when (searchMode.value) {
-                SearchMode.BookTitle, SearchMode.AuthorName -> onSearchInputSubmit()
+                SearchMode.BookTitle -> onSearchInputSubmit()
                 SearchMode.BookGenres -> onSearchGenresSubmit()
             }
         }
@@ -89,7 +85,7 @@ class DatabaseSearchViewModel @Inject constructor(
 
     private suspend fun getGenres() = withContext(Dispatchers.Default) {
         searchGenresCache
-            .fetch { database.getSearchGenres() }
+            .fetch { database.getSearchFilters() }
             .map { list ->
                 list.map {
                     GenreItem(genreId = it.id, genre = it.genreName, state = ToggleableState.Off)
@@ -100,7 +96,7 @@ class DatabaseSearchViewModel @Inject constructor(
     fun onSearchGenresSubmit() {
         if (searchMode.value != SearchMode.BookGenres) return
 
-        inputState = SearchInputState.Filters(
+        booksSearch = SearchInputState.Filters(
             genresIncludedId = filtersSearch
                 .filter { it.state == ToggleableState.On }
                 .map { it.genreId },
@@ -114,10 +110,9 @@ class DatabaseSearchViewModel @Inject constructor(
 
 
     fun onSearchInputSubmit() {
-        inputState = when (searchMode.value) {
+        booksSearch = when (searchMode.value) {
             SearchMode.BookGenres -> return
             SearchMode.BookTitle -> SearchInputState.BookTitle(text = inputSearch.value)
-            SearchMode.AuthorName -> SearchInputState.BookAuthor(authorName = inputSearch.value)
         }
         fetchIterator.reset()
         fetchIterator.fetchNext()

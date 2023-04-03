@@ -76,7 +76,7 @@ class DatabaseBookInfoActivity : BaseActivity() {
         ).let(this@DatabaseBookInfoActivity::startActivity)
     }
 
-    fun openSearchPageByAuthor(author: DatabaseInterface.BookAuthor) {
+    fun openSearchPageByAuthor(author: DatabaseInterface.AuthorMetadata) {
         if (author.url == null)
             return
         DatabaseSearchActivity
