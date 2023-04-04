@@ -9,6 +9,7 @@ import my.noveldokusha.scraper.SourceInterface
 import my.noveldokusha.ui.screens.chaptersList.ChaptersActivity
 import my.noveldokusha.ui.screens.databaseBookInfo.DatabaseBookInfoActivity
 import my.noveldokusha.ui.screens.databaseSearch.DatabaseSearchActivity
+import my.noveldokusha.ui.screens.databaseSearch.DatabaseSearchExtras
 import my.noveldokusha.ui.screens.globalSourceSearch.GlobalSourceSearchActivity
 import my.noveldokusha.ui.screens.reader.ReaderActivity
 import my.noveldokusha.ui.screens.sourceCatalog.SourceCatalogActivity
@@ -21,7 +22,7 @@ fun Context.goToSourceCatalog(source: SourceInterface.Catalog) {
 
 fun Context.goToDatabaseSearch(database: DatabaseInterface) {
     DatabaseSearchActivity
-        .IntentData(this, databaseBaseUrl = database.baseUrl)
+        .IntentData(this, DatabaseSearchExtras.Catalog(databaseBaseUrl = database.baseUrl))
         .let(::startActivity)
 }
 
@@ -43,12 +44,31 @@ fun Context.goToWebBrowser(url: String) {
         .let(::startActivity)
 }
 
-fun Context.goToDatabaseSearchResults(
-    inputText: String,
+fun Context.goToDatabaseSearch(
+    input: String,
     databaseUrlBase: String = "https://www.novelupdates.com/"
 ) {
     DatabaseSearchActivity
-        .IntentData(this, databaseBaseUrl = databaseUrlBase)
+        .IntentData(
+            this,
+            DatabaseSearchExtras.Title(databaseBaseUrl = databaseUrlBase, title = input)
+        )
+        .let(::startActivity)
+}
+
+fun Context.goToDatabaseSearchGenres(
+    includedGenresIds: List<String>,
+    databaseUrlBase: String = "https://www.novelupdates.com/"
+) {
+    DatabaseSearchActivity
+        .IntentData(
+            this,
+            DatabaseSearchExtras.Genres(
+                databaseBaseUrl = databaseUrlBase,
+                includedGenresIds = includedGenresIds,
+                excludedGenresIds = listOf()
+            )
+        )
         .let(::startActivity)
 }
 
@@ -63,3 +83,5 @@ fun Context.goToBookChapters(book: BookMetadata) {
         .IntentData(this, bookMetadata = BookMetadata(title = book.title, url = book.url))
         .let(::startActivity)
 }
+
+

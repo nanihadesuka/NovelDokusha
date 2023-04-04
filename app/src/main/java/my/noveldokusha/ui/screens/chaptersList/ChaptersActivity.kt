@@ -47,7 +47,7 @@ import my.noveldokusha.data.ChapterWithContext
 import my.noveldokusha.scraper.Scraper
 import my.noveldokusha.ui.BaseActivity
 import my.noveldokusha.ui.composeViews.TopAppBarSearch
-import my.noveldokusha.ui.goToDatabaseSearchResults
+import my.noveldokusha.ui.goToDatabaseSearch
 import my.noveldokusha.ui.goToReader
 import my.noveldokusha.ui.goToWebBrowser
 import my.noveldokusha.ui.theme.ColorAccent
@@ -285,7 +285,7 @@ class ChaptersActivity : BaseActivity() {
         }
     }
 
-    private fun searchBookInDatabase() = goToDatabaseSearchResults(inputText = viewModel.bookTitle)
+    private fun searchBookInDatabase() = goToDatabaseSearch(input = viewModel.bookTitle)
 
     private fun openInBrowser() = goToWebBrowser(url = viewModel.bookMetadata.url)
 

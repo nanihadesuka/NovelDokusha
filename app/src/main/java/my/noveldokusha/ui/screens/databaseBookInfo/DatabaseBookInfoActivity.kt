@@ -14,9 +14,11 @@ import dagger.hilt.android.AndroidEntryPoint
 import my.noveldokusha.composableActions.SetSystemBarTransparent
 import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.scraper.DatabaseInterface
+import my.noveldokusha.scraper.SearchGenre
 import my.noveldokusha.ui.BaseActivity
-import my.noveldokusha.ui.screens.databaseSearch.DatabaseSearchActivity
-import my.noveldokusha.ui.screens.globalSourceSearch.GlobalSourceSearchActivity
+import my.noveldokusha.ui.goToDatabaseSearch
+import my.noveldokusha.ui.goToDatabaseSearchGenres
+import my.noveldokusha.ui.goToGlobalSearch
 import my.noveldokusha.ui.theme.Theme
 import my.noveldokusha.utils.Extra_String
 
@@ -53,49 +55,32 @@ class DatabaseBookInfoActivity : BaseActivity() {
                     value / maxvalue
                 }
             }
-
             Theme(appPreferences = appPreferences) {
-
                 SetSystemBarTransparent(alpha)
-                DatabaseBookInfoView(
+                DatabaseBookInfoScreen(
                     scrollState = scrollState,
                     data = viewModel.bookData,
                     onSourcesClick = ::openGlobalSearchPage,
                     onAuthorsClick = ::openSearchPageByAuthor,
-                    onGenresClick = ::openSearchPageByGenres,
+                    onGenresIdsClick = ::openSearchPageByGenres,
                     onBookClick = ::openSearchPageByTitle
                 )
             }
         }
     }
 
-    fun openGlobalSearchPage() {
-        GlobalSourceSearchActivity.IntentData(
-            this,
-            input = viewModel.bookMetadata.title
-        ).let(this@DatabaseBookInfoActivity::startActivity)
+    private fun openGlobalSearchPage() = goToGlobalSearch(text = viewModel.bookMetadata.title)
+
+    private fun openSearchPageByAuthor(author: DatabaseInterface.AuthorMetadata) {
+        // TODO
     }
 
-    fun openSearchPageByAuthor(author: DatabaseInterface.AuthorMetadata) {
-        if (author.url == null)
-            return
-        DatabaseSearchActivity
-            .IntentData(this, databaseBaseUrl = viewModel.database.baseUrl)
-            .let(::startActivity)
-    }
+    private fun openSearchPageByGenres(genres: List<SearchGenre>) = goToDatabaseSearchGenres(
+        includedGenresIds = genres.map { it.id }
+    )
 
-    fun openSearchPageByGenres(genres: List<String>) {
-        DatabaseSearchActivity
-            .IntentData(this, databaseBaseUrl = viewModel.database.baseUrl)
-            .let(::startActivity)
-    }
-
-    fun openSearchPageByTitle(book: BookMetadata) {
-        val intent = IntentData(
-            this@DatabaseBookInfoActivity,
-            databaseUrlBase = viewModel.database.baseUrl,
-            bookMetadata = book
-        )
-        startActivity(intent)
-    }
+    private fun openSearchPageByTitle(book: BookMetadata) = goToDatabaseSearch(
+        input = book.title,
+        databaseUrlBase = viewModel.database.baseUrl
+    )
 }

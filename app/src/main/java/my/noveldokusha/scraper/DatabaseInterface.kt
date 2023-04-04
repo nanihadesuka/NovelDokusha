@@ -15,6 +15,8 @@ interface DatabaseInterface {
 
     val searchGenresCacheFileName get() = "database_search_genres_v2_$id"
 
+    suspend fun getCatalog(index: Int): Response<PagedList<BookMetadata>>
+
     suspend fun searchByTitle(index: Int, input: String): Response<PagedList<BookMetadata>>
 
     suspend fun searchByFilters(
@@ -37,7 +39,7 @@ interface DatabaseInterface {
         val alternativeTitles: List<String>,
         val authors: List<AuthorMetadata>,
         val tags: List<String>,
-        val genres: List<String>,
+        val genres: List<SearchGenre>,
         val bookType: String,
         val relatedBooks: List<BookMetadata>,
         val similarRecommended: List<BookMetadata>,

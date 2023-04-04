@@ -30,6 +30,18 @@ class NovelUpdates(
     override val baseUrl = "https://www.novelupdates.com/"
     override val iconUrl = "https://www.novelupdates.com/favicon.ico"
 
+    override suspend fun getCatalog(index: Int) = withContext(Dispatchers.Default) {
+        val page = index + 1
+        val url = "https://www.novelupdates.com/novelslisting".toUrlBuilderSafe().apply {
+            add("sort", "2")
+            add("order", "2")
+            add("status", "1")
+            if (page > 1) appendPath("pg").appendPath(page.toString())
+        }
+
+        getSearchList(page, url)
+    }
+
     override suspend fun getSearchFilters(): Response<List<SearchGenre>> =
         withContext(Dispatchers.Default) {
             tryConnect {
@@ -158,6 +170,9 @@ class NovelUpdates(
             .select("a[href]")
             .map { DatabaseInterface.AuthorMetadata(name = it.text(), url = it.attr("href")) }
 
+        val genres = doc.select("#seriesgenre a")
+            .map { SearchGenre(genreName = it.text(), id = it.attr("gid")) }
+
         DatabaseInterface.BookData(
             title = doc.selectFirst(".seriestitlenu")?.text() ?: "",
             description = TextExtractor.get(doc.selectFirst("#editdescription")).trim(),
@@ -166,7 +181,7 @@ class NovelUpdates(
             relatedBooks = relatedBooks,
             similarRecommended = similarRecommended,
             bookType = doc.selectFirst(".genre, .type")?.text() ?: "",
-            genres = doc.select("#seriesgenre a").map { it.text() },
+            genres = genres,
             tags = doc.select("#showtags a").map { it.text() },
             authors = authors,
             coverImageUrl = doc.selectFirst("div.seriesimg > img[src]")?.attr("src")

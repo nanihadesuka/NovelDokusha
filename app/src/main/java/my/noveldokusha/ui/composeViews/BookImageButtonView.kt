@@ -46,7 +46,7 @@ fun BookImageButtonView(
     onClick: () -> Unit,
     onLongClick: () -> Unit = { },
 ) {
-    Column(modifier = modifier.fillMaxWidth()) {
+    Column(modifier = modifier) {
         MyButton(
             text = title,
             onClick = onClick,

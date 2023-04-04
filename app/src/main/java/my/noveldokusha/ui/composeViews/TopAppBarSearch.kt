@@ -48,7 +48,8 @@ fun TopAppBarSearch(
     containerColor: Color = MaterialTheme.colorScheme.primaryContainer,
     placeholderText: String = stringResource(R.string.search_here),
     scrollBehavior: TopAppBarScrollBehavior? = null,
-    inputEnabled: Boolean = true
+    inputEnabled: Boolean = true,
+    labelText: String? = null,
 ) {
     // Many hacks going on here to make it scrollBehavior compatible
     Box {
@@ -75,7 +76,11 @@ fun TopAppBarSearch(
                 }
             },
             title = {
-                LaunchedEffect(Unit) { focusRequester.requestFocus() }
+                LaunchedEffect(Unit) {
+                    if (searchText.isEmpty() && inputEnabled) {
+                        focusRequester.requestFocus()
+                    }
+                }
                 TextField(
                     value = searchText,
                     onValueChange = onSearchTextChange,
@@ -89,11 +94,14 @@ fun TopAppBarSearch(
                         focusedIndicatorColor = Color.Transparent,
                         unfocusedIndicatorColor = Color.Transparent,
                         disabledIndicatorColor = Color.Transparent,
-                        focusedLabelColor = Color.Transparent,
-                        unfocusedLabelColor = Color.Transparent,
+                        focusedLabelColor = MaterialTheme.colorScheme.onTertiary,
+                        unfocusedLabelColor = MaterialTheme.colorScheme.onTertiary,
                         focusedPlaceholderColor = MaterialTheme.colorScheme.onTertiary,
                         unfocusedPlaceholderColor = MaterialTheme.colorScheme.onTertiary,
                     ),
+                    label = labelText?.let {
+                        { Text(text = it) }
+                    },
                     keyboardActions = KeyboardActions(onDone = {
                         if (searchText.isNotBlank()) {
                             onTextDone(searchText)

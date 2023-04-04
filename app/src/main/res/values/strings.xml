@@ -163,4 +163,5 @@
 	<string name="filter_author">Author</string>
     <string name="search_filter_action">Filter</string>
     <string name="clear_filters">Clear</string>
+    <string name="filter_catalog">Catalog</string>
 </resources>

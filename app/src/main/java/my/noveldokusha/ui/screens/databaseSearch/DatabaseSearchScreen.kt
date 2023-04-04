@@ -5,12 +5,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
@@ -44,9 +40,11 @@ import my.noveldokusha.ui.theme.PreviewThemes
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DatabaseSearchScreen(
+    databaseName: String,
     searchMode: SearchMode,
     searchInput: String,
     genresList: SnapshotStateList<GenreItem>,
+    onSearchCatalogSubmit: () -> Unit,
     onGenresFiltersSubmit: () -> Unit,
     onSearchInputSubmit: () -> Unit,
     onSearchInputChange: (String) -> Unit,
@@ -65,8 +63,8 @@ fun DatabaseSearchScreen(
     )
 
     val searchPlaceholderText = when (searchMode) {
-        SearchMode.BookTitle -> stringResource(id = R.string.search_by_title)
-        SearchMode.BookGenres -> stringResource(id = R.string.search_by_genre)
+        SearchMode.BookTitle, SearchMode.Catalog -> stringResource(id = R.string.search_by_title)
+        SearchMode.BookGenres -> ""
     }
 
     Scaffold(
@@ -77,11 +75,15 @@ fun DatabaseSearchScreen(
                 focusRequester = focusRequester,
                 searchText = searchInput,
                 onSearchTextChange = onSearchInputChange,
-                onTextDone = { onSearchInputSubmit() },
+                onTextDone = {
+                    onSearchModeChange(SearchMode.BookTitle)
+                    onSearchInputSubmit()
+                },
                 onClose = onPressBack,
                 placeholderText = searchPlaceholderText,
                 scrollBehavior = scrollBehavior,
-                inputEnabled = searchMode != SearchMode.BookGenres
+                inputEnabled = searchMode != SearchMode.BookGenres,
+                labelText = databaseName
             )
         },
         content = { innerPadding ->
@@ -92,6 +94,17 @@ fun DatabaseSearchScreen(
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                     modifier = Modifier.padding(horizontal = 8.dp),
                 ) {
+                    FilterChip(
+                        selected = searchMode == SearchMode.Catalog,
+                        onClick = {
+                            onSearchModeChange(SearchMode.Catalog)
+                            focusRequester.freeFocus()
+                            onSearchCatalogSubmit()
+                        },
+                        label = {
+                            Text(text = stringResource(R.string.filter_catalog))
+                        }
+                    )
                     FilterChip(
                         selected = searchMode == SearchMode.BookTitle,
                         onClick = {
@@ -161,11 +174,13 @@ private fun PreviewView() {
 
     InternalTheme {
         DatabaseSearchScreen(
+            databaseName = "Database",
             searchMode = SearchMode.BookTitle,
             genresList = genresList,
             searchInput = "",
             onSearchModeChange = { },
             onSearchInputChange = { },
+            onSearchCatalogSubmit = { },
             onSearchInputSubmit = { },
             fetchIterator = fetchIterator,
             listLayoutMode = AppPreferences.LIST_LAYOUT_MODE.verticalGrid,

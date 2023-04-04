@@ -28,6 +28,17 @@ class BakaUpdates(
 
     private fun String.removeNovelTag() = this.removeSuffix("(Novel)").trim()
 
+    override suspend fun getCatalog(index: Int) = withContext(Dispatchers.Default) {
+        val page = index + 1
+        val url = "https://www.mangaupdates.com/series.html".toUrlBuilderSafe().apply {
+            if (page > 1) add("page", page)
+            add("type", "novel")
+            add("perpage", 50)
+            add("orderby", "rating")
+        }
+        getSearchList(page, url)
+    }
+
     override suspend fun getAuthorData(authorUrl: String) = withContext(Dispatchers.Default) {
         tryConnect {
             val doc = networkClient.get(authorUrl).toDocument()
@@ -201,6 +212,9 @@ class BakaUpdates(
                 .selectFirst("img[src]")!!
                 .attr("src")
 
+            val genres = entry("Genre").select("a").dropLast(1)
+                .map { SearchGenre(genreName = it.text(), id = it.text()) }
+
             DatabaseInterface.BookData(
                 title = doc.selectFirst(".releasestitle.tabletitle")!!.text().removeNovelTag(),
                 description = description,
@@ -208,7 +222,7 @@ class BakaUpdates(
                 relatedBooks = relatedBooks,
                 similarRecommended = similarRecommended,
                 bookType = entry("Type").text(),
-                genres = entry("Genre").select("a").dropLast(1).map { it.text() },
+                genres = genres,
                 tags = tags,
                 authors = authors,
                 coverImageUrl = coverImageUrl

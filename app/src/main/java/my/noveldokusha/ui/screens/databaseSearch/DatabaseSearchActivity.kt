@@ -3,28 +3,51 @@ package my.noveldokusha.ui.screens.databaseSearch
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.os.Parcelable
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.parcelize.Parcelize
 import my.noveldokusha.R
 import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.ui.BaseActivity
 import my.noveldokusha.ui.goToDatabaseBookInfo
 import my.noveldokusha.ui.theme.Theme
-import my.noveldokusha.utils.Extra_String
+import my.noveldokusha.utils.Extra_Parcelable
 import my.noveldokusha.utils.colorAttrRes
+
+
+sealed interface DatabaseSearchExtras : Parcelable {
+    val databaseBaseUrl: String
+
+    @Parcelize
+    data class Catalog(override val databaseBaseUrl: String) : DatabaseSearchExtras
+
+    @Parcelize
+    data class Genres(
+        override val databaseBaseUrl: String,
+        val includedGenresIds: List<String>,
+        val excludedGenresIds: List<String>,
+    ) : DatabaseSearchExtras
+
+    @Parcelize
+    data class Title(
+        override val databaseBaseUrl: String,
+        val title: String
+    ) : DatabaseSearchExtras
+}
 
 @AndroidEntryPoint
 class DatabaseSearchActivity : BaseActivity() {
+
     class IntentData : Intent, DatabaseSearchStateBundle {
-        override var databaseBaseUrl by Extra_String()
+        override var extras: DatabaseSearchExtras by Extra_Parcelable()
 
         constructor(intent: Intent) : super(intent)
-        constructor(ctx: Context, databaseBaseUrl: String) : super(
-            ctx,
-            DatabaseSearchActivity::class.java
+        constructor(ctx: Context, extras: DatabaseSearchExtras) : super(
+            ctx, DatabaseSearchActivity::class.java
         ) {
-            this.databaseBaseUrl = databaseBaseUrl
+            this.extras = extras
         }
     }
 
@@ -36,9 +59,11 @@ class DatabaseSearchActivity : BaseActivity() {
         setContent {
             Theme(appPreferences = appPreferences) {
                 DatabaseSearchScreen(
+                    databaseName = viewModel.database.name,
                     searchMode = viewModel.searchMode.value,
                     searchInput = viewModel.inputSearch.value,
                     genresList = viewModel.filtersSearch,
+                    onSearchCatalogSubmit = viewModel::onSearchCatalogSubmit,
                     onSearchInputSubmit = viewModel::onSearchInputSubmit,
                     onGenresFiltersSubmit = viewModel::onSearchGenresSubmit,
                     onSearchInputChange = { viewModel.inputSearch.value = it },
@@ -54,7 +79,7 @@ class DatabaseSearchActivity : BaseActivity() {
     }
 
     private fun openBookInfoPage(book: BookMetadata) = goToDatabaseBookInfo(
-        databaseUrlBase = viewModel.databaseBaseUrl,
+        databaseUrlBase = viewModel.extras.databaseBaseUrl,
         book = book
     )
 }

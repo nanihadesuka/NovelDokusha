@@ -40,7 +40,7 @@ fun MyButton(
     outerPadding: Dp = 4.dp,
     contentPadding: Dp = 12.dp,
     minHeight: Dp = selectableMinHeight,
-    shape: Shape = MaterialTheme.shapes.large,
+    shape: Shape = MaterialTheme.shapes.medium,
     borderWidth: Dp = 1.dp,
     borderColor: Color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.2f),
     backgroundColor: Color = MaterialTheme.colorScheme.primary,

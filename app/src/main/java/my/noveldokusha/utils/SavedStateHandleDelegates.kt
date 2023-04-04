@@ -1,6 +1,7 @@
 package my.noveldokusha.utils
 
 import android.net.Uri
+import android.os.Parcelable
 import androidx.lifecycle.SavedStateHandle
 import kotlin.reflect.KProperty
 
@@ -17,6 +18,14 @@ class StateExtra_String(private val state: SavedStateHandle) {
         state.get<String>(property.name)!!
 
     operator fun setValue(thisRef: Any?, property: KProperty<*>, value: String) =
+        state.set(property.name, value)
+}
+
+class StateExtra_Parcelable<T : Parcelable>(private val state: SavedStateHandle) {
+    operator fun getValue(thisRef: Any?, property: KProperty<*>) =
+        state.get<T>(property.name)!!
+
+    operator fun setValue(thisRef: Any?, property: KProperty<*>, value: T) =
         state.set(property.name, value)
 }
 

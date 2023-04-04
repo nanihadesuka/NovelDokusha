@@ -2,6 +2,7 @@ package my.noveldokusha.utils
 
 import android.content.Intent
 import android.net.Uri
+import android.os.Parcelable
 import kotlin.reflect.KProperty
 
 class Extra_StringArrayList {
@@ -17,6 +18,14 @@ class Extra_String {
         thisRef.extras!!.getString(property.name)!!
 
     operator fun setValue(thisRef: Intent, property: KProperty<*>, value: String) =
+        thisRef.putExtra(property.name, value)
+}
+
+class Extra_Parcelable<T : Parcelable> {
+    operator fun getValue(thisRef: Intent, property: KProperty<*>) =
+        thisRef.extras!!.getParcelable<T>(property.name)!!
+
+    operator fun setValue(thisRef: Intent, property: KProperty<*>, value: T) =
         thisRef.putExtra(property.name, value)
 }
 
