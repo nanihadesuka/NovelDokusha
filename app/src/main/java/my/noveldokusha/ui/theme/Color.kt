@@ -6,7 +6,7 @@ val ColorAccent = Color(0xFF2A59B6)
 
 val Grey0 = Color(0xFFFFFFFF)
 val Grey25 = Color(0xFFFEFEFE)
-val Grey50 = Color(0xFFEAEAEA)
+val Grey50 = Color(0xFFF8F8F8)
 val Grey75 = Color(0xFFD7D7D7)
 val Grey100 = Color(0xFFC3C3C3)
 val Grey200 = Color(0xFFAFAFAF)

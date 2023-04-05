@@ -58,7 +58,7 @@ fun Context.goToDatabaseSearch(
 
 fun Context.goToDatabaseSearchGenres(
     includedGenresIds: List<String>,
-    databaseUrlBase: String = "https://www.novelupdates.com/"
+    databaseUrlBase: String
 ) {
     DatabaseSearchActivity
         .IntentData(

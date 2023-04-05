@@ -16,7 +16,7 @@ import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.scraper.DatabaseInterface
 import my.noveldokusha.scraper.SearchGenre
 import my.noveldokusha.ui.BaseActivity
-import my.noveldokusha.ui.goToDatabaseSearch
+import my.noveldokusha.ui.goToDatabaseBookInfo
 import my.noveldokusha.ui.goToDatabaseSearchGenres
 import my.noveldokusha.ui.goToGlobalSearch
 import my.noveldokusha.ui.theme.Theme
@@ -62,8 +62,8 @@ class DatabaseBookInfoActivity : BaseActivity() {
                     data = viewModel.bookData,
                     onSourcesClick = ::openGlobalSearchPage,
                     onAuthorsClick = ::openSearchPageByAuthor,
-                    onGenresIdsClick = ::openSearchPageByGenres,
-                    onBookClick = ::openSearchPageByTitle
+                    onGenresClick = ::openSearchPageByGenres,
+                    onBookClick = ::openBookInfo
                 )
             }
         }
@@ -76,11 +76,12 @@ class DatabaseBookInfoActivity : BaseActivity() {
     }
 
     private fun openSearchPageByGenres(genres: List<SearchGenre>) = goToDatabaseSearchGenres(
-        includedGenresIds = genres.map { it.id }
+        includedGenresIds = genres.map { it.id },
+        databaseUrlBase = viewModel.database.baseUrl
     )
 
-    private fun openSearchPageByTitle(book: BookMetadata) = goToDatabaseSearch(
-        input = book.title,
+    private fun openBookInfo(book: BookMetadata) = goToDatabaseBookInfo(
+        book = book,
         databaseUrlBase = viewModel.database.baseUrl
     )
 }

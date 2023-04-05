@@ -122,7 +122,10 @@ fun TopAppBarSearch(
                             enter = fadeIn() + expandIn(expandFrom = Alignment.Center),
                             exit = fadeOut() + shrinkOut(shrinkTowards = Alignment.Center)
                         ) {
-                            IconButton(onClick = { onSearchTextChange("") }) {
+                            IconButton(onClick = {
+                                onSearchTextChange("")
+                                focusRequester.requestFocus()
+                            }) {
                                 Icon(
                                     Icons.Default.Close,
                                     contentDescription = null

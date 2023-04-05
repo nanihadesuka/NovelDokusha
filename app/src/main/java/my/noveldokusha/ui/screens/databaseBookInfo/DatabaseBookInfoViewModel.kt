@@ -8,7 +8,6 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import my.noveldokusha.data.BookMetadata
-import my.noveldokusha.network.NetworkClient
 import my.noveldokusha.scraper.DatabaseInterface
 import my.noveldokusha.scraper.Scraper
 import my.noveldokusha.ui.BaseViewModel
@@ -27,7 +26,6 @@ interface DatabaseBookInfoStateBundle {
 @HiltViewModel
 class DatabaseBookInfoViewModel @Inject constructor(
     state: SavedStateHandle,
-    private val networkClient: NetworkClient,
     private val scraper: Scraper
 ) : BaseViewModel(), DatabaseBookInfoStateBundle {
     override var databaseUrlBase: String by StateExtra_String(state)

@@ -38,7 +38,7 @@ fun MyButton(
     animate: Boolean = true,
     textAlign: TextAlign = TextAlign.Start,
     outerPadding: Dp = 4.dp,
-    contentPadding: Dp = 12.dp,
+    contentPadding: PaddingValues = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
     minHeight: Dp = selectableMinHeight,
     shape: Shape = MaterialTheme.shapes.medium,
     borderWidth: Dp = 1.dp,
@@ -94,7 +94,7 @@ fun MyIconButton(
     animate: Boolean = true,
     contentDescription: String? = null,
     outerPadding: Dp = 4.dp,
-    contentPadding: Dp = 12.dp,
+    contentPadding: PaddingValues = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
     minSize: Dp = selectableMinHeight,
     shape: Shape = MaterialTheme.shapes.large,
     borderWidth: Dp = 1.dp,
@@ -153,7 +153,7 @@ private fun InternalButton(
     content: @Composable BoxScope.() -> Unit
 ) {
     val background by animateColorAsState(
-        targetValue = if (selected) selectedBackgroundColor else backgroundColor
+        targetValue = if (selected) selectedBackgroundColor else backgroundColor, label = ""
     )
     Surface(
         modifier = modifier

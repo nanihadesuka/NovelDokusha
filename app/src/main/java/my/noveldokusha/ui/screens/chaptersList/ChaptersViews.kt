@@ -81,8 +81,8 @@ fun HeaderView(
                     .align(Alignment.BottomCenter)
                     .background(
                         Brush.verticalGradient(
-                            0f to MaterialTheme.colorScheme.surface.copy(alpha = 0f),
-                            1f to MaterialTheme.colorScheme.surface,
+                            0f to MaterialTheme.colorScheme.primary.copy(alpha = 0f),
+                            1f to MaterialTheme.colorScheme.primary,
                         )
                     )
             )
@@ -185,9 +185,9 @@ fun ChaptersListView(
 ) {
 
     val backgroundColorSelected =
-        MaterialTheme.colorScheme.onPrimary.mix(MaterialTheme.colorScheme.surface, 0.1f)
+        MaterialTheme.colorScheme.onPrimary.mix(MaterialTheme.colorScheme.primary, 0.1f)
     val backgroundColorUnselected =
-        MaterialTheme.colorScheme.onPrimary.mix(MaterialTheme.colorScheme.surface, 0.5f)
+        MaterialTheme.colorScheme.onPrimary.mix(MaterialTheme.colorScheme.primary, 0.5f)
     val colorTextRead = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.5f)
     val colorTextNotRead = MaterialTheme.colorScheme.onPrimary
     val colorIconSeenRead = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.5f)
@@ -195,8 +195,8 @@ fun ChaptersListView(
     val colorIconDownloadedRead = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.5f)
     val colorIconDownloadedNotRead = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0f)
 
-    val backgroundColorNotSelectedRead = MaterialTheme.colorScheme.surface.mix(ColorAccent, 0.8f)
-    val backgroundColorNotSelectedNotRead = MaterialTheme.colorScheme.surface
+    val backgroundColorNotSelectedRead = MaterialTheme.colorScheme.primary.mix(ColorAccent, 0.8f)
+    val backgroundColorNotSelectedNotRead = MaterialTheme.colorScheme.primary
     val backgroundColorSelectedRead = backgroundColorSelected.mix(ColorAccent, 0.8f)
     val backgroundColorSelectedNotRead = backgroundColorSelected
 
@@ -224,7 +224,7 @@ fun ChaptersListView(
             )
 
             val indicatorColor = when (selected) {
-                true -> MaterialTheme.colorScheme.surface
+                true -> MaterialTheme.colorScheme.primary
                 false -> backgroundColorUnselected
             }
 

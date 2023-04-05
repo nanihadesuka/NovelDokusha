@@ -42,9 +42,9 @@ fun GlobalSourceSearchScreen(
 
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
-        containerColor = MaterialTheme.colorScheme.surface,
+        containerColor = MaterialTheme.colorScheme.primary,
         topBar = {
-            Surface(color = MaterialTheme.colorScheme.surface) {
+            Surface(color = MaterialTheme.colorScheme.primary) {
                 Column {
                     TopAppBarSearch(
                         focusRequester = focusRequester,

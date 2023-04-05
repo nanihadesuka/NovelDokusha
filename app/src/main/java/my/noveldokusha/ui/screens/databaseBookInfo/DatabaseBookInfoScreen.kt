@@ -1,11 +1,17 @@
 package my.noveldokusha.ui.screens.databaseBookInfo
 
+import android.content.res.Configuration
 import androidx.compose.animation.*
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedCard
+import androidx.compose.material3.SuggestionChip
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -20,6 +26,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
@@ -33,15 +40,18 @@ import my.noveldokusha.ui.composeViews.ImageView
 import my.noveldokusha.ui.composeViews.MyButton
 import my.noveldokusha.ui.theme.ColorAccent
 import my.noveldokusha.ui.theme.InternalTheme
-import my.noveldokusha.ui.theme.PreviewThemes
+import my.noveldokusha.utils.textPadding
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(
+    ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class,
+    ExperimentalMaterialApi::class
+)
 @Composable
 fun DatabaseBookInfoScreen(
     data: DatabaseInterface.BookData,
     onSourcesClick: () -> Unit,
     onAuthorsClick: (author: DatabaseInterface.AuthorMetadata) -> Unit,
-    onGenresIdsClick: (genresIds: List<SearchGenre>) -> Unit,
+    onGenresClick: (genresIds: List<SearchGenre>) -> Unit,
     onBookClick: (book: BookMetadata) -> Unit,
     scrollState: ScrollState,
 ) {
@@ -66,8 +76,8 @@ fun DatabaseBookInfoScreen(
                         .align(Alignment.BottomCenter)
                         .background(
                             Brush.verticalGradient(
-                                0f to MaterialTheme.colorScheme.surface.copy(alpha = 0f),
-                                1f to MaterialTheme.colorScheme.surface,
+                                0f to MaterialTheme.colorScheme.primary.copy(alpha = 0f),
+                                1f to MaterialTheme.colorScheme.primary,
                             )
                         )
                 )
@@ -135,38 +145,45 @@ fun DatabaseBookInfoScreen(
                 TextAnimated(text = title)
 
             Title(stringResource(R.string.authors))
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                modifier = Modifier.horizontalScroll(rememberScrollState())
-            ) {
-                for (author in data.authors) MyButton(
-                    text = author.name,
-                    enabled = author.url != null,
-                    onClick = { onAuthorsClick(author) },
-                    outerPadding = 0.dp,
-                )
+            FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                data.authors.forEach {
+                    SuggestionChip(
+                        onClick = { onAuthorsClick(it) },
+                        label = { Text(text = it.name) }
+                    )
+                }
             }
 
             Title(stringResource(R.string.genres))
-            MyButton(
-                text = data.genres.joinToString(" · ") { it.genreName },
-                onClick = { onGenresIdsClick(data.genres) },
-                outerPadding = 0.dp,
-                modifier = Modifier
-                    .fillMaxWidth()
-            )
+            if (data.genres.isNotEmpty()) OutlinedCard(
+                onClick = { onGenresClick(data.genres) },
+                colors = CardDefaults.outlinedCardColors(containerColor = MaterialTheme.colorScheme.primary),
+                modifier = Modifier.padding(top = 8.dp),
+            ) {
+                TextAnimated(
+                    text = data.genres.joinToString(" · ") { it.genreName },
+                    modifier = Modifier.textPadding()
+                )
+            }
 
             Title(stringResource(R.string.tags))
-            TextAnimated(
-                text = data.tags.joinToString(" · "),
-                modifier = Modifier.padding(8.dp)
-            )
+            if (data.tags.isNotEmpty()) ElevatedCard(
+                modifier = Modifier.padding(top = 8.dp),
+                elevation = CardDefaults.elevatedCardElevation(defaultElevation = 0.dp),
+                colors = CardDefaults.elevatedCardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
+            ) {
+                TextAnimated(
+                    text = data.tags.joinToString(" · "),
+                    modifier = Modifier.textPadding()
+                )
+            }
 
             Title(stringResource(R.string.related_books))
             if (data.relatedBooks.isEmpty())
                 TextAnimated(text = stringResource(id = R.string.none_found))
             Column(
-                verticalArrangement = Arrangement.spacedBy(8.dp)
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+                modifier = Modifier.padding(top = 8.dp),
             ) {
                 for (book in data.relatedBooks) MyButton(
                     text = book.title,
@@ -181,7 +198,8 @@ fun DatabaseBookInfoScreen(
             if (data.similarRecommended.isEmpty())
                 TextAnimated(text = stringResource(id = R.string.none_found))
             Column(
-                verticalArrangement = Arrangement.spacedBy(8.dp)
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+                modifier = Modifier.padding(top = 8.dp),
             ) {
                 for (book in data.similarRecommended) MyButton(
                     text = book.title,
@@ -215,16 +233,17 @@ private fun TextAnimated(
     AnimatedContent(
         targetState = text,
         transitionSpec = { fadeIn() with fadeOut() }, label = "",
-        modifier = modifier
+        modifier = modifier,
     ) { target ->
         Text(
             text = target,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
         )
     }
 }
 
-@PreviewThemes
+@Preview(heightDp = 1500)
+@Preview(heightDp = 1500, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 private fun PreviewView() {
     InternalTheme {
@@ -235,7 +254,9 @@ private fun PreviewView() {
                 description = "Novel description goes here and here to and a little more to fill lines",
                 coverImageUrl = "",
                 alternativeTitles = listOf("Title 1", "Title 2", "Title 3"),
-                authors = (1..3).map { DatabaseInterface.AuthorMetadata("Author $it", "page url") },
+                authors = (1..3).map {
+                    DatabaseInterface.AuthorMetadata("Author $it", "page url")
+                } + DatabaseInterface.AuthorMetadata("Author", null),
                 tags = (1..20).map { "tag $it" },
                 genres = (1..8).map { SearchGenre(genreName = "genre $it", id = "$it") },
                 bookType = "Web novel",
@@ -258,7 +279,7 @@ private fun PreviewView() {
             ),
             onSourcesClick = {},
             onAuthorsClick = {},
-            onGenresIdsClick = {},
+            onGenresClick = {},
             onBookClick = {},
         )
         Spacer(modifier = Modifier.height(200.dp))

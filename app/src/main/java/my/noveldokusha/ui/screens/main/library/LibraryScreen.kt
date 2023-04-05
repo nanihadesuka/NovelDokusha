@@ -32,7 +32,7 @@ fun LibraryScreen(
 
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
-        containerColor = MaterialTheme.colorScheme.surface,
+        containerColor = MaterialTheme.colorScheme.primary,
         topBar = {
             TopAppBar(
                 scrollBehavior = scrollBehavior,

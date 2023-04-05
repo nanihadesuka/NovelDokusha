@@ -44,7 +44,7 @@ fun ToolbarMain(
         horizontalArrangement = Arrangement.End,
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
-            .background(MaterialTheme.colorScheme.surface)
+            .background(MaterialTheme.colorScheme.primary)
             .fillMaxWidth()
             .padding(top = 8.dp, bottom = 0.dp, start = 12.dp, end = 12.dp)
             .height(56.dp)

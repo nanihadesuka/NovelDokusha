@@ -42,7 +42,7 @@ fun FinderScreen(
 
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
-        containerColor = MaterialTheme.colorScheme.surface,
+        containerColor = MaterialTheme.colorScheme.primary,
         topBar = {
             Column {
                 TopAppBar(

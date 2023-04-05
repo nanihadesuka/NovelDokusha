@@ -196,7 +196,7 @@ private fun SettingsRowList(
             MyIconButton(
                 icon = Icons.TwoTone.FormatSize,
                 selected = visibleSetting == CurrentSettingVisible.TextSize,
-                contentPadding = 8.dp,
+                contentPadding = PaddingValues(8.dp),
                 onClick = { toggleOrOpen(CurrentSettingVisible.TextSize) },
             )
         }
@@ -204,7 +204,7 @@ private fun SettingsRowList(
             MyIconButton(
                 icon = Icons.Default.FontDownload,
                 selected = visibleSetting == CurrentSettingVisible.TextFont,
-                contentPadding = 8.dp,
+                contentPadding = PaddingValues(8.dp),
                 onClick = { toggleOrOpen(CurrentSettingVisible.TextFont) },
             )
         }
@@ -212,7 +212,7 @@ private fun SettingsRowList(
             MyButton(
                 text = stringResource(id = R.string.live_translation),
                 selected = visibleSetting == CurrentSettingVisible.LiveTranslation,
-                contentPadding = 8.dp,
+                contentPadding = PaddingValues(8.dp),
                 onClick = { toggleOrOpen(CurrentSettingVisible.LiveTranslation) },
             )
         }
@@ -220,7 +220,7 @@ private fun SettingsRowList(
             MyButton(
                 text = stringResource(R.string.text_to_speech),
                 selected = visibleSetting == CurrentSettingVisible.TextToSpeech,
-                contentPadding = 8.dp,
+                contentPadding = PaddingValues(8.dp),
                 onClick = { toggleOrOpen(CurrentSettingVisible.TextToSpeech) },
             )
         }
@@ -228,7 +228,7 @@ private fun SettingsRowList(
             MyButton(
                 text = stringResource(id = R.string.theme),
                 selected = visibleSetting == CurrentSettingVisible.Theme,
-                contentPadding = 8.dp,
+                contentPadding = PaddingValues(8.dp),
                 onClick = { toggleOrOpen(CurrentSettingVisible.Theme) },
             )
         }
@@ -236,7 +236,7 @@ private fun SettingsRowList(
             MyButton(
                 text = stringResource(R.string.text_selection),
                 selected = visibleSetting == CurrentSettingVisible.SelectableText,
-                contentPadding = 8.dp,
+                contentPadding = PaddingValues(8.dp),
                 onClick = { toggleOrOpen(CurrentSettingVisible.SelectableText) },
             )
         }
