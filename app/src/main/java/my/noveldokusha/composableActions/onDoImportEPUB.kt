@@ -10,6 +10,8 @@ import my.noveldokusha.services.EpubImportService
 @Composable
 fun onDoImportEPUB(): () -> Unit {
     val context = LocalContext.current
+    val showDeniedPermissionDialog = rememberPermissionsDeniedDialog()
+
     val fileExplorer = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent(),
         onResult = { uri ->
@@ -21,8 +23,10 @@ fun onDoImportEPUB(): () -> Unit {
     val permissions = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission(),
     ) { isGranted ->
-        if (isGranted)
+        showDeniedPermissionDialog.value = !isGranted
+        if (isGranted) {
             fileExplorer.launch("application/epub+zip")
+        }
     }
 
     return { permissions.launch(Manifest.permission.READ_EXTERNAL_STORAGE) }

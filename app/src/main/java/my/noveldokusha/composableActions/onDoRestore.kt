@@ -10,6 +10,8 @@ import my.noveldokusha.services.RestoreDataService
 @Composable
 fun onDoRestore(): () -> Unit {
     val context = LocalContext.current
+    val showDeniedPermissionDialog = rememberPermissionsDeniedDialog()
+
     val fileExplorer = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent(),
         onResult = { uri ->
@@ -21,6 +23,7 @@ fun onDoRestore(): () -> Unit {
     val permissions = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission(),
     ) { isGranted ->
+        showDeniedPermissionDialog.value = !isGranted
         if (isGranted)
             fileExplorer.launch("application/*")
     }

@@ -164,4 +164,6 @@
     <string name="search_filter_action">Filter</string>
     <string name="clear_filters">Clear</string>
     <string name="filter_catalog">Catalog</string>
+	<string name="allow_the_denied_permissions_to_perform_the_action">Allow the denied permissions to perform the action</string>
+	<string name="app_settings">App settings</string>
 </resources>
