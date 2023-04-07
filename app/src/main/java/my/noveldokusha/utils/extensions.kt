@@ -80,7 +80,7 @@ fun Context.isServiceRunning(serviceClass: Class<*>): Boolean {
         .any { className == it.service.className }
 }
 
-fun Context.copyToClipboard(text: String) {
+fun Context.actionCopyToClipboard(text: String) {
     val clipboard = getSystemService(ComponentActivity.CLIPBOARD_SERVICE) as ClipboardManager
     clipboard.setPrimaryClip(ClipData.newPlainText("error message", text))
 }

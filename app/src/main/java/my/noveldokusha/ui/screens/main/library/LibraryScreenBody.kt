@@ -47,7 +47,8 @@ import my.noveldokusha.ui.composeViews.CollapsibleDivider
 import my.noveldokusha.ui.theme.ColorAccent
 import my.noveldokusha.ui.theme.ImageBorderShape
 
-@OptIn(ExperimentalMaterialApi::class, ExperimentalFoundationApi::class,
+@OptIn(
+    ExperimentalMaterialApi::class, ExperimentalFoundationApi::class,
     ExperimentalMaterial3Api::class
 )
 @Composable
@@ -84,7 +85,7 @@ fun LibraryScreenBody(
                             .tabIndicatorOffset(tabPos)
                             .fillMaxSize()
                             .padding(6.dp)
-                            .background(MaterialTheme.colorScheme.background, CircleShape)
+                            .background(MaterialTheme.colorScheme.primaryContainer, CircleShape)
                             .zIndex(-1f)
                     )
                 },

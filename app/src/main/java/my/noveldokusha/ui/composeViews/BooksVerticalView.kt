@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyGridState
@@ -39,6 +40,7 @@ fun BooksVerticalView(
     onReload: () -> Unit = {},
     onCopyError: (String) -> Unit = {},
     cells: GridCells = GridCells.Fixed(2),
+    innerPadding: PaddingValues = PaddingValues(),
 ) {
 
     val columns by remember(layoutMode, cells) {
@@ -59,7 +61,9 @@ fun BooksVerticalView(
     LazyVerticalGrid(
         columns = columns,
         state = state,
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(innerPadding),
         contentPadding = PaddingValues(start = 4.dp, end = 4.dp, top = 4.dp, bottom = 260.dp)
     ) {
         items(list) {

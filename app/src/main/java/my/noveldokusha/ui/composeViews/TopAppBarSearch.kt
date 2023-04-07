@@ -41,7 +41,7 @@ import my.noveldokusha.ui.theme.ColorAccent
 @Composable
 fun TopAppBarSearch(
     focusRequester: FocusRequester,
-    searchText: String,
+    searchTextInput: String,
     onSearchTextChange: (String) -> Unit,
     onClose: () -> Unit,
     onTextDone: (String) -> Unit,
@@ -77,12 +77,12 @@ fun TopAppBarSearch(
             },
             title = {
                 LaunchedEffect(Unit) {
-                    if (searchText.isEmpty() && inputEnabled) {
+                    if (searchTextInput.isEmpty() && inputEnabled) {
                         focusRequester.requestFocus()
                     }
                 }
                 TextField(
-                    value = searchText,
+                    value = searchTextInput,
                     onValueChange = onSearchTextChange,
                     textStyle = MaterialTheme.typography.bodyLarge,
                     singleLine = true,
@@ -103,8 +103,8 @@ fun TopAppBarSearch(
                         { Text(text = it) }
                     },
                     keyboardActions = KeyboardActions(onDone = {
-                        if (searchText.isNotBlank()) {
-                            onTextDone(searchText)
+                        if (searchTextInput.isNotBlank()) {
+                            onTextDone(searchTextInput)
                         }
                     }),
                     modifier = Modifier
@@ -118,7 +118,7 @@ fun TopAppBarSearch(
                     },
                     trailingIcon = {
                         AnimatedVisibility(
-                            visible = searchText.isNotEmpty(),
+                            visible = searchTextInput.isNotEmpty(),
                             enter = fadeIn() + expandIn(expandFrom = Alignment.Center),
                             exit = fadeOut() + shrinkOut(shrinkTowards = Alignment.Center)
                         ) {

@@ -1,8 +1,8 @@
 package my.noveldokusha.ui.screens.sourceCatalog
 
-import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.saveable
@@ -12,8 +12,6 @@ import kotlinx.coroutines.launch
 import my.noveldokusha.AppPreferences
 import my.noveldokusha.R
 import my.noveldokusha.data.BookMetadata
-import my.noveldokusha.data.Response
-import my.noveldokusha.network.PagedList
 import my.noveldokusha.network.PagedListIteratorState
 import my.noveldokusha.repository.Repository
 import my.noveldokusha.scraper.Scraper
@@ -37,33 +35,26 @@ class SourceCatalogViewModel @Inject constructor(
 
     override var sourceBaseUrl by StateExtra_String(state)
 
-    var searchText by state.saveable { mutableStateOf("") }
-    val listState = LazyGridState()
+    var searchTextInput by state.saveable { mutableStateOf("") }
     var toolbarMode by state.saveable { mutableStateOf(ToolbarMode.MAIN) }
 
     val source = scraper.getCompatibleSourceCatalog(sourceBaseUrl)!!
-    val fetchIterator =
-        PagedListIteratorState(viewModelScope) { source.getCatalogList(it).transform() }
+    val fetchIterator = PagedListIteratorState(viewModelScope) { source.getCatalogList(it) }
 
     init {
-        startCatalogListMode()
+        onSearchCatalog()
     }
 
-    val listLayout by appPreferences.BOOKS_LIST_LAYOUT_MODE.state(viewModelScope)
+    var booksListLayout by appPreferences.BOOKS_LIST_LAYOUT_MODE.state(viewModelScope)
 
-    private fun Response<PagedList<BookMetadata>>.transform() = when (val res = this) {
-        is Response.Error -> res
-        is Response.Success -> Response.Success(res.data)
-    }
-
-    fun startCatalogListMode() {
-        fetchIterator.setFunction { source.getCatalogList(it).transform() }
+    fun onSearchCatalog() {
+        fetchIterator.setFunction { source.getCatalogList(it) }
         fetchIterator.reset()
         fetchIterator.fetchNext()
     }
 
-    fun startCatalogSearchMode(input: String) {
-        fetchIterator.setFunction { source.getCatalogSearch(it, input).transform() }
+    fun onSearchText(input: String) {
+        fetchIterator.setFunction { source.getCatalogSearch(it, input) }
         fetchIterator.reset()
         fetchIterator.fetchNext()
     }

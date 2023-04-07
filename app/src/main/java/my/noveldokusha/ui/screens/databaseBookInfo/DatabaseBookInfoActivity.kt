@@ -81,7 +81,7 @@ class DatabaseBookInfoActivity : BaseActivity() {
     )
 
     private fun openBookInfo(book: BookMetadata) = goToDatabaseBookInfo(
-        book = book,
+        bookMetadata = book,
         databaseUrlBase = viewModel.database.baseUrl
     )
 }

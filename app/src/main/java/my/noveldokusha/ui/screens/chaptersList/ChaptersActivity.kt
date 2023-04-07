@@ -190,7 +190,7 @@ class ChaptersActivity : BaseActivity() {
                         ToolbarMode.SEARCH -> Surface(color = MaterialTheme.colorScheme.primary) {
                             TopAppBarSearch(
                                 focusRequester = focusRequester,
-                                searchText = viewModel.searchText,
+                                searchTextInput = viewModel.searchText,
                                 onSearchTextChange = { viewModel.searchText = it },
                                 onClose = {
                                     focusManager.clearFocus()

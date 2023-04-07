@@ -57,7 +57,9 @@ fun DatabaseBookInfoScreen(
 ) {
     val coverImg = data.coverImageUrl ?: R.drawable.ic_baseline_empty_24
     Column(
-        Modifier.verticalScroll(scrollState)
+        Modifier
+            .verticalScroll(scrollState)
+            .background(MaterialTheme.colorScheme.background)
     ) {
         Box {
             Box {

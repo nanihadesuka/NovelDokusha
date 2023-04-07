@@ -4,15 +4,18 @@ import androidx.annotation.StyleRes
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.ColorScheme
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.luminance
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import kotlinx.coroutines.flow.mapNotNull
@@ -42,7 +45,7 @@ private val light_ColorPalette = ColorScheme(
     onSurface = Grey900,
     surfaceVariant = Grey50,
     onSurfaceVariant = Grey900,
-    surfaceTint = Success400,
+    surfaceTint = Grey300,
     inverseSurface = Grey900,
     inverseOnSurface = Grey25,
     error = Error300,
@@ -68,13 +71,13 @@ private val dark_ColorPalette = ColorScheme(
     onTertiary = Grey300,
     tertiaryContainer = Grey600,
     onTertiaryContainer = Grey50,
-    background = Grey800,
+    background = Grey900,
     onBackground = Grey50,
     surface = Grey900,
     onSurface = Grey25,
-    surfaceVariant = Grey800,
+    surfaceVariant = Grey900,
     onSurfaceVariant = Grey50,
-    surfaceTint = Success800,
+    surfaceTint = Grey700,
     inverseSurface = Grey25,
     inverseOnSurface = Grey900,
     error = Error600,
@@ -184,7 +187,7 @@ fun InternalTheme(
     },
     content: @Composable () -> Unit
 ) {
-    val palette = when (theme) {
+    val colorScheme = when (theme) {
         Themes.LIGHT -> light_ColorPalette
         Themes.DARK -> dark_ColorPalette
         Themes.GREY -> grey_ColorPalette
@@ -193,16 +196,22 @@ fun InternalTheme(
 
     val systemUiController = rememberSystemUiController()
     systemUiController.setSystemBarsColor(
-        color = palette.primary,
+        color = colorScheme.primary,
         darkIcons = !theme.isDark
     )
 
-    MaterialTheme(
-        colorScheme = palette,
-        typography = typography,
-        shapes = shapes,
-        content = { wrapper { content() } }
-    )
+    val localContentColor by remember { derivedStateOf { Color.Red } }
+
+    CompositionLocalProvider(
+        LocalContentColor provides localContentColor
+    ) {
+        MaterialTheme(
+            colorScheme = colorScheme,
+            typography = typography,
+            shapes = shapes,
+            content = { wrapper { content() } }
+        )
+    }
 }
 
 // InternalTheme but for theming an object (wont try to fill all space)
@@ -216,7 +225,7 @@ fun InternalThemeObject(
     },
     content: @Composable () -> Unit
 ) {
-    val palette = when (theme) {
+    val colorScheme = when (theme) {
         Themes.LIGHT -> light_ColorPalette
         Themes.DARK -> dark_ColorPalette
         Themes.GREY -> grey_ColorPalette
@@ -225,14 +234,20 @@ fun InternalThemeObject(
 
     val systemUiController = rememberSystemUiController()
     systemUiController.setSystemBarsColor(
-        color = palette.primary,
+        color = colorScheme.primary,
         darkIcons = !theme.isDark
     )
 
-    MaterialTheme(
-        colorScheme = palette,
-        typography = typography,
-        shapes = shapes,
-        content = { wrapper { content() } }
-    )
+    val localContentColor by remember { derivedStateOf { colorScheme.onPrimary } }
+
+    CompositionLocalProvider(
+        LocalContentColor provides localContentColor
+    ) {
+        MaterialTheme(
+            colorScheme = colorScheme,
+            typography = typography,
+            shapes = shapes,
+            content = { wrapper { content() } }
+        )
+    }
 }

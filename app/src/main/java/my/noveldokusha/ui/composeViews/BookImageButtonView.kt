@@ -1,6 +1,8 @@
 package my.noveldokusha.ui.composeViews
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -18,11 +20,11 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import my.noveldokusha.R
 import my.noveldokusha.ui.theme.Grey25
@@ -36,7 +38,7 @@ enum class BookTitlePosition {
 }
 
 
-@OptIn(ExperimentalTextApi::class)
+@OptIn(ExperimentalTextApi::class, ExperimentalFoundationApi::class)
 @Composable
 fun BookImageButtonView(
     title: String,
@@ -47,67 +49,64 @@ fun BookImageButtonView(
     onLongClick: () -> Unit = { },
 ) {
     Column(modifier = modifier) {
-        MyButton(
-            text = title,
-            onClick = onClick,
-            onLongClick = onLongClick,
-            shape = ImageBorderShape,
-            borderWidth = Dp.Unspecified,
-        ) {
-            Box(
-                Modifier
-                    .fillMaxWidth()
-                    .aspectRatio(1 / 1.45f)
-                    .clip(ImageBorderShape)
-                    .background(MaterialTheme.colorScheme.background)
-            ) {
-                ImageView(
-                    imageModel = coverImageUrl,
-                    contentDescription = title,
-                    modifier = Modifier.fillMaxSize(),
-                    error = R.drawable.default_book_cover,
+        Box(
+            Modifier
+                .padding(4.dp)
+                .fillMaxWidth()
+                .aspectRatio(1 / 1.45f)
+                .clip(ImageBorderShape)
+                .background(MaterialTheme.colorScheme.primaryContainer)
+                .combinedClickable(
+                    role = Role.Button,
+                    onClick = onClick,
+                    onLongClick = onLongClick
                 )
-                if (bookTitlePosition == BookTitlePosition.Inside) {
-                    Text(
-                        text = title,
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .align(Alignment.BottomCenter)
-                            .background(
-                                Brush.verticalGradient(
-                                    0f to MaterialTheme.colorScheme.background.copy(alpha = 0.0f),
-                                    0.4f to MaterialTheme.colorScheme.background.copy(alpha = 0.2f),
-                                    1f to MaterialTheme.colorScheme.background.copy(alpha = 0.4f),
-                                )
-                            )
-                            .padding(top = 30.dp, bottom = 8.dp)
-                            .padding(horizontal = 8.dp),
-                        style = MaterialTheme.typography.bodySmall.copy(
-                            fontWeight = FontWeight.ExtraBold,
-                            color = Grey800,
-                            drawStyle = Stroke(
-                                miter = 4f,
-                                width = 4f,
-                                join = StrokeJoin.Miter
+        ) {
+            ImageView(
+                imageModel = coverImageUrl,
+                contentDescription = title,
+                modifier = Modifier.fillMaxSize(),
+                error = R.drawable.default_book_cover,
+            )
+            if (bookTitlePosition == BookTitlePosition.Inside) {
+                Text(
+                    text = title,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .align(Alignment.BottomCenter)
+                        .background(
+                            Brush.verticalGradient(
+                                0f to MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.0f),
+                                0.4f to MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.2f),
+                                1f to MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.4f),
                             )
                         )
-                    )
-                    Text(
-                        text = title,
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .align(Alignment.BottomCenter)
-                            .padding(top = 30.dp, bottom = 8.dp)
-                            .padding(horizontal = 8.dp),
-                        style = MaterialTheme.typography.bodySmall.copy(
-                            fontWeight = FontWeight.ExtraBold,
-                            color = Grey25,
+                        .padding(top = 30.dp, bottom = 8.dp)
+                        .padding(horizontal = 8.dp),
+                    style = MaterialTheme.typography.bodySmall.copy(
+                        fontWeight = FontWeight.ExtraBold,
+                        color = Grey800,
+                        drawStyle = Stroke(
+                            miter = 4f,
+                            width = 4f,
+                            join = StrokeJoin.Miter
                         )
                     )
-                }
-
+                )
+                Text(
+                    text = title,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .align(Alignment.BottomCenter)
+                        .padding(top = 30.dp, bottom = 8.dp)
+                        .padding(horizontal = 8.dp),
+                    style = MaterialTheme.typography.bodySmall.copy(
+                        fontWeight = FontWeight.ExtraBold,
+                        color = Grey25,
+                    )
+                )
             }
         }
         if (bookTitlePosition == BookTitlePosition.Outside) {

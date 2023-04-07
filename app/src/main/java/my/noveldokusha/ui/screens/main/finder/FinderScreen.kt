@@ -42,7 +42,6 @@ fun FinderScreen(
 
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
-        containerColor = MaterialTheme.colorScheme.primary,
         topBar = {
             Column {
                 TopAppBar(
@@ -73,9 +72,9 @@ fun FinderScreen(
                             )
                             LanguagesDropDown(
                                 expanded = languagesOptionsExpanded,
-                                list = viewModel.languagesList,
+                                sourceLanguageItemList = viewModel.languagesList,
                                 onDismiss = { languagesOptionsExpanded = false },
-                                onToggleLanguage = { viewModel.toggleSourceLanguage(it.language) }
+                                onSourceLanguageItemToggle = { viewModel.toggleSourceLanguage(it.language) }
                             )
                         }
                     }

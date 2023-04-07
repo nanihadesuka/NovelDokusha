@@ -80,6 +80,6 @@ class DatabaseSearchActivity : BaseActivity() {
 
     private fun openBookInfoPage(book: BookMetadata) = goToDatabaseBookInfo(
         databaseUrlBase = viewModel.extras.databaseBaseUrl,
-        book = book
+        bookMetadata = book
     )
 }

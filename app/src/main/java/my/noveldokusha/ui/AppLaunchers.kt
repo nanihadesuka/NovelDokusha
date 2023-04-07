@@ -13,6 +13,7 @@ import my.noveldokusha.ui.screens.databaseSearch.DatabaseSearchExtras
 import my.noveldokusha.ui.screens.globalSourceSearch.GlobalSourceSearchActivity
 import my.noveldokusha.ui.screens.reader.ReaderActivity
 import my.noveldokusha.ui.screens.sourceCatalog.SourceCatalogActivity
+import my.noveldokusha.ui.screens.webView.WebViewActivity
 
 fun Context.goToSourceCatalog(source: SourceInterface.Catalog) {
     SourceCatalogActivity
@@ -72,16 +73,19 @@ fun Context.goToDatabaseSearchGenres(
         .let(::startActivity)
 }
 
-fun Context.goToDatabaseBookInfo(book: BookMetadata, databaseUrlBase: String) {
+fun Context.goToDatabaseBookInfo(bookMetadata: BookMetadata, databaseUrlBase: String) {
     DatabaseBookInfoActivity
-        .IntentData(this, databaseUrlBase = databaseUrlBase, bookMetadata = book)
+        .IntentData(this, databaseUrlBase = databaseUrlBase, bookMetadata = bookMetadata)
         .let(::startActivity)
 }
 
-fun Context.goToBookChapters(book: BookMetadata) {
+fun Context.goToBookChapters(bookMetadata: BookMetadata) {
     ChaptersActivity
-        .IntentData(this, bookMetadata = BookMetadata(title = book.title, url = book.url))
+        .IntentData(this, bookMetadata = bookMetadata)
         .let(::startActivity)
 }
 
+fun Context.goToWebViewWithUrl(url: String) {
+    WebViewActivity.IntentData(this, url = url).let(::startActivity)
+}
 
