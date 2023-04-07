@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.MaterialTheme
@@ -103,3 +104,5 @@ fun Modifier.backgroundRounded(): Modifier = composed {
         shape = MaterialTheme.shapes.medium
     )
 }
+
+fun Modifier.textPadding() = padding(vertical = 8.dp, horizontal = 16.dp)

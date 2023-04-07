@@ -1,6 +1,12 @@
 package my.noveldokusha.utils
 
-import okhttp3.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import okhttp3.Call
+import okhttp3.Callback
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import okhttp3.Response
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import java.io.IOException
@@ -8,8 +14,8 @@ import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
 
-suspend fun Call.await(): Response {
-    return suspendCoroutine { continuation ->
+private suspend fun Call.await(): Response = withContext(Dispatchers.IO) {
+    suspendCoroutine { continuation ->
         enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
                 continuation.resumeWithException(e)
@@ -25,5 +31,5 @@ suspend fun Call.await(): Response {
 suspend fun OkHttpClient.call(builder: Request.Builder) = newCall(builder.build()).await()
 
 fun Response.toDocument(): Document {
-    return Jsoup.parse(body!!.string())
+    return Jsoup.parse(body.string())
 }

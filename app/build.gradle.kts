@@ -1,5 +1,5 @@
 import org.jetbrains.kotlin.konan.properties.hasProperty
-import java.util.*
+import java.util.Properties
 
 plugins {
     id("com.android.application")
@@ -192,6 +192,8 @@ dependencies {
 
     // Serialization
     implementation("com.google.code.gson:gson:2.10.1")
+    implementation("com.squareup.moshi:moshi:1.14.0")
+    implementation("com.squareup.moshi:moshi-kotlin:1.14.0")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.0")
 
     // Retrofit

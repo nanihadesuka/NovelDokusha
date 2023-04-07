@@ -1,6 +1,7 @@
 package my.noveldokusha.services.narratorMediaControls
 
 import android.app.Notification
+import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.TaskStackBuilder
 import android.content.ComponentName
@@ -13,8 +14,17 @@ import android.support.v4.media.session.PlaybackStateCompat
 import androidx.compose.runtime.snapshotFlow
 import androidx.core.app.NotificationCompat
 import androidx.media.session.MediaButtonReceiver
-import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.CoroutineName
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapNotNull
+import kotlinx.coroutines.launch
 import my.noveldokusha.R
 import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.ui.screens.chaptersList.ChaptersActivity
@@ -26,7 +36,6 @@ import my.noveldokusha.utils.NotificationsCenter
 import my.noveldokusha.utils.getPendingIntentCompat
 import my.noveldokusha.utils.text
 import my.noveldokusha.utils.title
-import timber.log.Timber
 
 class NarratorMediaControlsNotification(
     private val notificationsCenter: NotificationsCenter,
@@ -39,7 +48,6 @@ class NarratorMediaControlsNotification(
     private var mediaSession: MediaSessionCompat? = null
 
     fun handleCommand(intent: Intent?) {
-        Timber.d("> handleCommand intent: $intent")
         MediaButtonReceiver.handleIntent(mediaSession, intent)
     }
 
@@ -153,7 +161,10 @@ class NarratorMediaControlsNotification(
         }
 
         val notificationBuilder =
-            notificationsCenter.showNotification(NarratorMediaControlsService.channel_id) {
+            notificationsCenter.showNotification(
+                NarratorMediaControlsService.channel_id,
+                importance = NotificationManager.IMPORTANCE_LOW
+            ) {
                 title = ""
                 text = ""
                 defineActions(isPlaying = readerSession.readerTextToSpeech.settings.isPlaying.value)
@@ -162,7 +173,6 @@ class NarratorMediaControlsNotification(
                 priority = NotificationCompat.PRIORITY_HIGH
                 setLargeIcon(BitmapFactory.decodeResource(context.resources, R.mipmap.ic_logo))
                 setStyle(mediaStyle)
-                setSilent(true)
                 setDeleteIntent(cancelButton)
                 color = Color.CYAN
                 setContentIntent(

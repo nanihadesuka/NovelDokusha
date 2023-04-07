@@ -94,7 +94,7 @@ fun TextToSpeechSetting(
                     strokeWidth = 6.dp,
                     color = ColorAccent,
                     modifier = Modifier.background(
-                        MaterialTheme.colorScheme.surface.copy(alpha = 0.7f),
+                        MaterialTheme.colorScheme.primary.copy(alpha = 0.7f),
                         CircleShape
                     )
                 )

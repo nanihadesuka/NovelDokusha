@@ -4,10 +4,18 @@ import androidx.annotation.StyleRes
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.ColorScheme
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.luminance
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import kotlinx.coroutines.flow.mapNotNull
@@ -15,7 +23,7 @@ import my.noveldokusha.AppPreferences
 import my.noveldokusha.R
 
 @Composable
-fun ColorScheme.isDark() = this.background.luminance() <= 0.5
+fun ColorScheme.isLight() = this.background.luminance() > 0.5
 
 private val light_ColorPalette = ColorScheme(
     primary = Grey25,
@@ -23,29 +31,29 @@ private val light_ColorPalette = ColorScheme(
     primaryContainer = Grey50,
     onPrimaryContainer = Grey800,
     inversePrimary = Grey900,
-    secondary = Grey25,
+    secondary = Grey50,
     onSecondary = Grey900,
-    secondaryContainer = Grey50,
-    onSecondaryContainer = Grey800,
-    tertiary = Grey25,
-    onTertiary = Grey900,
+    secondaryContainer = ColorAccent,
+    onSecondaryContainer = Grey25,
+    tertiary = Grey200,
+    onTertiary = Grey600,
     tertiaryContainer = Grey50,
-    onTertiaryContainer = Grey800,
-    background = Grey25,
+    onTertiaryContainer = Grey900,
+    background = Grey50,
     onBackground = Grey900,
     surface = Grey25,
     onSurface = Grey900,
-    surfaceVariant = Grey25,
+    surfaceVariant = Grey50,
     onSurfaceVariant = Grey900,
     surfaceTint = Grey300,
     inverseSurface = Grey900,
-    inverseOnSurface = Grey50,
-    error = Error100,
+    inverseOnSurface = Grey25,
+    error = Error300,
     onError = Grey900,
-    errorContainer = Error50,
+    errorContainer = Error200,
     onErrorContainer = Grey800,
-    outline = Grey1000,
-    outlineVariant = Grey800,
+    outline = Grey800,
+    outlineVariant = Grey200,
     scrim = Grey300,
 )
 
@@ -57,27 +65,27 @@ private val dark_ColorPalette = ColorScheme(
     inversePrimary = Grey25,
     secondary = Grey900,
     onSecondary = Grey25,
-    secondaryContainer = Grey800,
-    onSecondaryContainer = Grey50,
-    tertiary = Grey900,
-    onTertiary = Grey25,
-    tertiaryContainer = Grey800,
+    secondaryContainer = ColorAccent,
+    onSecondaryContainer = Grey75,
+    tertiary = Grey700,
+    onTertiary = Grey300,
+    tertiaryContainer = Grey600,
     onTertiaryContainer = Grey50,
     background = Grey900,
-    onBackground = Grey25,
+    onBackground = Grey50,
     surface = Grey900,
     onSurface = Grey25,
     surfaceVariant = Grey900,
-    onSurfaceVariant = Grey25,
+    onSurfaceVariant = Grey50,
     surfaceTint = Grey700,
     inverseSurface = Grey25,
-    inverseOnSurface = Grey800,
-    error = Error900,
+    inverseOnSurface = Grey900,
+    error = Error600,
     onError = Grey25,
-    errorContainer = Error1000,
+    errorContainer = Error800,
     onErrorContainer = Grey50,
-    outline = Grey0,
-    outlineVariant = Grey25,
+    outline = Grey25,
+    outlineVariant = Grey700,
     scrim = Grey800,
 )
 
@@ -121,7 +129,12 @@ enum class Themes {
 @Composable
 fun Theme(
     appPreferences: AppPreferences,
-    wrapper: @Composable (fn: @Composable () -> @Composable Unit) -> Unit = { fn -> Surface(Modifier.fillMaxSize()) { fn() } },
+    wrapper: @Composable (fn: @Composable () -> @Composable Unit) -> Unit = { fn ->
+        Surface(
+            color = MaterialTheme.colorScheme.primary,
+            modifier = Modifier.fillMaxSize()
+        ) { fn() }
+    },
     content: @Composable () -> @Composable Unit,
 ) {
     // Done so the first load is not undefined (visually annoying)
@@ -166,10 +179,15 @@ fun Theme(
 @Composable
 fun InternalTheme(
     theme: Themes = if (isSystemInDarkTheme()) Themes.DARK else Themes.LIGHT,
-    wrapper: @Composable (fn: @Composable () -> Unit) -> Unit = { fn -> Surface(Modifier.fillMaxSize()) { fn() } },
+    wrapper: @Composable (fn: @Composable () -> Unit) -> Unit = { fn ->
+        Surface(
+            color = MaterialTheme.colorScheme.primary,
+            modifier = Modifier.fillMaxSize(),
+        ) { fn() }
+    },
     content: @Composable () -> Unit
 ) {
-    val palette = when (theme) {
+    val colorScheme = when (theme) {
         Themes.LIGHT -> light_ColorPalette
         Themes.DARK -> dark_ColorPalette
         Themes.GREY -> grey_ColorPalette
@@ -178,26 +196,36 @@ fun InternalTheme(
 
     val systemUiController = rememberSystemUiController()
     systemUiController.setSystemBarsColor(
-        color = palette.surface,
-        darkIcons = theme.isDark
+        color = colorScheme.primary,
+        darkIcons = !theme.isDark
     )
 
-    MaterialTheme(
-        colorScheme = palette,
-        typography = typography,
-        shapes = shapes,
-        content = { wrapper { content() } }
-    )
+    val localContentColor by remember { derivedStateOf { Color.Red } }
+
+    CompositionLocalProvider(
+        LocalContentColor provides localContentColor
+    ) {
+        MaterialTheme(
+            colorScheme = colorScheme,
+            typography = typography,
+            shapes = shapes,
+            content = { wrapper { content() } }
+        )
+    }
 }
 
 // InternalTheme but for theming an object (wont try to fill all space)
 @Composable
 fun InternalThemeObject(
     theme: Themes = if (isSystemInDarkTheme()) Themes.DARK else Themes.LIGHT,
-    wrapper: @Composable (fn: @Composable () -> Unit) -> Unit = { fn -> Surface { fn() } },
+    wrapper: @Composable (fn: @Composable () -> Unit) -> Unit = { fn ->
+        Surface(
+            color = MaterialTheme.colorScheme.primary,
+        ) { fn() }
+    },
     content: @Composable () -> Unit
 ) {
-    val palette = when (theme) {
+    val colorScheme = when (theme) {
         Themes.LIGHT -> light_ColorPalette
         Themes.DARK -> dark_ColorPalette
         Themes.GREY -> grey_ColorPalette
@@ -206,14 +234,20 @@ fun InternalThemeObject(
 
     val systemUiController = rememberSystemUiController()
     systemUiController.setSystemBarsColor(
-        color = palette.surface,
-        darkIcons = theme.isDark
+        color = colorScheme.primary,
+        darkIcons = !theme.isDark
     )
 
-    MaterialTheme(
-        colorScheme = palette,
-        typography = typography,
-        shapes = shapes,
-        content = { wrapper { content() } }
-    )
+    val localContentColor by remember { derivedStateOf { colorScheme.onPrimary } }
+
+    CompositionLocalProvider(
+        LocalContentColor provides localContentColor
+    ) {
+        MaterialTheme(
+            colorScheme = colorScheme,
+            typography = typography,
+            shapes = shapes,
+            content = { wrapper { content() } }
+        )
+    }
 }

@@ -7,11 +7,11 @@ import android.content.pm.PackageManager
 import android.os.Bundle
 import android.webkit.*
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import my.noveldokusha.R
 import my.noveldokusha.databinding.ActivityWebviewBinding
+import my.noveldokusha.di.AppCoroutineScope
 import my.noveldokusha.ui.BaseActivity
 import my.noveldokusha.utils.Extra_String
 import my.noveldokusha.utils.toUrl
@@ -20,7 +20,7 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class WebViewActivity : BaseActivity() {
     @Inject
-    lateinit var appScope: CoroutineScope
+    lateinit var appScope: AppCoroutineScope
 
     class IntentData : Intent {
         var url by Extra_String()

@@ -3,31 +3,51 @@ package my.noveldokusha.ui.screens.databaseSearch
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.os.Parcelable
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.state.ToggleableState
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.parcelize.Parcelize
 import my.noveldokusha.R
+import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.ui.BaseActivity
-import my.noveldokusha.ui.screens.databaseSearchResults.DatabaseSearchResultsActivity
+import my.noveldokusha.ui.goToDatabaseBookInfo
 import my.noveldokusha.ui.theme.Theme
-import my.noveldokusha.utils.Extra_String
-import my.noveldokusha.utils.capitalize
+import my.noveldokusha.utils.Extra_Parcelable
 import my.noveldokusha.utils.colorAttrRes
-import java.util.*
+
+
+sealed interface DatabaseSearchExtras : Parcelable {
+    val databaseBaseUrl: String
+
+    @Parcelize
+    data class Catalog(override val databaseBaseUrl: String) : DatabaseSearchExtras
+
+    @Parcelize
+    data class Genres(
+        override val databaseBaseUrl: String,
+        val includedGenresIds: List<String>,
+        val excludedGenresIds: List<String>,
+    ) : DatabaseSearchExtras
+
+    @Parcelize
+    data class Title(
+        override val databaseBaseUrl: String,
+        val title: String
+    ) : DatabaseSearchExtras
+}
 
 @AndroidEntryPoint
 class DatabaseSearchActivity : BaseActivity() {
+
     class IntentData : Intent, DatabaseSearchStateBundle {
-        override var databaseBaseUrl by Extra_String()
+        override var extras: DatabaseSearchExtras by Extra_Parcelable()
 
         constructor(intent: Intent) : super(intent)
-        constructor(ctx: Context, databaseBaseUrl: String) : super(
-            ctx,
-            DatabaseSearchActivity::class.java
+        constructor(ctx: Context, extras: DatabaseSearchExtras) : super(
+            ctx, DatabaseSearchActivity::class.java
         ) {
-            this.databaseBaseUrl = databaseBaseUrl
+            this.extras = extras
         }
     }
 
@@ -38,43 +58,28 @@ class DatabaseSearchActivity : BaseActivity() {
         window.statusBarColor = R.attr.colorSurface.colorAttrRes(this)
         setContent {
             Theme(appPreferences = appPreferences) {
-                DatabaseSearchView(
-                    title = stringResource(R.string.database),
-                    subtitle = viewModel.database.name.capitalize(Locale.ROOT),
-                    searchText = viewModel.searchText,
-                    genresList = viewModel.genresList,
-                    onTitleSearchClick = ::openSearchPageByTitle,
-                    onGenreSearchClick = ::openSearchPageByGenres,
-                    onSearchTextChange = { viewModel.searchText = it }
+                DatabaseSearchScreen(
+                    databaseName = viewModel.database.name,
+                    searchMode = viewModel.searchMode.value,
+                    searchInput = viewModel.inputSearch.value,
+                    genresList = viewModel.filtersSearch,
+                    onSearchCatalogSubmit = viewModel::onSearchCatalogSubmit,
+                    onSearchInputSubmit = viewModel::onSearchInputSubmit,
+                    onGenresFiltersSubmit = viewModel::onSearchGenresSubmit,
+                    onSearchInputChange = { viewModel.inputSearch.value = it },
+                    onSearchModeChange = { viewModel.searchMode.value = it },
+                    fetchIterator = viewModel.fetchIterator,
+                    listLayoutMode = viewModel.listLayout,
+                    onBookClicked = ::openBookInfoPage,
+                    onBookLongClicked = {},
+                    onPressBack = ::onBackPressed
                 )
             }
         }
     }
 
-    fun openSearchPageByGenres() {
-        val list = viewModel.genresList
-        val input = DatabaseSearchResultsActivity.SearchMode.Genres(
-            genresIncludeId = ArrayList(list.filter { it.state == ToggleableState.On }
-                .map { it.genreId }),
-            genresExcludeId = ArrayList(list.filter { it.state == ToggleableState.Indeterminate }
-                .map { it.genreId })
-        )
-
-        DatabaseSearchResultsActivity
-            .IntentData(
-                this@DatabaseSearchActivity,
-                databaseUrlBase = viewModel.database.baseUrl,
-                input = input
-            )
-            .let(this@DatabaseSearchActivity::startActivity)
-    }
-
-    fun openSearchPageByTitle(text: String) {
-        DatabaseSearchResultsActivity
-            .IntentData(
-                this@DatabaseSearchActivity,
-                databaseUrlBase = viewModel.database.baseUrl,
-                input = DatabaseSearchResultsActivity.SearchMode.Text(text = text)
-            ).let(this@DatabaseSearchActivity::startActivity)
-    }
+    private fun openBookInfoPage(book: BookMetadata) = goToDatabaseBookInfo(
+        databaseUrlBase = viewModel.extras.databaseBaseUrl,
+        bookMetadata = book
+    )
 }

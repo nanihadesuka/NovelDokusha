@@ -4,7 +4,7 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import kotlinx.coroutines.CoroutineScope
+import my.noveldokusha.di.AppCoroutineScope
 import my.noveldokusha.tools.TranslationManager
 import javax.inject.Singleton
 
@@ -14,7 +14,7 @@ object FullModule {
 
     @Provides
     @Singleton
-    fun provideTranslationManager(coroutineScope: CoroutineScope): TranslationManager {
+    fun provideTranslationManager(coroutineScope: AppCoroutineScope): TranslationManager {
         return TranslationManagerMLKit(coroutineScope)
     }
 }

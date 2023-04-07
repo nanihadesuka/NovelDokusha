@@ -9,7 +9,7 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.asLiveData
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.drop
-import my.noveldokusha.AppModule
+import my.noveldokusha.di.AppModule
 import my.noveldokusha.AppPreferences
 import my.noveldokusha.R
 import javax.inject.Inject

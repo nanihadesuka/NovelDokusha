@@ -1,17 +1,18 @@
 package my.noveldokusha.network
 
 import my.noveldokusha.data.Response
+import my.noveldokusha.data.flatMapError
 import my.noveldokusha.data.flatten
-import my.noveldokusha.data.mapError
-import my.noveldokusha.utils.tryAsResult
+import my.noveldokusha.utils.tryAsResponse
 import java.net.SocketTimeoutException
 
 suspend fun <T> tryConnect(
     extraErrorInfo: String = "",
     call: suspend () -> Response<T>
 ): Response<T> =
-    tryAsResult { call() }.flatten()
-        .mapError {
+    tryAsResponse { call() }
+        .flatten()
+        .flatMapError {
             when (it.exception) {
                 is SocketTimeoutException -> {
                     val error = listOf(

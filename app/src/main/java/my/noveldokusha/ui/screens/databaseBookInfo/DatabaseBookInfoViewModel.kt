@@ -6,17 +6,12 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import my.noveldokusha.data.BookMetadata
-import my.noveldokusha.network.NetworkClient
 import my.noveldokusha.scraper.DatabaseInterface
 import my.noveldokusha.scraper.Scraper
 import my.noveldokusha.ui.BaseViewModel
 import my.noveldokusha.utils.StateExtra_String
-import my.noveldokusha.utils.toDocument
-import my.noveldokusha.utils.tryAsResult
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -31,7 +26,6 @@ interface DatabaseBookInfoStateBundle {
 @HiltViewModel
 class DatabaseBookInfoViewModel @Inject constructor(
     state: SavedStateHandle,
-    private val networkClient: NetworkClient,
     private val scraper: Scraper
 ) : BaseViewModel(), DatabaseBookInfoStateBundle {
     override var databaseUrlBase: String by StateExtra_String(state)
@@ -56,18 +50,11 @@ class DatabaseBookInfoViewModel @Inject constructor(
     )
 
     init {
-        viewModelScope.launch(Dispatchers.IO) {
-            tryAsResult {
-                val doc = networkClient.get(bookMetadata.url).toDocument()
-                val data = withContext(Dispatchers.Default) {
-                    scraper.getCompatibleDatabase(databaseUrlBase)!!.getBookData(doc)
-                }
-                withContext(Dispatchers.Main) {
-                    bookData = data
-                }
-            }.onError {
-                Timber.d(it.exception)
-            }
+
+        viewModelScope.launch {
+            database.getBookData(bookMetadata.url)
+                .onSuccess { bookData = it }
+                .onError { Timber.d(it.exception) }
         }
     }
 }

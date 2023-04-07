@@ -1,4 +1,4 @@
-package my.noveldokusha
+package my.noveldokusha.di
 
 import android.content.Context
 import dagger.Module
@@ -7,9 +7,10 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.CoroutineName
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import my.noveldokusha.App
+import my.noveldokusha.AppPreferences
 import my.noveldokusha.data.database.AppDatabase
 import my.noveldokusha.data.database.AppDatabaseOperations
 import my.noveldokusha.network.NetworkClient
@@ -31,6 +32,7 @@ object AppModule {
     const val mainDatabaseName = "bookEntry"
 
     @Provides
+    @Singleton
     fun providesApp(@ApplicationContext context: Context): App {
         return context as App
     }
@@ -104,8 +106,11 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideAppCoroutineScope(): CoroutineScope {
-        return CoroutineScope(SupervisorJob() + Dispatchers.Main + CoroutineName("App"))
+    fun provideAppCoroutineScope(): AppCoroutineScope {
+        return object : AppCoroutineScope {
+            override val coroutineContext =
+                SupervisorJob() + Dispatchers.Main.immediate + CoroutineName("App")
+        }
     }
 
     @Provides
@@ -130,9 +135,16 @@ object AppModule {
         repository: Repository,
         translationManager: TranslationManager,
         appPreferences: AppPreferences,
+        appCoroutineScope: AppCoroutineScope,
         @ApplicationContext context: Context
     ): ReaderManager {
-        return ReaderManager(repository, translationManager, appPreferences, context)
+        return ReaderManager(
+            repository,
+            translationManager,
+            appPreferences,
+            context,
+            appScope = appCoroutineScope
+        )
     }
 
     @Provides
@@ -144,8 +156,7 @@ object AppModule {
     @Provides
     @Singleton
     fun provideScraperRepository(
-        appPreferences: AppPreferences,
-        scraper: Scraper
+        appPreferences: AppPreferences, scraper: Scraper
     ): ScraperRepository {
         return ScraperRepository(appPreferences, scraper)
     }
@@ -160,8 +171,7 @@ object AppModule {
 
     @Provides
     fun provideNarratorMediaControlsNotification(
-        notificationsCenter: NotificationsCenter,
-        readerManager: ReaderManager
+        notificationsCenter: NotificationsCenter, readerManager: ReaderManager
     ): NarratorMediaControlsNotification {
         return NarratorMediaControlsNotification(notificationsCenter, readerManager)
     }

@@ -3,6 +3,7 @@ package my.noveldokusha.ui.screens.reader.manager
 import android.content.Context
 import kotlinx.coroutines.*
 import my.noveldokusha.AppPreferences
+import my.noveldokusha.di.AppCoroutineScope
 import my.noveldokusha.repository.Repository
 import my.noveldokusha.tools.TranslationManager
 import my.noveldokusha.ui.screens.reader.tools.InitialPositionChapter
@@ -20,8 +21,9 @@ class ReaderManager(
     private val translationManager: TranslationManager,
     private val appPreferences: AppPreferences,
     private val context: Context,
+    private val appScope: AppCoroutineScope,
     private val scope: CoroutineScope = CoroutineScope(
-        SupervisorJob() + Dispatchers.Default + CoroutineName("Reader")
+        SupervisorJob() + Dispatchers.Default + CoroutineName("ReaderManager")
     )
 ) : ReaderManagerViewCallReferences {
 
@@ -59,6 +61,7 @@ class ReaderManager(
             bookUrl = bookUrl,
             initialChapterUrl = chapterUrl,
             scope = scope,
+            appScope = appScope,
             repository = repository,
             translationManager = translationManager,
             appPreferences = appPreferences,

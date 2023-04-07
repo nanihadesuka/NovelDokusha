@@ -4,7 +4,12 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.lazy.grid.*
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.GridItemSpan
+import androidx.compose.foundation.lazy.grid.LazyGridState
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -35,6 +40,7 @@ fun BooksVerticalView(
     onReload: () -> Unit = {},
     onCopyError: (String) -> Unit = {},
     cells: GridCells = GridCells.Fixed(2),
+    innerPadding: PaddingValues = PaddingValues(),
 ) {
 
     val columns by remember(layoutMode, cells) {
@@ -55,7 +61,9 @@ fun BooksVerticalView(
     LazyVerticalGrid(
         columns = columns,
         state = state,
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(innerPadding),
         contentPadding = PaddingValues(start = 4.dp, end = 4.dp, top = 4.dp, bottom = 260.dp)
     ) {
         items(list) {
@@ -75,7 +83,7 @@ fun BooksVerticalView(
             }
         }
 
-        item(span = { GridItemSpan(maxCurrentLineSpan) }) {
+        item(span = { GridItemSpan(maxLineSpan) }) {
             Box(
                 contentAlignment = Alignment.Center,
                 modifier = Modifier
@@ -98,7 +106,7 @@ fun BooksVerticalView(
             }
         }
 
-        if (error != null) item(span = { GridItemSpan(maxCurrentLineSpan) }) {
+        if (error != null) item(span = { GridItemSpan(maxLineSpan) }) {
             ErrorView(error = error, onReload = onReload, onCopyError = onCopyError)
         }
     }

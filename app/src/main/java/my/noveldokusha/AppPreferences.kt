@@ -1,8 +1,10 @@
+@file:Suppress("PropertyName")
+
 package my.noveldokusha
 
 import android.content.Context
 import android.content.SharedPreferences
-import androidx.compose.runtime.State
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.preference.PreferenceManager
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -138,7 +140,9 @@ class AppPreferences @Inject constructor(
         }
 
     enum class TERNARY_STATE {
-        active, inverse, inactive;
+        active,
+        inverse,
+        inactive;
 
         fun next() = when (this) {
             active -> inverse
@@ -152,7 +156,9 @@ class AppPreferences @Inject constructor(
     abstract inner class Preference<T>(val name: String) {
         abstract var value: T
         fun flow() = toFlow(name) { value }.flowOn(Dispatchers.IO)
-        fun state(scope: CoroutineScope) = toState(scope, name) { value }
+        fun state(scope: CoroutineScope) = toState(
+            scope = scope, key = name, mapper = { value }, setter = { value = it }
+        )
     }
 
     /**
@@ -178,15 +184,37 @@ class AppPreferences @Inject constructor(
             }.flowOn(Dispatchers.Default)
     }
 
-    fun <T> toState(scope: CoroutineScope, key: String, mapper: (String) -> T): State<T> {
-        val state = mutableStateOf(mapper(key))
-        scope.launch(Dispatchers.IO) {
-            toFlow(key, mapper).collect {
-                withContext(Dispatchers.Main) {
-                    state.value = it
+    /**
+     * This custom implementation has probably some details wrong
+     * Use only OUTSIDE of composable scope (e.g. viewModel)
+     */
+    fun <T> toState(
+        scope: CoroutineScope,
+        key: String,
+        mapper: (String) -> T,
+        setter: (T) -> Unit
+    ): MutableState<T> = object : MutableState<T> {
+
+        private val internalValue = mutableStateOf<T>(mapper(key))
+        override var value: T
+            get() = internalValue.value
+            set(newValue) {
+                if (internalValue.value != newValue) {
+                    setter(newValue)
+                }
+            }
+
+        init {
+            scope.launch(Dispatchers.IO) {
+                toFlow(key, mapper).collect {
+                    withContext(Dispatchers.Main) {
+                        internalValue.value = it
+                    }
                 }
             }
         }
-        return state
+
+        override fun component1(): T = value
+        override fun component2() = ::value::set
     }
 }

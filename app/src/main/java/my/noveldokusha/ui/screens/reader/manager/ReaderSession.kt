@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.take
 import my.noveldokusha.AppPreferences
 import my.noveldokusha.data.database.tables.Chapter
+import my.noveldokusha.di.AppCoroutineScope
 import my.noveldokusha.repository.Repository
 import my.noveldokusha.services.narratorMediaControls.NarratorMediaControlsService
 import my.noveldokusha.tools.TranslationManager
@@ -26,6 +27,7 @@ class ReaderSession(
     val bookUrl: String,
     initialChapterUrl: String,
     private val scope: CoroutineScope,
+    private val appScope: AppCoroutineScope,
     private val repository: Repository,
     translationManager: TranslationManager,
     private val appPreferences: AppPreferences,
@@ -277,27 +279,42 @@ class ReaderSession(
     private fun saveLastReadPositionState(
         newChapter: ChapterState,
         oldChapter: ChapterState? = null,
-        scope: CoroutineScope = CoroutineScope(Dispatchers.IO) // We want it to survive
     ) {
-        scope.launch {
-            repository.withTransaction {
-                repository.libraryBooks.updateLastReadChapter(
-                    bookUrl = bookUrl,
-                    lastReadChapterUrl = newChapter.chapterUrl
-                )
+        saveBookLastReadPositionState(
+            bookUrl = bookUrl,
+            newChapter = newChapter,
+            oldChapter = oldChapter,
+            scope = appScope,
+            repository = repository,
+        )
+    }
+}
 
-                if (oldChapter?.chapterUrl != null) repository.bookChapters.updatePosition(
-                    chapterUrl = oldChapter.chapterUrl,
-                    lastReadPosition = oldChapter.chapterItemPosition,
-                    lastReadOffset = oldChapter.offset
-                )
+private fun saveBookLastReadPositionState(
+    bookUrl: String,
+    newChapter: ChapterState,
+    oldChapter: ChapterState? = null,
+    scope: AppCoroutineScope,
+    repository: Repository,
+) {
+    scope.launch(Dispatchers.IO) {
+        repository.withTransaction {
+            repository.libraryBooks.updateLastReadChapter(
+                bookUrl = bookUrl,
+                lastReadChapterUrl = newChapter.chapterUrl
+            )
 
-                repository.bookChapters.updatePosition(
-                    chapterUrl = newChapter.chapterUrl,
-                    lastReadPosition = newChapter.chapterItemPosition,
-                    lastReadOffset = newChapter.offset
-                )
-            }
+            if (oldChapter?.chapterUrl != null) repository.bookChapters.updatePosition(
+                chapterUrl = oldChapter.chapterUrl,
+                lastReadPosition = oldChapter.chapterItemPosition,
+                lastReadOffset = oldChapter.offset
+            )
+
+            repository.bookChapters.updatePosition(
+                chapterUrl = newChapter.chapterUrl,
+                lastReadPosition = newChapter.chapterItemPosition,
+                lastReadOffset = newChapter.offset
+            )
         }
     }
 }

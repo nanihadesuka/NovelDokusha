@@ -35,12 +35,12 @@ import my.noveldokusha.R
 import my.noveldokusha.data.ChapterWithContext
 import my.noveldokusha.data.database.tables.Chapter
 import my.noveldokusha.rememberResolvedBookImagePath
+import my.noveldokusha.ui.composeViews.ErrorView
 import my.noveldokusha.ui.composeViews.ImageView
 import my.noveldokusha.ui.theme.ColorAccent
 import my.noveldokusha.ui.theme.ImageBorderShape
 import my.noveldokusha.ui.theme.InternalTheme
 import my.noveldokusha.ui.theme.Themes
-import my.noveldokusha.ui.composeViews.ErrorView
 import my.noveldokusha.utils.ifCase
 import my.noveldokusha.utils.mix
 
@@ -81,8 +81,8 @@ fun HeaderView(
                     .align(Alignment.BottomCenter)
                     .background(
                         Brush.verticalGradient(
-                            0f to MaterialTheme.colorScheme.surface.copy(alpha = 0f),
-                            1f to MaterialTheme.colorScheme.surface,
+                            0f to MaterialTheme.colorScheme.primary.copy(alpha = 0f),
+                            1f to MaterialTheme.colorScheme.primary,
                         )
                     )
             )
@@ -110,7 +110,7 @@ fun HeaderView(
                 ) {
                     Text(
                         text = bookTitle,
-                        style = MaterialTheme.typography.headlineMedium,
+                        style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.Bold,
                         modifier = Modifier.padding(bottom = 10.dp)
                     )
@@ -122,7 +122,7 @@ fun HeaderView(
                     )
                     Text(
                         text = stringResource(id = R.string.chapters) + " " + numberOfChapters.toString(),
-                        style = MaterialTheme.typography.labelLarge,
+                        style = MaterialTheme.typography.labelMedium,
                         fontWeight = FontWeight.Bold,
                         modifier = Modifier.padding(bottom = 8.dp)
                     )
@@ -156,6 +156,7 @@ fun HeaderView(
             Text(
                 text = description,
                 maxLines = maxLines,
+                style = MaterialTheme.typography.bodyMedium,
                 overflow = TextOverflow.Ellipsis,
                 modifier = Modifier
                     .padding(8.dp)
@@ -184,9 +185,9 @@ fun ChaptersListView(
 ) {
 
     val backgroundColorSelected =
-        MaterialTheme.colorScheme.onPrimary.mix(MaterialTheme.colorScheme.surface, 0.1f)
+        MaterialTheme.colorScheme.onPrimary.mix(MaterialTheme.colorScheme.primary, 0.1f)
     val backgroundColorUnselected =
-        MaterialTheme.colorScheme.onPrimary.mix(MaterialTheme.colorScheme.surface, 0.5f)
+        MaterialTheme.colorScheme.onPrimary.mix(MaterialTheme.colorScheme.primary, 0.5f)
     val colorTextRead = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.5f)
     val colorTextNotRead = MaterialTheme.colorScheme.onPrimary
     val colorIconSeenRead = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.5f)
@@ -194,8 +195,8 @@ fun ChaptersListView(
     val colorIconDownloadedRead = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.5f)
     val colorIconDownloadedNotRead = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0f)
 
-    val backgroundColorNotSelectedRead = MaterialTheme.colorScheme.surface.mix(ColorAccent, 0.8f)
-    val backgroundColorNotSelectedNotRead = MaterialTheme.colorScheme.surface
+    val backgroundColorNotSelectedRead = MaterialTheme.colorScheme.primary.mix(ColorAccent, 0.8f)
+    val backgroundColorNotSelectedNotRead = MaterialTheme.colorScheme.primary
     val backgroundColorSelectedRead = backgroundColorSelected.mix(ColorAccent, 0.8f)
     val backgroundColorSelectedNotRead = backgroundColorSelected
 
@@ -219,11 +220,11 @@ fun ChaptersListView(
                 } else {
                     if (it.lastReadChapter) backgroundColorNotSelectedRead
                     else backgroundColorNotSelectedNotRead
-                }
+                }, label = ""
             )
 
             val indicatorColor = when (selected) {
-                true -> MaterialTheme.colorScheme.surface
+                true -> MaterialTheme.colorScheme.primary
                 false -> backgroundColorUnselected
             }
 
@@ -244,15 +245,18 @@ fun ChaptersListView(
             ) {
 
                 val colorText by animateColorAsState(
-                    targetValue = if (it.chapter.read) colorTextRead else colorTextNotRead
+                    targetValue = if (it.chapter.read) colorTextRead else colorTextNotRead,
+                    label = ""
                 )
 
                 val colorIconSeen by animateColorAsState(
-                    targetValue = if (it.chapter.read) colorIconSeenRead else colorIconSeenNotRead
+                    targetValue = if (it.chapter.read) colorIconSeenRead else colorIconSeenNotRead,
+                    label = ""
                 )
 
                 val colorIconDownloaded by animateColorAsState(
-                    targetValue = if (it.downloaded) colorIconDownloadedRead else colorIconDownloadedNotRead
+                    targetValue = if (it.downloaded) colorIconDownloadedRead else colorIconDownloadedNotRead,
+                    label = ""
                 )
 
                 AnimatedContent(
@@ -263,12 +267,13 @@ fun ChaptersListView(
                         else
                             fadeIn() with fadeOut()
                     },
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier.weight(1f), label = "",
                 ) { targetText ->
                     Text(
                         text = targetText,
                         modifier = Modifier.fillMaxWidth(),
-                        color = colorText
+                        color = colorText,
+                        style = MaterialTheme.typography.bodyMedium
                     )
                 }
                 Icon(

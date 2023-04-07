@@ -5,7 +5,12 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import my.noveldokusha.data.Response
 
 /**
@@ -23,9 +28,7 @@ class PagedListIteratorState<T>(
     private var job: Job? = null
 
     var state by mutableStateOf(IteratorState.IDLE)
-        private set
     var error by mutableStateOf<String?>(null)
-        private set
 
     fun reset() {
         job?.cancel()
@@ -45,6 +48,11 @@ class PagedListIteratorState<T>(
         fetchNext()
     }
 
+    val hasFinished
+        get() = state == IteratorState.CONSUMED ||
+                (state == IteratorState.IDLE && list.size != 0) ||
+                error != null
+
     fun fetchNext() {
         if (state != IteratorState.IDLE) return
         state = IteratorState.LOADING
@@ -57,6 +65,7 @@ class PagedListIteratorState<T>(
                     list.addAll(res.data.list)
                     if (res.data.hasNoNextPage) IteratorState.CONSUMED else IteratorState.IDLE
                 }
+
                 is Response.Error -> {
                     error = res.message
                     IteratorState.CONSUMED

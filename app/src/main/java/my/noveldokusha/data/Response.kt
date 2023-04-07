@@ -12,8 +12,8 @@ sealed class Response<out T> {
         is Success -> this
     }
 
-    inline fun onSuccess(call: (Success<T>) -> Unit) = apply {
-        if (this is Success) call(this)
+    inline fun onSuccess(call: (T) -> Unit) = apply {
+        if (this is Success) call(data)
     }
 
     inline fun onError(call: (Error) -> Unit) = apply {
@@ -27,11 +27,28 @@ suspend inline fun <T, R> Response<T>.map(crossinline call: suspend (T) -> R): R
         is Success -> Success(call(data))
     }
 
-suspend inline fun <T> Response<T>.mapError(crossinline call: suspend (Error) -> Error): Response<T> =
+suspend inline fun <T> Response<T>.mapError(crossinline call: suspend (Error) -> T): Response<T> =
+    when (this) {
+        is Error -> Success(call(this))
+        is Success -> Success(data)
+    }
+
+suspend inline fun <T, R> Response<T>.flatMap(crossinline call: suspend (T) -> Response<R>): Response<R> =
+    when (this) {
+        is Error -> this
+        is Success -> call(data)
+    }
+
+suspend inline fun <T> Response<T>.flatMapError(crossinline call: suspend (Error) -> Response<T>): Response<T> =
     when (this) {
         is Error -> call(this)
         is Success -> this
     }
+
+fun <T> Response<T?>.asNotNull(): Response<T> = when (this) {
+    is Error -> this
+    is Success -> if (data == null) Error("null", NullPointerException()) else Success(data)
+}
 
 fun <T> Response<Response<T>>.flatten(): Response<T> =
     when (this) {

@@ -64,7 +64,7 @@ private fun MySliderBase(
     value: Float,
     onValueChange: (Float) -> Unit,
     height: Dp = selectableMinHeight,
-    backgroundColor: Color = ColorAccent.mix(MaterialTheme.colorScheme.surface, 0.5f),
+    backgroundColor: Color = ColorAccent.mix(MaterialTheme.colorScheme.primary, 0.5f),
     trackColor: Color = ColorAccent,
 ) {
     val currentValue by rememberUpdatedState(newValue = value)
