@@ -3,13 +3,22 @@ package my.noveldokusha.ui.theme
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.material.Chip
-import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Face
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.outlined.DataThresholding
+import androidx.compose.material.icons.outlined.LooksOne
 import androidx.compose.material.icons.outlined.Settings
+import androidx.compose.material.icons.outlined.TwoWheeler
 import androidx.compose.material3.AssistChip
+import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ElevatedAssistChip
 import androidx.compose.material3.ElevatedButton
@@ -30,14 +39,25 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconToggleButton
 import androidx.compose.material3.InputChip
 import androidx.compose.material3.LargeFloatingActionButton
+import androidx.compose.material3.LargeTopAppBar
+import androidx.compose.material3.ListItem
+import androidx.compose.material3.MediumTopAppBar
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.OutlinedIconButton
 import androidx.compose.material3.OutlinedIconToggleButton
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
+import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SuggestionChip
+import androidx.compose.material3.Switch
+import androidx.compose.material3.Tab
+import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
 
@@ -128,7 +148,7 @@ private fun PreviewButtons() {
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Preview(group = "card & chip")
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES, group = "card & chip")
 @Composable
@@ -158,9 +178,6 @@ private fun PreviewCards() {
             Divider()
 
             // Chips
-            Chip(onClick = {}) {
-                Text(text = "Card")
-            }
             SuggestionChip(
                 onClick = {},
                 label = { Text(text = "SuggestionChip") }
@@ -208,6 +225,131 @@ private fun PreviewCards() {
                     label = { Text(text = "InputChip true") }
                 )
             }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Preview(group = "miscellaneous")
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES, group = "miscellaneous")
+@Composable
+private fun PreviewMiscellaneous() {
+    InternalTheme {
+        Column {
+            BottomAppBar {
+                IconButton(onClick = { }) { Icon(Icons.Filled.Home, null) }
+                IconButton(onClick = { }) { Icon(Icons.Filled.Home, null) }
+                IconButton(onClick = { }) { Icon(Icons.Filled.Home, null) }
+            }
+            CenterAlignedTopAppBar(
+                title = { Text(text = "CenterAlignedTopAppBar") },
+                navigationIcon = { Icon(Icons.Filled.Menu, null) },
+                actions = { Icon(Icons.Filled.Person, null) }
+            )
+
+            LargeTopAppBar(
+                title = { Text(text = "LargeTopAppBar") },
+                navigationIcon = { Icon(Icons.Filled.Menu, null) },
+                actions = { Icon(Icons.Filled.Person, null) }
+            )
+            MediumTopAppBar(
+                title = { Text(text = "MediumTopAppBar") },
+                navigationIcon = { Icon(Icons.Filled.Menu, null) },
+                actions = { Icon(Icons.Filled.Person, null) }
+            )
+            TabRow(selectedTabIndex = 1) {
+                Tab(selected = true, onClick = {}) { Text(text = "1") }
+                Tab(selected = false, onClick = {}) { Text(text = "2") }
+                Tab(selected = false, onClick = {}) { Text(text = "3") }
+            }
+            NavigationBar {
+                NavigationBarItem(
+                    selected = true, onClick = { },
+                    icon = { Icon(Icons.Outlined.LooksOne, null) },
+                    label = { Text(text = "1") },
+                )
+                NavigationBarItem(
+                    selected = false, onClick = { },
+                    icon = { Icon(Icons.Outlined.TwoWheeler, null) },
+                    label = { Text(text = "2") },
+                )
+                NavigationBarItem(
+                    selected = false, onClick = { },
+                    icon = { Icon(Icons.Outlined.DataThresholding, null) },
+                    label = { Text(text = "3") },
+                )
+            }
+            ListItem(
+                overlineContent = { Text(text = "overlineContent") },
+                headlineContent = { Text(text = "Headline") },
+                supportingContent = { Text(text = "supportingContent") },
+                leadingContent = { Icon(Icons.Filled.Face, null) },
+                trailingContent = { Icon(Icons.Filled.Face, null) },
+            )
+            // Other stuff
+            Snackbar {
+                Text(text = "Snackbar")
+            }
+            Row {
+                Switch(checked = false, onCheckedChange = {})
+                Switch(checked = true, onCheckedChange = {})
+            }
+            Row {
+                Checkbox(checked = false, onCheckedChange = {})
+                Checkbox(checked = true, onCheckedChange = {})
+            }
+        }
+    }
+}
+
+
+@Preview(group = "textfields")
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES, group = "textfields")
+@Composable
+private fun PreviewTextFields() {
+    InternalTheme {
+        Column {
+            Text(text = "Text")
+            TextField(
+                value = "TextField",
+                onValueChange = {},
+                label = { Text("label") },
+                placeholder = { Text("placeholder") },
+                leadingIcon = { Icon(Icons.Filled.Person, null) },
+                trailingIcon = { Icon(Icons.Filled.Person, null) },
+                isError = false,
+            )
+            TextField(
+                value = "TextField error",
+                onValueChange = {},
+                label = { Text("label") },
+                placeholder = { Text("placeholder") },
+                leadingIcon = { Icon(Icons.Filled.Person, null) },
+                trailingIcon = { Icon(Icons.Filled.Person, null) },
+                isError = true,
+            )
+            OutlinedTextField(
+                value = "OutlinedTextField",
+                onValueChange = {},
+                label = { Text("label") },
+                placeholder = { Text("placeholder") },
+                leadingIcon = { Icon(Icons.Filled.Person, null) },
+                trailingIcon = { Icon(Icons.Filled.Person, null) },
+                isError = false,
+            )
+            OutlinedTextField(
+                value = "OutlinedTextField error",
+                onValueChange = {},
+                label = { Text("label") },
+                placeholder = { Text("placeholder") },
+                leadingIcon = { Icon(Icons.Filled.Person, null) },
+                trailingIcon = { Icon(Icons.Filled.Person, null) },
+                isError = true,
+            )
+            BasicTextField(
+                value = "BasicTextField",
+                onValueChange = {},
+            )
         }
     }
 }
