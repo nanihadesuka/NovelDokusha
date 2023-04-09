@@ -69,6 +69,14 @@ fun Modifier.clickableWithUnboundedIndicator(onClick: () -> Unit) = composed {
     )
 }
 
+fun Modifier.clickableNoIndicator(onClick: () -> Unit) = composed {
+    clickable(
+        interactionSource = remember { MutableInteractionSource() },
+        indication = null,
+        onClick = onClick
+    )
+}
+
 fun Modifier.debouncedClickable(waitMillis: Long = 250, action: () -> Unit) = composed {
     clickable(
         onClick = debouncedAction(waitMillis = waitMillis, action = action)

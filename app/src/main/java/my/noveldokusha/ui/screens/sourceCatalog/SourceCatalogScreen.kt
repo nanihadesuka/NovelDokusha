@@ -35,6 +35,7 @@ import my.noveldokusha.network.PagedListIteratorState
 import my.noveldokusha.ui.composeViews.AnimatedTransition
 import my.noveldokusha.ui.composeViews.BooksVerticalView
 import my.noveldokusha.ui.composeViews.CollapsibleDivider
+import my.noveldokusha.ui.composeViews.ToolbarMode
 import my.noveldokusha.ui.composeViews.TopAppBarSearch
 import my.noveldokusha.utils.actionCopyToClipboard
 
@@ -80,7 +81,8 @@ fun SourceCatalogScreen(
                                 Column {
                                     Text(
                                         text = sourceCatalogName,
-                                        style = MaterialTheme.typography.headlineSmall
+                                        style = MaterialTheme.typography.headlineSmall,
+                                        maxLines = 1
                                     )
                                     Text(
                                         text = stringResource(R.string.catalog),

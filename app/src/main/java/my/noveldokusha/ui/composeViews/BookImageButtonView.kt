@@ -42,7 +42,7 @@ enum class BookTitlePosition {
 @Composable
 fun BookImageButtonView(
     title: String,
-    coverImageUrl: Any,
+    coverImageModel: Any,
     modifier: Modifier = Modifier,
     bookTitlePosition: BookTitlePosition = BookTitlePosition.Inside,
     onClick: () -> Unit,
@@ -63,7 +63,7 @@ fun BookImageButtonView(
                 )
         ) {
             ImageView(
-                imageModel = coverImageUrl,
+                imageModel = coverImageModel,
                 contentDescription = title,
                 modifier = Modifier.fillMaxSize(),
                 error = R.drawable.default_book_cover,
@@ -132,7 +132,7 @@ private fun PreviewView() {
         Row {
             BookImageButtonView(
                 title = "Hello there",
-                coverImageUrl = "",
+                coverImageModel = "",
                 onClick = { },
                 onLongClick = { },
                 bookTitlePosition = BookTitlePosition.Inside,
@@ -140,7 +140,7 @@ private fun PreviewView() {
             )
             BookImageButtonView(
                 title = "Hello there text very long for a title, but many cases just like this",
-                coverImageUrl = "",
+                coverImageModel = "",
                 onClick = { },
                 onLongClick = { },
                 bookTitlePosition = BookTitlePosition.Outside,

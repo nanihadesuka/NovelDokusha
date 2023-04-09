@@ -157,7 +157,7 @@ private fun LibraryPageBody(
             Box {
                 BookImageButtonView(
                     title = it.book.title,
-                    coverImageUrl = coverImageUrl,
+                    coverImageModel = coverImageUrl,
                     onClick = { onClick(it) },
                     onLongClick = { onLongClick(it) }
                 )

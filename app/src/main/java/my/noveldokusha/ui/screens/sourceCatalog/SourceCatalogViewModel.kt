@@ -17,6 +17,7 @@ import my.noveldokusha.repository.Repository
 import my.noveldokusha.scraper.Scraper
 import my.noveldokusha.ui.BaseViewModel
 import my.noveldokusha.ui.Toasty
+import my.noveldokusha.ui.composeViews.ToolbarMode
 import my.noveldokusha.utils.StateExtra_String
 import javax.inject.Inject
 

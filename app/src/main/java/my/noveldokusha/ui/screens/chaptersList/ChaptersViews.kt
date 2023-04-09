@@ -3,7 +3,6 @@ package my.noveldokusha.ui.screens.chaptersList
 import androidx.compose.animation.*
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
@@ -14,19 +13,11 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.runtime.snapshots.SnapshotStateMap
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
@@ -34,143 +25,12 @@ import androidx.compose.ui.unit.dp
 import my.noveldokusha.R
 import my.noveldokusha.data.ChapterWithContext
 import my.noveldokusha.data.database.tables.Chapter
-import my.noveldokusha.rememberResolvedBookImagePath
 import my.noveldokusha.ui.composeViews.ErrorView
-import my.noveldokusha.ui.composeViews.ImageView
 import my.noveldokusha.ui.theme.ColorAccent
-import my.noveldokusha.ui.theme.ImageBorderShape
 import my.noveldokusha.ui.theme.InternalTheme
 import my.noveldokusha.ui.theme.Themes
-import my.noveldokusha.utils.ifCase
 import my.noveldokusha.utils.mix
 
-enum class ToolbarMode { MAIN, SEARCH }
-
-@Composable
-fun HeaderView(
-    bookTitle: String,
-    sourceName: String,
-    numberOfChapters: Int,
-    bookCoverUrl: String?,
-    bookUrl: String,
-    description: String,
-    onSearchBookInDatabase: () -> Unit,
-    onOpenInBrowser: () -> Unit
-) {
-    val bookCover = bookCoverUrl?.let {
-        rememberResolvedBookImagePath(
-            bookUrl = bookUrl,
-            imagePath = it
-        ).value
-    } ?: R.drawable.ic_baseline_empty_24
-
-    Box {
-        Box {
-            ImageView(
-                imageModel = bookCover,
-                contentScale = ContentScale.FillWidth,
-                modifier = Modifier
-                    .alpha(0.2f)
-                    .fillMaxWidth()
-                    .height(200.dp)
-            )
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(200.dp)
-                    .align(Alignment.BottomCenter)
-                    .background(
-                        Brush.verticalGradient(
-                            0f to MaterialTheme.colorScheme.primary.copy(alpha = 0f),
-                            1f to MaterialTheme.colorScheme.primary,
-                        )
-                    )
-            )
-        }
-        Column(modifier = Modifier.padding(top = 58.dp)) {
-            Row {
-                Box(
-                    contentAlignment = Alignment.Center,
-                    modifier = Modifier
-                        .padding(horizontal = 8.dp)
-                        .size(160.dp, 230.dp),
-                ) {
-                    ImageView(
-                        imageModel = bookCover,
-                        contentScale = ContentScale.FillHeight,
-                        modifier = Modifier
-                            .fillMaxHeight()
-                            .clip(ImageBorderShape)
-                    )
-                }
-                Column(
-                    Modifier
-                        .heightIn(min = 230.dp)
-                        .padding(top = 60.dp, start = 0.dp, end = 8.dp)
-                ) {
-                    Text(
-                        text = bookTitle,
-                        style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.padding(bottom = 10.dp)
-                    )
-                    Text(
-                        text = sourceName,
-                        style = MaterialTheme.typography.labelMedium,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.padding(bottom = 2.dp)
-                    )
-                    Text(
-                        text = stringResource(id = R.string.chapters) + " " + numberOfChapters.toString(),
-                        style = MaterialTheme.typography.labelMedium,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.padding(bottom = 8.dp)
-                    )
-                    Box(
-                        contentAlignment = Alignment.BottomCenter,
-                        modifier = Modifier
-                            .padding(16.dp)
-                            .fillMaxWidth()
-                    ) {
-                        Row(
-                            verticalAlignment = Alignment.Bottom,
-                            modifier = Modifier.height(32.dp)
-                        ) {
-                            IconButton(onClick = onSearchBookInDatabase) {
-                                Icon(
-                                    painter = painterResource(id = R.drawable.ic_outline_explore_24),
-                                    contentDescription = stringResource(id = R.string.search_in_database_for_more_information)
-                                )
-                            }
-                            IconButton(onClick = onOpenInBrowser) {
-                                Icon(
-                                    painter = painterResource(id = R.drawable.ic_outline_website_24),
-                                    contentDescription = stringResource(id = R.string.open_in_browser)
-                                )
-                            }
-                        }
-                    }
-                }
-            }
-            var maxLines by rememberSaveable { mutableStateOf(4) }
-            Text(
-                text = description,
-                maxLines = maxLines,
-                style = MaterialTheme.typography.bodyMedium,
-                overflow = TextOverflow.Ellipsis,
-                modifier = Modifier
-                    .padding(8.dp)
-                    .ifCase(description.isNotBlank()) { animateContentSize() }
-                    .clickable(
-                        interactionSource = remember { MutableInteractionSource() },
-                        indication = null,
-                        onClick = { maxLines = if (maxLines == 4) Int.MAX_VALUE else 4 }
-                    ),
-            )
-            Divider(Modifier.fillMaxWidth())
-        }
-    }
-}
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalAnimationApi::class)
 @Composable
@@ -326,15 +186,16 @@ private fun Preview(@PreviewParameter(SampleProvider::class) theme: Themes) {
         Box {
             ChaptersListView(
                 header = {
-                    HeaderView(
-                        bookTitle = "Book title",
-                        sourceName = "Novel Web Name",
+                    ChaptersScreenHeader(
+                        bookState = ChapterScreenState.BookState(
+                            title = "Book title",
+                            coverImageUrl = null,
+                            url = "",
+                            description = "In a very far land, there was a web novel being written."
+                        ),
+                        sourceCatalogName = "Novel Web Name",
                         numberOfChapters = 34,
-                        bookCoverUrl = null,
-                        bookUrl = "",
-                        description = "In a very far land, there was a web novel being written.",
-                        onSearchBookInDatabase = { },
-                        onOpenInBrowser = { }
+                        paddingValues = PaddingValues()
                     )
                 },
                 list = list,

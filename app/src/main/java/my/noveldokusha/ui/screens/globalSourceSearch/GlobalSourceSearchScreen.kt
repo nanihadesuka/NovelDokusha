@@ -4,9 +4,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.LinearProgressIndicator
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
@@ -43,30 +41,28 @@ fun GlobalSourceSearchScreen(
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
-            Surface(color = MaterialTheme.colorScheme.primary) {
-                Column {
-                    TopAppBarSearch(
-                        focusRequester = focusRequester,
-                        searchTextInput = searchInput,
-                        onSearchTextChange = onSearchInputChange,
-                        onTextDone = onSearchInputSubmit,
-                        onClose = onPressBack,
-                        placeholderText = stringResource(R.string.global_search),
-                        scrollBehavior = scrollBehavior,
-                    )
-                    val progress by remember {
-                        derivedStateOf {
-                            val totalCount = listSources.size.coerceAtLeast(1)
-                            val finishedCount = listSources.count { it.fetchIterator.hasFinished }
-                            finishedCount.toFloat() / totalCount.toFloat()
-                        }
+            Column {
+                TopAppBarSearch(
+                    focusRequester = focusRequester,
+                    searchTextInput = searchInput,
+                    onSearchTextChange = onSearchInputChange,
+                    onTextDone = onSearchInputSubmit,
+                    onClose = onPressBack,
+                    placeholderText = stringResource(R.string.global_search),
+                    scrollBehavior = scrollBehavior,
+                )
+                val progress by remember {
+                    derivedStateOf {
+                        val totalCount = listSources.size.coerceAtLeast(1)
+                        val finishedCount = listSources.count { it.fetchIterator.hasFinished }
+                        finishedCount.toFloat() / totalCount.toFloat()
                     }
-                    LinearProgressIndicator(
-                        progress = progress,
-                        color = ColorAccent,
-                        modifier = Modifier.fillMaxWidth()
-                    )
                 }
+                LinearProgressIndicator(
+                    progress = progress,
+                    color = ColorAccent,
+                    modifier = Modifier.fillMaxWidth()
+                )
             }
         },
         content = { innerPadding ->

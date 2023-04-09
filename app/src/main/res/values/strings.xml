@@ -166,4 +166,6 @@
     <string name="filter_catalog">Catalog</string>
 	<string name="allow_the_denied_permissions_to_perform_the_action">Allow the denied permissions to perform the action</string>
 	<string name="app_settings">App settings</string>
+    <string name="resume_reading">Resume reading</string>
+	<string name="find_in_database">Find in database</string>
 </resources>

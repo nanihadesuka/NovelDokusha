@@ -76,7 +76,7 @@ fun BooksVerticalView(
                 )
                 AppPreferences.LIST_LAYOUT_MODE.verticalGrid -> BookImageButtonView(
                     title = it.title,
-                    coverImageUrl = it.coverImageUrl,
+                    coverImageModel = it.coverImageUrl,
                     onClick = { onBookClicked(it) },
                     onLongClick = { onBookLongClicked(it) }
                 )
