@@ -40,7 +40,6 @@ import my.noveldokusha.ui.composeViews.ImageView
 import my.noveldokusha.ui.goToGlobalSearch
 import my.noveldokusha.utils.clickableNoIndicator
 
-@OptIn(ExperimentalTextApi::class)
 @Composable
 fun ChaptersScreenHeader(
     bookState: ChapterScreenState.BookState,

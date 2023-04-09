@@ -1,6 +1,5 @@
 package my.noveldokusha.ui.screens.chaptersList
 
-import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.outlined.Public
@@ -13,7 +12,7 @@ import androidx.compose.ui.res.stringResource
 import my.noveldokusha.R
 
 @Composable
-fun ColumnScope.ChaptersDropDown(
+fun ChaptersDropDown(
     onOpenWebView: () -> Unit,
     onSearchBookInDatabase: () -> Unit,
     onResumeReading: () -> Unit,

@@ -1,5 +1,6 @@
 package my.noveldokusha.ui.screens.chaptersList
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.animateContentSize
@@ -12,6 +13,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -19,6 +21,7 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.RemoveDone
 import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material.icons.outlined.CloudDownload
@@ -32,6 +35,7 @@ import androidx.compose.material3.BottomAppBarDefaults
 import androidx.compose.material3.Divider
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -64,6 +68,7 @@ import my.noveldokusha.ui.theme.ColorLike
 import my.noveldokusha.ui.theme.ColorNotice
 import my.noveldokusha.utils.isAtTop
 import my.noveldokusha.utils.mix
+import my.noveldokusha.utils.textPadding
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -85,15 +90,21 @@ fun ChaptersScreen(
     onSelectionModeChapterClick: (chapter: ChapterWithContext) -> Unit,
     onSelectionModeChapterLongClick: (chapter: ChapterWithContext) -> Unit,
     onChapterDownload: (chapter: ChapterWithContext) -> Unit,
+    onPullRefresh: () -> Unit,
 ) {
     val context by rememberUpdatedState(newValue = LocalContext.current)
     var showDropDown by rememberSaveable { mutableStateOf(false) }
-    val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     var showBottomSheet by rememberSaveable { mutableStateOf(false) }
+    val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     val lazyListState = rememberLazyListState()
+
+    if (state.isInSelectionMode.value) BackHandler {
+        onCloseSelectionBar()
+    }
 
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+        containerColor = MaterialTheme.colorScheme.primary,
         topBar = {
             val isAtTop by lazyListState.isAtTop(threshold = 40.dp)
             val alpha by animateFloatAsState(targetValue = if (isAtTop) 0f else 1f, label = "")
@@ -225,9 +236,10 @@ fun ChaptersScreen(
                 onChapterClick = if (state.isInSelectionMode.value) onSelectionModeChapterClick else onChapterClick,
                 onChapterLongClick = if (state.isInSelectionMode.value) onSelectionModeChapterLongClick else onChapterLongClick,
                 onChapterDownload = onChapterDownload,
+                onPullRefresh = onPullRefresh,
             )
         },
-        bottomBar = bottomBar@{
+        bottomBar = {
             AnimatedVisibility(
                 visible = state.isInSelectionMode.value,
                 enter = expandVertically(initialHeight = { it / 2 }) + fadeIn(),
@@ -269,6 +281,36 @@ fun ChaptersScreen(
                 }
 
             }
+        },
+        floatingActionButton = {
+            FloatingActionButton(
+                containerColor = ColorAccent,
+                onClick = onResumeReading
+            ) {
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.textPadding()
+                ) {
+                    Icon(
+                        Icons.Filled.PlayArrow,
+                        contentDescription = stringResource(id = R.string.open_last_read_chapter),
+                        tint = Color.White
+                    )
+                    AnimatedVisibility(visible = lazyListState.isAtTop(threshold = 100.dp).value) {
+                        Text(
+                            text = stringResource(id = R.string.read),
+                            modifier = Modifier.padding(end = 8.dp)
+                        )
+                    }
+                }
+            }
         }
+    )
+
+    ChaptersBottomSheet(
+        visible = showBottomSheet,
+        onDismiss = { showBottomSheet = false },
+        state = state
     )
 }

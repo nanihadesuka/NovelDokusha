@@ -56,6 +56,7 @@ data class ChapterScreenState(
     val isRefreshing: MutableState<Boolean>,
     val searchTextInput: MutableState<String>,
     val sourceCatalogName: MutableState<String>,
+    val settingChapterSort: MutableState<AppPreferences.TERNARY_STATE>
 ) {
 
     val isInSelectionMode = derivedStateOf { selectedChaptersUrl.size != 0 }
@@ -115,9 +116,7 @@ class ChaptersViewModel @Inject constructor(
             if (!repository.bookChapters.hasChapters(bookMetadata.url))
                 updateChaptersList()
 
-            val book = repository.libraryBooks.get(bookMetadata.url)
-            if (book != null)
-                return@launch
+            repository.libraryBooks.get(bookMetadata.url) ?: return@launch
 
             val coverUrl = async { downloadBookCoverImageUrl(scraper, networkClient, bookUrl) }
             val description = async { downloadBookDescription(scraper, networkClient, bookUrl) }
@@ -148,7 +147,8 @@ class ChaptersViewModel @Inject constructor(
         selectedChaptersUrl = mutableStateMapOf(),
         isRefreshing = mutableStateOf(false),
         searchTextInput = mutableStateOf(""),
-        sourceCatalogName = mutableStateOf(source.name)
+        sourceCatalogName = mutableStateOf(source.name),
+        settingChapterSort = appPreferences.CHAPTERS_SORT_ASCENDING.state(viewModelScope)
     )
 
     init {
@@ -192,25 +192,26 @@ class ChaptersViewModel @Inject constructor(
         }
     }
 
-    fun reloadAll() {
+    fun onPullRefresh() {
+        toasty.show(R.string.updating_book_info)
         updateCover()
         updateDescription()
         updateChaptersList()
     }
 
-    fun updateCover() = viewModelScope.launch {
+    private fun updateCover() = viewModelScope.launch {
         downloadBookCoverImageUrl(scraper, networkClient, bookUrl)
             .onSuccess { repository.libraryBooks.updateCover(bookUrl, it) }
     }
 
-    fun updateDescription() = viewModelScope.launch {
+    private fun updateDescription() = viewModelScope.launch {
         downloadBookDescription(scraper, networkClient, bookUrl).onSuccess {
             repository.libraryBooks.updateDescription(bookUrl, it)
         }
     }
 
     private var loadChaptersJob: Job? = null
-    fun updateChaptersList() {
+    private fun updateChaptersList() {
         if (bookMetadata.url.startsWith("local://")) {
             toasty.show(R.string.local_book_nothing_to_update)
             state.isRefreshing.value = false
@@ -239,15 +240,6 @@ class ChaptersViewModel @Inject constructor(
 
     @Volatile
     private var lastSelectedChapterUrl: String? = null
-
-    fun toggleChapterSort() {
-        appPreferences.CHAPTERS_SORT_ASCENDING.value =
-            when (appPreferences.CHAPTERS_SORT_ASCENDING.value) {
-                AppPreferences.TERNARY_STATE.active -> AppPreferences.TERNARY_STATE.inverse
-                AppPreferences.TERNARY_STATE.inverse -> AppPreferences.TERNARY_STATE.active
-                AppPreferences.TERNARY_STATE.inactive -> AppPreferences.TERNARY_STATE.active
-            }
-    }
 
     suspend fun getLastReadChapter(): String? {
         return repository.libraryBooks.get(bookUrl)?.lastReadChapter

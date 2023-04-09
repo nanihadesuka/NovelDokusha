@@ -50,7 +50,7 @@ fun TernaryStateToggle(
             )
             .padding(horizontal = 16.dp)
     ) {
-        AnimatedContent(targetState = updatedState) {
+        AnimatedContent(targetState = updatedState, label = "") {
             when (it) {
                 TERNARY_STATE.active -> activeIcon()
                 TERNARY_STATE.inverse -> inverseIcon()
