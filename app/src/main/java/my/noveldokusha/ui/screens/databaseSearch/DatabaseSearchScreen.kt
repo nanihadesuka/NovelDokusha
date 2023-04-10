@@ -5,8 +5,14 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.FilterList
+import androidx.compose.material.icons.filled.LibraryBooks
+import androidx.compose.material.icons.filled.Title
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -33,6 +39,7 @@ import my.noveldokusha.network.PagedListIteratorState
 import my.noveldokusha.ui.composeViews.BooksVerticalView
 import my.noveldokusha.ui.composeViews.CollapsibleDivider
 import my.noveldokusha.ui.composeViews.TopAppBarSearch
+import my.noveldokusha.ui.theme.ColorNotice
 import my.noveldokusha.ui.theme.InternalTheme
 import my.noveldokusha.ui.theme.PreviewThemes
 
@@ -101,6 +108,13 @@ fun DatabaseSearchScreen(
                         },
                         label = {
                             Text(text = stringResource(R.string.filter_catalog))
+                        },
+                        leadingIcon = {
+                            Icon(
+                                Icons.Filled.LibraryBooks,
+                                null,
+                                tint = MaterialTheme.colorScheme.onPrimary
+                            )
                         }
                     )
                     FilterChip(
@@ -111,6 +125,13 @@ fun DatabaseSearchScreen(
                         },
                         label = {
                             Text(text = stringResource(R.string.filter_title))
+                        },
+                        leadingIcon = {
+                            Icon(
+                                Icons.Filled.Title,
+                                null,
+                                tint = MaterialTheme.colorScheme.onPrimary
+                            )
                         }
                     )
                     FilterChip(
@@ -121,6 +142,9 @@ fun DatabaseSearchScreen(
                         },
                         label = {
                             Text(text = stringResource(R.string.filter_genres))
+                        },
+                        leadingIcon = {
+                            Icon(Icons.Filled.FilterList, null, tint = ColorNotice)
                         }
                     )
                 }

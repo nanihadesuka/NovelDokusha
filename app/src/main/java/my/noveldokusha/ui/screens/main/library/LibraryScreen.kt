@@ -17,6 +17,7 @@ import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.ui.composeViews.BookSettingsDialog
 import my.noveldokusha.ui.composeViews.BookSettingsDialogState
 import my.noveldokusha.ui.screens.chaptersList.ChaptersActivity
+import my.noveldokusha.ui.theme.ColorNotice
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -51,7 +52,8 @@ fun LibraryScreen(
                     ) {
                         Icon(
                             Icons.Filled.FilterList,
-                                    stringResource(R.string.filter)
+                            stringResource(R.string.filter),
+                            tint = ColorNotice
                         )
                     }
                     IconButton(

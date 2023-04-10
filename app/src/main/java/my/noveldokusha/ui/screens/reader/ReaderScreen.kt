@@ -62,7 +62,7 @@ fun ReaderScreen(
         state.showReaderInfo.value = false
     }
 
-    val infoSurfaceColor = MaterialTheme.colorScheme.primary.mix(ColorAccent, 0.85f)
+    val infoSurfaceColor = MaterialTheme.colorScheme.primary.mix(ColorAccent, 0.75f)
 
     Scaffold(
         topBar = {
@@ -141,7 +141,7 @@ fun ReaderScreen(
                 exit = shrinkVertically(targetHeight = { 0 }) + fadeOut(),
             ) {
                 Column {
-                    SettingsBottomBarDialog(
+                    ReaderScreenBottomBarDialogs(
                         settings = state.settings,
                         onTextFontChanged = onTextFontChanged,
                         onTextSizeChanged = onTextSizeChanged,

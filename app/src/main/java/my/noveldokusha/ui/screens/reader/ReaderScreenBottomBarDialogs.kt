@@ -18,7 +18,7 @@ import my.noveldokusha.ui.theme.Themes
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
-fun SettingsBottomBarDialog(
+fun ReaderScreenBottomBarDialogs(
     settings: ReaderScreenState.Settings,
     onTextFontChanged: (String) -> Unit,
     onTextSizeChanged: (Float) -> Unit,
@@ -33,29 +33,27 @@ fun SettingsBottomBarDialog(
     ) {
         Box(Modifier.padding(horizontal = 24.dp)) {
             AnimatedContent(targetState = settings.selectedSetting.value, label = "") { target ->
-                Column {
-                    when (target) {
-                        ReaderScreenState.Settings.Type.LiveTranslation -> TranslatorSettingDialog(
-                            state = settings.liveTranslation
+                when (target) {
+                    ReaderScreenState.Settings.Type.LiveTranslation -> TranslatorSettingDialog(
+                        state = settings.liveTranslation
+                    )
+                    ReaderScreenState.Settings.Type.TextToSpeech -> VoiceReaderSettingDialog(
+                        state = settings.textToSpeech
+                    )
+                    ReaderScreenState.Settings.Type.Style -> {
+                        StyleSettingDialog(
+                            state = settings.style,
+                            onFollowSystemChange = onFollowSystem,
+                            onThemeChange = onThemeSelected,
+                            onTextFontChange = onTextFontChanged,
+                            onTextSizeChange = onTextSizeChanged,
                         )
-                        ReaderScreenState.Settings.Type.TextToSpeech -> VoiceReaderSettingDialog(
-                            state = settings.textToSpeech
-                        )
-                        ReaderScreenState.Settings.Type.Style -> {
-                            StyleSettingDialog(
-                                state = settings.style,
-                                onFollowSystemChange = onFollowSystem,
-                                onThemeChange = onThemeSelected,
-                                onTextFontChange = onTextFontChanged,
-                                onTextSizeChange = onTextSizeChanged,
-                            )
-                        }
-                        ReaderScreenState.Settings.Type.More -> MoreSettingDialog(
-                            allowTextSelection = settings.isTextSelectable.value,
-                            onAllowTextSelectionChange = onSelectableTextChange
-                        )
-                        ReaderScreenState.Settings.Type.None -> Unit
                     }
+                    ReaderScreenState.Settings.Type.More -> MoreSettingDialog(
+                        allowTextSelection = settings.isTextSelectable.value,
+                        onAllowTextSelectionChange = onSelectableTextChange
+                    )
+                    ReaderScreenState.Settings.Type.None -> Unit
                 }
             }
         }
