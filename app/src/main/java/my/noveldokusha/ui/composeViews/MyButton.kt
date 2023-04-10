@@ -198,7 +198,7 @@ fun PreviewIcon() {
     Column {
         for (theme in Themes.values()) InternalTheme(theme) {
             MyIconButton(
-                icon = Icons.Default.Home,
+                icon = Icons.Filled.Home,
                 modifier = Modifier.fillMaxWidth(),
                 onClick = {}
             )

@@ -114,7 +114,7 @@ fun DatabaseSearchBottomSheet(
                             ToggleableState.Off -> Icon(
                                 Icons.Filled.Add,
                                 null,
-                                tint = MaterialTheme.colorScheme.tertiaryContainer
+                                tint = MaterialTheme.colorScheme.onPrimaryContainer
                             )
                         }
                     }

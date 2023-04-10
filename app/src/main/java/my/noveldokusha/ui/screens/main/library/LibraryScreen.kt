@@ -58,7 +58,7 @@ fun LibraryScreen(
                         onClick = { showDropDown = !showDropDown }
                     ) {
                         Icon(
-                            Icons.Default.MoreVert,
+                            Icons.Filled.MoreVert,
                             stringResource(R.string.options_panel)
                         )
                         LibraryDropDown(

@@ -152,4 +152,5 @@
     <string name="save_voice">Save voice</string>
     <string name="delete_voice">Delete voice</string>
     <string name="translate">Translate</string>
+    <string name="size">Size</string>
 </resources>

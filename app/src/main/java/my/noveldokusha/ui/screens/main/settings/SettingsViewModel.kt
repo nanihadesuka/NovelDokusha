@@ -4,8 +4,6 @@ import android.text.format.Formatter
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
-import androidx.lifecycle.asFlow
 import androidx.lifecycle.viewModelScope
 import com.bumptech.glide.Glide
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -28,40 +26,37 @@ class SettingsViewModel @Inject constructor(
     private val appScope: AppCoroutineScope,
     private val appPreferences: AppPreferences,
     private val app: App,
-    val translationManager: TranslationManager,
+    private val translationManager: TranslationManager,
 ) : BaseViewModel() {
 
-    val followsSystem by appPreferences.THEME_FOLLOW_SYSTEM.state(viewModelScope)
-
     private val themeId by appPreferences.THEME_ID.state(viewModelScope)
-    val theme by derivedStateOf { Themes.fromIDTheme(themeId) }
 
-    var databaseSize by mutableStateOf("")
-    var imageFolderSize by mutableStateOf("")
+    val state = SettingsScreenState(
+        databaseSize = mutableStateOf(""),
+        imageFolderSize = mutableStateOf(""),
+        followsSystemTheme = appPreferences.THEME_FOLLOW_SYSTEM.state(viewModelScope),
+        currentTheme = derivedStateOf { Themes.fromIDTheme(themeId) },
+        isTranslationSettingsVisible = mutableStateOf(false),
+        translationModelsStates = translationManager.models,
+    )
 
     init {
-        viewModelScope.launch(Dispatchers.IO) { updateDatabaseSize() }
-        viewModelScope.launch(Dispatchers.IO) { updateImagesFolderSize() }
-        viewModelScope.launch(Dispatchers.IO) {
-            repository.eventDataRestored.asFlow().collect {
+        updateDatabaseSize()
+        updateImagesFolderSize()
+        viewModelScope.launch {
+            repository.eventDataRestored.collect {
                 updateDatabaseSize()
                 updateImagesFolderSize()
             }
         }
     }
 
-    fun updateDatabaseSize() = viewModelScope.launch(Dispatchers.IO) {
-        val size = repository.getDatabaseSizeBytes()
-        withContext(Dispatchers.Main) {
-            databaseSize = Formatter.formatFileSize(appPreferences.context, size)
-        }
+    fun downloadTranslationModel(lang: String) {
+        translationManager.downloadModel(lang)
     }
 
-    fun updateImagesFolderSize() = viewModelScope.launch(Dispatchers.IO) {
-        val size = getFolderSizeBytes(repository.settings.folderBooks)
-        withContext(Dispatchers.Main) {
-            imageFolderSize = Formatter.formatFileSize(appPreferences.context, size)
-        }
+    fun removeTranslationModel(lang: String) {
+        translationManager.removeModel(lang)
     }
 
     fun cleanDatabase() = appScope.launch(Dispatchers.IO) {
@@ -72,24 +67,36 @@ class SettingsViewModel @Inject constructor(
 
     fun cleanImagesFolder() = appScope.launch(Dispatchers.IO) {
         val libraryFolders = repository.libraryBooks.getAllInLibrary()
-            .mapNotNull { """^local://(.+)$""".toRegex().find(it.url)?.destructured?.component1() }
+            .asSequence()
+            .filter { it.url.startsWith("local://") }
+            .map { it.url.removePrefix("local://") }
             .toSet()
 
-        repository.settings.folderBooks.listFiles()?.asSequence()
+        repository.settings.folderBooks.listFiles()
+            ?.asSequence()
             ?.filter { it.isDirectory && it.exists() }
             ?.filter { it.name !in libraryFolders }
             ?.forEach { it.deleteRecursively() }
-
         updateImagesFolderSize()
         Glide.get(app).clearDiskCache()
     }
 
-    fun onFollowSystem(follow: Boolean) {
+    fun onFollowSystemChange(follow: Boolean) {
         appPreferences.THEME_FOLLOW_SYSTEM.value = follow
     }
 
-    fun onThemeSelected(themes: Themes) {
+    fun onThemeChange(themes: Themes) {
         appPreferences.THEME_ID.value = themes.themeId
+    }
+
+    private fun updateDatabaseSize() = viewModelScope.launch {
+        val size = repository.getDatabaseSizeBytes()
+        state.databaseSize.value = Formatter.formatFileSize(appPreferences.context, size)
+    }
+
+    private fun updateImagesFolderSize() = viewModelScope.launch {
+        val size = getFolderSizeBytes(repository.settings.folderBooks)
+        state.imageFolderSize.value = Formatter.formatFileSize(appPreferences.context, size)
     }
 }
 

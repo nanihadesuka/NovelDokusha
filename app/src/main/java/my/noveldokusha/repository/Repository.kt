@@ -3,12 +3,12 @@ package my.noveldokusha.repository
 import android.content.Context
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.withContext
 import my.noveldokusha.data.database.AppDatabase
 import my.noveldokusha.data.database.tables.Book
 import my.noveldokusha.data.database.tables.Chapter
 import my.noveldokusha.folderBooks
-import my.noveldokusha.utils.LiveEvent
 import javax.inject.Inject
 
 class Repository @Inject constructor(
@@ -25,10 +25,11 @@ class Repository @Inject constructor(
     val chapterBody = chapterBodyRepository
 
     val settings = Settings()
-    val eventDataRestored = LiveEvent<Unit>()
+    val eventDataRestored = MutableSharedFlow<Unit>()
 
-    suspend fun getDatabaseSizeBytes() =
-        withContext(Dispatchers.IO) { context.getDatabasePath(name).length() }
+    suspend fun getDatabaseSizeBytes() = withContext(Dispatchers.IO) {
+        context.getDatabasePath(name).length()
+    }
 
     fun close() = db.close()
     fun delete() = context.deleteDatabase(name)

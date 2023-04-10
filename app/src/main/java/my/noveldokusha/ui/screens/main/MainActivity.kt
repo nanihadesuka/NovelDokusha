@@ -1,6 +1,7 @@
 package my.noveldokusha.ui.screens.main
 
 import android.os.Bundle
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
@@ -41,6 +42,10 @@ open class MainActivity : BaseActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             var activePageIndex by rememberSaveable { mutableStateOf(0) }
+
+            BackHandler(enabled = activePageIndex != 0) {
+                activePageIndex = 0
+            }
 
             Theme(appPreferences = appPreferences) {
                 Column(Modifier.fillMaxSize()) {

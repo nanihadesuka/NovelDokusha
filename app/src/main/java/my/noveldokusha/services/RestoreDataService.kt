@@ -99,10 +99,11 @@ class RestoreDataService : Service() {
         if (intent == null) return START_NOT_STICKY
         val intentData = IntentData(intent)
 
+        if (job?.isActive == true) return START_NOT_STICKY
         job = CoroutineScope(Dispatchers.IO).launch {
             tryAsResponse {
                 restoreData(intentData.uri)
-                repository.eventDataRestored.postValue(Unit)
+                repository.eventDataRestored.emit(Unit)
             }.onError {
                 Timber.e(it.exception)
             }

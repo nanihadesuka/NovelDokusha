@@ -84,8 +84,37 @@ private val dark_ColorPalette = ColorScheme(
     scrim = Grey800,
 )
 
-private val grey_ColorPalette = dark_ColorPalette
-private val black_ColorPalette = dark_ColorPalette
+private val black_ColorPalette = ColorScheme(
+    primary = Grey1000,
+    onPrimary = Grey25,
+    primaryContainer = Grey900,
+    onPrimaryContainer = Grey100,
+    inversePrimary = Grey25,
+    secondary = Grey1000,
+    onSecondary = Grey25,
+    secondaryContainer = ColorAccent,
+    onSecondaryContainer = Grey75,
+    tertiary = Grey800,
+    onTertiary = Grey300,
+    tertiaryContainer = Grey700,
+    onTertiaryContainer = Grey50,
+    background = Grey1000,
+    onBackground = Grey50,
+    surface = Grey1000,
+    onSurface = Grey25,
+    surfaceVariant = Grey1000,
+    onSurfaceVariant = Grey50,
+    surfaceTint = Grey800,
+    inverseSurface = Grey25,
+    inverseOnSurface = Grey1000,
+    error = Error600,
+    onError = Grey25,
+    errorContainer = Error800,
+    onErrorContainer = Grey50,
+    outline = Grey25,
+    outlineVariant = Grey800,
+    scrim = Grey900,
+)
 
 enum class Themes(
     val isLight: Boolean,
@@ -102,11 +131,6 @@ enum class Themes(
         nameId = R.string.theme_name_dark,
         themeId = R.style.AppTheme_BaseDark_Dark,
     ),
-    GREY(
-        isLight = false,
-        nameId = R.string.theme_name_grey,
-        themeId = R.style.AppTheme_BaseDark_Grey,
-    ),
     BLACK(
         isLight = false,
         nameId = R.string.theme_name_black,
@@ -114,8 +138,8 @@ enum class Themes(
     );
 
     companion object {
+        val list = Themes.values().toList()
         fun fromIDTheme(@StyleRes id: Int) = list.find { it.themeId == id } ?: LIGHT
-        val list = listOf(LIGHT, DARK, GREY, BLACK)
     }
 }
 
@@ -150,7 +174,6 @@ fun InternalTheme(
     val colorScheme = when (theme) {
         Themes.LIGHT -> light_ColorPalette
         Themes.DARK -> dark_ColorPalette
-        Themes.GREY -> grey_ColorPalette
         Themes.BLACK -> black_ColorPalette
     }
 

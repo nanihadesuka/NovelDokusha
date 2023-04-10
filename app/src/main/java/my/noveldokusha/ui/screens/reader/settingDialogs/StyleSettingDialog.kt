@@ -52,7 +52,7 @@ fun StyleSettingDialog(
     onTextSizeChange: (Float) -> Unit,
     onTextFontChange: (String) -> Unit,
     onFollowSystemChange: (Boolean) -> Unit,
-    onThemeSelectedChange: (Themes) -> Unit,
+    onThemeChange: (Themes) -> Unit,
 ) {
     ElevatedCard(
         elevation = CardDefaults.elevatedCardElevation(defaultElevation = 12.dp)
@@ -84,7 +84,7 @@ fun StyleSettingDialog(
                         fontFamily = fontLoader.getFontFamily(state.textFont.value),
                     )
                 },
-                leadingContent = { Icon(Icons.Default.TextFields, null) }
+                trailingContent = { Icon(Icons.Filled.TextFields, null) }
             )
             DropdownMenu(
                 expanded = showFontsDropdown,
@@ -116,7 +116,7 @@ fun StyleSettingDialog(
             headlineContent = {
                 Text(text = stringResource(id = R.string.follow_system))
             },
-            leadingContent = {
+            trailingContent = {
                 Switch(
                     checked = state.followSystem.value,
                     onCheckedChange = onFollowSystemChange,
@@ -138,7 +138,7 @@ fun StyleSettingDialog(
             Themes.list.forEach {
                 FilterChip(
                     selected = it == state.currentTheme.value,
-                    onClick = { onThemeSelectedChange(it) },
+                    onClick = { onThemeChange(it) },
                     label = { Text(text = stringResource(id = it.nameId)) }
                 )
             }

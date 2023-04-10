@@ -4,7 +4,7 @@ import android.content.Intent
 import android.net.Uri
 import android.provider.Settings
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.twotone.Info
+import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
@@ -30,7 +30,7 @@ fun rememberPermissionsDeniedDialog(): MutableState<Boolean> {
         title = { Text(text = stringResource(id = R.string.permissions_denied)) },
         icon = {
             Icon(
-                imageVector = Icons.TwoTone.Info,
+                imageVector = Icons.Outlined.Info,
                 contentDescription = null,
                 tint = Info400
             )

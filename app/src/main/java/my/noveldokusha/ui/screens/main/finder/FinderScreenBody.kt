@@ -52,7 +52,7 @@ fun FinderScreenBody(
         item {
             Text(
                 text = stringResource(id = R.string.database),
-                style = MaterialTheme.typography.titleLarge,
+                style = MaterialTheme.typography.titleMedium,
                 color = ColorAccent,
                 modifier = Modifier
                     .padding(horizontal = 16.dp)
@@ -67,7 +67,7 @@ fun FinderScreenBody(
                 headlineContent = {
                     Text(
                         text = it.name,
-                        style = MaterialTheme.typography.titleMedium,
+                        style = MaterialTheme.typography.titleSmall,
                     )
                 },
                 supportingContent = {
@@ -89,7 +89,7 @@ fun FinderScreenBody(
         item {
             Text(
                 text = stringResource(id = R.string.sources),
-                style = MaterialTheme.typography.titleLarge,
+                style = MaterialTheme.typography.titleMedium,
                 color = ColorAccent,
                 modifier = Modifier
                     .padding(horizontal = 16.dp)
@@ -108,7 +108,7 @@ fun FinderScreenBody(
                 headlineContent = {
                     Text(
                         text = it.catalog.name,
-                        style = MaterialTheme.typography.titleMedium,
+                        style = MaterialTheme.typography.titleSmall,
                     )
                 },
                 supportingContent = {

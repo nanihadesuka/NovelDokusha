@@ -58,9 +58,9 @@ fun LibraryBottomSheet(
                 state = model.readSort,
                 onStateChange = { model.readSortToggle() },
                 modifier = Modifier.fillMaxWidth(),
-                activeIcon = { Icon(imageVector = Icons.Default.ArrowUpward, null) },
-                inverseIcon = { Icon(imageVector = Icons.Default.ArrowDownward, null) },
-                inactiveIcon = { Icon(imageVector = Icons.Default.SwapVert, null) },
+                activeIcon = { Icon(imageVector = Icons.Filled.ArrowUpward, null) },
+                inverseIcon = { Icon(imageVector = Icons.Filled.ArrowDownward, null) },
+                inactiveIcon = { Icon(imageVector = Icons.Filled.SwapVert, null) },
             )
         }
     }

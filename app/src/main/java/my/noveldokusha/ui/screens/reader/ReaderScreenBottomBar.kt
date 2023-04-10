@@ -45,7 +45,7 @@ fun SettingsBottomBarDialog(
                             StyleSettingDialog(
                                 state = settings.style,
                                 onFollowSystemChange = onFollowSystem,
-                                onThemeSelectedChange = onThemeSelected,
+                                onThemeChange = onThemeSelected,
                                 onTextFontChange = onTextFontChanged,
                                 onTextSizeChange = onTextSizeChanged,
                             )

@@ -261,8 +261,8 @@ class ReaderActivity : BaseActivity() {
                     onTextFontChanged = { appPreferences.READER_FONT_FAMILY.value = it },
                     onTextSizeChanged = { appPreferences.READER_FONT_SIZE.value = it },
                     onSelectableTextChange = { appPreferences.READER_SELECTABLE_TEXT.value = it },
-                    onFollowSystem = viewModelGlobalSettings::onFollowSystem,
-                    onThemeSelected = viewModelGlobalSettings::onThemeSelected,
+                    onFollowSystem = viewModelGlobalSettings::onFollowSystemChange,
+                    onThemeSelected = viewModelGlobalSettings::onThemeChange,
                     onPressBack = ::finish,
                     onOpenChapterInWeb = {
                         val url = viewModel.state.readerInfo.chapterUrl.value

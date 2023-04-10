@@ -72,7 +72,7 @@ fun TopAppBarSearch(
             navigationIcon = {
                 IconButton(onClick = onClose, modifier = Modifier.padding(start = 2.dp)) {
                     Icon(
-                        Icons.Default.ArrowBack,
+                        Icons.Filled.ArrowBack,
                         contentDescription = null
                     )
                 }
@@ -129,7 +129,7 @@ fun TopAppBarSearch(
                                 focusRequester.requestFocus()
                             }) {
                                 Icon(
-                                    Icons.Default.Close,
+                                    Icons.Filled.Close,
                                     contentDescription = null
                                 )
                             }

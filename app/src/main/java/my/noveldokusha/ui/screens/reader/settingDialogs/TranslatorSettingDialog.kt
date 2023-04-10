@@ -98,7 +98,7 @@ fun TranslatorSettingDialog(
                                     .ifCase(state.source.value == null) { alpha(0.5f) },
                             )
                         }
-                        Icon(Icons.Default.ArrowRightAlt, contentDescription = null)
+                        Icon(Icons.Filled.ArrowRightAlt, contentDescription = null)
                         Box(
                             modifier = Modifier
                                 .clickableWithUnboundedIndicator {

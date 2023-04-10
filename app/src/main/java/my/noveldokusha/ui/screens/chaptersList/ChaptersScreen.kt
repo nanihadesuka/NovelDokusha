@@ -137,7 +137,7 @@ fun ChaptersScreen(
                             IconButton(
                                 onClick = onPressBack
                             ) {
-                                Icon(Icons.Default.ArrowBack, null)
+                                Icon(Icons.Filled.ArrowBack, null)
                             }
                         },
                         actions = {
@@ -161,7 +161,7 @@ fun ChaptersScreen(
                             }
                             IconButton(onClick = { showDropDown = !showDropDown }) {
                                 Icon(
-                                    Icons.Default.MoreVert,
+                                    Icons.Filled.MoreVert,
                                     stringResource(R.string.options_panel)
                                 )
                                 DropdownMenu(

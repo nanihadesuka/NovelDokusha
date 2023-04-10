@@ -30,7 +30,7 @@ fun MoreSettingDialog(
             headlineContent = {
                 Text(text = stringResource(id = R.string.allow_text_selection))
             },
-            leadingContent = {
+            trailingContent = {
                 Switch(
                     checked = allowTextSelection,
                     onCheckedChange = onAllowTextSelectionChange,

@@ -18,6 +18,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.BottomAppBar
+import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -90,12 +91,12 @@ fun ReaderScreen(
                             },
                             navigationIcon = {
                                 IconButton(onClick = onPressBack) {
-                                    Icon(Icons.Default.ArrowBack, null)
+                                    Icon(Icons.Filled.ArrowBack, null)
                                 }
                             },
                             actions = {
                                 IconButton(onClick = onOpenChapterInWeb) {
-                                    Icon(Icons.Default.Public, null)
+                                    Icon(Icons.Filled.Public, null)
                                 }
                             }
                         )
@@ -120,6 +121,7 @@ fun ReaderScreen(
                                 style = MaterialTheme.typography.labelMedium,
                             )
                         }
+                        Divider()
                     }
                 }
             }
@@ -168,7 +170,7 @@ fun ReaderScreen(
                             currentType = state.settings.selectedSetting.value,
                             settingType = Type.TextToSpeech,
                             onClick = toggleOrSet,
-                            icon = Icons.Default.RecordVoiceOver,
+                            icon = Icons.Filled.RecordVoiceOver,
                             textId = R.string.voice_reader,
                         )
                         SettingIconItem(
