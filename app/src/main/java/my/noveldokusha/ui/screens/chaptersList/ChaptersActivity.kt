@@ -18,7 +18,7 @@ import my.noveldokusha.ui.BaseActivity
 import my.noveldokusha.ui.goToDatabaseSearch
 import my.noveldokusha.ui.goToReader
 import my.noveldokusha.ui.theme.Theme
-import my.noveldokusha.ui.theme.isLight
+import my.noveldokusha.ui.theme.isLightTheme
 import my.noveldokusha.utils.Extra_String
 
 @AndroidEntryPoint
@@ -45,7 +45,7 @@ class ChaptersActivity : BaseActivity() {
         setContent {
             Theme(appPreferences = appPreferences) {
                 val systemUiController = rememberSystemUiController()
-                val useDarkIcons = MaterialTheme.colorScheme.isLight()
+                val useDarkIcons = MaterialTheme.colorScheme.isLightTheme()
                 SideEffect {
                     systemUiController.setSystemBarsColor(
                         color = Color.Transparent,

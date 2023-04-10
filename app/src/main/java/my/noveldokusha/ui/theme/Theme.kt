@@ -1,29 +1,24 @@
 package my.noveldokusha.ui.theme
 
+import androidx.annotation.StringRes
 import androidx.annotation.StyleRes
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.graphics.luminance
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
-import kotlinx.coroutines.flow.mapNotNull
 import my.noveldokusha.AppPreferences
 import my.noveldokusha.R
 
 @Composable
-fun ColorScheme.isLight() = this.background.luminance() > 0.5
+fun ColorScheme.isLightTheme() = background.luminance() > 0.5
 
 private val light_ColorPalette = ColorScheme(
     primary = Grey25,
@@ -31,7 +26,7 @@ private val light_ColorPalette = ColorScheme(
     primaryContainer = Grey50,
     onPrimaryContainer = Grey800,
     inversePrimary = Grey900,
-    secondary = Grey50,
+    secondary = Grey25,
     onSecondary = Grey900,
     secondaryContainer = ColorAccent,
     onSecondaryContainer = Grey25,
@@ -39,7 +34,7 @@ private val light_ColorPalette = ColorScheme(
     onTertiary = Grey600,
     tertiaryContainer = Grey50,
     onTertiaryContainer = Grey900,
-    background = Grey50,
+    background = Grey25,
     onBackground = Grey900,
     surface = Grey25,
     onSurface = Grey900,
@@ -92,99 +87,64 @@ private val dark_ColorPalette = ColorScheme(
 private val grey_ColorPalette = dark_ColorPalette
 private val black_ColorPalette = dark_ColorPalette
 
-enum class Themes {
-    LIGHT,
-    DARK,
-    GREY,
-    BLACK;
+enum class Themes(
+    val isLight: Boolean,
+    @StringRes val nameId: Int,
+    @StyleRes val themeId: Int,
+) {
+    LIGHT(
+        isLight = true,
+        nameId = R.string.theme_name_light,
+        themeId = R.style.AppTheme_Light,
+    ),
+    DARK(
+        isLight = false,
+        nameId = R.string.theme_name_dark,
+        themeId = R.style.AppTheme_BaseDark_Dark,
+    ),
+    GREY(
+        isLight = false,
+        nameId = R.string.theme_name_grey,
+        themeId = R.style.AppTheme_BaseDark_Grey,
+    ),
+    BLACK(
+        isLight = false,
+        nameId = R.string.theme_name_black,
+        themeId = R.style.AppTheme_BaseDark_Black,
+    );
 
     companion object {
-        fun fromIDTheme(@StyleRes id: Int) = when (id) {
-            R.style.AppTheme_Light -> LIGHT
-            R.style.AppTheme_BaseDark_Dark -> DARK
-            R.style.AppTheme_BaseDark_Grey -> GREY
-            R.style.AppTheme_BaseDark_Black -> BLACK
-            else -> null
-        }
-
-        fun toIDTheme(theme: Themes) = when (theme) {
-            LIGHT -> R.style.AppTheme_Light
-            DARK -> R.style.AppTheme_BaseDark_Dark
-            GREY -> R.style.AppTheme_BaseDark_Grey
-            BLACK -> R.style.AppTheme_BaseDark_Black
-        }
-
+        fun fromIDTheme(@StyleRes id: Int) = list.find { it.themeId == id } ?: LIGHT
         val list = listOf(LIGHT, DARK, GREY, BLACK)
-        val pairs = mapOf(
-            LIGHT to "Light",
-            DARK to "Dark",
-            GREY to "Grey",
-            BLACK to "Black"
-        )
     }
-
-    val isDark get() = this != LIGHT
 }
 
 @Composable
 fun Theme(
     appPreferences: AppPreferences,
-    wrapper: @Composable (fn: @Composable () -> @Composable Unit) -> Unit = { fn ->
-        Surface(
-            color = MaterialTheme.colorScheme.primary,
-            modifier = Modifier.fillMaxSize()
-        ) { fn() }
-    },
     content: @Composable () -> @Composable Unit,
 ) {
-    // Done so the first load is not undefined (visually annoying)
-    val initialThemeFollowSystem by remember {
-        mutableStateOf(appPreferences.THEME_FOLLOW_SYSTEM.value)
-    }
-    val initialThemeType by remember {
-        mutableStateOf(Themes.fromIDTheme(appPreferences.THEME_ID.value) ?: Themes.LIGHT)
-    }
-
-    val themeFollowSystem by remember {
-        appPreferences.THEME_FOLLOW_SYSTEM.flow()
-    }.collectAsState(initialThemeFollowSystem)
-
-    val themeType by remember {
-        appPreferences.THEME_ID.flow().mapNotNull(Themes::fromIDTheme)
-    }.collectAsState(initialThemeType)
-
+    val followSystemsTheme by appPreferences.THEME_FOLLOW_SYSTEM.state(rememberCoroutineScope())
+    val selectedThemeId = appPreferences.THEME_ID.state(rememberCoroutineScope())
+    val selectedTheme by remember { derivedStateOf { Themes.fromIDTheme(selectedThemeId.value) } }
     val isSystemThemeLight = !isSystemInDarkTheme()
-    val isThemeLight by remember {
-        derivedStateOf {
-            themeType !in setOf(Themes.DARK, Themes.GREY, Themes.BLACK)
-        }
-    }
-
-    val theme: Themes = when (themeFollowSystem) {
+    val theme: Themes = when (followSystemsTheme) {
         true -> when {
-            isSystemThemeLight && !isThemeLight -> Themes.LIGHT
-            !isSystemThemeLight && isThemeLight -> Themes.DARK
-            else -> themeType
+            isSystemThemeLight && !selectedTheme.isLight -> Themes.LIGHT
+            !isSystemThemeLight && selectedTheme.isLight -> Themes.DARK
+            else -> selectedTheme
         }
-        false -> themeType
+        false -> selectedTheme
     }
-
     InternalTheme(
         theme = theme,
         content = content,
-        wrapper = wrapper
     )
 }
 
 @Composable
 fun InternalTheme(
     theme: Themes = if (isSystemInDarkTheme()) Themes.DARK else Themes.LIGHT,
-    wrapper: @Composable (fn: @Composable () -> Unit) -> Unit = { fn ->
-        Surface(
-            color = MaterialTheme.colorScheme.primary,
-            modifier = Modifier.fillMaxSize(),
-        ) { fn() }
-    },
     content: @Composable () -> Unit
 ) {
     val colorScheme = when (theme) {
@@ -197,57 +157,17 @@ fun InternalTheme(
     val systemUiController = rememberSystemUiController()
     systemUiController.setSystemBarsColor(
         color = colorScheme.primary,
-        darkIcons = !theme.isDark
+        darkIcons = theme.isLight
     )
 
-    val localContentColor by remember { derivedStateOf { Color.Red } }
-
     CompositionLocalProvider(
-        LocalContentColor provides localContentColor
+        LocalContentColor provides colorScheme.onPrimary
     ) {
         MaterialTheme(
             colorScheme = colorScheme,
             typography = typography,
             shapes = shapes,
-            content = { wrapper { content() } }
-        )
-    }
-}
-
-// InternalTheme but for theming an object (wont try to fill all space)
-@Composable
-fun InternalThemeObject(
-    theme: Themes = if (isSystemInDarkTheme()) Themes.DARK else Themes.LIGHT,
-    wrapper: @Composable (fn: @Composable () -> Unit) -> Unit = { fn ->
-        Surface(
-            color = MaterialTheme.colorScheme.primary,
-        ) { fn() }
-    },
-    content: @Composable () -> Unit
-) {
-    val colorScheme = when (theme) {
-        Themes.LIGHT -> light_ColorPalette
-        Themes.DARK -> dark_ColorPalette
-        Themes.GREY -> grey_ColorPalette
-        Themes.BLACK -> black_ColorPalette
-    }
-
-    val systemUiController = rememberSystemUiController()
-    systemUiController.setSystemBarsColor(
-        color = colorScheme.primary,
-        darkIcons = !theme.isDark
-    )
-
-    val localContentColor by remember { derivedStateOf { colorScheme.onPrimary } }
-
-    CompositionLocalProvider(
-        LocalContentColor provides localContentColor
-    ) {
-        MaterialTheme(
-            colorScheme = colorScheme,
-            typography = typography,
-            shapes = shapes,
-            content = { wrapper { content() } }
+            content = content
         )
     }
 }

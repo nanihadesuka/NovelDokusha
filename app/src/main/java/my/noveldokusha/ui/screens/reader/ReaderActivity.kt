@@ -6,13 +6,11 @@ import android.os.Build
 import android.os.Bundle
 import android.view.WindowManager
 import android.widget.AbsListView
-import androidx.activity.compose.BackHandler
+import androidx.activity.compose.setContent
 import androidx.activity.viewModels
-import androidx.compose.material3.LocalContentColor
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.snapshotFlow
+import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
@@ -33,12 +31,16 @@ import my.noveldokusha.R
 import my.noveldokusha.databinding.ActivityReaderBinding
 import my.noveldokusha.tools.Utterance
 import my.noveldokusha.ui.BaseActivity
+import my.noveldokusha.ui.goToWebViewWithUrl
 import my.noveldokusha.ui.screens.main.settings.SettingsViewModel
-import my.noveldokusha.ui.screens.reader.settingsViews.ReaderInfoView
 import my.noveldokusha.ui.screens.reader.tools.FontsLoader
 import my.noveldokusha.ui.screens.reader.tools.indexOfReaderItem
 import my.noveldokusha.ui.theme.Theme
-import my.noveldokusha.utils.*
+import my.noveldokusha.utils.Extra_Boolean
+import my.noveldokusha.utils.Extra_String
+import my.noveldokusha.utils.colorAttrRes
+import my.noveldokusha.utils.dpToPx
+import my.noveldokusha.utils.fadeIn
 
 @AndroidEntryPoint
 class ReaderActivity : BaseActivity() {
@@ -83,21 +85,15 @@ class ReaderActivity : BaseActivity() {
                 currentSpeakerActiveItem = { viewModel.readerSpeaker.currentTextPlaying.value },
                 onChapterStartVisible = viewModel::markChapterStartAsSeen,
                 onChapterEndVisible = viewModel::markChapterEndAsSeen,
-                onReloadReader = ::reloadReader,
+                onReloadReader = viewModel::reloadReader,
                 onClick = {
-                    viewModel.showReaderInfoAndSettings = !viewModel.showReaderInfoAndSettings
+                    viewModel.state.showReaderInfo.value = !viewModel.state.showReaderInfo.value
                 },
             )
         }
     }
 
     private val fontsLoader = FontsLoader()
-
-    private fun reloadReader() {
-        val currentChapter = viewModel.readingCurrentChapter.copy()
-        viewModel.reloadReader()
-        viewModel.chaptersLoader.tryLoadRestartedInitial(currentChapter)
-    }
 
     override fun onBackPressed() {
         viewModel.onBackPressed()
@@ -111,7 +107,6 @@ class ReaderActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(viewBind.root)
 
         viewBind.listView.adapter = viewAdapter.listView
 
@@ -123,7 +118,7 @@ class ReaderActivity : BaseActivity() {
 
         lifecycleScope.launch {
             viewModel.onTranslatorChanged.collect {
-                reloadReader()
+                viewModel.reloadReader()
             }
         }
 
@@ -234,20 +229,11 @@ class ReaderActivity : BaseActivity() {
             )
         }
 
-        viewBind.settings.setContent {
-            Theme(
-                appPreferences = appPreferences,
-                wrapper = {
-                    // Necessary so that text knows what color it must be given that the
-                    // background is transparent (no Surface parent)
-                    CompositionLocalProvider(
-                        LocalContentColor provides MaterialTheme.colorScheme.onSecondary
-                    ) { it() }
-                }
-            ) {
+        setContent {
+            Theme(appPreferences) {
                 // Notify manually text font changed for list view
                 LaunchedEffect(true) {
-                    snapshotFlow { viewModel.textFont }.drop(1)
+                    snapshotFlow { viewModel.state.settings.style.textFont.value }.drop(1)
                         .collect {
                             viewAdapter.listView.notifyDataSetChanged()
                         }
@@ -255,7 +241,7 @@ class ReaderActivity : BaseActivity() {
 
                 // Notify manually text size changed for list view
                 LaunchedEffect(true) {
-                    snapshotFlow { viewModel.textSize }.drop(1)
+                    snapshotFlow { viewModel.state.settings.style.textSize.value }.drop(1)
                         .collect {
                             viewAdapter.listView.notifyDataSetChanged()
                         }
@@ -263,45 +249,36 @@ class ReaderActivity : BaseActivity() {
 
                 // Notify manually selectable text changed for list view
                 LaunchedEffect(true) {
-                    snapshotFlow { viewModel.isTextSelectable }.drop(1)
+                    snapshotFlow { viewModel.state.settings.isTextSelectable.value }.drop(1)
                         .collect {
                             viewAdapter.listView.notifyDataSetChanged()
                         }
                 }
 
-                // Capture back action when viewing info
-                BackHandler(enabled = viewModel.showReaderInfoAndSettings) {
-                    viewModel.showReaderInfoAndSettings = false
-                }
-
                 // Reader info
-                ReaderInfoView(
-                    chapterTitle = viewModel.readingPosStats.value?.chapterTitle ?: "",
-                    chapterCurrentNumber = viewModel.readingPosStats.value?.run { chapterIndex + 1 }
-                        ?: 0,
-                    chapterPercentageProgress = viewModel.chapterPercentageProgress.value,
-                    chaptersTotalSize = viewModel.readingPosStats.value?.chapterCount ?: 0,
-                    textFont = viewModel.textFont,
-                    textSize = viewModel.textSize,
-                    visible = viewModel.showReaderInfoAndSettings,
+                ReaderScreen(
+                    state = viewModel.state,
                     onTextFontChanged = { appPreferences.READER_FONT_FAMILY.value = it },
                     onTextSizeChanged = { appPreferences.READER_FONT_SIZE.value = it },
-                    liveTranslationSettingData = viewModel.liveTranslationSettingState,
-                    textToSpeechSettingData = viewModel.textToSpeechSettingData,
-                    currentFollowSystem = viewModelGlobalSettings.followsSystem,
-                    currentTheme = viewModelGlobalSettings.theme,
-                    selectableText = viewModel.isTextSelectable,
-                    onSelectableTextChange = {
-                        appPreferences.READER_SELECTABLE_TEXT.value = it
-                    },
+                    onSelectableTextChange = { appPreferences.READER_SELECTABLE_TEXT.value = it },
                     onFollowSystem = viewModelGlobalSettings::onFollowSystem,
                     onThemeSelected = viewModelGlobalSettings::onThemeSelected,
+                    onPressBack = ::finish,
+                    onOpenChapterInWeb = {
+                        val url = viewModel.state.readerInfo.chapterUrl.value
+                        if (url.isNotBlank()) {
+                            goToWebViewWithUrl(url)
+                        }
+                    },
+                    readerContent = {
+                        AndroidView(factory = { viewBind.root })
+                    }
                 )
             }
         }
 
         viewBind.listView.setOnItemClickListener { _, _, _, _ ->
-            viewModel.showReaderInfoAndSettings = !viewModel.showReaderInfoAndSettings
+            viewModel.state.showReaderInfo.value = !viewModel.state.showReaderInfo.value
         }
 
         viewBind.listView.setOnScrollListener(

@@ -51,26 +51,26 @@ class NarratorMediaControlsCallback(
     }
 
     override fun onPlay() {
-        readerTextToSpeech.settings.setPlaying(true)
+        readerTextToSpeech.state.setPlaying(true)
     }
 
     override fun onPause() {
-        readerTextToSpeech.settings.setPlaying(false)
+        readerTextToSpeech.state.setPlaying(false)
     }
 
     override fun onSkipToNext() {
-        readerTextToSpeech.settings.playNextChapter()
+        readerTextToSpeech.state.playNextChapter()
     }
 
     override fun onSkipToPrevious() {
-        readerTextToSpeech.settings.playPreviousChapter()
+        readerTextToSpeech.state.playPreviousChapter()
     }
 
     override fun onRewind() {
-        readerTextToSpeech.settings.playPreviousItem()
+        readerTextToSpeech.state.playPreviousItem()
     }
 
     override fun onFastForward() {
-        readerTextToSpeech.settings.playNextItem()
+        readerTextToSpeech.state.playNextItem()
     }
 }

@@ -33,10 +33,8 @@ class SettingsViewModel @Inject constructor(
 
     val followsSystem by appPreferences.THEME_FOLLOW_SYSTEM.state(viewModelScope)
 
-    val theme by derivedStateOf {
-        val themeId by appPreferences.THEME_ID.state(viewModelScope)
-        Themes.fromIDTheme(themeId) ?: Themes.LIGHT
-    }
+    private val themeId by appPreferences.THEME_ID.state(viewModelScope)
+    val theme by derivedStateOf { Themes.fromIDTheme(themeId) }
 
     var databaseSize by mutableStateOf("")
     var imageFolderSize by mutableStateOf("")
@@ -91,7 +89,7 @@ class SettingsViewModel @Inject constructor(
     }
 
     fun onThemeSelected(themes: Themes) {
-        appPreferences.THEME_ID.value = Themes.toIDTheme(themes)
+        appPreferences.THEME_ID.value = themes.themeId
     }
 }
 

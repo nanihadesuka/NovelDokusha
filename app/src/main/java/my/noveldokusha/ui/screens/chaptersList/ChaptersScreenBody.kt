@@ -67,7 +67,8 @@ fun ChaptersScreenBody(
                     bookState = state.book.value,
                     sourceCatalogName = state.sourceCatalogName.value,
                     numberOfChapters = state.chapters.size,
-                    paddingValues = innerPadding
+                    paddingValues = innerPadding,
+                    modifier = Modifier.padding(bottom = 12.dp)
                 )
             }
 

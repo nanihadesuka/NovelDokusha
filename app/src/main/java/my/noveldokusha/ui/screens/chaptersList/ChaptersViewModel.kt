@@ -116,7 +116,8 @@ class ChaptersViewModel @Inject constructor(
             if (!repository.bookChapters.hasChapters(bookMetadata.url))
                 updateChaptersList()
 
-            repository.libraryBooks.get(bookMetadata.url) ?: return@launch
+            if (repository.libraryBooks.get(bookMetadata.url) != null)
+                return@launch
 
             val coverUrl = async { downloadBookCoverImageUrl(scraper, networkClient, bookUrl) }
             val description = async { downloadBookDescription(scraper, networkClient, bookUrl) }
@@ -153,7 +154,7 @@ class ChaptersViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            repository.bookChapters.getChaptersWithContexFlow(bookMetadata.url)
+            repository.bookChapters.getChaptersWithContextFlow(bookMetadata.url)
                 .map { removeCommonTextFromTitles(it) }
                 // Sort the chapters given the order preference
                 .combine(appPreferences.CHAPTERS_SORT_ASCENDING.flow()) { chapters, sorted ->
@@ -287,15 +288,15 @@ class ChaptersViewModel @Inject constructor(
     fun onSelectionModeChapterLongClick(chapter: ChapterWithContext) {
         val url = chapter.chapter.url
         if (url != lastSelectedChapterUrl) {
-            val indexLast = state.chapters.indexOfFirst { it.chapter.url == lastSelectedChapterUrl }
+            val indexOld = state.chapters.indexOfFirst { it.chapter.url == lastSelectedChapterUrl }
             val indexNew = state.chapters.indexOfFirst { it.chapter.url == url }
-            val min = minOf(indexLast, indexNew)
-            val max = maxOf(indexLast, indexNew)
+            val min = minOf(indexOld, indexNew)
+            val max = maxOf(indexOld, indexNew)
             if (min >= 0 && max >= 0) {
                 for (index in min..max) {
                     state.selectedChaptersUrl[state.chapters[index].chapter.url] = Unit
                 }
-                lastSelectedChapterUrl = state.chapters[max].chapter.url
+                lastSelectedChapterUrl = state.chapters[indexNew].chapter.url
                 return
             }
         }

@@ -9,9 +9,9 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.asLiveData
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.drop
-import my.noveldokusha.di.AppModule
 import my.noveldokusha.AppPreferences
 import my.noveldokusha.R
+import my.noveldokusha.di.AppModule
 import javax.inject.Inject
 
 @AndroidEntryPoint

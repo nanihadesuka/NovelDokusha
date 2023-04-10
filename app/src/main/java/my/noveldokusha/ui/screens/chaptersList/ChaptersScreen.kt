@@ -137,7 +137,7 @@ fun ChaptersScreen(
                             IconButton(
                                 onClick = onPressBack
                             ) {
-                                Icon(Icons.Filled.ArrowBack, null)
+                                Icon(Icons.Default.ArrowBack, null)
                             }
                         },
                         actions = {

@@ -9,7 +9,12 @@ import my.noveldokusha.network.postRequest
 import my.noveldokusha.network.tryConnect
 import my.noveldokusha.scraper.SourceInterface
 import my.noveldokusha.scraper.TextExtractor
-import my.noveldokusha.utils.*
+import my.noveldokusha.utils.add
+import my.noveldokusha.utils.addPath
+import my.noveldokusha.utils.ifCase
+import my.noveldokusha.utils.toDocument
+import my.noveldokusha.utils.toUrlBuilder
+import my.noveldokusha.utils.toUrlBuilderSafe
 import org.jsoup.nodes.Document
 
 class WuxiaWorld(

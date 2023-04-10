@@ -1,11 +1,11 @@
 package my.noveldokusha.repository
 
+import my.noveldokusha.data.Response
 import my.noveldokusha.data.database.AppDatabaseOperations
 import my.noveldokusha.data.database.DAOs.ChapterBodyDao
 import my.noveldokusha.data.database.tables.ChapterBody
-import my.noveldokusha.network.NetworkClient
-import my.noveldokusha.data.Response
 import my.noveldokusha.data.map
+import my.noveldokusha.network.NetworkClient
 import my.noveldokusha.scraper.Scraper
 import my.noveldokusha.scraper.downloadChapter
 

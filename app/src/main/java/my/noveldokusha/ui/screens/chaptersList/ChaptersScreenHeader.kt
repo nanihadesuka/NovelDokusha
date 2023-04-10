@@ -26,7 +26,6 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
@@ -45,7 +44,8 @@ fun ChaptersScreenHeader(
     bookState: ChapterScreenState.BookState,
     sourceCatalogName: String,
     numberOfChapters: Int,
-    paddingValues: PaddingValues
+    paddingValues: PaddingValues,
+    modifier: Modifier = Modifier,
 ) {
     val context by rememberUpdatedState(LocalContext.current)
     val coverImageModel = bookState.coverImageUrl?.let {
@@ -55,7 +55,7 @@ fun ChaptersScreenHeader(
         ).value
     } ?: R.drawable.ic_baseline_empty_24
 
-    Box {
+    Box(modifier = modifier) {
         Box {
             ImageView(
                 imageModel = coverImageModel,

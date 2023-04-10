@@ -1,4 +1,4 @@
-package my.noveldokusha.ui.screens.reader.settingsViews
+package my.noveldokusha.ui.screens.reader.settingDialogs
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
@@ -6,19 +6,18 @@ import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.LocalContentAlpha
+import androidx.compose.material.Icon
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.StarRate
-import androidx.compose.material.icons.outlined.FormatListBulleted
+import androidx.compose.material.icons.outlined.Save
+import androidx.compose.material.icons.outlined.StarBorder
 import androidx.compose.material.icons.rounded.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -26,7 +25,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
@@ -34,7 +33,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
@@ -48,44 +46,24 @@ import my.noveldokusha.VoicePredefineState
 import my.noveldokusha.composableActions.debouncedAction
 import my.noveldokusha.tools.VoiceData
 import my.noveldokusha.ui.composeViews.*
+import my.noveldokusha.ui.screens.reader.features.TextToSpeechSettingData
 import my.noveldokusha.ui.theme.ColorAccent
+import my.noveldokusha.ui.theme.ColorNotice
 import my.noveldokusha.ui.theme.InternalTheme
-import my.noveldokusha.ui.theme.InternalThemeObject
-import my.noveldokusha.ui.theme.Themes
-import my.noveldokusha.utils.backgroundRounded
-import my.noveldokusha.utils.ifCase
-import my.noveldokusha.utils.outlineRounded
+import my.noveldokusha.utils.mix
 import my.noveldokusha.utils.rememberMutableStateOf
 
 
-@OptIn(ExperimentalAnimationApi::class, ExperimentalMaterialApi::class)
+@OptIn(ExperimentalAnimationApi::class, ExperimentalLayoutApi::class)
 @Composable
-fun TextToSpeechSetting(
-    isPlaying: Boolean,
-    isLoadingChapter: Boolean,
-    currentVoice: VoiceData?,
-    isActive: Boolean,
-    voiceSpeed: Float,
-    voicePitch: Float,
-    playCurrent: (Boolean) -> Unit,
-    playPreviousItem: () -> Unit,
-    playPreviousChapter: () -> Unit,
-    playNextItem: () -> Unit,
-    playNextChapter: () -> Unit,
-    playFirstVisibleItem: () -> Unit,
-    scrollToActiveItem: () -> Unit,
-    availableVoices: List<VoiceData>,
-    customSavedVoicesStates: List<VoicePredefineState>,
-    setVoice: (voiceId: String) -> Unit,
-    setVoiceSpeed: (Float) -> Unit,
-    setVoicePitch: (Float) -> Unit,
-    setCustomSavedVoices: (List<VoicePredefineState>) -> Unit,
+fun VoiceReaderSettingDialog(
+    state: TextToSpeechSettingData
 ) {
     var openVoicesDialog by rememberSaveable { mutableStateOf(false) }
     val dropdownCustomSavedVoicesExpanded = rememberSaveable { mutableStateOf(false) }
 
     Column {
-        AnimatedVisibility(visible = isLoadingChapter) {
+        AnimatedVisibility(visible = state.isLoadingChapter.value) {
             Box(
                 modifier = Modifier.fillMaxWidth(),
                 contentAlignment = Alignment.Center
@@ -100,24 +78,89 @@ fun TextToSpeechSetting(
                 )
             }
         }
-        Section {
+        ElevatedCard(
+            elevation = CardDefaults.elevatedCardElevation(defaultElevation = 12.dp)
+        ) {
             Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(8.dp),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 8.dp)
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+                modifier = Modifier.padding(16.dp)
             ) {
+                // Player voice parameters
+                MySlider(
+                    value = state.voicePitch.value,
+                    valueRange = 0.1f..5f,
+                    onValueChange = state.setVoicePitch,
+                    text = stringResource(R.string.voice_pitch) + ": %.2f".format(state.voicePitch.value),
+                )
+                MySlider(
+                    value = state.voiceSpeed.value,
+                    valueRange = 0.1f..5f,
+                    onValueChange = state.setVoiceSpeed,
+                    text = stringResource(R.string.voice_speed) + ": %.2f".format(state.voiceSpeed.value),
+                )
+
+                // Player settings buttons
+                FlowRow(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                    AssistChip(
+                        label = { Text(text = stringResource(id = R.string.start_here)) },
+                        onClick = debouncedAction { state.playFirstVisibleItem() },
+                    )
+                    AssistChip(
+                        label = { Text(text = stringResource(id = R.string.focus)) },
+                        onClick = debouncedAction { state.scrollToActiveItem() },
+                    )
+                    AssistChip(
+                        label = { Text(text = stringResource(id = R.string.voices)) },
+                        onClick = { openVoicesDialog = !openVoicesDialog },
+                    )
+                    AssistChip(
+                        label = { Text(text = stringResource(R.string.saved_voices)) },
+                        onClick = {
+                            dropdownCustomSavedVoicesExpanded.let {
+                                it.value = !it.value
+                            }
+                        },
+                    )
+                    Box {
+                        DropdownCustomSavedVoices(
+                            expanded = dropdownCustomSavedVoicesExpanded,
+                            list = state.customSavedVoices.value,
+                            currentVoice = state.activeVoice.value,
+                            currentVoiceSpeed = state.voiceSpeed.value,
+                            currentVoicePitch = state.voicePitch.value,
+                            onPredefinedSelected = {
+                                state.setVoiceSpeed(it.speed)
+                                state.setVoicePitch(it.pitch)
+                                state.setVoiceId(it.voiceId)
+                            },
+                            setCustomSavedVoices = state.setCustomSavedVoices
+                        )
+                        VoiceSelectorDialog(
+                            availableVoices = state.availableVoices,
+                            currentVoice = state.activeVoice.value,
+                            inputTextFilter = rememberSaveable { mutableStateOf("") },
+                            setVoice = state.setVoiceId,
+                            isDialogOpen = openVoicesDialog,
+                            setDialogOpen = { openVoicesDialog = it }
+                        )
+                    }
+                }
+
+                // Player playback buttons
                 Row(
                     horizontalArrangement = Arrangement.Center,
                     verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier
-                        .background(MaterialTheme.colorScheme.background, CircleShape)
+                    modifier = Modifier.fillMaxWidth()
                 ) {
-                    val alpha by animateFloatAsState(targetValue = if (isActive) 1f else 0.5f)
+                    val alpha by animateFloatAsState(
+                        targetValue = if (state.isThereActiveItem.value) 1f else 0.5f,
+                        label = ""
+                    )
                     IconButton(
-                        onClick = debouncedAction(waitMillis = 1000) { playPreviousChapter() },
-                        enabled = isActive,
+                        onClick = debouncedAction(waitMillis = 1000) { state.playPreviousChapter() },
+                        enabled = state.isThereActiveItem.value,
                         modifier = Modifier.alpha(alpha),
                     ) {
                         Icon(
@@ -130,8 +173,8 @@ fun TextToSpeechSetting(
                         )
                     }
                     IconButton(
-                        onClick = debouncedAction(waitMillis = 100) { playPreviousItem() },
-                        enabled = isActive,
+                        onClick = debouncedAction(waitMillis = 100) { state.playPreviousItem() },
+                        enabled = state.isThereActiveItem.value,
                         modifier = Modifier.alpha(alpha),
                     ) {
                         Icon(
@@ -143,12 +186,12 @@ fun TextToSpeechSetting(
                                 .background(ColorAccent, CircleShape),
                         )
                     }
-                    IconButton(onClick = { playCurrent(!isPlaying) }) {
+                    IconButton(onClick = { state.setPlaying(!state.isPlaying.value) }) {
                         AnimatedContent(
-                            targetState = isPlaying,
+                            targetState = state.isPlaying.value,
                             modifier = Modifier
                                 .size(56.dp)
-                                .background(ColorAccent, CircleShape)
+                                .background(ColorAccent, CircleShape), label = ""
                         ) { target ->
                             when (target) {
                                 true -> Icon(
@@ -165,8 +208,8 @@ fun TextToSpeechSetting(
                         }
                     }
                     IconButton(
-                        onClick = debouncedAction(waitMillis = 100) { playNextItem() },
-                        enabled = isActive,
+                        onClick = debouncedAction(waitMillis = 100) { state.playNextItem() },
+                        enabled = state.isThereActiveItem.value,
                         modifier = Modifier.alpha(alpha),
                     ) {
                         Icon(
@@ -179,8 +222,8 @@ fun TextToSpeechSetting(
                         )
                     }
                     IconButton(
-                        onClick = debouncedAction(waitMillis = 1000) { playNextChapter() },
-                        enabled = isActive,
+                        onClick = debouncedAction(waitMillis = 1000) { state.playNextChapter() },
+                        enabled = state.isThereActiveItem.value,
                         modifier = Modifier.alpha(alpha),
                     ) {
                         Icon(
@@ -193,81 +236,6 @@ fun TextToSpeechSetting(
                         )
                     }
                 }
-
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                ) {
-                    MyButton(
-                        text = stringResource(id = R.string.start_here),
-                        onClick = debouncedAction { playFirstVisibleItem() },
-                        borderWidth = 1.dp,
-                        borderColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
-                        outerPadding = 0.dp,
-                    )
-                    MyButton(
-                        text = stringResource(id = R.string.focus),
-                        onClick = debouncedAction { scrollToActiveItem() },
-                        borderWidth = 1.dp,
-                        borderColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
-                        outerPadding = 0.dp,
-                    )
-                    MyButton(
-                        text = stringResource(id = R.string.voices),
-                        onClick = { openVoicesDialog = !openVoicesDialog },
-                        borderWidth = 1.dp,
-                        borderColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
-                        outerPadding = 0.dp,
-                    )
-                    MyIconButton(
-                        icon = Icons.Outlined.FormatListBulleted,
-                        onClick = {
-                            dropdownCustomSavedVoicesExpanded.let {
-                                it.value = !it.value
-                            }
-                        },
-                        contentDescription = stringResource(R.string.custom_predefined_voices),
-                        borderWidth = 1.dp,
-                        borderColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
-                        outerPadding = 0.dp,
-                    )
-                    Box {
-                        DropdownCustomSavedVoices(
-                            expanded = dropdownCustomSavedVoicesExpanded,
-                            list = customSavedVoicesStates,
-                            currentVoice = currentVoice,
-                            currentVoiceSpeed = voiceSpeed,
-                            currentVoicePitch = voicePitch,
-                            onPredefinedSelected = {
-                                setVoiceSpeed(it.speed)
-                                setVoicePitch(it.pitch)
-                                setVoice(it.voiceId)
-                            },
-                            setCustomSavedVoices = setCustomSavedVoices
-                        )
-                        VoiceSelectorDialog(
-                            availableVoices = availableVoices,
-                            currentVoice = currentVoice,
-                            inputTextFilter = rememberSaveable { mutableStateOf("") },
-                            setVoice = setVoice,
-                            isDialogOpen = openVoicesDialog,
-                            setDialogOpen = { openVoicesDialog = it }
-                        )
-                    }
-                }
-
-                MySlider(
-                    value = voicePitch,
-                    valueRange = 0.1f..5f,
-                    onValueChange = setVoicePitch,
-                    text = stringResource(R.string.voice_pitch) + ": %.2f".format(voicePitch),
-                )
-
-                MySlider(
-                    value = voiceSpeed,
-                    valueRange = 0.1f..5f,
-                    onValueChange = setVoiceSpeed,
-                    text = stringResource(R.string.voice_speed) + ": %.2f".format(voiceSpeed),
-                )
             }
         }
     }
@@ -325,14 +293,12 @@ private fun VoiceSelectorDialog(
     ) {
         LazyColumn(
             state = listState,
-            verticalArrangement = Arrangement.spacedBy(8.dp),
             modifier = Modifier
-                .padding(4.dp)
-                .clip(MaterialTheme.shapes.large)
-                .background(MaterialTheme.colorScheme.background, MaterialTheme.shapes.large)
+                .shadow(10.dp, MaterialTheme.shapes.large)
+                .background(MaterialTheme.colorScheme.primary, MaterialTheme.shapes.large)
         ) {
             stickyHeader {
-                Surface(color = MaterialTheme.colorScheme.background) {
+                Surface(color = MaterialTheme.colorScheme.primary.mix(ColorAccent, 0.75f)) {
                     Column {
                         MyOutlinedTextField(
                             value = inputTextFilter.value,
@@ -366,15 +332,14 @@ private fun VoiceSelectorDialog(
                 val selected = it.id == currentVoice?.id
                 Row(
                     modifier = Modifier
-                        .padding(horizontal = 4.dp)
                         .heightIn(min = 54.dp)
                         .background(
-                            if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.secondary,
-                            CircleShape
+                            MaterialTheme.colorScheme.primary.mix(
+                                ColorAccent,
+                                if (selected) 0.85f else 1f
+                            )
                         )
-                        .clip(CircleShape)
                         .clickable(enabled = !selected) { setVoice(it.id) }
-                        .ifCase(selected) { border(2.dp, ColorAccent, CircleShape) }
                         .padding(horizontal = 16.dp)
                         .padding(4.dp)
                         .fillMaxWidth(),
@@ -388,16 +353,11 @@ private fun VoiceSelectorDialog(
                     )
                     Row {
                         for (star in 0..4) {
+                            val yay = it.quality > star * 100
                             Icon(
-                                imageVector = Icons.Default.StarRate,
+                                imageVector = if (yay) Icons.Filled.StarRate else Icons.Outlined.StarBorder,
                                 contentDescription = null,
-                                tint = if (it.quality > star * 100) {
-                                    Color.Yellow
-                                } else {
-                                    LocalContentColor.current.copy(
-                                        alpha = LocalContentAlpha.current
-                                    )
-                                },
+                                tint = if (yay) ColorNotice else MaterialTheme.colorScheme.onPrimary,
                                 modifier = Modifier.size(10.dp)
                             )
                         }
@@ -412,8 +372,7 @@ private fun VoiceSelectorDialog(
                             text = it.id,
                             modifier = Modifier
                                 .background(
-                                    MaterialTheme.colorScheme.primary,
-                                    MaterialTheme.shapes.medium
+                                    MaterialTheme.colorScheme.primary, MaterialTheme.shapes.medium
                                 )
                                 .padding(horizontal = 4.dp, vertical = 2.dp),
                             fontWeight = FontWeight.Bold,
@@ -441,9 +400,9 @@ private fun VoiceSelectorDialog(
 }
 
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun DropdownCustomSavedVoices(
+private fun DropdownCustomSavedVoices(
     expanded: MutableState<Boolean>,
     list: List<VoicePredefineState>,
     currentVoice: VoiceData?,
@@ -458,121 +417,111 @@ fun DropdownCustomSavedVoices(
         expanded = expanded.value,
         onDismissRequest = { expanded.value = !expanded.value },
     ) {
-        MyButton(
-            text = stringResource(R.string.save_current_voice),
-            onClick = { expandedAddNextEntry = true },
-            textAlign = TextAlign.Center,
-            modifier = Modifier
-                .align(Alignment.CenterHorizontally)
-                .padding(8.dp),
-            outerPadding = 0.dp,
-            shape = MaterialTheme.shapes.medium,
-            borderWidth = 1.dp,
-            borderColor = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.5f)
+        ListItem(
+            headlineContent = {
+                Text(text = stringResource(R.string.save_current_voice))
+            },
+            leadingContent = {
+                Icon(
+                    Icons.Outlined.Save,
+                    null,
+                    tint = MaterialTheme.colorScheme.onPrimary
+                )
+            },
+            modifier = Modifier.clickable { expandedAddNextEntry = true }
         )
-        Column(
-            Modifier
-                .padding(horizontal = 8.dp)
-                .backgroundRounded()
-                .outlineRounded(width = Dp.Hairline)
-                .widthIn(min = 128.dp)
-        ) {
-            list.forEachIndexed { index, predefinedVoice ->
-                var deleteEntryExpand by rememberMutableStateOf(false)
-                MyButton(
-                    text = predefinedVoice.savedName,
+        Divider()
+        if (list.isEmpty()) {
+            Text(text = stringResource(R.string.no_voices_saved), Modifier.padding(16.dp))
+        }
+        list.forEachIndexed { index, predefinedVoice ->
+            var deleteEntryExpand by rememberMutableStateOf(false)
+            ListItem(
+                headlineContent = {
+                    Text(text = predefinedVoice.savedName)
+                },
+                modifier = Modifier.combinedClickable(
+                    enabled = true,
                     onClick = { onPredefinedSelected(predefinedVoice) },
                     onLongClick = { deleteEntryExpand = true },
-                    borderWidth = Dp.Unspecified,
-                    textAlign = TextAlign.Center,
-                    outerPadding = 0.dp,
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(0.dp),
                 )
-                if (deleteEntryExpand) AlertDialog(
-                    onDismissRequest = { deleteEntryExpand = false },
-                    content = {
-                        Column {
-                            Text(
-                                text = predefinedVoice.savedName,
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(bottom = 8.dp),
-                                textAlign = TextAlign.Center
-                            )
-                            Box(Modifier.padding(8.dp)) {
-                                MyButton(
-                                    text = stringResource(R.string.delete),
-                                    onClick = {
-                                        deleteEntryExpand = false
-                                        setCustomSavedVoices(
-                                            list.toMutableList().also { it.removeAt(index) }
-                                        )
-                                    },
-                                    modifier = Modifier.fillMaxWidth(),
-                                    textAlign = TextAlign.Center
-                                )
-                            }
-                        }
+            )
+            if (deleteEntryExpand) AlertDialog(
+                onDismissRequest = { deleteEntryExpand = false },
+                title = { Text(text = stringResource(R.string.delete_voice)) },
+                text = {
+                    Text(
+                        text = predefinedVoice.savedName,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                },
+                confirmButton = {
+                    FilledTonalButton(onClick = {
+                        deleteEntryExpand = false
+                        setCustomSavedVoices(
+                            list.toMutableList().also { it.removeAt(index) }
+                        )
+                    }) {
+                        Text(text = stringResource(id = R.string.delete))
                     }
-                )
-            }
+                },
+                dismissButton = {
+                    Button(onClick = { deleteEntryExpand = false }) {
+                        Text(text = stringResource(R.string.cancel))
+                    }
+                },
+            )
         }
     }
 
-    if (expandedAddNextEntry) Dialog(
-        onDismissRequest = { expandedAddNextEntry = !expandedAddNextEntry }
-    ) {
+
+    if (expandedAddNextEntry) {
         var name by rememberMutableStateOf(value = "")
         val focusRequester = remember { FocusRequester() }
-        Surface(
-            shape = MaterialTheme.shapes.large
-        ) {
-            Column(
-                verticalArrangement = Arrangement.spacedBy(16.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier.padding(16.dp)
-            ) {
-                Text(
-                    text = stringResource(R.string.save_current_voice_parameters),
-                    textAlign = TextAlign.Center
-                )
+        LaunchedEffect(Unit) {
+            delay(300)
+            focusRequester.requestFocus()
+        }
+        AlertDialog(
+            tonalElevation = 24.dp,
+            onDismissRequest = { expandedAddNextEntry = false },
+            title = { Text(text = stringResource(R.string.save_current_voice_parameters)) },
+            text = {
                 MyOutlinedTextField(
                     value = name,
                     onValueChange = { name = it },
                     placeHolderText = stringResource(R.string.name),
                     modifier = Modifier.focusRequester(focusRequester)
                 )
-                MyButton(
-                    text = stringResource(id = R.string.save),
-                    onClick = click@{
-                        val voice = currentVoice ?: return@click
-                        val state = VoicePredefineState(
-                            savedName = name,
-                            voiceId = voice.id,
-                            speed = currentVoiceSpeed,
-                            pitch = currentVoicePitch
-                        )
-                        setCustomSavedVoices(list + state)
-                        expandedAddNextEntry = false
-                    },
-                    modifier = Modifier.fillMaxWidth(),
-                    outerPadding = 0.dp,
-                    textAlign = TextAlign.Center
-                )
-            }
-        }
-        LaunchedEffect(Unit) {
-            delay(300)
-            focusRequester.requestFocus()
-        }
+            },
+            confirmButton = {
+                FilledTonalButton(onClick = onClick@{
+                    val voice = currentVoice ?: return@onClick
+                    val state = VoicePredefineState(
+                        savedName = name,
+                        voiceId = voice.id,
+                        speed = currentVoiceSpeed,
+                        pitch = currentVoicePitch
+                    )
+                    setCustomSavedVoices(list + state)
+                    expandedAddNextEntry = false
+                }) {
+                    Text(text = stringResource(R.string.save_voice))
+                }
+            },
+            dismissButton = {
+                Button(onClick = { expandedAddNextEntry = false }) {
+                    Text(text = stringResource(R.string.cancel))
+                }
+            },
+        )
     }
 }
 
-
 @Preview(group = "dialog")
 @Composable
-fun VoiceSelectorDialogContentPreview() {
+private fun VoiceSelectorDialogContentPreview() {
     InternalTheme {
         VoiceSelectorDialog(
             availableVoices = (0..7).map {
@@ -593,46 +542,6 @@ fun VoiceSelectorDialogContentPreview() {
             ),
             setDialogOpen = {},
             isDialogOpen = true
-        )
-    }
-}
-
-@Preview(group = "setting")
-@Composable
-fun TextToSpeechSettingPreview() {
-    InternalThemeObject(Themes.DARK) {
-        TextToSpeechSetting(
-            isPlaying = true,
-            isLoadingChapter = true,
-            playCurrent = {},
-            currentVoice = VoiceData(
-                id = "",
-                language = "",
-                needsInternet = false,
-                quality = 100
-            ),
-            voiceSpeed = 1f,
-            voicePitch = 1f,
-            isActive = false,
-            playPreviousItem = {},
-            playPreviousChapter = {},
-            playNextItem = {},
-            playNextChapter = {},
-            setVoice = {},
-            availableVoices = (0..7).map {
-                VoiceData(
-                    id = "$it",
-                    language = "lang$it",
-                    needsInternet = (it % 2) == 0,
-                    quality = it
-                )
-            },
-            scrollToActiveItem = {},
-            playFirstVisibleItem = {},
-            setVoicePitch = {},
-            setVoiceSpeed = {},
-            customSavedVoicesStates = listOf(),
-            setCustomSavedVoices = {},
         )
     }
 }

@@ -1,8 +1,7 @@
 package my.noveldokusha.ui.screens.reader
 
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -10,6 +9,7 @@ import my.noveldokusha.AppPreferences
 import my.noveldokusha.ui.BaseViewModel
 import my.noveldokusha.ui.screens.reader.manager.ReaderManager
 import my.noveldokusha.ui.screens.reader.manager.ReaderManagerViewCallReferences
+import my.noveldokusha.ui.theme.Themes
 import my.noveldokusha.utils.StateExtra_Boolean
 import my.noveldokusha.utils.StateExtra_String
 import timber.log.Timber
@@ -24,46 +24,64 @@ interface ReaderStateBundle {
 
 @HiltViewModel
 class ReaderViewModel @Inject constructor(
-    state: SavedStateHandle,
+    stateHandler: SavedStateHandle,
     private val appPreferences: AppPreferences,
     private val readerManager: ReaderManager,
 ) : BaseViewModel(),
     ReaderStateBundle,
     ReaderManagerViewCallReferences by readerManager {
 
-    override var bookUrl by StateExtra_String(state)
-    override var chapterUrl by StateExtra_String(state)
-    override var introScrollToSpeaker by StateExtra_Boolean(state)
+    override var bookUrl by StateExtra_String(stateHandler)
+    override var chapterUrl by StateExtra_String(stateHandler)
+    override var introScrollToSpeaker by StateExtra_Boolean(stateHandler)
 
     private val readerSession = readerManager.initiateOrGetSession(
         bookUrl = bookUrl,
         chapterUrl = chapterUrl
     )
 
-    val textFont by appPreferences.READER_FONT_FAMILY.state(viewModelScope)
-    val textSize by appPreferences.READER_FONT_SIZE.state(viewModelScope)
-    val isTextSelectable by appPreferences.READER_SELECTABLE_TEXT.state(viewModelScope)
+    private val readingPosStats = readerSession.readingStats
+    private val themeId = appPreferences.THEME_ID.state(viewModelScope)
 
-    var showReaderInfoAndSettings by mutableStateOf(false)
+    val state = ReaderScreenState(
+        showReaderInfo = mutableStateOf(false),
+        readerInfo = ReaderScreenState.CurrentInfo(
+            chapterTitle = derivedStateOf {
+                readingPosStats.value?.chapterTitle ?: ""
+            },
+            chapterCurrentNumber = derivedStateOf {
+                readingPosStats.value?.run { chapterIndex + 1 } ?: 0
+            },
+            chapterPercentageProgress = readerSession.readingChapterProgressPercentage,
+            chaptersCount = derivedStateOf { readingPosStats.value?.chapterCount ?: 0 },
+            chapterUrl = derivedStateOf { readingPosStats.value?.chapterUrl ?: "" }
+        ),
+        settings = ReaderScreenState.Settings(
+            selectedSetting = mutableStateOf(ReaderScreenState.Settings.Type.None),
+            isTextSelectable = appPreferences.READER_SELECTABLE_TEXT.state(viewModelScope),
+            textToSpeech = readerSession.readerTextToSpeech.state,
+            liveTranslation = readerSession.readerLiveTranslation.state,
+            style = ReaderScreenState.Settings.StyleSettingsData(
+                followSystem = appPreferences.THEME_FOLLOW_SYSTEM.state(viewModelScope),
+                currentTheme = derivedStateOf { Themes.fromIDTheme(themeId.value) },
+                textFont = appPreferences.READER_FONT_FAMILY.state(viewModelScope),
+                textSize = appPreferences.READER_FONT_SIZE.state(viewModelScope),
+            )
+        )
+    )
 
     val items = readerSession.items
     val chaptersLoader = readerSession.readerChaptersLoader
-    val textToSpeechSettingData = readerSession.readerTextToSpeech.settings
     val readerSpeaker = readerSession.readerTextToSpeech
-    val chapterPercentageProgress = readerSession.readingChapterProgressPercentage
     var readingCurrentChapter by Delegates.observable(readerSession.currentChapter) { _, _, new ->
         readerSession.currentChapter = new
     }
-    val readingPosStats = readerSession.readingStats
-
-    val liveTranslationSettingState = readerSession.readerLiveTranslation.settingsState
     val onTranslatorChanged = readerSession.readerLiveTranslation.onTranslatorChanged
-
     val ttsScrolledToTheTop = readerSession.readerTextToSpeech.scrolledToTheTop
     val ttsScrolledToTheBottom = readerSession.readerTextToSpeech.scrolledToTheBottom
 
     fun onBackPressed() {
-        if (!showReaderInfoAndSettings) {
+        if (!state.showReaderInfo.value) {
             Timber.d("Close reader screen manually")
             readerManager.close()
         }
@@ -76,8 +94,11 @@ class ReaderViewModel @Inject constructor(
     fun startSpeaker(itemIndex: Int) =
         readerSession.startSpeaker(itemIndex = itemIndex)
 
-    fun reloadReader() =
+    fun reloadReader() {
+        val currentChapter = readingCurrentChapter.copy()
         readerSession.reloadReader()
+        chaptersLoader.tryLoadRestartedInitial(currentChapter)
+    }
 
     fun updateInfoViewTo(itemIndex: Int) =
         readerSession.updateInfoViewTo(itemIndex = itemIndex)

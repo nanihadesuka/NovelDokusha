@@ -28,7 +28,8 @@ import my.noveldokusha.data.database.tables.Chapter
 import my.noveldokusha.ui.composeViews.AnimatedTransition
 import my.noveldokusha.ui.theme.ColorAccent
 import my.noveldokusha.ui.theme.ColorNotice
-import my.noveldokusha.ui.theme.InternalThemeObject
+import my.noveldokusha.ui.theme.InternalTheme
+
 import my.noveldokusha.ui.theme.PreviewThemes
 import my.noveldokusha.utils.mix
 
@@ -96,7 +97,7 @@ fun ChaptersScreenChapterItem(
 private fun PreviewView(
     @PreviewParameter(PreviewProvider::class) previewProviderState: PreviewProviderState
 ) {
-    InternalThemeObject {
+    InternalTheme {
         ChaptersScreenChapterItem(
             chapterWithContext = previewProviderState.chapterWithContext,
             selected = previewProviderState.selected,

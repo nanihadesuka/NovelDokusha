@@ -1,11 +1,21 @@
 package my.noveldokusha.ui.screens.reader.features
 
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancelChildren
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import my.noveldokusha.data.Response
 import my.noveldokusha.data.database.tables.Chapter
 import my.noveldokusha.repository.Repository
-import my.noveldokusha.ui.screens.reader.*
+import my.noveldokusha.ui.screens.reader.ChapterState
+import my.noveldokusha.ui.screens.reader.ChapterStats
+import my.noveldokusha.ui.screens.reader.ChapterUrl
+import my.noveldokusha.ui.screens.reader.ReaderItem
+import my.noveldokusha.ui.screens.reader.ReaderState
+import my.noveldokusha.ui.screens.reader.ReadingChapterPosStats
 import my.noveldokusha.ui.screens.reader.tools.InitialPositionChapter
 import my.noveldokusha.ui.screens.reader.tools.getInitialChapterItemPosition
 import my.noveldokusha.ui.screens.reader.tools.indexOfReaderItem
@@ -64,7 +74,8 @@ class ReaderChaptersLoader(
             chapterCount = orderedChapters.size,
             chapterItemPosition = item.chapterItemPosition,
             chapterItemsCount = chapterStats.itemsCount,
-            chapterTitle = chapterStats.chapter.title
+            chapterTitle = chapterStats.chapter.title,
+            chapterUrl = chapterStats.chapter.url,
         )
     }
 
@@ -82,7 +93,8 @@ class ReaderChaptersLoader(
             chapterCount = orderedChapters.size,
             chapterItemPosition = item.chapterItemPosition,
             chapterItemsCount = chapterStats.itemsCount,
-            chapterTitle = chapterStats.chapter.title
+            chapterTitle = chapterStats.chapter.title,
+            chapterUrl = chapterStats.chapter.url,
         )
     }
 

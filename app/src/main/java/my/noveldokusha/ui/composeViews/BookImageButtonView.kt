@@ -30,7 +30,7 @@ import my.noveldokusha.R
 import my.noveldokusha.ui.theme.Grey25
 import my.noveldokusha.ui.theme.Grey800
 import my.noveldokusha.ui.theme.ImageBorderShape
-import my.noveldokusha.ui.theme.InternalThemeObject
+import my.noveldokusha.ui.theme.InternalTheme
 import my.noveldokusha.ui.theme.PreviewThemes
 
 enum class BookTitlePosition {
@@ -128,7 +128,7 @@ fun BookImageButtonView(
 @PreviewThemes
 @Composable
 private fun PreviewView() {
-    InternalThemeObject {
+    InternalTheme {
         Row {
             BookImageButtonView(
                 title = "Hello there",

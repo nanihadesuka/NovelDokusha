@@ -1,11 +1,15 @@
 package my.noveldokusha
 
 import android.graphics.BitmapFactory
-import kotlinx.coroutines.*
-import my.noveldokusha.repository.Repository
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.launch
 import my.noveldokusha.data.database.tables.Book
 import my.noveldokusha.data.database.tables.Chapter
 import my.noveldokusha.data.database.tables.ChapterBody
+import my.noveldokusha.repository.Repository
 import my.noveldokusha.tools.BookTextMapper
 import org.jsoup.Jsoup
 import org.jsoup.nodes.TextNode

@@ -2,7 +2,6 @@ package my.noveldokusha.ui.screens.main.settings
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.ExperimentalAnimationApi
-import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
@@ -96,12 +95,12 @@ fun SettingsTheme(
             Column(
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                val lines = Themes.pairs.toList().chunked(2)
+                val lines = Themes.list.chunked(2)
                 for (line in lines) Row(
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    for ((theme, themeName) in line) MyButton(
-                        text = themeName,
+                    for (theme in line) MyButton(
+                        text = stringResource(id = theme.nameId),
                         onClick = { onThemeSelected(theme) },
                         textAlign = TextAlign.Center,
                         modifier = Modifier.weight(1f),

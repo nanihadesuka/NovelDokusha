@@ -167,7 +167,7 @@ class NarratorMediaControlsNotification(
             ) {
                 title = ""
                 text = ""
-                defineActions(isPlaying = readerSession.readerTextToSpeech.settings.isPlaying.value)
+                defineActions(isPlaying = readerSession.readerTextToSpeech.state.isPlaying.value)
                 setOngoing(true)
                 setCategory(NotificationCompat.CATEGORY_TRANSPORT)
                 priority = NotificationCompat.PRIORITY_HIGH
@@ -186,7 +186,7 @@ class NarratorMediaControlsNotification(
 
         // Update reader speaking state
         scope.launch {
-            snapshotFlow { readerSession.readerTextToSpeech.settings.isPlaying.value }
+            snapshotFlow { readerSession.readerTextToSpeech.state.isPlaying.value }
                 .collectLatest { isPlaying ->
                     notificationsCenter.modifyNotification(
                         notificationBuilder,
