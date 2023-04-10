@@ -2,20 +2,31 @@ package my.noveldokusha.ui.screens.chaptersList
 
 import android.content.Context
 import android.content.Intent
-import androidx.compose.runtime.*
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.State
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateMapOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.snapshotFlow
+import androidx.compose.runtime.snapshots.SnapshotStateList
+import androidx.compose.runtime.snapshots.SnapshotStateMap
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import my.noveldokusha.AppPreferences
 import my.noveldokusha.R
 import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.data.ChapterWithContext
-import my.noveldokusha.data.Response
 import my.noveldokusha.data.database.tables.Book
 import my.noveldokusha.di.AppCoroutineScope
 import my.noveldokusha.network.NetworkClient
@@ -37,24 +48,38 @@ interface ChapterStateBundle {
     var bookTitle: String
 }
 
-data class BookDataView(
-    val title: String,
-    val url: String,
-    val completed: Boolean = false,
-    val lastReadChapter: String? = null,
-    val inLibrary: Boolean = false,
-    val coverImageUrl: String? = null,
-    val description: String = ""
+data class ChapterScreenState(
+    val book: State<BookState>,
+    val error: MutableState<String>,
+    val selectedChaptersUrl: SnapshotStateMap<String, Unit>,
+    val chapters: SnapshotStateList<ChapterWithContext>,
+    val isRefreshing: MutableState<Boolean>,
+    val searchTextInput: MutableState<String>,
+    val sourceCatalogName: MutableState<String>,
+    val settingChapterSort: MutableState<AppPreferences.TERNARY_STATE>
 ) {
-    constructor(book: Book) : this(
-        title = book.title,
-        url = book.url,
-        completed = book.completed,
-        lastReadChapter = book.lastReadChapter,
-        inLibrary = book.inLibrary,
-        coverImageUrl = book.coverImageUrl,
-        description = book.description
-    )
+
+    val isInSelectionMode = derivedStateOf { selectedChaptersUrl.size != 0 }
+
+    data class BookState(
+        val title: String,
+        val url: String,
+        val completed: Boolean = false,
+        val lastReadChapter: String? = null,
+        val inLibrary: Boolean = false,
+        val coverImageUrl: String? = null,
+        val description: String = "",
+    ) {
+        constructor(book: Book) : this(
+            title = book.title,
+            url = book.url,
+            completed = book.completed,
+            lastReadChapter = book.lastReadChapter,
+            inLibrary = book.inLibrary,
+            coverImageUrl = book.coverImageUrl,
+            description = book.description
+        )
+    }
 }
 
 @HiltViewModel
@@ -65,10 +90,10 @@ class ChaptersViewModel @Inject constructor(
     private val scraper: Scraper,
     private val toasty: Toasty,
     val appPreferences: AppPreferences,
-    state: SavedStateHandle,
+    stateHandle: SavedStateHandle,
 ) : BaseViewModel(), ChapterStateBundle {
-    override var bookUrl by StateExtra_String(state)
-    override var bookTitle by StateExtra_String(state)
+    override var bookUrl by StateExtra_String(stateHandle)
+    override var bookTitle by StateExtra_String(stateHandle)
 
     class IntentData : Intent {
         private var bookUrl by Extra_String()
@@ -84,13 +109,14 @@ class ChaptersViewModel @Inject constructor(
         }
     }
 
+    private val source = scraper.getCompatibleSource(bookUrl)!!
+
     init {
         viewModelScope.launch(Dispatchers.IO) {
             if (!repository.bookChapters.hasChapters(bookMetadata.url))
                 updateChaptersList()
 
-            val book = repository.libraryBooks.get(bookMetadata.url)
-            if (book != null)
+            if (repository.libraryBooks.get(bookMetadata.url) != null)
                 return@launch
 
             val coverUrl = async { downloadBookCoverImageUrl(scraper, networkClient, bookUrl) }
@@ -107,23 +133,28 @@ class ChaptersViewModel @Inject constructor(
         }
     }
 
-    val book by repository.libraryBooks.getFlow(bookUrl)
+    private val book = repository.libraryBooks.getFlow(bookUrl)
         .filterNotNull()
-        .map(::BookDataView)
+        .map(ChapterScreenState::BookState)
         .toState(
             viewModelScope,
-            BookDataView(title = bookTitle, url = bookUrl, coverImageUrl = null)
+            ChapterScreenState.BookState(title = bookTitle, url = bookUrl, coverImageUrl = null)
         )
 
-    var error by mutableStateOf("")
-    val selectedChaptersUrl = mutableStateMapOf<String, Unit>()
-    val chaptersWithContext = mutableStateListOf<ChapterWithContext>()
-    var isRefreshing by mutableStateOf(false)
-    var searchText by mutableStateOf("")
+    val state = ChapterScreenState(
+        book = book,
+        error = mutableStateOf(""),
+        chapters = mutableStateListOf(),
+        selectedChaptersUrl = mutableStateMapOf(),
+        isRefreshing = mutableStateOf(false),
+        searchTextInput = mutableStateOf(""),
+        sourceCatalogName = mutableStateOf(source.name),
+        settingChapterSort = appPreferences.CHAPTERS_SORT_ASCENDING.state(viewModelScope)
+    )
 
     init {
         viewModelScope.launch {
-            repository.bookChapters.getChaptersWithContexFlow(bookMetadata.url)
+            repository.bookChapters.getChaptersWithContextFlow(bookMetadata.url)
                 .map { removeCommonTextFromTitles(it) }
                 // Sort the chapters given the order preference
                 .combine(appPreferences.CHAPTERS_SORT_ASCENDING.flow()) { chapters, sorted ->
@@ -135,7 +166,7 @@ class ChaptersViewModel @Inject constructor(
                 }
                 // Filter the chapters if search is active
                 .combine(
-                    snapshotFlow { searchText }.flowOn(Dispatchers.Main)
+                    snapshotFlow { state.searchTextInput.value }.flowOn(Dispatchers.Main)
                 ) { chapters, searchText ->
                     if (searchText.isBlank()) chapters
                     else chapters.filter {
@@ -147,126 +178,166 @@ class ChaptersViewModel @Inject constructor(
                 }
                 .flowOn(Dispatchers.Default)
                 .collect {
-                    chaptersWithContext.clear()
-                    chaptersWithContext.addAll(it)
+                    state.chapters.clear()
+                    state.chapters.addAll(it)
                 }
         }
     }
 
-    fun reloadAll() {
+    fun toggleBookmark() {
+        viewModelScope.launch {
+            repository.libraryBooks.toggleBookmark(bookMetadata)
+            val isBookmarked = repository.libraryBooks.get(bookMetadata.url)?.inLibrary ?: false
+            val msg = if (isBookmarked) R.string.added_to_library else R.string.removed_from_library
+            toasty.show(msg)
+        }
+    }
+
+    fun onPullRefresh() {
+        toasty.show(R.string.updating_book_info)
         updateCover()
         updateDescription()
         updateChaptersList()
     }
 
-    fun updateCover() = viewModelScope.launch(Dispatchers.IO) {
-        val res = downloadBookCoverImageUrl(scraper, networkClient, bookUrl)
-        if (res is Response.Success)
-            repository.libraryBooks.updateCover(bookUrl, res.data)
+    private fun updateCover() = viewModelScope.launch {
+        downloadBookCoverImageUrl(scraper, networkClient, bookUrl)
+            .onSuccess { repository.libraryBooks.updateCover(bookUrl, it) }
     }
 
-    fun updateDescription() = viewModelScope.launch(Dispatchers.IO) {
-        val res = downloadBookDescription(scraper, networkClient, bookUrl)
-        if (res is Response.Success)
-            repository.libraryBooks.updateDescription(bookUrl, res.data)
+    private fun updateDescription() = viewModelScope.launch {
+        downloadBookDescription(scraper, networkClient, bookUrl).onSuccess {
+            repository.libraryBooks.updateDescription(bookUrl, it)
+        }
     }
 
     private var loadChaptersJob: Job? = null
-    fun updateChaptersList() {
+    private fun updateChaptersList() {
         if (bookMetadata.url.startsWith("local://")) {
             toasty.show(R.string.local_book_nothing_to_update)
-            isRefreshing = false
+            state.isRefreshing.value = false
             return
         }
 
         if (loadChaptersJob?.isActive == true) return
         loadChaptersJob = appScope.launch {
 
-            error = ""
-            isRefreshing = true
+            state.error.value = ""
+            state.isRefreshing.value = true
             val url = bookMetadata.url
             val res = downloadChaptersList(scraper, networkClient, url)
-            isRefreshing = false
-            when (res) {
-                is Response.Success -> {
-                    if (res.data.isEmpty())
-                        toasty.show(R.string.no_chapters_found)
-
-                    withContext(Dispatchers.IO) {
-                        repository.bookChapters.merge(res.data, url)
-                    }
+            state.isRefreshing.value = false
+            res.onSuccess {
+                if (it.isEmpty())
+                    toasty.show(R.string.no_chapters_found)
+                withContext(Dispatchers.IO) {
+                    repository.bookChapters.merge(it, url)
                 }
-                is Response.Error -> {
-                    error = res.message
-                }
+            }.onError {
+                state.error.value = it.message
             }
         }
     }
 
-    fun toggleChapterSort() {
-        appPreferences.CHAPTERS_SORT_ASCENDING.value =
-            when (appPreferences.CHAPTERS_SORT_ASCENDING.value) {
-                AppPreferences.TERNARY_STATE.active -> AppPreferences.TERNARY_STATE.inverse
-                AppPreferences.TERNARY_STATE.inverse -> AppPreferences.TERNARY_STATE.active
-                AppPreferences.TERNARY_STATE.inactive -> AppPreferences.TERNARY_STATE.active
-            }
-    }
+    @Volatile
+    private var lastSelectedChapterUrl: String? = null
 
-    suspend fun toggleBookmark() = withContext(Dispatchers.IO) {
-        repository.libraryBooks.toggleBookmark(bookMetadata)
-        repository.libraryBooks.get(bookMetadata.url)?.inLibrary ?: false
-    }
-
-    suspend fun getLastReadChapter() = withContext(Dispatchers.IO) {
-        repository.libraryBooks.get(bookUrl)?.lastReadChapter
+    suspend fun getLastReadChapter(): String? {
+        return repository.libraryBooks.get(bookUrl)?.lastReadChapter
             ?: repository.bookChapters.getFirstChapter(bookUrl)?.url
     }
 
-    fun setSelectedAsUnread() {
-        val list = selectedChaptersUrl.toList()
+    fun setAsUnreadSelected() {
+        val list = state.selectedChaptersUrl.toList()
         appScope.launch(Dispatchers.IO) {
             repository.bookChapters.setAsUnread(list.map { it.first })
         }
     }
 
-    fun setSelectedAsRead() {
-        val list = selectedChaptersUrl.toList()
+    fun setAsReadSelected() {
+        val list = state.selectedChaptersUrl.toList()
         appScope.launch(Dispatchers.IO) {
             repository.bookChapters.setAsRead(list.map { it.first })
         }
     }
 
     fun downloadSelected() {
-        val list = selectedChaptersUrl.toList()
+        val list = state.selectedChaptersUrl.toList()
         appScope.launch(Dispatchers.IO) {
             list.forEach { repository.chapterBody.fetchBody(it.first) }
         }
     }
 
-    fun deleteDownloadSelected() {
-        val list = selectedChaptersUrl.toList()
+    fun deleteDownloadsSelected() {
+        val list = state.selectedChaptersUrl.toList()
         appScope.launch(Dispatchers.IO) {
             repository.chapterBody.removeRows(list.map { it.first })
         }
     }
 
-    fun closeSelectionMode() {
-        selectedChaptersUrl.clear()
+    fun onSelectionModeChapterClick(chapter: ChapterWithContext) {
+        val url = chapter.chapter.url
+        if (state.selectedChaptersUrl.containsKey(url)) {
+            state.selectedChaptersUrl.remove(url)
+        } else {
+            state.selectedChaptersUrl[url] = Unit
+        }
+        lastSelectedChapterUrl = url
+    }
+
+    fun onSelectionModeChapterLongClick(chapter: ChapterWithContext) {
+        val url = chapter.chapter.url
+        if (url != lastSelectedChapterUrl) {
+            val indexOld = state.chapters.indexOfFirst { it.chapter.url == lastSelectedChapterUrl }
+            val indexNew = state.chapters.indexOfFirst { it.chapter.url == url }
+            val min = minOf(indexOld, indexNew)
+            val max = maxOf(indexOld, indexNew)
+            if (min >= 0 && max >= 0) {
+                for (index in min..max) {
+                    state.selectedChaptersUrl[state.chapters[index].chapter.url] = Unit
+                }
+                lastSelectedChapterUrl = state.chapters[indexNew].chapter.url
+                return
+            }
+        }
+
+        if (state.selectedChaptersUrl.containsKey(url)) {
+            state.selectedChaptersUrl.remove(url)
+        } else {
+            state.selectedChaptersUrl[url] = Unit
+        }
+        lastSelectedChapterUrl = url
+    }
+
+    fun onChapterLongClick(chapter: ChapterWithContext) {
+        val url = chapter.chapter.url
+        state.selectedChaptersUrl[url] = Unit
+        lastSelectedChapterUrl = url
+    }
+
+    fun onChapterDownload(chapter: ChapterWithContext) {
+        appScope.launch(Dispatchers.IO) {
+            repository.chapterBody.fetchBody(chapter.chapter.url)
+        }
+    }
+
+    fun unselectAll() {
+        state.selectedChaptersUrl.clear()
     }
 
     fun selectAll() {
-        chaptersWithContext
+        state.chapters
             .toList()
             .map { it.chapter.url to Unit }
-            .let { selectedChaptersUrl.putAll(it) }
+            .let { state.selectedChaptersUrl.putAll(it) }
     }
 
-    fun selectAllAfterSelectedOnes() {
-        chaptersWithContext
-            .toList()
-            .dropWhile { !selectedChaptersUrl.contains(it.chapter.url) }
-            .map { it.chapter.url to Unit }
-            .let { selectedChaptersUrl.putAll(it) }
+    fun invertSelection() {
+        val allChaptersUrl = state.chapters.asSequence().map { it.chapter.url }.toSet()
+        val selectedUrl = state.selectedChaptersUrl.asSequence().map { it.key }.toSet()
+        val inverse = (allChaptersUrl - selectedUrl).asSequence().associateWith { Unit }
+        state.selectedChaptersUrl.clear()
+        state.selectedChaptersUrl.putAll(inverse)
     }
 }
 

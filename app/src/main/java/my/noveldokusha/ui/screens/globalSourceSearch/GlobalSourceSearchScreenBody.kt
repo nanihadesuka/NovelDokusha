@@ -45,8 +45,9 @@ fun GlobalSourceSearchScreenBody(
     onBookClick: (book: BookMetadata) -> Unit
 ) {
     LazyColumn(
-        contentPadding = contentPadding,
-        verticalArrangement = Arrangement.spacedBy(8.dp)
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+        modifier = Modifier.padding(contentPadding),
+        contentPadding = PaddingValues(top = 8.dp, bottom = 240.dp)
     ) {
         items(listSources) { entry ->
             Text(
@@ -93,7 +94,7 @@ private fun SourceListView(
         items(list) {
             BookImageButtonView(
                 title = it.title,
-                coverImageUrl = it.coverImageUrl,
+                coverImageModel = it.coverImageUrl,
                 onClick = { onBookClick(it) },
                 onLongClick = { },
                 modifier = Modifier.width(130.dp),
@@ -103,7 +104,7 @@ private fun SourceListView(
 
         item {
             fun Modifier.topPadding() = padding(top = (130 / 1.45f).dp - 8.dp)
-            
+
             Box(
                 contentAlignment = Alignment.TopStart,
                 modifier = Modifier.padding(start = 4.dp)

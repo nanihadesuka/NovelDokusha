@@ -4,7 +4,6 @@ import android.content.res.Configuration
 import androidx.compose.animation.*
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -42,10 +41,7 @@ import my.noveldokusha.ui.theme.ColorAccent
 import my.noveldokusha.ui.theme.InternalTheme
 import my.noveldokusha.utils.textPadding
 
-@OptIn(
-    ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class,
-    ExperimentalMaterialApi::class
-)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 fun DatabaseBookInfoScreen(
     data: DatabaseInterface.BookData,
@@ -98,7 +94,7 @@ fun DatabaseBookInfoScreen(
                     var showImageFullScreen by remember { mutableStateOf(false) }
                     BookImageButtonView(
                         title = "",
-                        coverImageUrl = data.coverImageUrl ?: "",
+                        coverImageModel = data.coverImageUrl ?: "",
                         onClick = { showImageFullScreen = true },
                         modifier = Modifier.weight(1f),
                         bookTitlePosition = BookTitlePosition.Hidden

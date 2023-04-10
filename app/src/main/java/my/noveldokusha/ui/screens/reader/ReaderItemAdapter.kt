@@ -15,7 +15,16 @@ import androidx.core.view.updateLayoutParams
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import my.noveldokusha.R
-import my.noveldokusha.databinding.*
+import my.noveldokusha.databinding.ActivityReaderListItemBodyBinding
+import my.noveldokusha.databinding.ActivityReaderListItemDividerBinding
+import my.noveldokusha.databinding.ActivityReaderListItemErrorBinding
+import my.noveldokusha.databinding.ActivityReaderListItemGoogleTranslateAttributionBinding
+import my.noveldokusha.databinding.ActivityReaderListItemImageBinding
+import my.noveldokusha.databinding.ActivityReaderListItemPaddingBinding
+import my.noveldokusha.databinding.ActivityReaderListItemProgressBarBinding
+import my.noveldokusha.databinding.ActivityReaderListItemSpecialTitleBinding
+import my.noveldokusha.databinding.ActivityReaderListItemTitleBinding
+import my.noveldokusha.databinding.ActivityReaderListItemTranslatingBinding
 import my.noveldokusha.resolvedBookImagePath
 import my.noveldokusha.tools.Utterance
 import my.noveldokusha.ui.screens.reader.features.TextSynthesis

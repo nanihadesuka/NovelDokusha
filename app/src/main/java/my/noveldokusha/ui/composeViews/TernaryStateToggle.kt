@@ -3,7 +3,6 @@ package my.noveldokusha.ui.composeViews
 import android.content.res.Configuration
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.ExperimentalAnimationApi
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.material.icons.Icons
@@ -23,8 +22,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import my.noveldokusha.AppPreferences.TERNARY_STATE
-import my.noveldokusha.ui.theme.InternalThemeObject
-import my.noveldokusha.ui.theme.Themes
+import my.noveldokusha.ui.theme.InternalTheme
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
@@ -50,7 +48,7 @@ fun TernaryStateToggle(
             )
             .padding(horizontal = 16.dp)
     ) {
-        AnimatedContent(targetState = updatedState) {
+        AnimatedContent(targetState = updatedState, label = "") {
             when (it) {
                 TERNARY_STATE.active -> activeIcon()
                 TERNARY_STATE.inverse -> inverseIcon()
@@ -83,7 +81,7 @@ private fun PreviewView() {
         )
     }
 
-    InternalThemeObject(theme = if (isSystemInDarkTheme()) Themes.DARK else Themes.LIGHT) {
+    InternalTheme{
         Column {
             draw(text = "Up", state = TERNARY_STATE.active)
             draw(text = "Down", state = TERNARY_STATE.inverse)

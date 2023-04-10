@@ -20,8 +20,6 @@ import my.noveldokusha.AppPreferences.LIST_LAYOUT_MODE
 import my.noveldokusha.R
 import my.noveldokusha.ui.composeViews.MyButton
 
-enum class ToolbarMode { MAIN, SEARCH }
-
 @Composable
 fun SourceCatalogDropDown(
     expanded: Boolean,

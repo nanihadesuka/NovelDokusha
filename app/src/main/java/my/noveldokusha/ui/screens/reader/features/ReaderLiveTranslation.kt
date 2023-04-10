@@ -3,9 +3,13 @@ package my.noveldokusha.ui.screens.reader.features
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.snapshots.SnapshotStateList
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineName
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.launch
 import my.noveldokusha.AppPreferences
 import my.noveldokusha.tools.TranslationManager
 import my.noveldokusha.tools.TranslationModelState
@@ -30,7 +34,7 @@ class ReaderLiveTranslation(
         SupervisorJob() + Dispatchers.Default + CoroutineName("LiveTranslator")
     )
 ) {
-    val settingsState = LiveTranslationSettingData(
+    val state = LiveTranslationSettingData(
         isAvailable = translationManager.available,
         listOfAvailableModels = translationManager.models,
         enable = mutableStateOf(appPreferences.GLOBAL_TRANSLATION_ENABLED.value),
@@ -51,8 +55,8 @@ class ReaderLiveTranslation(
     suspend fun init() {
         val source = appPreferences.GLOBAL_TRANSLATION_PREFERRED_SOURCE.value
         val target = appPreferences.GLOBAL_TRANSLATION_PREFERRED_TARGET.value
-        settingsState.source.value = getValidTranslatorOrNull(source)
-        settingsState.target.value = getValidTranslatorOrNull(target)
+        state.source.value = getValidTranslatorOrNull(source)
+        state.target.value = getValidTranslatorOrNull(target)
         updateTranslatorState()
     }
 
@@ -62,9 +66,9 @@ class ReaderLiveTranslation(
     }
 
     private fun updateTranslatorState() {
-        val isEnabled = settingsState.enable.value
-        val source = settingsState.source.value
-        val target = settingsState.target.value
+        val isEnabled = state.enable.value
+        val source = state.source.value
+        val target = state.target.value
         translatorState = if (
             !isEnabled ||
             source == null ||
@@ -85,7 +89,7 @@ class ReaderLiveTranslation(
     }
 
     private fun onEnable(it: Boolean) {
-        settingsState.enable.value = it
+        state.enable.value = it
         appPreferences.GLOBAL_TRANSLATION_ENABLED.value = it
         updateTranslatorState()
         scope.launch {
@@ -94,7 +98,7 @@ class ReaderLiveTranslation(
     }
 
     private fun onSourceChange(it: TranslationModelState?) {
-        settingsState.source.value = it
+        state.source.value = it
         appPreferences.GLOBAL_TRANSLATION_PREFERRED_SOURCE.value = it?.language ?: ""
         updateTranslatorState()
         scope.launch {
@@ -103,7 +107,7 @@ class ReaderLiveTranslation(
     }
 
     private fun onTargetChange(it: TranslationModelState?) {
-        settingsState.target.value = it
+        state.target.value = it
         appPreferences.GLOBAL_TRANSLATION_PREFERRED_TARGET.value = it?.language ?: ""
         updateTranslatorState()
         scope.launch {

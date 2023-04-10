@@ -3,7 +3,22 @@ package my.noveldokusha.scraper
 import my.noveldokusha.network.NetworkClient
 import my.noveldokusha.scraper.databases.BakaUpdates
 import my.noveldokusha.scraper.databases.NovelUpdates
-import my.noveldokusha.scraper.sources.*
+import my.noveldokusha.scraper.sources.AT
+import my.noveldokusha.scraper.sources.BestLightNovel
+import my.noveldokusha.scraper.sources.BoxNovel
+import my.noveldokusha.scraper.sources.KoreanNovelsMTL
+import my.noveldokusha.scraper.sources.LightNovelWorld
+import my.noveldokusha.scraper.sources.LightNovelsTranslations
+import my.noveldokusha.scraper.sources.MTLNovel
+import my.noveldokusha.scraper.sources.NovelHall
+import my.noveldokusha.scraper.sources.ReadLightNovel
+import my.noveldokusha.scraper.sources.ReadNovelFull
+import my.noveldokusha.scraper.sources.Reddit
+import my.noveldokusha.scraper.sources.Saikai
+import my.noveldokusha.scraper.sources.Sousetsuka
+import my.noveldokusha.scraper.sources.Wuxia
+import my.noveldokusha.scraper.sources.WuxiaWorld
+import my.noveldokusha.scraper.sources._1stKissNovel
 
 class Scraper(
     networkClient: NetworkClient

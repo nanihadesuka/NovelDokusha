@@ -4,7 +4,6 @@ import android.net.Uri
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -47,8 +46,7 @@ fun FinderScreenBody(
     onSourceSetPinned: (id: String, pinned: Boolean) -> Unit,
 ) {
     LazyColumn(
-        contentPadding = PaddingValues(start = 8.dp, end = 8.dp, bottom = 200.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp),
+        contentPadding = PaddingValues(bottom = 300.dp),
         modifier = Modifier.padding(paddingValues = innerPadding)
     ) {
         item {
@@ -56,7 +54,9 @@ fun FinderScreenBody(
                 text = stringResource(id = R.string.database),
                 style = MaterialTheme.typography.titleLarge,
                 color = ColorAccent,
-                modifier = Modifier.padding(start = 8.dp, top = 16.dp),
+                modifier = Modifier
+                    .padding(horizontal = 16.dp)
+                    .padding(top = 8.dp),
             )
         }
 
@@ -91,7 +91,9 @@ fun FinderScreenBody(
                 text = stringResource(id = R.string.sources),
                 style = MaterialTheme.typography.titleLarge,
                 color = ColorAccent,
-                modifier = Modifier.padding(start = 8.dp, top = 16.dp),
+                modifier = Modifier
+                    .padding(horizontal = 16.dp)
+                    .padding(top = 8.dp),
             )
         }
 

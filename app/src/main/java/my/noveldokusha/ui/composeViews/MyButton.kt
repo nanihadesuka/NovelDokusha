@@ -25,7 +25,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import my.noveldokusha.ui.theme.ColorAccent
-import my.noveldokusha.ui.theme.InternalThemeObject
+import my.noveldokusha.ui.theme.InternalTheme
 import my.noveldokusha.ui.theme.Themes
 import my.noveldokusha.ui.theme.selectableMinHeight
 import my.noveldokusha.utils.ifCase
@@ -182,7 +182,7 @@ private fun InternalButton(
 @Composable
 fun Preview() {
     Column {
-        for (theme in Themes.values()) InternalThemeObject(theme) {
+        for (theme in Themes.values()) InternalTheme(theme) {
             MyButton(
                 text = "Theme ${theme.name}",
                 modifier = Modifier.fillMaxWidth(),
@@ -196,7 +196,7 @@ fun Preview() {
 @Composable
 fun PreviewIcon() {
     Column {
-        for (theme in Themes.values()) InternalThemeObject(theme) {
+        for (theme in Themes.values()) InternalTheme(theme) {
             MyIconButton(
                 icon = Icons.Default.Home,
                 modifier = Modifier.fillMaxWidth(),

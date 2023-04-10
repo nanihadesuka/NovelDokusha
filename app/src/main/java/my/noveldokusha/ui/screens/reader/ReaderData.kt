@@ -36,6 +36,7 @@ data class ReadingChapterPosStats(
     val chapterItemPosition: Int,
     val chapterItemsCount: Int,
     val chapterTitle: String,
+    val chapterUrl: String,
 )
 
 fun ReadingChapterPosStats.chapterReadPercentage() = when (chapterItemsCount) {

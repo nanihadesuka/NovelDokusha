@@ -27,7 +27,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import my.noveldokusha.AppPreferences
 import my.noveldokusha.ui.BaseFragment
-import java.util.*
+import java.util.Locale
 
 fun RecyclerView.ViewHolder.addBottomMargin(marginPx: Int = 1000, condition: () -> Boolean) =
     itemView.addBottomMargin(marginPx, condition)

@@ -2,8 +2,8 @@ package my.noveldokusha.scraper
 
 import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.data.ChapterMetadata
-import my.noveldokusha.network.PagedList
 import my.noveldokusha.data.Response
+import my.noveldokusha.network.PagedList
 import org.jsoup.nodes.Document
 
 sealed interface SourceInterface {

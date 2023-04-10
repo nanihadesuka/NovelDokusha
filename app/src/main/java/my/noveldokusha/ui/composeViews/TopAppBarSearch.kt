@@ -37,6 +37,8 @@ import androidx.compose.ui.unit.dp
 import my.noveldokusha.R
 import my.noveldokusha.ui.theme.ColorAccent
 
+enum class ToolbarMode { MAIN, SEARCH }
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TopAppBarSearch(

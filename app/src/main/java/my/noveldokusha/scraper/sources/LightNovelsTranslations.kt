@@ -14,7 +14,7 @@ import my.noveldokusha.utils.toDocument
 import my.noveldokusha.utils.toUrlBuilder
 import org.jsoup.nodes.Document
 import java.net.URLDecoder
-import java.util.*
+import java.util.Locale
 
 /**
  * Novel main page (chapter list) example:

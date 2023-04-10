@@ -2,7 +2,7 @@ package my.noveldokusha.tools
 
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import kotlinx.coroutines.Job
-import java.util.*
+import java.util.Locale
 
 data class TranslationModelState(
     val language: String,

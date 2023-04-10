@@ -9,8 +9,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import my.noveldokusha.ui.theme.InternalThemeObject
-import my.noveldokusha.ui.theme.Themes
+import my.noveldokusha.ui.theme.InternalTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -45,7 +44,7 @@ fun MyOutlinedTextField(
 @Preview
 @Composable
 private fun PreviewView() {
-    InternalThemeObject(Themes.LIGHT) {
+    InternalTheme {
         MyOutlinedTextField(
             value = "",
             onValueChange = {},

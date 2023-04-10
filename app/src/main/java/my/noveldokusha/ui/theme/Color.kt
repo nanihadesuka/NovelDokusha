@@ -3,6 +3,8 @@ package my.noveldokusha.ui.theme
 import androidx.compose.ui.graphics.Color
 
 val ColorAccent = Color(0xFF2A59B6)
+val ColorLike = Color(0xFFF44336)
+val ColorNotice = Color(0xFFE48800)
 
 val Grey0 = Color(0xFFFFFFFF)
 val Grey25 = Color(0xFFFEFEFE)

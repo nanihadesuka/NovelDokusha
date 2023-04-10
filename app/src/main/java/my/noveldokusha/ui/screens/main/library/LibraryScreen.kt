@@ -2,6 +2,7 @@ package my.noveldokusha.ui.screens.main.library
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -9,7 +10,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.viewmodel.compose.viewModel
 import my.noveldokusha.R
@@ -46,16 +46,20 @@ fun LibraryScreen(
                     )
                 },
                 actions = {
-                    IconButton(onClick = { libraryModel.showBottomSheet = !libraryModel.showBottomSheet }) {
+                    IconButton(
+                        onClick = { libraryModel.showBottomSheet = !libraryModel.showBottomSheet }
+                    ) {
                         Icon(
-                            painter = painterResource(id = R.drawable.ic_baseline_filter_list_24),
-                            contentDescription = stringResource(R.string.options_panel)
+                            Icons.Filled.FilterList,
+                                    stringResource(R.string.filter)
                         )
                     }
-                    IconButton(onClick = { showDropDown = !showDropDown }) {
+                    IconButton(
+                        onClick = { showDropDown = !showDropDown }
+                    ) {
                         Icon(
                             Icons.Default.MoreVert,
-                            contentDescription = stringResource(R.string.open_for_more_options)
+                            stringResource(R.string.options_panel)
                         )
                         LibraryDropDown(
                             expanded = showDropDown,

@@ -43,7 +43,7 @@ class BookChaptersRepository(
     suspend fun removeAllFromBook(bookUrl: String) = chapterDao.removeAllFromBook(bookUrl)
     suspend fun chapters(bookUrl: String) = chapterDao.chapters(bookUrl)
     suspend fun getFirstChapter(bookUrl: String) = chapterDao.getFirstChapter(bookUrl)
-    fun getChaptersWithContexFlow(bookUrl: String) =
+    fun getChaptersWithContextFlow(bookUrl: String) =
         chapterDao.getChaptersWithContextFlow(bookUrl)
 
     suspend fun merge(newChapters: List<Chapter>, bookUrl: String) {

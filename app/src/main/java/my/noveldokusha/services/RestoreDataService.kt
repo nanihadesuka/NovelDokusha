@@ -9,7 +9,11 @@ import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.qualifiers.ApplicationContext
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import my.noveldokusha.R
 import my.noveldokusha.data.database.AppDatabase
 import my.noveldokusha.network.NetworkClient
@@ -19,7 +23,13 @@ import my.noveldokusha.repository.LibraryBooksRepository
 import my.noveldokusha.repository.Repository
 import my.noveldokusha.scraper.Scraper
 import my.noveldokusha.ui.Toasty
-import my.noveldokusha.utils.*
+import my.noveldokusha.utils.Extra_Uri
+import my.noveldokusha.utils.NotificationsCenter
+import my.noveldokusha.utils.isServiceRunning
+import my.noveldokusha.utils.removeProgressBar
+import my.noveldokusha.utils.text
+import my.noveldokusha.utils.title
+import my.noveldokusha.utils.tryAsResponse
 import okhttp3.internal.closeQuietly
 import timber.log.Timber
 import java.io.File

@@ -3,7 +3,6 @@ package my.noveldokusha.ui.composeViews
 import android.content.res.Configuration
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.defaultMinSize
@@ -24,9 +23,8 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import my.noveldokusha.ui.theme.Error500
-import my.noveldokusha.ui.theme.InternalThemeObject
+import my.noveldokusha.ui.theme.InternalTheme
 import my.noveldokusha.ui.theme.Success500
-import my.noveldokusha.ui.theme.Themes
 
 fun ToggleableState.next() = when (this) {
     ToggleableState.On -> ToggleableState.Indeterminate
@@ -86,7 +84,7 @@ fun PosNegCheckbox(
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 private fun PreviewView() {
-    InternalThemeObject(theme = if (isSystemInDarkTheme()) Themes.DARK else Themes.LIGHT) {
+    InternalTheme {
         Column {
             PosNegCheckbox(text = "Checkbox on", state = ToggleableState.On, onStateChange = { })
             PosNegCheckbox(text = "Checkbox off", state = ToggleableState.Off, onStateChange = { })
