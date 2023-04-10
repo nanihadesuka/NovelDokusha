@@ -27,7 +27,7 @@ import my.noveldokusha.data.database.tables.Book
 import my.noveldokusha.rememberResolvedBookImagePath
 import my.noveldokusha.ui.screens.main.library.LibraryViewModel
 import my.noveldokusha.ui.theme.ImageBorderShape
-import my.noveldokusha.ui.theme.Success500
+import my.noveldokusha.ui.theme.colorApp
 
 sealed interface BookSettingsDialogState {
     object Hide : BookSettingsDialogState
@@ -76,7 +76,7 @@ fun BookSettingsDialog(
                     checked = book.completed,
                     onCheckedChange = null,
                     colors = CheckboxDefaults.colors(
-                        checkedColor = Success500,
+                        checkedColor = MaterialTheme.colorApp.checkboxPositive,
                         checkmarkColor = MaterialTheme.colorScheme.inverseOnSurface
                     )
                 )

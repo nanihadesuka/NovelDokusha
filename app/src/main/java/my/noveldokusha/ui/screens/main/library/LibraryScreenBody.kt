@@ -46,6 +46,7 @@ import my.noveldokusha.ui.composeViews.BookImageButtonView
 import my.noveldokusha.ui.composeViews.CollapsibleDivider
 import my.noveldokusha.ui.theme.ColorAccent
 import my.noveldokusha.ui.theme.ImageBorderShape
+import my.noveldokusha.ui.theme.colorApp
 
 @OptIn(
     ExperimentalMaterialApi::class, ExperimentalFoundationApi::class,
@@ -85,7 +86,7 @@ fun LibraryScreenBody(
                             .tabIndicatorOffset(tabPos)
                             .fillMaxSize()
                             .padding(6.dp)
-                            .background(MaterialTheme.colorScheme.primaryContainer, CircleShape)
+                            .background(MaterialTheme.colorApp.tabSurface, CircleShape)
                             .zIndex(-1f)
                     )
                 },

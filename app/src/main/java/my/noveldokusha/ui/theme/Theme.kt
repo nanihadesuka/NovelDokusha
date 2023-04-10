@@ -3,7 +3,6 @@ package my.noveldokusha.ui.theme
 import androidx.annotation.StringRes
 import androidx.annotation.StyleRes
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -12,109 +11,10 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.graphics.luminance
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import my.noveldokusha.AppPreferences
 import my.noveldokusha.R
 
-@Composable
-fun ColorScheme.isLightTheme() = background.luminance() > 0.5
-
-private val light_ColorPalette = ColorScheme(
-    primary = Grey25,
-    onPrimary = Grey900,
-    primaryContainer = Grey50,
-    onPrimaryContainer = Grey800,
-    inversePrimary = Grey900,
-    secondary = Grey25,
-    onSecondary = Grey900,
-    secondaryContainer = ColorAccent,
-    onSecondaryContainer = Grey25,
-    tertiary = Grey200,
-    onTertiary = Grey600,
-    tertiaryContainer = Grey50,
-    onTertiaryContainer = Grey900,
-    background = Grey25,
-    onBackground = Grey900,
-    surface = Grey25,
-    onSurface = Grey900,
-    surfaceVariant = Grey50,
-    onSurfaceVariant = Grey900,
-    surfaceTint = Grey300,
-    inverseSurface = Grey900,
-    inverseOnSurface = Grey25,
-    error = Error300,
-    onError = Grey900,
-    errorContainer = Error200,
-    onErrorContainer = Grey800,
-    outline = Grey800,
-    outlineVariant = Grey200,
-    scrim = Grey300,
-)
-
-private val dark_ColorPalette = ColorScheme(
-    primary = Grey900,
-    onPrimary = Grey25,
-    primaryContainer = Grey800,
-    onPrimaryContainer = Grey100,
-    inversePrimary = Grey25,
-    secondary = Grey900,
-    onSecondary = Grey25,
-    secondaryContainer = ColorAccent,
-    onSecondaryContainer = Grey75,
-    tertiary = Grey700,
-    onTertiary = Grey300,
-    tertiaryContainer = Grey600,
-    onTertiaryContainer = Grey50,
-    background = Grey900,
-    onBackground = Grey50,
-    surface = Grey900,
-    onSurface = Grey25,
-    surfaceVariant = Grey900,
-    onSurfaceVariant = Grey50,
-    surfaceTint = Grey700,
-    inverseSurface = Grey25,
-    inverseOnSurface = Grey900,
-    error = Error600,
-    onError = Grey25,
-    errorContainer = Error800,
-    onErrorContainer = Grey50,
-    outline = Grey25,
-    outlineVariant = Grey700,
-    scrim = Grey800,
-)
-
-private val black_ColorPalette = ColorScheme(
-    primary = Grey1000,
-    onPrimary = Grey25,
-    primaryContainer = Grey900,
-    onPrimaryContainer = Grey100,
-    inversePrimary = Grey25,
-    secondary = Grey1000,
-    onSecondary = Grey25,
-    secondaryContainer = ColorAccent,
-    onSecondaryContainer = Grey75,
-    tertiary = Grey800,
-    onTertiary = Grey300,
-    tertiaryContainer = Grey700,
-    onTertiaryContainer = Grey50,
-    background = Grey1000,
-    onBackground = Grey50,
-    surface = Grey1000,
-    onSurface = Grey25,
-    surfaceVariant = Grey1000,
-    onSurfaceVariant = Grey50,
-    surfaceTint = Grey800,
-    inverseSurface = Grey25,
-    inverseOnSurface = Grey1000,
-    error = Error600,
-    onError = Grey25,
-    errorContainer = Error800,
-    onErrorContainer = Grey50,
-    outline = Grey25,
-    outlineVariant = Grey800,
-    scrim = Grey900,
-)
 
 enum class Themes(
     val isLight: Boolean,
@@ -172,9 +72,15 @@ fun InternalTheme(
     content: @Composable () -> Unit
 ) {
     val colorScheme = when (theme) {
-        Themes.LIGHT -> light_ColorPalette
-        Themes.DARK -> dark_ColorPalette
-        Themes.BLACK -> black_ColorPalette
+        Themes.LIGHT -> light_colorScheme
+        Themes.DARK -> dark_colorScheme
+        Themes.BLACK -> black_colorScheme
+    }
+
+    val appColor = when (theme) {
+        Themes.LIGHT -> light_appColor
+        Themes.DARK -> dark_appColor
+        Themes.BLACK -> black_appColor
     }
 
     val systemUiController = rememberSystemUiController()
@@ -184,7 +90,8 @@ fun InternalTheme(
     )
 
     CompositionLocalProvider(
-        LocalContentColor provides colorScheme.onPrimary
+        LocalContentColor provides colorScheme.onPrimary,
+        LocalAppColor provides appColor
     ) {
         MaterialTheme(
             colorScheme = colorScheme,

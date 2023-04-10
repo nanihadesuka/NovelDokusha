@@ -38,6 +38,7 @@ import my.noveldokusha.ui.composeViews.next
 import my.noveldokusha.ui.theme.ColorAccent
 import my.noveldokusha.ui.theme.InternalTheme
 import my.noveldokusha.ui.theme.PreviewThemes
+import my.noveldokusha.ui.theme.colorApp
 
 
 @OptIn(ExperimentalLayoutApi::class, ExperimentalMaterial3Api::class)
@@ -102,9 +103,9 @@ fun DatabaseSearchBottomSheet(
                     label = { Text(text = genreItem.genre) },
                     colors = FilterChipDefaults.filterChipColors(
                         selectedContainerColor = when (genreItem.state) {
-                            ToggleableState.On -> MaterialTheme.colorScheme.secondaryContainer
-                            ToggleableState.Off -> MaterialTheme.colorScheme.primary
-                            ToggleableState.Indeterminate -> MaterialTheme.colorScheme.error
+                            ToggleableState.On -> MaterialTheme.colorApp.checkboxPositive
+                            ToggleableState.Off -> MaterialTheme.colorApp.checkboxNeutral
+                            ToggleableState.Indeterminate -> MaterialTheme.colorApp.checkboxNegative
                         }
                     ),
                     leadingIcon = {

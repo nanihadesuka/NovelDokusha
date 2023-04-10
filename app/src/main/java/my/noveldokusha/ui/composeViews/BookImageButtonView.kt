@@ -32,6 +32,7 @@ import my.noveldokusha.ui.theme.Grey800
 import my.noveldokusha.ui.theme.ImageBorderShape
 import my.noveldokusha.ui.theme.InternalTheme
 import my.noveldokusha.ui.theme.PreviewThemes
+import my.noveldokusha.ui.theme.colorApp
 
 enum class BookTitlePosition {
     Inside, Outside, Hidden
@@ -55,7 +56,7 @@ fun BookImageButtonView(
                 .fillMaxWidth()
                 .aspectRatio(1 / 1.45f)
                 .clip(ImageBorderShape)
-                .background(MaterialTheme.colorScheme.primaryContainer)
+                .background(MaterialTheme.colorApp.bookSurface)
                 .combinedClickable(
                     role = Role.Button,
                     onClick = onClick,
