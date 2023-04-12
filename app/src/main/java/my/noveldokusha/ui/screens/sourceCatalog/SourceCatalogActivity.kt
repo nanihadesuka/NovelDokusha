@@ -40,19 +40,16 @@ class SourceCatalogActivity : BaseActivity() {
 
             Theme(appPreferences = appPreferences) {
                 SourceCatalogScreen(
-                    sourceCatalogName = viewModel.source.name,
-                    searchTextInput = viewModel.searchTextInput,
-                    fetchIterator = viewModel.fetchIterator,
-                    toolbarMode = viewModel.toolbarMode,
-                    listLayoutMode = viewModel.booksListLayout,
-                    onSearchTextInputChange = viewModel::searchTextInput::set,
+                    state = viewModel.state,
+                    onSearchTextInputChange = viewModel.state.searchTextInput::value::set,
                     onSearchTextInputSubmit = viewModel::onSearchText,
                     onSearchCatalogSubmit = viewModel::onSearchCatalog,
-                    onListLayoutModeChange = viewModel::booksListLayout::set,
-                    onToolbarModeChange = viewModel::toolbarMode::set,
+                    onListLayoutModeChange = viewModel.state.listLayoutMode::value::set,
+                    onToolbarModeChange = viewModel.state.toolbarMode::value::set,
                     onOpenSourceWebPage = ::openSourceWebPage,
                     onBookClicked = context::goToBookChapters,
-                    onBookLongClicked = viewModel::addToLibraryToggle
+                    onBookLongClicked = viewModel::addToLibraryToggle,
+                    onPressBack = ::onBackPressed
                 )
             }
         }

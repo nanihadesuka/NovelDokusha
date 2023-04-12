@@ -6,6 +6,7 @@ import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.ui.graphics.Color
+import my.noveldokusha.utils.mix
 
 @Immutable
 data class AppColor(
@@ -13,7 +14,9 @@ data class AppColor(
     val bookSurface: Color,
     val checkboxPositive: Color,
     val checkboxNegative: Color,
-    val checkboxNeutral: Color
+    val checkboxNeutral: Color,
+    val tintedSurface: Color,
+    val tintedSelectedSurface: Color,
 )
 
 val light_appColor = AppColor(
@@ -22,6 +25,8 @@ val light_appColor = AppColor(
     checkboxPositive = Success500,
     checkboxNegative = Error500,
     checkboxNeutral = Grey900,
+    tintedSurface = Grey25.mix(ColorAccent, 0.65f),
+    tintedSelectedSurface = Grey25.mix(ColorAccent, 0.75f),
 )
 
 val dark_appColor = AppColor(
@@ -30,6 +35,8 @@ val dark_appColor = AppColor(
     checkboxPositive = Success500,
     checkboxNegative = Error500,
     checkboxNeutral = Grey900,
+    tintedSurface = Grey900.mix(ColorAccent, 0.65f),
+    tintedSelectedSurface = Grey900.mix(ColorAccent, 0.75f),
 )
 
 val black_appColor = AppColor(
@@ -38,6 +45,8 @@ val black_appColor = AppColor(
     checkboxPositive = Success500,
     checkboxNegative = Error500,
     checkboxNeutral = Grey900,
+    tintedSurface = Grey1000.mix(ColorAccent, 0.65f),
+    tintedSelectedSurface = Grey1000.mix(ColorAccent, 0.75f),
 )
 
 val LocalAppColor = compositionLocalOf { light_appColor }

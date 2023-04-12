@@ -13,8 +13,11 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.Icon
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Bookmarks
+import androidx.compose.material.icons.filled.CenterFocusStrong
+import androidx.compose.material.icons.filled.CenterFocusWeak
+import androidx.compose.material.icons.filled.RecordVoiceOver
 import androidx.compose.material.icons.filled.StarRate
 import androidx.compose.material.icons.outlined.Save
 import androidx.compose.material.icons.outlined.StarBorder
@@ -50,7 +53,7 @@ import my.noveldokusha.ui.screens.reader.features.TextToSpeechSettingData
 import my.noveldokusha.ui.theme.ColorAccent
 import my.noveldokusha.ui.theme.ColorNotice
 import my.noveldokusha.ui.theme.InternalTheme
-import my.noveldokusha.utils.mix
+import my.noveldokusha.ui.theme.colorApp
 import my.noveldokusha.utils.rememberMutableStateOf
 
 
@@ -106,14 +109,29 @@ fun VoiceReaderSettingDialog(
                     AssistChip(
                         label = { Text(text = stringResource(id = R.string.start_here)) },
                         onClick = debouncedAction { state.playFirstVisibleItem() },
+                        leadingIcon = { Icon(Icons.Filled.CenterFocusWeak, null) },
+                        colors = AssistChipDefaults.assistChipColors(
+                            leadingIconContentColor = MaterialTheme.colorScheme.onPrimary,
+                            disabledLeadingIconContentColor = MaterialTheme.colorScheme.onPrimary,
+                        ),
                     )
                     AssistChip(
                         label = { Text(text = stringResource(id = R.string.focus)) },
                         onClick = debouncedAction { state.scrollToActiveItem() },
+                        leadingIcon = { Icon(Icons.Filled.CenterFocusStrong, null) },
+                        colors = AssistChipDefaults.assistChipColors(
+                            leadingIconContentColor = MaterialTheme.colorScheme.onPrimary,
+                            disabledLeadingIconContentColor = MaterialTheme.colorScheme.onPrimary,
+                        ),
                     )
                     AssistChip(
                         label = { Text(text = stringResource(id = R.string.voices)) },
                         onClick = { openVoicesDialog = !openVoicesDialog },
+                        leadingIcon = { Icon(Icons.Filled.RecordVoiceOver, null) },
+                        colors = AssistChipDefaults.assistChipColors(
+                            leadingIconContentColor = MaterialTheme.colorScheme.onPrimary,
+                            disabledLeadingIconContentColor = MaterialTheme.colorScheme.onPrimary,
+                        ),
                     )
                     AssistChip(
                         label = { Text(text = stringResource(R.string.saved_voices)) },
@@ -122,6 +140,11 @@ fun VoiceReaderSettingDialog(
                                 it.value = !it.value
                             }
                         },
+                        leadingIcon = { Icon(Icons.Filled.Bookmarks, null) },
+                        colors = AssistChipDefaults.assistChipColors(
+                            leadingIconContentColor = MaterialTheme.colorScheme.onPrimary,
+                            disabledLeadingIconContentColor = MaterialTheme.colorScheme.onPrimary,
+                        ),
                     )
                     Box {
                         DropdownCustomSavedVoices(
@@ -298,7 +321,7 @@ private fun VoiceSelectorDialog(
                 .background(MaterialTheme.colorScheme.primary, MaterialTheme.shapes.large)
         ) {
             stickyHeader {
-                Surface(color = MaterialTheme.colorScheme.primary.mix(ColorAccent, 0.75f)) {
+                Surface(color = MaterialTheme.colorApp.tintedSurface) {
                     Column {
                         MyOutlinedTextField(
                             value = inputTextFilter.value,
@@ -329,15 +352,13 @@ private fun VoiceSelectorDialog(
             }
 
             items(voicesFiltered) {
-                val selected = it.id == currentVoice?.id
+                val selected by remember { derivedStateOf { it.id == currentVoice?.id } }
                 Row(
                     modifier = Modifier
                         .heightIn(min = 54.dp)
                         .background(
-                            MaterialTheme.colorScheme.primary.mix(
-                                ColorAccent,
-                                if (selected) 0.85f else 1f
-                            )
+                            if (selected) MaterialTheme.colorApp.tintedSelectedSurface
+                            else MaterialTheme.colorScheme.primary
                         )
                         .clickable(enabled = !selected) { setVoice(it.id) }
                         .padding(horizontal = 16.dp)

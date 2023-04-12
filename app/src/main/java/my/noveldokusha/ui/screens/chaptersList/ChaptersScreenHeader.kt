@@ -1,5 +1,6 @@
 package my.noveldokusha.ui.screens.chaptersList
 
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -39,6 +40,7 @@ import my.noveldokusha.ui.composeViews.ImageView
 import my.noveldokusha.ui.goToGlobalSearch
 import my.noveldokusha.utils.clickableNoIndicator
 
+@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun ChaptersScreenHeader(
     bookState: ChapterScreenState.BookState,
@@ -109,7 +111,9 @@ fun ChaptersScreenHeader(
                 ) {
                     ImageView(
                         imageModel = coverImageModel,
-                        modifier = Modifier.fillMaxWidth(),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickableNoIndicator { showImageFullScreen = false },
                         contentScale = ContentScale.FillWidth
                     )
                 }
@@ -119,7 +123,7 @@ fun ChaptersScreenHeader(
                         .padding(top = 16.dp)
                         .fillMaxHeight()
                         .weight(1f),
-                    ) {
+                ) {
                     Text(
                         text = bookState.title,
                         style = MaterialTheme.typography.titleLarge,

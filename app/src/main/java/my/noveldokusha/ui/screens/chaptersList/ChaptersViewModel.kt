@@ -2,15 +2,10 @@ package my.noveldokusha.ui.screens.chaptersList
 
 import android.content.Context
 import android.content.Intent
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.State
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.snapshotFlow
-import androidx.compose.runtime.snapshots.SnapshotStateList
-import androidx.compose.runtime.snapshots.SnapshotStateMap
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -48,40 +43,6 @@ interface ChapterStateBundle {
     var bookTitle: String
 }
 
-data class ChapterScreenState(
-    val book: State<BookState>,
-    val error: MutableState<String>,
-    val selectedChaptersUrl: SnapshotStateMap<String, Unit>,
-    val chapters: SnapshotStateList<ChapterWithContext>,
-    val isRefreshing: MutableState<Boolean>,
-    val searchTextInput: MutableState<String>,
-    val sourceCatalogName: MutableState<String>,
-    val settingChapterSort: MutableState<AppPreferences.TERNARY_STATE>
-) {
-
-    val isInSelectionMode = derivedStateOf { selectedChaptersUrl.size != 0 }
-
-    data class BookState(
-        val title: String,
-        val url: String,
-        val completed: Boolean = false,
-        val lastReadChapter: String? = null,
-        val inLibrary: Boolean = false,
-        val coverImageUrl: String? = null,
-        val description: String = "",
-    ) {
-        constructor(book: Book) : this(
-            title = book.title,
-            url = book.url,
-            completed = book.completed,
-            lastReadChapter = book.lastReadChapter,
-            inLibrary = book.inLibrary,
-            coverImageUrl = book.coverImageUrl,
-            description = book.description
-        )
-    }
-}
-
 @HiltViewModel
 class ChaptersViewModel @Inject constructor(
     private val repository: Repository,
@@ -109,7 +70,30 @@ class ChaptersViewModel @Inject constructor(
         }
     }
 
+    @Volatile
+    private var loadChaptersJob: Job? = null
+
+    @Volatile
+    private var lastSelectedChapterUrl: String? = null
     private val source = scraper.getCompatibleSource(bookUrl)!!
+    private val book = repository.libraryBooks.getFlow(bookUrl)
+        .filterNotNull()
+        .map(ChapterScreenState::BookState)
+        .toState(
+            viewModelScope,
+            ChapterScreenState.BookState(title = bookTitle, url = bookUrl, coverImageUrl = null)
+        )
+
+    val state = ChapterScreenState(
+        book = book,
+        error = mutableStateOf(""),
+        chapters = mutableStateListOf(),
+        selectedChaptersUrl = mutableStateMapOf(),
+        isRefreshing = mutableStateOf(false),
+        searchTextInput = mutableStateOf(""),
+        sourceCatalogName = mutableStateOf(source.name),
+        settingChapterSort = appPreferences.CHAPTERS_SORT_ASCENDING.state(viewModelScope)
+    )
 
     init {
         viewModelScope.launch(Dispatchers.IO) {
@@ -131,28 +115,7 @@ class ChaptersViewModel @Inject constructor(
                 )
             )
         }
-    }
 
-    private val book = repository.libraryBooks.getFlow(bookUrl)
-        .filterNotNull()
-        .map(ChapterScreenState::BookState)
-        .toState(
-            viewModelScope,
-            ChapterScreenState.BookState(title = bookTitle, url = bookUrl, coverImageUrl = null)
-        )
-
-    val state = ChapterScreenState(
-        book = book,
-        error = mutableStateOf(""),
-        chapters = mutableStateListOf(),
-        selectedChaptersUrl = mutableStateMapOf(),
-        isRefreshing = mutableStateOf(false),
-        searchTextInput = mutableStateOf(""),
-        sourceCatalogName = mutableStateOf(source.name),
-        settingChapterSort = appPreferences.CHAPTERS_SORT_ASCENDING.state(viewModelScope)
-    )
-
-    init {
         viewModelScope.launch {
             repository.bookChapters.getChaptersWithContextFlow(bookMetadata.url)
                 .map { removeCommonTextFromTitles(it) }
@@ -211,7 +174,6 @@ class ChaptersViewModel @Inject constructor(
         }
     }
 
-    private var loadChaptersJob: Job? = null
     private fun updateChaptersList() {
         if (bookMetadata.url.startsWith("local://")) {
             toasty.show(R.string.local_book_nothing_to_update)
@@ -238,9 +200,6 @@ class ChaptersViewModel @Inject constructor(
             }
         }
     }
-
-    @Volatile
-    private var lastSelectedChapterUrl: String? = null
 
     suspend fun getLastReadChapter(): String? {
         return repository.libraryBooks.get(bookUrl)?.lastReadChapter

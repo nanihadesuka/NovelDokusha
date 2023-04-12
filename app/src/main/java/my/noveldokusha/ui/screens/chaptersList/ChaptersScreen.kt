@@ -31,7 +31,6 @@ import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material.icons.outlined.PublishedWithChanges
 import androidx.compose.material.icons.outlined.SelectAll
 import androidx.compose.material3.BottomAppBar
-import androidx.compose.material3.BottomAppBarDefaults
 import androidx.compose.material3.Divider
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -66,8 +65,8 @@ import my.noveldokusha.ui.goToWebBrowser
 import my.noveldokusha.ui.theme.ColorAccent
 import my.noveldokusha.ui.theme.ColorLike
 import my.noveldokusha.ui.theme.ColorNotice
+import my.noveldokusha.ui.theme.colorApp
 import my.noveldokusha.utils.isAtTop
-import my.noveldokusha.utils.mix
 import my.noveldokusha.utils.textPadding
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -186,7 +185,7 @@ fun ChaptersScreen(
                 exit = shrinkVertically(targetHeight = { it / 2 }, shrinkTowards = Alignment.Top)
                         + fadeOut(),
             ) {
-                Surface(color = BottomAppBarDefaults.containerColor.mix(ColorAccent, 0.6f)) {
+                Surface(color = MaterialTheme.colorApp.tintedSurface) {
                     TopAppBar(
                         scrollBehavior = scrollBehavior,
                         colors = TopAppBarDefaults.topAppBarColors(
@@ -247,7 +246,7 @@ fun ChaptersScreen(
             ) {
                 BottomAppBar(
                     modifier = Modifier.clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)),
-                    containerColor = BottomAppBarDefaults.containerColor.mix(ColorAccent, 0.6f)
+                    containerColor = MaterialTheme.colorApp.tintedSurface,
                 ) {
                     Row(
                         horizontalArrangement = Arrangement.Center,

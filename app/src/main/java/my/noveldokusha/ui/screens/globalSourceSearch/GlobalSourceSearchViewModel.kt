@@ -32,6 +32,7 @@ class GlobalSourceSearchViewModel @Inject constructor(
 ) : BaseViewModel(), GlobalSourceSearchStateBundle {
     override var initialInput by StateExtra_String(state)
 
+    @Volatile
     private var searchJob: Job? = null
 
     val searchInput = mutableStateOf<String>(initialInput)

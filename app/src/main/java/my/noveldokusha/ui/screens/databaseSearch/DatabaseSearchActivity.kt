@@ -59,17 +59,12 @@ class DatabaseSearchActivity : BaseActivity() {
         setContent {
             Theme(appPreferences = appPreferences) {
                 DatabaseSearchScreen(
-                    databaseName = viewModel.database.name,
-                    searchMode = viewModel.searchMode.value,
-                    searchInput = viewModel.inputSearch.value,
-                    genresList = viewModel.filtersSearch,
+                    state = viewModel.state,
                     onSearchCatalogSubmit = viewModel::onSearchCatalogSubmit,
                     onSearchInputSubmit = viewModel::onSearchInputSubmit,
                     onGenresFiltersSubmit = viewModel::onSearchGenresSubmit,
-                    onSearchInputChange = { viewModel.inputSearch.value = it },
-                    onSearchModeChange = { viewModel.searchMode.value = it },
-                    fetchIterator = viewModel.fetchIterator,
-                    listLayoutMode = viewModel.listLayout,
+                    onSearchInputChange = viewModel.state.searchTextInput::value::set,
+                    onSearchModeChange = viewModel.state.searchMode::value::set,
                     onBookClicked = ::openBookInfoPage,
                     onBookLongClicked = {},
                     onPressBack = ::onBackPressed

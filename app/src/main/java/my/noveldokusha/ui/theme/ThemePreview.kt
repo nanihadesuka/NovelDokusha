@@ -9,6 +9,7 @@ import androidx.compose.material.icons.filled.Face
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material.icons.outlined.DataThresholding
 import androidx.compose.material.icons.outlined.LooksOne
 import androidx.compose.material.icons.outlined.Settings
@@ -186,43 +187,50 @@ private fun PreviewCards() {
                 FilterChip(
                     selected = false,
                     onClick = {},
-                    label = { Text(text = "FilterChip false") }
+                    label = { Text(text = "FilterChip false") },
+                    leadingIcon = { Icon(Icons.Filled.Phone, null) },
                 )
                 Text(text = "-")
                 FilterChip(
                     selected = true,
                     onClick = {},
-                    label = { Text(text = "FilterChip true ") }
+                    label = { Text(text = "FilterChip true ") },
+                    leadingIcon = { Icon(Icons.Filled.Phone, null) },
                 )
             }
             AssistChip(
                 onClick = {},
-                label = { Text(text = "AssistChip") }
+                label = { Text(text = "AssistChip") },
+                leadingIcon = { Icon(Icons.Filled.Phone, null) },
             )
             ElevatedAssistChip(
                 onClick = {},
-                label = { Text(text = "ElevatedAssistChip") }
+                label = { Text(text = "ElevatedAssistChip") },
+                leadingIcon = { Icon(Icons.Filled.Phone, null) },
             )
             ElevatedFilterChip(
                 selected = false,
                 onClick = {},
-                label = { Text(text = "ElevatedFilterChip") }
+                label = { Text(text = "ElevatedFilterChip") },
+                leadingIcon = { Icon(Icons.Filled.Phone, null) },
             )
             ElevatedSuggestionChip(
                 onClick = {},
-                label = { Text(text = "ElevatedSuggestionChip") }
+                label = { Text(text = "ElevatedSuggestionChip") },
             )
             Row {
                 InputChip(
                     selected = false,
                     onClick = {},
-                    label = { Text(text = "InputChip false") }
+                    label = { Text(text = "InputChip false") },
+                    leadingIcon = { Icon(Icons.Filled.Phone, null) },
                 )
                 Text(text = "-")
                 InputChip(
                     selected = true,
                     onClick = {},
-                    label = { Text(text = "InputChip true") }
+                    label = { Text(text = "InputChip true") },
+                    leadingIcon = { Icon(Icons.Filled.Phone, null) },
                 )
             }
         }

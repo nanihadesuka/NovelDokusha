@@ -26,12 +26,10 @@ import my.noveldokusha.R
 import my.noveldokusha.data.ChapterWithContext
 import my.noveldokusha.data.database.tables.Chapter
 import my.noveldokusha.ui.composeViews.AnimatedTransition
-import my.noveldokusha.ui.theme.ColorAccent
 import my.noveldokusha.ui.theme.ColorNotice
 import my.noveldokusha.ui.theme.InternalTheme
-
 import my.noveldokusha.ui.theme.PreviewThemes
-import my.noveldokusha.utils.mix
+import my.noveldokusha.ui.theme.colorApp
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalAnimationApi::class)
 @Composable
@@ -45,7 +43,12 @@ fun ChaptersScreenChapterItem(
 ) {
     val chapter = chapterWithContext.chapter
     ListItem(
-        headlineContent = { Text(text = chapter.title) },
+        headlineContent = {
+            Text(
+                text = chapter.title,
+                style = MaterialTheme.typography.bodyMedium
+            )
+        },
         supportingContent = {
             AnimatedTransition(
                 targetState = chapterWithContext.lastReadChapter to chapter.read,
@@ -77,10 +80,9 @@ fun ChaptersScreenChapterItem(
         },
         colors = ListItemDefaults.colors(
             supportingColor = MaterialTheme.colorScheme.onTertiary,
-            containerColor = MaterialTheme.colorScheme.surface.mix(
-                color = ColorAccent,
-                fraction = if (selected) 0.8f else 1f
-            )
+            containerColor =
+            if (selected) MaterialTheme.colorApp.tintedSelectedSurface
+            else MaterialTheme.colorScheme.surface
         ),
         modifier = modifier
             .animateContentSize()

@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.TextFields
+import androidx.compose.material.icons.outlined.ColorLens
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -19,6 +20,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
+import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
@@ -84,7 +86,10 @@ fun StyleSettingDialog(
                         fontFamily = fontLoader.getFontFamily(state.textFont.value),
                     )
                 },
-                trailingContent = { Icon(Icons.Filled.TextFields, null) }
+                leadingContent = { Icon(Icons.Filled.TextFields, null) },
+                colors = ListItemDefaults.colors(
+                    leadingIconColor = MaterialTheme.colorScheme.onSurfaceVariant
+                ),
             )
             DropdownMenu(
                 expanded = showFontsDropdown,
@@ -126,22 +131,39 @@ fun StyleSettingDialog(
                         uncheckedBorderColor = MaterialTheme.colorScheme.onPrimary,
                     )
                 )
-            }
+            },
+            colors = ListItemDefaults.colors(
+                leadingIconColor = MaterialTheme.colorScheme.onSurfaceVariant
+            ),
         )
         // Themes
-        FlowRow(
-            modifier = Modifier
-                .padding(8.dp)
-                .fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-        ) {
-            Themes.list.forEach {
-                FilterChip(
-                    selected = it == state.currentTheme.value,
-                    onClick = { onThemeChange(it) },
-                    label = { Text(text = stringResource(id = it.nameId)) }
+        ListItem(
+            headlineContent = {
+                FlowRow(
+                    modifier = Modifier
+                        .padding(8.dp)
+                        .fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                    Themes.list.forEach {
+                        FilterChip(
+                            selected = it == state.currentTheme.value,
+                            onClick = { onThemeChange(it) },
+                            label = { Text(text = stringResource(id = it.nameId)) }
+                        )
+                    }
+                }
+            },
+            leadingContent = {
+                Icon(
+                    Icons.Outlined.ColorLens,
+                    null,
+                    tint = MaterialTheme.colorScheme.onPrimary
                 )
-            }
-        }
+            },
+            colors = ListItemDefaults.colors(
+                leadingIconColor = MaterialTheme.colorScheme.onSurfaceVariant
+            ),
+        )
     }
 }

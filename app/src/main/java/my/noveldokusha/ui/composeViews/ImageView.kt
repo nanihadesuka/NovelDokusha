@@ -6,6 +6,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -42,21 +43,32 @@ fun ImageView(
             modifier = modifier
         )
     } else {
+        val context by rememberUpdatedState(LocalContext.current)
+        val imageModel by remember {
+            derivedStateOf {
+                ImageRequest
+                    .Builder(context)
+                    .data(model)
+                    .crossfade(fadeInDurationMillis)
+                    .build()
+            }
+        }
+        val imageErrorModel by remember {
+            derivedStateOf {
+                ImageRequest
+                    .Builder(context)
+                    .data(error)
+                    .crossfade(fadeInDurationMillis)
+                    .build()
+            }
+        }
         AsyncImage(
-            model = ImageRequest
-                .Builder(LocalContext.current)
-                .data(model)
-                .crossfade(fadeInDurationMillis)
-                .build(),
+            model = imageModel,
             contentDescription = contentDescription,
             contentScale = contentScale,
             modifier = modifier,
             error = rememberAsyncImagePainter(
-                model = ImageRequest
-                    .Builder(LocalContext.current)
-                    .data(error)
-                    .crossfade(fadeInDurationMillis)
-                    .build(),
+                model = imageErrorModel,
                 contentScale = contentScale
             )
         )

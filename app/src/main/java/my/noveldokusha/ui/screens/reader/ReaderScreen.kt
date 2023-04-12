@@ -39,9 +39,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import my.noveldokusha.R
 import my.noveldokusha.ui.screens.reader.ReaderScreenState.Settings.Type
-import my.noveldokusha.ui.theme.ColorAccent
 import my.noveldokusha.ui.theme.Themes
-import my.noveldokusha.utils.mix
+import my.noveldokusha.ui.theme.colorApp
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -62,8 +61,6 @@ fun ReaderScreen(
         state.showReaderInfo.value = false
     }
 
-    val infoSurfaceColor = MaterialTheme.colorScheme.primary.mix(ColorAccent, 0.75f)
-
     Scaffold(
         topBar = {
             AnimatedVisibility(
@@ -73,12 +70,12 @@ fun ReaderScreen(
                 exit = shrinkVertically(targetHeight = { 0 }, shrinkTowards = Alignment.Top)
                         + fadeOut(),
             ) {
-                Surface(color = infoSurfaceColor) {
+                Surface(color = MaterialTheme.colorApp.tintedSurface) {
                     Column(modifier = Modifier.displayCutoutPadding()) {
                         TopAppBar(
                             colors = TopAppBarDefaults.topAppBarColors(
-                                containerColor = infoSurfaceColor,
-                                scrolledContainerColor = infoSurfaceColor,
+                                containerColor = MaterialTheme.colorApp.tintedSurface,
+                                scrolledContainerColor = MaterialTheme.colorApp.tintedSurface,
                             ),
                             title = {
                                 Text(
@@ -157,7 +154,7 @@ fun ReaderScreen(
                                 topEnd = 16.dp
                             )
                         ),
-                        containerColor = infoSurfaceColor,
+                        containerColor = MaterialTheme.colorApp.tintedSurface,
                     ) {
                         if (state.settings.liveTranslation.isAvailable) SettingIconItem(
                             currentType = state.settings.selectedSetting.value,

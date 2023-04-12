@@ -1,5 +1,6 @@
 package my.noveldokusha.network
 
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -48,10 +49,11 @@ class PagedListIteratorState<T>(
         fetchNext()
     }
 
-    val hasFinished
-        get() = state == IteratorState.CONSUMED ||
+    val hasFinished by derivedStateOf {
+        state == IteratorState.CONSUMED ||
                 (state == IteratorState.IDLE && list.size != 0) ||
                 error != null
+    }
 
     fun fetchNext() {
         if (state != IteratorState.IDLE) return

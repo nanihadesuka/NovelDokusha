@@ -169,7 +169,7 @@ dependencies {
 
     // UI
     implementation("androidx.appcompat:appcompat:1.6.1")
-    implementation("androidx.core:core-ktx:1.9.0")
+    implementation("androidx.core:core-ktx:1.10.0")
     implementation("androidx.navigation:navigation-fragment-ktx:2.5.3")
     implementation("androidx.navigation:navigation-ui-ktx:2.5.3")
     implementation("androidx.activity:activity-ktx:1.7.0")
@@ -213,20 +213,20 @@ dependencies {
 
     // Jetpack compose
     implementation("androidx.activity:activity-compose:1.7.0")
-    implementation("androidx.compose.material3:material3:1.1.0-beta01")
-    implementation("androidx.compose.animation:animation:1.4.0")
-    implementation("androidx.compose.ui:ui-tooling:1.4.0")
-    implementation("androidx.compose.runtime:runtime-livedata:1.4.0")
+    implementation("androidx.compose.material3:material3:1.1.0-beta02")
+    implementation("androidx.compose.animation:animation:1.4.1")
+    implementation("androidx.compose.ui:ui-tooling:1.4.1")
+    implementation("androidx.compose.runtime:runtime-livedata:1.4.1")
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.1")
     implementation("androidx.constraintlayout:constraintlayout-compose:1.0.1")
-    implementation("androidx.compose.material:material-icons-extended:1.4.0")
+    implementation("androidx.compose.material:material-icons-extended:1.4.1")
     implementation("com.google.accompanist:accompanist-systemuicontroller:0.30.0")
     implementation("com.google.accompanist:accompanist-swiperefresh:0.30.0")
     implementation("com.google.accompanist:accompanist-insets:0.30.0")
     implementation("com.google.accompanist:accompanist-pager:0.30.0")
     implementation("com.google.accompanist:accompanist-pager-indicators:0.30.0")
 
-    androidTestImplementation("androidx.compose.ui:ui-test-junit4:1.4.0")
+    androidTestImplementation("androidx.compose.ui:ui-test-junit4:1.4.1")
 
     // Networking
     implementation("com.squareup.okhttp3:okhttp:5.0.0-alpha.11")

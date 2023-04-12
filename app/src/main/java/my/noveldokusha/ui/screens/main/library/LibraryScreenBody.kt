@@ -91,8 +91,9 @@ fun LibraryScreenBody(
                     )
                 },
                 tabs = {
-                    tabs.forEachIndexed { index, title ->
+                    tabs.forEachIndexed { index, text ->
                         val selected by remember { derivedStateOf { pagerState.currentPage == index } }
+                        val title by remember { derivedStateOf { text } }
                         Tab(
                             selected = selected,
                             text = { Text(title, color = MaterialTheme.colorScheme.onPrimary) },

@@ -13,6 +13,7 @@ import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.SuggestionChip
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -35,13 +36,16 @@ import my.noveldokusha.scraper.DatabaseInterface
 import my.noveldokusha.scraper.SearchGenre
 import my.noveldokusha.ui.composeViews.BookImageButtonView
 import my.noveldokusha.ui.composeViews.BookTitlePosition
+import my.noveldokusha.ui.composeViews.ExpandableText
 import my.noveldokusha.ui.composeViews.ImageView
 import my.noveldokusha.ui.composeViews.MyButton
 import my.noveldokusha.ui.theme.ColorAccent
 import my.noveldokusha.ui.theme.InternalTheme
 import my.noveldokusha.utils.textPadding
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class,
+    ExperimentalAnimationApi::class
+)
 @Composable
 fun DatabaseBookInfoScreen(
     data: DatabaseInterface.BookData,
@@ -134,7 +138,7 @@ fun DatabaseBookInfoScreen(
 
         Column(Modifier.padding(horizontal = 12.dp)) {
 
-            TextAnimated(data.description)
+            ExpandableText(text = data.description, linesForExpand = 8)
 
             Title(stringResource(R.string.alternative_titles))
             if (data.alternativeTitles.isEmpty())
@@ -170,8 +174,10 @@ fun DatabaseBookInfoScreen(
                 elevation = CardDefaults.elevatedCardElevation(defaultElevation = 0.dp),
                 colors = CardDefaults.elevatedCardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
             ) {
-                TextAnimated(
-                    text = data.tags.joinToString(" · "),
+                val tagsText by remember { derivedStateOf { data.tags.joinToString(" · ") } }
+                ExpandableText(
+                    text = tagsText,
+                    linesForExpand = 3,
                     modifier = Modifier.textPadding()
                 )
             }
@@ -236,6 +242,7 @@ private fun TextAnimated(
         Text(
             text = target,
             modifier = Modifier.fillMaxWidth(),
+            style = MaterialTheme.typography.bodyMedium,
         )
     }
 }

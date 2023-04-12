@@ -1,11 +1,8 @@
 package my.noveldokusha.ui.screens.sourceCatalog
 
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.compose.saveable
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -19,45 +16,48 @@ import my.noveldokusha.ui.BaseViewModel
 import my.noveldokusha.ui.Toasty
 import my.noveldokusha.ui.composeViews.ToolbarMode
 import my.noveldokusha.utils.StateExtra_String
+import my.noveldokusha.utils.asMutableStateOf
 import javax.inject.Inject
 
 interface SourceCatalogStateBundle {
     var sourceBaseUrl: String
 }
 
+
 @HiltViewModel
 class SourceCatalogViewModel @Inject constructor(
     private val repository: Repository,
     private val toasty: Toasty,
-    state: SavedStateHandle,
+    stateHandle: SavedStateHandle,
     appPreferences: AppPreferences,
     scraper: Scraper,
 ) : BaseViewModel(), SourceCatalogStateBundle {
 
-    override var sourceBaseUrl by StateExtra_String(state)
+    override var sourceBaseUrl by StateExtra_String(stateHandle)
+    private val source = scraper.getCompatibleSourceCatalog(sourceBaseUrl)!!
 
-    var searchTextInput by state.saveable { mutableStateOf("") }
-    var toolbarMode by state.saveable { mutableStateOf(ToolbarMode.MAIN) }
-
-    val source = scraper.getCompatibleSourceCatalog(sourceBaseUrl)!!
-    val fetchIterator = PagedListIteratorState(viewModelScope) { source.getCatalogList(it) }
+    val state = SourceCatalogScreenState(
+        sourceCatalogName = mutableStateOf(source.name),
+        searchTextInput = stateHandle.asMutableStateOf("searchTextInput") { "" },
+        toolbarMode = stateHandle.asMutableStateOf("toolbarMode") { ToolbarMode.MAIN },
+        fetchIterator = PagedListIteratorState(viewModelScope) { source.getCatalogList(it) },
+        listLayoutMode = appPreferences.BOOKS_LIST_LAYOUT_MODE.state(viewModelScope),
+    )
 
     init {
         onSearchCatalog()
     }
 
-    var booksListLayout by appPreferences.BOOKS_LIST_LAYOUT_MODE.state(viewModelScope)
-
     fun onSearchCatalog() {
-        fetchIterator.setFunction { source.getCatalogList(it) }
-        fetchIterator.reset()
-        fetchIterator.fetchNext()
+        state.fetchIterator.setFunction { source.getCatalogList(it) }
+        state.fetchIterator.reset()
+        state.fetchIterator.fetchNext()
     }
 
     fun onSearchText(input: String) {
-        fetchIterator.setFunction { source.getCatalogSearch(it, input) }
-        fetchIterator.reset()
-        fetchIterator.fetchNext()
+        state.fetchIterator.setFunction { source.getCatalogSearch(it, input) }
+        state.fetchIterator.reset()
+        state.fetchIterator.fetchNext()
     }
 
     fun addToLibraryToggle(book: BookMetadata) = viewModelScope.launch(Dispatchers.IO)

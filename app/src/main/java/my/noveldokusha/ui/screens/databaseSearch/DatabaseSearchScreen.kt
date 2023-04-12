@@ -11,6 +11,7 @@ import androidx.compose.material.icons.filled.LibraryBooks
 import androidx.compose.material.icons.filled.Title
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
@@ -24,7 +25,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.input.nestedscroll.nestedScroll
@@ -40,23 +40,19 @@ import my.noveldokusha.ui.composeViews.BooksVerticalView
 import my.noveldokusha.ui.composeViews.CollapsibleDivider
 import my.noveldokusha.ui.composeViews.TopAppBarSearch
 import my.noveldokusha.ui.theme.ColorNotice
+import my.noveldokusha.ui.theme.Grey25
 import my.noveldokusha.ui.theme.InternalTheme
 import my.noveldokusha.ui.theme.PreviewThemes
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DatabaseSearchScreen(
-    databaseName: String,
-    searchMode: SearchMode,
-    searchInput: String,
-    genresList: SnapshotStateList<GenreItem>,
+    state: DatabaseSearchScreenState,
     onSearchCatalogSubmit: () -> Unit,
     onGenresFiltersSubmit: () -> Unit,
     onSearchInputSubmit: () -> Unit,
     onSearchInputChange: (String) -> Unit,
     onSearchModeChange: (SearchMode) -> Unit,
-    fetchIterator: PagedListIteratorState<BookMetadata>,
-    listLayoutMode: AppPreferences.LIST_LAYOUT_MODE,
     onBookClicked: (BookMetadata) -> Unit,
     onBookLongClicked: (BookMetadata) -> Unit,
     onPressBack: () -> Unit,
@@ -68,7 +64,7 @@ fun DatabaseSearchScreen(
         flingAnimationSpec = null
     )
 
-    val searchPlaceholderText = when (searchMode) {
+    val searchPlaceholderText = when (state.searchMode.value) {
         SearchMode.BookTitle, SearchMode.Catalog -> stringResource(id = R.string.search_by_title)
         SearchMode.BookGenres -> ""
     }
@@ -78,7 +74,7 @@ fun DatabaseSearchScreen(
         topBar = {
             TopAppBarSearch(
                 focusRequester = focusRequester,
-                searchTextInput = searchInput,
+                searchTextInput = state.searchTextInput.value,
                 onSearchTextChange = onSearchInputChange,
                 onTextDone = {
                     onSearchModeChange(SearchMode.BookTitle)
@@ -87,8 +83,8 @@ fun DatabaseSearchScreen(
                 onClose = onPressBack,
                 placeholderText = searchPlaceholderText,
                 scrollBehavior = scrollBehavior,
-                inputEnabled = searchMode != SearchMode.BookGenres,
-                labelText = databaseName
+                inputEnabled = state.searchMode.value != SearchMode.BookGenres,
+                labelText = state.databaseName.value
             )
         },
         content = { innerPadding ->
@@ -100,42 +96,36 @@ fun DatabaseSearchScreen(
                     modifier = Modifier.padding(horizontal = 8.dp),
                 ) {
                     FilterChip(
-                        selected = searchMode == SearchMode.Catalog,
+                        selected = state.searchMode.value == SearchMode.Catalog,
                         onClick = {
                             onSearchModeChange(SearchMode.Catalog)
                             focusRequester.freeFocus()
                             onSearchCatalogSubmit()
                         },
-                        label = {
-                            Text(text = stringResource(R.string.filter_catalog))
-                        },
-                        leadingIcon = {
-                            Icon(
-                                Icons.Filled.LibraryBooks,
-                                null,
-                                tint = MaterialTheme.colorScheme.onPrimary
-                            )
-                        }
+                        label = { Text(text = stringResource(R.string.filter_catalog)) },
+                        leadingIcon = { Icon(Icons.Filled.LibraryBooks, null) },
+                        colors = FilterChipDefaults.filterChipColors(
+                            selectedLeadingIconColor = Grey25,
+                            disabledLeadingIconColor = MaterialTheme.colorScheme.onPrimary,
+                            iconColor = MaterialTheme.colorScheme.onPrimary,
+                        )
                     )
                     FilterChip(
-                        selected = searchMode == SearchMode.BookTitle,
+                        selected = state.searchMode.value == SearchMode.BookTitle,
                         onClick = {
                             onSearchModeChange(SearchMode.BookTitle)
                             focusRequester.requestFocus() // Doesn't work
                         },
-                        label = {
-                            Text(text = stringResource(R.string.filter_title))
-                        },
-                        leadingIcon = {
-                            Icon(
-                                Icons.Filled.Title,
-                                null,
-                                tint = MaterialTheme.colorScheme.onPrimary
-                            )
-                        }
+                        label = { Text(text = stringResource(R.string.filter_title)) },
+                        leadingIcon = { Icon(Icons.Filled.Title, null) },
+                        colors = FilterChipDefaults.filterChipColors(
+                            selectedLeadingIconColor = Grey25,
+                            disabledLeadingIconColor = MaterialTheme.colorScheme.onPrimary,
+                            iconColor = MaterialTheme.colorScheme.onPrimary,
+                        )
                     )
                     FilterChip(
-                        selected = searchMode == SearchMode.BookGenres,
+                        selected = state.searchMode.value == SearchMode.BookGenres,
                         onClick = {
                             onSearchModeChange(SearchMode.BookGenres)
                             showFiltersBottomSheet.value = true
@@ -150,12 +140,12 @@ fun DatabaseSearchScreen(
                 }
                 CollapsibleDivider(scrollBehavior.state)
                 BooksVerticalView(
-                    list = fetchIterator.list,
+                    list = state.fetchIterator.list,
                     state = rememberLazyGridState(),
-                    error = fetchIterator.error,
-                    loadState = fetchIterator.state,
-                    layoutMode = listLayoutMode,
-                    onLoadNext = { fetchIterator.fetchNext() },
+                    error = state.fetchIterator.error,
+                    loadState = state.fetchIterator.state,
+                    layoutMode = state.listLayoutMode.value,
+                    onLoadNext = state.fetchIterator::fetchNext,
                     onBookClicked = onBookClicked,
                     onBookLongClicked = onBookLongClicked,
                 )
@@ -163,19 +153,20 @@ fun DatabaseSearchScreen(
         }
     )
 
-    LaunchedEffect(searchMode) {
-        showFiltersBottomSheet.value = searchMode == SearchMode.BookGenres
+    LaunchedEffect(state.searchMode.value) {
+        showFiltersBottomSheet.value = state.searchMode.value == SearchMode.BookGenres
     }
 
     if (showFiltersBottomSheet.value) ModalBottomSheet(
         onDismissRequest = { showFiltersBottomSheet.value = false }
     ) {
         DatabaseSearchBottomSheet(
-            genresList = genresList,
+            genresList = state.genresList,
             onGenresFiltersSubmit = onGenresFiltersSubmit
         )
     }
 }
+
 
 @PreviewThemes
 @Composable
@@ -193,19 +184,24 @@ private fun PreviewView() {
     val fetchIterator = PagedListIteratorState(list = list, coroutineScope = scope) {
         Response.Success(PagedList(listOf(), 0, true))
     }
+    val state = remember {
+        DatabaseSearchScreenState(
+            databaseName = mutableStateOf(" Database"),
+            searchMode = mutableStateOf(SearchMode.BookTitle),
+            genresList = genresList,
+            searchTextInput = mutableStateOf(""),
+            fetchIterator = fetchIterator,
+            listLayoutMode = mutableStateOf(AppPreferences.LIST_LAYOUT_MODE.verticalGrid),
+        )
+    }
 
     InternalTheme {
         DatabaseSearchScreen(
-            databaseName = "Database",
-            searchMode = SearchMode.BookTitle,
-            genresList = genresList,
-            searchInput = "",
+            state = state,
             onSearchModeChange = { },
             onSearchInputChange = { },
             onSearchCatalogSubmit = { },
             onSearchInputSubmit = { },
-            fetchIterator = fetchIterator,
-            listLayoutMode = AppPreferences.LIST_LAYOUT_MODE.verticalGrid,
             onBookClicked = { },
             onBookLongClicked = { },
             onPressBack = { },

@@ -1,6 +1,5 @@
 package my.noveldokusha.ui.screens.databaseSearch
 
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.state.ToggleableState
@@ -41,25 +40,28 @@ private sealed interface SearchInputState {
 
 @HiltViewModel
 class DatabaseSearchViewModel @Inject constructor(
-    state: SavedStateHandle,
+    stateHandle: SavedStateHandle,
     scraper: Scraper,
     val appPreferences: AppPreferences,
     app: App
 ) : BaseViewModel(), DatabaseSearchStateBundle {
 
-    override val extras: DatabaseSearchExtras by StateExtra_Parcelable(state)
+    override val extras: DatabaseSearchExtras by StateExtra_Parcelable(stateHandle)
 
-    val database = scraper.getCompatibleDatabase(extras.databaseBaseUrl)!!
-    val listLayout by appPreferences.BOOKS_LIST_LAYOUT_MODE.state(viewModelScope)
+    private val database = scraper.getCompatibleDatabase(extras.databaseBaseUrl)!!
+    val state = DatabaseSearchScreenState(
+        databaseName = mutableStateOf(database.name),
+        searchMode = mutableStateOf(SearchMode.Catalog),
+        searchTextInput = mutableStateOf(""),
+        genresList = mutableStateListOf(),
+        listLayoutMode = appPreferences.BOOKS_LIST_LAYOUT_MODE.state(viewModelScope),
+        fetchIterator = createPageLoaderState()
+    )
 
     @Volatile
     private var booksSearch: SearchInputState = SearchInputState.BookTitle("")
-
-    val searchMode = mutableStateOf(SearchMode.Catalog)
-    val inputSearch = mutableStateOf("")
-    val filtersSearch = mutableStateListOf<GenreItem>()
-
-    val fetchIterator = PagedListIteratorState(viewModelScope) { index ->
+    private val searchGenresCache = persistentCacheDatabaseSearchGenres(database, app.cacheDir)
+    private fun createPageLoaderState() = PagedListIteratorState(viewModelScope) { index ->
         when (val input = booksSearch) {
             is SearchInputState.Catalog -> database.getCatalog(index = index)
             is SearchInputState.BookTitle -> database.searchByTitle(
@@ -74,39 +76,71 @@ class DatabaseSearchViewModel @Inject constructor(
         }
     }
 
-    private val searchGenresCache = persistentCacheDatabaseSearchGenres(database, app.cacheDir)
 
     init {
         viewModelScope.launch {
-            val genresLoading = async { getGenres().onSuccess { filtersSearch.addAll(it) } }
+            val genresLoading = async { getGenres().onSuccess { state.genresList.addAll(it) } }
 
             when (val extras = extras) {
                 is DatabaseSearchExtras.Catalog -> {
-                    searchMode.value = SearchMode.Catalog
+                    state.searchMode.value = SearchMode.Catalog
                     onSearchCatalogSubmit()
                 }
                 is DatabaseSearchExtras.Genres -> {
-                    searchMode.value = SearchMode.BookGenres
+                    state.searchMode.value = SearchMode.BookGenres
                     genresLoading.await()
-                    val newFiltersSearch = filtersSearch.map {
+                    val newFiltersSearch = state.genresList.map {
                         when (it.genreId) {
                             in extras.includedGenresIds -> it.copy(state = ToggleableState.On)
                             in extras.excludedGenresIds -> it.copy(state = ToggleableState.Indeterminate)
                             else -> it.copy(state = ToggleableState.Off)
                         }
                     }
-                    filtersSearch.clear()
-                    filtersSearch.addAll(newFiltersSearch)
+                    state.genresList.clear()
+                    state.genresList.addAll(newFiltersSearch)
                     onSearchGenresSubmit()
                 }
                 is DatabaseSearchExtras.Title -> {
-                    searchMode.value = SearchMode.BookTitle
-                    inputSearch.value = extras.title
+                    state.searchMode.value = SearchMode.BookTitle
+                    state.searchTextInput.value = extras.title
                     onSearchInputSubmit()
                 }
             }
         }
     }
+
+    fun onSearchGenresSubmit() {
+        if (state.searchMode.value != SearchMode.BookGenres) return
+
+        booksSearch = SearchInputState.Filters(
+            genresIncludedId = state.genresList
+                .filter { it.state == ToggleableState.On }
+                .map { it.genreId },
+            genresExcludedId = state.genresList
+                .filter { it.state == ToggleableState.Indeterminate }
+                .map { it.genreId },
+        )
+        state.fetchIterator.reset()
+        state.fetchIterator.fetchNext()
+    }
+
+    fun onSearchCatalogSubmit() {
+        if (state.searchMode.value != SearchMode.Catalog) return
+
+        booksSearch = SearchInputState.Catalog
+        state.fetchIterator.reset()
+        state.fetchIterator.fetchNext()
+    }
+
+    fun onSearchInputSubmit() {
+        if (state.searchMode.value != SearchMode.BookTitle) return
+        if (state.searchTextInput.value.isBlank()) return
+
+        booksSearch = SearchInputState.BookTitle(text = state.searchTextInput.value)
+        state.fetchIterator.reset()
+        state.fetchIterator.fetchNext()
+    }
+
 
     private suspend fun getGenres() = withContext(Dispatchers.Default) {
         searchGenresCache
@@ -120,37 +154,5 @@ class DatabaseSearchViewModel @Inject constructor(
                     )
                 }
             }
-    }
-
-    fun onSearchGenresSubmit() {
-        if (searchMode.value != SearchMode.BookGenres) return
-
-        booksSearch = SearchInputState.Filters(
-            genresIncludedId = filtersSearch
-                .filter { it.state == ToggleableState.On }
-                .map { it.genreId },
-            genresExcludedId = filtersSearch
-                .filter { it.state == ToggleableState.Indeterminate }
-                .map { it.genreId },
-        )
-        fetchIterator.reset()
-        fetchIterator.fetchNext()
-    }
-
-    fun onSearchCatalogSubmit() {
-        if (searchMode.value != SearchMode.Catalog) return
-
-        booksSearch = SearchInputState.Catalog
-        fetchIterator.reset()
-        fetchIterator.fetchNext()
-    }
-
-    fun onSearchInputSubmit() {
-        if (searchMode.value != SearchMode.BookTitle) return
-        if (inputSearch.value.isBlank()) return
-
-        booksSearch = SearchInputState.BookTitle(text = inputSearch.value)
-        fetchIterator.reset()
-        fetchIterator.fetchNext()
     }
 }

@@ -4,6 +4,7 @@ import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -31,7 +32,6 @@ import androidx.compose.ui.res.stringResource
 import my.noveldokusha.AppPreferences
 import my.noveldokusha.R
 import my.noveldokusha.data.BookMetadata
-import my.noveldokusha.network.PagedListIteratorState
 import my.noveldokusha.ui.composeViews.AnimatedTransition
 import my.noveldokusha.ui.composeViews.BooksVerticalView
 import my.noveldokusha.ui.composeViews.CollapsibleDivider
@@ -42,11 +42,7 @@ import my.noveldokusha.utils.actionCopyToClipboard
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalAnimationApi::class)
 @Composable
 fun SourceCatalogScreen(
-    sourceCatalogName: String,
-    searchTextInput: String,
-    fetchIterator: PagedListIteratorState<BookMetadata>,
-    toolbarMode: ToolbarMode,
-    listLayoutMode: AppPreferences.LIST_LAYOUT_MODE,
+    state: SourceCatalogScreenState,
     onSearchTextInputChange: (String) -> Unit,
     onSearchTextInputSubmit: (String) -> Unit,
     onSearchCatalogSubmit: () -> Unit,
@@ -55,6 +51,7 @@ fun SourceCatalogScreen(
     onOpenSourceWebPage: () -> Unit,
     onBookClicked: (BookMetadata) -> Unit,
     onBookLongClicked: (BookMetadata) -> Unit,
+    onPressBack: () -> Unit,
 ) {
     val context by rememberUpdatedState(newValue = LocalContext.current)
     val focusRequester = remember { FocusRequester() }
@@ -69,7 +66,7 @@ fun SourceCatalogScreen(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
             Column {
-                AnimatedTransition(targetState = toolbarMode) { target ->
+                AnimatedTransition(targetState = state.toolbarMode.value) { target ->
                     when (target) {
                         ToolbarMode.MAIN -> TopAppBar(
                             scrollBehavior = scrollBehavior,
@@ -80,7 +77,7 @@ fun SourceCatalogScreen(
                             title = {
                                 Column {
                                     Text(
-                                        text = sourceCatalogName,
+                                        text = state.sourceCatalogName.value,
                                         style = MaterialTheme.typography.headlineSmall,
                                         maxLines = 1
                                     )
@@ -88,6 +85,13 @@ fun SourceCatalogScreen(
                                         text = stringResource(R.string.catalog),
                                         style = MaterialTheme.typography.titleSmall
                                     )
+                                }
+                            },
+                            navigationIcon = {
+                                IconButton(
+                                    onClick = onPressBack
+                                ) {
+                                    Icon(Icons.Filled.ArrowBack, null)
                                 }
                             },
                             actions = {
@@ -111,7 +115,7 @@ fun SourceCatalogScreen(
                                     SourceCatalogDropDown(
                                         expanded = optionsExpanded,
                                         onDismiss = { optionsExpanded = !optionsExpanded },
-                                        listLayoutMode = listLayoutMode,
+                                        listLayoutMode = state.listLayoutMode.value,
                                         onListLayoutModeChange = onListLayoutModeChange
                                     )
                                 }
@@ -120,7 +124,7 @@ fun SourceCatalogScreen(
                         ToolbarMode.SEARCH -> TopAppBarSearch(
                             scrollBehavior = scrollBehavior,
                             focusRequester = focusRequester,
-                            searchTextInput = searchTextInput,
+                            searchTextInput = state.searchTextInput.value,
                             onClose = {
                                 focusManager.clearFocus()
                                 onToolbarModeChange(ToolbarMode.MAIN)
@@ -140,15 +144,15 @@ fun SourceCatalogScreen(
         },
         content = { innerPadding ->
             BooksVerticalView(
-                layoutMode = listLayoutMode,
-                list = fetchIterator.list,
+                layoutMode = state.listLayoutMode.value,
+                list = state.fetchIterator.list,
                 state = rememberLazyGridState(),
-                error = fetchIterator.error,
-                loadState = fetchIterator.state,
-                onLoadNext = { fetchIterator.fetchNext() },
+                error = state.fetchIterator.error,
+                loadState = state.fetchIterator.state,
+                onLoadNext = state.fetchIterator::fetchNext,
                 onBookClicked = onBookClicked,
                 onBookLongClicked = onBookLongClicked,
-                onReload = { fetchIterator.reloadFailedLastLoad() },
+                onReload = state.fetchIterator::reloadFailedLastLoad,
                 onCopyError = context::actionCopyToClipboard,
                 innerPadding = innerPadding
             )
