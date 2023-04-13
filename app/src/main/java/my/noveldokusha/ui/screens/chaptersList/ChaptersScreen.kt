@@ -10,6 +10,7 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -59,6 +60,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import my.nanihadesuka.compose.InternalLazyColumnScrollbar
 import my.noveldokusha.R
 import my.noveldokusha.data.ChapterWithContext
 import my.noveldokusha.ui.goToWebBrowser
@@ -237,6 +239,9 @@ fun ChaptersScreen(
                 onChapterDownload = onChapterDownload,
                 onPullRefresh = onPullRefresh,
             )
+            Box(Modifier.padding(innerPadding)) {
+                InternalLazyColumnScrollbar(listState = lazyListState)
+            }
         },
         bottomBar = {
             AnimatedVisibility(
