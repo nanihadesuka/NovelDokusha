@@ -44,7 +44,7 @@ fun ImageView(
         )
     } else {
         val context by rememberUpdatedState(LocalContext.current)
-        val imageModel by remember {
+        val imageRequest by remember(model) {
             derivedStateOf {
                 ImageRequest
                     .Builder(context)
@@ -53,7 +53,7 @@ fun ImageView(
                     .build()
             }
         }
-        val imageErrorModel by remember {
+        val imageErrorRequest by remember(error) {
             derivedStateOf {
                 ImageRequest
                     .Builder(context)
@@ -63,12 +63,12 @@ fun ImageView(
             }
         }
         AsyncImage(
-            model = imageModel,
+            model = imageRequest,
             contentDescription = contentDescription,
             contentScale = contentScale,
             modifier = modifier,
             error = rememberAsyncImagePainter(
-                model = imageErrorModel,
+                model = imageErrorRequest,
                 contentScale = contentScale
             )
         )
