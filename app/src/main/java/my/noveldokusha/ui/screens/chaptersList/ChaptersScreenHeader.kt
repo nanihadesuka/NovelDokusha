@@ -48,7 +48,7 @@ import my.noveldokusha.utils.clickableNoIndicator
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun ChaptersScreenHeader(
-    bookState: ChapterScreenState.BookState,
+    bookState: ChaptersScreenState.BookState,
     sourceCatalogName: String,
     numberOfChapters: Int,
     paddingValues: PaddingValues,

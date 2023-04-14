@@ -1,8 +1,6 @@
 package my.noveldokusha.ui.screens.databaseBookInfo
 
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -23,37 +21,41 @@ interface DatabaseBookInfoStateBundle {
     var bookTitle: String
 }
 
+
 @HiltViewModel
 class DatabaseBookInfoViewModel @Inject constructor(
-    state: SavedStateHandle,
+    stateHandle: SavedStateHandle,
     private val scraper: Scraper
 ) : BaseViewModel(), DatabaseBookInfoStateBundle {
-    override var databaseUrlBase: String by StateExtra_String(state)
-    override var bookUrl: String by StateExtra_String(state)
-    override var bookTitle: String by StateExtra_String(state)
+    override var databaseUrlBase: String by StateExtra_String(stateHandle)
+    override var bookUrl: String by StateExtra_String(stateHandle)
+    override var bookTitle: String by StateExtra_String(stateHandle)
 
-    val database get() = scraper.getCompatibleDatabase(databaseUrlBase)!!
+    val database = scraper.getCompatibleDatabase(databaseUrlBase)!!
 
-    var bookData by mutableStateOf(
-        DatabaseInterface.BookData(
-            title = bookTitle,
-            description = "",
-            coverImageUrl = null,
-            alternativeTitles = listOf(),
-            authors = listOf(),
-            tags = listOf(),
-            genres = listOf(),
-            bookType = "",
-            relatedBooks = listOf(),
-            similarRecommended = listOf()
+    val state = DatabaseBookInfoState(
+        databaseName = mutableStateOf(database.name),
+        book = mutableStateOf(
+            DatabaseInterface.BookData(
+                title = bookTitle,
+                description = "",
+                coverImageUrl = null,
+                alternativeTitles = listOf(),
+                authors = listOf(),
+                tags = listOf(),
+                genres = listOf(),
+                bookType = "",
+                relatedBooks = listOf(),
+                similarRecommended = listOf()
+            )
         )
+
     )
 
     init {
-
         viewModelScope.launch {
             database.getBookData(bookMetadata.url)
-                .onSuccess { bookData = it }
+                .onSuccess { state.book.value = it }
                 .onError { Timber.d(it.exception) }
         }
     }

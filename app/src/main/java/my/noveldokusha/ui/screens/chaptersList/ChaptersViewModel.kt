@@ -78,13 +78,13 @@ class ChaptersViewModel @Inject constructor(
     private val source = scraper.getCompatibleSource(bookUrl)!!
     private val book = repository.libraryBooks.getFlow(bookUrl)
         .filterNotNull()
-        .map(ChapterScreenState::BookState)
+        .map(ChaptersScreenState::BookState)
         .toState(
             viewModelScope,
-            ChapterScreenState.BookState(title = bookTitle, url = bookUrl, coverImageUrl = null)
+            ChaptersScreenState.BookState(title = bookTitle, url = bookUrl, coverImageUrl = null)
         )
 
-    val state = ChapterScreenState(
+    val state = ChaptersScreenState(
         book = book,
         error = mutableStateOf(""),
         chapters = mutableStateListOf(),

@@ -22,15 +22,15 @@ class LibraryViewModel @Inject constructor(
     var bookSettingsDialogState by mutableStateOf<BookSettingsDialogState>(BookSettingsDialogState.Hide)
     var showBottomSheet by mutableStateOf(false)
 
-    val readFilter by appPreferences.LIBRARY_FILTER_READ.state(viewModelScope)
-    val readSort by appPreferences.LIBRARY_SORT_LAST_READ.state(viewModelScope)
+    var readFilter by appPreferences.LIBRARY_FILTER_READ.state(viewModelScope)
+    var readSort by appPreferences.LIBRARY_SORT_LAST_READ.state(viewModelScope)
 
     fun readFilterToggle() {
-        appPreferences.LIBRARY_FILTER_READ.value = readFilter.next()
+        readFilter = readFilter.next()
     }
 
     fun readSortToggle() {
-        appPreferences.LIBRARY_SORT_LAST_READ.value = readSort.next()
+        readSort = readSort.next()
     }
 
     fun bookCompletedToggle(bookUrl: String) {

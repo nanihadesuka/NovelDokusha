@@ -5,13 +5,7 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.runtime.derivedStateOf
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
-import androidx.core.view.WindowCompat
 import dagger.hilt.android.AndroidEntryPoint
-import my.noveldokusha.composableActions.SetSystemBarTransparent
 import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.scraper.DatabaseInterface
 import my.noveldokusha.scraper.SearchGenre
@@ -19,6 +13,7 @@ import my.noveldokusha.ui.BaseActivity
 import my.noveldokusha.ui.goToDatabaseBookInfo
 import my.noveldokusha.ui.goToDatabaseSearchGenres
 import my.noveldokusha.ui.goToGlobalSearch
+import my.noveldokusha.ui.goToWebBrowser
 import my.noveldokusha.ui.theme.Theme
 import my.noveldokusha.utils.Extra_String
 
@@ -45,31 +40,22 @@ class DatabaseBookInfoActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        WindowCompat.setDecorFitsSystemWindows(window, false)
         setContent {
-            val scrollState = rememberScrollState()
-            val alpha by remember {
-                derivedStateOf {
-                    val value = (scrollState.value - 50).coerceIn(0, 200).toFloat()
-                    val maxvalue = (scrollState.maxValue).coerceIn(1, 200).toFloat()
-                    value / maxvalue
-                }
-            }
             Theme(appPreferences = appPreferences) {
-                SetSystemBarTransparent(alpha)
                 DatabaseBookInfoScreen(
-                    scrollState = scrollState,
-                    data = viewModel.bookData,
+                    state = viewModel.state,
                     onSourcesClick = ::openGlobalSearchPage,
                     onAuthorsClick = ::openSearchPageByAuthor,
                     onGenresClick = ::openSearchPageByGenres,
-                    onBookClick = ::openBookInfo
+                    onBookClick = ::openBookInfo,
+                    onOpenInWeb = { goToWebBrowser(viewModel.bookUrl) },
+                    onPressBack = ::onBackPressed
                 )
             }
         }
     }
 
-    private fun openGlobalSearchPage() = goToGlobalSearch(text = viewModel.bookMetadata.title)
+    private fun openGlobalSearchPage() = goToGlobalSearch(text = viewModel.state.book.value.title)
 
     private fun openSearchPageByAuthor(author: DatabaseInterface.AuthorMetadata) {
         // TODO

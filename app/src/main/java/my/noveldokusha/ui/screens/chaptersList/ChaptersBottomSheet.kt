@@ -21,7 +21,7 @@ import my.noveldokusha.ui.theme.ColorAccent
 fun ChaptersBottomSheet(
     visible: Boolean,
     onDismiss: () -> Unit,
-    state: ChapterScreenState,
+    state: ChaptersScreenState,
 ) {
     if (!visible) return
 

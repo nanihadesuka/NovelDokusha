@@ -30,7 +30,7 @@ val light_appColor = AppColor(
 )
 
 val dark_appColor = AppColor(
-    tabSurface = Grey900,
+    tabSurface = Grey800,
     bookSurface = Grey800,
     checkboxPositive = Success500,
     checkboxNegative = Error500,

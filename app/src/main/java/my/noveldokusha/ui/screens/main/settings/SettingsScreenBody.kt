@@ -48,7 +48,7 @@ import my.noveldokusha.utils.textPadding
 
 @OptIn(ExperimentalLayoutApi::class, ExperimentalMaterial3Api::class)
 @Composable
-fun SettingsTheme(
+private fun SettingsTheme(
     currentTheme: Themes,
     currentFollowSystem: Boolean,
     onFollowSystemChange: (Boolean) -> Unit,

@@ -74,7 +74,7 @@ import my.noveldokusha.utils.textPadding
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ChaptersScreen(
-    state: ChapterScreenState,
+    state: ChaptersScreenState,
     onLibraryToggle: () -> Unit,
     onSearchBookInDatabase: () -> Unit,
     onResumeReading: () -> Unit,

@@ -29,7 +29,7 @@ import my.noveldokusha.ui.composeViews.ErrorView
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun ChaptersScreenBody(
-    state: ChapterScreenState,
+    state: ChaptersScreenState,
     lazyListState: LazyListState,
     innerPadding: PaddingValues,
     onChapterClick: (chapter: ChapterWithContext) -> Unit,

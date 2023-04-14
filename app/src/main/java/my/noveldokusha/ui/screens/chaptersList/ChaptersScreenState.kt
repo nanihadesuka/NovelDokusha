@@ -9,7 +9,7 @@ import my.noveldokusha.AppPreferences
 import my.noveldokusha.data.ChapterWithContext
 import my.noveldokusha.data.database.tables.Book
 
-data class ChapterScreenState(
+data class ChaptersScreenState(
     val book: State<BookState>,
     val error: MutableState<String>,
     val selectedChaptersUrl: SnapshotStateMap<String, Unit>,
