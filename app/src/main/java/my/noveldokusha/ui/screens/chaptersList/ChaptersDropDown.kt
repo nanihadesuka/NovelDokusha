@@ -13,11 +13,12 @@ import my.noveldokusha.R
 
 @Composable
 fun ChaptersDropDown(
+    isLocalSource: Boolean,
     onOpenWebView: () -> Unit,
     onSearchBookInDatabase: () -> Unit,
     onResumeReading: () -> Unit,
 ) {
-    DropdownMenuItem(
+    if (!isLocalSource) DropdownMenuItem(
         onClick = onOpenWebView,
         text = {
             Text(text = stringResource(id = R.string.open_in_browser))

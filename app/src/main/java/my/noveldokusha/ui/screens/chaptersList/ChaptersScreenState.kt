@@ -17,7 +17,8 @@ data class ChaptersScreenState(
     val isRefreshing: MutableState<Boolean>,
     val searchTextInput: MutableState<String>,
     val sourceCatalogName: MutableState<String>,
-    val settingChapterSort: MutableState<AppPreferences.TERNARY_STATE>
+    val settingChapterSort: MutableState<AppPreferences.TERNARY_STATE>,
+    val isLocalSource: State<Boolean>
 ) {
 
     val isInSelectionMode = derivedStateOf { selectedChaptersUrl.size != 0 }

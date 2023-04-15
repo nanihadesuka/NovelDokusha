@@ -63,6 +63,7 @@ import androidx.compose.ui.unit.dp
 import my.nanihadesuka.compose.InternalLazyColumnScrollbar
 import my.noveldokusha.R
 import my.noveldokusha.data.ChapterWithContext
+import my.noveldokusha.isLocalUri
 import my.noveldokusha.ui.goToWebBrowser
 import my.noveldokusha.ui.theme.ColorAccent
 import my.noveldokusha.ui.theme.ColorLike
@@ -169,7 +170,12 @@ fun ChaptersScreen(
                                     expanded = showDropDown,
                                     onDismissRequest = { showDropDown = false }) {
                                     ChaptersDropDown(
-                                        onOpenWebView = { context.goToWebBrowser(url = state.book.value.url) },
+                                        isLocalSource = state.isLocalSource.value,
+                                        onOpenWebView = {
+                                            if (!state.book.value.url.isLocalUri) {
+                                                context.goToWebBrowser(url = state.book.value.url)
+                                            }
+                                        },
                                         onSearchBookInDatabase = onSearchBookInDatabase,
                                         onResumeReading = onResumeReading,
                                     )
@@ -257,17 +263,20 @@ fun ChaptersScreen(
                         horizontalArrangement = Arrangement.Center,
                         modifier = Modifier.fillMaxWidth()
                     ) {
-                        IconButton(onClick = onSelectedDeleteDownloads) {
-                            Icon(
-                                Icons.Outlined.Delete,
-                                stringResource(id = R.string.remove_selected_chapters_dowloads)
-                            )
-                        }
-                        IconButton(onClick = onSelectedDownload) {
-                            Icon(
-                                Icons.Outlined.CloudDownload,
-                                stringResource(id = R.string.download_selected_chapters)
-                            )
+
+                        if (!state.isLocalSource.value) {
+                            IconButton(onClick = onSelectedDeleteDownloads) {
+                                Icon(
+                                    Icons.Outlined.Delete,
+                                    stringResource(id = R.string.remove_selected_chapters_dowloads)
+                                )
+                            }
+                            IconButton(onClick = onSelectedDownload) {
+                                Icon(
+                                    Icons.Outlined.CloudDownload,
+                                    stringResource(id = R.string.download_selected_chapters)
+                                )
+                            }
                         }
                         IconButton(onClick = onSelectedSetRead) {
                             Icon(

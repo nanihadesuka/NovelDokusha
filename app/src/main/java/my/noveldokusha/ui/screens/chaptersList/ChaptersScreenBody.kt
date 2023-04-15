@@ -80,6 +80,7 @@ fun ChaptersScreenBody(
                 ChaptersScreenChapterItem(
                     chapterWithContext = it,
                     selected = state.selectedChaptersUrl.containsKey(it.chapter.url),
+                    isLocalSource = state.isLocalSource.value,
                     onClick = { onChapterClick(it) },
                     onLongClick = { onChapterLongClick(it) },
                     onDownload = { onChapterDownload(it) }

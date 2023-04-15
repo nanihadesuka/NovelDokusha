@@ -24,6 +24,7 @@ import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.data.ChapterWithContext
 import my.noveldokusha.data.database.tables.Book
 import my.noveldokusha.di.AppCoroutineScope
+import my.noveldokusha.isLocalUri
 import my.noveldokusha.network.NetworkClient
 import my.noveldokusha.repository.Repository
 import my.noveldokusha.scraper.Scraper
@@ -75,7 +76,7 @@ class ChaptersViewModel @Inject constructor(
 
     @Volatile
     private var lastSelectedChapterUrl: String? = null
-    private val source = scraper.getCompatibleSource(bookUrl)!!
+    private val source = scraper.getCompatibleSource(bookUrl)
     private val book = repository.libraryBooks.getFlow(bookUrl)
         .filterNotNull()
         .map(ChaptersScreenState::BookState)
@@ -91,12 +92,15 @@ class ChaptersViewModel @Inject constructor(
         selectedChaptersUrl = mutableStateMapOf(),
         isRefreshing = mutableStateOf(false),
         searchTextInput = mutableStateOf(""),
-        sourceCatalogName = mutableStateOf(source.name),
-        settingChapterSort = appPreferences.CHAPTERS_SORT_ASCENDING.state(viewModelScope)
+        sourceCatalogName = mutableStateOf(source?.name ?: "Local"),
+        settingChapterSort = appPreferences.CHAPTERS_SORT_ASCENDING.state(viewModelScope),
+        isLocalSource = mutableStateOf(bookUrl.isLocalUri)
     )
 
     init {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
+            if(state.isLocalSource.value) return@launch
+
             if (!repository.bookChapters.hasChapters(bookMetadata.url))
                 updateChaptersList()
 
@@ -157,6 +161,7 @@ class ChaptersViewModel @Inject constructor(
     }
 
     fun onPullRefresh() {
+        if(state.isLocalSource.value) return
         toasty.show(R.string.updating_book_info)
         updateCover()
         updateDescription()
@@ -164,18 +169,20 @@ class ChaptersViewModel @Inject constructor(
     }
 
     private fun updateCover() = viewModelScope.launch {
+        if(state.isLocalSource.value) return@launch
         downloadBookCoverImageUrl(scraper, networkClient, bookUrl)
             .onSuccess { repository.libraryBooks.updateCover(bookUrl, it) }
     }
 
     private fun updateDescription() = viewModelScope.launch {
+        if(state.isLocalSource.value) return@launch
         downloadBookDescription(scraper, networkClient, bookUrl).onSuccess {
             repository.libraryBooks.updateDescription(bookUrl, it)
         }
     }
 
     private fun updateChaptersList() {
-        if (bookMetadata.url.startsWith("local://")) {
+        if (state.isLocalSource.value) {
             toasty.show(R.string.local_book_nothing_to_update)
             state.isRefreshing.value = false
             return
@@ -208,28 +215,30 @@ class ChaptersViewModel @Inject constructor(
 
     fun setAsUnreadSelected() {
         val list = state.selectedChaptersUrl.toList()
-        appScope.launch(Dispatchers.IO) {
+        appScope.launch(Dispatchers.Default) {
             repository.bookChapters.setAsUnread(list.map { it.first })
         }
     }
 
     fun setAsReadSelected() {
         val list = state.selectedChaptersUrl.toList()
-        appScope.launch(Dispatchers.IO) {
+        appScope.launch(Dispatchers.Default) {
             repository.bookChapters.setAsRead(list.map { it.first })
         }
     }
 
     fun downloadSelected() {
+        if (state.isLocalSource.value) return
         val list = state.selectedChaptersUrl.toList()
-        appScope.launch(Dispatchers.IO) {
+        appScope.launch(Dispatchers.Default) {
             list.forEach { repository.chapterBody.fetchBody(it.first) }
         }
     }
 
     fun deleteDownloadsSelected() {
+        if (state.isLocalSource.value) return
         val list = state.selectedChaptersUrl.toList()
-        appScope.launch(Dispatchers.IO) {
+        appScope.launch(Dispatchers.Default) {
             repository.chapterBody.removeRows(list.map { it.first })
         }
     }
@@ -275,7 +284,8 @@ class ChaptersViewModel @Inject constructor(
     }
 
     fun onChapterDownload(chapter: ChapterWithContext) {
-        appScope.launch(Dispatchers.IO) {
+        if (state.isLocalSource.value) return
+        appScope.launch {
             repository.chapterBody.fetchBody(chapter.chapter.url)
         }
     }
