@@ -51,7 +51,7 @@ fun GlobalSourceSearchScreenBody(
     ) {
         items(listSources) { entry ->
             Text(
-                text = entry.source.catalog.name.capitalize(Locale.ROOT),
+                text = entry.source.remoteCatalog.name.capitalize(Locale.ROOT),
                 style = MaterialTheme.typography.titleMedium,
                 modifier = Modifier
                     .padding(start = 12.dp)
@@ -151,9 +151,9 @@ private fun PreviewView() {
             Response.Builder().build()
     })
 
-    val list = scraper.sourcesListCatalog.mapIndexed { index, source ->
+    val list = scraper.sourcesListRemoteCatalog.mapIndexed { index, source ->
         val (catalog, books) = SourceCatalogItem(
-            catalog = source,
+            remoteCatalog = source,
             pinned = false
         ) to (0..5).map { BookMetadata(title = "Book $it", url = "") }
 

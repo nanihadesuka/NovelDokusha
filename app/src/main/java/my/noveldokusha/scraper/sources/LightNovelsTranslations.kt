@@ -1,5 +1,7 @@
 package my.noveldokusha.scraper.sources
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.data.ChapterMetadata
 import my.noveldokusha.data.Response
@@ -24,7 +26,7 @@ import java.util.Locale
  */
 class LightNovelsTranslations(
     private val networkClient: NetworkClient
-) : SourceInterface.Catalog {
+) : SourceInterface.RemoteCatalog {
     override val id = "light_novel_translations"
     override val name = "Light Novel Translations"
     override val baseUrl = "https://lightnovelstranslations.com/"
@@ -33,53 +35,73 @@ class LightNovelsTranslations(
         "https://c10.patreonusercontent.com/4/patreon-media/p/campaign/458169/797a2e9b03094435947635c4da0fc683/eyJ3IjoyMDB9/1.jpeg?token-time=2145916800&token-hash=2gkkI3EgQqRPh5dQe9uxrULjURfQVm60BHKUdh91MtE%3D"
     override val language = "English"
 
-    override suspend fun getChapterTitle(doc: Document): String? =
+    override suspend fun getChapterTitle(
+        doc: Document
+    ): String? = withContext(Dispatchers.Default) {
         doc.selectFirst("h1.entry-title")?.text()
+    }
 
-    override suspend fun getChapterText(doc: Document): String {
-        return doc.selectFirst(".page, .type-page, .status-publish, .hentry")!!
+    override suspend fun getChapterText(doc: Document): String = withContext(Dispatchers.Default) {
+        doc.selectFirst(".page, .type-page, .status-publish, .hentry")!!
             .selectFirst(".entry-content").run {
                 this!!.select("#textbox").remove()
                 TextExtractor.get(this)
             }
     }
 
-    override suspend fun getBookCoverImageUrl(doc: Document): String? {
-        return doc.selectFirst("div.entry-content")
-            ?.selectFirst("img[src]")
-            ?.attr("src")
-            ?.replace("&#038;", "")
+    override suspend fun getBookCoverImageUrl(
+        bookUrl: String
+    ): Response<String?> = withContext(Dispatchers.Default) {
+        tryConnect {
+            networkClient.get(bookUrl).toDocument().selectFirst("div.entry-content")
+                ?.selectFirst("img[src]")
+                ?.attr("src")
+                ?.replace("&#038;", "")
+        }
     }
 
-    override suspend fun getBookDescription(doc: Document): String? {
-        return doc.selectFirst("div.entry-content")
-            ?.select("p")
-            ?.find { it.text().startsWith("Synopsis", ignoreCase = true) }
-            ?.nextElementSiblings()?.asSequence()
-            ?.takeWhile { it.`is`("p") }
-            ?.joinToString("\n\n") { it.text() }
+    override suspend fun getBookDescription(
+        bookUrl: String,
+    ): Response<String?> = withContext(Dispatchers.Default) {
+        tryConnect {
+            networkClient.get(bookUrl).toDocument()
+                .selectFirst("div.entry-content")
+                ?.select("p")
+                ?.find { it.text().startsWith("Synopsis", ignoreCase = true) }
+                ?.nextElementSiblings()?.asSequence()
+                ?.takeWhile { it.`is`("p") }
+                ?.joinToString("\n\n") { it.text() }
+        }
     }
 
-    override suspend fun getChapterList(doc: Document): List<ChapterMetadata> {
-        return doc
-            .select(".su-spoiler-content.su-u-clearfix.su-u-trim a[href]")
-            .map {
-                val url = it.attr("href")
-                val decoded_url = URLDecoder.decode(url, "UTF-8")
-                val title: String = Regex(""".+/(.+)/?$""").find(decoded_url)?.destructured?.run {
-                    this.component1().replace("-", " ").removeSuffix("/")
-                } ?: it.text()
+    override suspend fun getChapterList(
+        bookUrl: String
+    ): Response<List<ChapterMetadata>> = withContext(Dispatchers.Default) {
+        tryConnect {
+            networkClient.get(bookUrl)
+                .toDocument()
+                .select(".su-spoiler-content.su-u-clearfix.su-u-trim a[href]")
+                .map {
+                    val url = it.attr("href")
+                    val decoded_url = URLDecoder.decode(url, "UTF-8")
+                    val title: String =
+                        Regex(""".+/(.+)/?$""").find(decoded_url)?.destructured?.run {
+                            this.component1().replace("-", " ").removeSuffix("/")
+                        } ?: it.text()
 
-                ChapterMetadata(title = title.trim().capitalize(Locale.ROOT), url = url)
-            }
+                    ChapterMetadata(title = title.trim().capitalize(Locale.ROOT), url = url)
+                }
+        }
     }
 
-    override suspend fun getCatalogList(index: Int): Response<PagedList<BookMetadata>> {
-        val page = index + 1
-        if (page > 1)
-            return Response.Success(PagedList.createEmpty(index = index))
+    override suspend fun getCatalogList(
+        index: Int
+    ): Response<PagedList<BookMetadata>> = withContext(Dispatchers.Default) {
+        tryConnect {
+            val page = index + 1
+            if (page > 1)
+                return@tryConnect PagedList.createEmpty(index = index)
 
-        return tryConnect {
             networkClient.get(catalogUrl).toDocument()
                 .selectFirst("#prime_nav")!!
                 .children()
@@ -97,12 +119,10 @@ class LightNovelsTranslations(
                 }
                 .map { BookMetadata(title = it.text(), url = it.attr("href")) }
                 .let {
-                    Response.Success(
-                        PagedList(
-                            list = it,
-                            index = index,
-                            isLastPage = true
-                        )
+                    PagedList(
+                        list = it,
+                        index = index,
+                        isLastPage = true
                     )
                 }
         }
@@ -111,17 +131,17 @@ class LightNovelsTranslations(
     override suspend fun getCatalogSearch(
         index: Int,
         input: String
-    ): Response<PagedList<BookMetadata>> {
-        if (input.isBlank() || index > 0)
-            return Response.Success(PagedList.createEmpty(index = index))
+    ): Response<PagedList<BookMetadata>> = withContext(Dispatchers.Default) {
+        tryConnect {
+            if (input.isBlank() || index > 0)
+                return@tryConnect PagedList.createEmpty(index = index)
 
-        val url = baseUrl.toUrlBuilder()!!.apply {
-            add("order", "DESC")
-            add("orderby", "relevance")
-            add("s", input)
-        }
+            val url = baseUrl.toUrlBuilder()!!.apply {
+                add("order", "DESC")
+                add("orderby", "relevance")
+                add("s", input)
+            }
 
-        return tryConnect {
             networkClient.get(url)
                 .toDocument()
                 .selectFirst(".jetpack-search-filters-widget__filter-list")!!
@@ -133,12 +153,10 @@ class LightNovelsTranslations(
                         url = "https://lightnovelstranslations.com/${name}/"
                     )
                 }.let {
-                    Response.Success(
-                        PagedList(
-                            list = it,
-                            index = index,
-                            isLastPage = true
-                        )
+                    PagedList(
+                        list = it,
+                        index = index,
+                        isLastPage = true
                     )
                 }
         }

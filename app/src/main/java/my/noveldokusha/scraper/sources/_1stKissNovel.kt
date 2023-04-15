@@ -1,5 +1,7 @@
 package my.noveldokusha.scraper.sources
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.data.ChapterMetadata
 import my.noveldokusha.data.Response
@@ -18,48 +20,63 @@ import org.jsoup.nodes.Document
 
 class _1stKissNovel(
     private val networkClient: NetworkClient
-) : SourceInterface.Catalog {
+) : SourceInterface.RemoteCatalog {
     override val id = "1stkissnovel"
     override val name = "1stKissNovel"
     override val catalogUrl = "https://1stkissnovel.love/novel/?m_orderby=alphabet"
     override val baseUrl = "https://1stkissnovel.love/"
-    override val iconUrl = "https://1stkissnovel.love/wp-content/uploads/2020/10/cropped-HINH-NEN-3-1-32x32.png"
+    override val iconUrl =
+        "https://1stkissnovel.love/wp-content/uploads/2020/10/cropped-HINH-NEN-3-1-32x32.png"
     override val language = "English"
 
 
-    override suspend fun getBookCoverImageUrl(doc: Document): String? {
-        return doc.selectFirst("div.summary_image")
-            ?.selectFirst("img[src]")
-            ?.attr("src")
+    override suspend fun getBookCoverImageUrl(
+        bookUrl: String
+    ): Response<String?> = withContext(Dispatchers.Default) {
+        tryConnect {
+            networkClient.get(bookUrl).toDocument()
+                .selectFirst("div.summary_image")
+                ?.selectFirst("img[src]")
+                ?.attr("src")
+        }
     }
 
-    override suspend fun getBookDescription(doc: Document): String? {
-        return doc.selectFirst(".summary__content.show-more")
-            ?.let { TextExtractor.get(it) }
+    override suspend fun getBookDescription(
+        bookUrl: String
+    ): Response<String?> = withContext(Dispatchers.Default) {
+        tryConnect {
+            networkClient.get(bookUrl).toDocument()
+                .selectFirst(".summary__content.show-more")
+                ?.let { TextExtractor.get(it) }
+        }
     }
 
     // TODO() not working, website blocking calls
-    override suspend fun getChapterList(doc: Document): List<ChapterMetadata> {
-        val url = doc
-            .selectFirst("meta[property=og:url]")!!
-            .attr("content")
-            .toUrlBuilderSafe()
-            .addPath("ajax", "chapters")
-            .toString()
+    override suspend fun getChapterList(
+        bookUrl: String
+    ): Response<List<ChapterMetadata>> = withContext(Dispatchers.Default) {
+        tryConnect {
+            val url = bookUrl
+                .toUrlBuilderSafe()
+                .addPath("ajax", "chapters")
+                .toString()
 
-        val request = postRequest(url)
+            val request = postRequest(url)
 
-        return networkClient
-            .call(request)
-            .toDocument()
-            .select(".wp-manga-chapter a[href]")
-            .map { ChapterMetadata(title = it.text(), url = it.attr("href")) }
-            .reversed()
+            networkClient
+                .call(request)
+                .toDocument()
+                .select(".wp-manga-chapter a[href]")
+                .map { ChapterMetadata(title = it.text(), url = it.attr("href")) }
+                .reversed()
+        }
     }
 
-    override suspend fun getCatalogList(index: Int): Response<PagedList<BookMetadata>> {
-        val page = index + 1
-        return tryConnect {
+    override suspend fun getCatalogList(
+        index: Int
+    ): Response<PagedList<BookMetadata>> = withContext(Dispatchers.Default) {
+        tryConnect {
+            val page = index + 1
             val url = when (page) {
                 1 -> catalogUrl
                 else -> baseUrl
@@ -81,12 +98,10 @@ class _1stKissNovel(
                     )
                 }
                 .let {
-                    Response.Success(
-                        PagedList(
-                            list = it,
-                            index = index,
-                            isLastPage = isLastPage(doc)
-                        )
+                    PagedList(
+                        list = it,
+                        index = index,
+                        isLastPage = isLastPage(doc)
                     )
                 }
         }
@@ -95,9 +110,9 @@ class _1stKissNovel(
     override suspend fun getCatalogSearch(
         index: Int,
         input: String
-    ): Response<PagedList<BookMetadata>> {
-        val page = index + 1
-        return tryConnect {
+    ): Response<PagedList<BookMetadata>> = withContext(Dispatchers.Default) {
+        tryConnect {
+            val page = index + 1
             val url = baseUrl
                 .toUrlBuilderSafe()
                 .ifCase(page != 1) { addPath("page", page.toString()) }
@@ -116,12 +131,10 @@ class _1stKissNovel(
                     )
                 }
                 .let {
-                    Response.Success(
-                        PagedList(
-                            list = it,
-                            index = index,
-                            isLastPage = isLastPage(doc)
-                        )
+                    PagedList(
+                        list = it,
+                        index = index,
+                        isLastPage = isLastPage(doc)
                     )
                 }
         }

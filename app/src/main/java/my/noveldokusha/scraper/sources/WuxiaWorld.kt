@@ -1,5 +1,7 @@
 package my.noveldokusha.scraper.sources
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.data.ChapterMetadata
 import my.noveldokusha.data.Response
@@ -15,11 +17,10 @@ import my.noveldokusha.utils.ifCase
 import my.noveldokusha.utils.toDocument
 import my.noveldokusha.utils.toUrlBuilder
 import my.noveldokusha.utils.toUrlBuilderSafe
-import org.jsoup.nodes.Document
 
 class WuxiaWorld(
     private val networkClient: NetworkClient
-) : SourceInterface.Catalog {
+) : SourceInterface.RemoteCatalog {
     override val id = "wuxia_world"
     override val name = "Wuxia World"
     override val baseUrl = "https://wuxiaworld.site/"
@@ -27,36 +28,50 @@ class WuxiaWorld(
     override val iconUrl = "https://wuxiaworld.site/wp-content/uploads/2019/04/favicon-1.ico"
     override val language = "English"
 
-    override suspend fun getBookCoverImageUrl(doc: Document): String? {
-        return doc.selectFirst("div.summary_image")
-            ?.selectFirst("img[src]")
-            ?.attr("src")
+    override suspend fun getBookCoverImageUrl(
+        bookUrl: String
+    ): Response<String?> = withContext(Dispatchers.Default) {
+        tryConnect {
+            networkClient.get(bookUrl).toDocument()
+                .selectFirst("div.summary_image")
+                ?.selectFirst("img[src]")
+                ?.attr("src")
+        }
     }
 
-    override suspend fun getBookDescription(doc: Document): String? {
-        return doc.selectFirst(".summary__content.show-more")
-            ?.let { TextExtractor.get(it).trim() }
+    override suspend fun getBookDescription(
+        bookUrl: String
+    ): Response<String?> = withContext(Dispatchers.Default) {
+        tryConnect {
+            networkClient.get(bookUrl).toDocument()
+                .selectFirst(".summary__content.show-more")
+                ?.let { TextExtractor.get(it).trim() }
+        }
     }
 
-    override suspend fun getChapterList(doc: Document): List<ChapterMetadata> {
-        val url = doc
-            .selectFirst("meta[property=og:url]")!!
-            .attr("content")
-            .toUrlBuilder()
-            ?.addPath("ajax")
-            ?.addPath("chapters")
+    override suspend fun getChapterList(
+        bookUrl: String
+    ): Response<List<ChapterMetadata>> = withContext(Dispatchers.Default) {
+        tryConnect {
+            val url = bookUrl
+                .toUrlBuilder()
+                ?.addPath("ajax")
+                ?.addPath("chapters")
 
-        val request = postRequest(url.toString())
-        return networkClient.call(request)
-            .toDocument()
-            .select(".wp-manga-chapter > a[href]")
-            .map { ChapterMetadata(title = it.text(), url = it.attr("href")) }
-            .reversed()
+            val request = postRequest(url.toString())
+            networkClient.call(request)
+                .toDocument()
+                .select(".wp-manga-chapter > a[href]")
+                .map { ChapterMetadata(title = it.text(), url = it.attr("href")) }
+                .reversed()
+        }
     }
 
-    override suspend fun getCatalogList(index: Int): Response<PagedList<BookMetadata>> {
-        val page = index + 1
-        return tryConnect {
+    override suspend fun getCatalogList(
+        index: Int
+    ): Response<PagedList<BookMetadata>> = withContext(Dispatchers.Default) {
+        tryConnect {
+            val page = index + 1
             val url = baseUrl
                 .toUrlBuilderSafe()
                 .addPath("novel")
@@ -78,12 +93,10 @@ class WuxiaWorld(
                     )
                 }
                 .let {
-                    Response.Success(
-                        PagedList(
-                            list = it,
-                            index = index,
-                            isLastPage = doc.selectFirst("div.nav-previous.float-left") == null
-                        )
+                    PagedList(
+                        list = it,
+                        index = index,
+                        isLastPage = doc.selectFirst("div.nav-previous.float-left") == null
                     )
                 }
         }
@@ -92,12 +105,11 @@ class WuxiaWorld(
     override suspend fun getCatalogSearch(
         index: Int,
         input: String
-    ): Response<PagedList<BookMetadata>> {
-        val page = index + 1
-        if (page != 1)
-            return Response.Success(PagedList.createEmpty(index = index))
-
-        return tryConnect {
+    ): Response<PagedList<BookMetadata>> = withContext(Dispatchers.Default) {
+        tryConnect {
+            val page = index + 1
+            if (page != 1)
+                return@tryConnect PagedList.createEmpty(index = index)
             val url = baseUrl
                 .toUrlBuilderSafe()
                 .ifCase(page > 1) { addPath("page", page.toString()) }
@@ -125,12 +137,10 @@ class WuxiaWorld(
                     )
                 }
                 .let {
-                    Response.Success(
-                        PagedList(
-                            list = it,
-                            index = index,
-                            isLastPage = true
-                        )
+                    PagedList(
+                        list = it,
+                        index = index,
+                        isLastPage = true
                     )
                 }
         }

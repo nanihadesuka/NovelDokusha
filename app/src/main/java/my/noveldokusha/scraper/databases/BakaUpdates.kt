@@ -7,7 +7,7 @@ import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.data.Response.Success
 import my.noveldokusha.network.NetworkClient
 import my.noveldokusha.network.PagedList
-import my.noveldokusha.network.tryConnect
+import my.noveldokusha.network.tryFlatConnect
 import my.noveldokusha.scraper.DatabaseInterface
 import my.noveldokusha.scraper.SearchGenre
 import my.noveldokusha.scraper.TextExtractor
@@ -40,7 +40,7 @@ class BakaUpdates(
     }
 
     override suspend fun getAuthorData(authorUrl: String) = withContext(Dispatchers.Default) {
-        tryConnect {
+        tryFlatConnect {
             val doc = networkClient.get(authorUrl).toDocument()
             fun entry(header: String) =
                 doc.selectFirst("div.sCat > b:containsOwn($header)")!!.parent()!!
@@ -70,8 +70,8 @@ class BakaUpdates(
     }
 
     override suspend fun getSearchFilters() = withContext(Dispatchers.Default) {
-        tryConnect {
-            return@tryConnect networkClient
+        tryFlatConnect {
+            return@tryFlatConnect networkClient
                 .get("https://www.mangaupdates.com/series.html?act=genresearch")
                 .toDocument()
                 .select(".p-1.col-6.text")
@@ -121,7 +121,7 @@ class BakaUpdates(
         index: Int,
         url: Uri.Builder
     ) = withContext(Dispatchers.Default) {
-        tryConnect("index: $index\n\nurl: $url") {
+        tryFlatConnect("index: $index\n\nurl: $url") {
             val doc = networkClient.get(url).toDocument()
             doc.select(".col-12.col-lg-6.p-3.text")
                 .mapNotNull {
@@ -151,7 +151,7 @@ class BakaUpdates(
     override suspend fun getBookData(
         bookUrl: String
     ) = withContext(Dispatchers.Default) {
-        tryConnect {
+        tryFlatConnect {
             val doc = networkClient.get(bookUrl).toDocument()
             fun entry(header: String) =
                 doc.selectFirst("div.sCat > b:containsOwn($header)")!!.parent()!!

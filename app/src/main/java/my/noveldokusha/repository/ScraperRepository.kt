@@ -11,7 +11,7 @@ import my.noveldokusha.scraper.Scraper
 import my.noveldokusha.scraper.SourceInterface
 
 data class SourceLanguageItem(val language: String, val active: Boolean)
-data class SourceCatalogItem(val catalog: SourceInterface.Catalog, val pinned: Boolean)
+data class SourceCatalogItem(val remoteCatalog: SourceInterface.RemoteCatalog, val pinned: Boolean)
 
 class ScraperRepository(
     private val appPreferences: AppPreferences,
@@ -27,9 +27,9 @@ class ScraperRepository(
             appPreferences.SOURCES_LANGUAGES.flow(),
             appPreferences.FINDER_SOURCES_PINNED.flow()
         ) { activeLanguages, pinnedSourcesIds ->
-            scraper.sourcesListCatalog
+            scraper.sourcesListRemoteCatalog
                 .filter { it.language in activeLanguages }
-                .map { SourceCatalogItem(catalog = it, pinned = it.id in pinnedSourcesIds) }
+                .map { SourceCatalogItem(remoteCatalog = it, pinned = it.id in pinnedSourcesIds) }
                 .sortedByDescending { it.pinned }
         }.flowOn(Dispatchers.Default)
     }

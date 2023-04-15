@@ -1,5 +1,7 @@
 package my.noveldokusha.scraper.sources
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.data.ChapterMetadata
 import my.noveldokusha.data.Response
@@ -14,11 +16,10 @@ import my.noveldokusha.utils.addPath
 import my.noveldokusha.utils.ifCase
 import my.noveldokusha.utils.toDocument
 import my.noveldokusha.utils.toUrlBuilderSafe
-import org.jsoup.nodes.Document
 
 class BoxNovel(
     private val networkClient: NetworkClient
-) : SourceInterface.Catalog {
+) : SourceInterface.RemoteCatalog {
     override val id = "box_novel"
     override val name = "Box Novel"
     override val baseUrl = "https://boxnovel.com/"
@@ -26,35 +27,49 @@ class BoxNovel(
     override val iconUrl = "https://boxnovel.com/wp-content/uploads/2018/04/box-icon-150x150.png"
     override val language = "English"
 
-    override suspend fun getBookCoverImageUrl(doc: Document): String? {
-        return doc.selectFirst("div.summary_image img[data-src]")
-            ?.attr("data-src")
+    override suspend fun getBookCoverImageUrl(
+        bookUrl: String
+    ): Response<String?> = withContext(Dispatchers.Default) {
+        tryConnect {
+            networkClient.get(bookUrl).toDocument()
+                .selectFirst("div.summary_image img[data-src]")
+                ?.attr("data-src")
+        }
     }
 
-    override suspend fun getBookDescription(doc: Document): String? {
-        return doc.selectFirst(".summary__content.show-more")
-            ?.let { TextExtractor.get(it) }
+    override suspend fun getBookDescription(
+        bookUrl: String
+    ): Response<String?> = withContext(Dispatchers.Default) {
+        tryConnect {
+            networkClient.get(bookUrl).toDocument()
+                .selectFirst(".summary__content.show-more")
+                ?.let { TextExtractor.get(it) }
+        }
     }
 
-    override suspend fun getChapterList(doc: Document): List<ChapterMetadata> {
-        val url = doc
-            .selectFirst("meta[property=og:url] ")!!
-            .attr("content")
-            .toUrlBuilderSafe()
-            .addPath("ajax")
-            .addPath("chapters")
-            .toString()
+    override suspend fun getChapterList(
+        bookUrl: String
+    ): Response<List<ChapterMetadata>> = withContext(Dispatchers.Default) {
+        tryConnect {
+            val url = bookUrl
+                .toUrlBuilderSafe()
+                .addPath("ajax")
+                .addPath("chapters")
+                .toString()
 
-        return networkClient.call(postRequest(url))
-            .toDocument()
-            .select(".wp-manga-chapter > a[href]")
-            .map { ChapterMetadata(title = it.text(), url = it.attr("href")) }
-            .reversed()
+            networkClient.call(postRequest(url))
+                .toDocument()
+                .select(".wp-manga-chapter > a[href]")
+                .map { ChapterMetadata(title = it.text(), url = it.attr("href")) }
+                .reversed()
+        }
     }
 
-    override suspend fun getCatalogList(index: Int): Response<PagedList<BookMetadata>> {
-        val page = index + 1
-        return tryConnect {
+    override suspend fun getCatalogList(
+        index: Int
+    ): Response<PagedList<BookMetadata>> = withContext(Dispatchers.Default) {
+        tryConnect {
+            val page = index + 1
             val url = baseUrl
                 .toUrlBuilderSafe()
                 .addPath("novel")
@@ -73,12 +88,10 @@ class BoxNovel(
                     )
                 }
                 .let {
-                    Response.Success(
-                        PagedList(
-                            list = it,
-                            index = index,
-                            isLastPage = doc.selectFirst("div.nav-previous.float-left") == null
-                        )
+                    PagedList(
+                        list = it,
+                        index = index,
+                        isLastPage = doc.selectFirst("div.nav-previous.float-left") == null
                     )
                 }
         }
@@ -87,9 +100,9 @@ class BoxNovel(
     override suspend fun getCatalogSearch(
         index: Int,
         input: String
-    ): Response<PagedList<BookMetadata>> {
-        val page = index + 1
-        return tryConnect {
+    ): Response<PagedList<BookMetadata>> = withContext(Dispatchers.Default) {
+        tryConnect {
+            val page = index + 1
             val url = baseUrl
                 .toUrlBuilderSafe()
                 .ifCase(page != 1) { addPath("page", page.toString()) }
@@ -115,12 +128,10 @@ class BoxNovel(
                     )
                 }
                 .let {
-                    Response.Success(
-                        PagedList(
-                            list = it,
-                            index = index,
-                            isLastPage = doc.selectFirst("div.nav-previous.float-left") == null
-                        )
+                    PagedList(
+                        list = it,
+                        index = index,
+                        isLastPage = doc.selectFirst("div.nav-previous.float-left") == null
                     )
                 }
         }

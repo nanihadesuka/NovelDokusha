@@ -99,7 +99,7 @@ class ChaptersViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            if(state.isLocalSource.value) return@launch
+            if (state.isLocalSource.value) return@launch
 
             if (!repository.bookChapters.hasChapters(bookMetadata.url))
                 updateChaptersList()
@@ -161,7 +161,7 @@ class ChaptersViewModel @Inject constructor(
     }
 
     fun onPullRefresh() {
-        if(state.isLocalSource.value) return
+        if (state.isLocalSource.value) return
         toasty.show(R.string.updating_book_info)
         updateCover()
         updateDescription()
@@ -169,14 +169,17 @@ class ChaptersViewModel @Inject constructor(
     }
 
     private fun updateCover() = viewModelScope.launch {
-        if(state.isLocalSource.value) return@launch
-        downloadBookCoverImageUrl(scraper, networkClient, bookUrl)
-            .onSuccess { repository.libraryBooks.updateCover(bookUrl, it) }
+        if (state.isLocalSource.value) return@launch
+        downloadBookCoverImageUrl(scraper, networkClient, bookUrl).onSuccess {
+            if (it == null) return@onSuccess
+            repository.libraryBooks.updateCover(bookUrl, it)
+        }
     }
 
     private fun updateDescription() = viewModelScope.launch {
-        if(state.isLocalSource.value) return@launch
+        if (state.isLocalSource.value) return@launch
         downloadBookDescription(scraper, networkClient, bookUrl).onSuccess {
+            if (it == null) return@onSuccess
             repository.libraryBooks.updateDescription(bookUrl, it)
         }
     }
@@ -194,7 +197,7 @@ class ChaptersViewModel @Inject constructor(
             state.error.value = ""
             state.isRefreshing.value = true
             val url = bookMetadata.url
-            val res = downloadChaptersList(scraper, networkClient, url)
+            val res = downloadChaptersList(scraper, url)
             state.isRefreshing.value = false
             res.onSuccess {
                 if (it.isEmpty())
@@ -304,7 +307,7 @@ class ChaptersViewModel @Inject constructor(
     fun invertSelection() {
         val allChaptersUrl = state.chapters.asSequence().map { it.chapter.url }.toSet()
         val selectedUrl = state.selectedChaptersUrl.asSequence().map { it.key }.toSet()
-        val inverse = (allChaptersUrl - selectedUrl).asSequence().associateWith { Unit }
+        val inverse = (allChaptersUrl - selectedUrl).asSequence().associateWith { }
         state.selectedChaptersUrl.clear()
         state.selectedChaptersUrl.putAll(inverse)
     }

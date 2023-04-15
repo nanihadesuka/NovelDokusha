@@ -48,9 +48,9 @@ class Scraper(
         KoreanNovelsMTL(networkClient),
     )
 
-    val sourcesListCatalog = sourcesList.filterIsInstance<SourceInterface.Catalog>().toSet()
+    val sourcesListRemoteCatalog = sourcesList.filterIsInstance<SourceInterface.RemoteCatalog>().toSet()
     val sourcesLanguages =
-        sourcesList.filterIsInstance<SourceInterface.Catalog>().map { it.language }.toSortedSet()
+        sourcesList.filterIsInstance<SourceInterface.RemoteCatalog>().map { it.language }.toSortedSet()
 
     private fun String.isCompatibleWithBaseUrl(baseUrl: String): Boolean {
         val normalizedUrl = if (this.endsWith("/")) this else "$this/"
@@ -61,8 +61,8 @@ class Scraper(
     fun getCompatibleSource(url: String): SourceInterface? =
         sourcesList.find { url.isCompatibleWithBaseUrl(it.baseUrl) }
 
-    fun getCompatibleSourceCatalog(url: String): SourceInterface.Catalog? =
-        sourcesListCatalog.find { url.isCompatibleWithBaseUrl(it.baseUrl) }
+    fun getCompatibleSourceCatalog(url: String): SourceInterface.RemoteCatalog? =
+        sourcesListRemoteCatalog.find { url.isCompatibleWithBaseUrl(it.baseUrl) }
 
     fun getCompatibleDatabase(url: String): DatabaseInterface? =
         databasesList.find { url.isCompatibleWithBaseUrl(it.baseUrl) }

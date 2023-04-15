@@ -1,11 +1,14 @@
 package my.noveldokusha.scraper.sources
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.data.ChapterMetadata
 import my.noveldokusha.data.Response
 import my.noveldokusha.network.NetworkClient
 import my.noveldokusha.network.PagedList
 import my.noveldokusha.network.tryConnect
+import my.noveldokusha.network.tryFlatConnect
 import my.noveldokusha.scraper.SourceInterface
 import my.noveldokusha.scraper.TextExtractor
 import my.noveldokusha.utils.add
@@ -17,7 +20,7 @@ import org.jsoup.nodes.Document
 
 class BestLightNovel(
     private val networkClient: NetworkClient
-) : SourceInterface.Catalog {
+) : SourceInterface.RemoteCatalog {
     override val id = "best_light_novel"
     override val name = "BestLightNovel"
     override val baseUrl = "https://bestlightnovel.com/"
@@ -26,34 +29,45 @@ class BestLightNovel(
 
     override suspend fun getChapterTitle(doc: Document): String? = null
 
-    override suspend fun getChapterText(doc: Document): String {
-        return doc.selectFirst("#vung_doc")!!.let {
-            TextExtractor.get(it)
+    override suspend fun getChapterText(doc: Document): String = withContext(Dispatchers.Default) {
+        doc.selectFirst("#vung_doc")!!.let(TextExtractor::get)
+    }
+
+    override suspend fun getBookCoverImageUrl(
+        bookUrl: String
+    ): Response<String?> = withContext(Dispatchers.Default) {
+        tryConnect {
+            networkClient.get(bookUrl).toDocument()
+                .selectFirst(".info_image > img[src]")
+                ?.attr("src")
         }
     }
 
-    override suspend fun getBookCoverImageUrl(doc: Document): String? {
-        return doc.selectFirst(".info_image > img[src]")
-            ?.attr("src")
+
+    override suspend fun getBookDescription(
+        bookUrl: String
+    ): Response<String?> = withContext(Dispatchers.Default) {
+        tryConnect {
+            networkClient.get(bookUrl).toDocument()
+                .selectFirst("#noidungm")
+                ?.let {
+                    it.select("h2").remove()
+                    TextExtractor.get(it)
+                }
+        }
     }
 
-    override suspend fun getBookDescription(doc: Document): String? {
-        return doc.selectFirst("#noidungm")
-            ?.let {
-                it.select("h2").remove()
-                TextExtractor.get(it)
-            }
-    }
-
-    override suspend fun getChapterList(doc: Document): List<ChapterMetadata> {
-        return doc.select("div.chapter-list a[href]").map {
-            ChapterMetadata(title = it.text(), url = it.attr("href"))
-        }.reversed()
-    }
+    override suspend fun getChapterList(bookUrl: String): Response<List<ChapterMetadata>> =
+        tryConnect {
+            networkClient.get(bookUrl).toDocument()
+                .select("div.chapter-list a[href]")
+                .map { ChapterMetadata(title = it.text(), url = it.attr("href")) }
+                .reversed()
+        }
 
     override suspend fun getCatalogList(index: Int): Response<PagedList<BookMetadata>> {
         val page = index + 1
-        return tryConnect {
+        return tryFlatConnect {
 
             val url = catalogUrl
                 .toUrlBuilderSafe()
@@ -74,7 +88,7 @@ class BestLightNovel(
         if (input.isBlank()) return Response.Success(PagedList.createEmpty(index = index))
 
         val page = index + 1
-        return tryConnect {
+        return tryFlatConnect {
             val url = baseUrl
                 .toUrlBuilderSafe()
                 .addPath("search_novels", input.replace(" ", "_"))
@@ -102,7 +116,8 @@ class BestLightNovel(
                         index = index,
                         isLastPage = when (val nav = doc.selectFirst("div.phan-trang")) {
                             null -> true
-                            else -> nav.children().takeLast(2).first()?.`is`(".pageselect") ?: true
+                            else -> nav.children().takeLast(2).first()?.`is`(".pageselect")
+                                ?: true
                         }
                     )
                 )

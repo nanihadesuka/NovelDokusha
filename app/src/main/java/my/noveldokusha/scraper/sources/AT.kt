@@ -1,5 +1,7 @@
 package my.noveldokusha.scraper.sources
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import my.noveldokusha.network.NetworkClient
 import my.noveldokusha.scraper.SourceInterface
 import org.jsoup.nodes.Document
@@ -12,9 +14,11 @@ class AT(
     override val name = "AT"
     override val baseUrl = "https://a-t.nu/"
 
-    override suspend fun getChapterTitle(doc: Document): String? = doc.title().ifBlank { null }
+    override suspend fun getChapterTitle(doc: Document): String? = withContext(Dispatchers.Default) {
+        doc.title().ifBlank { null }
+    }
 
-    override suspend fun getChapterText(doc: Document): String {
+    override suspend fun getChapterText(doc: Document): String = withContext(Dispatchers.Default) {
         val raw = doc.selectFirst(".text-left style")!!.data()
 
         data class CSSData(val id: String, val type: String, val text: String)
@@ -29,7 +33,7 @@ class AT(
                 it.id
             }.mapValues { data -> data.value.associate { it.type to it.text } }
 
-        return doc.selectFirst("div.text-left")!!
+        doc.selectFirst("div.text-left")!!
             .apply {
                 select("div.code-block.code-block-3").remove()
             }.select("p")

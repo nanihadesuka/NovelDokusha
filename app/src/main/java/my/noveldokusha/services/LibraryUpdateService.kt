@@ -193,7 +193,7 @@ class LibraryUpdateService : Service() {
                     updateActor.send(Pair(book, true))
                 }
 
-                when (val res = downloadChaptersList(scraper, networkClient, book.url)) {
+                when (val res = downloadChaptersList(scraper, book.url)) {
                     is Response.Success -> {
                         oldChaptersList.join()
                         launch(Dispatchers.IO) {

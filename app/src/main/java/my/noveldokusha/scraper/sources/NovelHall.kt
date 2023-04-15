@@ -1,5 +1,7 @@
 package my.noveldokusha.scraper.sources
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.data.ChapterMetadata
 import my.noveldokusha.data.Response
@@ -16,7 +18,7 @@ import org.jsoup.nodes.Document
 
 class NovelHall(
     private val networkClient: NetworkClient
-) : SourceInterface.Catalog {
+) : SourceInterface.RemoteCatalog {
     override val id = "novelhall"
     override val name = "NovelHall"
     override val baseUrl = "https://www.novelhall.com/"
@@ -31,33 +33,47 @@ class NovelHall(
             .let { TextExtractor.get(it) }
     }
 
-    override suspend fun getBookCoverImageUrl(doc: Document): String? {
-        return doc
-            .selectFirst(".book-img.hidden-xs")
-            ?.selectFirst("img[src]")
-            ?.attr("src")
-    }
-
-    override suspend fun getBookDescription(doc: Document): String? {
-        return doc
-            .selectFirst("span.js-close-wrap")
-            ?.let { TextExtractor.get(it) }
-    }
-
-    override suspend fun getChapterList(doc: Document): List<ChapterMetadata> {
-        return doc.select("#morelist a[href]").map {
-            ChapterMetadata(title = it.text(), url = baseUrl + it.attr("href"))
+    override suspend fun getBookCoverImageUrl(
+        bookUrl: String
+    ): Response<String?> = withContext(Dispatchers.Default) {
+        tryConnect {
+            networkClient.get(bookUrl).toDocument()
+                .selectFirst(".book-img.hidden-xs")
+                ?.selectFirst("img[src]")
+                ?.attr("src")
         }
     }
 
-    override suspend fun getCatalogList(index: Int): Response<PagedList<BookMetadata>> {
-        val page = index + 1
-        val url = baseUrl.toUrlBuilderSafe().apply {
-            if (page == 1) addPath("all.html")
-            else addPath("all-$page.html")
+    override suspend fun getBookDescription(
+        bookUrl: String
+    ): Response<String?> = withContext(Dispatchers.Default) {
+        tryConnect {
+            networkClient.get(bookUrl).toDocument()
+                .selectFirst("span.js-close-wrap")
+                ?.let { TextExtractor.get(it) }
         }
+    }
 
-        return tryConnect {
+    override suspend fun getChapterList(
+        bookUrl: String
+    ): Response<List<ChapterMetadata>> = withContext(Dispatchers.Default) {
+        tryConnect {
+            networkClient.get(bookUrl)
+                .toDocument()
+                .select("#morelist a[href]")
+                .map { ChapterMetadata(title = it.text(), url = baseUrl + it.attr("href")) }
+        }
+    }
+
+    override suspend fun getCatalogList(
+        index: Int
+    ): Response<PagedList<BookMetadata>> = withContext(Dispatchers.Default) {
+        tryConnect {
+            val page = index + 1
+            val url = baseUrl.toUrlBuilderSafe().apply {
+                if (page == 1) addPath("all.html")
+                else addPath("all-$page.html")
+            }
             val doc = networkClient.get(url).toDocument()
             doc.select("li.btm")
                 .mapNotNull {
@@ -68,12 +84,10 @@ class NovelHall(
                     )
                 }
                 .let {
-                    Response.Success(
-                        PagedList(
-                            list = it,
-                            index = index,
-                            isLastPage = isLastPage(doc)
-                        )
+                    PagedList(
+                        list = it,
+                        index = index,
+                        isLastPage = isLastPage(doc)
                     )
                 }
         }
@@ -82,17 +96,17 @@ class NovelHall(
     override suspend fun getCatalogSearch(
         index: Int,
         input: String
-    ): Response<PagedList<BookMetadata>> {
-        if (input.isBlank())
-            return Response.Success(PagedList.createEmpty(index = index))
+    ): Response<PagedList<BookMetadata>> = withContext(Dispatchers.Default) {
+        tryConnect {
+            if (input.isBlank())
+                return@tryConnect PagedList.createEmpty(index = index)
 
-        val url = baseUrl.toUrlBuilderSafe().apply {
-            addPath("index.php")
-            add("s", "so")
-            add("module", "book")
-            add("keyword", input)
-        }
-        return tryConnect {
+            val url = baseUrl.toUrlBuilderSafe().apply {
+                addPath("index.php")
+                add("s", "so")
+                add("module", "book")
+                add("keyword", input)
+            }
             val doc = networkClient.get(url).toDocument()
             doc.selectFirst(".section3.inner.mt30 > table")
                 ?.select("tr > td:nth-child(2) > a[href]")
@@ -104,12 +118,10 @@ class NovelHall(
                     )
                 }
                 .let {
-                    Response.Success(
-                        PagedList(
-                            list = it,
-                            index = index,
-                            isLastPage = isLastPage(doc)
-                        )
+                    PagedList(
+                        list = it,
+                        index = index,
+                        isLastPage = isLastPage(doc)
                     )
                 }
         }

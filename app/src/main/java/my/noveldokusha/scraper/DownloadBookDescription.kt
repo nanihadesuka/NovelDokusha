@@ -4,14 +4,13 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import my.noveldokusha.data.Response
 import my.noveldokusha.network.NetworkClient
-import my.noveldokusha.network.tryConnect
-import my.noveldokusha.utils.toDocument
+import my.noveldokusha.network.tryFlatConnect
 
 suspend fun downloadBookDescription(
     scraper: Scraper,
     networkClient: NetworkClient,
     bookUrl: String,
-): Response<String> = withContext(Dispatchers.IO) {
+): Response<String?> = withContext(Dispatchers.Default) {
     val error by lazy {
         """
 			Incompatible source.
@@ -25,10 +24,7 @@ suspend fun downloadBookDescription(
     val scrap = scraper.getCompatibleSourceCatalog(bookUrl)
         ?: return@withContext Response.Error(error, Exception())
 
-    tryConnect {
-        val doc = networkClient.get(bookUrl).toDocument()
-        scrap.getBookDescription(doc)
-            ?.let { Response.Success(it) }
-            ?: Response.Error("", Exception())
+    tryFlatConnect {
+        scrap.getBookDescription(bookUrl)
     }
 }

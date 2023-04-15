@@ -15,7 +15,7 @@ import my.noveldokusha.ui.screens.reader.ReaderActivity
 import my.noveldokusha.ui.screens.sourceCatalog.SourceCatalogActivity
 import my.noveldokusha.ui.screens.webView.WebViewActivity
 
-fun Context.goToSourceCatalog(source: SourceInterface.Catalog) {
+fun Context.goToSourceCatalog(source: SourceInterface.RemoteCatalog) {
     SourceCatalogActivity
         .IntentData(this, sourceBaseUrl = source.baseUrl)
         .let(::startActivity)

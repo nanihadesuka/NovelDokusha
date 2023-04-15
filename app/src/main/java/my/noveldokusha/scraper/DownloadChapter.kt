@@ -5,7 +5,7 @@ import kotlinx.coroutines.withContext
 import my.noveldokusha.data.Response
 import my.noveldokusha.network.NetworkClient
 import my.noveldokusha.network.getRequest
-import my.noveldokusha.network.tryConnect
+import my.noveldokusha.network.tryFlatConnect
 import my.noveldokusha.utils.toDocument
 import net.dankito.readability4j.extended.Readability4JExtended
 import org.jsoup.nodes.Document
@@ -14,8 +14,8 @@ suspend fun downloadChapter(
     scraper: Scraper,
     networkClient: NetworkClient,
     chapterUrl: String,
-): Response<ChapterDownload> = withContext(Dispatchers.IO) {
-    tryConnect {
+): Response<ChapterDownload> = withContext(Dispatchers.Default) {
+    tryFlatConnect {
         val request = getRequest(chapterUrl)
         val realUrl = networkClient
             .call(request, followRedirects = true)
@@ -41,13 +41,13 @@ suspend fun downloadChapter(
                 body = source.getChapterText(doc) ?: return@also,
                 title = source.getChapterTitle(doc)
             )
-            return@tryConnect Response.Success(data)
+            return@tryFlatConnect Response.Success(data)
         }
 
         // If no predefined source is found try extracting text with heuristic extraction
         val chapter = heuristicChapterExtraction(realUrl, networkClient.get(realUrl).toDocument())
         when (chapter) {
-            null -> Response.Error(error, Exception())
+            null -> Response.Error(error, Exception("Unable to extract chapter data with heuristics"))
             else -> Response.Success(chapter)
         }
     }

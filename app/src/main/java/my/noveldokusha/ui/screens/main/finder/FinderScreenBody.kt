@@ -42,7 +42,7 @@ fun FinderScreenBody(
     databasesList: List<DatabaseInterface>,
     sourcesList: List<SourceCatalogItem>,
     onDatabaseClick: (DatabaseInterface) -> Unit,
-    onSourceClick: (SourceInterface.Catalog) -> Unit,
+    onSourceClick: (SourceInterface.RemoteCatalog) -> Unit,
     onSourceSetPinned: (id: String, pinned: Boolean) -> Unit,
 ) {
     LazyColumn(
@@ -99,34 +99,34 @@ fun FinderScreenBody(
 
         items(
             items = sourcesList,
-            key = { it.catalog.id }
+            key = { it.remoteCatalog.id }
         ) {
             ListItem(
                 modifier = Modifier
-                    .clickable { onSourceClick(it.catalog) }
+                    .clickable { onSourceClick(it.remoteCatalog) }
                     .animateItemPlacement(),
                 headlineContent = {
                     Text(
-                        text = it.catalog.name,
+                        text = it.remoteCatalog.name,
                         style = MaterialTheme.typography.titleSmall,
                     )
                 },
                 supportingContent = {
                     Text(
-                        text = it.catalog.language,
+                        text = it.remoteCatalog.language,
                         style = MaterialTheme.typography.bodySmall,
                     )
                 },
                 leadingContent = {
                     ImageViewGlide(
-                        imageModel = it.catalog.iconUrl,
+                        imageModel = it.remoteCatalog.iconUrl,
                         modifier = Modifier.size(28.dp),
                         error = R.drawable.default_icon
                     )
                 },
                 trailingContent = {
                     IconButton(
-                        onClick = { onSourceSetPinned(it.catalog.id, !it.pinned) },
+                        onClick = { onSourceSetPinned(it.remoteCatalog.id, !it.pinned) },
                     ) {
                         AnimatedTransition(targetState = it.pinned) { pinned ->
                             Icon(
@@ -152,9 +152,9 @@ private fun PreviewView() {
             Response.Builder().build()
     })
 
-    val sourcesList = scraper.sourcesListCatalog.toList().mapIndexed { index, it ->
+    val sourcesList = scraper.sourcesListRemoteCatalog.toList().mapIndexed { index, it ->
         SourceCatalogItem(
-            catalog = it, pinned = index < 3
+            remoteCatalog = it, pinned = index < 3
         )
     }
 

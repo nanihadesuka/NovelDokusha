@@ -1,5 +1,7 @@
 package my.noveldokusha.scraper.sources
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.data.ChapterMetadata
 import my.noveldokusha.data.Response
@@ -7,6 +9,7 @@ import my.noveldokusha.network.NetworkClient
 import my.noveldokusha.network.PagedList
 import my.noveldokusha.network.postRequest
 import my.noveldokusha.network.tryConnect
+import my.noveldokusha.network.tryFlatConnect
 import my.noveldokusha.scraper.SourceInterface
 import my.noveldokusha.scraper.TextExtractor
 import my.noveldokusha.utils.add
@@ -16,7 +19,7 @@ import org.jsoup.nodes.Document
 
 class Wuxia(
     private val networkClient: NetworkClient
-) : SourceInterface.Catalog {
+) : SourceInterface.RemoteCatalog {
     override val id = "wuxia"
     override val name = "Wuxia"
     override val baseUrl = "https://www.wuxia.blog/"
@@ -25,8 +28,10 @@ class Wuxia(
 
     override suspend fun getChapterTitle(doc: Document): String? = null
 
-    override suspend fun getChapterText(doc: Document): String {
-        return doc.selectFirst("div.panel-body.article")!!.also {
+    override suspend fun getChapterText(
+        doc: Document
+    ): String = withContext(Dispatchers.Default) {
+        doc.selectFirst("div.panel-body.article")!!.also {
             it.select(".pager").remove()
             it.select(".fa.fa-calendar").remove()
             it.select("button.btn.btn-default").remove()
@@ -34,63 +39,80 @@ class Wuxia(
         }.let { TextExtractor.get(it) }
     }
 
-    override suspend fun getBookCoverImageUrl(doc: Document): String? {
-        return doc.selectFirst(".imageCover")
-            ?.selectFirst("img[src]")
-            ?.attr("src")
+    override suspend fun getBookCoverImageUrl(
+        bookUrl: String
+    ): Response<String?> = withContext(Dispatchers.Default) {
+        tryConnect {
+            networkClient.get(bookUrl).toDocument()
+                .selectFirst(".imageCover")
+                ?.selectFirst("img[src]")
+                ?.attr("src")
+        }
     }
 
-    override suspend fun getBookDescription(doc: Document): String? {
-        return doc.selectFirst("div[itemprop=description]")
-            ?.let {
-                it.select("h4").remove()
-                TextExtractor.get(it)
+    override suspend fun getBookDescription(
+        bookUrl: String
+    ): Response<String?> = withContext(Dispatchers.Default) {
+        tryConnect {
+            networkClient.get(bookUrl).toDocument()
+                .selectFirst("div[itemprop=description]")
+                ?.let {
+                    it.select("h4").remove()
+                    TextExtractor.get(it)
+                }
+        }
+    }
+
+    override suspend fun getChapterList(
+        bookUrl: String
+    ): Response<List<ChapterMetadata>> = withContext(Dispatchers.Default) {
+        tryConnect {
+            val doc = networkClient.get(bookUrl).toDocument()
+            val id = doc.selectFirst("#more")!!.attr("data-nid")
+            val newChapters = doc.select("#chapters a[href]")
+            val res = tryFlatConnect {
+                val request =
+                    postRequest("https://wuxia.blog/temphtml/_tempChapterList_all_$id.html")
+                networkClient.call(request)
+                    .toDocument()
+                    .select("a[href]")
+                    .let { Response.Success(it) }
             }
-    }
 
-    override suspend fun getChapterList(doc: Document): List<ChapterMetadata> {
-        val id = doc.selectFirst("#more")!!.attr("data-nid")
-        val newChapters = doc.select("#chapters a[href]")
-        val res = tryConnect {
-            val request = postRequest("https://wuxia.blog/temphtml/_tempChapterList_all_$id.html")
-            networkClient.call(request)
-                .toDocument()
-                .select("a[href]")
-                .let { Response.Success(it) }
-        }
+            val oldChapters = if (res is Response.Success) res.data else listOf()
 
-        val oldChapters = if (res is Response.Success) res.data else listOf()
-
-        return (newChapters + oldChapters).reversed().map {
-            ChapterMetadata(title = it.text(), url = it.attr("href"))
+            (newChapters + oldChapters)
+                .reversed()
+                .map { ChapterMetadata(title = it.text(), url = it.attr("href")) }
         }
     }
 
-    override suspend fun getCatalogList(index: Int): Response<PagedList<BookMetadata>> {
+    override suspend fun getCatalogList(
+        index: Int
+    ): Response<PagedList<BookMetadata>> = withContext(Dispatchers.Default) {
         if (index > 0)
-            return Response.Success(PagedList.createEmpty(index = index))
+            return@withContext Response.Success(PagedList.createEmpty(index = index))
 
-        return tryConnect {
+        tryConnect {
             networkClient.get(catalogUrl)
                 .toDocument()
                 .select("td.novel a[href]")
                 .map { BookMetadata(title = it.text(), url = baseUrl + it.attr("href")) }
-                .let { Response.Success(PagedList(list = it, index = index, isLastPage = true)) }
+                .let { PagedList(list = it, index = index, isLastPage = true) }
         }
     }
 
     override suspend fun getCatalogSearch(
         index: Int,
         input: String
-    ): Response<PagedList<BookMetadata>> {
-        if (input.isBlank() || index > 0)
-            return Response.Success(PagedList.createEmpty(index = index))
+    ): Response<PagedList<BookMetadata>> = withContext(Dispatchers.Default) {
+        tryConnect {
+            if (input.isBlank() || index > 0)
+                return@tryConnect PagedList.createEmpty(index = index)
 
-        val url = baseUrl.toUrlBuilderSafe().apply {
-            add("search", input)
-        }
-
-        return tryConnect {
+            val url = baseUrl.toUrlBuilderSafe().apply {
+                add("search", input)
+            }
             networkClient.get(url)
                 .toDocument()
                 .selectFirst("#table")!!
@@ -106,7 +128,7 @@ class Wuxia(
                         coverImageUrl = bookCover
                     )
                 }
-                .let { Response.Success(PagedList(list = it, index = index, isLastPage = true)) }
+                .let { PagedList(list = it, index = index, isLastPage = true) }
         }
     }
 }

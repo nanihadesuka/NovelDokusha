@@ -8,7 +8,7 @@ import my.noveldokusha.data.Response
 import my.noveldokusha.data.Response.Success
 import my.noveldokusha.network.NetworkClient
 import my.noveldokusha.network.PagedList
-import my.noveldokusha.network.tryConnect
+import my.noveldokusha.network.tryFlatConnect
 import my.noveldokusha.scraper.DatabaseInterface
 import my.noveldokusha.scraper.SearchGenre
 import my.noveldokusha.scraper.TextExtractor
@@ -44,7 +44,7 @@ class NovelUpdates(
 
     override suspend fun getSearchFilters(): Response<List<SearchGenre>> =
         withContext(Dispatchers.Default) {
-            tryConnect {
+            tryFlatConnect {
                 networkClient
                     .get("https://www.novelupdates.com/series-finder/")
                     .toDocument()
@@ -101,7 +101,7 @@ class NovelUpdates(
 
     override suspend fun getAuthorData(authorUrl: String):
             Response<DatabaseInterface.AuthorData> = withContext(Dispatchers.Default) {
-        tryConnect {
+        tryFlatConnect {
             val doc = networkClient.get(authorUrl).toDocument()
             val books = doc.select(".search_main_box_nu")
                 .mapNotNull {
@@ -127,7 +127,7 @@ class NovelUpdates(
         index: Int,
         url: Uri.Builder
     ) = withContext(Dispatchers.Default) {
-        tryConnect(extraErrorInfo = "index: $index\n\nurl: $url") {
+        tryFlatConnect(extraErrorInfo = "index: $index\n\nurl: $url") {
             val doc = networkClient.get(url).toDocument()
             doc.select(".search_main_box_nu")
                 .mapNotNull {

@@ -1,5 +1,7 @@
 package my.noveldokusha.scraper.sources
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.data.ChapterMetadata
 import my.noveldokusha.data.Response
@@ -18,7 +20,7 @@ import org.jsoup.nodes.Document
  */
 class KoreanNovelsMTL(
     private val networkClient: NetworkClient
-) : SourceInterface.Catalog {
+) : SourceInterface.RemoteCatalog {
     override val id = "korean_novels_mtl"
     override val name = "Korean Novels MTL"
     override val baseUrl = "https://www.koreanmtl.online/"
@@ -28,30 +30,43 @@ class KoreanNovelsMTL(
     override suspend fun getChapterTitle(doc: Document): String? = null
     override suspend fun getChapterText(doc: Document): String? = null
 
-    override suspend fun getBookCoverImageUrl(doc: Document): String = ""
+    override suspend fun getBookCoverImageUrl(bookUrl: String): Response<String?> =
+        Response.Success("")
 
-    override suspend fun getBookDescription(doc: Document): String {
-        return doc.select(".post-body.entry-content.float-container > p")
-            .drop(1)
-            .joinToString("\n\n") { it.text() }
-            .trim()
+    override suspend fun getBookDescription(
+        bookUrl: String
+    ): Response<String?> = withContext(Dispatchers.Default) {
+        tryConnect {
+            networkClient.get(bookUrl).toDocument()
+                .select(".post-body.entry-content.float-container > p")
+                .drop(1)
+                .joinToString("\n\n") { it.text() }
+                .trim()
+        }
     }
 
-    override suspend fun getChapterList(doc: Document): List<ChapterMetadata> {
-        return doc.select(".post-body.entry-content.float-container li a[href]")
-            .map {
-                val url = it.attr("href")
-                val title = it.text()
-                ChapterMetadata(title = title, url = url)
-            }
+    override suspend fun getChapterList(
+        bookUrl: String
+    ): Response<List<ChapterMetadata>> = withContext(Dispatchers.Default) {
+        tryConnect {
+            networkClient.get(bookUrl)
+                .toDocument()
+                .select(".post-body.entry-content.float-container li a[href]")
+                .map {
+                    val url = it.attr("href")
+                    val title = it.text()
+                    ChapterMetadata(title = title, url = url)
+                }
+        }
     }
 
-    override suspend fun getCatalogList(index: Int): Response<PagedList<BookMetadata>> {
-        val page = index + 1
-        if (page > 1)
-            return Response.Success(PagedList.createEmpty(index = index))
-
-        return tryConnect {
+    override suspend fun getCatalogList(
+        index: Int
+    ): Response<PagedList<BookMetadata>> = withContext(Dispatchers.Default) {
+        tryConnect {
+            val page = index + 1
+            if (page > 1)
+                return@tryConnect PagedList.createEmpty(index = index)
             networkClient.get(catalogUrl)
                 .toDocument()
                 .select(".post-body.entry-content.float-container li a[href]")
@@ -61,12 +76,10 @@ class KoreanNovelsMTL(
                     BookMetadata(title = text, url = url)
                 }
                 .let {
-                    Response.Success(
-                        PagedList(
-                            list = it,
-                            index = index,
-                            isLastPage = true
-                        )
+                    PagedList(
+                        list = it,
+                        index = index,
+                        isLastPage = true
                     )
                 }
         }
@@ -75,11 +88,11 @@ class KoreanNovelsMTL(
     override suspend fun getCatalogSearch(
         index: Int,
         input: String
-    ): Response<PagedList<BookMetadata>> {
-        if (input.isBlank() || index > 0)
-            return Response.Success(PagedList.createEmpty(index = index))
+    ): Response<PagedList<BookMetadata>> = withContext(Dispatchers.Default) {
+        tryConnect {
+            if (input.isBlank() || index > 0)
+                return@tryConnect PagedList.createEmpty(index = index)
 
-        return tryConnect {
             networkClient.get(catalogUrl).toDocument()
                 .select(".post-body.entry-content.float-container a[href]")
                 .map {
@@ -89,12 +102,10 @@ class KoreanNovelsMTL(
                 }
                 .filter { it.title.contains(input, ignoreCase = true) }
                 .let {
-                    Response.Success(
-                        PagedList(
-                            list = it,
-                            index = index,
-                            isLastPage = true
-                        )
+                    PagedList(
+                        list = it,
+                        index = index,
+                        isLastPage = true
                     )
                 }
         }

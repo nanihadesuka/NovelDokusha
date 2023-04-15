@@ -1,5 +1,7 @@
 package my.noveldokusha.scraper.sources
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import my.noveldokusha.network.NetworkClient
 import my.noveldokusha.scraper.SourceInterface
 import my.noveldokusha.scraper.TextExtractor
@@ -12,10 +14,13 @@ class Sousetsuka(
     override val name = "Sousetsuka"
     override val baseUrl = "https://www.sousetsuka.com/"
 
-    override suspend fun getChapterTitle(doc: Document): String? = doc.title().ifBlank { null }
+    override suspend fun getChapterTitle(doc: Document): String? =
+        withContext(Dispatchers.Default) {
+            doc.title().ifBlank { null }
+        }
 
-    override suspend fun getChapterText(doc: Document): String {
-        return doc.selectFirst(".post-body.entry-content")!!
+    override suspend fun getChapterText(doc: Document): String = withContext(Dispatchers.Default) {
+        doc.selectFirst(".post-body.entry-content")!!
             .let { TextExtractor.get(it) }
     }
 }

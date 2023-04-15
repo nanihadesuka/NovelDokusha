@@ -1,6 +1,8 @@
 package my.noveldokusha.scraper.sources
 
 import com.google.gson.JsonParser
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.data.ChapterMetadata
 import my.noveldokusha.data.Response
@@ -19,7 +21,7 @@ import org.jsoup.nodes.Document
 
 class MTLNovel(
     private val networkClient: NetworkClient
-) : SourceInterface.Catalog {
+) : SourceInterface.RemoteCatalog {
     override val id = "mtlnovel"
     override val name = "MTLNovel"
     override val baseUrl = "https://www.mtlnovel.com/"
@@ -28,52 +30,65 @@ class MTLNovel(
 
     override suspend fun getChapterTitle(doc: Document): String? = null
 
-    override suspend fun getChapterText(doc: Document): String {
-        return doc.selectFirst(".par.fontsize-16")!!.let { TextExtractor.get(it) }
+    override suspend fun getChapterText(doc: Document): String = withContext(Dispatchers.Default) {
+        doc.selectFirst(".par.fontsize-16")!!.let { TextExtractor.get(it) }
     }
 
-    override suspend fun getBookCoverImageUrl(doc: Document): String? {
-        return doc.selectFirst("amp-img.main-tmb[src]")
-            ?.attr("src")
-    }
-
-    override suspend fun getBookDescription(doc: Document): String? {
-        val text = doc.selectFirst(".desc") ?: return null
-        val node = text.apply {
-            select("h2").remove()
-            select("p.descr").remove()
+    override suspend fun getBookCoverImageUrl(
+        bookUrl: String
+    ): Response<String?> = withContext(Dispatchers.Default) {
+        tryConnect {
+            networkClient.get(bookUrl).toDocument()
+                .selectFirst("amp-img.main-tmb[src]")
+                ?.attr("src")
         }
-        return TextExtractor.get(node).trim()
     }
 
-    override suspend fun getChapterList(doc: Document): List<ChapterMetadata> {
-        // Needs to add "/" at the end
-        val url = doc
-            .selectFirst("meta[property=og:url] ")!!
-            .attr("content")
-            .toUrlBuilderSafe()
-            .addPath("chapter-list")
-            .toString() + "/"
-
-        return networkClient.get(url)
-            .toDocument()
-            .select("a.ch-link[href]")
-            .map {
-                ChapterMetadata(
-                    title = it.text(),
-                    url = it.attr("href"),
-                )
+    override suspend fun getBookDescription(
+        bookUrl: String
+    ): Response<String?> = withContext(Dispatchers.Default) {
+        tryConnect {
+            val text = networkClient.get(bookUrl).toDocument()
+                .selectFirst(".desc") ?: return@tryConnect null
+            val node = text.apply {
+                select("h2").remove()
+                select("p.descr").remove()
             }
-            .reversed()
+            TextExtractor.get(node).trim()
+        }
     }
 
-    override suspend fun getCatalogList(index: Int): Response<PagedList<BookMetadata>> {
-        val page = index + 1
-        val url = catalogUrl.toUrlBuilderSafe().apply {
-            if (page != 1) addPath("page", "$page")
-        }
+    override suspend fun getChapterList(
+        bookUrl: String
+    ): Response<List<ChapterMetadata>> = withContext(Dispatchers.Default) {
+        tryConnect {
+            // Needs to add "/" at the end
+            val url = bookUrl
+                .toUrlBuilderSafe()
+                .addPath("chapter-list")
+                .toString() + "/"
 
-        return tryConnect {
+            networkClient.get(url)
+                .toDocument()
+                .select("a.ch-link[href]")
+                .map {
+                    ChapterMetadata(
+                        title = it.text(),
+                        url = it.attr("href"),
+                    )
+                }
+                .reversed()
+        }
+    }
+
+    override suspend fun getCatalogList(
+        index: Int
+    ): Response<PagedList<BookMetadata>> = withContext(Dispatchers.Default) {
+        tryConnect {
+            val page = index + 1
+            val url = catalogUrl.toUrlBuilderSafe().apply {
+                if (page != 1) addPath("page", "$page")
+            }
             val doc = networkClient.get(url).toDocument()
             doc.select(".box.wide")
                 .mapNotNull {
@@ -85,15 +100,13 @@ class MTLNovel(
                     )
                 }
                 .let {
-                    Response.Success(
-                        PagedList(
-                            list = it,
-                            index = index,
-                            isLastPage = when (val nav = doc.selectFirst("div#pagination")) {
-                                null -> true
-                                else -> nav.children().last()?.`is`("span") ?: true
-                            }
-                        )
+                    PagedList(
+                        list = it,
+                        index = index,
+                        isLastPage = when (val nav = doc.selectFirst("div#pagination")) {
+                            null -> true
+                            else -> nav.children().last()?.`is`("span") ?: true
+                        }
                     )
                 }
         }
@@ -102,21 +115,21 @@ class MTLNovel(
     override suspend fun getCatalogSearch(
         index: Int,
         input: String
-    ): Response<PagedList<BookMetadata>> {
-        if (input.isBlank() || index > 0)
-            return Response.Success(PagedList.createEmpty(index = index))
+    ): Response<PagedList<BookMetadata>> = withContext(Dispatchers.Default) {
+        tryConnect {
+            if (input.isBlank() || index > 0)
+                return@tryConnect PagedList.createEmpty(index = index)
 
-        val url = """https://www.mtlnovel.com/wp-admin/admin-ajax.php"""
-            .toUrlBuilderSafe()
-            .add("action", "autosuggest")
-            .add("q", input)
-            .add("__amp_source_origin", "https://www.mtlnovel.com")
-            .toString()
+            val url = """https://www.mtlnovel.com/wp-admin/admin-ajax.php"""
+                .toUrlBuilderSafe()
+                .add("action", "autosuggest")
+                .add("q", input)
+                .add("__amp_source_origin", "https://www.mtlnovel.com")
+                .toString()
 
-        return tryConnect {
             val request = getRequest(url)
             val json = networkClient.call(request)
-                .body!!
+                .body
                 .string()
 
             JsonParser
@@ -134,12 +147,10 @@ class MTLNovel(
                     )
                 }
                 .let {
-                    Response.Success(
-                        PagedList(
-                            list = it,
-                            index = index,
-                            isLastPage = true
-                        )
+                    PagedList(
+                        list = it,
+                        index = index,
+                        isLastPage = true
                     )
                 }
         }

@@ -1,6 +1,8 @@
 package my.noveldokusha.scraper.sources
 
 import android.net.Uri
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.data.ChapterMetadata
 import my.noveldokusha.data.Response
@@ -9,6 +11,7 @@ import my.noveldokusha.network.PagedList
 import my.noveldokusha.network.postPayload
 import my.noveldokusha.network.postRequest
 import my.noveldokusha.network.tryConnect
+import my.noveldokusha.network.tryFlatConnect
 import my.noveldokusha.scraper.SourceInterface
 import my.noveldokusha.scraper.TextExtractor
 import my.noveldokusha.utils.add
@@ -24,7 +27,7 @@ import org.jsoup.nodes.Document
  */
 class NovelUpdates(
     private val networkClient: NetworkClient
-) : SourceInterface.Catalog {
+) : SourceInterface.RemoteCatalog {
     override val id = "novel_updates"
     override val name = "Novel Updates"
     override val baseUrl = "https://www.novelupdates.com/"
@@ -39,58 +42,79 @@ class NovelUpdates(
         return ""
     }
 
-    override suspend fun getBookCoverImageUrl(doc: Document): String? {
-        return doc.selectFirst("div.seriesimg > img[src]")
-            ?.attr("src")
-            ?.let { if (it == "https://www.novelupdates.com/img/noimagefound.jpg") null else it }
-    }
-
-    override suspend fun getBookDescription(doc: Document): String? {
-        return doc.selectFirst("#editdescription")
-            ?.let { TextExtractor.get(it) }
-    }
-
-    override suspend fun getChapterList(doc: Document): List<ChapterMetadata> {
-
-        val request = postRequest("https://www.novelupdates.com/wp-admin/admin-ajax.php")
-            .postPayload {
-                add("action", "nd_getchapters")
-                add("mygrr", doc.selectFirst("#grr_groups")!!.attr("value"))
-                add("mygroupfilter", "")
-                add("mypostid", doc.selectFirst("#mypostid")!!.attr("value"))
-            }
-        return networkClient.call(request)
-            .toDocument()
-            .select("a[href]")
-            .asSequence()
-            .filter { it.hasAttr("data-id") }
-            .map {
-                val title = it.selectFirst("span")!!.attr("title")
-                val url = "https:" + it.attr("href")
-                ChapterMetadata(title = title, url = url)
-            }.toList().reversed()
-    }
-
-    override suspend fun getCatalogList(index: Int): Response<PagedList<BookMetadata>> {
-        val page = index + 1
-        val url = catalogUrl.toUrlBuilderSafe().apply {
-            add("st", 1)
-            if (page > 1) add("pg", page)
+    override suspend fun getBookCoverImageUrl(
+        bookUrl: String
+    ): Response<String?> = withContext(Dispatchers.Default) {
+        tryConnect {
+            networkClient.get(bookUrl).toDocument()
+                .selectFirst("div.seriesimg > img[src]")
+                ?.attr("src")
+                ?.let { if (it == "https://www.novelupdates.com/img/noimagefound.jpg") null else it }
         }
-        return getSearchList(index, url)
+    }
+
+    override suspend fun getBookDescription(
+        bookUrl: String
+    ): Response<String?> = withContext(Dispatchers.Default) {
+        tryConnect {
+            networkClient.get(bookUrl).toDocument()
+                .selectFirst("#editdescription")
+                ?.let { TextExtractor.get(it) }
+        }
+    }
+
+    override suspend fun getChapterList(
+        bookUrl: String
+    ): Response<List<ChapterMetadata>> = withContext(Dispatchers.Default) {
+        tryConnect {
+            val doc = networkClient.get(bookUrl).toDocument()
+            val request = postRequest("https://www.novelupdates.com/wp-admin/admin-ajax.php")
+                .postPayload {
+                    add("action", "nd_getchapters")
+                    add("mygrr", doc.selectFirst("#grr_groups")!!.attr("value"))
+                    add("mygroupfilter", "")
+                    add("mypostid", doc.selectFirst("#mypostid")!!.attr("value"))
+                }
+
+            networkClient.call(request)
+                .toDocument()
+                .select("a[href]")
+                .asSequence()
+                .filter { it.hasAttr("data-id") }
+                .map {
+                    val title = it.selectFirst("span")!!.attr("title")
+                    val url = "https:" + it.attr("href")
+                    ChapterMetadata(title = title, url = url)
+                }.toList().reversed()
+        }
+    }
+
+    override suspend fun getCatalogList(
+        index: Int
+    ): Response<PagedList<BookMetadata>> = withContext(Dispatchers.Default) {
+        tryFlatConnect {
+            val page = index + 1
+            val url = catalogUrl.toUrlBuilderSafe().apply {
+                add("st", 1)
+                if (page > 1) add("pg", page)
+            }
+            getSearchList(index, url)
+        }
     }
 
     override suspend fun getCatalogSearch(
         index: Int,
         input: String
-    ): Response<PagedList<BookMetadata>> {
-        val page = index + 1
-        val url = baseUrl.toUrlBuilderSafe().apply {
-            if (page > 1) appendPath("page").appendPath(page.toString())
-            add("s", input)
-            add("post_type", "seriesplans")
+    ): Response<PagedList<BookMetadata>> = withContext(Dispatchers.Default) {
+        tryFlatConnect {
+            val page = index + 1
+            val url = baseUrl.toUrlBuilderSafe().apply {
+                if (page > 1) appendPath("page").appendPath(page.toString())
+                add("s", input)
+                add("post_type", "seriesplans")
+            }
+            getSearchList(index, url)
         }
-        return getSearchList(index, url)
     }
 
     private suspend fun getSearchList(index: Int, url: Uri.Builder) = tryConnect(
@@ -108,12 +132,10 @@ class NovelUpdates(
                 )
             }
             .let {
-                Response.Success(
-                    PagedList(
-                        list = it,
-                        index = index,
-                        isLastPage = isLastPage(doc)
-                    )
+                PagedList(
+                    list = it,
+                    index = index,
+                    isLastPage = isLastPage(doc)
                 )
             }
     }
