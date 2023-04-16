@@ -1,5 +1,6 @@
 package my.noveldokusha.scraper
 
+import androidx.compose.runtime.Composable
 import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.data.ChapterMetadata
 import my.noveldokusha.data.Response
@@ -10,6 +11,7 @@ sealed interface SourceInterface {
     val id: String
     val name: String
     val baseUrl: String
+    val isLocalSource: Boolean get() = true
 
     // Transform current url to preferred url
     suspend fun transformChapterUrl(url: String): String = url
@@ -18,12 +20,14 @@ sealed interface SourceInterface {
     suspend fun getChapterText(doc: Document): String? = null
 
     interface Base : SourceInterface
-    interface RemoteCatalog : SourceInterface {
+    interface Catalog : SourceInterface {
         val catalogUrl: String
         val language: String
         val iconUrl: String get() = "$baseUrl/favicon.ico"
 
-        suspend fun getBookCoverImageUrl(bookUrl: String): Response<String?> = Response.Success(null)
+        suspend fun getBookCoverImageUrl(bookUrl: String): Response<String?> =
+            Response.Success(null)
+
         suspend fun getBookDescription(bookUrl: String): Response<String?> = Response.Success(null)
 
         /**
@@ -32,5 +36,10 @@ sealed interface SourceInterface {
         suspend fun getChapterList(bookUrl: String): Response<List<ChapterMetadata>>
         suspend fun getCatalogList(index: Int): Response<PagedList<BookMetadata>>
         suspend fun getCatalogSearch(index: Int, input: String): Response<PagedList<BookMetadata>>
+    }
+
+    interface Configurable {
+        @Composable
+        fun ScreenConfig()
     }
 }

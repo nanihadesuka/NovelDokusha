@@ -26,7 +26,7 @@ import java.util.Locale
  */
 class LightNovelsTranslations(
     private val networkClient: NetworkClient
-) : SourceInterface.RemoteCatalog {
+) : SourceInterface.Catalog {
     override val id = "light_novel_translations"
     override val name = "Light Novel Translations"
     override val baseUrl = "https://lightnovelstranslations.com/"

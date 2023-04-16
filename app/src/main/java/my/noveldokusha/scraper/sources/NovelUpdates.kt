@@ -27,7 +27,7 @@ import org.jsoup.nodes.Document
  */
 class NovelUpdates(
     private val networkClient: NetworkClient
-) : SourceInterface.RemoteCatalog {
+) : SourceInterface.Catalog {
     override val id = "novel_updates"
     override val name = "Novel Updates"
     override val baseUrl = "https://www.novelupdates.com/"

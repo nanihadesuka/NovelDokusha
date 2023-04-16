@@ -2,7 +2,6 @@ package my.noveldokusha.network
 
 import android.content.Context
 import android.net.Uri
-import dagger.hilt.android.qualifiers.ApplicationContext
 import my.noveldokusha.BuildConfig
 import my.noveldokusha.utils.call
 import okhttp3.Cache
@@ -23,7 +22,7 @@ interface NetworkClient {
 class ScraperNetworkClient(
     cacheDir: File,
     cacheSize: Long,
-    @ApplicationContext private val appContext: Context
+    private val appContext: Context
 ) : NetworkClient {
     private val cookieJar = ScraperCookieJar()
 

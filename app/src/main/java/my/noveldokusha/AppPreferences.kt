@@ -139,6 +139,11 @@ class AppPreferences @Inject constructor(
             override var value by SharedPreference_String(name, preferences, "")
         }
 
+    val LOCAL_SOURCES_URI_DIRECTORIES =
+        object : Preference<Set<String>>("LOCAL_SOURCES_URI_DIRECTORIES") {
+            override var value by SharedPreference_StringSet(name, preferences, setOf())
+        }
+
     enum class TERNARY_STATE {
         active,
         inverse,

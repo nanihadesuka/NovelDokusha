@@ -29,7 +29,7 @@ import org.jsoup.nodes.Document
  */
 class LightNovelWorld(
     private val networkClient: NetworkClient
-) : SourceInterface.RemoteCatalog {
+) : SourceInterface.Catalog {
     override val id = "light_novel_world"
     override val name = "Light Novel World"
     override val baseUrl = "https://www.lightnovelworld.com/"

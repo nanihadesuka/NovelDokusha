@@ -19,7 +19,7 @@ import org.jsoup.nodes.Document
 
 class Wuxia(
     private val networkClient: NetworkClient
-) : SourceInterface.RemoteCatalog {
+) : SourceInterface.Catalog {
     override val id = "wuxia"
     override val name = "Wuxia"
     override val baseUrl = "https://www.wuxia.blog/"

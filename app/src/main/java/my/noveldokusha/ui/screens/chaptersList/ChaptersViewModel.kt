@@ -24,6 +24,7 @@ import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.data.ChapterWithContext
 import my.noveldokusha.data.database.tables.Book
 import my.noveldokusha.di.AppCoroutineScope
+import my.noveldokusha.isContentUri
 import my.noveldokusha.isLocalUri
 import my.noveldokusha.network.NetworkClient
 import my.noveldokusha.repository.Repository
@@ -94,7 +95,7 @@ class ChaptersViewModel @Inject constructor(
         searchTextInput = mutableStateOf(""),
         sourceCatalogName = mutableStateOf(source?.name ?: "Local"),
         settingChapterSort = appPreferences.CHAPTERS_SORT_ASCENDING.state(viewModelScope),
-        isLocalSource = mutableStateOf(bookUrl.isLocalUri)
+        isLocalSource = mutableStateOf(bookUrl.isLocalUri || bookUrl.isContentUri)
     )
 
     init {

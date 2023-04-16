@@ -19,7 +19,7 @@ import java.io.StringReader
 
 class Saikai(
     private val networkClient: NetworkClient
-) : SourceInterface.RemoteCatalog {
+) : SourceInterface.Catalog {
     override val id = "seikai"
     override val name = "Saikai"
     override val baseUrl = "https://saikaiscan.com.br/"

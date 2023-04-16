@@ -9,6 +9,7 @@ import androidx.compose.ui.platform.LocalContext
 import java.io.File
 
 val String.isLocalUri: Boolean get() = startsWith("local://")
+val String.isContentUri: Boolean get() = startsWith("content://")
 
 val Context.folderBooks: File get() = File(filesDir, "books")
 fun Context.getLocalBookFolder(bookUrl: String) =

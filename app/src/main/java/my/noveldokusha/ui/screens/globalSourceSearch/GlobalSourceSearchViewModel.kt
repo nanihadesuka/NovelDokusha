@@ -78,7 +78,7 @@ data class SourceResults(
     val coroutineScope: CoroutineScope
 ) {
     val fetchIterator =
-        PagedListIteratorState(coroutineScope) { source.remoteCatalog.getCatalogSearch(it, searchInput) }
+        PagedListIteratorState(coroutineScope) { source.catalog.getCatalogSearch(it, searchInput) }
 
     init {
         fetchIterator.fetchNext()

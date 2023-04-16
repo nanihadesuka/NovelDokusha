@@ -19,7 +19,7 @@ import my.noveldokusha.utils.toUrlBuilderSafe
 
 class BoxNovel(
     private val networkClient: NetworkClient
-) : SourceInterface.RemoteCatalog {
+) : SourceInterface.Catalog {
     override val id = "box_novel"
     override val name = "Box Novel"
     override val baseUrl = "https://boxnovel.com/"

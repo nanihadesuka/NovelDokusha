@@ -1,6 +1,5 @@
 package my.noveldokusha.ui.screens.globalSourceSearch
 
-import android.net.Uri
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -25,17 +24,14 @@ import my.noveldokusha.R
 import my.noveldokusha.composableActions.ListLoadWatcher
 import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.network.IteratorState
-import my.noveldokusha.network.NetworkClient
 import my.noveldokusha.repository.SourceCatalogItem
-import my.noveldokusha.scraper.Scraper
 import my.noveldokusha.ui.composeViews.BookImageButtonView
 import my.noveldokusha.ui.composeViews.BookTitlePosition
+import my.noveldokusha.ui.previewFixtures.previewFixturesCatalogList
 import my.noveldokusha.ui.theme.ColorAccent
 import my.noveldokusha.ui.theme.InternalTheme
 import my.noveldokusha.ui.theme.PreviewThemes
 import my.noveldokusha.utils.capitalize
-import okhttp3.Request
-import okhttp3.Response
 import java.util.Locale
 
 @Composable
@@ -51,7 +47,7 @@ fun GlobalSourceSearchScreenBody(
     ) {
         items(listSources) { entry ->
             Text(
-                text = entry.source.remoteCatalog.name.capitalize(Locale.ROOT),
+                text = entry.source.catalog.name.capitalize(Locale.ROOT),
                 style = MaterialTheme.typography.titleMedium,
                 modifier = Modifier
                     .padding(start = 12.dp)
@@ -144,16 +140,11 @@ private fun SourceListView(
 @PreviewThemes
 @Composable
 private fun PreviewView() {
-    val scraper = Scraper(object : NetworkClient {
-        override suspend fun get(url: String) = Response.Builder().build()
-        override suspend fun get(url: Uri.Builder) = Response.Builder().build()
-        override suspend fun call(request: Request.Builder, followRedirects: Boolean) =
-            Response.Builder().build()
-    })
 
-    val list = scraper.sourcesListRemoteCatalog.mapIndexed { index, source ->
+
+    val list = previewFixturesCatalogList().mapIndexed { index, source ->
         val (catalog, books) = SourceCatalogItem(
-            remoteCatalog = source,
+            catalog = source,
             pinned = false
         ) to (0..5).map { BookMetadata(title = "Book $it", url = "") }
 

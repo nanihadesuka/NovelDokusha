@@ -25,7 +25,7 @@ import org.jsoup.nodes.Document
  */
 class ReadLightNovel(
     private val networkClient: NetworkClient
-) : SourceInterface.RemoteCatalog {
+) : SourceInterface.Catalog {
     override val id = "read_light_novel"
     override val name = "Read Light Novel"
     override val baseUrl = "https://www.readlightnovel.me/"

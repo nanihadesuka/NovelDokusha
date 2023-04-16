@@ -20,7 +20,7 @@ import my.noveldokusha.utils.toUrlBuilderSafe
 
 class WuxiaWorld(
     private val networkClient: NetworkClient
-) : SourceInterface.RemoteCatalog {
+) : SourceInterface.Catalog {
     override val id = "wuxia_world"
     override val name = "Wuxia World"
     override val baseUrl = "https://wuxiaworld.site/"

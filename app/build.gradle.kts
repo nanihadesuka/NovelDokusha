@@ -167,6 +167,9 @@ dependencies {
     // Preferences
     implementation("androidx.preference:preference-ktx:1.2.0")
 
+    // Local storage directory access
+    implementation("androidx.documentfile:documentfile:1.0.1")
+
     // UI
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("androidx.core:core-ktx:1.10.0")
@@ -180,6 +183,7 @@ dependencies {
     implementation("com.google.android.material:material:1.9.0-beta01")
     implementation("com.l4digital.fastscroll:fastscroll:2.0.1")
     implementation("com.afollestad.material-dialogs:core:3.3.0")
+
 
     // Media session controls
     implementation("androidx.media:media:1.6.0")

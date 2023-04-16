@@ -153,4 +153,9 @@
     <string name="delete_voice">Delete voice</string>
     <string name="translate">Translate</string>
     <string name="size">Size</string>
+    <string name="add_local_directory">Add local directory</string>
+    <string name="configuration">Configuration</string>
+    <string name="done">Done</string>
+    <string name="close">Close</string>
+    <string name="no_directories_added_please_add_them_to_see_them_in_the_source_catalog_list">No directories added, please add them to see them in the source catalog list</string>
 </resources>

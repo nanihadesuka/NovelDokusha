@@ -21,7 +21,7 @@ import org.jsoup.nodes.Document
 
 class MTLNovel(
     private val networkClient: NetworkClient
-) : SourceInterface.RemoteCatalog {
+) : SourceInterface.Catalog {
     override val id = "mtlnovel"
     override val name = "MTLNovel"
     override val baseUrl = "https://www.mtlnovel.com/"
