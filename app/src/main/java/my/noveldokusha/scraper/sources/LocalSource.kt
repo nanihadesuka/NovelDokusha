@@ -1,6 +1,9 @@
 package my.noveldokusha.scraper.sources
 
 import android.content.Context
+import android.database.Cursor
+import android.net.Uri
+import android.provider.DocumentsContract
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -57,39 +60,63 @@ class LocalSource(
         )
     }
 
+    private val validMIMES = setOf(
+        "application/epub+zip",
+        DocumentsContract.Document.MIME_TYPE_DIR
+    )
 
-    private fun DocumentFile.recursiveGetAllFiles(depth: Int): Sequence<DocumentFile> {
-        return if (isDirectory && depth > 0) {
-            listFiles()
-                .asSequence()
-                .flatMap { it.recursiveGetAllFiles(depth - 1) }
-        } else sequenceOf(this)
+    private fun Uri.cursorRecursiveGetAllFiles(): Sequence<BookMetadata> {
+        val rootURI = this
+        return appContext.contentResolver.query(
+            rootURI,
+            arrayOf(
+                DocumentsContract.Document.COLUMN_DISPLAY_NAME,
+                DocumentsContract.Document.COLUMN_DOCUMENT_ID,
+                DocumentsContract.Document.COLUMN_MIME_TYPE,
+            ),
+            null,
+            null,
+            null,
+        ).asSequence().flatMap {
+            val mime = it.getString(2)
+            // Query selector doesn't work for mime_type
+            if (mime !in validMIMES) return@flatMap emptySequence()
+
+            val id = it.getString(1)
+            when (mime) {
+                DocumentsContract.Document.MIME_TYPE_DIR -> {
+                    val fileURI = DocumentsContract.buildChildDocumentsUriUsingTree(rootURI, id)
+                    fileURI.cursorRecursiveGetAllFiles()
+                }
+                else -> {
+                    val fileName = it.getString(0)
+                    val fileURI = DocumentsContract.buildDocumentUriUsingTree(rootURI, id)
+                    sequenceOf(
+                        BookMetadata(
+                            title = fileName,
+                            url = fileURI.toString(),
+                        )
+                    )
+                }
+            }
+        }
     }
-
-    private val validMIMEs = setOf<String>("application/epub+zip")
 
     override suspend fun getCatalogList(
         index: Int
     ): Response<PagedList<BookMetadata>> = withContext(Dispatchers.IO) {
         tryConnect {
-            val list = localSourcesDirectories
+            val files = localSourcesDirectories
                 .list
                 .asSequence()
-                .mapNotNull {
-                    DocumentFile.fromTreeUri(appContext, it)?.recursiveGetAllFiles(6)
+                .flatMap {
+                    DocumentsContract.buildChildDocumentsUriUsingTree(
+                        it, DocumentsContract.getTreeDocumentId(it)
+                    ).cursorRecursiveGetAllFiles()
                 }
-                .flatten()
-                .filter { it.canRead() && validMIMEs.contains(it.type) }
-                .distinctBy { it.uri }
-                .mapNotNull {
-                    val name = it.name ?: return@mapNotNull null
-                    BookMetadata(
-                        title = name,
-                        url = it.uri.toString(),
-                    )
-                }
+
             PagedList(
-                list = list.toList(),
+                list = files.toList(),
                 index = 0,
                 isLastPage = true
             )
@@ -145,5 +172,15 @@ class LocalSource(
                 )
             }
         }
+    }
+}
+
+
+private fun Cursor?.asSequence() = sequence<Cursor> {
+    if (this@asSequence != null) {
+        while (moveToNext()) {
+            yield(this@asSequence)
+        }
+        this@asSequence.close()
     }
 }
