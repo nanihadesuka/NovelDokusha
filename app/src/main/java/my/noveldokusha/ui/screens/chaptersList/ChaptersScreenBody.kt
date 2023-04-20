@@ -2,7 +2,6 @@ package my.noveldokusha.ui.screens.chaptersList
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
@@ -11,8 +10,6 @@ import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
-import androidx.compose.material3.FilledTonalButton
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -24,12 +21,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.core.net.toUri
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.distinctUntilChanged
 import my.noveldokusha.R
-import my.noveldokusha.composableActions.onDoImportEPUBWithUri
 import my.noveldokusha.data.ChapterWithContext
 import my.noveldokusha.ui.composeViews.ErrorView
 
@@ -56,7 +51,7 @@ fun ChaptersScreenBody(
 
     val pullRefreshState = rememberPullRefreshState(
         refreshing = isRefreshingDelayed,
-        onRefresh = onPullRefresh
+        onRefresh = onPullRefresh,
     )
 
     Box(
@@ -72,7 +67,8 @@ fun ChaptersScreenBody(
             ) {
                 ChaptersScreenHeader(
                     bookState = state.book.value,
-                    sourceCatalogName = state.sourceCatalogName.value,
+                    sourceCatalogName = state.sourceCatalogName.value
+                        ?: stringResource(R.string.invalid_source),
                     numberOfChapters = state.chapters.size,
                     paddingValues = innerPadding,
                     modifier = Modifier.padding(bottom = 12.dp)
@@ -93,26 +89,12 @@ fun ChaptersScreenBody(
                     onDownload = { onChapterDownload(it) }
                 )
             }
-            if (state.isLocalSource.value) {
-                item {
-                    Box(
-                        modifier = Modifier
-                            .padding(32.dp)
-                            .fillMaxWidth(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        FilledTonalButton(onClick = onDoImportEPUBWithUri(state.book.value.url.toUri())) {
-                            Text(text = stringResource(id = R.string.import_epub))
-                        }
-                    }
-                }
-            } else {
-                if (state.error.value.isNotBlank()) item(
-                    key = "error",
-                    contentType = { 2 }
-                ) {
-                    ErrorView(error = state.error.value)
-                }
+
+            if (state.error.value.isNotBlank()) item(
+                key = "error",
+                contentType = { 2 }
+            ) {
+                ErrorView(error = state.error.value)
             }
         }
         PullRefreshIndicator(

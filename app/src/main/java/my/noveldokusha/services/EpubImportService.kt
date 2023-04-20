@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.IBinder
+import android.provider.OpenableColumns
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import dagger.hilt.android.AndroidEntryPoint
@@ -18,6 +19,7 @@ import my.noveldokusha.importEpubToRepository
 import my.noveldokusha.repository.Repository
 import my.noveldokusha.utils.Extra_Uri
 import my.noveldokusha.utils.NotificationsCenter
+import my.noveldokusha.utils.asSequence
 import my.noveldokusha.utils.isServiceRunning
 import my.noveldokusha.utils.removeProgressBar
 import my.noveldokusha.utils.text
@@ -89,12 +91,24 @@ class EpubImportService : Service() {
                     }
                     return@tryAsResponse
                 }
-                val epub = inputStream.use { createEpubBook(it) }
+
+                val fileName = contentResolver.query(
+                    intentData.uri,
+                    arrayOf(OpenableColumns.DISPLAY_NAME),
+                    null,
+                    null,
+                    null,
+                    null
+                ).asSequence().map { it.getString(0) }.last()
+
+                val epub = inputStream.use {
+                    createEpubBook(fileName = fileName, inputStream = it)
+                }
 
                 notificationsCenter.modifyNotification(notificationBuilder, channel_id) {
                     text = getString(R.string.importing_epub)
                 }
-                importEpubToRepository(repository, epub)
+                importEpubToRepository(repository = repository, epub = epub, addToLibrary = true)
 
                 notificationsCenter.modifyNotification(notificationBuilder, channel_id) {
                     text = getString(R.string.epub_added_to_library)
@@ -104,6 +118,7 @@ class EpubImportService : Service() {
                 Timber.e(it.exception)
                 notificationsCenter.showNotification(channel_id_error) {
                     text = getString(R.string.failed_to_import_epub)
+                    setSubText(it.message)
                     removeProgressBar()
                 }
             }

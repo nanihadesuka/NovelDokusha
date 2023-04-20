@@ -110,7 +110,7 @@ class RestoreDataService : Service() {
 
             stopSelf(startId)
         }
-        return START_NOT_STICKY
+        return START_STICKY
     }
 
     /**
@@ -161,15 +161,15 @@ class RestoreDataService : Service() {
                         db = newDatabase,
                         context = context,
                         name = "temp_database",
-                        bookChaptersRepository = bookChaptersRepository,
-                        chapterBodyRepository = ChapterBodyRepository(
+                        bookChapters = bookChaptersRepository,
+                        chapterBody = ChapterBodyRepository(
                             chapterBodyDao = newDatabase.chapterBodyDao(),
                             operations = newDatabase,
                             bookChaptersRepository = bookChaptersRepository,
                             scraper = scraper,
                             networkClient = networkClient
                         ),
-                        libraryBooksRepository = LibraryBooksRepository(
+                        libraryBooks = LibraryBooksRepository(
                             libraryDao = newDatabase.libraryDao(),
                             operations = newDatabase
                         )

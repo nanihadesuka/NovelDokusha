@@ -1,7 +1,6 @@
 package my.noveldokusha.scraper.sources
 
 import android.content.Context
-import android.database.Cursor
 import android.net.Uri
 import android.provider.DocumentsContract
 import androidx.compose.foundation.layout.Arrangement
@@ -40,6 +39,7 @@ import my.noveldokusha.network.tryConnect
 import my.noveldokusha.scraper.LocalSourcesDirectories
 import my.noveldokusha.scraper.SourceInterface
 import my.noveldokusha.ui.theme.Grey25
+import my.noveldokusha.utils.asSequence
 import my.noveldokusha.utils.textPadding
 
 class LocalSource(
@@ -172,15 +172,5 @@ class LocalSource(
                 )
             }
         }
-    }
-}
-
-
-private fun Cursor?.asSequence() = sequence<Cursor> {
-    if (this@asSequence != null) {
-        while (moveToNext()) {
-            yield(this@asSequence)
-        }
-        this@asSequence.close()
     }
 }

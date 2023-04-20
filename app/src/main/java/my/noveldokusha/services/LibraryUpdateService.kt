@@ -132,7 +132,7 @@ class LibraryUpdateService : Service() {
 
             stopSelf(startId)
         }
-        return START_NOT_STICKY
+        return START_STICKY
     }
 
     /**

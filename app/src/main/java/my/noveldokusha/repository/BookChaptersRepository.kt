@@ -8,9 +8,6 @@ class BookChaptersRepository(
     private val chapterDao: ChapterDao,
     private val operations: AppDatabaseOperations
 ) {
-    fun numberOfUnreadChaptersFlow(bookUrl: String) =
-        chapterDao.numberOfUnreadChaptersFlow(bookUrl)
-
     suspend fun update(chapter: Chapter) = chapterDao.update(chapter)
     suspend fun updatePosition(chapterUrl: String, lastReadPosition: Int, lastReadOffset: Int) =
         chapterDao.updatePosition(

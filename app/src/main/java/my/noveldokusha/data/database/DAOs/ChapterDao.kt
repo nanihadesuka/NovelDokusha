@@ -65,9 +65,6 @@ interface ChapterDao {
     @Query("SELECT * FROM Chapter WHERE url = :url")
     suspend fun get(url: String): Chapter?
 
-    @Query("SELECT COUNT(*) FROM Chapter WHERE bookUrl = :bookUrl AND read = 0")
-    fun numberOfUnreadChaptersFlow(bookUrl: String): Flow<Int>
-
     @Query("DELETE FROM Chapter WHERE Chapter.bookUrl = :bookUrl")
     suspend fun removeAllFromBook(bookUrl: String)
 

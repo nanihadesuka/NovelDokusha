@@ -6,6 +6,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import my.noveldokusha.data.database.tables.Book
 import my.noveldokusha.data.database.tables.Chapter
 import my.noveldokusha.data.database.tables.ChapterBody
@@ -50,23 +51,30 @@ private fun ZipInputStream.entries() = generateSequence { nextEntry }
 data class EpubChapter(val url: String, val title: String, val body: String)
 data class EpubImage(val path: String, val image: ByteArray)
 data class EpubBook(
-    val fileName: String,
+    val bookUrl: String,
     val title: String,
     val coverImagePath: String,
     val chapters: List<EpubChapter>,
     val images: List<EpubImage>
 )
 
-fun createEpubBook(inputStream: InputStream): EpubBook {
-    val zipFile = ZipInputStream(inputStream).use { zipInputStream ->
-        zipInputStream
-            .entries()
-            .filterNot { it.isDirectory }
-            .associate { it.name to (it to zipInputStream.readBytes()) }
+@Throws(Exception::class)
+suspend fun createEpubBook(
+    fileName: String,
+    inputStream: InputStream
+): EpubBook = withContext(Dispatchers.Default) {
+    val zipFile = withContext(Dispatchers.IO) {
+        ZipInputStream(inputStream).use { zipInputStream ->
+            zipInputStream
+                .entries()
+                .filterNot { it.isDirectory }
+                .associate { it.name to (it to zipInputStream.readBytes()) }
+        }
     }
 
     val container =
-        zipFile["META-INF/container.xml"] ?: throw Exception("META-INF/container.xml file missing")
+        zipFile["META-INF/container.xml"]
+            ?: throw Exception("META-INF/container.xml file missing")
 
     val opfFilePath = parseXMLFile(container.second)
         ?.selectFirstTag("rootfile")
@@ -75,17 +83,19 @@ fun createEpubBook(inputStream: InputStream): EpubBook {
 
     val opfFile = zipFile[opfFilePath] ?: throw Exception(".opf file missing")
 
-    val docuemnt = parseXMLFile(opfFile.second) ?: throw Exception(".opf file failed to parse data")
+    val docuemnt =
+        parseXMLFile(opfFile.second) ?: throw Exception(".opf file failed to parse data")
     val metadata =
-        docuemnt.selectFirstTag("metadata") ?: throw Exception(".opf file metadata section missing")
+        docuemnt.selectFirstTag("metadata")
+            ?: throw Exception(".opf file metadata section missing")
     val manifest =
-        docuemnt.selectFirstTag("manifest") ?: throw Exception(".opf file manifest section missing")
+        docuemnt.selectFirstTag("manifest")
+            ?: throw Exception(".opf file manifest section missing")
     val spine =
         docuemnt.selectFirstTag("spine") ?: throw Exception(".opf file spine section missing")
 
     val bookTitle = metadata.selectFirstChildTag("dc:title")?.textContent
         ?: throw Exception(".opf metadata title tag missing")
-    val bookUrl = bookTitle.asFileName()
     val rootPath = File(opfFilePath).parentFile ?: File("")
     fun String.absPath() = File(rootPath, this).path.replace("""\""", "/").removePrefix("/")
 
@@ -111,13 +121,13 @@ fun createEpubBook(inputStream: InputStream): EpubBook {
         val url: String,
         val title: String?,
         val body: String,
-        val chapterIndex: Int
+        val chapterIndex: Int,
     )
 
     var chapterIndex = 0
     val chapterExtensions = listOf("xhtml", "xml", "html").map { ".$it" }
     val chapters = idRef
-        .mapNotNull { items.get(it) }
+        .mapNotNull { items[it] }
         .filter { item -> chapterExtensions.any { item.href.endsWith(it, ignoreCase = true) } }
         .mapNotNull { zipFile[it.href.absPath()] }
         .mapIndexed { index, (entry, byteArray) ->
@@ -130,7 +140,7 @@ fun createEpubBook(inputStream: InputStream): EpubBook {
                 chapterIndex += 1
 
             TempEpubChapter(
-                url = "$bookUrl/${entry.name}",
+                url = "$fileName/${entry.name}",
                 title = chapterTitle,
                 body = res.body,
                 chapterIndex = chapterIndex,
@@ -152,10 +162,18 @@ fun createEpubBook(inputStream: InputStream): EpubBook {
         .mapNotNull { zipFile[it.href.absPath()] }
         .map { (entry, byteArray) -> EpubImage(path = entry.name, image = byteArray) }
 
-    val imageExtensions = listOf("png", "gif", "raw", "png", "jpg", "jpeg", "webp").map { ".$it" }
+    val imageExtensions =
+        listOf("png", "gif", "raw", "png", "jpg", "jpeg", "webp").map { ".$it" }
     val unlistedImages = zipFile.values.asSequence()
         .filterNot { (entry, _) -> entry.isDirectory }
-        .filter { (entry, _) -> imageExtensions.any { entry.name.endsWith(it, ignoreCase = true) } }
+        .filter { (entry, _) ->
+            imageExtensions.any {
+                entry.name.endsWith(
+                    it,
+                    ignoreCase = true
+                )
+            }
+        }
         .map { (entry, byteArray) -> EpubImage(path = entry.name, image = byteArray) }
 
     val images = (listedImages + unlistedImages).distinctBy { it.path }
@@ -166,8 +184,8 @@ fun createEpubBook(inputStream: InputStream): EpubBook {
         ?.let { zipFile[it.href.absPath()] }
         ?.let { (entry, byteArray) -> EpubImage(path = entry.name, image = byteArray) }
 
-    return EpubBook(
-        fileName = bookUrl,
+    return@withContext EpubBook(
+        bookUrl = fileName,
         title = bookTitle,
         coverImagePath = coverImage?.path ?: "",
         chapters = chapters.toList(),
@@ -175,12 +193,16 @@ fun createEpubBook(inputStream: InputStream): EpubBook {
     )
 }
 
-fun importEpubToRepository(repository: Repository, epub: EpubBook) =
+fun String.addLocalPrefix() = "local://${this}"
+fun String.replaceContentByLocal() = this.removePrefix("content://").addLocalPrefix()
+fun String.urlIfContent(title: String) = if (isContentUri) title.addLocalPrefix() else this
+
+
+fun importEpubToRepository(repository: Repository, epub: EpubBook, addToLibrary: Boolean) =
     CoroutineScope(Dispatchers.IO).launch {
         // First clean any previous entries from the book
-        fun String.withLocalPrefix() = "local://${this}"
 
-        val bookUrl = epub.fileName.withLocalPrefix()
+        val bookUrl = epub.bookUrl.addLocalPrefix()
         repository.bookChapters.chapters(bookUrl)
             .map { it.url }
             .let { repository.chapterBody.removeRows(it) }
@@ -191,15 +213,15 @@ fun importEpubToRepository(repository: Repository, epub: EpubBook) =
         Book(
             title = epub.title,
             url = bookUrl,
-            coverImageUrl = epub.coverImagePath.withLocalPrefix(),
-            inLibrary = true
+            coverImageUrl = epub.coverImagePath.addLocalPrefix(),
+            inLibrary = addToLibrary
         ).let { repository.libraryBooks.insert(it) }
 
         epub.chapters
             .mapIndexed { i, it ->
                 Chapter(
                     title = it.title,
-                    url = it.url.withLocalPrefix(),
+                    url = it.url.addLocalPrefix(),
                     bookUrl = bookUrl,
                     position = i
                 )
@@ -207,13 +229,13 @@ fun importEpubToRepository(repository: Repository, epub: EpubBook) =
             .let { repository.bookChapters.insert(it) }
 
         epub.chapters
-            .map { ChapterBody(url = it.url.withLocalPrefix(), body = it.body) }
+            .map { ChapterBody(url = it.url.addLocalPrefix(), body = it.body) }
             .let { repository.chapterBody.insertReplace(it) }
 
         epub.images.map {
             async {
                 val imgFile =
-                    Paths.get(repository.settings.folderBooks.path, epub.fileName, it.path).toFile()
+                    Paths.get(repository.settings.folderBooks.path, epub.bookUrl, it.path).toFile()
                 imgFile.parentFile?.also { parent ->
                     parent.mkdirs()
                     if (parent.exists())

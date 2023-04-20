@@ -55,9 +55,6 @@ interface LibraryDao {
     @Query("SELECT EXISTS(SELECT * FROM Book WHERE url == :url AND inLibrary == 1)")
     suspend fun existInLibrary(url: String): Boolean
 
-    @Query("SELECT EXISTS(SELECT * FROM Book WHERE url == :url AND inLibrary == 1)")
-    fun existInLibraryFlow(url: String): Flow<Boolean>
-
     @Query(
         """
         SELECT Book.*, COUNT(Chapter.read) AS chaptersCount, SUM(Chapter.read) AS chaptersReadCount

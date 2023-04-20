@@ -1,7 +1,6 @@
 package my.noveldokusha.ui.screens.chaptersList
 
 import android.content.Context
-import android.content.Intent
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
@@ -9,6 +8,7 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
@@ -20,7 +20,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import my.noveldokusha.AppPreferences
 import my.noveldokusha.R
-import my.noveldokusha.data.BookMetadata
+import my.noveldokusha.addLocalPrefix
 import my.noveldokusha.data.ChapterWithContext
 import my.noveldokusha.data.database.tables.Book
 import my.noveldokusha.di.AppCoroutineScope
@@ -34,14 +34,13 @@ import my.noveldokusha.scraper.downloadBookDescription
 import my.noveldokusha.scraper.downloadChaptersList
 import my.noveldokusha.ui.BaseViewModel
 import my.noveldokusha.ui.Toasty
-import my.noveldokusha.utils.Extra_String
 import my.noveldokusha.utils.StateExtra_String
 import my.noveldokusha.utils.toState
+import my.noveldokusha.utils.tryAsResponse
 import javax.inject.Inject
 
 interface ChapterStateBundle {
-    val bookMetadata get() = BookMetadata(title = bookTitle, url = bookUrl)
-    var bookUrl: String
+    var rawBookUrl: String
     var bookTitle: String
 }
 
@@ -54,23 +53,12 @@ class ChaptersViewModel @Inject constructor(
     private val toasty: Toasty,
     val appPreferences: AppPreferences,
     stateHandle: SavedStateHandle,
+    @ApplicationContext private val context: Context,
 ) : BaseViewModel(), ChapterStateBundle {
-    override var bookUrl by StateExtra_String(stateHandle)
+    override var rawBookUrl by StateExtra_String(stateHandle)
     override var bookTitle by StateExtra_String(stateHandle)
 
-    class IntentData : Intent {
-        private var bookUrl by Extra_String()
-        private var bookTitle by Extra_String()
-
-        constructor(intent: Intent) : super(intent)
-        constructor(ctx: Context, bookMetadata: BookMetadata) : super(
-            ctx,
-            ChaptersActivity::class.java
-        ) {
-            this.bookUrl = bookMetadata.url
-            this.bookTitle = bookMetadata.title
-        }
-    }
+    val bookUrl = if (rawBookUrl.isContentUri) bookTitle.addLocalPrefix() else rawBookUrl
 
     @Volatile
     private var loadChaptersJob: Job? = null
@@ -93,19 +81,33 @@ class ChaptersViewModel @Inject constructor(
         selectedChaptersUrl = mutableStateMapOf(),
         isRefreshing = mutableStateOf(false),
         searchTextInput = mutableStateOf(""),
-        sourceCatalogName = mutableStateOf(source?.name ?: "Local"),
+        sourceCatalogName = mutableStateOf(source?.name),
         settingChapterSort = appPreferences.CHAPTERS_SORT_ASCENDING.state(viewModelScope),
-        isLocalSource = mutableStateOf(bookUrl.isLocalUri || bookUrl.isContentUri)
+        isLocalSource = mutableStateOf(bookUrl.isLocalUri)
     )
 
     init {
         viewModelScope.launch {
+            tryAsResponse {
+                val importContentUri =
+                    rawBookUrl.isContentUri && repository.libraryBooks.get(bookUrl) == null
+                if (importContentUri) {
+                    repository.importEpubFromContentUri(
+                        contentUri = rawBookUrl,
+                        bookTitle = bookTitle,
+                        addToLibrary = false
+                    )
+                }
+            }
+        }
+
+        viewModelScope.launch {
             if (state.isLocalSource.value) return@launch
 
-            if (!repository.bookChapters.hasChapters(bookMetadata.url))
+            if (!repository.bookChapters.hasChapters(bookUrl))
                 updateChaptersList()
 
-            if (repository.libraryBooks.get(bookMetadata.url) != null)
+            if (repository.libraryBooks.get(bookUrl) != null)
                 return@launch
 
             val coverUrl = async { downloadBookCoverImageUrl(scraper, networkClient, bookUrl) }
@@ -113,8 +115,8 @@ class ChaptersViewModel @Inject constructor(
 
             repository.libraryBooks.insert(
                 Book(
-                    title = bookMetadata.title,
-                    url = bookMetadata.url,
+                    title = bookTitle,
+                    url = bookUrl,
                     coverImageUrl = coverUrl.await().toSuccessOrNull()?.data ?: "",
                     description = description.await().toSuccessOrNull()?.data ?: ""
                 )
@@ -122,7 +124,7 @@ class ChaptersViewModel @Inject constructor(
         }
 
         viewModelScope.launch {
-            repository.bookChapters.getChaptersWithContextFlow(bookMetadata.url)
+            repository.bookChapters.getChaptersWithContextFlow(bookUrl)
                 .map { removeCommonTextFromTitles(it) }
                 // Sort the chapters given the order preference
                 .combine(appPreferences.CHAPTERS_SORT_ASCENDING.flow()) { chapters, sorted ->
@@ -154,8 +156,8 @@ class ChaptersViewModel @Inject constructor(
 
     fun toggleBookmark() {
         viewModelScope.launch {
-            repository.libraryBooks.toggleBookmark(bookMetadata)
-            val isBookmarked = repository.libraryBooks.get(bookMetadata.url)?.inLibrary ?: false
+            repository.toggleBookmark(bookTitle = bookTitle, bookUrl = bookUrl)
+            val isBookmarked = repository.libraryBooks.get(bookUrl)?.inLibrary ?: false
             val msg = if (isBookmarked) R.string.added_to_library else R.string.removed_from_library
             toasty.show(msg)
         }
@@ -197,7 +199,7 @@ class ChaptersViewModel @Inject constructor(
 
             state.error.value = ""
             state.isRefreshing.value = true
-            val url = bookMetadata.url
+            val url = bookUrl
             val res = downloadChaptersList(scraper, url)
             state.isRefreshing.value = false
             res.onSuccess {

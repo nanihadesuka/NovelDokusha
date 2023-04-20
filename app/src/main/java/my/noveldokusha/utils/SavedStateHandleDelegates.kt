@@ -27,6 +27,14 @@ class StateExtra_String(private val state: SavedStateHandle) {
         state.set(property.name, value)
 }
 
+class StateExtra_StringNullable(private val state: SavedStateHandle) {
+    operator fun getValue(thisRef: Any?, property: KProperty<*>) =
+        state.get<String?>(property.name)
+
+    operator fun setValue(thisRef: Any?, property: KProperty<*>, value: String?) =
+        state.set(property.name, value)
+}
+
 class StateExtra_Parcelable<T : Parcelable>(private val state: SavedStateHandle) {
     operator fun getValue(thisRef: Any?, property: KProperty<*>) =
         state.get<T>(property.name)!!

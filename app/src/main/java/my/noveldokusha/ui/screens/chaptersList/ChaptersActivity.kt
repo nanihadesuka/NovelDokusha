@@ -24,7 +24,7 @@ import my.noveldokusha.utils.Extra_String
 @AndroidEntryPoint
 class ChaptersActivity : BaseActivity() {
     class IntentData : Intent, ChapterStateBundle {
-        override var bookUrl by Extra_String()
+        override var rawBookUrl by Extra_String()
         override var bookTitle by Extra_String()
 
         constructor(intent: Intent) : super(intent)
@@ -32,7 +32,7 @@ class ChaptersActivity : BaseActivity() {
             ctx,
             ChaptersActivity::class.java
         ) {
-            this.bookUrl = bookMetadata.url
+            this.rawBookUrl = bookMetadata.url
             this.bookTitle = bookMetadata.title
         }
     }

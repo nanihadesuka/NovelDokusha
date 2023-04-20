@@ -1,6 +1,5 @@
 package my.noveldokusha.repository
 
-import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.data.database.AppDatabaseOperations
 import my.noveldokusha.data.database.DAOs.LibraryDao
 import my.noveldokusha.data.database.tables.Book
@@ -13,7 +12,6 @@ class LibraryBooksRepository(
         libraryDao.getBooksInLibraryWithContextFlow()
     }
 
-    fun existInLibraryFlow(url: String) = libraryDao.existInLibraryFlow(url)
     fun getFlow(url: String) = libraryDao.getFlow(url)
     suspend fun insert(book: Book) = if (isValid(book)) libraryDao.insert(book) else Unit
     suspend fun insert(books: List<Book>) = libraryDao.insert(books.filter(::isValid))
@@ -43,10 +41,10 @@ class LibraryBooksRepository(
     suspend fun getAll() = libraryDao.getAll()
     suspend fun getAllInLibrary() = libraryDao.getAllInLibrary()
     suspend fun existInLibrary(url: String) = libraryDao.existInLibrary(url)
-    suspend fun toggleBookmark(bookMetadata: BookMetadata) = operations.transaction {
-        val book = get(bookMetadata.url)
+    suspend fun toggleBookmark(bookUrl: String, bookTitle: String) = operations.transaction {
+        val book = get(bookUrl)
         if (book == null)
-            insert(Book(title = bookMetadata.title, url = bookMetadata.url, inLibrary = true))
+            insert(Book(title = bookTitle, url = bookUrl, inLibrary = true))
         else
             update(book.copy(inLibrary = !book.inLibrary))
     }

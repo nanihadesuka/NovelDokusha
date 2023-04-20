@@ -21,6 +21,14 @@ class Extra_String {
         thisRef.putExtra(property.name, value)
 }
 
+class Extra_StringNullable {
+    operator fun getValue(thisRef: Intent, property: KProperty<*>) =
+        thisRef.extras!!.getString(property.name)
+
+    operator fun setValue(thisRef: Intent, property: KProperty<*>, value: String?) =
+        thisRef.putExtra(property.name, value)
+}
+
 class Extra_Parcelable<T : Parcelable> {
     operator fun getValue(thisRef: Intent, property: KProperty<*>) =
         thisRef.extras!!.getParcelable<T>(property.name)!!
