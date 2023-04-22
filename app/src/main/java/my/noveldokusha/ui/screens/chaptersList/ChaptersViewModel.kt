@@ -87,7 +87,9 @@ class ChaptersViewModel @Inject constructor(
     )
 
     init {
-        viewModelScope.launch {
+        appScope.launch {
+            val rawBookUrl = rawBookUrl
+            val bookTitle = bookTitle
             tryAsResponse {
                 val importContentUri =
                     rawBookUrl.isContentUri && repository.libraryBooks.get(bookUrl) == null

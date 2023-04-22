@@ -31,6 +31,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 import my.noveldokusha.R
 import my.noveldokusha.composableActions.onDoAddLocalSourceDirectory
@@ -144,6 +145,7 @@ class LocalSource(
             appFileResolver = appFileResolver,
             coverImage = coverImage,
         )
+        delay(50) // Give some time for the images to get written
 
         return bookMetadata.copy(
             coverImageUrl = appFileResolver.resolvedBookImagePathString(
