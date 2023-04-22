@@ -1,42 +1,73 @@
 package my.noveldokusha.tools.epub
 
-import kotlinx.coroutines.CoroutineScope
+import android.os.Build
+import android.os.FileObserver
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.withContext
 import my.noveldokusha.data.database.tables.Book
 import my.noveldokusha.data.database.tables.Chapter
 import my.noveldokusha.data.database.tables.ChapterBody
 import my.noveldokusha.repository.AppFileResolver
 import my.noveldokusha.repository.Repository
+import timber.log.Timber
+import java.io.File
 import java.nio.file.Paths
+import kotlin.coroutines.resume
 
-fun epubCoverImporter(
+
+// TODO: this doesn't seem to work
+suspend inline fun waitForFileDoneWriting(file: File, crossinline operation: () -> Unit): Unit =
+    suspendCancellableCoroutine {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            val observer = object : FileObserver(file) {
+                override fun onEvent(event: Int, path: String?) {
+                    when (event and ALL_EVENTS) {
+                        CLOSE_WRITE -> it.resume(Unit)
+                        else -> Unit
+                    }
+                }
+            }
+            observer.startWatching()
+            operation()
+            it.invokeOnCancellation {
+                observer.stopWatching()
+            }
+        } else {
+            it.resume(Unit)
+        }
+    }
+
+suspend fun epubCoverImporter(
     storageFolderName: String,
     appFileResolver: AppFileResolver,
     coverImage: EpubImage,
-) = CoroutineScope(Dispatchers.IO).launch {
-    val imgFile =
-        Paths.get(
-            appFileResolver.folderBooks.path,
-            storageFolderName,
-            coverImage.absoluteFilePath
-        ).toFile()
+) = withContext(Dispatchers.IO) {
+    val imgFile = Paths.get(
+        appFileResolver.folderBooks.path,
+        storageFolderName,
+        coverImage.absoluteFilePath
+    ).toFile()
     imgFile.parentFile?.also { parent ->
         parent.mkdirs()
-        if (parent.exists())
-            imgFile.writeBytes(coverImage.image)
+        if (parent.exists()) {
+            waitForFileDoneWriting(imgFile) {
+                imgFile.writeBytes(coverImage.image)
+            }
+        } else {
+            Timber.e("Failed to create folder ${parent.absolutePath}")
+        }
     }
 }
 
-fun epubImporter(
+suspend fun epubImporter(
     storageFolderName: String,
     repository: Repository,
     epub: EpubBook,
     addToLibrary: Boolean
-) = CoroutineScope(Dispatchers.IO).launch {
+): Unit = withContext(Dispatchers.IO) {
     val databaseBookUrl = storageFolderName.addLocalPrefix()
 
     // First clean any previous entries from the book
@@ -71,18 +102,21 @@ fun epubImporter(
 
     epub.images.map {
         async {
-            val imgFile =
-                Paths.get(
-                    repository.settings.folderBooks.path,
-                    storageFolderName,
-                    it.absoluteFilePath
-                ).toFile()
+            val imgFile = Paths.get(
+                repository.settings.folderBooks.path,
+                storageFolderName,
+                it.absoluteFilePath
+            ).toFile()
             imgFile.parentFile?.also { parent ->
                 parent.mkdirs()
-                if (parent.exists())
-                    imgFile.writeBytes(it.image)
+                if (parent.exists()) {
+                    waitForFileDoneWriting(imgFile) {
+                        imgFile.writeBytes(it.image)
+                    }
+                } else {
+                    Timber.e("Failed to create folder ${parent.absolutePath}")
+                }
             }
         }
     }.awaitAll()
-    delay(500) // Give some time for the images to get written
 }

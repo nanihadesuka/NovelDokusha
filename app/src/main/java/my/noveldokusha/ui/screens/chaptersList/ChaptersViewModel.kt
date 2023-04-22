@@ -36,7 +36,7 @@ import my.noveldokusha.ui.BaseViewModel
 import my.noveldokusha.ui.Toasty
 import my.noveldokusha.utils.StateExtra_String
 import my.noveldokusha.utils.toState
-import my.noveldokusha.utils.tryAsResponse
+import timber.log.Timber
 import javax.inject.Inject
 
 interface ChapterStateBundle {
@@ -90,16 +90,17 @@ class ChaptersViewModel @Inject constructor(
         appScope.launch {
             val rawBookUrl = rawBookUrl
             val bookTitle = bookTitle
-            tryAsResponse {
-                val importContentUri =
-                    rawBookUrl.isContentUri && repository.libraryBooks.get(bookUrl) == null
-                if (importContentUri) {
-                    repository.importEpubFromContentUri(
-                        contentUri = rawBookUrl,
-                        bookTitle = bookTitle,
-                        addToLibrary = false
-                    )
-                }
+            val importContentUri =
+                rawBookUrl.isContentUri && repository.libraryBooks.get(bookUrl) == null
+
+            if (!importContentUri) return@launch
+
+            repository.importEpubFromContentUri(
+                contentUri = rawBookUrl,
+                bookTitle = bookTitle,
+                addToLibrary = false
+            ).onError {
+                Timber.e(it.exception, "FAILED TO LOAD EPUB: ${it.message}")
             }
         }
 

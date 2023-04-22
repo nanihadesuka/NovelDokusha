@@ -31,13 +31,13 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 import my.noveldokusha.R
 import my.noveldokusha.composableActions.onDoAddLocalSourceDirectory
 import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.data.ChapterMetadata
 import my.noveldokusha.data.Response
+import my.noveldokusha.data.getOrNull
 import my.noveldokusha.network.PagedList
 import my.noveldokusha.network.tryConnect
 import my.noveldokusha.repository.AppFileResolver
@@ -123,9 +123,10 @@ class LocalSource(
                         it, DocumentsContract.getTreeDocumentId(it)
                     ).cursorRecursiveGetAllFiles()
                 }
-                .map { async { addCover(it) } }
+                .map { async { tryConnect { addCover(it) }.getOrNull() } }
                 .toList()
                 .awaitAll()
+                .filterNotNull()
 
             PagedList(
                 list = files,
@@ -145,7 +146,6 @@ class LocalSource(
             appFileResolver = appFileResolver,
             coverImage = coverImage,
         )
-        delay(50) // Give some time for the images to get written
 
         return bookMetadata.copy(
             coverImageUrl = appFileResolver.resolvedBookImagePathString(
