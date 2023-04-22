@@ -8,6 +8,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.io.File
+import java.nio.file.Paths
 import javax.inject.Inject
 
 class AppFileResolver @Inject constructor(
@@ -15,10 +16,13 @@ class AppFileResolver @Inject constructor(
 ) {
     val folderBooks = File(context.filesDir, "books")
 
-    fun getLocalBookFolder(bookUrl: String) =
+    fun getLocalBookCoverFile(storageFolderName: String): File =
+        Paths.get(folderBooks.absolutePath, storageFolderName, "__cover").toFile()
+
+    fun getLocalBookFolder(bookUrl: String): File =
         File(folderBooks, bookUrl.removePrefix("local://"))
 
-    fun getLocalBookImage(bookUrl: String, imagePath: String) =
+    fun getLocalBookImage(bookUrl: String, imagePath: String): File =
         File(getLocalBookFolder(bookUrl), imagePath.removePrefix("local://"))
 
     /**

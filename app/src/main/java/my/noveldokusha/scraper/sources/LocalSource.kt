@@ -43,7 +43,6 @@ import my.noveldokusha.network.tryConnect
 import my.noveldokusha.repository.AppFileResolver
 import my.noveldokusha.scraper.LocalSourcesDirectories
 import my.noveldokusha.scraper.SourceInterface
-import my.noveldokusha.tools.epub.addLocalPrefix
 import my.noveldokusha.tools.epub.epubCoverImporter
 import my.noveldokusha.tools.epub.epubCoverParser
 import my.noveldokusha.ui.theme.Grey25
@@ -111,6 +110,47 @@ class LocalSource(
         }
     }
 
+    private fun Uri.cursorRecursiveSearchAllFilesWithName(text: String): Sequence<BookMetadata> {
+        val rootURI = this
+        return appContext.contentResolver.query(
+            rootURI,
+            arrayOf(
+                DocumentsContract.Document.COLUMN_DISPLAY_NAME,
+                DocumentsContract.Document.COLUMN_DOCUMENT_ID,
+                DocumentsContract.Document.COLUMN_MIME_TYPE,
+            ),
+            null,
+            null,
+            null,
+        ).asSequence().flatMap {
+            val mime = it.getString(2)
+            // Query selector doesn't work for mime_type
+            if (mime !in validMIMES) return@flatMap emptySequence()
+
+            val id = it.getString(1)
+            when (mime) {
+                DocumentsContract.Document.MIME_TYPE_DIR -> {
+                    val fileURI = DocumentsContract.buildChildDocumentsUriUsingTree(rootURI, id)
+                    fileURI.cursorRecursiveSearchAllFilesWithName(text)
+                }
+                else -> {
+                    val fileName = it.getString(0)
+                    if (fileName.contains(text, ignoreCase = true)) {
+                        val fileURI = DocumentsContract.buildDocumentUriUsingTree(rootURI, id)
+                        sequenceOf(
+                            BookMetadata(
+                                title = fileName,
+                                url = fileURI.toString(),
+                            )
+                        )
+                    } else {
+                        sequenceOf()
+                    }
+                }
+            }
+        }
+    }
+
     override suspend fun getCatalogList(
         index: Int
     ): Response<PagedList<BookMetadata>> = withContext(Dispatchers.IO) {
@@ -136,30 +176,58 @@ class LocalSource(
         }
     }
 
-    private suspend fun addCover(bookMetadata: BookMetadata): BookMetadata {
+    private suspend fun addCover(
+        bookMetadata: BookMetadata
+    ): BookMetadata = withContext(Dispatchers.IO) {
+        val coverFile = appFileResolver.getLocalBookCoverFile(bookMetadata.title)
+        if (coverFile.exists()) {
+            return@withContext bookMetadata.copy(
+                coverImageUrl = coverFile.canonicalPath
+            )
+        }
+
         val inputStream = appContext.contentResolver.openInputStream(bookMetadata.url.toUri())
-            ?: return bookMetadata
+            ?: return@withContext bookMetadata
         val coverImage = inputStream.use { epubCoverParser(inputStream = inputStream) }
-            ?: return bookMetadata
+            ?: return@withContext bookMetadata
         epubCoverImporter(
             storageFolderName = bookMetadata.title,
             appFileResolver = appFileResolver,
             coverImage = coverImage,
         )
 
-        return bookMetadata.copy(
-            coverImageUrl = appFileResolver.resolvedBookImagePathString(
-                bookUrl = bookMetadata.title,
-                imagePath = coverImage.absoluteFilePath.addLocalPrefix()
-            )
+        bookMetadata.copy(
+            coverImageUrl = coverFile.canonicalPath
         )
     }
 
     override suspend fun getCatalogSearch(
         index: Int,
         input: String
-    ): Response<PagedList<BookMetadata>> {
-        TODO("Not yet implemented")
+    ): Response<PagedList<BookMetadata>> = withContext(Dispatchers.IO) {
+        if (index > 0) {
+            return@withContext Response.Success(PagedList.createEmpty(index))
+        }
+        tryConnect {
+            val files = localSourcesDirectories
+                .list
+                .asSequence()
+                .flatMap {
+                    DocumentsContract.buildChildDocumentsUriUsingTree(
+                        it, DocumentsContract.getTreeDocumentId(it)
+                    ).cursorRecursiveSearchAllFilesWithName(input)
+                }
+                .map { async { tryConnect { addCover(it) }.getOrNull() } }
+                .toList()
+                .awaitAll()
+                .filterNotNull()
+
+            PagedList(
+                list = files,
+                index = 0,
+                isLastPage = true
+            )
+        }
     }
 
     @Composable

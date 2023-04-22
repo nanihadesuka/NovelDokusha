@@ -45,11 +45,7 @@ suspend fun epubCoverImporter(
     appFileResolver: AppFileResolver,
     coverImage: EpubImage,
 ) = withContext(Dispatchers.IO) {
-    val imgFile = Paths.get(
-        appFileResolver.folderBooks.path,
-        storageFolderName,
-        coverImage.absoluteFilePath
-    ).toFile()
+    val imgFile = appFileResolver.getLocalBookCoverFile(storageFolderName)
     imgFile.parentFile?.also { parent ->
         parent.mkdirs()
         if (parent.exists()) {
