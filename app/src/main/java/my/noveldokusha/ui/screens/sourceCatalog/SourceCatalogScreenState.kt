@@ -8,7 +8,7 @@ import my.noveldokusha.network.PagedListIteratorState
 import my.noveldokusha.ui.composeViews.ToolbarMode
 
 data class SourceCatalogScreenState(
-    val sourceCatalogName: State<String>,
+    val sourceCatalogNameStrId: State<Int>,
     val searchTextInput: MutableState<String>,
     val fetchIterator: PagedListIteratorState<BookMetadata>,
     val toolbarMode: MutableState<ToolbarMode>,

@@ -25,7 +25,7 @@ import my.noveldokusha.databinding.ActivityReaderListItemProgressBarBinding
 import my.noveldokusha.databinding.ActivityReaderListItemSpecialTitleBinding
 import my.noveldokusha.databinding.ActivityReaderListItemTitleBinding
 import my.noveldokusha.databinding.ActivityReaderListItemTranslatingBinding
-import my.noveldokusha.resolvedBookImagePath
+import my.noveldokusha.repository.AppFileResolver
 import my.noveldokusha.tools.Utterance
 import my.noveldokusha.ui.screens.reader.features.TextSynthesis
 import my.noveldokusha.utils.inflater
@@ -44,6 +44,7 @@ class ReaderItemAdapter(
     private val onReloadReader: () -> Unit,
     private val onClick: () -> Unit,
 ) : ArrayAdapter<ReaderItem>(ctx, 0, list) {
+    val appFileResolver = AppFileResolver(ctx)
     override fun getCount() = super.getCount() + 2
     override fun getItem(position: Int): ReaderItem = when (position) {
         0 -> topPadding
@@ -142,7 +143,10 @@ class ReaderItemAdapter(
             dimensionRatio = "1:${item.image.yrel}"
         }
 
-        val imageModel = resolvedBookImagePath(ctx, bookUrl = bookUrl, imagePath = item.image.path)
+        val imageModel = appFileResolver.resolvedBookImagePath(
+            bookUrl = bookUrl,
+            imagePath = item.image.path
+        )
 
         // Glide uses current imageView size to load the bitmap best optimized for it, but current
         // size corresponds to the last image (different size) and the view layout only updates to

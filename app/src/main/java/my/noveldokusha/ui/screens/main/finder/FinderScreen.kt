@@ -72,7 +72,7 @@ fun FinderScreen(
                             )
                             LanguagesDropDown(
                                 expanded = languagesOptionsExpanded,
-                                sourceLanguageItemList = viewModel.languagesList,
+                                languageItemList = viewModel.languagesList,
                                 onDismiss = { languagesOptionsExpanded = false },
                                 onSourceLanguageItemToggle = { viewModel.toggleSourceLanguage(it.language) }
                             )

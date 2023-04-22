@@ -7,11 +7,12 @@ import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import my.noveldokusha.AppPreferences
 import my.noveldokusha.scraper.DatabaseInterface
+import my.noveldokusha.scraper.LanguageCode
 import my.noveldokusha.scraper.Scraper
 import my.noveldokusha.scraper.SourceInterface
 
-data class SourceLanguageItem(val language: String, val active: Boolean)
-data class SourceCatalogItem(val remoteCatalog: SourceInterface.RemoteCatalog, val pinned: Boolean)
+data class LanguageItem(val language: LanguageCode, val active: Boolean)
+data class CatalogItem(val catalog: SourceInterface.Catalog, val pinned: Boolean)
 
 class ScraperRepository(
     private val appPreferences: AppPreferences,
@@ -22,24 +23,26 @@ class ScraperRepository(
         return scraper.databasesList.toList()
     }
 
-    fun sourcesCatalogListFlow(): Flow<List<SourceCatalogItem>> {
+    fun sourcesCatalogListFlow(): Flow<List<CatalogItem>> {
         return combine(
-            appPreferences.SOURCES_LANGUAGES.flow(),
+            appPreferences.SOURCES_LANGUAGES_ISO639_1.flow(),
             appPreferences.FINDER_SOURCES_PINNED.flow()
         ) { activeLanguages, pinnedSourcesIds ->
-            scraper.sourcesListRemoteCatalog
-                .filter { it.language in activeLanguages }
-                .map { SourceCatalogItem(remoteCatalog = it, pinned = it.id in pinnedSourcesIds) }
+            scraper.sourcesCatalogsList
+                .filter { it.language == null || it.language?.iso639_1 in activeLanguages }
+                .map { CatalogItem(catalog = it, pinned = it.id in pinnedSourcesIds) }
                 .sortedByDescending { it.pinned }
         }.flowOn(Dispatchers.Default)
     }
 
-    fun sourcesLanguagesListFlow(): Flow<List<SourceLanguageItem>> {
-        return appPreferences.SOURCES_LANGUAGES.flow()
+    fun sourcesLanguagesListFlow(): Flow<List<LanguageItem>> {
+        return appPreferences.SOURCES_LANGUAGES_ISO639_1.flow()
             .map { activeLanguages ->
                 scraper
-                    .sourcesLanguages
-                    .map { SourceLanguageItem(it, active = activeLanguages.contains(it)) }
+                    .sourcesCatalogsLanguagesList
+                    .map {
+                        LanguageItem(it, active = activeLanguages.contains(it.iso639_1))
+                    }
             }
     }
 }

@@ -52,3 +52,18 @@
 
 # @Serializable and @Polymorphic are used at runtime for polymorphic serialization.
 -keepattributes RuntimeVisibleAnnotations,AnnotationDefault
+
+-dontwarn org.slf4j.impl.StaticLoggerBinder
+
+-assumenosideeffects class android.util.Log {
+    public static boolean isLoggable(java.lang.String, int);
+    public static int d(...);
+    public static int v(...);
+    public static int i(...);
+}
+
+-assumenosideeffects class timber.log.Timber* {
+    public static *** d(...);
+    public static *** v(...);
+    public static *** i(...);
+}

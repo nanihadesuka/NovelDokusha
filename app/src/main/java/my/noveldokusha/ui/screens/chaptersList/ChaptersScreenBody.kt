@@ -19,10 +19,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.distinctUntilChanged
+import my.noveldokusha.R
 import my.noveldokusha.data.ChapterWithContext
 import my.noveldokusha.ui.composeViews.ErrorView
 
@@ -49,7 +51,7 @@ fun ChaptersScreenBody(
 
     val pullRefreshState = rememberPullRefreshState(
         refreshing = isRefreshingDelayed,
-        onRefresh = onPullRefresh
+        onRefresh = onPullRefresh,
     )
 
     Box(
@@ -65,7 +67,9 @@ fun ChaptersScreenBody(
             ) {
                 ChaptersScreenHeader(
                     bookState = state.book.value,
-                    sourceCatalogName = state.sourceCatalogName.value,
+                    sourceCatalogName = stringResource(
+                        id = state.sourceCatalogNameStrRes.value ?: R.string.invalid_source
+                    ),
                     numberOfChapters = state.chapters.size,
                     paddingValues = innerPadding,
                     modifier = Modifier.padding(bottom = 12.dp)

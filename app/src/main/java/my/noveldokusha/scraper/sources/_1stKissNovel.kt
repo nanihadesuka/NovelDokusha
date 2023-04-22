@@ -2,6 +2,7 @@ package my.noveldokusha.scraper.sources
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import my.noveldokusha.R
 import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.data.ChapterMetadata
 import my.noveldokusha.data.Response
@@ -9,6 +10,7 @@ import my.noveldokusha.network.NetworkClient
 import my.noveldokusha.network.PagedList
 import my.noveldokusha.network.postRequest
 import my.noveldokusha.network.tryConnect
+import my.noveldokusha.scraper.LanguageCode
 import my.noveldokusha.scraper.SourceInterface
 import my.noveldokusha.scraper.TextExtractor
 import my.noveldokusha.utils.add
@@ -20,14 +22,13 @@ import org.jsoup.nodes.Document
 
 class _1stKissNovel(
     private val networkClient: NetworkClient
-) : SourceInterface.RemoteCatalog {
+) : SourceInterface.Catalog {
     override val id = "1stkissnovel"
-    override val name = "1stKissNovel"
+    override val nameStrId = R.string.source_name_1stkissnovel
     override val catalogUrl = "https://1stkissnovel.love/novel/?m_orderby=alphabet"
     override val baseUrl = "https://1stkissnovel.love/"
-    override val iconUrl =
-        "https://1stkissnovel.love/wp-content/uploads/2020/10/cropped-HINH-NEN-3-1-32x32.png"
-    override val language = "English"
+    override val iconUrl = "https://1stkissnovel.org/wp-content/uploads/2023/04/cropped-Im-3-32x32.png"
+    override val language = LanguageCode.ENGLISH
 
 
     override suspend fun getBookCoverImageUrl(

@@ -3,6 +3,7 @@ package my.noveldokusha.scraper.sources
 import com.google.gson.JsonParser
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import my.noveldokusha.R
 import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.data.ChapterMetadata
 import my.noveldokusha.data.Response
@@ -11,6 +12,7 @@ import my.noveldokusha.network.PagedList
 import my.noveldokusha.network.postPayload
 import my.noveldokusha.network.postRequest
 import my.noveldokusha.network.tryConnect
+import my.noveldokusha.scraper.LanguageCode
 import my.noveldokusha.scraper.SourceInterface
 import my.noveldokusha.scraper.TextExtractor
 import my.noveldokusha.utils.addPath
@@ -29,14 +31,14 @@ import org.jsoup.nodes.Document
  */
 class LightNovelWorld(
     private val networkClient: NetworkClient
-) : SourceInterface.RemoteCatalog {
+) : SourceInterface.Catalog {
     override val id = "light_novel_world"
-    override val name = "Light Novel World"
+    override val nameStrId = R.string.source_name_light_novel_world
     override val baseUrl = "https://www.lightnovelworld.com/"
     override val catalogUrl = "https://www.lightnovelworld.com/genre/all/popular/all/"
     override val iconUrl =
         "https://static.lightnovelworld.com/content/img/lightnovelworld/favicon.png"
-    override val language = "English"
+    override val language = LanguageCode.ENGLISH
 
     override suspend fun getChapterText(doc: Document): String = withContext(Dispatchers.Default) {
         doc.selectFirst("#chapter-container")?.let(TextExtractor::get) ?: ""

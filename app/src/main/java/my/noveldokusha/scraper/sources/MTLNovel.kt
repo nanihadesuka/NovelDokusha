@@ -3,6 +3,7 @@ package my.noveldokusha.scraper.sources
 import com.google.gson.JsonParser
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import my.noveldokusha.R
 import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.data.ChapterMetadata
 import my.noveldokusha.data.Response
@@ -10,6 +11,7 @@ import my.noveldokusha.network.NetworkClient
 import my.noveldokusha.network.PagedList
 import my.noveldokusha.network.getRequest
 import my.noveldokusha.network.tryConnect
+import my.noveldokusha.scraper.LanguageCode
 import my.noveldokusha.scraper.SourceInterface
 import my.noveldokusha.scraper.TextExtractor
 import my.noveldokusha.utils.add
@@ -21,12 +23,12 @@ import org.jsoup.nodes.Document
 
 class MTLNovel(
     private val networkClient: NetworkClient
-) : SourceInterface.RemoteCatalog {
+) : SourceInterface.Catalog {
     override val id = "mtlnovel"
-    override val name = "MTLNovel"
+    override val nameStrId = R.string.source_name_mtlnovel
     override val baseUrl = "https://www.mtlnovel.com/"
     override val catalogUrl = "https://www.mtlnovel.com/alltime-rank/"
-    override val language = "English"
+    override val language = LanguageCode.ENGLISH
 
     override suspend fun getChapterTitle(doc: Document): String? = null
 

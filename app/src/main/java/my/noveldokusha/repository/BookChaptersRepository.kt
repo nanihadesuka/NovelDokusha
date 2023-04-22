@@ -1,5 +1,7 @@
 package my.noveldokusha.repository
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import my.noveldokusha.data.database.AppDatabaseOperations
 import my.noveldokusha.data.database.DAOs.ChapterDao
 import my.noveldokusha.data.database.tables.Chapter
@@ -8,9 +10,6 @@ class BookChaptersRepository(
     private val chapterDao: ChapterDao,
     private val operations: AppDatabaseOperations
 ) {
-    fun numberOfUnreadChaptersFlow(bookUrl: String) =
-        chapterDao.numberOfUnreadChaptersFlow(bookUrl)
-
     suspend fun update(chapter: Chapter) = chapterDao.update(chapter)
     suspend fun updatePosition(chapterUrl: String, lastReadPosition: Int, lastReadOffset: Int) =
         chapterDao.updatePosition(
@@ -46,7 +45,7 @@ class BookChaptersRepository(
     fun getChaptersWithContextFlow(bookUrl: String) =
         chapterDao.getChaptersWithContextFlow(bookUrl)
 
-    suspend fun merge(newChapters: List<Chapter>, bookUrl: String) {
+    suspend fun merge(newChapters: List<Chapter>, bookUrl: String) = withContext(Dispatchers.IO){
         val current = chapters(bookUrl).associateBy { it.url }.toMutableMap()
         for (chapter in newChapters)
             current.merge(

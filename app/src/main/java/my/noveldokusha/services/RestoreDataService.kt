@@ -17,6 +17,7 @@ import kotlinx.coroutines.withContext
 import my.noveldokusha.R
 import my.noveldokusha.data.database.AppDatabase
 import my.noveldokusha.network.NetworkClient
+import my.noveldokusha.repository.AppFileResolver
 import my.noveldokusha.repository.BookChaptersRepository
 import my.noveldokusha.repository.ChapterBodyRepository
 import my.noveldokusha.repository.LibraryBooksRepository
@@ -52,6 +53,9 @@ class RestoreDataService : Service() {
 
     @Inject
     lateinit var networkClient: NetworkClient
+
+    @Inject
+    lateinit var appFileResolver: AppFileResolver
 
     @Inject
     lateinit var toasty: Toasty
@@ -110,7 +114,7 @@ class RestoreDataService : Service() {
 
             stopSelf(startId)
         }
-        return START_NOT_STICKY
+        return START_STICKY
     }
 
     /**
@@ -161,18 +165,19 @@ class RestoreDataService : Service() {
                         db = newDatabase,
                         context = context,
                         name = "temp_database",
-                        bookChaptersRepository = bookChaptersRepository,
-                        chapterBodyRepository = ChapterBodyRepository(
+                        bookChapters = bookChaptersRepository,
+                        chapterBody = ChapterBodyRepository(
                             chapterBodyDao = newDatabase.chapterBodyDao(),
                             operations = newDatabase,
                             bookChaptersRepository = bookChaptersRepository,
                             scraper = scraper,
                             networkClient = networkClient
                         ),
-                        libraryBooksRepository = LibraryBooksRepository(
+                        libraryBooks = LibraryBooksRepository(
                             libraryDao = newDatabase.libraryDao(),
                             operations = newDatabase
-                        )
+                        ),
+                        appFileResolver = appFileResolver
                     )
                 }
                 notificationsCenter.modifyNotification(builder, channel_id) {

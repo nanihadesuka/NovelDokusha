@@ -60,7 +60,7 @@ fun DatabaseBookInfoScreen(
                     ),
                     title = {
                         Text(
-                            text = state.databaseName.value,
+                            text = stringResource(id = state.databaseNameStrId.value),
                             style = MaterialTheme.typography.titleSmall
                         )
                     },
@@ -97,7 +97,7 @@ fun DatabaseBookInfoScreen(
 private fun PreviewView() {
     val state = remember {
         DatabaseBookInfoState(
-            databaseName = mutableStateOf("Name"),
+            databaseNameStrId = mutableStateOf(R.string.database_name_baka_updates),
             book = DatabaseInterface.BookData(
                 title = "Novel title",
                 description = "Novel description goes here and here to and a little more to fill lines",

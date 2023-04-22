@@ -3,6 +3,7 @@ package my.noveldokusha.scraper.databases
 import android.net.Uri
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import my.noveldokusha.R
 import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.data.Response
 import my.noveldokusha.data.Response.Success
@@ -26,7 +27,7 @@ class NovelUpdates(
     private val networkClient: NetworkClient
 ) : DatabaseInterface {
     override val id = "novel_updates"
-    override val name = "Novel Updates"
+    override val nameStrId = R.string.database_name_novel_updates
     override val baseUrl = "https://www.novelupdates.com/"
     override val iconUrl = "https://www.novelupdates.com/favicon.ico"
 

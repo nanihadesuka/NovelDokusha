@@ -1,6 +1,7 @@
 package my.noveldokusha.composableActions
 
 import android.Manifest
+import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
@@ -26,6 +27,22 @@ fun onDoImportEPUB(): () -> Unit {
         showDeniedPermissionDialog.value = !isGranted
         if (isGranted) {
             fileExplorer.launch("application/epub+zip")
+        }
+    }
+
+    return { permissions.launch(Manifest.permission.READ_EXTERNAL_STORAGE) }
+}
+
+@Composable
+fun onDoImportEPUBWithUri(uri: Uri): () -> Unit {
+    val context = LocalContext.current
+    val showDeniedPermissionDialog = rememberPermissionsDeniedDialog()
+    val permissions = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission(),
+    ) { isGranted ->
+        showDeniedPermissionDialog.value = !isGranted
+        if (isGranted) {
+            EpubImportService.start(ctx = context, uri = uri)
         }
     }
 

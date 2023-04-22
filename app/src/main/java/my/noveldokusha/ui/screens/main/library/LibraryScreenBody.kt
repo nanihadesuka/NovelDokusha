@@ -36,12 +36,15 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.coroutines.launch
+import my.noveldokusha.R
 import my.noveldokusha.data.BookWithContext
-import my.noveldokusha.rememberResolvedBookImagePath
+import my.noveldokusha.isLocalUri
+import my.noveldokusha.repository.rememberResolvedBookImagePath
 import my.noveldokusha.ui.composeViews.BookImageButtonView
 import my.noveldokusha.ui.composeViews.CollapsibleDivider
 import my.noveldokusha.ui.theme.ColorAccent
@@ -178,6 +181,16 @@ private fun LibraryPageBody(
                             .padding(4.dp)
                     )
                 }
+
+                if (it.book.url.isLocalUri) Text(
+                    text = stringResource(R.string.local),
+                    color = Color.White,
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .padding(8.dp)
+                        .background(ColorAccent, ImageBorderShape)
+                        .padding(4.dp)
+                )
             }
         }
     }

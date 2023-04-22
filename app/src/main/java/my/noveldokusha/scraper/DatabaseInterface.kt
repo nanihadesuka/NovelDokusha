@@ -1,5 +1,6 @@
 package my.noveldokusha.scraper
 
+import androidx.annotation.StringRes
 import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.data.Response
 import my.noveldokusha.network.PagedList
@@ -9,7 +10,9 @@ data class SearchGenre(val id: String, val genreName: String)
 interface DatabaseInterface {
 
     val id: String
-    val name: String
+
+    @get:StringRes
+    val nameStrId: Int
     val baseUrl: String
     val iconUrl: String get() = "$baseUrl/favicon.ico"
 

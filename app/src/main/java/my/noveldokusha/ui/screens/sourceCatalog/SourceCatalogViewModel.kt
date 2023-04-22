@@ -37,7 +37,7 @@ class SourceCatalogViewModel @Inject constructor(
     private val source = scraper.getCompatibleSourceCatalog(sourceBaseUrl)!!
 
     val state = SourceCatalogScreenState(
-        sourceCatalogName = mutableStateOf(source.name),
+        sourceCatalogNameStrId = mutableStateOf(source.nameStrId),
         searchTextInput = stateHandle.asMutableStateOf("searchTextInput") { "" },
         toolbarMode = stateHandle.asMutableStateOf("toolbarMode") { ToolbarMode.MAIN },
         fetchIterator = PagedListIteratorState(viewModelScope) { source.getCatalogList(it) },
@@ -62,7 +62,7 @@ class SourceCatalogViewModel @Inject constructor(
 
     fun addToLibraryToggle(book: BookMetadata) = viewModelScope.launch(Dispatchers.IO)
     {
-        repository.libraryBooks.toggleBookmark(book)
+        repository.toggleBookmark(bookUrl = book.url, bookTitle = book.title)
         val isInLibrary = repository.libraryBooks.existInLibrary(book.url)
         val res = if (isInLibrary) R.string.added_to_library else R.string.removed_from_library
         toasty.show(res)

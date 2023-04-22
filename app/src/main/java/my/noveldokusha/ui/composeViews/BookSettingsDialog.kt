@@ -24,7 +24,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import my.noveldokusha.R
 import my.noveldokusha.data.database.tables.Book
-import my.noveldokusha.rememberResolvedBookImagePath
+import my.noveldokusha.repository.rememberResolvedBookImagePath
 import my.noveldokusha.ui.screens.main.library.LibraryViewModel
 import my.noveldokusha.ui.theme.ImageBorderShape
 import my.noveldokusha.ui.theme.colorApp

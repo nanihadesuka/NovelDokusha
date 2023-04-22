@@ -2,6 +2,7 @@ package my.noveldokusha.scraper.sources
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import my.noveldokusha.R
 import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.data.ChapterMetadata
 import my.noveldokusha.data.Response
@@ -10,6 +11,7 @@ import my.noveldokusha.network.PagedList
 import my.noveldokusha.network.postPayload
 import my.noveldokusha.network.postRequest
 import my.noveldokusha.network.tryConnect
+import my.noveldokusha.scraper.LanguageCode
 import my.noveldokusha.scraper.SourceInterface
 import my.noveldokusha.scraper.TextExtractor
 import my.noveldokusha.utils.addPath
@@ -25,12 +27,12 @@ import org.jsoup.nodes.Document
  */
 class ReadLightNovel(
     private val networkClient: NetworkClient
-) : SourceInterface.RemoteCatalog {
+) : SourceInterface.Catalog {
     override val id = "read_light_novel"
-    override val name = "Read Light Novel"
+    override val nameStrId = R.string.source_name_read_light_novel
     override val baseUrl = "https://www.readlightnovel.me/"
     override val catalogUrl = "https://www.readlightnovel.me/top-novels/new/1"
-    override val language = "English"
+    override val language = LanguageCode.ENGLISH
 
     override suspend fun getChapterTitle(doc: Document): String? =
         withContext(Dispatchers.Default) {

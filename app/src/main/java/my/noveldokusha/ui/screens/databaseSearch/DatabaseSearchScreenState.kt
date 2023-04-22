@@ -8,7 +8,7 @@ import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.network.PagedListIteratorState
 
 data class DatabaseSearchScreenState(
-    val databaseName: State<String>,
+    val databaseNameStrId: State<Int>,
     val searchMode: MutableState<SearchMode>,
     val searchTextInput: MutableState<String>,
     val genresList: SnapshotStateList<GenreItem>,

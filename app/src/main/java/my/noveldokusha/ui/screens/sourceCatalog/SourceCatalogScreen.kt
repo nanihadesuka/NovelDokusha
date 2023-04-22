@@ -77,7 +77,7 @@ fun SourceCatalogScreen(
                             title = {
                                 Column {
                                     Text(
-                                        text = state.sourceCatalogName.value,
+                                        text = stringResource(id = state.sourceCatalogNameStrId.value),
                                         style = MaterialTheme.typography.headlineSmall,
                                         maxLines = 1
                                     )

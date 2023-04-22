@@ -17,6 +17,7 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import my.noveldokusha.scraper.LanguageCode
 import my.noveldokusha.utils.*
 import javax.inject.Inject
 
@@ -100,8 +101,12 @@ class AppPreferences @Inject constructor(
             TERNARY_STATE.active
         ) { enumValueOf(it) }
     }
-    val SOURCES_LANGUAGES = object : Preference<Set<String>>("SOURCES_LANGUAGES") {
-        override var value by SharedPreference_StringSet(name, preferences, setOf("English"))
+    val SOURCES_LANGUAGES_ISO639_1 = object : Preference<Set<String>>("SOURCES_LANGUAGES") {
+        override var value by SharedPreference_StringSet(
+            name,
+            preferences,
+            setOf(LanguageCode.ENGLISH.iso639_1)
+        )
     }
     val FINDER_SOURCES_PINNED = object : Preference<Set<String>>("FINDER_SOURCES_PINNED") {
         override var value by SharedPreference_StringSet(name, preferences, setOf())
@@ -137,6 +142,11 @@ class AppPreferences @Inject constructor(
     val GLOBAL_TRANSLATION_PREFERRED_TARGET =
         object : Preference<String>("GLOBAL_TRANSLATION_PREFERRED_TARGET") {
             override var value by SharedPreference_String(name, preferences, "")
+        }
+
+    val LOCAL_SOURCES_URI_DIRECTORIES =
+        object : Preference<Set<String>>("LOCAL_SOURCES_URI_DIRECTORIES") {
+            override var value by SharedPreference_StringSet(name, preferences, setOf())
         }
 
     enum class TERNARY_STATE {

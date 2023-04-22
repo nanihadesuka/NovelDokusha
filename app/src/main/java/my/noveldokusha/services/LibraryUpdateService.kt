@@ -132,7 +132,7 @@ class LibraryUpdateService : Service() {
 
             stopSelf(startId)
         }
-        return START_NOT_STICKY
+        return START_STICKY
     }
 
     /**
@@ -196,9 +196,7 @@ class LibraryUpdateService : Service() {
                 when (val res = downloadChaptersList(scraper, book.url)) {
                     is Response.Success -> {
                         oldChaptersList.join()
-                        launch(Dispatchers.IO) {
-                            repository.bookChapters.merge(res.data, book.url)
-                        }
+                        repository.bookChapters.merge(res.data, book.url)
                         val hasNewChapters = res.data.any { it.url !in oldChaptersList.await() }
                         if (hasNewChapters)
                             hasUpdates.add(book.title)

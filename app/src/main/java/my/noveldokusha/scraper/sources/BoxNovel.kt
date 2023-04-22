@@ -2,6 +2,7 @@ package my.noveldokusha.scraper.sources
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import my.noveldokusha.R
 import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.data.ChapterMetadata
 import my.noveldokusha.data.Response
@@ -9,6 +10,7 @@ import my.noveldokusha.network.NetworkClient
 import my.noveldokusha.network.PagedList
 import my.noveldokusha.network.postRequest
 import my.noveldokusha.network.tryConnect
+import my.noveldokusha.scraper.LanguageCode
 import my.noveldokusha.scraper.SourceInterface
 import my.noveldokusha.scraper.TextExtractor
 import my.noveldokusha.utils.add
@@ -19,13 +21,13 @@ import my.noveldokusha.utils.toUrlBuilderSafe
 
 class BoxNovel(
     private val networkClient: NetworkClient
-) : SourceInterface.RemoteCatalog {
+) : SourceInterface.Catalog {
     override val id = "box_novel"
-    override val name = "Box Novel"
+    override val nameStrId = R.string.source_name_box_novel
     override val baseUrl = "https://boxnovel.com/"
     override val catalogUrl = "https://boxnovel.com/novel/?m_orderby=alphabet"
     override val iconUrl = "https://boxnovel.com/wp-content/uploads/2018/04/box-icon-150x150.png"
-    override val language = "English"
+    override val language = LanguageCode.ENGLISH
 
     override suspend fun getBookCoverImageUrl(
         bookUrl: String

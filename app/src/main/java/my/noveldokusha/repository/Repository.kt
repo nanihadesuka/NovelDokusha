@@ -1,6 +1,7 @@
 package my.noveldokusha.repository
 
 import android.content.Context
+import androidx.core.net.toUri
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -8,24 +9,52 @@ import kotlinx.coroutines.withContext
 import my.noveldokusha.data.database.AppDatabase
 import my.noveldokusha.data.database.tables.Book
 import my.noveldokusha.data.database.tables.Chapter
-import my.noveldokusha.folderBooks
+import my.noveldokusha.isContentUri
+import my.noveldokusha.tools.epub.epubImporter
+import my.noveldokusha.tools.epub.epubParser
+import my.noveldokusha.tools.epub.urlIfContent
+import my.noveldokusha.utils.tryAsResponse
 import javax.inject.Inject
 
 class Repository @Inject constructor(
     private val db: AppDatabase,
     @ApplicationContext private val context: Context,
     val name: String,
-    private val libraryBooksRepository: LibraryBooksRepository,
-    private val bookChaptersRepository: BookChaptersRepository,
-    private val chapterBodyRepository: ChapterBodyRepository,
+    val libraryBooks: LibraryBooksRepository,
+    val bookChapters: BookChaptersRepository,
+    val chapterBody: ChapterBodyRepository,
+    val appFileResolver: AppFileResolver,
 ) {
-
-    val libraryBooks = libraryBooksRepository
-    val bookChapters = bookChaptersRepository
-    val chapterBody = chapterBodyRepository
-
     val settings = Settings()
     val eventDataRestored = MutableSharedFlow<Unit>()
+
+    suspend fun toggleBookmark(bookUrl: String, bookTitle: String) {
+        val realUrl = bookUrl.urlIfContent(bookTitle)
+        if (bookUrl.isContentUri && libraryBooks.get(realUrl) == null) {
+            importEpubFromContentUri(
+                contentUri = bookUrl,
+                bookTitle = bookTitle,
+                addToLibrary = false
+            )
+        }
+        libraryBooks.toggleBookmark(bookUrl = realUrl, bookTitle = bookTitle)
+    }
+
+    suspend fun importEpubFromContentUri(
+        contentUri: String,
+        bookTitle: String,
+        addToLibrary: Boolean = false
+    ) = tryAsResponse {
+        val inputStream = context.contentResolver.openInputStream(contentUri.toUri())
+            ?: return@tryAsResponse
+        val epub = inputStream.use { epubParser(inputStream = inputStream) }
+        epubImporter(
+            storageFolderName = bookTitle,
+            repository = this,
+            epub = epub,
+            addToLibrary = addToLibrary
+        )
+    }
 
     suspend fun getDatabaseSizeBytes() = withContext(Dispatchers.IO) {
         context.getDatabasePath(name).length()
@@ -52,7 +81,7 @@ class Repository @Inject constructor(
          * Each subfolder must be an unique folder for each book.
          * Each book folder can have an arbitrary structure internally.
          */
-        val folderBooks = context.folderBooks
+        val folderBooks = appFileResolver.folderBooks
     }
 
 }
