@@ -15,6 +15,7 @@ import my.noveldokusha.data.database.AppDatabase
 import my.noveldokusha.data.database.AppDatabaseOperations
 import my.noveldokusha.network.NetworkClient
 import my.noveldokusha.network.ScraperNetworkClient
+import my.noveldokusha.repository.AppFileResolver
 import my.noveldokusha.repository.BookChaptersRepository
 import my.noveldokusha.repository.ChapterBodyRepository
 import my.noveldokusha.repository.LibraryBooksRepository
@@ -57,6 +58,7 @@ abstract class AppModule {
             libraryBooksRepository: LibraryBooksRepository,
             bookChaptersRepository: BookChaptersRepository,
             chapterBodyRepository: ChapterBodyRepository,
+            appFileResolver: AppFileResolver,
         ): Repository {
             return Repository(
                 database,
@@ -65,6 +67,7 @@ abstract class AppModule {
                 libraryBooksRepository,
                 bookChaptersRepository,
                 chapterBodyRepository,
+                appFileResolver
             )
         }
 
@@ -72,6 +75,12 @@ abstract class AppModule {
         @Singleton
         fun provideAppDatabaseOperations(database: AppDatabase): AppDatabaseOperations {
             return database
+        }
+
+        @Provides
+        @Singleton
+        fun provideAppFileResolver(@ApplicationContext context: Context): AppFileResolver {
+            return AppFileResolver(context = context)
         }
 
         @Provides

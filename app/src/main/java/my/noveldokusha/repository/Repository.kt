@@ -6,14 +6,13 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.withContext
-import my.noveldokusha.createEpubBook
 import my.noveldokusha.data.database.AppDatabase
 import my.noveldokusha.data.database.tables.Book
 import my.noveldokusha.data.database.tables.Chapter
-import my.noveldokusha.folderBooks
-import my.noveldokusha.importEpubToRepository
 import my.noveldokusha.isContentUri
-import my.noveldokusha.urlIfContent
+import my.noveldokusha.tools.epub.epubImporter
+import my.noveldokusha.tools.epub.epubParser
+import my.noveldokusha.tools.epub.urlIfContent
 import my.noveldokusha.utils.tryAsResponse
 import javax.inject.Inject
 
@@ -24,6 +23,7 @@ class Repository @Inject constructor(
     val libraryBooks: LibraryBooksRepository,
     val bookChapters: BookChaptersRepository,
     val chapterBody: ChapterBodyRepository,
+    val appFileResolver: AppFileResolver,
 ) {
     val settings = Settings()
     val eventDataRestored = MutableSharedFlow<Unit>()
@@ -47,10 +47,9 @@ class Repository @Inject constructor(
     ) = tryAsResponse {
         val inputStream = context.contentResolver.openInputStream(contentUri.toUri())
             ?: return@tryAsResponse
-        val epub = inputStream.use {
-            createEpubBook(fileName = bookTitle, inputStream = inputStream)
-        }
-        importEpubToRepository(
+        val epub = inputStream.use { epubParser(inputStream = inputStream) }
+        epubImporter(
+            storageFolderName = bookTitle,
             repository = this,
             epub = epub,
             addToLibrary = addToLibrary
@@ -82,7 +81,7 @@ class Repository @Inject constructor(
          * Each subfolder must be an unique folder for each book.
          * Each book folder can have an arbitrary structure internally.
          */
-        val folderBooks = context.folderBooks
+        val folderBooks = appFileResolver.folderBooks
     }
 
 }

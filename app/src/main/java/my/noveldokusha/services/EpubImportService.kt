@@ -14,9 +14,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import my.noveldokusha.R
-import my.noveldokusha.createEpubBook
-import my.noveldokusha.importEpubToRepository
 import my.noveldokusha.repository.Repository
+import my.noveldokusha.tools.epub.epubImporter
+import my.noveldokusha.tools.epub.epubParser
 import my.noveldokusha.utils.Extra_Uri
 import my.noveldokusha.utils.NotificationsCenter
 import my.noveldokusha.utils.asSequence
@@ -101,14 +101,17 @@ class EpubImportService : Service() {
                     null
                 ).asSequence().map { it.getString(0) }.last()
 
-                val epub = inputStream.use {
-                    createEpubBook(fileName = fileName, inputStream = it)
-                }
+                val epub = inputStream.use { epubParser(inputStream = it) }
 
                 notificationsCenter.modifyNotification(notificationBuilder, channel_id) {
                     text = getString(R.string.importing_epub)
                 }
-                importEpubToRepository(repository = repository, epub = epub, addToLibrary = true)
+                epubImporter(
+                    storageFolderName = fileName,
+                    repository = repository,
+                    epub = epub,
+                    addToLibrary = true
+                )
 
                 notificationsCenter.modifyNotification(notificationBuilder, channel_id) {
                     text = getString(R.string.epub_added_to_library)

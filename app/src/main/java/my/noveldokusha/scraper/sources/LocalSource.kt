@@ -25,9 +25,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.core.net.toUri
 import androidx.documentfile.provider.DocumentFile
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.withContext
 import my.noveldokusha.R
 import my.noveldokusha.composableActions.onDoAddLocalSourceDirectory
@@ -36,15 +39,20 @@ import my.noveldokusha.data.ChapterMetadata
 import my.noveldokusha.data.Response
 import my.noveldokusha.network.PagedList
 import my.noveldokusha.network.tryConnect
+import my.noveldokusha.repository.AppFileResolver
 import my.noveldokusha.scraper.LocalSourcesDirectories
 import my.noveldokusha.scraper.SourceInterface
+import my.noveldokusha.tools.epub.addLocalPrefix
+import my.noveldokusha.tools.epub.epubCoverImporter
+import my.noveldokusha.tools.epub.epubCoverParser
 import my.noveldokusha.ui.theme.Grey25
 import my.noveldokusha.utils.asSequence
 import my.noveldokusha.utils.textPadding
 
 class LocalSource(
     @ApplicationContext private val appContext: Context,
-    private val localSourcesDirectories: LocalSourcesDirectories
+    private val localSourcesDirectories: LocalSourcesDirectories,
+    private val appFileResolver: AppFileResolver,
 ) : SourceInterface.Catalog, SourceInterface.Configurable {
     override val id: String = "local_source"
     override val name: String = "Local"
@@ -114,13 +122,35 @@ class LocalSource(
                         it, DocumentsContract.getTreeDocumentId(it)
                     ).cursorRecursiveGetAllFiles()
                 }
+                .map { async { addCover(it) } }
+                .toList()
+                .awaitAll()
 
             PagedList(
-                list = files.toList(),
+                list = files,
                 index = 0,
                 isLastPage = true
             )
         }
+    }
+
+    private suspend fun addCover(bookMetadata: BookMetadata): BookMetadata {
+        val inputStream = appContext.contentResolver.openInputStream(bookMetadata.url.toUri())
+            ?: return bookMetadata
+        val coverImage = inputStream.use { epubCoverParser(inputStream = inputStream) }
+            ?: return bookMetadata
+        epubCoverImporter(
+            storageFolderName = bookMetadata.title,
+            appFileResolver = appFileResolver,
+            coverImage = coverImage,
+        )
+
+        return bookMetadata.copy(
+            coverImageUrl = appFileResolver.resolvedBookImagePathString(
+                bookUrl = bookMetadata.title,
+                imagePath = coverImage.absoluteFilePath.addLocalPrefix()
+            )
+        )
     }
 
     override suspend fun getCatalogSearch(

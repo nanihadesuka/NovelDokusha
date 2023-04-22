@@ -44,7 +44,7 @@ import kotlinx.coroutines.launch
 import my.noveldokusha.R
 import my.noveldokusha.data.BookWithContext
 import my.noveldokusha.isLocalUri
-import my.noveldokusha.rememberResolvedBookImagePath
+import my.noveldokusha.repository.rememberResolvedBookImagePath
 import my.noveldokusha.ui.composeViews.BookImageButtonView
 import my.noveldokusha.ui.composeViews.CollapsibleDivider
 import my.noveldokusha.ui.theme.ColorAccent

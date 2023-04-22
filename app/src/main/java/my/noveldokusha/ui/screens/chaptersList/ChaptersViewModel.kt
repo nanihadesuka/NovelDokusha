@@ -20,7 +20,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import my.noveldokusha.AppPreferences
 import my.noveldokusha.R
-import my.noveldokusha.addLocalPrefix
 import my.noveldokusha.data.ChapterWithContext
 import my.noveldokusha.data.database.tables.Book
 import my.noveldokusha.di.AppCoroutineScope
@@ -32,6 +31,7 @@ import my.noveldokusha.scraper.Scraper
 import my.noveldokusha.scraper.downloadBookCoverImageUrl
 import my.noveldokusha.scraper.downloadBookDescription
 import my.noveldokusha.scraper.downloadChaptersList
+import my.noveldokusha.tools.epub.addLocalPrefix
 import my.noveldokusha.ui.BaseViewModel
 import my.noveldokusha.ui.Toasty
 import my.noveldokusha.utils.StateExtra_String

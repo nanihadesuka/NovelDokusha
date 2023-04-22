@@ -3,6 +3,7 @@ package my.noveldokusha.scraper
 import android.content.Context
 import dagger.hilt.android.qualifiers.ApplicationContext
 import my.noveldokusha.network.NetworkClient
+import my.noveldokusha.repository.AppFileResolver
 import my.noveldokusha.scraper.databases.BakaUpdates
 import my.noveldokusha.scraper.databases.NovelUpdates
 import my.noveldokusha.scraper.sources.AT
@@ -29,7 +30,8 @@ import javax.inject.Singleton
 class Scraper @Inject constructor(
     networkClient: NetworkClient,
     @ApplicationContext appContext: Context,
-    localSourcesDirectories: LocalSourcesDirectories
+    localSourcesDirectories: LocalSourcesDirectories,
+    appFileResolver: AppFileResolver,
 ) {
     val databasesList = setOf<DatabaseInterface>(
         NovelUpdates(networkClient),
@@ -37,7 +39,7 @@ class Scraper @Inject constructor(
     )
 
     val sourcesList = setOf<SourceInterface>(
-        LocalSource(appContext, localSourcesDirectories),
+        LocalSource(appContext, localSourcesDirectories, appFileResolver),
         LightNovelsTranslations(networkClient),
         ReadLightNovel(networkClient),
         ReadNovelFull(networkClient),

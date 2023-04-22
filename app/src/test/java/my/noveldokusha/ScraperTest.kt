@@ -1,38 +1,47 @@
 package my.noveldokusha
 
+import android.content.Context
 import my.noveldokusha.network.NetworkClient
+import my.noveldokusha.repository.AppFileResolver
+import my.noveldokusha.scraper.LocalSourcesDirectories
 import my.noveldokusha.scraper.Scraper
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.Mock
 import org.mockito.junit.MockitoJUnitRunner
+import org.mockito.kotlin.mock
 
 @RunWith(MockitoJUnitRunner::class)
 class ScraperTest {
 
-    // DATABASES TEST
+    val networkClient: NetworkClient = mock()
+    val appContext: Context = mock()
+    val localSourcesDirectories: LocalSourcesDirectories = mock()
+    val appFileResolver: AppFileResolver = mock()
 
-    @Mock
-    lateinit var networkClient: NetworkClient
-
-    private lateinit var scraper: Scraper
+    private val sut = Scraper(
+        networkClient = networkClient,
+        appContext = appContext,
+        localSourcesDirectories = localSourcesDirectories,
+        appFileResolver = appFileResolver
+    )
 
     @Before
     fun setup() {
-        scraper = Scraper(networkClient = networkClient)
     }
+
+    // DATABASES TEST
 
     @Test
     fun `databaseList items are compatible`() {
-        for (database in scraper.databasesList)
-            assertNotNull(scraper.getCompatibleDatabase(database.baseUrl))
+        for (database in sut.databasesList)
+            assertNotNull(sut.getCompatibleDatabase(database.baseUrl))
     }
 
     @Test
     fun `databaseList items baseUrl ends with slash`() {
-        for (database in scraper.databasesList)
+        for (database in sut.databasesList)
             assertTrue(
                 "${database::class.simpleName} baseUrl missing ending slash",
                 database.baseUrl.endsWith("/")
@@ -41,7 +50,7 @@ class ScraperTest {
 
     @Test
     fun `databaseList items have unique id`() {
-        val groups = scraper.databasesList.groupBy { it.id }
+        val groups = sut.databasesList.groupBy { it.id }
         for (list in groups)
             assertEquals(
                 "${list.value.joinToString { it::class.simpleName.toString() }}: id can't be the same value for multiple databases",
@@ -52,7 +61,7 @@ class ScraperTest {
 
     @Test
     fun `databaseList items have unique name`() {
-        val groups = scraper.databasesList.groupBy { it.name }
+        val groups = sut.databasesList.groupBy { it.name }
         for (list in groups)
             assertEquals(
                 "${list.value.joinToString { it::class.simpleName.toString() }}: name can't be the same value for multiple databases",
@@ -65,13 +74,13 @@ class ScraperTest {
 
     @Test
     fun `sourceList items are compatible`() {
-        for (source in scraper.sourcesList)
-            assertNotNull(scraper.getCompatibleSource(source.baseUrl))
+        for (source in sut.sourcesList)
+            assertNotNull(sut.getCompatibleSource(source.baseUrl))
     }
 
     @Test
     fun `sourceList items baseUrl ends with slash`() {
-        for (source in scraper.sourcesList)
+        for (source in sut.sourcesList)
             assertTrue(
                 "${source::class.simpleName} baseUrl missing ending slash",
                 source.baseUrl.endsWith("/")
@@ -80,7 +89,7 @@ class ScraperTest {
 
     @Test
     fun `sourceList items have unique id`() {
-        val groups = scraper.sourcesList.groupBy { it.id }
+        val groups = sut.sourcesList.groupBy { it.id }
         for (list in groups)
             assertEquals(
                 "${list.value.joinToString { it::class.simpleName.toString() }}: name can't be the same value for multiple sources",
@@ -91,7 +100,7 @@ class ScraperTest {
 
     @Test
     fun `sourceList items have unique name`() {
-        val groups = scraper.sourcesList.groupBy { it.name }
+        val groups = sut.sourcesList.groupBy { it.name }
         for (list in groups)
             assertEquals(
                 "${list.value.joinToString { it::class.simpleName.toString() }}: name can't be the same value for multiple sources",
