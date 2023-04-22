@@ -2,6 +2,7 @@ package my.noveldokusha.scraper.sources
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import my.noveldokusha.R
 import my.noveldokusha.network.NetworkClient
 import my.noveldokusha.scraper.SourceInterface
 import org.jsoup.nodes.Document
@@ -11,7 +12,7 @@ class AT(
     private val networkClient: NetworkClient
 ) : SourceInterface.Base {
     override val id = "at_nu"
-    override val name = "AT"
+    override val nameStrId = R.string.source_name_at
     override val baseUrl = "https://a-t.nu/"
 
     override suspend fun getChapterTitle(doc: Document): String? = withContext(Dispatchers.Default) {

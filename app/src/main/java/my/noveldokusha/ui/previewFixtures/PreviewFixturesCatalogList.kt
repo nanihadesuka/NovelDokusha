@@ -1,5 +1,6 @@
 package my.noveldokusha.ui.previewFixtures
 
+import my.noveldokusha.R
 import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.data.ChapterMetadata
 import my.noveldokusha.data.Response
@@ -23,7 +24,7 @@ fun previewFixturesCatalogList(): List<SourceInterface.Catalog> = (0..7).map {
         ): Response<PagedList<BookMetadata>> = Response.Success(PagedList.createEmpty(0))
 
         override val id = "id$it"
-        override val name = "name$it"
+        override val nameStrId = R.string.source_name_local
         override val baseUrl = "baseUrl$it"
     }
 }

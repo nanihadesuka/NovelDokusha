@@ -55,7 +55,7 @@ class LocalSource(
     private val appFileResolver: AppFileResolver,
 ) : SourceInterface.Catalog, SourceInterface.Configurable {
     override val id = "local_source"
-    override val name = "Local"
+    override val nameStrId = R.string.source_name_local
     override val baseUrl = "local://"
     override val catalogUrl = "local://"
     override val language = null

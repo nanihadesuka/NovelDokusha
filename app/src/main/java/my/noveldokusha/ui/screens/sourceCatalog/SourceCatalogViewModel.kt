@@ -37,7 +37,7 @@ class SourceCatalogViewModel @Inject constructor(
     private val source = scraper.getCompatibleSourceCatalog(sourceBaseUrl)!!
 
     val state = SourceCatalogScreenState(
-        sourceCatalogName = mutableStateOf(source.name),
+        sourceCatalogNameStrId = mutableStateOf(source.nameStrId),
         searchTextInput = stateHandle.asMutableStateOf("searchTextInput") { "" },
         toolbarMode = stateHandle.asMutableStateOf("toolbarMode") { ToolbarMode.MAIN },
         fetchIterator = PagedListIteratorState(viewModelScope) { source.getCatalogList(it) },

@@ -3,6 +3,7 @@ package my.noveldokusha.scraper.sources
 import com.google.gson.JsonParser
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import my.noveldokusha.R
 import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.data.ChapterMetadata
 import my.noveldokusha.data.Response
@@ -32,7 +33,7 @@ class LightNovelWorld(
     private val networkClient: NetworkClient
 ) : SourceInterface.Catalog {
     override val id = "light_novel_world"
-    override val name = "Light Novel World"
+    override val nameStrId = R.string.source_name_light_novel_world
     override val baseUrl = "https://www.lightnovelworld.com/"
     override val catalogUrl = "https://www.lightnovelworld.com/genre/all/popular/all/"
     override val iconUrl =

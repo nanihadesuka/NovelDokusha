@@ -34,7 +34,7 @@ class DatabaseBookInfoViewModel @Inject constructor(
     val database = scraper.getCompatibleDatabase(databaseUrlBase)!!
 
     val state = DatabaseBookInfoState(
-        databaseName = mutableStateOf(database.name),
+        databaseNameStrId = mutableStateOf(database.nameStrId),
         book = mutableStateOf(
             DatabaseInterface.BookData(
                 title = bookTitle,

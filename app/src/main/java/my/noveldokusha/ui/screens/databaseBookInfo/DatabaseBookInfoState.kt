@@ -5,6 +5,6 @@ import androidx.compose.runtime.State
 import my.noveldokusha.scraper.DatabaseInterface
 
 data class DatabaseBookInfoState(
-    val databaseName: State<String>,
+    val databaseNameStrId: State<Int>,
     val book: MutableState<DatabaseInterface.BookData>,
 )

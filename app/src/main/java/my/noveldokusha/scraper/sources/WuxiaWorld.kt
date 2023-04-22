@@ -2,6 +2,7 @@ package my.noveldokusha.scraper.sources
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import my.noveldokusha.R
 import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.data.ChapterMetadata
 import my.noveldokusha.data.Response
@@ -23,7 +24,7 @@ class WuxiaWorld(
     private val networkClient: NetworkClient
 ) : SourceInterface.Catalog {
     override val id = "wuxia_world"
-    override val name = "Wuxia World"
+    override val nameStrId = R.string.source_name_wuxia_world
     override val baseUrl = "https://wuxiaworld.site/"
     override val catalogUrl = "https://wuxiaworld.site/novel/?m_orderby=trending"
     override val iconUrl = "https://wuxiaworld.site/wp-content/uploads/2019/04/favicon-1.ico"

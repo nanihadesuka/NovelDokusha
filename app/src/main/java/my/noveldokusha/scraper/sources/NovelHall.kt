@@ -2,6 +2,7 @@ package my.noveldokusha.scraper.sources
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import my.noveldokusha.R
 import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.data.ChapterMetadata
 import my.noveldokusha.data.Response
@@ -21,7 +22,7 @@ class NovelHall(
     private val networkClient: NetworkClient
 ) : SourceInterface.Catalog {
     override val id = "novelhall"
-    override val name = "NovelHall"
+    override val nameStrId = R.string.source_name_novelhall
     override val baseUrl = "https://www.novelhall.com/"
     override val catalogUrl = "https://www.novelhall.com/all.html"
     override val language = LanguageCode.ENGLISH

@@ -3,6 +3,7 @@ package my.noveldokusha.scraper.sources
 import android.net.Uri
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import my.noveldokusha.R
 import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.data.ChapterMetadata
 import my.noveldokusha.data.Response
@@ -30,7 +31,7 @@ class NovelUpdates(
     private val networkClient: NetworkClient
 ) : SourceInterface.Catalog {
     override val id = "novel_updates"
-    override val name = "Novel Updates"
+    override val nameStrId = R.string.source_name_novel_updates
     override val baseUrl = "https://www.novelupdates.com/"
     override val catalogUrl = "https://www.novelupdates.com/novelslisting/?sort=7&order=1&status=1"
     override val language = LanguageCode.ENGLISH

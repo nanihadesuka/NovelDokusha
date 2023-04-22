@@ -72,7 +72,7 @@ fun FinderScreenBody(
                     .clickable { onDatabaseClick(it) },
                 headlineContent = {
                     Text(
-                        text = it.name,
+                        text = stringResource(id = it.nameStrId),
                         style = MaterialTheme.typography.titleSmall,
                     )
                 },
@@ -113,7 +113,7 @@ fun FinderScreenBody(
                     .animateItemPlacement(),
                 headlineContent = {
                     Text(
-                        text = it.catalog.name,
+                        text = stringResource(id = it.catalog.nameStrId),
                         style = MaterialTheme.typography.titleSmall,
                     )
                 },

@@ -3,6 +3,7 @@ package my.noveldokusha.scraper.sources
 import com.google.gson.JsonParser
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import my.noveldokusha.R
 import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.data.ChapterMetadata
 import my.noveldokusha.data.Response
@@ -24,7 +25,7 @@ class MTLNovel(
     private val networkClient: NetworkClient
 ) : SourceInterface.Catalog {
     override val id = "mtlnovel"
-    override val name = "MTLNovel"
+    override val nameStrId = R.string.source_name_mtlnovel
     override val baseUrl = "https://www.mtlnovel.com/"
     override val catalogUrl = "https://www.mtlnovel.com/alltime-rank/"
     override val language = LanguageCode.ENGLISH

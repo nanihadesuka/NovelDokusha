@@ -2,6 +2,7 @@ package my.noveldokusha.scraper.sources
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import my.noveldokusha.R
 import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.data.ChapterMetadata
 import my.noveldokusha.data.Response
@@ -22,7 +23,7 @@ class BoxNovel(
     private val networkClient: NetworkClient
 ) : SourceInterface.Catalog {
     override val id = "box_novel"
-    override val name = "Box Novel"
+    override val nameStrId = R.string.source_name_box_novel
     override val baseUrl = "https://boxnovel.com/"
     override val catalogUrl = "https://boxnovel.com/novel/?m_orderby=alphabet"
     override val iconUrl = "https://boxnovel.com/wp-content/uploads/2018/04/box-icon-150x150.png"

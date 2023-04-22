@@ -84,7 +84,7 @@ fun DatabaseSearchScreen(
                 placeholderText = searchPlaceholderText,
                 scrollBehavior = scrollBehavior,
                 inputEnabled = state.searchMode.value != SearchMode.BookGenres,
-                labelText = state.databaseName.value
+                labelText = stringResource(id = state.databaseNameStrId.value),
             )
         },
         content = { innerPadding ->
@@ -186,7 +186,7 @@ private fun PreviewView() {
     }
     val state = remember {
         DatabaseSearchScreenState(
-            databaseName = mutableStateOf(" Database"),
+            databaseNameStrId = mutableStateOf(R.string.database_name_baka_updates),
             searchMode = mutableStateOf(SearchMode.BookTitle),
             genresList = genresList,
             searchTextInput = mutableStateOf(""),

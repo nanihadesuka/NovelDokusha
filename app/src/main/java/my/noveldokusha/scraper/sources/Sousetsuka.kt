@@ -2,6 +2,7 @@ package my.noveldokusha.scraper.sources
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import my.noveldokusha.R
 import my.noveldokusha.network.NetworkClient
 import my.noveldokusha.scraper.SourceInterface
 import my.noveldokusha.scraper.TextExtractor
@@ -11,7 +12,7 @@ class Sousetsuka(
     private val networkClient: NetworkClient
 ) : SourceInterface.Base {
     override val id = "sousetsuka"
-    override val name = "Sousetsuka"
+    override val nameStrId = R.string.source_name_sousetsuka
     override val baseUrl = "https://www.sousetsuka.com/"
 
     override suspend fun getChapterTitle(doc: Document): String? =

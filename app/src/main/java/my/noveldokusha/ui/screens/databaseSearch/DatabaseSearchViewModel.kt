@@ -50,7 +50,7 @@ class DatabaseSearchViewModel @Inject constructor(
 
     private val database = scraper.getCompatibleDatabase(extras.databaseBaseUrl)!!
     val state = DatabaseSearchScreenState(
-        databaseName = mutableStateOf(database.name),
+        databaseNameStrId = mutableStateOf(database.nameStrId),
         searchMode = mutableStateOf(SearchMode.Catalog),
         searchTextInput = mutableStateOf(""),
         genresList = mutableStateListOf(),

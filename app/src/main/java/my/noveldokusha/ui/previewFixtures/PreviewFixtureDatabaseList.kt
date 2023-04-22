@@ -1,5 +1,6 @@
 package my.noveldokusha.ui.previewFixtures
 
+import my.noveldokusha.R
 import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.data.Response
 import my.noveldokusha.network.PagedList
@@ -9,7 +10,7 @@ import my.noveldokusha.scraper.SearchGenre
 fun previewFixturesDatabaseList(): List<DatabaseInterface> = (0..2).map {
     object : DatabaseInterface {
         override val id = "id$it"
-        override val name = "name$it"
+        override val nameStrId = R.string.database_name_baka_updates
         override val baseUrl = "baseUrl$it"
         override suspend fun getCatalog(index: Int): Response<PagedList<BookMetadata>> =
             Response.Success(PagedList.createEmpty(0))

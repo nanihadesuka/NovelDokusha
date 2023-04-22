@@ -1,5 +1,6 @@
 package my.noveldokusha.scraper
 
+import androidx.annotation.StringRes
 import androidx.compose.runtime.Composable
 import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.data.ChapterMetadata
@@ -9,7 +10,8 @@ import org.jsoup.nodes.Document
 
 sealed interface SourceInterface {
     val id: String
-    val name: String
+    @get:StringRes
+    val nameStrId: Int
     val baseUrl: String
     val isLocalSource: Boolean get() = true
 

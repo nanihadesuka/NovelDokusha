@@ -4,6 +4,7 @@ import com.google.gson.JsonParser
 import com.google.gson.stream.JsonReader
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import my.noveldokusha.R
 import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.data.ChapterMetadata
 import my.noveldokusha.data.Response
@@ -22,7 +23,7 @@ class Saikai(
     private val networkClient: NetworkClient
 ) : SourceInterface.Catalog {
     override val id = "seikai"
-    override val name = "Saikai"
+    override val nameStrId = R.string.source_name_saikai
     override val baseUrl = "https://saikaiscan.com.br/"
     override val catalogUrl = "https://saikaiscan.com.br/series"
     override val language = LanguageCode.PORTUGUESE

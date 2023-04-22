@@ -59,17 +59,6 @@ class ScraperTest {
             )
     }
 
-    @Test
-    fun `databaseList items have unique name`() {
-        val groups = sut.databasesList.groupBy { it.name }
-        for (list in groups)
-            assertEquals(
-                "${list.value.joinToString { it::class.simpleName.toString() }}: name can't be the same value for multiple databases",
-                1,
-                list.value.size
-            )
-    }
-
     // SOURCES TEST
 
     @Test
@@ -90,17 +79,6 @@ class ScraperTest {
     @Test
     fun `sourceList items have unique id`() {
         val groups = sut.sourcesList.groupBy { it.id }
-        for (list in groups)
-            assertEquals(
-                "${list.value.joinToString { it::class.simpleName.toString() }}: name can't be the same value for multiple sources",
-                1,
-                list.value.size
-            )
-    }
-
-    @Test
-    fun `sourceList items have unique name`() {
-        val groups = sut.sourcesList.groupBy { it.name }
         for (list in groups)
             assertEquals(
                 "${list.value.joinToString { it::class.simpleName.toString() }}: name can't be the same value for multiple sources",

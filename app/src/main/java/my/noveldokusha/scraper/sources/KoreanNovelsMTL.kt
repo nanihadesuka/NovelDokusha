@@ -2,6 +2,7 @@ package my.noveldokusha.scraper.sources
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import my.noveldokusha.R
 import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.data.ChapterMetadata
 import my.noveldokusha.data.Response
@@ -23,7 +24,7 @@ class KoreanNovelsMTL(
     private val networkClient: NetworkClient
 ) : SourceInterface.Catalog {
     override val id = "korean_novels_mtl"
-    override val name = "Korean Novels MTL"
+    override val nameStrId = R.string.source_name_korean_novels_mtl
     override val baseUrl = "https://www.koreanmtl.online/"
     override val catalogUrl = "https://www.koreanmtl.online/p/novels-listing.html?m=1"
     override val language = LanguageCode.ENGLISH

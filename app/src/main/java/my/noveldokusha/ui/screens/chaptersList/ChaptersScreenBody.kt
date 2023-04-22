@@ -67,8 +67,9 @@ fun ChaptersScreenBody(
             ) {
                 ChaptersScreenHeader(
                     bookState = state.book.value,
-                    sourceCatalogName = state.sourceCatalogName.value
-                        ?: stringResource(R.string.invalid_source),
+                    sourceCatalogName = stringResource(
+                        id = state.sourceCatalogNameStrRes.value ?: R.string.invalid_source
+                    ),
                     numberOfChapters = state.chapters.size,
                     paddingValues = innerPadding,
                     modifier = Modifier.padding(bottom = 12.dp)

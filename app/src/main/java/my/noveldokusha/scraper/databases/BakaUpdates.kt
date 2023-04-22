@@ -3,6 +3,7 @@ package my.noveldokusha.scraper.databases
 import android.net.Uri
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import my.noveldokusha.R
 import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.data.Response.Success
 import my.noveldokusha.network.NetworkClient
@@ -23,7 +24,7 @@ class BakaUpdates(
     private val networkClient: NetworkClient
 ) : DatabaseInterface {
     override val id = "baka_updates"
-    override val name = "Baka-Updates"
+    override val nameStrId = R.string.database_name_baka_updates
     override val baseUrl = "https://www.mangaupdates.com/"
 
     private fun String.removeNovelTag() = this.removeSuffix("(Novel)").trim()

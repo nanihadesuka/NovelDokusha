@@ -31,8 +31,6 @@ import my.noveldokusha.ui.previewFixtures.previewFixturesCatalogList
 import my.noveldokusha.ui.theme.ColorAccent
 import my.noveldokusha.ui.theme.InternalTheme
 import my.noveldokusha.ui.theme.PreviewThemes
-import my.noveldokusha.utils.capitalize
-import java.util.Locale
 
 @Composable
 fun GlobalSourceSearchScreenBody(
@@ -47,7 +45,7 @@ fun GlobalSourceSearchScreenBody(
     ) {
         items(listSources) { entry ->
             Text(
-                text = entry.source.catalog.name.capitalize(Locale.ROOT),
+                text = stringResource(id = entry.source.catalog.nameStrId),
                 style = MaterialTheme.typography.titleMedium,
                 modifier = Modifier
                     .padding(start = 12.dp)
