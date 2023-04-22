@@ -12,6 +12,7 @@ import my.noveldokusha.network.postPayload
 import my.noveldokusha.network.postRequest
 import my.noveldokusha.network.tryConnect
 import my.noveldokusha.network.tryFlatConnect
+import my.noveldokusha.scraper.LanguageCode
 import my.noveldokusha.scraper.SourceInterface
 import my.noveldokusha.scraper.TextExtractor
 import my.noveldokusha.utils.add
@@ -32,7 +33,7 @@ class NovelUpdates(
     override val name = "Novel Updates"
     override val baseUrl = "https://www.novelupdates.com/"
     override val catalogUrl = "https://www.novelupdates.com/novelslisting/?sort=7&order=1&status=1"
-    override val language = "English"
+    override val language = LanguageCode.ENGLISH
 
     override suspend fun getChapterTitle(doc: Document): String? = null
 

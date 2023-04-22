@@ -17,15 +17,15 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import my.noveldokusha.R
-import my.noveldokusha.repository.SourceLanguageItem
+import my.noveldokusha.repository.LanguageItem
 import my.noveldokusha.ui.composeViews.MyButton
 
 @Composable
 fun LanguagesDropDown(
     expanded: Boolean,
     onDismiss: () -> Unit,
-    sourceLanguageItemList: List<SourceLanguageItem>,
-    onSourceLanguageItemToggle: (SourceLanguageItem) -> Unit
+    languageItemList: List<LanguageItem>,
+    onSourceLanguageItemToggle: (LanguageItem) -> Unit
 ) {
     DropdownMenu(
         expanded = expanded,
@@ -40,9 +40,9 @@ fun LanguagesDropDown(
         ) {
             Text(text = stringResource(R.string.sources_languages))
             OutlinedCard {
-                sourceLanguageItemList.forEach { lang ->
+                languageItemList.forEach { lang ->
                     MyButton(
-                        text = lang.language,
+                        text = stringResource(id = lang.language.nameResId),
                         onClick = { onSourceLanguageItemToggle(lang) },
                         selected = lang.active,
                         borderWidth = Dp.Unspecified,

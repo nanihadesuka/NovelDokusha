@@ -10,6 +10,7 @@ import my.noveldokusha.network.PagedList
 import my.noveldokusha.network.postRequest
 import my.noveldokusha.network.tryConnect
 import my.noveldokusha.network.tryFlatConnect
+import my.noveldokusha.scraper.LanguageCode
 import my.noveldokusha.scraper.SourceInterface
 import my.noveldokusha.scraper.TextExtractor
 import my.noveldokusha.utils.add
@@ -24,7 +25,7 @@ class Wuxia(
     override val name = "Wuxia"
     override val baseUrl = "https://www.wuxia.blog/"
     override val catalogUrl = "https://www.wuxia.blog/listNovels"
-    override val language = "English"
+    override val language = LanguageCode.ENGLISH
 
     override suspend fun getChapterTitle(doc: Document): String? = null
 

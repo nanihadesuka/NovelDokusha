@@ -9,6 +9,7 @@ import my.noveldokusha.network.NetworkClient
 import my.noveldokusha.network.PagedList
 import my.noveldokusha.network.tryConnect
 import my.noveldokusha.network.tryFlatConnect
+import my.noveldokusha.scraper.LanguageCode
 import my.noveldokusha.scraper.SourceInterface
 import my.noveldokusha.scraper.TextExtractor
 import my.noveldokusha.utils.add
@@ -30,7 +31,7 @@ class ReadNovelFull(
     override val name = "Read Novel Full"
     override val baseUrl = "https://readnovelfull.com/"
     override val catalogUrl = "https://readnovelfull.com/novel-list/most-popular-novel"
-    override val language = "English"
+    override val language = LanguageCode.ENGLISH
 
     override suspend fun getChapterTitle(doc: Document): String? = null
 

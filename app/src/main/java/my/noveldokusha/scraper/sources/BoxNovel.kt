@@ -9,6 +9,7 @@ import my.noveldokusha.network.NetworkClient
 import my.noveldokusha.network.PagedList
 import my.noveldokusha.network.postRequest
 import my.noveldokusha.network.tryConnect
+import my.noveldokusha.scraper.LanguageCode
 import my.noveldokusha.scraper.SourceInterface
 import my.noveldokusha.scraper.TextExtractor
 import my.noveldokusha.utils.add
@@ -25,7 +26,7 @@ class BoxNovel(
     override val baseUrl = "https://boxnovel.com/"
     override val catalogUrl = "https://boxnovel.com/novel/?m_orderby=alphabet"
     override val iconUrl = "https://boxnovel.com/wp-content/uploads/2018/04/box-icon-150x150.png"
-    override val language = "English"
+    override val language = LanguageCode.ENGLISH
 
     override suspend fun getBookCoverImageUrl(
         bookUrl: String

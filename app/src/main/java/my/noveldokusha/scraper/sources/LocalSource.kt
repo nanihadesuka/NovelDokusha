@@ -54,11 +54,12 @@ class LocalSource(
     private val localSourcesDirectories: LocalSourcesDirectories,
     private val appFileResolver: AppFileResolver,
 ) : SourceInterface.Catalog, SourceInterface.Configurable {
-    override val id: String = "local_source"
-    override val name: String = "Local"
-    override val baseUrl: String = "local://"
-    override val catalogUrl: String = "local://"
-    override val language: String = "*"
+    override val id = "local_source"
+    override val name = "Local"
+    override val baseUrl = "local://"
+    override val catalogUrl = "local://"
+    override val language = null
+    override val iconUrl = Icons.Filled.Folder
 
     override suspend fun getChapterList(bookUrl: String): Response<List<ChapterMetadata>> {
         // This should always fail as is local

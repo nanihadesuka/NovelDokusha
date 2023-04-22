@@ -9,6 +9,7 @@ import my.noveldokusha.network.NetworkClient
 import my.noveldokusha.network.PagedList
 import my.noveldokusha.network.postRequest
 import my.noveldokusha.network.tryConnect
+import my.noveldokusha.scraper.LanguageCode
 import my.noveldokusha.scraper.SourceInterface
 import my.noveldokusha.scraper.TextExtractor
 import my.noveldokusha.utils.add
@@ -26,7 +27,7 @@ class WuxiaWorld(
     override val baseUrl = "https://wuxiaworld.site/"
     override val catalogUrl = "https://wuxiaworld.site/novel/?m_orderby=trending"
     override val iconUrl = "https://wuxiaworld.site/wp-content/uploads/2019/04/favicon-1.ico"
-    override val language = "English"
+    override val language = LanguageCode.ENGLISH
 
     override suspend fun getBookCoverImageUrl(
         bookUrl: String

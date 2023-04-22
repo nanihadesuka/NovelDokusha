@@ -11,6 +11,7 @@ import my.noveldokusha.network.PagedList
 import my.noveldokusha.network.postPayload
 import my.noveldokusha.network.postRequest
 import my.noveldokusha.network.tryConnect
+import my.noveldokusha.scraper.LanguageCode
 import my.noveldokusha.scraper.SourceInterface
 import my.noveldokusha.scraper.TextExtractor
 import my.noveldokusha.utils.addPath
@@ -36,7 +37,7 @@ class LightNovelWorld(
     override val catalogUrl = "https://www.lightnovelworld.com/genre/all/popular/all/"
     override val iconUrl =
         "https://static.lightnovelworld.com/content/img/lightnovelworld/favicon.png"
-    override val language = "English"
+    override val language = LanguageCode.ENGLISH
 
     override suspend fun getChapterText(doc: Document): String = withContext(Dispatchers.Default) {
         doc.selectFirst("#chapter-container")?.let(TextExtractor::get) ?: ""

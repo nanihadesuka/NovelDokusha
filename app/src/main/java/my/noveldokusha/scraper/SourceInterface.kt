@@ -22,8 +22,8 @@ sealed interface SourceInterface {
     interface Base : SourceInterface
     interface Catalog : SourceInterface {
         val catalogUrl: String
-        val language: String
-        val iconUrl: String get() = "$baseUrl/favicon.ico"
+        val language: LanguageCode?
+        val iconUrl: Any get() = "$baseUrl/favicon.ico"
 
         suspend fun getBookCoverImageUrl(bookUrl: String): Response<String?> =
             Response.Success(null)

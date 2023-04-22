@@ -24,7 +24,7 @@ import my.noveldokusha.R
 import my.noveldokusha.composableActions.ListLoadWatcher
 import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.network.IteratorState
-import my.noveldokusha.repository.SourceCatalogItem
+import my.noveldokusha.repository.CatalogItem
 import my.noveldokusha.ui.composeViews.BookImageButtonView
 import my.noveldokusha.ui.composeViews.BookTitlePosition
 import my.noveldokusha.ui.previewFixtures.previewFixturesCatalogList
@@ -143,7 +143,7 @@ private fun PreviewView() {
 
 
     val list = previewFixturesCatalogList().mapIndexed { index, source ->
-        val (catalog, books) = SourceCatalogItem(
+        val (catalog, books) = CatalogItem(
             catalog = source,
             pinned = false
         ) to (0..5).map { BookMetadata(title = "Book $it", url = "") }

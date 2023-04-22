@@ -15,7 +15,7 @@ import kotlinx.coroutines.launch
 import my.noveldokusha.AppPreferences
 import my.noveldokusha.network.PagedListIteratorState
 import my.noveldokusha.repository.ScraperRepository
-import my.noveldokusha.repository.SourceCatalogItem
+import my.noveldokusha.repository.CatalogItem
 import my.noveldokusha.ui.BaseViewModel
 import my.noveldokusha.utils.StateExtra_String
 import javax.inject.Inject
@@ -73,7 +73,7 @@ class GlobalSourceSearchViewModel @Inject constructor(
 }
 
 data class SourceResults(
-    val source: SourceCatalogItem,
+    val source: CatalogItem,
     val searchInput: String,
     val coroutineScope: CoroutineScope
 ) {

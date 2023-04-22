@@ -10,6 +10,7 @@ import my.noveldokusha.network.NetworkClient
 import my.noveldokusha.network.PagedList
 import my.noveldokusha.network.getRequest
 import my.noveldokusha.network.tryConnect
+import my.noveldokusha.scraper.LanguageCode
 import my.noveldokusha.scraper.SourceInterface
 import my.noveldokusha.scraper.TextExtractor
 import my.noveldokusha.utils.add
@@ -26,7 +27,7 @@ class MTLNovel(
     override val name = "MTLNovel"
     override val baseUrl = "https://www.mtlnovel.com/"
     override val catalogUrl = "https://www.mtlnovel.com/alltime-rank/"
-    override val language = "English"
+    override val language = LanguageCode.ENGLISH
 
     override suspend fun getChapterTitle(doc: Document): String? = null
 

@@ -26,10 +26,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import my.noveldokusha.R
-import my.noveldokusha.repository.SourceCatalogItem
+import my.noveldokusha.repository.CatalogItem
 import my.noveldokusha.scraper.DatabaseInterface
 import my.noveldokusha.scraper.SourceInterface
 import my.noveldokusha.ui.composeViews.AnimatedTransition
@@ -45,7 +46,7 @@ import my.noveldokusha.ui.theme.PreviewThemes
 fun FinderScreenBody(
     innerPadding: PaddingValues,
     databasesList: List<DatabaseInterface>,
-    sourcesList: List<SourceCatalogItem>,
+    sourcesList: List<CatalogItem>,
     onDatabaseClick: (DatabaseInterface) -> Unit,
     onSourceClick: (SourceInterface.Catalog) -> Unit,
     onSourceSetPinned: (id: String, pinned: Boolean) -> Unit,
@@ -117,17 +118,27 @@ fun FinderScreenBody(
                     )
                 },
                 supportingContent = {
-                    Text(
-                        text = it.catalog.language,
+                    val langResId = it.catalog.language?.nameResId
+                    if (langResId != null) Text(
+                        text = stringResource(id = langResId),
                         style = MaterialTheme.typography.bodySmall,
                     )
                 },
                 leadingContent = {
-                    ImageViewGlide(
-                        imageModel = it.catalog.iconUrl,
-                        modifier = Modifier.size(28.dp),
-                        error = R.drawable.default_icon
-                    )
+                    val icon = it.catalog.iconUrl
+                    if (icon is ImageVector) {
+                        Icon(
+                            imageVector = icon,
+                            contentDescription = null,
+                            modifier = Modifier.size(28.dp),
+                        )
+                    } else {
+                        ImageViewGlide(
+                            imageModel = icon,
+                            modifier = Modifier.size(28.dp),
+                            error = R.drawable.default_icon
+                        )
+                    }
                 },
                 trailingContent = {
                     Row {
@@ -181,7 +192,7 @@ fun FinderScreenBody(
 @Composable
 private fun PreviewView() {
     val catalogItemsList = previewFixturesCatalogList().mapIndexed { index, it ->
-        SourceCatalogItem(
+        CatalogItem(
             catalog = it,
             pinned = index % 2 == 0,
         )

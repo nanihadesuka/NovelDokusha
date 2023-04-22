@@ -9,6 +9,7 @@ import my.noveldokusha.network.NetworkClient
 import my.noveldokusha.network.PagedList
 import my.noveldokusha.network.tryConnect
 import my.noveldokusha.network.tryFlatConnect
+import my.noveldokusha.scraper.LanguageCode
 import my.noveldokusha.scraper.SourceInterface
 import my.noveldokusha.scraper.TextExtractor
 import my.noveldokusha.utils.add
@@ -25,7 +26,7 @@ class BestLightNovel(
     override val name = "BestLightNovel"
     override val baseUrl = "https://bestlightnovel.com/"
     override val catalogUrl = "https://bestlightnovel.com/novel_list"
-    override val language = "English"
+    override val language = LanguageCode.ENGLISH
 
     override suspend fun getChapterTitle(doc: Document): String? = null
 

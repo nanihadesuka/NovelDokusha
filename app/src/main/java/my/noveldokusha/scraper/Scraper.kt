@@ -59,9 +59,8 @@ class Scraper @Inject constructor(
         KoreanNovelsMTL(networkClient),
     )
 
-    val sourcesListCatalog = sourcesList.filterIsInstance<SourceInterface.Catalog>().toSet()
-    val sourcesLanguages =
-        sourcesList.filterIsInstance<SourceInterface.Catalog>().map { it.language }.toSortedSet()
+    val sourcesCatalogsList = sourcesList.filterIsInstance<SourceInterface.Catalog>()
+    val sourcesCatalogsLanguagesList = sourcesCatalogsList.mapNotNull { it.language }.toSet()
 
     private fun String.isCompatibleWithBaseUrl(baseUrl: String): Boolean {
         val normalizedUrl = if (this.endsWith("/")) this else "$this/"
@@ -73,7 +72,7 @@ class Scraper @Inject constructor(
         sourcesList.find { url.isCompatibleWithBaseUrl(it.baseUrl) }
 
     fun getCompatibleSourceCatalog(url: String): SourceInterface.Catalog? =
-        sourcesListCatalog.find { url.isCompatibleWithBaseUrl(it.baseUrl) }
+        sourcesCatalogsList.find { url.isCompatibleWithBaseUrl(it.baseUrl) }
 
     fun getCompatibleDatabase(url: String): DatabaseInterface? =
         databasesList.find { url.isCompatibleWithBaseUrl(it.baseUrl) }

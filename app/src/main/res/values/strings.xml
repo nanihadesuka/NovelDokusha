@@ -160,4 +160,8 @@
     <string name="no_directories_added_please_add_them_to_see_them_in_the_source_catalog_list">No directories added, please add them to see them in the source catalog list</string>
     <string name="local">Local</string>
     <string name="invalid_source">Invalid source</string>
+    <string name="language_english">English</string>
+    <string name="language_portuguese">Portuguese</string>
+    <string name="language_spanish">Spanish</string>
+    <string name="language_french">French</string>
 </resources>

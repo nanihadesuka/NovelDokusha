@@ -10,6 +10,7 @@ import my.noveldokusha.data.Response
 import my.noveldokusha.network.NetworkClient
 import my.noveldokusha.network.PagedList
 import my.noveldokusha.network.tryConnect
+import my.noveldokusha.scraper.LanguageCode
 import my.noveldokusha.scraper.SourceInterface
 import my.noveldokusha.scraper.TextExtractor
 import my.noveldokusha.utils.add
@@ -24,7 +25,7 @@ class Saikai(
     override val name = "Saikai"
     override val baseUrl = "https://saikaiscan.com.br/"
     override val catalogUrl = "https://saikaiscan.com.br/series"
-    override val language = "Brazilian"
+    override val language = LanguageCode.PORTUGUESE
 
     override suspend fun getBookCoverImageUrl(
         bookUrl: String

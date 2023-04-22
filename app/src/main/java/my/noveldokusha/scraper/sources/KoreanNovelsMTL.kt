@@ -8,6 +8,7 @@ import my.noveldokusha.data.Response
 import my.noveldokusha.network.NetworkClient
 import my.noveldokusha.network.PagedList
 import my.noveldokusha.network.tryConnect
+import my.noveldokusha.scraper.LanguageCode
 import my.noveldokusha.scraper.SourceInterface
 import my.noveldokusha.utils.toDocument
 import org.jsoup.nodes.Document
@@ -25,7 +26,7 @@ class KoreanNovelsMTL(
     override val name = "Korean Novels MTL"
     override val baseUrl = "https://www.koreanmtl.online/"
     override val catalogUrl = "https://www.koreanmtl.online/p/novels-listing.html?m=1"
-    override val language = "English"
+    override val language = LanguageCode.ENGLISH
 
     override suspend fun getChapterTitle(doc: Document): String? = null
     override suspend fun getChapterText(doc: Document): String? = null

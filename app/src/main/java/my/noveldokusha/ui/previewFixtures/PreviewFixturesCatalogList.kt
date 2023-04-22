@@ -4,12 +4,13 @@ import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.data.ChapterMetadata
 import my.noveldokusha.data.Response
 import my.noveldokusha.network.PagedList
+import my.noveldokusha.scraper.LanguageCode
 import my.noveldokusha.scraper.SourceInterface
 
 fun previewFixturesCatalogList(): List<SourceInterface.Catalog> = (0..7).map {
     object : SourceInterface.Catalog {
         override val catalogUrl = "catalogUrl$it"
-        override val language = "EN"
+        override val language = LanguageCode.ENGLISH
         override suspend fun getChapterList(bookUrl: String): Response<List<ChapterMetadata>> =
             Response.Success(listOf())
 
