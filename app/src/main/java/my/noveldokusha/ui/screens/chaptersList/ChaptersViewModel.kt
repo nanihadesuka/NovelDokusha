@@ -17,7 +17,6 @@ import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import my.noveldokusha.AppPreferences
 import my.noveldokusha.R
 import my.noveldokusha.data.ChapterWithContext
@@ -36,7 +35,6 @@ import my.noveldokusha.ui.BaseViewModel
 import my.noveldokusha.ui.Toasty
 import my.noveldokusha.utils.StateExtra_String
 import my.noveldokusha.utils.toState
-import timber.log.Timber
 import javax.inject.Inject
 
 interface ChapterStateBundle {
@@ -83,24 +81,14 @@ class ChaptersViewModel @Inject constructor(
         searchTextInput = mutableStateOf(""),
         sourceCatalogName = mutableStateOf(source?.name),
         settingChapterSort = appPreferences.CHAPTERS_SORT_ASCENDING.state(viewModelScope),
-        isLocalSource = mutableStateOf(bookUrl.isLocalUri)
+        isLocalSource = mutableStateOf(bookUrl.isLocalUri),
+        isRefreshable = mutableStateOf(rawBookUrl.isContentUri || !bookUrl.isLocalUri)
     )
 
     init {
         appScope.launch {
-            val rawBookUrl = rawBookUrl
-            val bookTitle = bookTitle
-            val importContentUri =
-                rawBookUrl.isContentUri && repository.libraryBooks.get(bookUrl) == null
-
-            if (!importContentUri) return@launch
-
-            repository.importEpubFromContentUri(
-                contentUri = rawBookUrl,
-                bookTitle = bookTitle,
-                addToLibrary = false
-            ).onError {
-                Timber.e(it.exception, "FAILED TO LOAD EPUB: ${it.message}")
+            if (rawBookUrl.isContentUri && repository.libraryBooks.get(bookUrl) == null) {
+                importUriContent()
             }
         }
 
@@ -167,11 +155,19 @@ class ChaptersViewModel @Inject constructor(
     }
 
     fun onPullRefresh() {
-        if (state.isLocalSource.value) return
+        if (!state.isRefreshable.value) {
+            toasty.show(R.string.local_book_nothing_to_update)
+            state.isRefreshing.value = false
+            return
+        }
         toasty.show(R.string.updating_book_info)
-        updateCover()
-        updateDescription()
-        updateChaptersList()
+        if (rawBookUrl.isContentUri) {
+            importUriContent()
+        } else if (!state.isLocalSource.value) {
+            updateCover()
+            updateDescription()
+            updateChaptersList()
+        }
     }
 
     private fun updateCover() = viewModelScope.launch {
@@ -190,30 +186,41 @@ class ChaptersViewModel @Inject constructor(
         }
     }
 
-    private fun updateChaptersList() {
-        if (state.isLocalSource.value) {
-            toasty.show(R.string.local_book_nothing_to_update)
-            state.isRefreshing.value = false
-            return
-        }
-
+    private fun importUriContent() {
         if (loadChaptersJob?.isActive == true) return
         loadChaptersJob = appScope.launch {
+            state.error.value = ""
+            state.isRefreshing.value = true
+            val rawBookUrl = rawBookUrl
+            val bookTitle = bookTitle
+            repository.importEpubFromContentUri(
+                contentUri = rawBookUrl,
+                bookTitle = bookTitle,
+                addToLibrary = false
+            ).onError {
+                state.error.value = it.message
+            }
+            state.isRefreshing.value = false
+        }
+    }
 
+    private fun updateChaptersList() {
+        if (loadChaptersJob?.isActive == true) return
+        loadChaptersJob = appScope.launch {
             state.error.value = ""
             state.isRefreshing.value = true
             val url = bookUrl
-            val res = downloadChaptersList(scraper, url)
-            state.isRefreshing.value = false
-            res.onSuccess {
+            downloadChaptersList(
+                scraper = scraper, bookUrl = url
+            ).onSuccess {
                 if (it.isEmpty())
                     toasty.show(R.string.no_chapters_found)
-                withContext(Dispatchers.IO) {
-                    repository.bookChapters.merge(it, url)
-                }
+                repository.bookChapters.merge(newChapters = it, bookUrl = url)
             }.onError {
                 state.error.value = it.message
             }
+            state.isRefreshing.value = false
+
         }
     }
 
