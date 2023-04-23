@@ -49,6 +49,7 @@ class AppFileResolver @Inject constructor(
     fun resolvedBookImagePath(bookUrl: String, imagePath: String): Any = when {
         imagePath.startsWith("http://", ignoreCase = true) -> imagePath
         imagePath.startsWith("https://", ignoreCase = true) -> imagePath
+        bookUrl.isContentUri -> imagePath
         else -> getStorageBookImageFile(bookUrl, imagePath)
     }
 }

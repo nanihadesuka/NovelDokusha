@@ -192,7 +192,7 @@ class LocalSource(
             )
         }
         bookMetadata.copy(
-            coverImageUrl = appFileResolver.getLocalBookCoverPath()
+            coverImageUrl = coverFile.canonicalFile.absolutePath
         )
     }
 
