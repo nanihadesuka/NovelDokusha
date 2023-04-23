@@ -2,7 +2,6 @@ package my.noveldokusha.repository
 
 import android.content.Context
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
@@ -58,7 +57,7 @@ class AppFileResolver @Inject constructor(
  * Returns the path to the image if local, no changes if non local.
  */
 @Composable
-fun rememberResolvedBookImagePath(bookUrl: String, imagePath: String): State<Any> {
+fun rememberResolvedBookImagePath(bookUrl: String, imagePath: String): Any {
     val context = LocalContext.current
     val appFileResolver = remember(context) { AppFileResolver(context) }
     return remember(context, bookUrl, imagePath) {
@@ -68,5 +67,5 @@ fun rememberResolvedBookImagePath(bookUrl: String, imagePath: String): State<Any
                 imagePath = imagePath
             )
         )
-    }
+    }.value
 }

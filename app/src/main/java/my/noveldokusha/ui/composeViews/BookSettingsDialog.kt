@@ -45,12 +45,11 @@ fun BookSettingsDialog(
     AlertDialog(
         onDismissRequest = onDismiss,
         icon = {
-            val image by rememberResolvedBookImagePath(
-                bookUrl = book.url,
-                imagePath = book.coverImageUrl
-            )
             ImageView(
-                imageModel = image,
+                imageModel = rememberResolvedBookImagePath(
+                    bookUrl = book.url,
+                    imagePath = book.coverImageUrl
+                ),
                 error = R.drawable.default_book_cover,
                 modifier = Modifier
                     .width(96.dp)

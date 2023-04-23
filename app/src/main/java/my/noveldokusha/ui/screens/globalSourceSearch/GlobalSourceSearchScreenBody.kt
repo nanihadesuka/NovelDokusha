@@ -25,6 +25,7 @@ import my.noveldokusha.composableActions.ListLoadWatcher
 import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.network.IteratorState
 import my.noveldokusha.repository.CatalogItem
+import my.noveldokusha.repository.rememberResolvedBookImagePath
 import my.noveldokusha.ui.composeViews.BookImageButtonView
 import my.noveldokusha.ui.composeViews.BookTitlePosition
 import my.noveldokusha.ui.previewFixtures.previewFixturesCatalogList
@@ -88,7 +89,10 @@ private fun SourceListView(
         items(list) {
             BookImageButtonView(
                 title = it.title,
-                coverImageModel = it.coverImageUrl,
+                coverImageModel = rememberResolvedBookImagePath(
+                    bookUrl = it.url,
+                    imagePath = it.coverImageUrl
+                ),
                 onClick = { onBookClick(it) },
                 onLongClick = { },
                 modifier = Modifier.width(130.dp),

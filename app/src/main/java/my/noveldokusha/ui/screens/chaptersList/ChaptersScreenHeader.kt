@@ -59,7 +59,7 @@ fun ChaptersScreenHeader(
         rememberResolvedBookImagePath(
             bookUrl = bookState.url,
             imagePath = it
-        ).value
+        )
     } ?: R.drawable.ic_baseline_empty_24
 
     Box(modifier = modifier) {

@@ -161,7 +161,7 @@ suspend fun epubParser(
 
     data class EpubManifestItem(
         val id: String,
-        val absoluteFilePath: String,
+        val absPath: String,
         val mediaType: String,
         val properties: String
     )
@@ -169,7 +169,7 @@ suspend fun epubParser(
     val manifestItems = manifest.selectChildTag("item").map {
         EpubManifestItem(
             id = it.getAttribute("id"),
-            absoluteFilePath = it.getAttribute("href").decodedURL.hrefAbsolutePath(),
+            absPath = it.getAttribute("href").decodedURL.hrefAbsolutePath(),
             mediaType = it.getAttribute("media-type"),
             properties = it.getAttribute("properties")
         )
@@ -189,34 +189,41 @@ suspend fun epubParser(
         .mapNotNull { manifestItems[it.getAttribute("idref")] }
         .filter { item ->
             chapterExtensions.any {
-                item.absoluteFilePath.endsWith(
-                    it,
-                    ignoreCase = true
+                item.absPath.endsWith(it, ignoreCase = true)
+            } || item.mediaType.startsWith("image/")
+        }
+        .mapNotNull { files[it.absPath]?.let { file -> it to file } }
+        .mapIndexed { index, (item, file) ->
+            val parser = EpubXMLFileParser(file.absPath, file.data, files)
+            if (item.mediaType.startsWith("image/")) {
+                TempEpubChapter(
+                    url = "image_${file.absPath}",
+                    title = null,
+                    body = parser.parseAsImage(item.absPath),
+                    chapterIndex = chapterIndex,
+                )
+            } else {
+                val res = parser.parseAsDocument()
+                // A full chapter usually is split in multiple sequential entries,
+                // try to merge them and extract the main title of each one.
+                // Is is not perfect but better than dealing with a table of contents
+                val chapterTitle = res.title ?: if (index == 0) metadataTitle else null
+                if (chapterTitle != null)
+                    chapterIndex += 1
+
+                TempEpubChapter(
+                    url = file.absPath,
+                    title = chapterTitle,
+                    body = res.body,
+                    chapterIndex = chapterIndex,
                 )
             }
-        }
-        .mapNotNull { files[it.absoluteFilePath] }
-        .mapIndexed { index, file ->
-            val res = EpubXMLFileParser(file.absPath, file.data, files).parse()
-            // A full chapter usually is split in multiple sequential entries,
-            // try to merge them and extract the main title of each one.
-            // Is is not perfect but better than dealing with a table of contents
-            val chapterTitle = res.title ?: if (index == 0) metadataTitle else null
-            if (chapterTitle != null)
-                chapterIndex += 1
-
-            TempEpubChapter(
-                url = file.absPath,
-                title = chapterTitle,
-                body = res.body,
-                chapterIndex = chapterIndex,
-            )
         }.groupBy {
             it.chapterIndex
-        }.map { (_, list) ->
+        }.map { (index, list) ->
             EpubChapter(
                 absPath = list.first().url,
-                title = list.first().title!!,
+                title = list.first().title ?: "Chapter $index",
                 body = list.joinToString("\n\n") { it.body }
             )
         }.filter {
@@ -237,13 +244,13 @@ suspend fun epubParser(
     val listedImages = manifestItems.asSequence()
         .map { it.value }
         .filter { it.mediaType.startsWith("image") }
-        .mapNotNull { files[it.absoluteFilePath] }
+        .mapNotNull { files[it.absPath] }
         .map { EpubImage(absPath = it.absPath, image = it.data) }
 
     val images = (listedImages + unlistedImages).distinctBy { it.absPath }
 
     val coverImage = manifestItems[metadataCoverId]
-        ?.let { files[it.absoluteFilePath] }
+        ?.let { files[it.absPath] }
         ?.let { EpubImage(absPath = it.absPath, image = it.data) }
 
     return@withContext EpubBook(
@@ -264,7 +271,7 @@ private class EpubXMLFileParser(
     val fileParentFolder: File = File(fileAbsolutePath).parentFile ?: File("")
 
 
-    fun parse(): Output {
+    fun parseAsDocument(): Output {
         val body = Jsoup.parse(data.inputStream(), "UTF-8", "").body()
 
         val title = body.selectFirst("h1, h2, h3, h4, h5, h6")?.text()
@@ -276,15 +283,7 @@ private class EpubXMLFileParser(
         )
     }
 
-    // Rewrites the image node to xml for the next stage.
-    private fun declareImgEntry(node: org.jsoup.nodes.Node): String {
-        val relPathEncoded = (node as? org.jsoup.nodes.Element)?.attr("src") ?: return ""
-        val absolutePathImage = File(fileParentFolder, relPathEncoded.decodedURL)
-            .canonicalFile
-            .toPath()
-            .invariantSeparatorsPathString
-            .removePrefix("/")
-
+    fun parseAsImage(absolutePathImage: String): String {
         // Use run catching so it can be run locally without crash
         val bitmap = zipFile[absolutePathImage]?.data?.runCatching {
             BitmapFactory.decodeByteArray(this, 0, this.size)
@@ -296,6 +295,20 @@ private class EpubXMLFileParser(
         ).toXMLString()
 
         return "\n\n$text\n\n"
+    }
+
+    // Rewrites the image node to xml for the next stage.
+    private fun declareImgEntry(node: org.jsoup.nodes.Node): String {
+        val attrs = node.attributes().associate { it.key to it.value }
+        val relPathEncoded = attrs["src"] ?: attrs["xlink:href"] ?: ""
+
+        val absolutePathImage = File(fileParentFolder, relPathEncoded.decodedURL)
+            .canonicalFile
+            .toPath()
+            .invariantSeparatorsPathString
+            .removePrefix("/")
+
+        return parseAsImage(absolutePathImage)
     }
 
     private fun getPTraverse(node: org.jsoup.nodes.Node): String {

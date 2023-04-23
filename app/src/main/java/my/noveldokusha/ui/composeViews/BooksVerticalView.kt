@@ -80,7 +80,7 @@ fun BooksVerticalView(
                     coverImageModel = rememberResolvedBookImagePath(
                         bookUrl = it.title,
                         imagePath = it.coverImageUrl
-                    ).value,
+                    ),
                     onClick = { onBookClicked(it) },
                     onLongClick = { onBookLongClicked(it) }
                 )

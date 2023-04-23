@@ -155,14 +155,13 @@ private fun LibraryPageBody(
             items = list,
             key = { it.book.url }
         ) {
-            val coverImageUrl by rememberResolvedBookImagePath(
-                bookUrl = it.book.url,
-                imagePath = it.book.coverImageUrl
-            )
             Box {
                 BookImageButtonView(
                     title = it.book.title,
-                    coverImageModel = coverImageUrl,
+                    coverImageModel = rememberResolvedBookImagePath(
+                        bookUrl = it.book.url,
+                        imagePath = it.book.coverImageUrl
+                    ),
                     onClick = { onClick(it) },
                     onLongClick = { onLongClick(it) }
                 )
