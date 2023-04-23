@@ -3,6 +3,8 @@ package my.noveldokusha.ui.theme
 import androidx.annotation.StringRes
 import androidx.annotation.StyleRes
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.text.selection.LocalTextSelectionColors
+import androidx.compose.foundation.text.selection.TextSelectionColors
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -88,15 +90,22 @@ fun InternalTheme(
         color = colorScheme.primary,
         darkIcons = theme.isLight
     )
+    val textSelectionColors = remember {
+        TextSelectionColors(
+            handleColor = ColorAccent,
+            backgroundColor = ColorAccent.copy(alpha = 0.3f)
+        )
+    }
 
-    CompositionLocalProvider(
-        LocalContentColor provides colorScheme.onPrimary,
-        LocalAppColor provides appColor
+    MaterialTheme(
+        colorScheme = colorScheme,
+        typography = typography,
+        shapes = shapes,
     ) {
-        MaterialTheme(
-            colorScheme = colorScheme,
-            typography = typography,
-            shapes = shapes,
+        CompositionLocalProvider(
+            LocalContentColor provides colorScheme.onPrimary,
+            LocalAppColor provides appColor,
+            LocalTextSelectionColors provides textSelectionColors,
             content = content
         )
     }
