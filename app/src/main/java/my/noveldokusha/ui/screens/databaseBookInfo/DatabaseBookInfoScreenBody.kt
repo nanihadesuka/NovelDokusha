@@ -3,13 +3,13 @@ package my.noveldokusha.ui.screens.databaseBookInfo
 import androidx.compose.animation.*
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
-import androidx.compose.material3.SuggestionChip
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
@@ -30,7 +30,6 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import my.noveldokusha.R
 import my.noveldokusha.data.BookMetadata
-import my.noveldokusha.scraper.DatabaseInterface
 import my.noveldokusha.scraper.SearchGenre
 import my.noveldokusha.ui.composeViews.BookImageButtonView
 import my.noveldokusha.ui.composeViews.BookTitlePosition
@@ -38,6 +37,7 @@ import my.noveldokusha.ui.composeViews.ExpandableText
 import my.noveldokusha.ui.composeViews.ImageView
 import my.noveldokusha.ui.composeViews.MyButton
 import my.noveldokusha.ui.theme.ColorAccent
+import my.noveldokusha.utils.clickableNoIndicator
 import my.noveldokusha.utils.textPadding
 
 @OptIn(
@@ -48,7 +48,6 @@ import my.noveldokusha.utils.textPadding
 fun DatabaseBookInfoScreenBody(
     state: DatabaseBookInfoState,
     onSourcesClick: () -> Unit,
-    onAuthorsClick: (author: DatabaseInterface.AuthorMetadata) -> Unit,
     onGenresClick: (genresIds: List<SearchGenre>) -> Unit,
     onBookClick: (book: BookMetadata) -> Unit,
     modifier: Modifier = Modifier,
@@ -101,13 +100,16 @@ fun DatabaseBookInfoScreenBody(
                         modifier = Modifier.weight(1f),
                         bookTitlePosition = BookTitlePosition.Hidden
                     )
-                    Text(
-                        text = state.book.value.title,
-                        style = MaterialTheme.typography.titleLarge,
-                        textAlign = TextAlign.Center,
-                        fontWeight = FontWeight.Bold,
+                    SelectionContainer(
                         modifier = Modifier.weight(1f)
-                    )
+                    ) {
+                        Text(
+                            text = state.book.value.title,
+                            style = MaterialTheme.typography.titleLarge,
+                            textAlign = TextAlign.Center,
+                            fontWeight = FontWeight.Bold,
+                        )
+                    }
                     if (showImageFullScreen) Dialog(
                         onDismissRequest = { showImageFullScreen = false },
                         properties = DialogProperties(
@@ -118,7 +120,9 @@ fun DatabaseBookInfoScreenBody(
                     ) {
                         ImageView(
                             imageModel = state.book.value.coverImageUrl,
-                            modifier = Modifier.fillMaxWidth(),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickableNoIndicator { showImageFullScreen = false },
                             contentScale = ContentScale.FillWidth
                         )
                     }
@@ -134,82 +138,117 @@ fun DatabaseBookInfoScreenBody(
             }
         }
 
-        Column(Modifier.padding(horizontal = 12.dp)) {
-
-            ExpandableText(text = state.book.value.description, linesForExpand = 8)
-
-            Title(stringResource(R.string.alternative_titles))
-            if (state.book.value.alternativeTitles.isEmpty())
-                TextAnimated(text = stringResource(R.string.none_found))
-            for (title in state.book.value.alternativeTitles)
-                TextAnimated(text = title)
-
-            Title(stringResource(R.string.authors))
-            FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                state.book.value.authors.forEach {
-                    SuggestionChip(
-                        onClick = { onAuthorsClick(it) },
-                        label = { Text(text = it.name) }
-                    )
+        Column(
+            modifier = Modifier.padding(horizontal = 12.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            SelectionContainer {
+                ExpandableText(
+                    text = state.book.value.description,
+                    linesForExpand = 8,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+            Section(stringResource(R.string.alternative_titles)) {
+                val titles by remember(state.book.value.alternativeTitles) {
+                    derivedStateOf {
+                        state.book.value.alternativeTitles.joinToString(separator = "\n")
+                    }
+                }
+                if (state.book.value.alternativeTitles.isEmpty()) {
+                    TextAnimated(text = stringResource(R.string.none_found))
+                } else {
+                    SelectionContainer {
+                        ExpandableText(
+                            text = titles,
+                            linesForExpand = 4,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
                 }
             }
-
-            Title(stringResource(R.string.genres))
-            if (state.book.value.genres.isNotEmpty()) OutlinedCard(
-                onClick = { onGenresClick(state.book.value.genres) },
-                colors = CardDefaults.outlinedCardColors(containerColor = MaterialTheme.colorScheme.primary),
-                modifier = Modifier.padding(top = 8.dp),
-            ) {
-                TextAnimated(
-                    text = state.book.value.genres.joinToString(" · ") { it.genreName },
-                    modifier = Modifier.textPadding()
-                )
+            Section(stringResource(R.string.authors)) {
+                if (state.book.value.authors.isEmpty()) {
+                    TextAnimated(text = stringResource(id = R.string.none_found))
+                } else {
+                    SelectionContainer {
+                        FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            state.book.value.authors.forEach {
+                                Container {
+                                    Text(text = it.name, modifier = Modifier.textPadding())
+                                }
+                            }
+                        }
+                    }
+                }
             }
-
-            Title(stringResource(R.string.tags))
-            if (state.book.value.tags.isNotEmpty()) ElevatedCard(
-                modifier = Modifier.padding(top = 8.dp),
-                elevation = CardDefaults.elevatedCardElevation(defaultElevation = 0.dp),
-                colors = CardDefaults.elevatedCardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
-            ) {
-                val tagsText by remember { derivedStateOf { state.book.value.tags.joinToString(" · ") } }
-                ExpandableText(
-                    text = tagsText,
-                    linesForExpand = 3,
-                    modifier = Modifier.textPadding()
-                )
+            Section(stringResource(R.string.genres)) {
+                if (state.book.value.genres.isEmpty()) {
+                    TextAnimated(text = stringResource(id = R.string.none_found))
+                } else {
+                    OutlinedCard(
+                        onClick = { onGenresClick(state.book.value.genres) },
+                        colors = CardDefaults.outlinedCardColors(containerColor = MaterialTheme.colorScheme.primary),
+                        shape = MaterialTheme.shapes.small,
+                    ) {
+                        TextAnimated(
+                            text = state.book.value.genres.joinToString(" · ") { it.genreName },
+                            modifier = Modifier.textPadding()
+                        )
+                    }
+                }
             }
-
-            Title(stringResource(R.string.related_books))
-            if (state.book.value.relatedBooks.isEmpty())
-                TextAnimated(text = stringResource(id = R.string.none_found))
-            Column(
-                verticalArrangement = Arrangement.spacedBy(8.dp),
-                modifier = Modifier.padding(top = 8.dp),
-            ) {
-                for (book in state.book.value.relatedBooks) MyButton(
-                    text = book.title,
-                    onClick = { onBookClick(book) },
-                    outerPadding = 0.dp,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                )
+            Section(stringResource(R.string.tags)) {
+                if (state.book.value.tags.isEmpty()) {
+                    TextAnimated(text = stringResource(id = R.string.none_found))
+                } else {
+                    Container {
+                        val tagsText by remember {
+                            derivedStateOf { state.book.value.tags.joinToString(" · ") }
+                        }
+                        SelectionContainer {
+                            ExpandableText(
+                                text = tagsText,
+                                linesForExpand = 3,
+                                modifier = Modifier.textPadding()
+                            )
+                        }
+                    }
+                }
             }
-
-            Title(stringResource(R.string.similar_recommended))
-            if (state.book.value.similarRecommended.isEmpty())
-                TextAnimated(text = stringResource(id = R.string.none_found))
-            Column(
-                verticalArrangement = Arrangement.spacedBy(8.dp),
-                modifier = Modifier.padding(top = 8.dp),
-            ) {
-                for (book in state.book.value.similarRecommended) MyButton(
-                    text = book.title,
-                    onClick = { onBookClick(book) },
-                    outerPadding = 0.dp,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                )
+            Section(stringResource(R.string.related_books)) {
+                if (state.book.value.relatedBooks.isEmpty()) {
+                    TextAnimated(text = stringResource(id = R.string.none_found))
+                } else {
+                    Column(
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        for (book in state.book.value.relatedBooks) MyButton(
+                            text = book.title,
+                            onClick = { onBookClick(book) },
+                            outerPadding = 0.dp,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                        )
+                    }
+                }
+            }
+            Section(stringResource(R.string.similar_recommended)) {
+                if (state.book.value.similarRecommended.isEmpty()) {
+                    TextAnimated(text = stringResource(id = R.string.none_found))
+                } else {
+                    Column(
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        for (book in state.book.value.similarRecommended) MyButton(
+                            text = book.title,
+                            onClick = { onBookClick(book) },
+                            outerPadding = 0.dp,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                        )
+                    }
+                }
             }
         }
         Spacer(modifier = Modifier.height(200.dp))
@@ -217,12 +256,30 @@ fun DatabaseBookInfoScreenBody(
 }
 
 @Composable
-private fun Title(name: String) {
-    Text(
-        text = name,
-        color = ColorAccent,
-        style = MaterialTheme.typography.titleMedium,
-        modifier = Modifier.padding(top = 16.dp, bottom = 4.dp),
+private fun Section(title: String, content: @Composable () -> Unit) {
+    Column(
+        verticalArrangement = Arrangement.spacedBy(4.dp)
+    ) {
+        Text(
+            text = title,
+            color = ColorAccent,
+            style = MaterialTheme.typography.titleMedium,
+        )
+        content()
+    }
+}
+
+@Composable
+private fun Container(
+    modifier: Modifier = Modifier,
+    content: @Composable ColumnScope.() -> Unit
+) {
+    ElevatedCard(
+        modifier = modifier,
+        elevation = CardDefaults.elevatedCardElevation(defaultElevation = 0.dp),
+        colors = CardDefaults.elevatedCardColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
+        shape = MaterialTheme.shapes.small,
+        content = content,
     )
 }
 

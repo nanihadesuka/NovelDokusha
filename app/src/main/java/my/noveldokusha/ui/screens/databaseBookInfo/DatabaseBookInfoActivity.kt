@@ -45,7 +45,6 @@ class DatabaseBookInfoActivity : BaseActivity() {
                 DatabaseBookInfoScreen(
                     state = viewModel.state,
                     onSourcesClick = ::openGlobalSearchPage,
-                    onAuthorsClick = ::openSearchPageByAuthor,
                     onGenresClick = ::openSearchPageByGenres,
                     onBookClick = ::openBookInfo,
                     onOpenInWeb = { goToWebBrowser(viewModel.bookUrl) },
@@ -56,10 +55,6 @@ class DatabaseBookInfoActivity : BaseActivity() {
     }
 
     private fun openGlobalSearchPage() = goToGlobalSearch(text = viewModel.state.book.value.title)
-
-    private fun openSearchPageByAuthor(author: DatabaseInterface.AuthorMetadata) {
-        // TODO
-    }
 
     private fun openSearchPageByGenres(genres: List<SearchGenre>) = goToDatabaseSearchGenres(
         includedGenresIds = genres.map { it.id },

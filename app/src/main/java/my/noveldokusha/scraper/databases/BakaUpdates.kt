@@ -207,14 +207,16 @@ class BakaUpdates(
 
             val tags = entry("Categories")
                 .select("li > a")
-                .map { it.text() }
+                .mapNotNull { it.text().ifBlank { null } }
 
             val coverImageUrl = entry("Image")
                 .selectFirst("img[src]")!!
                 .attr("src")
 
-            val genres = entry("Genre").select("a").dropLast(1)
-                .map { SearchGenre(genreName = it.text(), id = it.text()) }
+            val genres = entry("Genre").select("a")
+                .dropLast(1)
+                .mapNotNull { it.text().ifBlank { null } }
+                .map { SearchGenre(genreName = it, id = it) }
 
             DatabaseInterface.BookData(
                 title = doc.selectFirst(".releasestitle.tabletitle")!!.text().removeNovelTag(),

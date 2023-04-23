@@ -7,7 +7,6 @@ import kotlinx.coroutines.withContext
 import my.noveldokusha.data.database.tables.Book
 import my.noveldokusha.data.database.tables.Chapter
 import my.noveldokusha.data.database.tables.ChapterBody
-import my.noveldokusha.isContentUri
 import my.noveldokusha.repository.AppFileResolver
 import my.noveldokusha.repository.Repository
 import timber.log.Timber

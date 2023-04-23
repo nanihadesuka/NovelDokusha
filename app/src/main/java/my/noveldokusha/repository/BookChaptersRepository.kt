@@ -54,5 +54,4 @@ class BookChaptersRepository(
             ) { old, new -> old.copy(position = new.position) }
         insertReplace(current.values.toList())
     }
-
 }

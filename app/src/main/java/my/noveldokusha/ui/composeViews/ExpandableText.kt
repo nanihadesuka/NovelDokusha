@@ -12,7 +12,7 @@ import androidx.compose.animation.with
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.BoxWithConstraints
-import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -57,7 +57,7 @@ fun ExpandableText(
                 density = LocalDensity.current,
                 fontFamilyResolver = LocalFontFamilyResolver.current
             )
-            val textColor = MaterialTheme.colorScheme.onPrimary
+            val textColor = LocalContentColor.current
             val textColorEnd by animateColorAsState(
                 targetValue = when {
                     target.isBlank() -> textColor.copy(alpha = 0.25f)
@@ -77,7 +77,6 @@ fun ExpandableText(
                     )
                 ),
                 modifier = modifier
-                    .fillMaxWidth()
                     .ifCase(target.isNotBlank()) { animateContentSize() }
                     .clickable(
                         interactionSource = remember { MutableInteractionSource() },

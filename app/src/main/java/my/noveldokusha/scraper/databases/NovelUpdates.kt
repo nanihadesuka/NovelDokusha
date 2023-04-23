@@ -171,19 +171,28 @@ class NovelUpdates(
             .select("a[href]")
             .map { DatabaseInterface.AuthorMetadata(name = it.text(), url = it.attr("href")) }
 
-        val genres = doc.select("#seriesgenre a")
+        val genres = doc
+            .select("#seriesgenre a")
             .map { SearchGenre(genreName = it.text(), id = it.attr("gid")) }
 
+        val tags = doc
+            .select("#showtags a")
+            .mapNotNull { it.text().ifBlank { null } }
+
+        val alternativeTitles = TextExtractor
+            .get(doc.selectFirst("#editassociated"))
+            .split("\n")
+            .mapNotNull { it.trim().ifBlank { null } }
+
         DatabaseInterface.BookData(
-            title = doc.selectFirst(".seriestitlenu")?.text() ?: "",
+            title = doc.selectFirst(".seriestitlenu")?.text()?.trim() ?: "",
             description = TextExtractor.get(doc.selectFirst("#editdescription")).trim(),
-            alternativeTitles = TextExtractor.get(doc.selectFirst("#editassociated"))
-                .split("\n"),
+            alternativeTitles = alternativeTitles,
             relatedBooks = relatedBooks,
             similarRecommended = similarRecommended,
             bookType = doc.selectFirst(".genre, .type")?.text() ?: "",
             genres = genres,
-            tags = doc.select("#showtags a").map { it.text() },
+            tags = tags,
             authors = authors,
             coverImageUrl = doc.selectFirst("div.seriesimg > img[src]")?.attr("src")
         )

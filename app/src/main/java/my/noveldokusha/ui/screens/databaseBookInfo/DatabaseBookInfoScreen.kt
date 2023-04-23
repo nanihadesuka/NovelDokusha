@@ -37,7 +37,6 @@ import my.noveldokusha.ui.theme.InternalTheme
 fun DatabaseBookInfoScreen(
     state: DatabaseBookInfoState,
     onSourcesClick: () -> Unit,
-    onAuthorsClick: (DatabaseInterface.AuthorMetadata) -> Unit,
     onGenresClick: (List<SearchGenre>) -> Unit,
     onBookClick: (BookMetadata) -> Unit,
     onOpenInWeb: () -> Unit,
@@ -82,7 +81,6 @@ fun DatabaseBookInfoScreen(
             DatabaseBookInfoScreenBody(
                 state = state,
                 onSourcesClick = onSourcesClick,
-                onAuthorsClick = onAuthorsClick,
                 onGenresClick = onGenresClick,
                 onBookClick = onBookClick,
                 modifier = Modifier.padding(innerPadding)
@@ -132,7 +130,6 @@ private fun PreviewView() {
         DatabaseBookInfoScreenBody(
             state = state,
             onSourcesClick = {},
-            onAuthorsClick = {},
             onGenresClick = {},
             onBookClick = {},
         )

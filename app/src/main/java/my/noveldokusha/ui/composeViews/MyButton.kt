@@ -6,8 +6,6 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.border
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Home
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -17,7 +15,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.luminance
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
@@ -40,7 +37,7 @@ fun MyButton(
     outerPadding: Dp = 4.dp,
     contentPadding: PaddingValues = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
     minHeight: Dp = selectableMinHeight,
-    shape: Shape = MaterialTheme.shapes.medium,
+    shape: Shape = MaterialTheme.shapes.small,
     borderWidth: Dp = 1.dp,
     borderColor: Color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.2f),
     backgroundColor: Color = MaterialTheme.colorScheme.primary,
@@ -74,53 +71,6 @@ fun MyButton(
         outerPadding = outerPadding,
         minHeight = minHeight,
         minWidth = Dp.Unspecified,
-        shape = shape,
-        borderWidth = borderWidth,
-        borderColor = borderColor,
-        backgroundColor = backgroundColor,
-        selectedBackgroundColor = selectedBackgroundColor,
-        selected = selected,
-        onClick = onClick,
-        onLongClick = onLongClick,
-        content = content,
-    )
-}
-
-@Composable
-fun MyIconButton(
-    icon: ImageVector,
-    modifier: Modifier = Modifier,
-    enabled: Boolean = true,
-    animate: Boolean = true,
-    contentDescription: String? = null,
-    outerPadding: Dp = 4.dp,
-    contentPadding: PaddingValues = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
-    minSize: Dp = selectableMinHeight,
-    shape: Shape = MaterialTheme.shapes.large,
-    borderWidth: Dp = 1.dp,
-    borderColor: Color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.2f),
-    backgroundColor: Color = MaterialTheme.colorScheme.primary,
-    selectedBackgroundColor: Color = ColorAccent,
-    selected: Boolean = false,
-    onClick: () -> Unit,
-    onLongClick: (() -> Unit)? = null,
-    content: @Composable BoxScope.() -> Unit = {
-        Icon(
-            imageVector = icon,
-            contentDescription = contentDescription,
-            modifier = Modifier
-                .padding(contentPadding)
-                .align(Alignment.Center),
-        )
-    }
-) {
-    InternalButton(
-        modifier = modifier,
-        enabled = enabled,
-        animate = animate,
-        outerPadding = outerPadding,
-        minHeight = minSize,
-        minWidth = minSize,
         shape = shape,
         borderWidth = borderWidth,
         borderColor = borderColor,
@@ -187,20 +137,6 @@ fun Preview() {
                 text = "Theme ${theme.name}",
                 modifier = Modifier.fillMaxWidth(),
                 onClick = {},
-            )
-        }
-    }
-}
-
-@Preview
-@Composable
-fun PreviewIcon() {
-    Column {
-        for (theme in Themes.values()) InternalTheme(theme) {
-            MyIconButton(
-                icon = Icons.Filled.Home,
-                modifier = Modifier.fillMaxWidth(),
-                onClick = {}
             )
         }
     }
