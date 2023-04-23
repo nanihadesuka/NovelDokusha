@@ -14,7 +14,7 @@ jobs:
       - name: Set up JDK enviroment
         uses: actions/setup-java@v1.4.3
         with:
-          java-version: 11
+          java-version: 17
 
       - name: Setup Python enviroment
         uses: actions/setup-python@v2
