@@ -62,8 +62,7 @@ class SourceCatalogViewModel @Inject constructor(
 
     fun addToLibraryToggle(book: BookMetadata) = viewModelScope.launch(Dispatchers.IO)
     {
-        repository.toggleBookmark(bookUrl = book.url, bookTitle = book.title)
-        val isInLibrary = repository.libraryBooks.existInLibrary(book.url)
+        val isInLibrary = repository.toggleBookmark(bookUrl = book.url, bookTitle = book.title)
         val res = if (isInLibrary) R.string.added_to_library else R.string.removed_from_library
         toasty.show(res)
     }

@@ -41,11 +41,19 @@ class LibraryBooksRepository(
     suspend fun getAll() = libraryDao.getAll()
     suspend fun getAllInLibrary() = libraryDao.getAllInLibrary()
     suspend fun existInLibrary(url: String) = libraryDao.existInLibrary(url)
-    suspend fun toggleBookmark(bookUrl: String, bookTitle: String) = operations.transaction {
-        val book = get(bookUrl)
-        if (book == null)
-            insert(Book(title = bookTitle, url = bookUrl, inLibrary = true))
-        else
-            update(book.copy(inLibrary = !book.inLibrary))
+    suspend fun toggleBookmark(
+        bookUrl: String,
+        bookTitle: String
+    ): Boolean = operations.transaction {
+        when (val book = get(bookUrl)) {
+            null -> {
+                insert(Book(title = bookTitle, url = bookUrl, inLibrary = true))
+                true
+            }
+            else -> {
+                update(book.copy(inLibrary = !book.inLibrary))
+                !book.inLibrary
+            }
+        }
     }
 }

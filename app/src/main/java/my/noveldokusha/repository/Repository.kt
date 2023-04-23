@@ -6,6 +6,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.withContext
+import my.noveldokusha.data.Response
 import my.noveldokusha.data.database.AppDatabase
 import my.noveldokusha.data.database.tables.Book
 import my.noveldokusha.data.database.tables.Chapter
@@ -27,16 +28,17 @@ class Repository @Inject constructor(
     val settings = Settings()
     val eventDataRestored = MutableSharedFlow<Unit>()
 
-    suspend fun toggleBookmark(bookUrl: String, bookTitle: String) {
+    suspend fun toggleBookmark(bookUrl: String, bookTitle: String): Boolean {
         val realUrl = appFileResolver.getLocalIfContentType(bookUrl, bookFolderName = bookTitle)
-        if (bookUrl.isContentUri && libraryBooks.get(realUrl) == null) {
+        return if (bookUrl.isContentUri && libraryBooks.get(realUrl) == null) {
             importEpubFromContentUri(
                 contentUri = bookUrl,
                 bookTitle = bookTitle,
-                addToLibrary = false
-            )
+                addToLibrary = true
+            ) is Response.Success
+        } else {
+            libraryBooks.toggleBookmark(bookUrl = realUrl, bookTitle = bookTitle)
         }
-        libraryBooks.toggleBookmark(bookUrl = realUrl, bookTitle = bookTitle)
     }
 
     suspend fun importEpubFromContentUri(

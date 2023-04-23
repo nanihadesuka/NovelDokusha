@@ -145,8 +145,7 @@ class ChaptersViewModel @Inject constructor(
 
     fun toggleBookmark() {
         viewModelScope.launch {
-            repository.toggleBookmark(bookTitle = bookTitle, bookUrl = bookUrl)
-            val isBookmarked = repository.libraryBooks.get(bookUrl)?.inLibrary ?: false
+            val isBookmarked = repository.toggleBookmark(bookTitle = bookTitle, bookUrl = bookUrl)
             val msg = if (isBookmarked) R.string.added_to_library else R.string.removed_from_library
             toasty.show(msg)
         }
