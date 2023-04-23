@@ -7,23 +7,23 @@ import kotlinx.coroutines.withContext
 import my.noveldokusha.data.database.tables.Book
 import my.noveldokusha.data.database.tables.Chapter
 import my.noveldokusha.data.database.tables.ChapterBody
+import my.noveldokusha.isContentUri
 import my.noveldokusha.repository.AppFileResolver
 import my.noveldokusha.repository.Repository
 import timber.log.Timber
-import java.nio.file.Paths
+import java.io.File
 
-suspend fun epubCoverImporter(
-    storageFolderName: String,
-    appFileResolver: AppFileResolver,
-    coverImage: EpubImage,
+
+suspend fun epubImageImporter(
+    targetFile: File,
+    imageData: ByteArray,
 ) = withContext(Dispatchers.IO) {
-    val imgFile = appFileResolver.getLocalBookCoverFile(storageFolderName)
-    imgFile.parentFile?.also { parent ->
+    targetFile.parentFile?.also { parent ->
         parent.mkdirs()
         if (parent.exists()) {
-            imgFile.writeBytes(coverImage.image)
+            targetFile.writeBytes(imageData)
         } else {
-            Timber.e("Failed to create folder ${parent.absolutePath}")
+            Timber.e("epubCoverImporter: Failed to create folder ${parent.absolutePath}")
         }
     }
 }
@@ -31,56 +31,56 @@ suspend fun epubCoverImporter(
 suspend fun epubImporter(
     storageFolderName: String,
     repository: Repository,
+    appFileResolver: AppFileResolver,
     epub: EpubBook,
     addToLibrary: Boolean
 ): Unit = withContext(Dispatchers.IO) {
-    val databaseBookUrl = storageFolderName.addLocalPrefix()
+    val localBookUrl = appFileResolver.getLocalBookPath(storageFolderName)
 
     // First clean any previous entries from the book
-    repository.bookChapters.chapters(databaseBookUrl)
+    repository.bookChapters.chapters(localBookUrl)
         .map { it.url }
         .let { repository.chapterBody.removeRows(it) }
-    repository.bookChapters.removeAllFromBook(databaseBookUrl)
-    repository.libraryBooks.remove(databaseBookUrl)
+    repository.bookChapters.removeAllFromBook(localBookUrl)
+    repository.libraryBooks.remove(localBookUrl)
+
+    if (epub.coverImage != null) {
+        epubImageImporter(
+            targetFile = appFileResolver.getStorageBookCoverImageFile(storageFolderName),
+            imageData = epub.coverImage.image
+        )
+    }
 
     // Insert new book data
     Book(
-        title = epub.title,
-        url = databaseBookUrl,
-        coverImageUrl = epub.coverImagePath.addLocalPrefix(),
+        title = storageFolderName,
+        url = localBookUrl,
+        coverImageUrl = appFileResolver.getLocalBookCoverPath(),
         inLibrary = addToLibrary
     ).let { repository.libraryBooks.insert(it) }
 
-    epub.chapters
-        .mapIndexed { i, it ->
-            Chapter(
-                title = it.title,
-                url = it.url.addLocalPrefix(),
-                bookUrl = databaseBookUrl,
-                position = i
-            )
-        }
-        .let { repository.bookChapters.insert(it) }
+    epub.chapters.mapIndexed { i, chapter ->
+        Chapter(
+            title = chapter.title,
+            url = appFileResolver.getLocalBookChapterPath(storageFolderName, chapter.absPath),
+            bookUrl = localBookUrl,
+            position = i
+        )
+    }.let { repository.bookChapters.insert(it) }
 
-    epub.chapters
-        .map { ChapterBody(url = it.url.addLocalPrefix(), body = it.body) }
-        .let { repository.chapterBody.insertReplace(it) }
+    epub.chapters.map { chapter ->
+        ChapterBody(
+            url = appFileResolver.getLocalBookChapterPath(storageFolderName, chapter.absPath),
+            body = chapter.body
+        )
+    }.let { repository.chapterBody.insertReplace(it) }
 
     epub.images.map {
         async {
-            val imgFile = Paths.get(
-                repository.settings.folderBooks.path,
-                storageFolderName,
-                it.absoluteFilePath
-            ).toFile()
-            imgFile.parentFile?.also { parent ->
-                parent.mkdirs()
-                if (parent.exists()) {
-                    imgFile.writeBytes(it.image)
-                } else {
-                    Timber.e("Failed to create folder ${parent.absolutePath}")
-                }
-            }
+            epubImageImporter(
+                targetFile = appFileResolver.getStorageBookImageFile(storageFolderName, it.absPath),
+                imageData = it.image
+            )
         }
     }.awaitAll()
 }

@@ -25,6 +25,7 @@ import my.noveldokusha.R
 import my.noveldokusha.composableActions.ListGridLoadWatcher
 import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.network.IteratorState
+import my.noveldokusha.repository.rememberResolvedBookImagePath
 import my.noveldokusha.ui.theme.ColorAccent
 
 @Composable
@@ -76,7 +77,10 @@ fun BooksVerticalView(
                 )
                 AppPreferences.LIST_LAYOUT_MODE.verticalGrid -> BookImageButtonView(
                     title = it.title,
-                    coverImageModel = it.coverImageUrl,
+                    coverImageModel = rememberResolvedBookImagePath(
+                        bookUrl = it.title,
+                        imagePath = it.coverImageUrl
+                    ).value,
                     onClick = { onBookClicked(it) },
                     onLongClick = { onBookLongClicked(it) }
                 )

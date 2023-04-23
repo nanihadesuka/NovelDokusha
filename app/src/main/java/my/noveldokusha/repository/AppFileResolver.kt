@@ -7,23 +7,42 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import dagger.hilt.android.qualifiers.ApplicationContext
+import my.noveldokusha.isContentUri
 import java.io.File
 import java.nio.file.Paths
 import javax.inject.Inject
 
+private val String.stripLocal get() = removePrefix("local://")
+private fun String.addLocalPrefix() = "local://${this}"
+
 class AppFileResolver @Inject constructor(
     @ApplicationContext context: Context,
 ) {
+    companion object {
+        const val coverPathRelativeToBook = "__cover_image"
+    }
+
     val folderBooks = File(context.filesDir, "books")
 
-    fun getLocalBookCoverFile(storageFolderName: String): File =
-        Paths.get(folderBooks.absolutePath, storageFolderName, "__cover").toFile()
+    fun getLocalIfContentType(url: String, bookFolderName: String) =
+        if (url.isContentUri) bookFolderName.addLocalPrefix() else url
 
-    fun getLocalBookFolder(bookUrl: String): File =
-        File(folderBooks, bookUrl.removePrefix("local://"))
+    fun getLocalBookCoverPath(): String =
+        Paths.get(coverPathRelativeToBook).toString().addLocalPrefix()
 
-    fun getLocalBookImage(bookUrl: String, imagePath: String): File =
-        File(getLocalBookFolder(bookUrl), imagePath.removePrefix("local://"))
+    fun getLocalBookChapterPath(bookFolderName: String, chapterName: String): String =
+        Paths.get(bookFolderName.stripLocal, chapterName.stripLocal).toString().addLocalPrefix()
+
+    fun getLocalBookPath(bookFolderName: String): String =
+        Paths.get(bookFolderName.stripLocal).toString().addLocalPrefix()
+
+    fun getStorageBookCoverImageFile(bookFolderName: String): File =
+        Paths.get(folderBooks.absolutePath, bookFolderName.stripLocal, coverPathRelativeToBook)
+            .toFile()
+
+    fun getStorageBookImageFile(bookFolderName: String, imagePath: String): File =
+        Paths.get(folderBooks.absolutePath, bookFolderName.stripLocal, imagePath.stripLocal)
+            .toFile()
 
     /**
      * Returns the path to the image if local, no changes if non local.
@@ -31,13 +50,7 @@ class AppFileResolver @Inject constructor(
     fun resolvedBookImagePath(bookUrl: String, imagePath: String): Any = when {
         imagePath.startsWith("http://", ignoreCase = true) -> imagePath
         imagePath.startsWith("https://", ignoreCase = true) -> imagePath
-        else -> getLocalBookImage(bookUrl, imagePath)
-    }
-
-    fun resolvedBookImagePathString(bookUrl: String, imagePath: String): String = when {
-        imagePath.startsWith("http://", ignoreCase = true) -> imagePath
-        imagePath.startsWith("https://", ignoreCase = true) -> imagePath
-        else -> getLocalBookImage(bookUrl, imagePath).canonicalPath
+        else -> getStorageBookImageFile(bookUrl, imagePath)
     }
 }
 

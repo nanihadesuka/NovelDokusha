@@ -12,7 +12,6 @@ import my.noveldokusha.data.database.tables.Chapter
 import my.noveldokusha.isContentUri
 import my.noveldokusha.tools.epub.epubImporter
 import my.noveldokusha.tools.epub.epubParser
-import my.noveldokusha.tools.epub.urlIfContent
 import my.noveldokusha.utils.tryAsResponse
 import javax.inject.Inject
 
@@ -23,13 +22,13 @@ class Repository @Inject constructor(
     val libraryBooks: LibraryBooksRepository,
     val bookChapters: BookChaptersRepository,
     val chapterBody: ChapterBodyRepository,
-    val appFileResolver: AppFileResolver,
+    private val appFileResolver: AppFileResolver,
 ) {
     val settings = Settings()
     val eventDataRestored = MutableSharedFlow<Unit>()
 
     suspend fun toggleBookmark(bookUrl: String, bookTitle: String) {
-        val realUrl = bookUrl.urlIfContent(bookTitle)
+        val realUrl = appFileResolver.getLocalIfContentType(bookUrl, bookFolderName = bookTitle)
         if (bookUrl.isContentUri && libraryBooks.get(realUrl) == null) {
             importEpubFromContentUri(
                 contentUri = bookUrl,
@@ -50,6 +49,7 @@ class Repository @Inject constructor(
         val epub = inputStream.use { epubParser(inputStream = inputStream) }
         epubImporter(
             storageFolderName = bookTitle,
+            appFileResolver = appFileResolver,
             repository = this,
             epub = epub,
             addToLibrary = addToLibrary

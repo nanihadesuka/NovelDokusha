@@ -1,6 +1,5 @@
 package my.noveldokusha.ui.screens.chaptersList
 
-import android.content.Context
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
@@ -8,7 +7,6 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
@@ -25,12 +23,12 @@ import my.noveldokusha.di.AppCoroutineScope
 import my.noveldokusha.isContentUri
 import my.noveldokusha.isLocalUri
 import my.noveldokusha.network.NetworkClient
+import my.noveldokusha.repository.AppFileResolver
 import my.noveldokusha.repository.Repository
 import my.noveldokusha.scraper.Scraper
 import my.noveldokusha.scraper.downloadBookCoverImageUrl
 import my.noveldokusha.scraper.downloadBookDescription
 import my.noveldokusha.scraper.downloadChaptersList
-import my.noveldokusha.tools.epub.addLocalPrefix
 import my.noveldokusha.ui.BaseViewModel
 import my.noveldokusha.ui.Toasty
 import my.noveldokusha.utils.StateExtra_String
@@ -49,14 +47,14 @@ class ChaptersViewModel @Inject constructor(
     private val networkClient: NetworkClient,
     private val scraper: Scraper,
     private val toasty: Toasty,
-    val appPreferences: AppPreferences,
+    private val appPreferences: AppPreferences,
+    private val appFileResolver: AppFileResolver,
     stateHandle: SavedStateHandle,
-    @ApplicationContext private val context: Context,
 ) : BaseViewModel(), ChapterStateBundle {
     override var rawBookUrl by StateExtra_String(stateHandle)
     override var bookTitle by StateExtra_String(stateHandle)
 
-    val bookUrl = if (rawBookUrl.isContentUri) bookTitle.addLocalPrefix() else rawBookUrl
+    val bookUrl = appFileResolver.getLocalIfContentType(rawBookUrl, bookFolderName = bookTitle)
 
     @Volatile
     private var loadChaptersJob: Job? = null
@@ -193,10 +191,11 @@ class ChaptersViewModel @Inject constructor(
             state.isRefreshing.value = true
             val rawBookUrl = rawBookUrl
             val bookTitle = bookTitle
+            val isInLibrary = repository.libraryBooks.existInLibrary(bookUrl)
             repository.importEpubFromContentUri(
                 contentUri = rawBookUrl,
                 bookTitle = bookTitle,
-                addToLibrary = false
+                addToLibrary = isInLibrary
             ).onError {
                 state.error.value = it.message
             }

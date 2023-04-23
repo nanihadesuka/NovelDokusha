@@ -16,7 +16,6 @@ import coil.compose.AsyncImage
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import my.noveldokusha.R
-import my.noveldokusha.repository.rememberResolvedBookImagePath
 
 @Composable
 fun ImageView(

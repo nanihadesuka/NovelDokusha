@@ -43,8 +43,8 @@ import my.noveldokusha.network.tryConnect
 import my.noveldokusha.repository.AppFileResolver
 import my.noveldokusha.scraper.LocalSourcesDirectories
 import my.noveldokusha.scraper.SourceInterface
-import my.noveldokusha.tools.epub.epubCoverImporter
 import my.noveldokusha.tools.epub.epubCoverParser
+import my.noveldokusha.tools.epub.epubImageImporter
 import my.noveldokusha.ui.theme.Grey25
 import my.noveldokusha.utils.asSequence
 import my.noveldokusha.utils.textPadding
@@ -180,25 +180,19 @@ class LocalSource(
     private suspend fun addCover(
         bookMetadata: BookMetadata
     ): BookMetadata = withContext(Dispatchers.IO) {
-        val coverFile = appFileResolver.getLocalBookCoverFile(bookMetadata.title)
-        if (coverFile.exists()) {
-            return@withContext bookMetadata.copy(
-                coverImageUrl = coverFile.canonicalPath
+        val coverFile = appFileResolver.getStorageBookCoverImageFile(bookMetadata.title)
+        if (!coverFile.exists()) {
+            val inputStream = appContext.contentResolver.openInputStream(bookMetadata.url.toUri())
+                ?: return@withContext bookMetadata
+            val coverImage = inputStream.use { epubCoverParser(inputStream = inputStream) }
+                ?: return@withContext bookMetadata
+            epubImageImporter(
+                targetFile = coverFile,
+                imageData = coverImage.image,
             )
         }
-
-        val inputStream = appContext.contentResolver.openInputStream(bookMetadata.url.toUri())
-            ?: return@withContext bookMetadata
-        val coverImage = inputStream.use { epubCoverParser(inputStream = inputStream) }
-            ?: return@withContext bookMetadata
-        epubCoverImporter(
-            storageFolderName = bookMetadata.title,
-            appFileResolver = appFileResolver,
-            coverImage = coverImage,
-        )
-
         bookMetadata.copy(
-            coverImageUrl = coverFile.canonicalPath
+            coverImageUrl = appFileResolver.getLocalBookCoverPath()
         )
     }
 
