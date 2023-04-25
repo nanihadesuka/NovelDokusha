@@ -1,6 +1,5 @@
 package my.noveldokusha.composableActions
 
-import android.Manifest
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.clickable
@@ -35,25 +34,15 @@ import java.util.Locale
 @Composable
 fun onDoBackup(): () -> Unit {
     val context = LocalContext.current
-    val showDeniedPermissionDialog = rememberPermissionsDeniedDialog()
     var showDialog by remember { mutableStateOf(false) }
     var saveImages by remember { mutableStateOf(false) }
 
     /**
      * Steps:
-     * 1) Ask permissions
      * 2) Dialog options
      * 3) Open file explorer
      * 4) Start backup
      */
-    val permissions = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestMultiplePermissions(),
-    ) { areGranted ->
-        val allGranted = areGranted.all { it.value }
-        showDeniedPermissionDialog.value = !allGranted
-        showDialog = allGranted
-    }
-
     val fileExplorer = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.CreateDocument("*/*"),
         onResult = {
@@ -114,12 +103,5 @@ fun onDoBackup(): () -> Unit {
         }
     )
 
-    return {
-        permissions.launch(
-            arrayOf(
-                Manifest.permission.READ_EXTERNAL_STORAGE,
-                Manifest.permission.WRITE_EXTERNAL_STORAGE
-            )
-        )
-    }
+    return { showDialog = true }
 }

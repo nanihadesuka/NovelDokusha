@@ -1,6 +1,5 @@
 package my.noveldokusha.composableActions
 
-import android.Manifest
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
@@ -12,8 +11,6 @@ import androidx.compose.runtime.Composable
 fun onDoAddLocalSourceDirectory(
     onResult: (uri: Uri) -> Unit
 ): () -> Unit {
-    val showDeniedPermissionDialog = rememberPermissionsDeniedDialog()
-
     val directorySelector = rememberLauncherForActivityResult(
         contract = OpenDocumentTreeReadPersistent(),
         onResult = { uri ->
@@ -23,16 +20,7 @@ fun onDoAddLocalSourceDirectory(
         }
     )
 
-    val permissions = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestPermission(),
-    ) { isGranted ->
-        showDeniedPermissionDialog.value = !isGranted
-        if (isGranted) {
-            directorySelector.launch(null)
-        }
-    }
-
-    return { permissions.launch(Manifest.permission.READ_EXTERNAL_STORAGE) }
+    return { directorySelector.launch(null) }
 }
 
 private class OpenDocumentTreeReadPersistent : ActivityResultContracts.OpenDocumentTree() {
