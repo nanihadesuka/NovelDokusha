@@ -83,7 +83,7 @@
     <string name="backup_options">Backup options</string>
     <string name="save_images">Save images</string>
     <string name="settings_translations_models_main_description">Download the desired languages models to translate novels on the fly</string>
-    <string name="settings_title_translation_models">Live Translation Models</string>
+    <string name="settings_title_translation_models">Live translation models</string>
     <string name="translating_from_lang_a_to_lang_b">Translating from %1$s to %2$s</string>
     <string name="language_source_empty_text">Source</string>
     <string name="language_target_empty_text">Target</string>

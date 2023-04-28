@@ -1,8 +1,11 @@
 package my.noveldokusha.data.database.tables
 
+import android.os.Parcelable
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import kotlinx.parcelize.Parcelize
 
+@Parcelize
 @Entity
 data class Book(
     val title: String,
@@ -13,4 +16,4 @@ data class Book(
     val coverImageUrl: String = "",
     val description: String = "",
     val lastReadEpochTimeMilli: Long = 0,
-)
+) : Parcelable

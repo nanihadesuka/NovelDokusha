@@ -2,14 +2,8 @@ package my.noveldokusha.utils
 
 import android.net.Uri
 import android.os.Parcelable
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.SavedStateHandle
-import androidx.lifecycle.viewmodel.compose.saveable
 import kotlin.reflect.KProperty
-
-fun <T> SavedStateHandle.asMutableStateOf(key: String, default: () -> T): MutableState<T> =
-    object : MutableState<T> by saveable(key = key, init = { mutableStateOf(default()) }) {}
 
 class StateExtra_StringArrayList(private val state: SavedStateHandle) {
     operator fun getValue(thisRef: Any?, property: KProperty<*>) =

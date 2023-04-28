@@ -1,5 +1,6 @@
 package my.noveldokusha.ui.composeViews
 
+import android.os.Parcelable
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
@@ -22,6 +23,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import kotlinx.parcelize.Parcelize
 import my.noveldokusha.R
 import my.noveldokusha.data.database.tables.Book
 import my.noveldokusha.repository.rememberResolvedBookImagePath
@@ -29,8 +31,12 @@ import my.noveldokusha.ui.screens.main.library.LibraryViewModel
 import my.noveldokusha.ui.theme.ImageBorderShape
 import my.noveldokusha.ui.theme.colorApp
 
-sealed interface BookSettingsDialogState {
+
+sealed interface BookSettingsDialogState : Parcelable {
+    @Parcelize
     object Hide : BookSettingsDialogState
+
+    @Parcelize
     data class Show(val book: Book) : BookSettingsDialogState
 }
 

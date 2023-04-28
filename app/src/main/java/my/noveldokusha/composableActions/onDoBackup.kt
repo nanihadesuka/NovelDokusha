@@ -15,7 +15,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -34,8 +34,8 @@ import java.util.Locale
 @Composable
 fun onDoBackup(): () -> Unit {
     val context = LocalContext.current
-    var showDialog by remember { mutableStateOf(false) }
-    var saveImages by remember { mutableStateOf(false) }
+    var showDialog by rememberSaveable { mutableStateOf(false) }
+    var saveImages by rememberSaveable { mutableStateOf(false) }
 
     /**
      * Steps:

@@ -16,6 +16,7 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -92,7 +93,7 @@ fun DatabaseBookInfoScreenBody(
                     horizontalArrangement = Arrangement.spacedBy(4.dp),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    var showImageFullScreen by remember { mutableStateOf(false) }
+                    var showImageFullScreen by rememberSaveable { mutableStateOf(false) }
                     BookImageButtonView(
                         title = "",
                         coverImageModel = coverImg,

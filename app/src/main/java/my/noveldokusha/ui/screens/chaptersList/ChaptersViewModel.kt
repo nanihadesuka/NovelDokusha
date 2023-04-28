@@ -3,7 +3,6 @@ package my.noveldokusha.ui.screens.chaptersList
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.snapshotFlow
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -36,8 +35,8 @@ import my.noveldokusha.utils.toState
 import javax.inject.Inject
 
 interface ChapterStateBundle {
-    var rawBookUrl: String
-    var bookTitle: String
+    val rawBookUrl: String
+    val bookTitle: String
 }
 
 @HiltViewModel
@@ -51,8 +50,8 @@ class ChaptersViewModel @Inject constructor(
     private val appFileResolver: AppFileResolver,
     stateHandle: SavedStateHandle,
 ) : BaseViewModel(), ChapterStateBundle {
-    override var rawBookUrl by StateExtra_String(stateHandle)
-    override var bookTitle by StateExtra_String(stateHandle)
+    override val rawBookUrl by StateExtra_String(stateHandle)
+    override val bookTitle by StateExtra_String(stateHandle)
 
     val bookUrl = appFileResolver.getLocalIfContentType(rawBookUrl, bookFolderName = bookTitle)
 
@@ -76,7 +75,6 @@ class ChaptersViewModel @Inject constructor(
         chapters = mutableStateListOf(),
         selectedChaptersUrl = mutableStateMapOf(),
         isRefreshing = mutableStateOf(false),
-        searchTextInput = mutableStateOf(""),
         sourceCatalogNameStrRes = mutableStateOf(source?.nameStrId),
         settingChapterSort = appPreferences.CHAPTERS_SORT_ASCENDING.state(viewModelScope),
         isLocalSource = mutableStateOf(bookUrl.isLocalUri),
@@ -121,18 +119,6 @@ class ChaptersViewModel @Inject constructor(
                         AppPreferences.TERNARY_STATE.active -> chapters.sortedBy { it.chapter.position }
                         AppPreferences.TERNARY_STATE.inverse -> chapters.sortedByDescending { it.chapter.position }
                         AppPreferences.TERNARY_STATE.inactive -> chapters
-                    }
-                }
-                // Filter the chapters if search is active
-                .combine(
-                    snapshotFlow { state.searchTextInput.value }.flowOn(Dispatchers.Main)
-                ) { chapters, searchText ->
-                    if (searchText.isBlank()) chapters
-                    else chapters.filter {
-                        it.chapter.title.contains(
-                            searchText,
-                            ignoreCase = true
-                        )
                     }
                 }
                 .flowOn(Dispatchers.Default)
@@ -321,38 +307,5 @@ class ChaptersViewModel @Inject constructor(
         val inverse = (allChaptersUrl - selectedUrl).asSequence().associateWith { }
         state.selectedChaptersUrl.clear()
         state.selectedChaptersUrl.putAll(inverse)
-    }
-}
-
-private fun removeCommonTextFromTitles(list: List<ChapterWithContext>): List<ChapterWithContext> {
-    // Try removing repetitive title text from chapters
-    if (list.size <= 1) return list
-    val first = list.first().chapter.title
-    val prefix =
-        list.fold(first) { acc, e -> e.chapter.title.commonPrefixWith(acc, ignoreCase = true) }
-    val suffix =
-        list.fold(first) { acc, e -> e.chapter.title.commonSuffixWith(acc, ignoreCase = true) }
-
-    // Kotlin Std Lib doesn't have optional ignoreCase parameter for removeSurrounding
-    fun String.removeSurrounding(
-        prefix: CharSequence,
-        suffix: CharSequence,
-        ignoreCase: Boolean = false
-    ): String {
-        if ((length >= prefix.length + suffix.length) && startsWith(prefix, ignoreCase) && endsWith(
-                suffix,
-                ignoreCase
-            )
-        ) {
-            return substring(prefix.length, length - suffix.length)
-        }
-        return this
-    }
-
-    return list.map { data ->
-        val newTitle = data
-            .chapter.title.removeSurrounding(prefix, suffix, ignoreCase = true)
-            .ifBlank { data.chapter.title }
-        data.copy(chapter = data.chapter.copy(title = newTitle))
     }
 }

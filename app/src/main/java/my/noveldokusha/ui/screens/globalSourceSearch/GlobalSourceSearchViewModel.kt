@@ -1,23 +1,20 @@
 package my.noveldokusha.ui.screens.globalSourceSearch
 
 import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.snapshotFlow
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.launch
 import my.noveldokusha.AppPreferences
 import my.noveldokusha.network.PagedListIteratorState
-import my.noveldokusha.repository.ScraperRepository
 import my.noveldokusha.repository.CatalogItem
+import my.noveldokusha.repository.ScraperRepository
 import my.noveldokusha.ui.BaseViewModel
 import my.noveldokusha.utils.StateExtra_String
+import my.noveldokusha.utils.asMutableStateOf
 import javax.inject.Inject
 
 interface GlobalSourceSearchStateBundle {
@@ -30,24 +27,16 @@ class GlobalSourceSearchViewModel @Inject constructor(
     val appPreferences: AppPreferences,
     private val scraperRepository: ScraperRepository,
 ) : BaseViewModel(), GlobalSourceSearchStateBundle {
-    override var initialInput by StateExtra_String(state)
+    override val initialInput by StateExtra_String(state)
 
     @Volatile
     private var searchJob: Job? = null
 
-    val searchInput = mutableStateOf<String>(initialInput)
+    val searchInput = state.asMutableStateOf("searchInput") { initialInput }
     val sourcesResults = mutableStateListOf<SourceResults>()
 
     init {
         search(text = searchInput.value)
-
-        viewModelScope.launch {
-            snapshotFlow { searchInput.value }
-                .collectLatest {
-                    delay(300)
-                    initialInput = it
-                }
-        }
     }
 
     fun search(text: String) {

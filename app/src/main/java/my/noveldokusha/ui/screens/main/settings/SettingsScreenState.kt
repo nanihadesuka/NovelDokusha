@@ -11,6 +11,6 @@ data class SettingsScreenState(
     val imageFolderSize: MutableState<String>,
     val followsSystemTheme: State<Boolean>,
     val currentTheme: State<Themes>,
-    val isTranslationSettingsVisible: MutableState<Boolean>,
+    val isTranslationSettingsVisible: State<Boolean>,
     val translationModelsStates: SnapshotStateList<TranslationModelState>,
-    )
+)
