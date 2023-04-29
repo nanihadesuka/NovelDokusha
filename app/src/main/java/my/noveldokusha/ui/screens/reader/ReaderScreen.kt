@@ -30,17 +30,32 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
+import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import my.noveldokusha.R
+import my.noveldokusha.tools.TranslationModelState
+import my.noveldokusha.tools.Utterance
+import my.noveldokusha.tools.VoiceData
 import my.noveldokusha.ui.screens.reader.ReaderScreenState.Settings.Type
+import my.noveldokusha.ui.screens.reader.features.LiveTranslationSettingData
+import my.noveldokusha.ui.screens.reader.features.TextSynthesis
+import my.noveldokusha.ui.screens.reader.features.TextToSpeechSettingData
+import my.noveldokusha.ui.theme.InternalTheme
 import my.noveldokusha.ui.theme.Themes
 import my.noveldokusha.ui.theme.colorApp
+import my.noveldokusha.utils.rememberMutableStateOf
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -207,108 +222,137 @@ private fun RowScope.SettingIconItem(
     )
 }
 
-//@Preview(
-//    showBackground = true,
-//    widthDp = 360
-//)
-//@Composable
-//private fun ViewsPreview() {
-//
-//    val liveTranslationSettingData = LiveTranslationSettingData(
-//        isAvailable = true,
-//        enable = remember { mutableStateOf(true) },
-//        listOfAvailableModels = remember { mutableStateListOf() },
-//        source = remember {
-//            mutableStateOf(
-//                TranslationModelState(
-//                    language = "fr",
-//                    available = true,
-//                    downloading = false,
-//                    downloadingFailed = false
-//                )
-//            )
-//        },
-//        target = remember {
-//            mutableStateOf(
-//                TranslationModelState(
-//                    language = "en",
-//                    available = true,
-//                    downloading = false,
-//                    downloadingFailed = false
-//                )
-//            )
-//        },
-//        onTargetChange = {},
-//        onEnable = {},
-//        onSourceChange = {},
-//        onDownloadTranslationModel = {}
-//    )
-//
-//    val textToSpeechSettingData = TextToSpeechSettingData(
-//        isPlaying = rememberMutableStateOf(false),
-//        isLoadingChapter = rememberMutableStateOf(false),
-//        voicePitch = rememberMutableStateOf(1f),
-//        voiceSpeed = rememberMutableStateOf(1f),
-//        availableVoices = remember { mutableStateListOf() },
-//        activeVoice = remember {
-//            mutableStateOf(
-//                VoiceData(
-//                    id = "",
-//                    language = "",
-//                    quality = 100,
-//                    needsInternet = true
-//                )
-//            )
-//        },
-//        currentActiveItemState = remember {
-//            mutableStateOf(
-//                TextSynthesis(
-//                    playState = Utterance.PlayState.PLAYING,
-//                    itemPos = ReaderItem.Title(
-//                        chapterUrl = "",
-//                        chapterIndex = 0,
-//                        chapterItemPosition = 1,
-//                        text = ""
-//                    )
-//                )
-//            )
-//        },
-//        isThereActiveItem = rememberMutableStateOf(true),
-//        setPlaying = {},
-//        playPreviousItem = {},
-//        playPreviousChapter = {},
-//        playNextItem = {},
-//        playNextChapter = {},
-//        setVoiceId = {},
-//        playFirstVisibleItem = {},
-//        scrollToActiveItem = {},
-//        setVoiceSpeed = {},
-//        setVoicePitch = {},
-//        setCustomSavedVoices = {},
-//        customSavedVoices = rememberMutableStateOf(value = listOf())
-//    )
-//
-//    InternalTheme {
-//        Surface(color = Color.Black) {
-//            ReaderInfoView(
-//                chapterTitle = "Chapter title",
-//                chapterCurrentNumber = 64,
-//                chapterPercentageProgress = 20f,
-//                chaptersTotalSize = 540,
-//                textFont = "serif",
-//                textSize = 15f,
-//                onTextSizeChanged = {},
-//                onTextFontChanged = {},
-//                visible = true,
-//                liveTranslationSettingData = liveTranslationSettingData,
-//                textToSpeechSettingData = textToSpeechSettingData,
-//                currentTheme = Themes.DARK,
-//                currentFollowSystem = true,
-//                selectableText = false,
-//                onSelectableTextChange = {},
-//                onFollowSystem = {},
-//                onThemeSelected = {},
-//            )
-//        }
-//    }
-//}
+@Preview(showBackground = true, widthDp = 360)
+@Composable
+private fun ViewsPreview(
+    @PreviewParameter(PreviewDataProvider::class) data: PreviewDataProvider.Data
+) {
+
+    val liveTranslationSettingData = LiveTranslationSettingData(
+        isAvailable = true,
+        enable = remember { mutableStateOf(true) },
+        listOfAvailableModels = remember { mutableStateListOf() },
+        source = remember {
+            mutableStateOf(
+                TranslationModelState(
+                    language = "fr",
+                    available = true,
+                    downloading = false,
+                    downloadingFailed = false
+                )
+            )
+        },
+        target = remember {
+            mutableStateOf(
+                TranslationModelState(
+                    language = "en",
+                    available = true,
+                    downloading = false,
+                    downloadingFailed = false
+                )
+            )
+        },
+        onTargetChange = {},
+        onEnable = {},
+        onSourceChange = {},
+        onDownloadTranslationModel = {}
+    )
+
+    val textToSpeechSettingData = TextToSpeechSettingData(
+        isPlaying = rememberMutableStateOf(false),
+        isLoadingChapter = rememberMutableStateOf(false),
+        voicePitch = rememberMutableStateOf(1f),
+        voiceSpeed = rememberMutableStateOf(1f),
+        availableVoices = remember { mutableStateListOf() },
+        activeVoice = remember {
+            mutableStateOf(
+                VoiceData(
+                    id = "",
+                    language = "",
+                    quality = 100,
+                    needsInternet = true
+                )
+            )
+        },
+        currentActiveItemState = remember {
+            mutableStateOf(
+                TextSynthesis(
+                    playState = Utterance.PlayState.PLAYING,
+                    itemPos = ReaderItem.Title(
+                        chapterUrl = "",
+                        chapterIndex = 0,
+                        chapterItemPosition = 1,
+                        text = ""
+                    )
+                )
+            )
+        },
+        isThereActiveItem = rememberMutableStateOf(true),
+        setPlaying = {},
+        playPreviousItem = {},
+        playPreviousChapter = {},
+        playNextItem = {},
+        playNextChapter = {},
+        setVoiceId = {},
+        playFirstVisibleItem = {},
+        scrollToActiveItem = {},
+        setVoiceSpeed = {},
+        setVoicePitch = {},
+        setCustomSavedVoices = {},
+        customSavedVoices = rememberMutableStateOf(value = listOf())
+    )
+
+    val style = ReaderScreenState.Settings.StyleSettingsData(
+        followSystem = remember { mutableStateOf(true) },
+        currentTheme = remember { mutableStateOf(Themes.DARK) },
+        textFont = remember { mutableStateOf("Arial") },
+        textSize = remember { mutableStateOf(20f) },
+    )
+
+    InternalTheme {
+        Surface(color = Color.Black) {
+            ReaderScreen(
+                state = ReaderScreenState(
+                    showReaderInfo = remember { mutableStateOf(true) },
+                    readerInfo = ReaderScreenState.CurrentInfo(
+                        chapterTitle = remember { mutableStateOf("Chapter title") },
+                        chapterCurrentNumber = remember { mutableStateOf(2) },
+                        chapterPercentageProgress = remember { mutableStateOf(0.5f) },
+                        chaptersCount = remember { mutableStateOf(255) },
+                        chapterUrl = remember { mutableStateOf("Chapter url") },
+                    ),
+                    settings = ReaderScreenState.Settings(
+                        isTextSelectable = remember { mutableStateOf(false) },
+                        textToSpeech = textToSpeechSettingData,
+                        liveTranslation = liveTranslationSettingData,
+                        style = style,
+                        selectedSetting = remember { mutableStateOf(data.selectedSetting) }
+                    )
+                ),
+                onTextSizeChanged = {},
+                onTextFontChanged = {},
+                onSelectableTextChange = {},
+                onFollowSystem = {},
+                onThemeSelected = {},
+                onPressBack = {},
+                onOpenChapterInWeb = {},
+                readerContent = {},
+            )
+        }
+    }
+}
+
+
+private class PreviewDataProvider : PreviewParameterProvider<PreviewDataProvider.Data> {
+    data class Data(
+        val selectedSetting: Type
+    )
+
+    override val values = sequenceOf(
+        Data(selectedSetting = Type.None),
+        Data(selectedSetting = Type.LiveTranslation),
+        Data(selectedSetting = Type.TextToSpeech),
+        Data(selectedSetting = Type.Style),
+        Data(selectedSetting = Type.More),
+    )
+}
