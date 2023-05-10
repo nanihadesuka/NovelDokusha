@@ -1,5 +1,7 @@
 package my.noveldokusha.utils
 
+import com.google.gson.JsonElement
+import com.google.gson.JsonParser
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.Call
@@ -32,4 +34,8 @@ suspend fun OkHttpClient.call(builder: Request.Builder) = newCall(builder.build(
 
 fun Response.toDocument(): Document {
     return Jsoup.parse(body.string())
+}
+
+fun Response.toJson(): JsonElement {
+    return JsonParser.parseString(body.string())
 }
