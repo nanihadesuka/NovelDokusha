@@ -56,7 +56,7 @@ class LightNovelsTranslations(
             networkClient.get(bookUrl).toDocument()
                 .selectFirst(".novel_text")!!
                 .let {
-                    it.select(".alternative_titles").remove()
+                    it.select(".alternate_titles").remove()
                     TextExtractor.get(it).trim()
                 }
         }
