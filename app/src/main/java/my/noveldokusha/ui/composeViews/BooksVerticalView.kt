@@ -40,7 +40,7 @@ fun BooksVerticalView(
     onBookLongClicked: (bookItem: BookMetadata) -> Unit,
     onReload: () -> Unit = {},
     onCopyError: (String) -> Unit = {},
-    cells: GridCells = GridCells.Fixed(2),
+    cells: GridCells = GridCells.Adaptive(160.dp),
     innerPadding: PaddingValues = PaddingValues(),
 ) {
 

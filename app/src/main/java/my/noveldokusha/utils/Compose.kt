@@ -1,5 +1,6 @@
 package my.noveldokusha.utils
 
+import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
@@ -28,4 +29,19 @@ fun LazyListState.isAtTop(threshold: Dp) = run {
         }
     }
 }
+
+@Composable
+fun ScrollState.isAtTop(threshold: Dp) = run {
+
+    val density by rememberUpdatedState(LocalDensity.current)
+
+    return@run remember(threshold) {
+        derivedStateOf {
+            val valueDp = with(density) { value.toDp() }
+            valueDp < threshold
+        }
+    }
+}
+
+
 

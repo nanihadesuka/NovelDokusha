@@ -5,9 +5,13 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.runtime.SideEffect
+import androidx.compose.ui.graphics.Color
+import androidx.core.view.WindowCompat
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import dagger.hilt.android.AndroidEntryPoint
 import my.noveldokusha.data.BookMetadata
-import my.noveldokusha.scraper.DatabaseInterface
 import my.noveldokusha.scraper.SearchGenre
 import my.noveldokusha.ui.BaseActivity
 import my.noveldokusha.ui.goToDatabaseBookInfo
@@ -15,6 +19,7 @@ import my.noveldokusha.ui.goToDatabaseSearchGenres
 import my.noveldokusha.ui.goToGlobalSearch
 import my.noveldokusha.ui.goToWebBrowser
 import my.noveldokusha.ui.theme.Theme
+import my.noveldokusha.ui.theme.isLightTheme
 import my.noveldokusha.utils.Extra_String
 
 @AndroidEntryPoint
@@ -39,9 +44,17 @@ class DatabaseBookInfoActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
+        WindowCompat.setDecorFitsSystemWindows(window, false)
         setContent {
             Theme(appPreferences = appPreferences) {
+                val systemUiController = rememberSystemUiController()
+                val useDarkIcons = MaterialTheme.colorScheme.isLightTheme()
+                SideEffect {
+                    systemUiController.setSystemBarsColor(
+                        color = Color.Transparent,
+                        darkIcons = useDarkIcons
+                    )
+                }
                 DatabaseBookInfoScreen(
                     state = viewModel.state,
                     onSourcesClick = ::openGlobalSearchPage,

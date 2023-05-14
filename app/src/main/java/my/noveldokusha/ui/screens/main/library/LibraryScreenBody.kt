@@ -148,7 +148,7 @@ private fun LibraryPageBody(
     onLongClick: (BookWithContext) -> Unit,
 ) {
     LazyVerticalGrid(
-        columns = GridCells.Fixed(2),
+        columns = GridCells.Adaptive(160.dp),
         contentPadding = PaddingValues(top = 4.dp, bottom = 400.dp, start = 4.dp, end = 4.dp)
     ) {
         items(

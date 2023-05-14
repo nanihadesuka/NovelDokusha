@@ -91,10 +91,8 @@ fun ChaptersScreenHeader(
                 .padding(horizontal = 14.dp),
             verticalArrangement = Arrangement.spacedBy(18.dp)
         ) {
-            val headerHeight = 230.dp
             Row(
                 horizontalArrangement = Arrangement.spacedBy(14.dp),
-                modifier = Modifier.height(headerHeight),
             ) {
                 var showImageFullScreen by rememberSaveable { mutableStateOf(false) }
                 BookImageButtonView(
@@ -102,9 +100,7 @@ fun ChaptersScreenHeader(
                     coverImageModel = coverImageModel,
                     onClick = { showImageFullScreen = true },
                     bookTitlePosition = BookTitlePosition.Hidden,
-                    modifier = Modifier
-                        .fillMaxHeight()
-                        .weight(1f)
+                    modifier = Modifier.weight(1f)
                 )
                 if (showImageFullScreen) Dialog(
                     onDismissRequest = { showImageFullScreen = false },
@@ -119,7 +115,7 @@ fun ChaptersScreenHeader(
                         modifier = Modifier
                             .fillMaxWidth()
                             .clickableNoIndicator { showImageFullScreen = false },
-                        contentScale = ContentScale.FillWidth
+                        contentScale = ContentScale.Fit
                     )
                 }
 
@@ -129,26 +125,32 @@ fun ChaptersScreenHeader(
                         .fillMaxHeight()
                         .weight(1f),
                 ) {
-                    Text(
-                        text = bookState.title,
-                        style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.Bold,
-                        maxLines = 5,
-                        modifier = Modifier.clickableNoIndicator {
-                            context.goToGlobalSearch(bookState.title)
-                        }
-                    )
+                    SelectionContainer {
+                        Text(
+                            text = bookState.title,
+                            style = MaterialTheme.typography.titleLarge,
+                            fontWeight = FontWeight.Bold,
+                            maxLines = 5,
+                            modifier = Modifier.clickableNoIndicator {
+                                context.goToGlobalSearch(bookState.title)
+                            }
+                        )
+                    }
                     Spacer(modifier = Modifier.height(12.dp))
-                    Text(
-                        text = sourceCatalogName,
-                        style = MaterialTheme.typography.labelMedium,
-                        color = MaterialTheme.colorScheme.onTertiary,
-                    )
-                    Text(
-                        text = stringResource(id = R.string.chapters) + " " + numberOfChapters.toString(),
-                        style = MaterialTheme.typography.labelMedium,
-                        color = MaterialTheme.colorScheme.onTertiary,
-                    )
+                    SelectionContainer {
+                        Text(
+                            text = sourceCatalogName,
+                            style = MaterialTheme.typography.labelMedium,
+                            color = MaterialTheme.colorScheme.onTertiary,
+                        )
+                    }
+                    SelectionContainer {
+                        Text(
+                            text = stringResource(id = R.string.chapters) + " " + numberOfChapters.toString(),
+                            style = MaterialTheme.typography.labelMedium,
+                            color = MaterialTheme.colorScheme.onTertiary,
+                        )
+                    }
                 }
             }
             SelectionContainer {
@@ -161,7 +163,8 @@ fun ChaptersScreenHeader(
             Divider(
                 Modifier
                     .padding(horizontal = 40.dp)
-                    .alpha(0.5f), thickness = Dp.Hairline)
+                    .alpha(0.5f), thickness = Dp.Hairline
+            )
         }
     }
 }

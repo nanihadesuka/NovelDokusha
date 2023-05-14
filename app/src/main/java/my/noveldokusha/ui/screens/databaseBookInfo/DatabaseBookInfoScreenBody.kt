@@ -25,7 +25,6 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
@@ -48,15 +47,17 @@ import my.noveldokusha.utils.textPadding
 @Composable
 fun DatabaseBookInfoScreenBody(
     state: DatabaseBookInfoState,
+    scrollState: ScrollState,
     onSourcesClick: () -> Unit,
     onGenresClick: (genresIds: List<SearchGenre>) -> Unit,
     onBookClick: (book: BookMetadata) -> Unit,
+    innerPadding: PaddingValues,
     modifier: Modifier = Modifier,
 ) {
     val coverImg = state.book.value.coverImageUrl ?: R.drawable.ic_baseline_empty_24
     Column(
         modifier
-            .verticalScroll(rememberScrollState())
+            .verticalScroll(scrollState)
             .background(MaterialTheme.colorScheme.background)
     ) {
         Box {
@@ -85,21 +86,19 @@ fun DatabaseBookInfoScreenBody(
             Column(
                 Modifier
                     .fillMaxWidth()
-                    .statusBarsPadding()
-                    .padding(8.dp)
+                    .padding(horizontal = 8.dp)
+                    .padding(top = innerPadding.calculateTopPadding())
             ) {
                 Row(
-                    modifier = Modifier,
-                    horizontalArrangement = Arrangement.spacedBy(4.dp),
-                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(14.dp),
                 ) {
                     var showImageFullScreen by rememberSaveable { mutableStateOf(false) }
                     BookImageButtonView(
                         title = "",
                         coverImageModel = coverImg,
                         onClick = { showImageFullScreen = true },
+                        bookTitlePosition = BookTitlePosition.Hidden,
                         modifier = Modifier.weight(1f),
-                        bookTitlePosition = BookTitlePosition.Hidden
                     )
                     SelectionContainer(
                         modifier = Modifier.weight(1f)
@@ -107,8 +106,8 @@ fun DatabaseBookInfoScreenBody(
                         Text(
                             text = state.book.value.title,
                             style = MaterialTheme.typography.titleLarge,
-                            textAlign = TextAlign.Center,
                             fontWeight = FontWeight.Bold,
+                            modifier = Modifier.padding(top = 16.dp)
                         )
                     }
                     if (showImageFullScreen) Dialog(
@@ -124,7 +123,7 @@ fun DatabaseBookInfoScreenBody(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .clickableNoIndicator { showImageFullScreen = false },
-                            contentScale = ContentScale.FillWidth
+                            contentScale = ContentScale.Fit
                         )
                     }
                 }
