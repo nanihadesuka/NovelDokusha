@@ -20,6 +20,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.font.FontWeight
@@ -27,6 +28,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import my.noveldokusha.R
+import my.noveldokusha.ui.AppTestTags
 import my.noveldokusha.ui.theme.Grey25
 import my.noveldokusha.ui.theme.Grey800
 import my.noveldokusha.ui.theme.ImageBorderShape
@@ -38,7 +40,6 @@ enum class BookTitlePosition {
     Inside, Outside, Hidden
 }
 
-
 @OptIn(ExperimentalTextApi::class, ExperimentalFoundationApi::class)
 @Composable
 fun BookImageButtonView(
@@ -49,7 +50,7 @@ fun BookImageButtonView(
     onClick: () -> Unit,
     onLongClick: () -> Unit = { },
 ) {
-    Column(modifier = modifier) {
+    Column(modifier = modifier.testTag(AppTestTags.bookImageButtonView)) {
         Box(
             Modifier
                 .padding(4.dp)

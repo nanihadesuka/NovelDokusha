@@ -72,6 +72,13 @@ android {
         versionCode = 13
         versionName = "2.0.1"
         setProperty("archivesBaseName", "NovelDokusha_v$versionName")
+
+        testInstrumentationRunnerArguments["clearPackageData"] = "true"
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    testOptions {
+        execution = "ANDROIDX_TEST_ORCHESTRATOR"
     }
 
     signingConfigs {
@@ -189,9 +196,18 @@ dependencies {
 
     // Test
     testImplementation("junit:junit:4.13.2")
-    androidTestImplementation("androidx.test.ext:junit:1.1.5")
-    androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
     testImplementation("org.mockito.kotlin:mockito-kotlin:4.1.0")
+
+    // e2e test
+    androidTestImplementation("androidx.test:core-ktx:1.5.0")
+    androidTestImplementation("androidx.test.ext:junit-ktx:1.1.5")
+    androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
+    androidTestImplementation("androidx.compose.ui:ui-test-junit4:1.4.3")
+    androidTestImplementation("androidx.test:rules:1.5.0")
+    androidTestImplementation("androidx.test:runner:1.5.2")
+
+    androidTestUtil("androidx.test:orchestrator:1.4.2")
+
 
     // Serialization
     implementation("com.google.code.gson:gson:2.10.1")
@@ -228,8 +244,6 @@ dependencies {
     implementation("com.google.accompanist:accompanist-insets:0.30.0")
     implementation("com.google.accompanist:accompanist-pager:0.30.0")
     implementation("com.google.accompanist:accompanist-pager-indicators:0.30.0")
-
-    androidTestImplementation("androidx.compose.ui:ui-test-junit4:1.4.1")
 
     // Networking
     implementation("com.squareup.okhttp3:okhttp:5.0.0-alpha.11")
