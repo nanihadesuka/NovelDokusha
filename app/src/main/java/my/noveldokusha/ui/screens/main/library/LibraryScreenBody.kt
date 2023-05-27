@@ -43,6 +43,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.coroutines.launch
 import my.noveldokusha.R
 import my.noveldokusha.data.BookWithContext
+import my.noveldokusha.data.LibraryCategory
 import my.noveldokusha.isLocalUri
 import my.noveldokusha.repository.rememberResolvedBookImagePath
 import my.noveldokusha.ui.composeViews.BookImageButtonView
@@ -70,7 +71,12 @@ fun LibraryScreenBody(
     val pullRefreshState = rememberPullRefreshState(
         refreshing = viewModel.isPullRefreshing,
         onRefresh = {
-            viewModel.onLibraryCategoryRefresh(isCompletedCategory = updateCompleted.value == 1)
+            viewModel.onLibraryCategoryRefresh(
+                libraryCategory = when (updateCompleted.value) {
+                    0 -> LibraryCategory.DEFAULT
+                    else -> LibraryCategory.COMPLETED
+                }
+            )
         }
     )
 

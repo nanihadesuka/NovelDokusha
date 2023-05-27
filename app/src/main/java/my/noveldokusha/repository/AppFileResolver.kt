@@ -6,13 +6,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import dagger.hilt.android.qualifiers.ApplicationContext
+import my.noveldokusha.addLocalUriPrefix
 import my.noveldokusha.isContentUri
+import my.noveldokusha.removeLocalUriPrefix
 import java.io.File
 import java.nio.file.Paths
 import javax.inject.Inject
 
-private val String.stripLocal get() = removePrefix("local://")
-private fun String.addLocalPrefix() = "local://${this}"
 
 class AppFileResolver @Inject constructor(
     @ApplicationContext context: Context,
@@ -24,24 +24,32 @@ class AppFileResolver @Inject constructor(
     val folderBooks = File(context.filesDir, "books")
 
     fun getLocalIfContentType(url: String, bookFolderName: String) =
-        if (url.isContentUri) bookFolderName.addLocalPrefix() else url
+        if (url.isContentUri) bookFolderName.addLocalUriPrefix else url
 
-    fun getLocalBookCoverPath(): String =
-        Paths.get(coverPathRelativeToBook).toString().addLocalPrefix()
+    fun getLocalBookCoverPath(): String = Paths.get(
+        coverPathRelativeToBook
+    ).toString().addLocalUriPrefix
 
-    fun getLocalBookChapterPath(bookFolderName: String, chapterName: String): String =
-        Paths.get(bookFolderName.stripLocal, chapterName.stripLocal).toString().addLocalPrefix()
+    fun getLocalBookChapterPath(bookFolderName: String, chapterName: String): String = Paths.get(
+        bookFolderName.removeLocalUriPrefix,
+        chapterName.removeLocalUriPrefix
+    ).toString().addLocalUriPrefix
 
-    fun getLocalBookPath(bookFolderName: String): String =
-        Paths.get(bookFolderName.stripLocal).toString().addLocalPrefix()
+    fun getLocalBookPath(bookFolderName: String): String = Paths.get(
+        bookFolderName.removeLocalUriPrefix
+    ).toString().addLocalUriPrefix
 
-    fun getStorageBookCoverImageFile(bookFolderName: String): File =
-        Paths.get(folderBooks.absolutePath, bookFolderName.stripLocal, coverPathRelativeToBook)
-            .toFile()
+    fun getStorageBookCoverImageFile(bookFolderName: String): File = Paths.get(
+        folderBooks.absolutePath,
+        bookFolderName.removeLocalUriPrefix,
+        coverPathRelativeToBook
+    ).toFile()
 
-    fun getStorageBookImageFile(bookFolderName: String, imagePath: String): File =
-        Paths.get(folderBooks.absolutePath, bookFolderName.stripLocal, imagePath.stripLocal)
-            .toFile()
+    fun getStorageBookImageFile(bookFolderName: String, imagePath: String): File = Paths.get(
+        folderBooks.absolutePath,
+        bookFolderName.removeLocalUriPrefix,
+        imagePath.removeLocalUriPrefix
+    ).toFile()
 
     /**
      * Returns the path to the image if local, no changes if non local.

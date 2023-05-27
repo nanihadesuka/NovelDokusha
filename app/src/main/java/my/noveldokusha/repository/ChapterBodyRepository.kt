@@ -5,6 +5,7 @@ import my.noveldokusha.data.database.AppDatabaseOperations
 import my.noveldokusha.data.database.DAOs.ChapterBodyDao
 import my.noveldokusha.data.database.tables.ChapterBody
 import my.noveldokusha.data.map
+import my.noveldokusha.isLocalUri
 import my.noveldokusha.network.NetworkClient
 import my.noveldokusha.scraper.Scraper
 import my.noveldokusha.scraper.downloadChapter
@@ -37,7 +38,7 @@ class ChapterBodyRepository(
             return@fetchBody Response.Success(it.body)
         }
 
-        if (urlChapter.startsWith("local://")) {
+        if (urlChapter.isLocalUri) {
             return Response.Error(
                 """
                 Unable to load chapter from url:

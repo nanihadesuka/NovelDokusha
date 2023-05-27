@@ -19,34 +19,35 @@ class NotificationsCenter(
 
     @SuppressLint("MissingPermission")
     fun showNotification(
-        channel_id: String,
-        channel_name: String = channel_id,
+        channelId: String,
+        channelName: String = channelId,
+        notificationId: String = channelId,
         importance: Int = NotificationManager.IMPORTANCE_DEFAULT,
         builder: NotificationCompat.Builder.() -> Unit = {}
     ) = run {
-        buildNotification(context, channel_id, channel_name, importance, builder).apply {
+        buildNotification(context, channelId, channelName, importance, builder).apply {
             NotificationManagerCompat
                 .from(context)
-                .notify(channel_id.hashCode(), build())
+                .notify(notificationId.hashCode(), build())
         }
     }
 
-    fun close(channel_id: String) = manager.cancel(channel_id.hashCode())
+    fun close(channelId: String) = manager.cancel(channelId.hashCode())
 
     private fun buildNotification(
         context: Context,
-        channel_id: String,
-        channel_name: String = channel_id,
+        channelId: String,
+        channelName: String = channelId,
         importance: Int = NotificationManager.IMPORTANCE_DEFAULT,
         builder: NotificationCompat.Builder.() -> Unit,
     ) = run {
-        NotificationCompat.Builder(context, channel_id).apply {
+        NotificationCompat.Builder(context, channelId).apply {
             setSmallIcon(R.mipmap.ic_logo)
             BitmapFactory.decodeResource(context.resources, R.mipmap.ic_logo)
             priority = NotificationCompat.PRIORITY_DEFAULT
             builder(this)
 
-            val channel = NotificationChannel(channel_id, channel_name, importance)
+            val channel = NotificationChannel(channelId, channelName, importance)
             manager.createNotificationChannel(channel)
         }
     }
@@ -54,13 +55,13 @@ class NotificationsCenter(
     @SuppressLint("MissingPermission")
     fun modifyNotification(
         builder: NotificationCompat.Builder,
-        channel_id: String,
+        channelId: String,
         modifierBlock: NotificationCompat.Builder.() -> Unit
     ) {
         modifierBlock(builder)
         NotificationManagerCompat
             .from(context)
-            .notify(channel_id.hashCode(), builder.build())
+            .notify(channelId.hashCode(), builder.build())
     }
 }
 

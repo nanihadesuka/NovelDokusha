@@ -13,8 +13,9 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import my.noveldokusha.AppPreferences
 import my.noveldokusha.R
+import my.noveldokusha.data.LibraryCategory
 import my.noveldokusha.repository.Repository
-import my.noveldokusha.services.LibraryUpdateService
+import my.noveldokusha.services.libraryUpdate.LibraryUpdateService
 import my.noveldokusha.ui.BaseViewModel
 import my.noveldokusha.ui.Toasty
 import my.noveldokusha.utils.toState
@@ -59,12 +60,12 @@ class LibraryPageViewModel @Inject constructor(
         }
     }
 
-    fun onLibraryCategoryRefresh(isCompletedCategory: Boolean) {
+    fun onLibraryCategoryRefresh(libraryCategory: LibraryCategory) {
         showLoadingSpinner()
         toasty.show(R.string.updaing_library)
         LibraryUpdateService.start(
             ctx = context,
-            completedCategory = isCompletedCategory
+            updateCategory = libraryCategory
         )
     }
 }
