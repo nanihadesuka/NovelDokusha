@@ -59,8 +59,10 @@ class EpubImportService : Service() {
             context.isServiceRunning(EpubImportService::class.java)
     }
 
-    private val channel_id = "Import EPUB"
-    private val channel_id_error = "epub import error"
+    private val channelName by lazy { getString(R.string.notification_channel_name_import_epub) }
+    private val channelId = "Import EPUB"
+    private val notificationId = channelId.hashCode()
+
     private lateinit var notificationBuilder: NotificationCompat.Builder
     private var job: Job? = null
 
@@ -68,8 +70,12 @@ class EpubImportService : Service() {
 
     override fun onCreate() {
         super.onCreate()
-        notificationBuilder = notificationsCenter.showNotification(channel_id)
-        startForeground(channel_id.hashCode(), notificationBuilder.build())
+        notificationBuilder = notificationsCenter.showNotification(
+            notificationId = notificationId,
+            channelId = channelId,
+            channelName = channelName,
+        )
+        startForeground(notificationId, notificationBuilder.build())
     }
 
     override fun onDestroy() {
@@ -82,14 +88,21 @@ class EpubImportService : Service() {
         val intentData = IntentData(intent)
         job = CoroutineScope(Dispatchers.IO).launch {
             tryAsResponse {
-                notificationsCenter.modifyNotification(notificationBuilder, channel_id) {
+                notificationsCenter.modifyNotification(
+                    notificationBuilder,
+                    notificationId = notificationId
+                ) {
                     title = getString(R.string.import_epub)
                     foregroundServiceBehavior = NotificationCompat.FOREGROUND_SERVICE_IMMEDIATE
                     setProgress(100, 0, true)
                 }
                 val inputStream = contentResolver.openInputStream(intentData.uri)
                 if (inputStream == null) {
-                    notificationsCenter.showNotification(channel_id_error) {
+                    notificationsCenter.showNotification(
+                        channelName = channelName,
+                        channelId = channelId,
+                        notificationId = "Import EPUB failure".hashCode()
+                    ) {
                         text = getString(R.string.failed_get_file)
                         removeProgressBar()
                     }
@@ -107,7 +120,10 @@ class EpubImportService : Service() {
 
                 val epub = inputStream.use { epubParser(inputStream = it) }
 
-                notificationsCenter.modifyNotification(notificationBuilder, channel_id) {
+                notificationsCenter.modifyNotification(
+                    notificationBuilder,
+                    notificationId = notificationId
+                ) {
                     text = getString(R.string.importing_epub)
                 }
                 epubImporter(
@@ -117,14 +133,13 @@ class EpubImportService : Service() {
                     epub = epub,
                     addToLibrary = true
                 )
-
-                notificationsCenter.modifyNotification(notificationBuilder, channel_id) {
-                    text = getString(R.string.epub_added_to_library)
-                    removeProgressBar()
-                }
             }.onError {
                 Timber.e(it.exception)
-                notificationsCenter.showNotification(channel_id_error) {
+                notificationsCenter.showNotification(
+                    channelName = channelName,
+                    channelId = channelId,
+                    notificationId = "Import EPUB failure".hashCode()
+                ) {
                     text = getString(R.string.failed_to_import_epub)
                     setSubText(it.message)
                     removeProgressBar()

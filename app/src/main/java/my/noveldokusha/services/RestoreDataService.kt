@@ -82,7 +82,11 @@ class RestoreDataService : Service() {
             context.isServiceRunning(RestoreDataService::class.java)
     }
 
-    private val channel_id = "Restore backup"
+    private val channelName by lazy { getString(R.string.notification_channel_name_restore_backup) }
+    private val channelId = "Restore backup"
+    private val notificationId = channelId.hashCode()
+
+
     private lateinit var notificationBuilder: NotificationCompat.Builder
     private var job: Job? = null
 
@@ -90,8 +94,12 @@ class RestoreDataService : Service() {
 
     override fun onCreate() {
         super.onCreate()
-        notificationBuilder = notificationsCenter.showNotification(channel_id)
-        startForeground(channel_id.hashCode(), notificationBuilder.build())
+        notificationBuilder = notificationsCenter.showNotification(
+            notificationId = notificationId,
+            channelId = channelId,
+            channelName = channelName
+        )
+        startForeground(notificationId, notificationBuilder.build())
     }
 
     override fun onDestroy() {
@@ -126,9 +134,12 @@ class RestoreDataService : Service() {
      * This function assumes the READ_EXTERNAL_STORAGE permission is granted.
      * This function will also show a status notificaton of the restoration progress.
      */
-    suspend fun restoreData(uri: Uri) = withContext(Dispatchers.IO) {
+    private suspend fun restoreData(uri: Uri) = withContext(Dispatchers.IO) {
 
-        val builder = notificationsCenter.showNotification(channel_id) {
+        notificationsCenter.modifyNotification(
+            notificationBuilder,
+            notificationId = notificationId
+        ) {
             title = getString(R.string.restore_data)
             text = getString(R.string.loading_data)
             setProgress(100, 0, true)
@@ -136,8 +147,11 @@ class RestoreDataService : Service() {
 
         val inputStream = context.contentResolver.openInputStream(uri)
         if (inputStream == null) {
-            notificationsCenter.modifyNotification(builder, channel_id) {
-                removeProgressBar()
+            notificationsCenter.showNotification(
+                channelName = channelName,
+                channelId = channelId,
+                notificationId = "Backup restore failure".hashCode()
+            ) {
                 text = getString(R.string.failed_to_restore_cant_access_file)
             }
             return@withContext
@@ -152,7 +166,10 @@ class RestoreDataService : Service() {
 
         suspend fun mergeToDatabase(inputStream: InputStream) {
             tryAsResponse {
-                notificationsCenter.modifyNotification(builder, channel_id) {
+                notificationsCenter.modifyNotification(
+                    notificationBuilder,
+                    notificationId = notificationId
+                ) {
                     text = getString(R.string.loading_database)
                 }
                 val backupDatabase = inputStream.use {
@@ -180,25 +197,45 @@ class RestoreDataService : Service() {
                         appFileResolver = appFileResolver
                     )
                 }
-                notificationsCenter.modifyNotification(builder, channel_id) {
+                notificationsCenter.modifyNotification(
+                    notificationBuilder,
+                    notificationId = notificationId
+                ) {
                     text = getString(R.string.adding_books)
                 }
                 repository.libraryBooks.insertReplace(backupDatabase.libraryBooks.getAll())
-                notificationsCenter.modifyNotification(builder, channel_id) {
+                notificationsCenter.modifyNotification(
+                    notificationBuilder,
+                    notificationId = notificationId
+                ) {
                     text = getString(R.string.adding_chapters)
                 }
                 repository.bookChapters.insert(backupDatabase.bookChapters.getAll())
-                notificationsCenter.modifyNotification(builder, channel_id) {
+                notificationsCenter.modifyNotification(
+                    notificationBuilder,
+                    notificationId = notificationId
+                ) {
                     text = getString(R.string.adding_chapters_text)
                 }
                 repository.chapterBody.insertReplace(backupDatabase.chapterBody.getAll())
-                toasty.show(R.string.database_restored)
                 backupDatabase.close()
                 backupDatabase.delete()
             }.onError {
-                notificationsCenter.modifyNotification(builder, channel_id) {
+                notificationsCenter.showNotification(
+                    channelName = channelName,
+                    channelId = channelId,
+                    notificationId = "Backup restore failure - invalid database".hashCode()
+                ) {
                     removeProgressBar()
                     text = getString(R.string.failed_to_restore_invalid_backup_database)
+                }
+            }.onSuccess {
+                notificationsCenter.showNotification(
+                    channelName = channelName,
+                    channelId = channelId,
+                    notificationId = "Backup restore success".hashCode()
+                ) {
+                    title = getString(R.string.backup_restored)
                 }
             }
         }
@@ -213,7 +250,10 @@ class RestoreDataService : Service() {
             }
         }
 
-        notificationsCenter.modifyNotification(builder, channel_id) {
+        notificationsCenter.modifyNotification(
+            notificationBuilder,
+            notificationId = notificationId
+        ) {
             text = getString(R.string.adding_images)
         }
         for ((entry, file) in zipSequence) when {
@@ -222,7 +262,10 @@ class RestoreDataService : Service() {
         }
 
         inputStream.closeQuietly()
-        notificationsCenter.modifyNotification(builder, channel_id) {
+        notificationsCenter.modifyNotification(
+            notificationBuilder,
+            notificationId = notificationId
+        ) {
             removeProgressBar()
             text = getString(R.string.data_restored)
         }

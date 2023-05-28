@@ -166,4 +166,12 @@
     <string name="language_french">French</string>
     <string name="source_name_local">Local</string>
     <string name="updating_library">Updating library (%1$d/%2$d)</string>
+    <string name="notification_channel_name_reader_narrator">Reader narrator</string>
+    <string name="notification_channel_name_library_update">Library update</string>
+    <string name="notification_channel_name_new_chapters">New chapters</string>
+    <string name="notification_channel_name_failed_updates">Failed updates</string>
+    <string name="notification_channel_name_backup">Backup</string>
+    <string name="notification_channel_name_import_epub">Import EPUB</string>
+    <string name="notification_channel_name_restore_backup">Restore backup</string>
+    <string name="backup_restored">Backup restored</string>
 </resources>

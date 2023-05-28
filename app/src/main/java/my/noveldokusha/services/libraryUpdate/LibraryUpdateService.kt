@@ -89,7 +89,7 @@ class LibraryUpdateService : Service() {
     override fun onCreate() {
         super.onCreate()
         val notification = libraryUpdateNotifications.createEmptyUpdatingNotification()
-        startForeground(libraryUpdateNotifications.channelId.hashCode(), notification)
+        startForeground(libraryUpdateNotifications.notificationId, notification)
     }
 
     override fun onDestroy() {
@@ -189,7 +189,6 @@ class LibraryUpdateService : Service() {
         }
 
         currentUpdatingNotifyJob.cancel()
-        libraryUpdateNotifications.closeUpdateUpdatingNotification()
     }
 
     private suspend fun updateBooks(

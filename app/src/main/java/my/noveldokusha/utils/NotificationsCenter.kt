@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
-import android.graphics.BitmapFactory
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -20,48 +19,53 @@ class NotificationsCenter(
     @SuppressLint("MissingPermission")
     fun showNotification(
         channelId: String,
-        channelName: String = channelId,
-        notificationId: String = channelId,
+        channelName: String,
+        notificationId: Int,
         importance: Int = NotificationManager.IMPORTANCE_DEFAULT,
         builder: NotificationCompat.Builder.() -> Unit = {}
-    ) = run {
-        buildNotification(context, channelId, channelName, importance, builder).apply {
+    ): NotificationCompat.Builder {
+        return buildNotification(
+            context = context,
+            channelId = channelId,
+            channelName = channelName,
+            importance = importance,
+            builder = builder
+        ).apply {
             NotificationManagerCompat
                 .from(context)
-                .notify(notificationId.hashCode(), build())
+                .notify(notificationId, build())
         }
     }
 
-    fun close(channelId: String) = manager.cancel(channelId.hashCode())
+    fun close(notificationId: Int) = manager.cancel(notificationId)
 
     private fun buildNotification(
         context: Context,
         channelId: String,
-        channelName: String = channelId,
+        channelName: String,
         importance: Int = NotificationManager.IMPORTANCE_DEFAULT,
         builder: NotificationCompat.Builder.() -> Unit,
-    ) = run {
-        NotificationCompat.Builder(context, channelId).apply {
+    ): NotificationCompat.Builder {
+        val channel = NotificationChannel(channelId, channelName, importance)
+        manager.createNotificationChannel(channel)
+
+        return NotificationCompat.Builder(context, channelId).apply {
             setSmallIcon(R.mipmap.ic_logo)
-            BitmapFactory.decodeResource(context.resources, R.mipmap.ic_logo)
             priority = NotificationCompat.PRIORITY_DEFAULT
             builder(this)
-
-            val channel = NotificationChannel(channelId, channelName, importance)
-            manager.createNotificationChannel(channel)
         }
     }
 
     @SuppressLint("MissingPermission")
     fun modifyNotification(
         builder: NotificationCompat.Builder,
-        channelId: String,
+        notificationId: Int,
         modifierBlock: NotificationCompat.Builder.() -> Unit
     ) {
         modifierBlock(builder)
         NotificationManagerCompat
             .from(context)
-            .notify(channelId.hashCode(), builder.build())
+            .notify(notificationId, builder.build())
     }
 }
 

@@ -18,8 +18,6 @@ import javax.inject.Inject
 class NarratorMediaControlsService : Service() {
 
     companion object {
-        const val channel_id = "ReaderNarrator"
-
         fun start(ctx: Context) {
             if (!isRunning(ctx))
                 ContextCompat.startForegroundService(
@@ -39,13 +37,12 @@ class NarratorMediaControlsService : Service() {
     @Inject
     lateinit var narratorNotification: NarratorMediaControlsNotification
 
-
     override fun onCreate() {
         super.onCreate()
 
         val notification = narratorNotification.createNotificationMediaControls(this) ?: return
 
-        startForeground(channel_id.hashCode(), notification)
+        startForeground(narratorNotification.notificationId, notification)
     }
 
     override fun onDestroy() {

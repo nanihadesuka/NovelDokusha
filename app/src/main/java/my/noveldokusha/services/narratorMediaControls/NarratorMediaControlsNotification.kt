@@ -3,7 +3,6 @@ package my.noveldokusha.services.narratorMediaControls
 import android.app.Notification
 import android.app.NotificationManager
 import android.app.PendingIntent
-import android.app.TaskStackBuilder
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
@@ -14,6 +13,7 @@ import android.support.v4.media.session.PlaybackStateCompat
 import androidx.compose.runtime.snapshotFlow
 import androidx.core.app.NotificationCompat
 import androidx.media.session.MediaButtonReceiver
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -33,17 +33,23 @@ import my.noveldokusha.ui.screens.reader.ReaderActivity
 import my.noveldokusha.ui.screens.reader.chapterReadPercentage
 import my.noveldokusha.ui.screens.reader.manager.ReaderManager
 import my.noveldokusha.utils.NotificationsCenter
-import my.noveldokusha.utils.getPendingIntentCompat
 import my.noveldokusha.utils.text
 import my.noveldokusha.utils.title
+import javax.inject.Inject
 
-class NarratorMediaControlsNotification(
+class NarratorMediaControlsNotification @Inject constructor(
+    @ApplicationContext private val context: Context,
     private val notificationsCenter: NotificationsCenter,
     private val readerManager: ReaderManager,
+) {
     private val scope: CoroutineScope = CoroutineScope(
         SupervisorJob() + Dispatchers.Main.immediate + CoroutineName("NarratorNotificationService")
     )
-) {
+
+    private val channelName = context.getString(R.string.notification_channel_name_reader_narrator)
+    private val channelId = "Reader narrator"
+    private val mediaTagDebug = "NovelDokusha_narratorMediaControls"
+    val notificationId: Int = channelId.hashCode()
 
     private var mediaSession: MediaSessionCompat? = null
 
@@ -61,7 +67,7 @@ class NarratorMediaControlsNotification(
         )
         val mediaSession = MediaSessionCompat(
             context,
-            "NovelDokusha_narratorMediaControls",
+            mediaTagDebug,
             ComponentName(context, MediaButtonReceiver::class.java),
             mbrIntent
         ).also {
@@ -80,26 +86,31 @@ class NarratorMediaControlsNotification(
             .setCancelButtonIntent(cancelButton)
             .setMediaSession(mediaSession.sessionToken)
 
-        val intentStack = TaskStackBuilder.create(context).also {
-            it.addParentStack(MainActivity::class.java)
-            it.addNextIntent(
-                ChaptersActivity.IntentData(
-                    context,
-                    BookMetadata(
-                        url = readerSession.bookUrl,
-                        title = readerSession.bookTitle ?: ""
-                    )
+        val readerIntent = ReaderActivity.IntentData(
+            ctx = context,
+            bookUrl = readerSession.bookUrl,
+            chapterUrl = readerSession.currentChapter.chapterUrl,
+            scrollToSpeakingItem = true
+        )
+
+        val chain = listOf<Intent>(
+            Intent(context, MainActivity::class.java),
+            ChaptersActivity.IntentData(
+                context,
+                BookMetadata(
+                    url = readerSession.bookUrl,
+                    title = readerSession.bookTitle ?: ""
                 )
-            )
-            it.addNextIntent(
-                ReaderActivity.IntentData(
-                    ctx = context,
-                    bookUrl = readerSession.bookUrl,
-                    chapterUrl = readerSession.currentChapter.chapterUrl,
-                    scrollToSpeakingItem = true
-                )
-            )
-        }
+            ),
+            readerIntent
+        )
+
+        fun generateIntentStack() = PendingIntent.getActivities(
+            context,
+            readerSession.bookUrl.hashCode(),
+            chain.toTypedArray(),
+            PendingIntent.FLAG_ONE_SHOT or PendingIntent.FLAG_MUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+        )
 
         val actionIntentPrevious = NotificationCompat.Action(
             R.drawable.ic_media_control_previous,
@@ -160,37 +171,32 @@ class NarratorMediaControlsNotification(
             addAction(actionIntentNext)
         }
 
-        val notificationBuilder =
-            notificationsCenter.showNotification(
-                NarratorMediaControlsService.channel_id,
-                importance = NotificationManager.IMPORTANCE_LOW
-            ) {
-                title = ""
-                text = ""
-                defineActions(isPlaying = readerSession.readerTextToSpeech.state.isPlaying.value)
-                setOngoing(true)
-                setCategory(NotificationCompat.CATEGORY_TRANSPORT)
-                priority = NotificationCompat.PRIORITY_HIGH
-                setLargeIcon(BitmapFactory.decodeResource(context.resources, R.mipmap.ic_logo))
-                setStyle(mediaStyle)
-                setDeleteIntent(cancelButton)
-                color = Color.CYAN
-                setContentIntent(
-                    intentStack.getPendingIntentCompat(
-                        requestCode = 0,
-                        flags = PendingIntent.FLAG_UPDATE_CURRENT,
-                        isMutable = true
-                    )
-                )
-            }
+        val notificationBuilder = notificationsCenter.showNotification(
+            channelId = channelId,
+            channelName = channelName,
+            notificationId = notificationId,
+            importance = NotificationManager.IMPORTANCE_LOW
+        ) {
+            title = ""
+            text = ""
+            defineActions(isPlaying = readerSession.readerTextToSpeech.state.isPlaying.value)
+            setOngoing(true)
+            setCategory(NotificationCompat.CATEGORY_TRANSPORT)
+            priority = NotificationCompat.PRIORITY_HIGH
+            setLargeIcon(BitmapFactory.decodeResource(context.resources, R.mipmap.ic_logo))
+            setStyle(mediaStyle)
+            setDeleteIntent(cancelButton)
+            color = Color.CYAN
+            setContentIntent(generateIntentStack())
+        }
 
         // Update reader speaking state
         scope.launch {
             snapshotFlow { readerSession.readerTextToSpeech.state.isPlaying.value }
                 .collectLatest { isPlaying ->
                     notificationsCenter.modifyNotification(
-                        notificationBuilder,
-                        NarratorMediaControlsService.channel_id
+                        builder = notificationBuilder,
+                        notificationId = notificationId,
                     ) {
                         defineActions(isPlaying = isPlaying)
                     }
@@ -205,8 +211,8 @@ class NarratorMediaControlsNotification(
                 .distinctUntilChanged()
                 .collectLatest { chapterTitle ->
                     notificationsCenter.modifyNotification(
-                        notificationBuilder,
-                        NarratorMediaControlsService.channel_id
+                        builder = notificationBuilder,
+                        notificationId = notificationId,
                     ) {
                         title = chapterTitle
                     }
@@ -219,25 +225,13 @@ class NarratorMediaControlsNotification(
                 .mapNotNull { readerSession.readerChaptersLoader.chaptersStats[it.itemPos.chapterUrl] }
                 .map { it.chapter.url }
                 .distinctUntilChanged()
-                .mapNotNull { chapterUrl ->
-                    intentStack.intents
-                        .filterIsInstance<ReaderActivity.IntentData>()
-                        .firstOrNull()
-                        ?.let { chapterUrl to it }
-                }
-                .collectLatest { (chapterUrl, readerIntent) ->
+                .collectLatest { chapterUrl ->
                     readerIntent.chapterUrl = chapterUrl
                     notificationsCenter.modifyNotification(
-                        notificationBuilder,
-                        NarratorMediaControlsService.channel_id
+                        builder = notificationBuilder,
+                        notificationId = notificationId,
                     ) {
-                        setContentIntent(
-                            intentStack.getPendingIntentCompat(
-                                requestCode = 0,
-                                flags = PendingIntent.FLAG_UPDATE_CURRENT,
-                                isMutable = true
-                            )
-                        )
+                        setContentIntent(generateIntentStack())
                     }
                 }
         }
@@ -258,8 +252,8 @@ class NarratorMediaControlsNotification(
                         it.chapterReadPercentage()
                     )
                     notificationsCenter.modifyNotification(
-                        notificationBuilder,
-                        NarratorMediaControlsService.channel_id
+                        builder = notificationBuilder,
+                        notificationId = notificationId,
                     ) {
                         text = "$chapterPos  $progress"
                     }

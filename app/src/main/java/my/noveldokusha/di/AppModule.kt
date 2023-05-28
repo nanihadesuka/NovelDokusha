@@ -22,7 +22,6 @@ import my.noveldokusha.repository.LibraryBooksRepository
 import my.noveldokusha.repository.Repository
 import my.noveldokusha.repository.ScraperRepository
 import my.noveldokusha.scraper.Scraper
-import my.noveldokusha.services.narratorMediaControls.NarratorMediaControlsNotification
 import my.noveldokusha.tools.TranslationManager
 import my.noveldokusha.ui.Toasty
 import my.noveldokusha.ui.ToastyToast
@@ -177,13 +176,6 @@ abstract class AppModule {
             @ApplicationContext context: Context,
         ): NotificationsCenter {
             return NotificationsCenter(context)
-        }
-
-        @Provides
-        fun provideNarratorMediaControlsNotification(
-            notificationsCenter: NotificationsCenter, readerManager: ReaderManager
-        ): NarratorMediaControlsNotification {
-            return NarratorMediaControlsNotification(notificationsCenter, readerManager)
         }
     }
 }

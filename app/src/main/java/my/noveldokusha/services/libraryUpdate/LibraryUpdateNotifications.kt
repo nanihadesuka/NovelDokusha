@@ -3,6 +3,7 @@ package my.noveldokusha.services.libraryUpdate
 import android.app.Notification
 import android.app.NotificationManager
 import android.app.PendingIntent
+import android.app.TaskStackBuilder
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
@@ -18,7 +19,9 @@ import my.noveldokusha.data.database.tables.Book
 import my.noveldokusha.data.database.tables.Chapter
 import my.noveldokusha.ui.screens.chaptersList.ChaptersActivity
 import my.noveldokusha.ui.screens.main.MainActivity
+import my.noveldokusha.ui.screens.reader.ReaderActivity
 import my.noveldokusha.utils.NotificationsCenter
+import my.noveldokusha.utils.getPendingIntentCompat
 import my.noveldokusha.utils.text
 import my.noveldokusha.utils.title
 import javax.inject.Inject
@@ -28,13 +31,28 @@ class LibraryUpdateNotifications @Inject constructor(
     private val notificationsCenter: NotificationsCenter
 ) {
 
-    val channelId = "Library update"
+    private val channelName = context.getString(R.string.notification_channel_name_library_update)
+    private val channelId = "Library update"
+    val notificationId: Int = channelId.hashCode()
+
+    private val notifyNewChapters = object {
+        val channelName = context.getString(R.string.notification_channel_name_new_chapters)
+        val channelId = "New chapters"
+    }
+
+    private val notifyFailedUpdates = object {
+        val channelName = context.getString(R.string.notification_channel_name_failed_updates)
+        val channelId = "Failed updates"
+        val notificationId: Int = channelId.hashCode()
+    }
 
     private lateinit var notificationBuilder: NotificationCompat.Builder
 
     fun createEmptyUpdatingNotification(): Notification {
         notificationBuilder = notificationsCenter.showNotification(
             channelId = channelId,
+            channelName = channelName,
+            notificationId = notificationId,
             importance = NotificationManager.IMPORTANCE_LOW
         ) {
             setStyle(NotificationCompat.BigTextStyle())
@@ -48,7 +66,7 @@ class LibraryUpdateNotifications @Inject constructor(
         countingTotal: Int,
         books: Set<Book>
     ) {
-        notificationsCenter.modifyNotification(notificationBuilder, channelId) {
+        notificationsCenter.modifyNotification(notificationBuilder, notificationId) {
             title = context.getString(R.string.updating_library, countingUpdated, countingTotal)
             text = books.joinToString(separator = "\n") { "· " + it.title }
             setProgress(countingTotal, countingUpdated, false)
@@ -58,13 +76,11 @@ class LibraryUpdateNotifications @Inject constructor(
     fun showNewChaptersNotification(
         book: Book,
         newChapters: List<Chapter>,
-        silent :Boolean
+        silent: Boolean
     ) {
-        val intentStack = PendingIntent.getActivities(
-            context,
-            book.url.hashCode(),
-            arrayOf(
-                Intent(context, MainActivity::class.java),
+        val chain = mutableListOf<Intent>().also {
+            it.add(Intent(context, MainActivity::class.java))
+            it.add(
                 ChaptersActivity.IntentData(
                     context, bookMetadata = BookMetadata(
                         coverImageUrl = book.coverImageUrl,
@@ -73,13 +89,30 @@ class LibraryUpdateNotifications @Inject constructor(
                         url = book.url
                     )
                 ).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-            ),
+            )
+            newChapters.firstOrNull()?.let { chapter ->
+                it.add(
+                    ReaderActivity.IntentData(
+                        ctx = context,
+                        bookUrl = book.url,
+                        chapterUrl = chapter.url,
+                        scrollToSpeakingItem = false
+                    )
+                )
+            }
+        }
+
+        val intentStack = PendingIntent.getActivities(
+            context,
+            book.url.hashCode(),
+            chain.toTypedArray(),
             PendingIntent.FLAG_ONE_SHOT or PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_CANCEL_CURRENT
         )
 
         notificationsCenter.showNotification(
-            notificationId = book.url,
-            channelId = "New chapters",
+            notificationId = book.url.hashCode(),
+            channelId = notifyNewChapters.channelId,
+            channelName = "New chapters",
             importance = NotificationManager.IMPORTANCE_DEFAULT
         )
         {
@@ -106,8 +139,9 @@ class LibraryUpdateNotifications @Inject constructor(
                         transition: Transition<in Bitmap>?
                     ) {
                         notificationsCenter.showNotification(
-                            notificationId = book.url,
-                            channelId = "New chapters",
+                            notificationId = book.url.hashCode(),
+                            channelId = notifyNewChapters.channelId,
+                            channelName = notifyNewChapters.channelName,
                             importance = NotificationManager.IMPORTANCE_DEFAULT
                         ) {
                             title = book.title
@@ -128,17 +162,13 @@ class LibraryUpdateNotifications @Inject constructor(
                 })
     }
 
-    fun closeUpdateUpdatingNotification() {
-        notificationsCenter.close(channelId)
-
-    }
-
     fun showFailedNotification(
         books: Set<Book>,
     ) {
         notificationsCenter.showNotification(
-            notificationId = books.hashCode().toString(),
-            channelId = "Update error",
+            notificationId = notifyFailedUpdates.notificationId,
+            channelId = notifyFailedUpdates.channelId,
+            channelName = notifyFailedUpdates.channelName,
             importance = NotificationManager.IMPORTANCE_DEFAULT
         ) {
             title = context.getString(R.string.update_error)
