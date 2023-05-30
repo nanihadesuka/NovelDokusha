@@ -2,6 +2,7 @@ package my.noveldokusha.ui.screens.chaptersList
 
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -38,6 +39,7 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import my.noveldokusha.R
 import my.noveldokusha.repository.rememberResolvedBookImagePath
+import my.noveldokusha.ui.bounceOnPressed
 import my.noveldokusha.ui.composeViews.BookImageButtonView
 import my.noveldokusha.ui.composeViews.BookTitlePosition
 import my.noveldokusha.ui.composeViews.ExpandableText
@@ -53,6 +55,7 @@ fun ChaptersScreenHeader(
     numberOfChapters: Int,
     paddingValues: PaddingValues,
     modifier: Modifier = Modifier,
+    onCoverLongClick: () -> Unit,
 ) {
     val context by rememberUpdatedState(LocalContext.current)
     val coverImageModel = bookState.coverImageUrl?.let {
@@ -95,12 +98,17 @@ fun ChaptersScreenHeader(
                 horizontalArrangement = Arrangement.spacedBy(14.dp),
             ) {
                 var showImageFullScreen by rememberSaveable { mutableStateOf(false) }
+                val interactionSource = remember { MutableInteractionSource() }
                 BookImageButtonView(
                     title = "",
                     coverImageModel = coverImageModel,
                     onClick = { showImageFullScreen = true },
+                    onLongClick = onCoverLongClick,
                     bookTitlePosition = BookTitlePosition.Hidden,
-                    modifier = Modifier.weight(1f)
+                    interactionSource = interactionSource,
+                    modifier = Modifier
+                        .weight(1f)
+                        .bounceOnPressed(interactionSource)
                 )
                 if (showImageFullScreen) Dialog(
                     onDismissRequest = { showImageFullScreen = false },

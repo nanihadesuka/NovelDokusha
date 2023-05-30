@@ -38,6 +38,7 @@ fun ChaptersScreenBody(
     onChapterLongClick: (chapter: ChapterWithContext) -> Unit,
     onChapterDownload: (chapter: ChapterWithContext) -> Unit,
     onPullRefresh: () -> Unit,
+    onCoverLongClick: () -> Unit,
 ) {
     var isRefreshingDelayed by remember { mutableStateOf(state.isRefreshing.value) }
     LaunchedEffect(Unit) {
@@ -72,7 +73,8 @@ fun ChaptersScreenBody(
                     ),
                     numberOfChapters = state.chapters.size,
                     paddingValues = innerPadding,
-                    modifier = Modifier.padding(bottom = 12.dp)
+                    modifier = Modifier.padding(bottom = 12.dp),
+                    onCoverLongClick = onCoverLongClick
                 )
             }
 

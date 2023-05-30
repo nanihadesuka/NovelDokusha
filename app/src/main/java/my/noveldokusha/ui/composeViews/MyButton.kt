@@ -3,12 +3,27 @@ package my.noveldokusha.ui.composeViews
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.Indication
+import androidx.compose.foundation.LocalIndication
 import androidx.compose.foundation.border
 import androidx.compose.foundation.combinedClickable
-import androidx.compose.foundation.layout.*
-import androidx.compose.material3.*
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.material3.LocalTextStyle
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -46,6 +61,8 @@ fun MyButton(
     selectedBackgroundColor: Color = ColorAccent,
     onClick: () -> Unit,
     onLongClick: (() -> Unit)? = null,
+    indication: Indication = LocalIndication.current,
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     content: @Composable BoxScope.() -> Unit = {
 
         val color = when {
@@ -79,6 +96,8 @@ fun MyButton(
         selected = selected,
         onClick = onClick,
         onLongClick = onLongClick,
+        indication = indication,
+        interactionSource = interactionSource,
         content = content,
     )
 }
@@ -100,6 +119,8 @@ private fun InternalButton(
     selected: Boolean,
     onClick: () -> Unit,
     onLongClick: (() -> Unit)?,
+    indication: Indication,
+    interactionSource: MutableInteractionSource,
     content: @Composable BoxScope.() -> Unit
 ) {
     val background by animateColorAsState(
@@ -114,6 +135,8 @@ private fun InternalButton(
             .border(borderWidth, borderColor, shape)
             .clip(shape)
             .combinedClickable(
+                interactionSource = interactionSource,
+                indication = indication,
                 enabled = enabled,
                 role = Role.Button,
                 onClick = onClick,

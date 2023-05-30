@@ -1,6 +1,7 @@
 package my.noveldokusha.ui.screens.globalSourceSearch
 
 import androidx.compose.animation.animateContentSize
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -15,6 +16,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -26,6 +28,7 @@ import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.network.IteratorState
 import my.noveldokusha.repository.CatalogItem
 import my.noveldokusha.repository.rememberResolvedBookImagePath
+import my.noveldokusha.ui.bounceOnPressed
 import my.noveldokusha.ui.composeViews.BookImageButtonView
 import my.noveldokusha.ui.composeViews.BookTitlePosition
 import my.noveldokusha.ui.previewFixtures.previewFixturesCatalogList
@@ -87,6 +90,7 @@ private fun SourceListView(
             .fillMaxWidth(),
     ) {
         items(list) {
+            val interactionSource = remember { MutableInteractionSource() }
             BookImageButtonView(
                 title = it.title,
                 coverImageModel = rememberResolvedBookImagePath(
@@ -95,8 +99,11 @@ private fun SourceListView(
                 ),
                 onClick = { onBookClick(it) },
                 onLongClick = { },
-                modifier = Modifier.width(130.dp),
+                modifier = Modifier
+                    .width(130.dp)
+                    .bounceOnPressed(interactionSource),
                 bookTitlePosition = BookTitlePosition.Outside,
+                interactionSource = interactionSource
             )
         }
 

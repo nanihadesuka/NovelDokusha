@@ -93,6 +93,7 @@ fun ChaptersScreen(
     onSelectionModeChapterLongClick: (chapter: ChapterWithContext) -> Unit,
     onChapterDownload: (chapter: ChapterWithContext) -> Unit,
     onPullRefresh: () -> Unit,
+    onCoverLongClick: () -> Unit,
 ) {
     val context by rememberUpdatedState(newValue = LocalContext.current)
     var showDropDown by rememberSaveable { mutableStateOf(false) }
@@ -244,6 +245,7 @@ fun ChaptersScreen(
                 onChapterLongClick = if (state.isInSelectionMode.value) onSelectionModeChapterLongClick else onChapterLongClick,
                 onChapterDownload = onChapterDownload,
                 onPullRefresh = onPullRefresh,
+                onCoverLongClick = onCoverLongClick,
             )
             Box(Modifier.padding(innerPadding)) {
                 InternalLazyColumnScrollbar(listState = lazyListState)

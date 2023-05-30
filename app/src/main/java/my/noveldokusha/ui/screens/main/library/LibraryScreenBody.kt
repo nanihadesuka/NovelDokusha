@@ -5,6 +5,7 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -46,6 +47,7 @@ import my.noveldokusha.data.BookWithContext
 import my.noveldokusha.data.LibraryCategory
 import my.noveldokusha.isLocalUri
 import my.noveldokusha.repository.rememberResolvedBookImagePath
+import my.noveldokusha.ui.bounceOnPressed
 import my.noveldokusha.ui.composeViews.BookImageButtonView
 import my.noveldokusha.ui.composeViews.CollapsibleDivider
 import my.noveldokusha.ui.theme.ColorAccent
@@ -161,6 +163,7 @@ private fun LibraryPageBody(
             items = list,
             key = { it.book.url }
         ) {
+            val interactionSource = remember { MutableInteractionSource() }
             Box {
                 BookImageButtonView(
                     title = it.book.title,
@@ -169,7 +172,9 @@ private fun LibraryPageBody(
                         imagePath = it.book.coverImageUrl
                     ),
                     onClick = { onClick(it) },
-                    onLongClick = { onLongClick(it) }
+                    onLongClick = { onLongClick(it) },
+                    interactionSource = interactionSource,
+                    modifier = Modifier.bounceOnPressed(interactionSource)
                 )
                 val notReadCount = it.chaptersCount - it.chaptersReadCount
                 AnimatedVisibility(

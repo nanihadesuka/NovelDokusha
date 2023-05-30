@@ -70,7 +70,8 @@ class ChaptersActivity : BaseActivity() {
                     onCloseSelectionBar = viewModel::unselectAll,
                     onSelectAllChapters = viewModel::selectAll,
                     onSelectedInvertSelection = viewModel::invertSelection,
-                    onPullRefresh = viewModel::onPullRefresh
+                    onPullRefresh = viewModel::onPullRefresh,
+                    onCoverLongClick = { goToDatabaseSearch(input = viewModel.bookTitle) }
                 )
             }
         }

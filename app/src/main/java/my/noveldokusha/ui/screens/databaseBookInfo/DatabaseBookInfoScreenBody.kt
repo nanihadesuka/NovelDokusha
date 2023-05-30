@@ -1,9 +1,27 @@
 package my.noveldokusha.ui.screens.databaseBookInfo
 
-import androidx.compose.animation.*
-import androidx.compose.foundation.*
-import androidx.compose.foundation.layout.*
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.with
+import androidx.compose.foundation.ScrollState
+import androidx.compose.foundation.background
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.selection.SelectionContainer
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -31,6 +49,7 @@ import androidx.compose.ui.window.DialogProperties
 import my.noveldokusha.R
 import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.scraper.SearchGenre
+import my.noveldokusha.ui.bounceOnPressed
 import my.noveldokusha.ui.composeViews.BookImageButtonView
 import my.noveldokusha.ui.composeViews.BookTitlePosition
 import my.noveldokusha.ui.composeViews.ExpandableText
@@ -93,12 +112,16 @@ fun DatabaseBookInfoScreenBody(
                     horizontalArrangement = Arrangement.spacedBy(14.dp),
                 ) {
                     var showImageFullScreen by rememberSaveable { mutableStateOf(false) }
+                    val interactionSource = remember { MutableInteractionSource() }
                     BookImageButtonView(
                         title = "",
                         coverImageModel = coverImg,
                         onClick = { showImageFullScreen = true },
                         bookTitlePosition = BookTitlePosition.Hidden,
-                        modifier = Modifier.weight(1f),
+                        interactionSource = interactionSource,
+                        modifier = Modifier
+                            .weight(1f)
+                            .bounceOnPressed(interactionSource),
                     )
                     SelectionContainer(
                         modifier = Modifier.weight(1f)

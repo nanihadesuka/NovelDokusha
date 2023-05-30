@@ -1,5 +1,6 @@
 package my.noveldokusha.ui.composeViews
 
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -26,6 +27,7 @@ import my.noveldokusha.composableActions.ListGridLoadWatcher
 import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.network.IteratorState
 import my.noveldokusha.repository.rememberResolvedBookImagePath
+import my.noveldokusha.ui.bounceOnPressed
 import my.noveldokusha.ui.theme.ColorAccent
 
 @Composable
@@ -68,12 +70,16 @@ fun BooksVerticalView(
         contentPadding = PaddingValues(start = 4.dp, end = 4.dp, top = 4.dp, bottom = 260.dp)
     ) {
         items(list) {
+            val interactionSource = remember { MutableInteractionSource() }
             when (layoutMode) {
                 AppPreferences.LIST_LAYOUT_MODE.verticalList -> MyButton(
                     text = it.title,
                     onClick = { onBookClicked(it) },
                     onLongClick = { onBookLongClicked(it) },
-                    modifier = Modifier.fillMaxWidth()
+                    interactionSource = interactionSource,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .bounceOnPressed(interactionSource)
                 )
                 AppPreferences.LIST_LAYOUT_MODE.verticalGrid -> BookImageButtonView(
                     title = it.title,
@@ -81,8 +87,10 @@ fun BooksVerticalView(
                         bookUrl = it.url,
                         imagePath = it.coverImageUrl
                     ),
+                    interactionSource = interactionSource,
                     onClick = { onBookClicked(it) },
-                    onLongClick = { onBookLongClicked(it) }
+                    onLongClick = { onBookLongClicked(it) },
+                    modifier = Modifier.bounceOnPressed(interactionSource)
                 )
             }
         }
