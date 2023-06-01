@@ -18,6 +18,7 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateListOf
@@ -30,6 +31,7 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.launch
 import my.noveldokusha.AppPreferences
 import my.noveldokusha.R
 import my.noveldokusha.data.BookMetadata
@@ -157,13 +159,23 @@ fun DatabaseSearchScreen(
         showFiltersBottomSheet.value = state.searchMode.value == SearchMode.BookGenres
     }
 
-    if (showFiltersBottomSheet.value) ModalBottomSheet(
-        onDismissRequest = { showFiltersBottomSheet.value = false }
-    ) {
-        DatabaseSearchBottomSheet(
-            genresList = state.genresList,
-            onGenresFiltersSubmit = onGenresFiltersSubmit
-        )
+    if (showFiltersBottomSheet.value) {
+        val sheetState = rememberModalBottomSheetState()
+        val coroutineScope = rememberCoroutineScope()
+        ModalBottomSheet(
+            onDismissRequest = { showFiltersBottomSheet.value = false },
+            sheetState = sheetState,
+        ) {
+            DatabaseSearchBottomSheet(
+                genresList = state.genresList,
+                onGenresFiltersSubmit = {
+                    onGenresFiltersSubmit()
+                    coroutineScope.launch {
+                        sheetState.partialExpand()
+                    }
+                }
+            )
+        }
     }
 }
 
@@ -187,7 +199,7 @@ private fun PreviewView() {
     val state = remember {
         DatabaseSearchScreenState(
             databaseNameStrId = mutableStateOf(R.string.database_name_baka_updates),
-            searchMode = mutableStateOf(SearchMode.BookTitle),
+            searchMode = mutableStateOf(SearchMode.BookGenres),
             genresList = genresList,
             searchTextInput = mutableStateOf(""),
             fetchIterator = fetchIterator,
