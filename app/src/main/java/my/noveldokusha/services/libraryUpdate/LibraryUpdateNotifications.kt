@@ -3,7 +3,6 @@ package my.noveldokusha.services.libraryUpdate
 import android.app.Notification
 import android.app.NotificationManager
 import android.app.PendingIntent
-import android.app.TaskStackBuilder
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
@@ -21,7 +20,6 @@ import my.noveldokusha.ui.screens.chaptersList.ChaptersActivity
 import my.noveldokusha.ui.screens.main.MainActivity
 import my.noveldokusha.ui.screens.reader.ReaderActivity
 import my.noveldokusha.utils.NotificationsCenter
-import my.noveldokusha.utils.getPendingIntentCompat
 import my.noveldokusha.utils.text
 import my.noveldokusha.utils.title
 import javax.inject.Inject
@@ -79,7 +77,10 @@ class LibraryUpdateNotifications @Inject constructor(
         silent: Boolean
     ) {
         val chain = mutableListOf<Intent>().also {
-            it.add(Intent(context, MainActivity::class.java))
+            it.add(
+                Intent(context, MainActivity::class.java)
+                    .setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK)
+            )
             it.add(
                 ChaptersActivity.IntentData(
                     context, bookMetadata = BookMetadata(
@@ -88,7 +89,7 @@ class LibraryUpdateNotifications @Inject constructor(
                         title = book.title,
                         url = book.url
                     )
-                ).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                )
             )
             newChapters.firstOrNull()?.let { chapter ->
                 it.add(
@@ -106,7 +107,9 @@ class LibraryUpdateNotifications @Inject constructor(
             context,
             book.url.hashCode(),
             chain.toTypedArray(),
-            PendingIntent.FLAG_ONE_SHOT or PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_CANCEL_CURRENT
+            PendingIntent.FLAG_ONE_SHOT
+                    or PendingIntent.FLAG_IMMUTABLE
+                    or PendingIntent.FLAG_CANCEL_CURRENT
         )
 
         notificationsCenter.showNotification(

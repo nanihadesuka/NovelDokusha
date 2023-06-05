@@ -92,9 +92,14 @@ class NarratorMediaControlsNotification @Inject constructor(
             chapterUrl = readerSession.currentChapter.chapterUrl,
             scrollToSpeakingItem = true
         )
+        readerIntent.setFlags(
+            Intent.FLAG_ACTIVITY_CLEAR_TOP
+                    or Intent.FLAG_ACTIVITY_SINGLE_TOP
+        )
 
         val chain = listOf<Intent>(
-            Intent(context, MainActivity::class.java),
+            Intent(context, MainActivity::class.java)
+                .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK),
             ChaptersActivity.IntentData(
                 context,
                 BookMetadata(
@@ -109,7 +114,7 @@ class NarratorMediaControlsNotification @Inject constructor(
             context,
             readerSession.bookUrl.hashCode(),
             chain.toTypedArray(),
-            PendingIntent.FLAG_ONE_SHOT or PendingIntent.FLAG_MUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+            PendingIntent.FLAG_MUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
         )
 
         val actionIntentPrevious = NotificationCompat.Action(
