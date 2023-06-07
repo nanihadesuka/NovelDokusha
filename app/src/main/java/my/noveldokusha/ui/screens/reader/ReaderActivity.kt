@@ -260,7 +260,10 @@ class ReaderActivity : BaseActivity() {
                     onSelectableTextChange = { appPreferences.READER_SELECTABLE_TEXT.value = it },
                     onFollowSystem = viewModelGlobalSettings::onFollowSystemChange,
                     onThemeSelected = viewModelGlobalSettings::onThemeChange,
-                    onPressBack = ::onBackPressed,
+                    onPressBack = {
+                        viewModel.onBackPressed()
+                        finish()
+                    },
                     onOpenChapterInWeb = {
                         val url = viewModel.state.readerInfo.chapterUrl.value
                         if (url.isNotBlank()) {
