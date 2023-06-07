@@ -18,6 +18,7 @@ interface ReaderManagerViewCallReferences {
     var maintainStartPosition: (suspend (suspend () -> Unit) -> Unit)?
     var setInitialPosition: (suspend (InitialPositionChapter) -> Unit)?
     var showInvalidChapterDialog: (suspend () -> Unit)?
+    var introScrollToCurrentChapter: Boolean
 }
 
 class ReaderManager(
@@ -49,19 +50,23 @@ class ReaderManager(
     @Volatile
     override var showInvalidChapterDialog: (suspend () -> Unit)? = null
 
+    @Volatile
+    override var introScrollToCurrentChapter: Boolean = false
+
     fun initiateOrGetSession(
         bookUrl: String,
         chapterUrl: String,
     ): ReaderSession {
-        session?.let {
-            if (bookUrl == it.bookUrl) {
-                return it
-            } else {
-                it.close()
-            }
+        val currentSession = session
+        if (currentSession != null && bookUrl == currentSession.bookUrl && chapterUrl == currentSession.currentChapter.chapterUrl) {
+            introScrollToCurrentChapter = true
+            return currentSession
         }
 
-        return ReaderSession(
+        currentSession?.close()
+        introScrollToCurrentChapter = false
+
+        val newSession = ReaderSession(
             bookUrl = bookUrl,
             initialChapterUrl = chapterUrl,
             scope = scope,
@@ -79,10 +84,11 @@ class ReaderManager(
             setInitialPosition = { withMainNow { setInitialPosition?.invoke(it) } },
             showInvalidChapterDialog = { withMainNow { showInvalidChapterDialog?.invoke() } },
             context = context
-        ).also {
-            session = it
-            it.init()
-        }
+        )
+        session = newSession
+        newSession.init()
+
+        return newSession
     }
 
     fun invalidateViewsHandlers() {

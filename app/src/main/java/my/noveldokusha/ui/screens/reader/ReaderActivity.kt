@@ -121,7 +121,6 @@ class ReaderActivity : BaseActivity() {
                 viewModel.reloadReader()
             }
         }
-
         viewModel.forceUpdateListViewState = {
             withContext(Dispatchers.Main.immediate) {
                 viewAdapter.listView.notifyDataSetChanged()
@@ -141,9 +140,7 @@ class ReaderActivity : BaseActivity() {
             withContext(Dispatchers.Main.immediate) {
                 it()
                 val titleIndex = (0..viewAdapter.listView.count)
-                    .asSequence()
-                    .map { viewAdapter.listView.getItem(it) }
-                    .indexOfFirst { it is ReaderItem.Title }
+                    .indexOfFirst { viewAdapter.listView.getItem(it) is ReaderItem.Title }
 
                 if (titleIndex != -1) {
                     viewBind.listView.setSelection(titleIndex)
@@ -263,7 +260,7 @@ class ReaderActivity : BaseActivity() {
                     onSelectableTextChange = { appPreferences.READER_SELECTABLE_TEXT.value = it },
                     onFollowSystem = viewModelGlobalSettings::onFollowSystemChange,
                     onThemeSelected = viewModelGlobalSettings::onThemeChange,
-                    onPressBack = ::finish,
+                    onPressBack = ::onBackPressed,
                     onOpenChapterInWeb = {
                         val url = viewModel.state.readerInfo.chapterUrl.value
                         if (url.isNotBlank()) {
@@ -325,14 +322,29 @@ class ReaderActivity : BaseActivity() {
         }
 
 
-        // Use case: user opens app from media control intent
-        if (viewModel.introScrollToSpeaker) {
-            viewModel.introScrollToSpeaker = false
-            val itemPos = viewModel.readerSpeaker.currentTextPlaying.value.itemPos
-            scrollToReadingPositionImmediately(
-                chapterIndex = itemPos.chapterIndex,
-                chapterItemPosition = itemPos.chapterItemPosition,
-            )
+
+        when {
+            // Use case: user opens app from media control intent
+            viewModel.introScrollToSpeaker -> {
+                viewModel.introScrollToSpeaker = false
+                val itemPos = viewModel.readerSpeaker.currentTextPlaying.value.itemPos
+                scrollToReadingPositionImmediately(
+                    chapterIndex = itemPos.chapterIndex,
+                    chapterItemPosition = itemPos.chapterItemPosition,
+                )
+            }
+            // Use case: user opens reader on the same book, on the same chapter url (session is maintained)
+            viewModel.introScrollToCurrentChapter -> {
+                viewModel.introScrollToCurrentChapter = false
+                val chapterState = viewModel.readingCurrentChapter
+                val chapterStats =
+                    viewModel.chaptersLoader.chaptersStats[chapterState.chapterUrl] ?: return
+                initialScrollToChapterItemPosition(
+                    chapterIndex = chapterStats.orderedChaptersIndex,
+                    chapterItemPosition = chapterState.chapterItemPosition,
+                    offset = chapterState.offset
+                )
+            }
         }
     }
 
