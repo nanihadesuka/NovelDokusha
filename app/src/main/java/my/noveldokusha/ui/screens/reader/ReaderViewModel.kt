@@ -80,11 +80,9 @@ class ReaderViewModel @Inject constructor(
     val ttsScrolledToTheTop = readerSession.readerTextToSpeech.scrolledToTheTop
     val ttsScrolledToTheBottom = readerSession.readerTextToSpeech.scrolledToTheBottom
 
-    fun onBackPressed() {
-        if (!state.showReaderInfo.value) {
-            Timber.d("Close reader screen manually")
-            readerManager.close()
-        }
+    fun onCloseManually() {
+        Timber.d("Close reader screen manually")
+        readerManager.close()
     }
 
     fun onViewDestroyed() {

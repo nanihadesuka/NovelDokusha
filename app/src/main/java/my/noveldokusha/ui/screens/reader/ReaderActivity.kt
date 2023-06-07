@@ -96,7 +96,7 @@ class ReaderActivity : BaseActivity() {
     private val fontsLoader = FontsLoader()
 
     override fun onBackPressed() {
-        viewModel.onBackPressed()
+        viewModel.onCloseManually()
         super.onBackPressed()
     }
 
@@ -261,7 +261,7 @@ class ReaderActivity : BaseActivity() {
                     onFollowSystem = viewModelGlobalSettings::onFollowSystemChange,
                     onThemeSelected = viewModelGlobalSettings::onThemeChange,
                     onPressBack = {
-                        viewModel.onBackPressed()
+                        viewModel.onCloseManually()
                         finish()
                     },
                     onOpenChapterInWeb = {
