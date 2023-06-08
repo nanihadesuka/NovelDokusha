@@ -28,6 +28,7 @@ import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import my.noveldokusha.R
+import my.noveldokusha.composableActions.SetSystemBarTransparent
 import my.noveldokusha.databinding.ActivityReaderBinding
 import my.noveldokusha.tools.Utterance
 import my.noveldokusha.ui.BaseActivity
@@ -225,9 +226,10 @@ class ReaderActivity : BaseActivity() {
                 itemIndex = viewAdapter.listView.getFirstVisibleItemIndexGivenPosition(firstPosition)
             )
         }
-
         setContent {
             Theme(appPreferences) {
+                SetSystemBarTransparent()
+
                 // Notify manually text font changed for list view
                 LaunchedEffect(true) {
                     snapshotFlow { viewModel.state.settings.style.textFont.value }.drop(1)
@@ -305,12 +307,16 @@ class ReaderActivity : BaseActivity() {
 
         // Fullscreen mode that ignores any cutout, notch etc.
         WindowCompat.setDecorFitsSystemWindows(window, false)
-        WindowInsetsControllerCompat(window, window.decorView).let {
-            it.hide(WindowInsetsCompat.Type.displayCutout())
-            it.hide(WindowInsetsCompat.Type.systemBars())
-            it.systemBarsBehavior =
-                WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
-        }
+        val controller = WindowInsetsControllerCompat(window, window.decorView)
+        controller.hide(WindowInsetsCompat.Type.displayCutout())
+        controller.hide(WindowInsetsCompat.Type.systemBars())
+
+        snapshotFlow { viewModel.state.showReaderInfo.value }
+            .asLiveData()
+            .observe(this) { show ->
+                if (show) controller.show(WindowInsetsCompat.Type.statusBars())
+                else controller.hide(WindowInsetsCompat.Type.statusBars())
+            }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
             window.attributes.layoutInDisplayCutoutMode =

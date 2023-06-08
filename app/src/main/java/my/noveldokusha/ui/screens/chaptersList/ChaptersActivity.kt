@@ -13,6 +13,7 @@ import androidx.lifecycle.lifecycleScope
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import my.noveldokusha.composableActions.SetSystemBarTransparent
 import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.ui.BaseActivity
 import my.noveldokusha.ui.goToDatabaseSearch
@@ -44,14 +45,7 @@ class ChaptersActivity : BaseActivity() {
         WindowCompat.setDecorFitsSystemWindows(window, false)
         setContent {
             Theme(appPreferences = appPreferences) {
-                val systemUiController = rememberSystemUiController()
-                val useDarkIcons = MaterialTheme.colorScheme.isLightTheme()
-                SideEffect {
-                    systemUiController.setSystemBarsColor(
-                        color = Color.Transparent,
-                        darkIcons = useDarkIcons
-                    )
-                }
+                SetSystemBarTransparent()
                 ChaptersScreen(
                     state = viewModel.state,
                     onSearchBookInDatabase = ::searchBookInDatabase,

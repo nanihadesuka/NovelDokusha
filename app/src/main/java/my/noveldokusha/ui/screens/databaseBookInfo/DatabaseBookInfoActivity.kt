@@ -11,6 +11,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.core.view.WindowCompat
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import dagger.hilt.android.AndroidEntryPoint
+import my.noveldokusha.composableActions.SetSystemBarTransparent
 import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.scraper.SearchGenre
 import my.noveldokusha.ui.BaseActivity
@@ -47,14 +48,7 @@ class DatabaseBookInfoActivity : BaseActivity() {
         WindowCompat.setDecorFitsSystemWindows(window, false)
         setContent {
             Theme(appPreferences = appPreferences) {
-                val systemUiController = rememberSystemUiController()
-                val useDarkIcons = MaterialTheme.colorScheme.isLightTheme()
-                SideEffect {
-                    systemUiController.setSystemBarsColor(
-                        color = Color.Transparent,
-                        darkIcons = useDarkIcons
-                    )
-                }
+                SetSystemBarTransparent()
                 DatabaseBookInfoScreen(
                     state = viewModel.state,
                     onSourcesClick = ::openGlobalSearchPage,
