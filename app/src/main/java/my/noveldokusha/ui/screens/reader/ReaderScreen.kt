@@ -1,5 +1,6 @@
 package my.noveldokusha.ui.screens.reader
 
+import android.content.res.Configuration
 import androidx.activity.compose.BackHandler
 import androidx.annotation.StringRes
 import androidx.compose.animation.AnimatedVisibility
@@ -15,8 +16,12 @@ import androidx.compose.foundation.layout.displayCutoutPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
-import androidx.compose.material.icons.outlined.*
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Public
+import androidx.compose.material.icons.filled.RecordVoiceOver
+import androidx.compose.material.icons.outlined.ColorLens
+import androidx.compose.material.icons.outlined.MoreHoriz
+import androidx.compose.material.icons.outlined.Translate
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -63,6 +68,7 @@ import my.noveldokusha.utils.rememberMutableStateOf
 fun ReaderScreen(
     state: ReaderScreenState,
     onSelectableTextChange: (Boolean) -> Unit,
+    onKeepScreenOn: (Boolean) -> Unit,
     onFollowSystem: (Boolean) -> Unit,
     onThemeSelected: (Themes) -> Unit,
     onTextFontChanged: (String) -> Unit,
@@ -160,6 +166,7 @@ fun ReaderScreen(
                         onSelectableTextChange = onSelectableTextChange,
                         onFollowSystem = onFollowSystem,
                         onThemeSelected = onThemeSelected,
+                        onKeepScreenOn = onKeepScreenOn,
                         modifier = Modifier.padding(bottom = 8.dp)
                     )
                     BottomAppBar(
@@ -223,6 +230,7 @@ private fun RowScope.SettingIconItem(
 }
 
 @Preview(showBackground = true, widthDp = 360)
+@Preview(showBackground = true, widthDp = 360, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 private fun ViewsPreview(
     @PreviewParameter(PreviewDataProvider::class) data: PreviewDataProvider.Data
@@ -323,10 +331,11 @@ private fun ViewsPreview(
                     ),
                     settings = ReaderScreenState.Settings(
                         isTextSelectable = remember { mutableStateOf(false) },
+                        keepScreenOn = remember { mutableStateOf(false) },
                         textToSpeech = textToSpeechSettingData,
                         liveTranslation = liveTranslationSettingData,
                         style = style,
-                        selectedSetting = remember { mutableStateOf(data.selectedSetting) }
+                        selectedSetting = remember { mutableStateOf(data.selectedSetting) },
                     )
                 ),
                 onTextSizeChanged = {},
@@ -337,6 +346,7 @@ private fun ViewsPreview(
                 onPressBack = {},
                 onOpenChapterInWeb = {},
                 readerContent = {},
+                onKeepScreenOn = {},
             )
         }
     }

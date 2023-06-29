@@ -21,6 +21,7 @@ data class ReaderScreenState(
 
     data class Settings(
         val isTextSelectable: State<Boolean>,
+        val keepScreenOn: State<Boolean>,
         val textToSpeech: TextToSpeechSettingData,
         val liveTranslation: LiveTranslationSettingData,
         val style: StyleSettingsData,

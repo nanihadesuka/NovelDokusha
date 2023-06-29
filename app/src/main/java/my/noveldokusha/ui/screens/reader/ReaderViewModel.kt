@@ -59,6 +59,7 @@ class ReaderViewModel @Inject constructor(
         settings = ReaderScreenState.Settings(
             selectedSetting = mutableStateOf(ReaderScreenState.Settings.Type.None),
             isTextSelectable = appPreferences.READER_SELECTABLE_TEXT.state(viewModelScope),
+            keepScreenOn = appPreferences.READER_KEEP_SCREEN_ON.state(viewModelScope),
             textToSpeech = readerSession.readerTextToSpeech.state,
             liveTranslation = readerSession.readerLiveTranslation.state,
             style = ReaderScreenState.Settings.StyleSettingsData(

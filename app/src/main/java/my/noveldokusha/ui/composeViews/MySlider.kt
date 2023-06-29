@@ -1,5 +1,6 @@
 package my.noveldokusha.ui.composeViews
 
+import android.content.res.Configuration
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.draggable
@@ -14,6 +15,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -47,7 +49,11 @@ fun MySlider(
         onValueChange = onValueChange,
         modifier = modifier,
     ) {
-        Text(text = text, modifier = Modifier.align(Alignment.Center))
+        Text(
+            text = text,
+            modifier = Modifier.align(Alignment.Center),
+            color = MaterialTheme.colorScheme.contentColorFor(ColorAccent)
+        )
     }
 }
 

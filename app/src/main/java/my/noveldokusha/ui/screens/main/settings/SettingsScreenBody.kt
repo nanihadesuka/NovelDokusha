@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.AutoAwesome
 import androidx.compose.material.icons.outlined.ColorLens
 import androidx.compose.material.icons.outlined.DataArray
 import androidx.compose.material.icons.outlined.Image
@@ -67,6 +68,13 @@ private fun SettingsTheme(
                 .clickable { onFollowSystemChange(!currentFollowSystem) },
             headlineContent = {
                 Text(text = stringResource(id = R.string.follow_system))
+            },
+            leadingContent = {
+                Icon(
+                    Icons.Outlined.AutoAwesome,
+                    null,
+                    tint = MaterialTheme.colorScheme.onPrimary
+                )
             },
             trailingContent = {
                 Switch(
@@ -252,7 +260,7 @@ fun SettingsScreenBody(
 private fun Preview() {
     val isDark = isSystemInDarkTheme()
     val theme = remember { mutableStateOf(if (isDark) Themes.DARK else Themes.LIGHT) }
-    InternalTheme {
+    InternalTheme(theme.value) {
         SettingsScreenBody(
             state = SettingsScreenState(
                 followsSystemTheme = remember { derivedStateOf { true } },

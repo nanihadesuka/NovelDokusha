@@ -101,7 +101,7 @@
     <string name="completed">Completed</string>
     <string name="loading_data">Loading data</string>
     <string name="pin_or_unpin_source">Pin or unpin source</string>
-    <string name="allow_text_selection">Allow text selection</string>
+    <string name="allow_text_selection">Text selection</string>
     <string name="last_read">Last read</string>
     <string name="voices">Voices</string>
     <string name="search_voice_by_language">Search voice by language</string>
@@ -174,4 +174,5 @@
     <string name="notification_channel_name_import_epub">Import EPUB</string>
     <string name="notification_channel_name_restore_backup">Restore backup</string>
     <string name="backup_restored">Backup restored</string>
+    <string name="keep_screen_on">Keep screen on</string>
 </resources>

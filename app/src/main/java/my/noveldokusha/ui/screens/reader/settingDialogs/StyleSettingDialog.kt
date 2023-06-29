@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.TextFields
+import androidx.compose.material.icons.outlined.AutoAwesome
 import androidx.compose.material.icons.outlined.ColorLens
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenu
@@ -120,6 +121,13 @@ fun StyleSettingDialog(
                 .clickable { onFollowSystemChange(!state.followSystem.value) },
             headlineContent = {
                 Text(text = stringResource(id = R.string.follow_system))
+            },
+            leadingContent = {
+                Icon(
+                    Icons.Outlined.AutoAwesome,
+                    null,
+                    tint = MaterialTheme.colorScheme.onPrimary
+                )
             },
             trailingContent = {
                 Switch(

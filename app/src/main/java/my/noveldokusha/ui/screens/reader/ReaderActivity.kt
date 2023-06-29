@@ -8,7 +8,6 @@ import android.view.WindowManager
 import android.widget.AbsListView
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.view.WindowCompat
@@ -226,33 +225,33 @@ class ReaderActivity : BaseActivity() {
                 itemIndex = viewAdapter.listView.getFirstVisibleItemIndexGivenPosition(firstPosition)
             )
         }
+
+        // Notify manually text font changed for list view
+        snapshotFlow { viewModel.state.settings.style.textFont.value }.drop(1)
+            .asLiveData()
+            .observe(this) { viewAdapter.listView.notifyDataSetChanged() }
+
+        // Notify manually text size changed for list view
+        snapshotFlow { viewModel.state.settings.style.textSize.value }.drop(1)
+            .asLiveData()
+            .observe(this) { viewAdapter.listView.notifyDataSetChanged() }
+
+        // Notify manually selectable text changed for list view
+        snapshotFlow { viewModel.state.settings.isTextSelectable.value }.drop(1)
+            .asLiveData()
+            .observe(this) { viewAdapter.listView.notifyDataSetChanged() }
+
+        // Set current screen to be kept bright always or not
+        snapshotFlow { viewModel.state.settings.keepScreenOn.value }
+            .asLiveData()
+            .observe(this) { keepScreenOn ->
+                val flag = WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
+                if (keepScreenOn) window.addFlags(flag) else window.clearFlags(flag)
+            }
+
         setContent {
             Theme(appPreferences) {
                 SetSystemBarTransparent()
-
-                // Notify manually text font changed for list view
-                LaunchedEffect(true) {
-                    snapshotFlow { viewModel.state.settings.style.textFont.value }.drop(1)
-                        .collect {
-                            viewAdapter.listView.notifyDataSetChanged()
-                        }
-                }
-
-                // Notify manually text size changed for list view
-                LaunchedEffect(true) {
-                    snapshotFlow { viewModel.state.settings.style.textSize.value }.drop(1)
-                        .collect {
-                            viewAdapter.listView.notifyDataSetChanged()
-                        }
-                }
-
-                // Notify manually selectable text changed for list view
-                LaunchedEffect(true) {
-                    snapshotFlow { viewModel.state.settings.isTextSelectable.value }.drop(1)
-                        .collect {
-                            viewAdapter.listView.notifyDataSetChanged()
-                        }
-                }
 
                 // Reader info
                 ReaderScreen(
@@ -260,6 +259,7 @@ class ReaderActivity : BaseActivity() {
                     onTextFontChanged = { appPreferences.READER_FONT_FAMILY.value = it },
                     onTextSizeChanged = { appPreferences.READER_FONT_SIZE.value = it },
                     onSelectableTextChange = { appPreferences.READER_SELECTABLE_TEXT.value = it },
+                    onKeepScreenOn = { appPreferences.READER_KEEP_SCREEN_ON.value = it },
                     onFollowSystem = viewModelGlobalSettings::onFollowSystemChange,
                     onThemeSelected = viewModelGlobalSettings::onThemeChange,
                     onPressBack = {
@@ -274,7 +274,7 @@ class ReaderActivity : BaseActivity() {
                     },
                     readerContent = {
                         AndroidView(factory = { viewBind.root })
-                    }
+                    },
                 )
             }
         }

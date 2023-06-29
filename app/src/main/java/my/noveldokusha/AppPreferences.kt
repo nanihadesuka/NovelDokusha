@@ -10,7 +10,11 @@ import androidx.preference.PreferenceManager
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.onCompletion
+import kotlinx.coroutines.flow.onSubscription
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.Serializable
@@ -18,7 +22,13 @@ import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import my.noveldokusha.scraper.LanguageCode
-import my.noveldokusha.utils.*
+import my.noveldokusha.utils.SharedPreference_Boolean
+import my.noveldokusha.utils.SharedPreference_Enum
+import my.noveldokusha.utils.SharedPreference_Float
+import my.noveldokusha.utils.SharedPreference_Int
+import my.noveldokusha.utils.SharedPreference_Serializable
+import my.noveldokusha.utils.SharedPreference_String
+import my.noveldokusha.utils.SharedPreference_StringSet
 import javax.inject.Inject
 
 @Serializable
@@ -28,12 +38,6 @@ data class VoicePredefineState(
     val pitch: Float,
     val speed: Float
 )
-
-/**
- * KEYS ALREADY USED AND REMOVED:
- *
- * LIBRARY_SORT_READ
- */
 
 class AppPreferences @Inject constructor(
     @ApplicationContext val context: Context
@@ -94,6 +98,11 @@ class AppPreferences @Inject constructor(
     val READER_SELECTABLE_TEXT = object : Preference<Boolean>("READER_SELECTABLE_TEXT") {
         override var value by SharedPreference_Boolean(name, preferences, false)
     }
+
+    val READER_KEEP_SCREEN_ON = object : Preference<Boolean>("READER_KEEP_SCREEN_ON") {
+        override var value by SharedPreference_Boolean(name, preferences, false)
+    }
+
     val CHAPTERS_SORT_ASCENDING = object : Preference<TERNARY_STATE>("CHAPTERS_SORT_ASCENDING") {
         override var value by SharedPreference_Enum(
             name,
@@ -144,10 +153,20 @@ class AppPreferences @Inject constructor(
             override var value by SharedPreference_String(name, preferences, "")
         }
 
+    @Deprecated("Removed", level = DeprecationLevel.HIDDEN)
     val LOCAL_SOURCES_URI_DIRECTORIES =
         object : Preference<Set<String>>("LOCAL_SOURCES_URI_DIRECTORIES") {
             override var value by SharedPreference_StringSet(name, preferences, setOf())
         }
+
+    @Deprecated("Removed", level = DeprecationLevel.HIDDEN)
+    val LIBRARY_SORT_READ = object : Preference<TERNARY_STATE>("LIBRARY_SORT_READ") {
+        override var value by SharedPreference_Enum(
+            name,
+            preferences,
+            TERNARY_STATE.active
+        ) { enumValueOf(it) }
+    }
 
     enum class TERNARY_STATE {
         active,

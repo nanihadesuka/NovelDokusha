@@ -25,6 +25,7 @@ fun ReaderScreenBottomBarDialogs(
     onSelectableTextChange: (Boolean) -> Unit,
     onFollowSystem: (Boolean) -> Unit,
     onThemeSelected: (Themes) -> Unit,
+    onKeepScreenOn: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -51,7 +52,9 @@ fun ReaderScreenBottomBarDialogs(
                     }
                     ReaderScreenState.Settings.Type.More -> MoreSettingDialog(
                         allowTextSelection = settings.isTextSelectable.value,
-                        onAllowTextSelectionChange = onSelectableTextChange
+                        onAllowTextSelectionChange = onSelectableTextChange,
+                        keepScreenOn = settings.keepScreenOn.value,
+                        onKeepScreenOn = onKeepScreenOn
                     )
                     ReaderScreenState.Settings.Type.None -> Unit
                 }
