@@ -9,23 +9,7 @@ import my.noveldokusha.data.database.tables.Chapter
 import my.noveldokusha.data.database.tables.ChapterBody
 import my.noveldokusha.repository.AppFileResolver
 import my.noveldokusha.repository.Repository
-import timber.log.Timber
-import java.io.File
-
-
-suspend fun epubImageImporter(
-    targetFile: File,
-    imageData: ByteArray,
-) = withContext(Dispatchers.IO) {
-    targetFile.parentFile?.also { parent ->
-        parent.mkdirs()
-        if (parent.exists()) {
-            targetFile.writeBytes(imageData)
-        } else {
-            Timber.e("epubCoverImporter: Failed to create folder ${parent.absolutePath}")
-        }
-    }
-}
+import my.noveldokusha.utils.fileImporter
 
 suspend fun epubImporter(
     storageFolderName: String,
@@ -44,7 +28,7 @@ suspend fun epubImporter(
     repository.libraryBooks.remove(localBookUrl)
 
     if (epub.coverImage != null) {
-        epubImageImporter(
+        fileImporter(
             targetFile = appFileResolver.getStorageBookCoverImageFile(storageFolderName),
             imageData = epub.coverImage.image
         )
@@ -76,7 +60,7 @@ suspend fun epubImporter(
 
     epub.images.map {
         async {
-            epubImageImporter(
+            fileImporter(
                 targetFile = appFileResolver.getStorageBookImageFile(storageFolderName, it.absPath),
                 imageData = it.image
             )

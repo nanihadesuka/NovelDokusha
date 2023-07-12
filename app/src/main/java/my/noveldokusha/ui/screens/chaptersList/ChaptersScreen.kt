@@ -94,6 +94,7 @@ fun ChaptersScreen(
     onChapterDownload: (chapter: ChapterWithContext) -> Unit,
     onPullRefresh: () -> Unit,
     onCoverLongClick: () -> Unit,
+    onChangeCover: () -> Unit,
 ) {
     val context by rememberUpdatedState(newValue = LocalContext.current)
     var showDropDown by rememberSaveable { mutableStateOf(false) }
@@ -179,6 +180,7 @@ fun ChaptersScreen(
                                         },
                                         onSearchBookInDatabase = onSearchBookInDatabase,
                                         onResumeReading = onResumeReading,
+                                        onChangeCover = onChangeCover,
                                     )
                                 }
                             }

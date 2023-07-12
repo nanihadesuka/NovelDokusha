@@ -1,5 +1,6 @@
 package my.noveldokusha.ui.screens.chaptersList
 
+import android.net.Uri
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
@@ -50,6 +51,7 @@ class ChaptersViewModel @Inject constructor(
     private val appFileResolver: AppFileResolver,
     stateHandle: SavedStateHandle,
 ) : BaseViewModel(), ChapterStateBundle {
+
     override val rawBookUrl by StateExtra_String(stateHandle)
     override val bookTitle by StateExtra_String(stateHandle)
 
@@ -154,7 +156,7 @@ class ChaptersViewModel @Inject constructor(
     }
 
     private fun updateCover() = viewModelScope.launch {
-        if (state.isLocalSource.value) return@launch
+        if (state.isLocalSource.value || book.value.coverImageUrl?.isLocalUri == true) return@launch
         downloadBookCoverImageUrl(scraper, networkClient, bookUrl).onSuccess {
             if (it == null) return@onSuccess
             repository.libraryBooks.updateCover(bookUrl, it)
@@ -251,6 +253,10 @@ class ChaptersViewModel @Inject constructor(
             state.selectedChaptersUrl[url] = Unit
         }
         lastSelectedChapterUrl = url
+    }
+
+    fun saveImageAsCover(uri: Uri) {
+        repository.libraryBooks.saveImageAsCover(imageUri = uri, bookUrl = bookUrl)
     }
 
     fun onSelectionModeChapterLongClick(chapter: ChapterWithContext) {

@@ -44,9 +44,9 @@ import my.noveldokusha.repository.AppFileResolver
 import my.noveldokusha.scraper.LocalSourcesDirectories
 import my.noveldokusha.scraper.SourceInterface
 import my.noveldokusha.tools.epub.epubCoverParser
-import my.noveldokusha.tools.epub.epubImageImporter
 import my.noveldokusha.ui.theme.Grey25
 import my.noveldokusha.utils.asSequence
+import my.noveldokusha.utils.fileImporter
 import my.noveldokusha.utils.textPadding
 
 class LocalSource(
@@ -186,7 +186,7 @@ class LocalSource(
                 ?: return@withContext bookMetadata
             val coverImage = inputStream.use { epubCoverParser(inputStream = inputStream) }
                 ?: return@withContext bookMetadata
-            epubImageImporter(
+            fileImporter(
                 targetFile = coverFile,
                 imageData = coverImage.image,
             )

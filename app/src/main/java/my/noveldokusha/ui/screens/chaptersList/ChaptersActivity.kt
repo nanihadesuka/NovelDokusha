@@ -5,21 +5,17 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.runtime.SideEffect
-import androidx.compose.ui.graphics.Color
 import androidx.core.view.WindowCompat
 import androidx.lifecycle.lifecycleScope
-import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import my.noveldokusha.composableActions.SetSystemBarTransparent
+import my.noveldokusha.composableActions.onDoAskForImage
 import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.ui.BaseActivity
 import my.noveldokusha.ui.goToDatabaseSearch
 import my.noveldokusha.ui.goToReader
 import my.noveldokusha.ui.theme.Theme
-import my.noveldokusha.ui.theme.isLightTheme
 import my.noveldokusha.utils.Extra_String
 
 @AndroidEntryPoint
@@ -48,24 +44,25 @@ class ChaptersActivity : BaseActivity() {
                 SetSystemBarTransparent()
                 ChaptersScreen(
                     state = viewModel.state,
-                    onSearchBookInDatabase = ::searchBookInDatabase,
-                    onPressBack = ::onBackPressed,
                     onLibraryToggle = viewModel::toggleBookmark,
+                    onSearchBookInDatabase = ::searchBookInDatabase,
                     onResumeReading = ::onOpenLastActiveChapter,
-                    onSelectionModeChapterClick = viewModel::onSelectionModeChapterClick,
-                    onSelectionModeChapterLongClick = viewModel::onSelectionModeChapterLongClick,
-                    onChapterClick = { openBookAtChapter(chapterUrl = it.chapter.url) },
-                    onChapterLongClick = viewModel::onChapterLongClick,
-                    onChapterDownload = viewModel::onChapterDownload,
-                    onSelectedDownload = viewModel::downloadSelected,
+                    onPressBack = ::onBackPressed,
                     onSelectedDeleteDownloads = viewModel::deleteDownloadsSelected,
+                    onSelectedDownload = viewModel::downloadSelected,
                     onSelectedSetRead = viewModel::setAsReadSelected,
                     onSelectedSetUnread = viewModel::setAsUnreadSelected,
-                    onCloseSelectionBar = viewModel::unselectAll,
-                    onSelectAllChapters = viewModel::selectAll,
                     onSelectedInvertSelection = viewModel::invertSelection,
+                    onSelectAllChapters = viewModel::selectAll,
+                    onCloseSelectionBar = viewModel::unselectAll,
+                    onChapterClick = { openBookAtChapter(chapterUrl = it.chapter.url) },
+                    onChapterLongClick = viewModel::onChapterLongClick,
+                    onSelectionModeChapterClick = viewModel::onSelectionModeChapterClick,
+                    onSelectionModeChapterLongClick = viewModel::onSelectionModeChapterLongClick,
+                    onChapterDownload = viewModel::onChapterDownload,
                     onPullRefresh = viewModel::onPullRefresh,
-                    onCoverLongClick = { goToDatabaseSearch(input = viewModel.bookTitle) }
+                    onCoverLongClick = { goToDatabaseSearch(input = viewModel.bookTitle) },
+                    onChangeCover = onDoAskForImage { viewModel.saveImageAsCover(it) }
                 )
             }
         }

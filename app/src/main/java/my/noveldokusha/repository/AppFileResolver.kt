@@ -8,9 +8,12 @@ import androidx.compose.ui.platform.LocalContext
 import dagger.hilt.android.qualifiers.ApplicationContext
 import my.noveldokusha.addLocalUriPrefix
 import my.noveldokusha.isContentUri
+import my.noveldokusha.isHttpsUrl
+import my.noveldokusha.isLocalUri
 import my.noveldokusha.removeLocalUriPrefix
 import java.io.File
 import java.nio.file.Paths
+import java.util.Base64
 import javax.inject.Inject
 
 
@@ -45,18 +48,29 @@ class AppFileResolver @Inject constructor(
         coverPathRelativeToBook
     ).toFile()
 
-    fun getStorageBookImageFile(bookFolderName: String, imagePath: String): File = Paths.get(
-        folderBooks.absolutePath,
-        bookFolderName.removeLocalUriPrefix,
-        imagePath.removeLocalUriPrefix
-    ).toFile()
+    fun getStorageBookImageFile(bookFolderName: String, imagePath: String): File {
+        val localBookFolderName = when {
+            imagePath.isLocalUri -> getLocalBookFolderName(bookFolderName)
+            else -> bookFolderName
+        }
+        return Paths.get(
+            folderBooks.absolutePath,
+            localBookFolderName.removeLocalUriPrefix,
+            imagePath.removeLocalUriPrefix
+        ).toFile()
+    }
+
+    fun getLocalBookFolderName(bookUrl: String): String = when {
+        bookUrl.isHttpsUrl -> Base64.getEncoder().encodeToString(bookUrl.encodeToByteArray())
+        bookUrl.isLocalUri -> bookUrl.removeLocalUriPrefix
+        else -> bookUrl
+    }
 
     /**
      * Returns the path to the image if local, no changes if non local.
      */
     fun resolvedBookImagePath(bookUrl: String, imagePath: String): Any = when {
-        imagePath.startsWith("http://", ignoreCase = true) -> imagePath
-        imagePath.startsWith("https://", ignoreCase = true) -> imagePath
+        imagePath.isHttpsUrl -> imagePath
         bookUrl.isContentUri -> imagePath
         else -> getStorageBookImageFile(bookUrl, imagePath)
     }

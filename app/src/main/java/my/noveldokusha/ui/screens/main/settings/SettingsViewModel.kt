@@ -14,8 +14,7 @@ import kotlinx.coroutines.withContext
 import my.noveldokusha.App
 import my.noveldokusha.AppPreferences
 import my.noveldokusha.di.AppCoroutineScope
-import my.noveldokusha.isLocalUri
-import my.noveldokusha.removeLocalUriPrefix
+import my.noveldokusha.repository.AppFileResolver
 import my.noveldokusha.repository.Repository
 import my.noveldokusha.tools.TranslationManager
 import my.noveldokusha.ui.BaseViewModel
@@ -32,6 +31,7 @@ class SettingsViewModel @Inject constructor(
     private val app: App,
     private val translationManager: TranslationManager,
     private val stateHandle: SavedStateHandle,
+    private val appFileResolver: AppFileResolver,
 ) : BaseViewModel() {
 
     private val themeId by appPreferences.THEME_ID.state(viewModelScope)
@@ -73,8 +73,7 @@ class SettingsViewModel @Inject constructor(
     fun cleanImagesFolder() = appScope.launch(Dispatchers.IO) {
         val libraryFolders = repository.libraryBooks.getAllInLibrary()
             .asSequence()
-            .filter { it.url.isLocalUri }
-            .map { it.url.removeLocalUriPrefix }
+            .map { appFileResolver.getLocalBookFolderName(it.url) }
             .toSet()
 
         repository.settings.folderBooks.listFiles()

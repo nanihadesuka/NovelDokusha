@@ -1,20 +1,29 @@
 package my.noveldokusha.composableActions
 
+import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.platform.LocalContext
-import my.noveldokusha.services.EpubImportService
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberUpdatedState
 
 @Composable
-fun onDoImportEPUB(): () -> Unit {
-    val context = LocalContext.current
-    val fileExplorer = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.GetContent(),
+fun onDoAskForImage(onSuccess: (uri: Uri) -> Unit): () -> Unit {
+    val result by rememberUpdatedState(newValue = onSuccess)
+    val imageExplorer = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.PickVisualMedia(),
         onResult = { uri ->
-            if (uri != null)
-                EpubImportService.start(ctx = context, uri = uri)
+            if (uri != null) {
+                result(uri)
+            }
         }
     )
-    return { fileExplorer.launch("application/epub+zip") }
+    return {
+        imageExplorer.launch(
+            PickVisualMediaRequest.Builder()
+                .setMediaType(ActivityResultContracts.PickVisualMedia.ImageOnly)
+                .build()
+        )
+    }
 }

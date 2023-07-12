@@ -276,8 +276,8 @@ private fun Preview() {
             onCleanImageFolder = { },
             onBackupData = { },
             onRestoreData = { },
-            onDownloadTranslationModel = {},
-            onRemoveTranslationModel = {},
+            onDownloadTranslationModel = { },
+            onRemoveTranslationModel = { },
         )
     }
 }

@@ -16,6 +16,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import my.noveldokusha.R
 import my.noveldokusha.data.database.AppDatabase
+import my.noveldokusha.di.AppCoroutineScope
 import my.noveldokusha.network.NetworkClient
 import my.noveldokusha.repository.AppFileResolver
 import my.noveldokusha.repository.BookChaptersRepository
@@ -62,6 +63,9 @@ class RestoreDataService : Service() {
 
     @Inject
     lateinit var notificationsCenter: NotificationsCenter
+
+    @Inject
+    lateinit var appCoroutineScope: AppCoroutineScope
 
     private class IntentData : Intent {
         var uri by Extra_Uri()
@@ -192,7 +196,10 @@ class RestoreDataService : Service() {
                         ),
                         libraryBooks = LibraryBooksRepository(
                             libraryDao = newDatabase.libraryDao(),
-                            operations = newDatabase
+                            operations = newDatabase,
+                            context = context,
+                            appFileResolver = appFileResolver,
+                            appCoroutineScope = appCoroutineScope
                         ),
                         appFileResolver = appFileResolver
                     )

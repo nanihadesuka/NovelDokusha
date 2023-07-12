@@ -13,6 +13,9 @@ import my.noveldokusha.App
 import my.noveldokusha.AppPreferences
 import my.noveldokusha.data.database.AppDatabase
 import my.noveldokusha.data.database.AppDatabaseOperations
+import my.noveldokusha.data.database.DAOs.ChapterBodyDao
+import my.noveldokusha.data.database.DAOs.ChapterDao
+import my.noveldokusha.data.database.DAOs.LibraryDao
 import my.noveldokusha.network.NetworkClient
 import my.noveldokusha.network.ScraperNetworkClient
 import my.noveldokusha.repository.AppFileResolver
@@ -72,6 +75,30 @@ abstract class AppModule {
 
         @Provides
         @Singleton
+        fun provideLibraryDao(database: AppDatabase): LibraryDao = database.libraryDao()
+
+        @Provides
+        @Singleton
+        fun provideChapterDao(database: AppDatabase): ChapterDao = database.chapterDao()
+
+        @Provides
+        @Singleton
+        fun provideChapterBodyDao(database: AppDatabase): ChapterBodyDao = database.chapterBodyDao()
+
+        @Provides
+        @Singleton
+        fun provideLibraryBooksRepository(
+            libraryDao: LibraryDao,
+            operations: AppDatabaseOperations,
+            @ApplicationContext context: Context,
+            appFileResolver: AppFileResolver,
+            appCoroutineScope: AppCoroutineScope,
+        ): LibraryBooksRepository = LibraryBooksRepository(
+            libraryDao, operations, context, appFileResolver, appCoroutineScope,
+        )
+
+        @Provides
+        @Singleton
         fun provideAppDatabaseOperations(database: AppDatabase): AppDatabaseOperations {
             return database
         }
@@ -84,14 +111,11 @@ abstract class AppModule {
 
         @Provides
         @Singleton
-        fun provideLibraryBooksRepository(database: AppDatabase): LibraryBooksRepository {
-            return LibraryBooksRepository(libraryDao = database.libraryDao(), database)
-        }
-
-        @Provides
-        @Singleton
-        fun provideChapterBooksRepository(database: AppDatabase): BookChaptersRepository {
-            return BookChaptersRepository(chapterDao = database.chapterDao(), database)
+        fun provideChapterBooksRepository(
+            chapterDao: ChapterDao,
+            databaseOperations: AppDatabaseOperations
+        ): BookChaptersRepository {
+            return BookChaptersRepository(chapterDao, databaseOperations)
         }
 
         @Provides

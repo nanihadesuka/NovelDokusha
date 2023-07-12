@@ -1,6 +1,7 @@
 package my.noveldokusha.ui.screens.chaptersList
 
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.outlined.Public
 import androidx.compose.material.icons.outlined.Search
@@ -17,6 +18,7 @@ fun ChaptersDropDown(
     onOpenWebView: () -> Unit,
     onSearchBookInDatabase: () -> Unit,
     onResumeReading: () -> Unit,
+    onChangeCover: () -> Unit,
 ) {
     if (!isLocalSource) DropdownMenuItem(
         onClick = onOpenWebView,
@@ -48,6 +50,18 @@ fun ChaptersDropDown(
             Icon(
                 Icons.Filled.PlayArrow,
                 stringResource(R.string.resume_reading),
+            )
+        }
+    )
+    DropdownMenuItem(
+        onClick = onChangeCover,
+        text = {
+            Text(text = stringResource(R.string.change_cover))
+        },
+        leadingIcon = {
+            Icon(
+                Icons.Filled.Image,
+                stringResource(R.string.change_cover),
             )
         }
     )

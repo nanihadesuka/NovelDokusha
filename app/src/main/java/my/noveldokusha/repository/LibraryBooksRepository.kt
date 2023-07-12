@@ -1,12 +1,22 @@
 package my.noveldokusha.repository
 
+import android.content.Context
+import android.net.Uri
+import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import my.noveldokusha.data.database.AppDatabaseOperations
 import my.noveldokusha.data.database.DAOs.LibraryDao
 import my.noveldokusha.data.database.tables.Book
+import my.noveldokusha.di.AppCoroutineScope
+import my.noveldokusha.utils.fileImporter
 
 class LibraryBooksRepository(
     private val libraryDao: LibraryDao,
     private val operations: AppDatabaseOperations,
+    @ApplicationContext val context: Context,
+    private val appFileResolver: AppFileResolver,
+    private val appCoroutineScope: AppCoroutineScope,
 ) {
     val getBooksInLibraryWithContextFlow by lazy {
         libraryDao.getBooksInLibraryWithContextFlow()
@@ -54,6 +64,22 @@ class LibraryBooksRepository(
                 update(book.copy(inLibrary = !book.inLibrary))
                 !book.inLibrary
             }
+        }
+    }
+
+    fun saveImageAsCover(imageUri: Uri, bookUrl: String) {
+        appCoroutineScope.launch {
+            val imageData = context.contentResolver.openInputStream(imageUri)
+                ?.use { it.readBytes() } ?: return@launch
+            val bookFolderName = appFileResolver.getLocalBookFolderName(
+                bookUrl = bookUrl
+            )
+            val bookCoverFile = appFileResolver.getStorageBookCoverImageFile(
+                bookFolderName = bookFolderName
+            )
+            fileImporter(targetFile = bookCoverFile, imageData = imageData)
+            delay(timeMillis = 1_000)
+            updateCover(bookUrl = bookUrl, coverUrl = appFileResolver.getLocalBookCoverPath())
         }
     }
 }
