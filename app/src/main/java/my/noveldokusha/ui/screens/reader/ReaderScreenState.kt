@@ -10,6 +10,7 @@ data class ReaderScreenState(
     val showReaderInfo: MutableState<Boolean>,
     val readerInfo: CurrentInfo,
     val settings: Settings,
+    val showInvalidChapterDialog: MutableState<Boolean>
 ) {
     data class CurrentInfo(
         val chapterTitle: State<String>,
@@ -33,6 +34,7 @@ data class ReaderScreenState(
             val textFont: State<String>,
             val textSize: State<Float>,
         )
+
         enum class Type {
             None, LiveTranslation, TextToSpeech, Style, More
         }

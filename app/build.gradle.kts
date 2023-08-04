@@ -2,13 +2,12 @@ import org.jetbrains.kotlin.konan.properties.hasProperty
 import java.util.Properties
 
 plugins {
-    id("com.android.application")
-    id("kotlin-android")
-    id("kotlin-parcelize")
-    id("kotlin-kapt")
-    id("dagger.hilt.android.plugin")
-    kotlin("plugin.serialization") version ("1.7.10")
-
+    alias(libs.plugins.android.app)
+    alias(libs.plugins.android.hilt)
+    alias(libs.plugins.kotlin.serialization)
+    alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.kotlin.parcelize)
+    alias(libs.plugins.kotlin.ksp)
 }
 
 inner class CLICustomSettings {
@@ -55,7 +54,7 @@ android {
     }
 
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.4.4"
+        kotlinCompilerExtensionVersion = libs.versions.compose.core.orNull
     }
 
     if (cliCustomSettings.splitByAbi) splits {
@@ -126,10 +125,10 @@ android {
             // Having the dependencies here the same in the main scope, visually separated
             dependencies {
                 // Needed to have the Task -> await extension.
-                fullImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.6.4")
+                fullImplementation(libs.kotlinx.coroutines.playServices)
 
                 // Android ML Translation Kit
-                fullImplementation("com.google.mlkit:translate:17.0.1")
+                fullImplementation(libs.translate)
             }
         }
 
@@ -154,121 +153,93 @@ fun DependencyHandler.fossImplementation(dependencyNotation: Any): Dependency? =
 dependencies {
 
     // Kotlin
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
-    implementation("org.jetbrains.kotlin:kotlin-script-runtime:1.8.10")
-    implementation("org.jetbrains.kotlin:kotlin-stdlib:1.8.10")
+    implementation(libs.kotlinx.coroutines.core)
+    implementation(libs.kotlin.stdlib)
+    implementation(libs.kotlin.script)
 
     // Room components
-    implementation("androidx.room:room-runtime:2.5.1")
-    implementation("androidx.room:room-ktx:2.5.1")
-    kapt("androidx.room:room-compiler:2.5.1")
-    androidTestImplementation("androidx.room:room-testing:2.5.1")
+    implementation(libs.androidx.room.core)
+    implementation(libs.androidx.room.ktx)
+    ksp(libs.androidx.room.compiler)
+    implementation(libs.androidx.room.testing)
 
     // Lifecycle components
-    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.1")
-    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.6.1")
-    implementation("androidx.lifecycle:lifecycle-common-java8:2.6.1")
-    implementation("androidx.coordinatorlayout:coordinatorlayout:1.2.0")
+    implementation(libs.androidx.lifecycle.viewmodel.ktx)
+    implementation(libs.androidx.lifecycle.livedata.ktx)
+    implementation(libs.androidx.lifecycle.common)
 
     // Preferences
-    implementation("androidx.preference:preference-ktx:1.2.0")
+    implementation(libs.androidx.preference.ktx)
 
     // Local storage directory access
-    implementation("androidx.documentfile:documentfile:1.0.1")
+    implementation(libs.androidx.documentfile)
 
     // UI
-    implementation("androidx.appcompat:appcompat:1.6.1")
-    implementation("androidx.core:core-ktx:1.10.0")
-    implementation("androidx.navigation:navigation-fragment-ktx:2.5.3")
-    implementation("androidx.navigation:navigation-ui-ktx:2.5.3")
-    implementation("androidx.activity:activity-ktx:1.7.0")
-    implementation("androidx.fragment:fragment-ktx:1.5.6")
-    implementation("androidx.constraintlayout:constraintlayout:2.1.4")
-    implementation("androidx.recyclerview:recyclerview:1.3.0")
-    implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
-    implementation("com.google.android.material:material:1.9.0-beta01")
-    implementation("com.l4digital.fastscroll:fastscroll:2.0.1")
-    implementation("com.afollestad.material-dialogs:core:3.3.0")
+    implementation(libs.android.material)
+    implementation(libs.androidx.core.ktx)
+    implementation(libs.androidx.activity.ktx)
+    implementation(libs.androidx.navigation.fragment.ktx)
+    implementation(libs.androidx.navigation.ui.ktx)
+    implementation(libs.androidx.appcompat)
+    implementation(libs.androidx.fragment.ktx)
 
 
     // Media session controls
-    implementation("androidx.media:media:1.6.0")
+    implementation(libs.androidx.media)
 
     // Test
-    testImplementation("junit:junit:4.13.2")
-    testImplementation("org.mockito.kotlin:mockito-kotlin:4.1.0")
-
-    // e2e test
-    androidTestImplementation("androidx.test:core-ktx:1.5.0")
-    androidTestImplementation("androidx.test.ext:junit-ktx:1.1.5")
-    androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
-    androidTestImplementation("androidx.compose.ui:ui-test-junit4:1.4.3")
-    androidTestImplementation("androidx.test:rules:1.5.0")
-    androidTestImplementation("androidx.test:runner:1.5.2")
-
-    androidTestUtil("androidx.test:orchestrator:1.4.2")
-
+    testImplementation(libs.tests.junit)
+    testImplementation(libs.tests.mockito)
+    androidTestImplementation(libs.tests.androidx.core)
+    androidTestImplementation(libs.tests.androidx.junit)
+    androidTestImplementation(libs.tests.androidx.espresso)
+    androidTestImplementation(libs.tests.androidx.compose)
+    androidTestImplementation(libs.tests.androidx.rules)
+    androidTestImplementation(libs.tests.androidx.runner)
+    androidTestUtil(libs.tests.androidx.util)
 
     // Serialization
-    implementation("com.google.code.gson:gson:2.10.1")
-    implementation("com.squareup.moshi:moshi:1.14.0")
-    implementation("com.squareup.moshi:moshi-kotlin:1.14.0")
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.0")
-
-    // Retrofit
-    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation(libs.serialization.kotlin.json)
+    implementation(libs.serialization.gson)
+    implementation(libs.serialization.moshi)
+    implementation(libs.serialization.moshi.kotlin)
 
     // Dependency injection
-    implementation("com.google.dagger:hilt-android:2.45")
-    kapt("com.google.dagger:hilt-compiler:2.45")
+    implementation(libs.hilt.android)
+    ksp(libs.hilt.compiler)
 
     // HTML text extractor
-    implementation("com.chimbori.crux:crux:3.12.0")
-    implementation("net.dankito.readability4j:readability4j:1.0.8")
-    implementation("org.jsoup:jsoup:1.15.4")
-
-    // Memory leak detector
-    //debugImplementation("com.squareup.leakcanary:leakcanary-android:2.7")
+    implementation(libs.html.crux)
+    implementation(libs.html.readability4j)
+    implementation(libs.html.jsoup)
 
     // Jetpack compose
-    implementation("androidx.activity:activity-compose:1.7.0")
-    implementation("androidx.compose.material3:material3:1.1.0-beta02")
-    implementation("androidx.compose.animation:animation:1.4.1")
-    implementation("androidx.compose.ui:ui-tooling:1.4.1")
-    implementation("androidx.compose.runtime:runtime-livedata:1.4.1")
-    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.1")
-    implementation("androidx.constraintlayout:constraintlayout-compose:1.0.1")
-    implementation("androidx.compose.material:material-icons-extended:1.4.1")
-    implementation("com.google.accompanist:accompanist-systemuicontroller:0.30.0")
-    implementation("com.google.accompanist:accompanist-swiperefresh:0.30.0")
-    implementation("com.google.accompanist:accompanist-insets:0.30.0")
-    implementation("com.google.accompanist:accompanist-pager:0.30.0")
-    implementation("com.google.accompanist:accompanist-pager-indicators:0.30.0")
+    implementation(libs.compose.activity)
+    implementation(libs.compose.material3)
+    implementation(libs.compose.animation)
+    implementation(libs.compose.tooling)
+    implementation(libs.compose.livedata)
+    implementation(libs.compose.viewmodel)
+    implementation(libs.compose.contrainLayout)
+    implementation(libs.compose.materiaIconsExtended)
+    implementation(libs.compose.systemuicontroller)
+    implementation(libs.compose.swiperefresh)
+    implementation(libs.compose.insets)
+    implementation(libs.compose.pager)
+    implementation(libs.compose.pagerIndicator)
+    implementation(libs.compose.coil)
+    implementation(libs.compose.glide)
+    implementation(libs.compose.lazyColumnScrollbar)
 
     // Networking
-    implementation("com.squareup.okhttp3:okhttp:5.0.0-alpha.11")
-    implementation("com.squareup.okhttp3:okhttp-brotli:5.0.0-alpha.11")
-    implementation("com.squareup.okhttp3:logging-interceptor:5.0.0-alpha.11")
-
-    // Coil for jetpack compose
-    implementation("io.coil-kt:coil-compose:2.2.2")
-
-    // Glide for jetpack compose (has more compatible formats)
-    implementation("com.github.skydoves:landscapist-glide:2.1.9")
-    implementation("com.github.bumptech.glide:okhttp3-integration:4.15.1")
-
-    // Compose collapsing toolbar
-    implementation("me.onebone:toolbar-compose:2.3.5")
-
-    // Compose scroll bar
-    implementation("com.github.nanihadesuka:LazyColumnScrollbar:1.6.3")
+    implementation(libs.networking.okhttp)
+    implementation(libs.networking.okhttp.brotli)
+    implementation(libs.networking.okhttp.interceptor)
+    implementation(libs.networking.okhttp.glideIntegration)
+    implementation(libs.networking.retrofit)
 
     // Logging
-    implementation("com.jakewharton.timber:timber:5.0.1")
-}
-
-kapt {
-    correctErrorTypes = true
+    implementation(libs.logging.timber)
 }
 
 hilt {

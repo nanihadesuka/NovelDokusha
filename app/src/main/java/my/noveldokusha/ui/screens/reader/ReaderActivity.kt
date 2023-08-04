@@ -8,7 +8,11 @@ import android.view.WindowManager
 import android.widget.AbsListView
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Text
 import androidx.compose.runtime.snapshotFlow
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
@@ -18,7 +22,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.distinctUntilChanged
 import androidx.lifecycle.lifecycleScope
-import com.afollestad.materialdialogs.MaterialDialog
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -105,6 +108,7 @@ class ReaderActivity : BaseActivity() {
         super.onDestroy()
     }
 
+    @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -124,15 +128,6 @@ class ReaderActivity : BaseActivity() {
         viewModel.forceUpdateListViewState = {
             withContext(Dispatchers.Main.immediate) {
                 viewAdapter.listView.notifyDataSetChanged()
-            }
-        }
-
-        viewModel.showInvalidChapterDialog = {
-            withContext(Dispatchers.Main.immediate) {
-                MaterialDialog(this@ReaderActivity).show {
-                    title(text = getString(R.string.invalid_chapter))
-                    cornerRadius(16f)
-                }
             }
         }
 
@@ -276,6 +271,16 @@ class ReaderActivity : BaseActivity() {
                         AndroidView(factory = { viewBind.root })
                     },
                 )
+
+                if (viewModel.state.showInvalidChapterDialog.value) {
+                    AlertDialog(
+                        onDismissRequest = {
+                            viewModel.state.showInvalidChapterDialog.value = false
+                        }
+                    ) {
+                        Text(stringResource(id = R.string.invalid_chapter))
+                    }
+                }
             }
         }
 
