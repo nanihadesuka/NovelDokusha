@@ -336,8 +336,7 @@ private fun ViewsPreview(
                         liveTranslation = liveTranslationSettingData,
                         style = style,
                         selectedSetting = remember { mutableStateOf(data.selectedSetting) },
-                    ),
-                    showInvalidChapterDialog = remember { mutableStateOf(false) }
+                    )
                 ),
                 onTextSizeChanged = {},
                 onTextFontChanged = {},
