@@ -5,9 +5,9 @@ plugins {
     id("com.android.application")
     id("kotlin-android")
     id("kotlin-parcelize")
-    id("kotlin-kapt")
+    id("com.google.devtools.ksp")
     id("dagger.hilt.android.plugin")
-    kotlin("plugin.serialization") version ("1.7.10")
+    kotlin("plugin.serialization") version ("1.8.10")
 
 }
 
@@ -154,15 +154,15 @@ fun DependencyHandler.fossImplementation(dependencyNotation: Any): Dependency? =
 dependencies {
 
     // Kotlin
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.1")
     implementation("org.jetbrains.kotlin:kotlin-script-runtime:1.8.10")
-    implementation("org.jetbrains.kotlin:kotlin-stdlib:1.8.10")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib:1.8.20")
 
     // Room components
-    implementation("androidx.room:room-runtime:2.5.1")
-    implementation("androidx.room:room-ktx:2.5.1")
-    kapt("androidx.room:room-compiler:2.5.1")
-    androidTestImplementation("androidx.room:room-testing:2.5.1")
+    implementation("androidx.room:room-runtime:2.5.2")
+    implementation("androidx.room:room-ktx:2.5.2")
+    ksp("androidx.room:room-compiler:2.5.2")
+    androidTestImplementation("androidx.room:room-testing:2.5.2")
 
     // Lifecycle components
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.1")
@@ -178,17 +178,13 @@ dependencies {
 
     // UI
     implementation("androidx.appcompat:appcompat:1.6.1")
-    implementation("androidx.core:core-ktx:1.10.0")
-    implementation("androidx.navigation:navigation-fragment-ktx:2.5.3")
-    implementation("androidx.navigation:navigation-ui-ktx:2.5.3")
-    implementation("androidx.activity:activity-ktx:1.7.0")
-    implementation("androidx.fragment:fragment-ktx:1.5.6")
+    implementation("androidx.core:core-ktx:1.10.1")
+    implementation("androidx.navigation:navigation-fragment-ktx:2.6.0")
+    implementation("androidx.navigation:navigation-ui-ktx:2.6.0")
+    implementation("androidx.activity:activity-ktx:1.7.2")
+    implementation("androidx.fragment:fragment-ktx:1.6.1")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
-    implementation("androidx.recyclerview:recyclerview:1.3.0")
-    implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
-    implementation("com.google.android.material:material:1.9.0-beta01")
-    implementation("com.l4digital.fastscroll:fastscroll:2.0.1")
-    implementation("com.afollestad.material-dialogs:core:3.3.0")
+    implementation("com.google.android.material:material:1.9.0")
 
 
     // Media session controls
@@ -220,7 +216,7 @@ dependencies {
 
     // Dependency injection
     implementation("com.google.dagger:hilt-android:2.45")
-    kapt("com.google.dagger:hilt-compiler:2.45")
+    ksp("com.google.dagger:hilt-compiler:2.45")
 
     // HTML text extractor
     implementation("com.chimbori.crux:crux:3.12.0")
@@ -231,14 +227,14 @@ dependencies {
     //debugImplementation("com.squareup.leakcanary:leakcanary-android:2.7")
 
     // Jetpack compose
-    implementation("androidx.activity:activity-compose:1.7.0")
-    implementation("androidx.compose.material3:material3:1.1.0-beta02")
-    implementation("androidx.compose.animation:animation:1.4.1")
-    implementation("androidx.compose.ui:ui-tooling:1.4.1")
-    implementation("androidx.compose.runtime:runtime-livedata:1.4.1")
+    implementation("androidx.activity:activity-compose:1.7.2")
+    implementation("androidx.compose.material3:material3:1.1.1")
+    implementation("androidx.compose.animation:animation:1.4.3")
+    implementation("androidx.compose.ui:ui-tooling:1.4.3")
+    implementation("androidx.compose.runtime:runtime-livedata:1.4.3")
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.1")
     implementation("androidx.constraintlayout:constraintlayout-compose:1.0.1")
-    implementation("androidx.compose.material:material-icons-extended:1.4.1")
+    implementation("androidx.compose.material:material-icons-extended:1.4.3")
     implementation("com.google.accompanist:accompanist-systemuicontroller:0.30.0")
     implementation("com.google.accompanist:accompanist-swiperefresh:0.30.0")
     implementation("com.google.accompanist:accompanist-insets:0.30.0")
@@ -265,10 +261,6 @@ dependencies {
 
     // Logging
     implementation("com.jakewharton.timber:timber:5.0.1")
-}
-
-kapt {
-    correctErrorTypes = true
 }
 
 hilt {

@@ -5,6 +5,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import my.noveldokusha.AppPreferences
 import my.noveldokusha.ui.BaseViewModel
 import my.noveldokusha.ui.screens.reader.manager.ReaderManager
@@ -68,8 +70,18 @@ class ReaderViewModel @Inject constructor(
                 textFont = appPreferences.READER_FONT_FAMILY.state(viewModelScope),
                 textSize = appPreferences.READER_FONT_SIZE.state(viewModelScope),
             )
-        )
+        ),
+        showInvalidChapterDialog = mutableStateOf(false)
     )
+
+    init {
+        showInvalidChapterDialog = {
+            withContext(Dispatchers.Main) {
+                state.showInvalidChapterDialog.value = true
+            }
+        }
+    }
+
 
     val items = readerSession.items
     val chaptersLoader = readerSession.readerChaptersLoader
