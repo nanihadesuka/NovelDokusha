@@ -154,9 +154,9 @@ fun DependencyHandler.fossImplementation(dependencyNotation: Any): Dependency? =
 dependencies {
 
     // Kotlin
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.1")
-    implementation("org.jetbrains.kotlin:kotlin-script-runtime:1.8.10")
-    implementation("org.jetbrains.kotlin:kotlin-stdlib:1.8.20")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
+    implementation("org.jetbrains.kotlin:kotlin-script-runtime:1.9.0")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib:1.9.0")
 
     // Room components
     implementation("androidx.room:room-runtime:2.5.2")
@@ -192,7 +192,7 @@ dependencies {
 
     // Test
     testImplementation("junit:junit:4.13.2")
-    testImplementation("org.mockito.kotlin:mockito-kotlin:4.1.0")
+    testImplementation("org.mockito.kotlin:mockito-kotlin:5.0.0")
 
     // e2e test
     androidTestImplementation("androidx.test:core-ktx:1.5.0")
@@ -207,21 +207,21 @@ dependencies {
 
     // Serialization
     implementation("com.google.code.gson:gson:2.10.1")
-    implementation("com.squareup.moshi:moshi:1.14.0")
-    implementation("com.squareup.moshi:moshi-kotlin:1.14.0")
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.0")
+    implementation("com.squareup.moshi:moshi:1.15.0")
+    implementation("com.squareup.moshi:moshi-kotlin:1.15.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.1")
 
     // Retrofit
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
 
     // Dependency injection
-    implementation("com.google.dagger:hilt-android:2.45")
-    kapt("com.google.dagger:hilt-compiler:2.45")
+    implementation("com.google.dagger:hilt-android:2.47")
+    kapt("com.google.dagger:hilt-compiler:2.47")
 
     // HTML text extractor
-    implementation("com.chimbori.crux:crux:3.12.0")
+    implementation("com.chimbori.crux:crux:5.0")
     implementation("net.dankito.readability4j:readability4j:1.0.8")
-    implementation("org.jsoup:jsoup:1.15.4")
+    implementation("org.jsoup:jsoup:1.16.1")
 
     // Memory leak detector
     //debugImplementation("com.squareup.leakcanary:leakcanary-android:2.7")
@@ -235,11 +235,11 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.1")
     implementation("androidx.constraintlayout:constraintlayout-compose:1.0.1")
     implementation("androidx.compose.material:material-icons-extended:1.4.3")
-    implementation("com.google.accompanist:accompanist-systemuicontroller:0.30.0")
-    implementation("com.google.accompanist:accompanist-swiperefresh:0.30.0")
-    implementation("com.google.accompanist:accompanist-insets:0.30.0")
-    implementation("com.google.accompanist:accompanist-pager:0.30.0")
-    implementation("com.google.accompanist:accompanist-pager-indicators:0.30.0")
+    implementation("com.google.accompanist:accompanist-systemuicontroller:0.30.1")
+    implementation("com.google.accompanist:accompanist-swiperefresh:0.30.1")
+    implementation("com.google.accompanist:accompanist-insets:0.30.1")
+    implementation("com.google.accompanist:accompanist-pager:0.30.1")
+    implementation("com.google.accompanist:accompanist-pager-indicators:0.30.1")
 
     // Networking
     implementation("com.squareup.okhttp3:okhttp:5.0.0-alpha.11")
@@ -247,10 +247,10 @@ dependencies {
     implementation("com.squareup.okhttp3:logging-interceptor:5.0.0-alpha.11")
 
     // Coil for jetpack compose
-    implementation("io.coil-kt:coil-compose:2.2.2")
+    implementation("io.coil-kt:coil-compose:2.4.0")
 
     // Glide for jetpack compose (has more compatible formats)
-    implementation("com.github.skydoves:landscapist-glide:2.1.9")
+    implementation("com.github.skydoves:landscapist-glide:2.2.5")
     implementation("com.github.bumptech.glide:okhttp3-integration:4.15.1")
 
     // Compose collapsing toolbar
