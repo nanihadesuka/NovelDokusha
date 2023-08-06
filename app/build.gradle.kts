@@ -5,7 +5,7 @@ plugins {
     id("com.android.application")
     id("kotlin-android")
     id("kotlin-parcelize")
-    id("com.google.devtools.ksp")
+    id("kotlin-kapt")
     id("dagger.hilt.android.plugin")
     kotlin("plugin.serialization") version ("1.8.10")
 
@@ -161,7 +161,7 @@ dependencies {
     // Room components
     implementation("androidx.room:room-runtime:2.5.2")
     implementation("androidx.room:room-ktx:2.5.2")
-    ksp("androidx.room:room-compiler:2.5.2")
+    kapt("androidx.room:room-compiler:2.5.2")
     androidTestImplementation("androidx.room:room-testing:2.5.2")
 
     // Lifecycle components
@@ -216,7 +216,7 @@ dependencies {
 
     // Dependency injection
     implementation("com.google.dagger:hilt-android:2.45")
-    ksp("com.google.dagger:hilt-compiler:2.45")
+    kapt("com.google.dagger:hilt-compiler:2.45")
 
     // HTML text extractor
     implementation("com.chimbori.crux:crux:3.12.0")
