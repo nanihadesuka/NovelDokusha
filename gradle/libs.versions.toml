@@ -1,9 +1,13 @@
 [versions]
-kotlin-serializationPlugin = "1.8.0"
 
-kotlin-compilerVersion = "1.4.4"
+kotlin = "1.8.21"
+kotlin-compilerVersion = "1.4.7"
 
-kotlin-core = "1.9.0"
+plugin-agp = "8.2.0-alpha09"
+
+hilt = "2.47"
+ksp = "1.8.21-1.0.11"
+
 kotlinx-coroutines-core = "1.7.3"
 kotlinx-coroutines-playServices = "1.6.4"
 kotlinx-serialization-json = "1.5.1"
@@ -47,7 +51,6 @@ compose-material3 = "1.1.1"
 
 crux = "5.0"
 gson = "2.10.1"
-hilt = "2.47"
 jsoup = "1.16.1"
 translate = "17.0.1"
 moshi = "1.15.0"
@@ -123,8 +126,8 @@ test-androidx-rules = { module = "androidx.test:rules", version.ref = "androidx-
 test-androidx-core-ktx = { module = "androidx.test:core-ktx", version.ref = "androidx-testing-core" }
 
 # Kotlin
-kotlin-stdlib = { module = "org.jetbrains.kotlin:kotlin-stdlib", version.ref = "kotlin-core" }
-kotlin-script-runtime = { module = "org.jetbrains.kotlin:kotlin-script-runtime", version.ref = "kotlin-core" }
+kotlin-stdlib = { module = "org.jetbrains.kotlin:kotlin-stdlib", version.ref = "kotlin" }
+kotlin-script-runtime = { module = "org.jetbrains.kotlin:kotlin-script-runtime", version.ref = "kotlin" }
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinx-coroutines-core" }
 kotlinx-coroutines-playServices = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-play-services", version.ref = "kotlinx-coroutines-playServices" }
 
@@ -154,6 +157,13 @@ translate = { module = "com.google.mlkit:translate", version.ref = "translate" }
 timber = { module = "com.jakewharton.timber:timber", version.ref = "timber" }
 
 [plugins]
+android-application = { id = "com.android.application", version.ref = "plugin-agp" }
+hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
+kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+kotlin-parcelize = { id = "org.jetbrains.kotlin.plugin.parcelize", version.ref = "kotlin" }
+kotlin-scripting = { id = "org.jetbrains.kotlin.plugin.scripting", version.ref = "kotlin" }
+kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 
 [bundles]
 

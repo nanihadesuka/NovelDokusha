@@ -2,12 +2,13 @@ import org.jetbrains.kotlin.konan.properties.hasProperty
 import java.util.Properties
 
 plugins {
-    id("com.android.application")
-    id("kotlin-android")
-    id("kotlin-parcelize")
-    id("kotlin-kapt")
-    id("dagger.hilt.android.plugin")
-    kotlin("plugin.serialization") version ("1.8.10")
+    alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.android.application)
+    alias(libs.plugins.hilt)
+    alias(libs.plugins.ksp)
+    alias(libs.plugins.kotlin.parcelize)
+    alias(libs.plugins.kotlin.scripting)
+    alias(libs.plugins.kotlin.serialization)
 
 }
 
@@ -49,7 +50,7 @@ android {
         jvmTarget = "17"
         freeCompilerArgs = freeCompilerArgs + listOf(
             "-opt-in=kotlin.RequiresOptIn",
-            "-Xjvm-default=enable",
+            "-Xjvm-default=all-compatibility",
             "-opt-in=androidx.lifecycle.viewmodel.compose.SavedStateHandleSaveableApi",
         )
     }
@@ -161,7 +162,7 @@ dependencies {
     // Room components
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
-    kapt(libs.androidx.room.compiler)
+    ksp(libs.androidx.room.compiler)
     androidTestImplementation(libs.androidx.room.testing)
 
     // Lifecycle components
@@ -211,7 +212,7 @@ dependencies {
 
     // Dependency injection
     implementation(libs.hilt.android)
-    kapt(libs.hilt.compiler)
+    ksp(libs.hilt.compiler)
 
     // HTML text extractor
     implementation(libs.crux)
