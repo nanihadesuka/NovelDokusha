@@ -55,7 +55,7 @@ android {
     }
 
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.4.4"
+        kotlinCompilerExtensionVersion = libs.versions.kotlin.compilerVersion.get()
     }
 
     if (cliCustomSettings.splitByAbi) splits {
@@ -126,7 +126,7 @@ android {
             // Having the dependencies here the same in the main scope, visually separated
             dependencies {
                 // Needed to have the Task -> await extension.
-                fullImplementation(libs.kotlinx.coroutines.play.services)
+                fullImplementation(libs.kotlinx.coroutines.playServices)
 
                 // Android ML Translation Kit
                 fullImplementation(libs.translate)
@@ -159,8 +159,8 @@ dependencies {
     implementation(libs.kotlin.stdlib)
 
     // Room components
-    implementation(libs.room.runtime)
-    implementation(libs.room.ktx)
+    implementation(libs.androidx.room.runtime)
+    implementation(libs.androidx.room.ktx)
     kapt(libs.androidx.room.compiler)
     androidTestImplementation(libs.androidx.room.testing)
 
@@ -186,7 +186,6 @@ dependencies {
     implementation(libs.androidx.constraintlayout)
     implementation(libs.material)
 
-
     // Media session controls
     implementation(libs.androidx.media)
 
@@ -198,20 +197,16 @@ dependencies {
     androidTestImplementation(libs.test.androidx.core.ktx)
     androidTestImplementation(libs.test.androidx.junit.ktx)
     androidTestImplementation(libs.test.androidx.espresso.core)
-    androidTestImplementation(libs.androidx.ui.test.junit4)
+    androidTestImplementation(libs.compose.androidx.ui.test.junit4)
     androidTestImplementation(libs.test.androidx.rules)
     androidTestImplementation(libs.test.androidx.runner)
-
     androidTestUtil(libs.test.androidx.orchestrator)
-
 
     // Serialization
     implementation(libs.gson)
     implementation(libs.moshi)
     implementation(libs.moshi.kotlin)
     implementation(libs.kotlinx.serialization.json)
-
-    // Retrofit
     implementation(libs.retrofit)
 
     // Dependency injection
@@ -224,37 +219,28 @@ dependencies {
     implementation(libs.jsoup)
 
     // Jetpack compose
-    implementation(libs.androidx.activity.compose)
-    implementation(libs.androidx.material3)
-    implementation(libs.androidx.animation)
-    implementation(libs.androidx.ui.tooling)
-    implementation(libs.androidx.runtime.livedata)
-    implementation(libs.androidx.lifecycle.viewmodel.compose)
-    implementation(libs.androidx.constraintlayout.compose)
-    implementation(libs.androidx.material.icons.extended)
-    implementation(libs.accompanist.systemuicontroller)
-    implementation(libs.accompanist.swiperefresh)
-    implementation(libs.accompanist.insets)
-    implementation(libs.accompanist.pager)
-    implementation(libs.accompanist.pager.indicators)
+    implementation(libs.compose.androidx.activity)
+    implementation(libs.compose.androidx.material3)
+    implementation(libs.compose.androidx.animation)
+    implementation(libs.compose.androidx.ui.tooling)
+    implementation(libs.compose.androidx.runtime.livedata)
+    implementation(libs.compose.androidx.lifecycle.viewmodel)
+    implementation(libs.compose.androidx.constraintlayout)
+    implementation(libs.compose.androidx.material.icons.extended)
+    implementation(libs.compose.accompanist.systemuicontroller)
+    implementation(libs.compose.accompanist.swiperefresh)
+    implementation(libs.compose.accompanist.insets)
+    implementation(libs.compose.accompanist.pager)
+    implementation(libs.compose.accompanist.pager.indicators)
+    implementation(libs.compose.landscapist.glide)
+    implementation(libs.compose.coil)
+    implementation(libs.compose.lazyColumnScrollbar)
 
     // Networking
     implementation(libs.okhttp)
-    implementation(libs.okhttp.brotli)
-    implementation(libs.logging.interceptor)
-
-    // Coil for jetpack compose
-    implementation(libs.coil.compose)
-
-    // Glide for jetpack compose (has more compatible formats)
-    implementation(libs.landscapist.glide)
-    implementation(libs.okhttp3.integration)
-
-    // Compose collapsing toolbar
-    implementation(libs.toolbar.compose)
-
-    // Compose scroll bar
-    implementation(libs.lazyColumnScrollbar)
+    implementation(libs.okhttp.interceptor.brotli)
+    implementation(libs.okhttp.interceptor.logging)
+    implementation(libs.okhttp.glideIntegration)
 
     // Logging
     implementation(libs.timber)
