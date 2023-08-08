@@ -13,7 +13,7 @@ buildscript {
 }
 
 plugins {
-
+	id("org.jetbrains.kotlin.kapt") version "1.8.10" apply false
 }
 
 allprojects {
