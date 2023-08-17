@@ -25,6 +25,7 @@ import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
@@ -261,23 +262,25 @@ private fun Preview() {
     val isDark = isSystemInDarkTheme()
     val theme = remember { mutableStateOf(if (isDark) Themes.DARK else Themes.LIGHT) }
     InternalTheme(theme.value) {
-        SettingsScreenBody(
-            state = SettingsScreenState(
-                followsSystemTheme = remember { derivedStateOf { true } },
-                currentTheme = theme,
-                databaseSize = remember { mutableStateOf("1 MB") },
-                imageFolderSize = remember { mutableStateOf("10 MB") },
-                isTranslationSettingsVisible = remember { mutableStateOf(true) },
-                translationModelsStates = remember { mutableStateListOf() },
-            ),
-            onFollowSystem = { },
-            onThemeSelected = { },
-            onCleanDatabase = { },
-            onCleanImageFolder = { },
-            onBackupData = { },
-            onRestoreData = { },
-            onDownloadTranslationModel = { },
-            onRemoveTranslationModel = { },
-        )
+        Surface(color = MaterialTheme.colorScheme.background) {
+            SettingsScreenBody(
+                state = SettingsScreenState(
+                    followsSystemTheme = remember { derivedStateOf { true } },
+                    currentTheme = theme,
+                    databaseSize = remember { mutableStateOf("1 MB") },
+                    imageFolderSize = remember { mutableStateOf("10 MB") },
+                    isTranslationSettingsVisible = remember { mutableStateOf(true) },
+                    translationModelsStates = remember { mutableStateListOf() },
+                ),
+                onFollowSystem = { },
+                onThemeSelected = { },
+                onCleanDatabase = { },
+                onCleanImageFolder = { },
+                onBackupData = { },
+                onRestoreData = { },
+                onDownloadTranslationModel = { },
+                onRemoveTranslationModel = { },
+            )
+        }
     }
 }
