@@ -177,6 +177,10 @@ dependencies {
     // Local storage directory access
     implementation(libs.androidx.documentfile)
 
+    // Android SDK
+    implementation(libs.androidx.workmanager)
+    implementation(libs.androidx.startup)
+
     // UI
     implementation(libs.androidx.appcompat)
     implementation(libs.test.androidx.core.ktx)
@@ -212,7 +216,9 @@ dependencies {
 
     // Dependency injection
     implementation(libs.hilt.android)
+    implementation(libs.hilt.workmanager)
     ksp(libs.hilt.compiler)
+    ksp(libs.hilt.androidx.compiler)
 
     // HTML text extractor
     implementation(libs.crux)

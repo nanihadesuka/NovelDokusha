@@ -64,3 +64,8 @@ fun <T> Response<Response<T>>.flatten(): Response<T> =
             }
         }
     }
+
+fun <T> Response<T>.toResult() = when (this) {
+    is Error -> Result.failure<T>(exception)
+    is Success -> Result.success(this)
+}

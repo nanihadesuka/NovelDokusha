@@ -18,7 +18,6 @@ import kotlinx.coroutines.flow.onSubscription
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import my.noveldokusha.scraper.LanguageCode
@@ -151,6 +150,11 @@ class AppPreferences @Inject constructor(
     val GLOBAL_TRANSLATION_PREFERRED_TARGET =
         object : Preference<String>("GLOBAL_TRANSLATION_PREFERRED_TARGET") {
             override var value by SharedPreference_String(name, preferences, "")
+        }
+
+    val GLOBAL_APP_UPDATER_CHECKER_ENABLED =
+        object : Preference<Boolean>("GLOBAL_APP_UPDATER_CHECKER_ENABLED") {
+            override var value by SharedPreference_Boolean(name, preferences, true)
         }
 
     @Deprecated("Removed", level = DeprecationLevel.HIDDEN)

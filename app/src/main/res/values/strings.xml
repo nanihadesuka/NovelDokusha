@@ -173,7 +173,16 @@
     <string name="notification_channel_name_backup">Backup</string>
     <string name="notification_channel_name_import_epub">Import EPUB</string>
     <string name="notification_channel_name_restore_backup">Restore backup</string>
+    <string name="notification_channel_name_app_updates_checker">Updates checker</string>
+    <string name="new_app_version_available">New app version available</string>
     <string name="backup_restored">Backup restored</string>
     <string name="keep_screen_on">Keep screen on</string>
     <string name="change_cover">Change cover</string>
+	<string name="app_updates">App updates</string>
+    <string name="automatically_check_for_app_updates">Automatically check for app updates</string>
+    <string name="check_for_app_updates_now">Check for app updates now</string>
+	<string name="you_already_have_the_last_version">You already have the last version</string>
+    <string name="failed_to_check_last_app_version">Failed to check last app version</string>
+	<string name="download">Download</string>
+	<string name="new_app_version_found_s">New app version found %s</string>
 </resources>
