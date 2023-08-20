@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest
-	xmlns:android="http://schemas.android.com/apk/res/android">
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:tools="http://schemas.android.com/tools"
+	>
 
 	<uses-permission android:name="android.permission.INTERNET" />
 	<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -72,6 +74,23 @@
 				<action android:name="android.intent.action.MEDIA_BUTTON" />
 			</intent-filter>
 		</receiver>
+
+		<provider
+			android:name="androidx.startup.InitializationProvider"
+			android:authorities="${applicationId}.androidx-startup"
+			android:exported="false"
+			tools:node="merge"
+			>
+			<!-- Remove and manually initialize with Configuration.Provider
+				 so we can inject a custom worker factory.
+			-->
+			<meta-data
+				android:name="androidx.work.WorkManagerInitializer"
+				android:value="androidx.startup"
+				tools:node="remove"
+				/>
+		</provider>
+
 	</application>
 
 </manifest>

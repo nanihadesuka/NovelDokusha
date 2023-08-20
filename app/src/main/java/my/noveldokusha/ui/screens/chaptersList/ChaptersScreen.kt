@@ -173,7 +173,7 @@ fun ChaptersScreen(
                                     onDismissRequest = { showDropDown = false }) {
                                     ChaptersDropDown(
                                         isLocalSource = state.isLocalSource.value,
-                                        onOpenWebView = {
+                                        openInBrowser = {
                                             if (!state.book.value.url.isLocalUri) {
                                                 context.goToWebBrowser(url = state.book.value.url)
                                             }

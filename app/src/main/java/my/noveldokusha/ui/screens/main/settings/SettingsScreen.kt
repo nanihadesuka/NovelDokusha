@@ -60,6 +60,7 @@ fun SettingsScreen(
                 onRestoreData = onDoRestore(),
                 onDownloadTranslationModel = viewModel::downloadTranslationModel,
                 onRemoveTranslationModel = viewModel::removeTranslationModel,
+                onCheckForUpdatesManual = viewModel::onCheckForUpdatesManual,
                 modifier = Modifier.padding(innerPadding),
             )
         }

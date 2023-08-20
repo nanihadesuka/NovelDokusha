@@ -13,11 +13,14 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import my.noveldokusha.App
 import my.noveldokusha.AppPreferences
+import my.noveldokusha.R
 import my.noveldokusha.di.AppCoroutineScope
 import my.noveldokusha.repository.AppFileResolver
+import my.noveldokusha.repository.AppRemoteRepository
 import my.noveldokusha.repository.Repository
 import my.noveldokusha.tools.TranslationManager
 import my.noveldokusha.ui.BaseViewModel
+import my.noveldokusha.ui.Toasty
 import my.noveldokusha.ui.theme.Themes
 import my.noveldokusha.utils.asMutableStateOf
 import java.io.File
@@ -32,6 +35,8 @@ class SettingsViewModel @Inject constructor(
     private val translationManager: TranslationManager,
     private val stateHandle: SavedStateHandle,
     private val appFileResolver: AppFileResolver,
+    private val appRemoteRepository: AppRemoteRepository,
+    private val toasty: Toasty,
 ) : BaseViewModel() {
 
     private val themeId by appPreferences.THEME_ID.state(viewModelScope)
@@ -43,6 +48,14 @@ class SettingsViewModel @Inject constructor(
         currentTheme = derivedStateOf { Themes.fromIDTheme(themeId) },
         isTranslationSettingsVisible = mutableStateOf(translationManager.available),
         translationModelsStates = translationManager.models,
+        updateAppSetting = SettingsScreenState.UpdateApp(
+            currentAppVersion = appRemoteRepository.getCurrentAppVersion().toString(),
+            showNewVersionDialog = mutableStateOf(null),
+            appUpdateCheckerEnabled = appPreferences.GLOBAL_APP_UPDATER_CHECKER_ENABLED.state(
+                viewModelScope
+            ),
+            checkingForNewVersion = mutableStateOf(false)
+        )
     )
 
     init {
@@ -101,6 +114,24 @@ class SettingsViewModel @Inject constructor(
     private fun updateImagesFolderSize() = viewModelScope.launch {
         val size = getFolderSizeBytes(repository.settings.folderBooks)
         state.imageFolderSize.value = Formatter.formatFileSize(appPreferences.context, size)
+    }
+
+    fun onCheckForUpdatesManual() {
+        viewModelScope.launch {
+            state.updateAppSetting.checkingForNewVersion.value = true
+            val current = appRemoteRepository.getCurrentAppVersion()
+            appRemoteRepository.getLastAppVersion()
+                .onSuccess { new ->
+                    if (new.version > current) {
+                        state.updateAppSetting.showNewVersionDialog.value = new
+                    } else {
+                        toasty.show(R.string.you_already_have_the_last_version)
+                    }
+                }.onError {
+                    toasty.show(R.string.failed_to_check_last_app_version)
+                }
+            state.updateAppSetting.checkingForNewVersion.value = false
+        }
     }
 }
 

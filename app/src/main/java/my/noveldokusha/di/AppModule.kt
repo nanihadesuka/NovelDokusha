@@ -1,6 +1,7 @@
 package my.noveldokusha.di
 
 import android.content.Context
+import androidx.work.WorkManager
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -200,6 +201,14 @@ abstract class AppModule {
             @ApplicationContext context: Context,
         ): NotificationsCenter {
             return NotificationsCenter(context)
+        }
+
+
+        @Provides
+        fun providesWorkManager(
+            @ApplicationContext context: Context
+        ): WorkManager {
+            return WorkManager.getInstance(context)
         }
     }
 }

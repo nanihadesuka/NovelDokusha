@@ -6,6 +6,8 @@ kotlin-compilerVersion = "1.4.7"
 plugin-agp = "8.2.0-alpha09"
 
 hilt = "2.47"
+hilt-androidx = "1.0.0"
+
 ksp = "1.8.21-1.0.11"
 
 kotlinx-coroutines-core = "1.7.3"
@@ -26,6 +28,8 @@ androidx-runtime-livedata = "1.4.3"
 androidx-documentfile = "1.0.1"
 androidx-media = "1.6.0"
 androidx-lifecycle = "2.6.1"
+androidx-workmanager = "2.8.1"
+androidx-startup = "1.1.1"
 
 androidx-constraintLayout = "2.1.4"
 androidx-coordinatorLayout = "1.2.0"
@@ -90,6 +94,8 @@ compose-landscapist-glide = { module = "com.github.skydoves:landscapist-glide", 
 # Hilt
 hilt-compiler = { module = "com.google.dagger:hilt-compiler", version.ref = "hilt" }
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hilt" }
+hilt-workmanager = { module = "androidx.hilt:hilt-work", version.ref = "hilt-androidx" }
+hilt-androidx-compiler = { module = "androidx.hilt:hilt-compiler", version.ref = "hilt-androidx" }
 
 # Room
 androidx-room-testing = { module = "androidx.room:room-testing", version.ref = "room" }
@@ -141,7 +147,9 @@ androidx-lifecycle-common-java8 = { module = "androidx.lifecycle:lifecycle-commo
 androidx-coordinatorlayout = { module = "androidx.coordinatorlayout:coordinatorlayout", version.ref = "androidx-coordinatorLayout" }
 androidx-lifecycle-livedata-ktx = { module = "androidx.lifecycle:lifecycle-livedata-ktx", version.ref = "androidx-lifecycle" }
 androidx-lifecycle-viewmodel-ktx = { module = "androidx.lifecycle:lifecycle-viewmodel-ktx", version.ref = "androidx-lifecycle" }
+androidx-startup = { module = "androidx.startup:startup-runtime", version.ref = "androidx-startup" }
 
+androidx-workmanager = { module = "androidx.work:work-runtime-ktx", version.ref = "androidx-workmanager" }
 androidx-documentfile = { module = "androidx.documentfile:documentfile", version.ref = "androidx-documentfile" }
 androidx-media = { module = "androidx.media:media", version.ref = "androidx-media" }
 androidx-navigation-ui-ktx = { module = "androidx.navigation:navigation-ui-ktx", version.ref = "androidx-navigation-ui-ktx" }

@@ -1,5 +1,6 @@
 package my.noveldokusha.ui.screens.main.settings
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
@@ -10,21 +11,26 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.AutoAwesome
+import androidx.compose.material.icons.outlined.AutoMode
 import androidx.compose.material.icons.outlined.ColorLens
 import androidx.compose.material.icons.outlined.DataArray
+import androidx.compose.material.icons.outlined.DoubleArrow
 import androidx.compose.material.icons.outlined.Image
 import androidx.compose.material.icons.outlined.Save
 import androidx.compose.material.icons.outlined.SettingsBackupRestore
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
@@ -40,11 +46,15 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import my.noveldokusha.R
+import my.noveldokusha.domain.AppVersion
+import my.noveldokusha.domain.RemoteAppVersion
 import my.noveldokusha.ui.composeViews.SettingsTranslationModels
+import my.noveldokusha.ui.screens.main.settings.views.NewAppUpdateDialog
 import my.noveldokusha.ui.theme.ColorAccent
 import my.noveldokusha.ui.theme.InternalTheme
 import my.noveldokusha.ui.theme.PreviewThemes
 import my.noveldokusha.ui.theme.Themes
+import my.noveldokusha.utils.debouncedClickable
 import my.noveldokusha.utils.textPadding
 
 @OptIn(ExperimentalLayoutApi::class, ExperimentalMaterial3Api::class)
@@ -210,6 +220,7 @@ fun SettingsScreenBody(
     onRestoreData: () -> Unit,
     onDownloadTranslationModel: (lang: String) -> Unit,
     onRemoveTranslationModel: (lang: String) -> Unit,
+    onCheckForUpdatesManual: () -> Unit,
 ) {
     Column(
         modifier = modifier.verticalScroll(rememberScrollState()),
@@ -240,6 +251,11 @@ fun SettingsScreenBody(
                 onRemoveTranslationModel = onRemoveTranslationModel
             )
         }
+        Divider()
+        AppUpdates(
+            state = state.updateAppSetting,
+            onCheckForUpdatesManual = onCheckForUpdatesManual
+        )
         Spacer(modifier = Modifier.height(500.dp))
         Text(
             text = "(°.°)",
@@ -255,29 +271,113 @@ fun SettingsScreenBody(
     }
 }
 
+@Composable
+fun AppUpdates(
+    state: SettingsScreenState.UpdateApp,
+    onCheckForUpdatesManual: () -> Unit
+) {
+    Column {
+        Text(
+            text = stringResource(R.string.app_updates) + " | " + state.currentAppVersion,
+            style = MaterialTheme.typography.titleMedium,
+            modifier = Modifier.textPadding(),
+            color = ColorAccent
+        )
+        // Follow system theme
+        ListItem(
+            modifier = Modifier.clickable {
+                state.appUpdateCheckerEnabled.value = !state.appUpdateCheckerEnabled.value
+            },
+            headlineContent = {
+                Text(text = stringResource(R.string.automatically_check_for_app_updates))
+            },
+            leadingContent = {
+                Icon(
+                    Icons.Outlined.AutoMode,
+                    null,
+                    tint = MaterialTheme.colorScheme.onPrimary
+                )
+            },
+            trailingContent = {
+                Switch(
+                    checked = state.appUpdateCheckerEnabled.value,
+                    onCheckedChange = {
+                        state.appUpdateCheckerEnabled.value = !state.appUpdateCheckerEnabled.value
+                    },
+                    colors = SwitchDefaults.colors(
+                        checkedThumbColor = ColorAccent,
+                        checkedBorderColor = MaterialTheme.colorScheme.onPrimary,
+                        uncheckedBorderColor = MaterialTheme.colorScheme.onPrimary,
+                    )
+                )
+            }
+        )
+        ListItem(
+            headlineContent = {
+                Text(text = stringResource(R.string.check_for_app_updates_now))
+            },
+            leadingContent = {
+                Icon(
+                    Icons.Outlined.DoubleArrow,
+                    null,
+                    tint = MaterialTheme.colorScheme.onPrimary
+                )
+            },
+            trailingContent = {
+                AnimatedVisibility(visible = state.checkingForNewVersion.value) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(22.dp),
+                        color = MaterialTheme.colorScheme.onPrimary
+                    )
+                }
+            },
+            modifier = Modifier.debouncedClickable { onCheckForUpdatesManual() }
+        )
+        NewAppUpdateDialog(
+            updateApp = state
+        )
+    }
+}
+
 @PreviewThemes
 @Composable
 private fun Preview() {
     val isDark = isSystemInDarkTheme()
     val theme = remember { mutableStateOf(if (isDark) Themes.DARK else Themes.LIGHT) }
     InternalTheme(theme.value) {
-        SettingsScreenBody(
-            state = SettingsScreenState(
-                followsSystemTheme = remember { derivedStateOf { true } },
-                currentTheme = theme,
-                databaseSize = remember { mutableStateOf("1 MB") },
-                imageFolderSize = remember { mutableStateOf("10 MB") },
-                isTranslationSettingsVisible = remember { mutableStateOf(true) },
-                translationModelsStates = remember { mutableStateListOf() },
-            ),
-            onFollowSystem = { },
-            onThemeSelected = { },
-            onCleanDatabase = { },
-            onCleanImageFolder = { },
-            onBackupData = { },
-            onRestoreData = { },
-            onDownloadTranslationModel = { },
-            onRemoveTranslationModel = { },
-        )
+        Surface(color = MaterialTheme.colorScheme.background) {
+            SettingsScreenBody(
+                state = SettingsScreenState(
+                    followsSystemTheme = remember { derivedStateOf { true } },
+                    currentTheme = theme,
+                    databaseSize = remember { mutableStateOf("1 MB") },
+                    imageFolderSize = remember { mutableStateOf("10 MB") },
+                    isTranslationSettingsVisible = remember { mutableStateOf(true) },
+                    translationModelsStates = remember { mutableStateListOf() },
+                    updateAppSetting = SettingsScreenState.UpdateApp(
+                        currentAppVersion = "1.0.0",
+                        appUpdateCheckerEnabled = remember { mutableStateOf(true) },
+                        showNewVersionDialog = remember {
+                            mutableStateOf(
+                                RemoteAppVersion(
+                                    version = AppVersion(1, 1, 1),
+                                    sourceUrl = "url"
+                                )
+                            )
+                        },
+                        checkingForNewVersion = remember { mutableStateOf(true) },
+                    ),
+                ),
+                onFollowSystem = { },
+                onThemeSelected = { },
+                onCleanDatabase = { },
+                onCleanImageFolder = { },
+                onBackupData = { },
+                onRestoreData = { },
+                onDownloadTranslationModel = { },
+                onRemoveTranslationModel = { },
+                onCheckForUpdatesManual = { },
+            )
+        }
     }
 }
