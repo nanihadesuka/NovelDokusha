@@ -1,4 +1,4 @@
-package my.noveldokusha.services.libraryUpdate
+package my.noveldokusha.notifications
 
 import android.app.Notification
 import android.app.NotificationManager
@@ -24,7 +24,7 @@ import my.noveldokusha.utils.text
 import my.noveldokusha.utils.title
 import javax.inject.Inject
 
-class LibraryUpdateNotifications @Inject constructor(
+class LibraryUpdateNotification @Inject constructor(
     @ApplicationContext private val context: Context,
     private val notificationsCenter: NotificationsCenter
 ) {
@@ -45,6 +45,10 @@ class LibraryUpdateNotifications @Inject constructor(
     }
 
     private lateinit var notificationBuilder: NotificationCompat.Builder
+
+    fun closeNotification() {
+        notificationsCenter.close(notificationId = notificationId)
+    }
 
     fun createEmptyUpdatingNotification(): Notification {
         notificationBuilder = notificationsCenter.showNotification(

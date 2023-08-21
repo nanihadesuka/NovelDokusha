@@ -15,7 +15,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import my.noveldokusha.R
 import my.noveldokusha.repository.AppFileResolver
-import my.noveldokusha.repository.Repository
+import my.noveldokusha.repository.AppRepository
 import my.noveldokusha.tools.epub.epubImporter
 import my.noveldokusha.tools.epub.epubParser
 import my.noveldokusha.utils.Extra_Uri
@@ -32,7 +32,7 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class EpubImportService : Service() {
     @Inject
-    lateinit var repository: Repository
+    lateinit var appRepository: AppRepository
 
     @Inject
     lateinit var notificationsCenter: NotificationsCenter
@@ -129,7 +129,7 @@ class EpubImportService : Service() {
                 epubImporter(
                     storageFolderName = fileName,
                     appFileResolver = appFileResolver,
-                    repository = repository,
+                    appRepository = appRepository,
                     epub = epub,
                     addToLibrary = true
                 )

@@ -22,7 +22,7 @@ import my.noveldokusha.repository.AppFileResolver
 import my.noveldokusha.repository.BookChaptersRepository
 import my.noveldokusha.repository.ChapterBodyRepository
 import my.noveldokusha.repository.LibraryBooksRepository
-import my.noveldokusha.repository.Repository
+import my.noveldokusha.repository.AppRepository
 import my.noveldokusha.scraper.Scraper
 import my.noveldokusha.ui.Toasty
 import my.noveldokusha.utils.Extra_Uri
@@ -47,7 +47,7 @@ class RestoreDataService : Service() {
     lateinit var context: Context
 
     @Inject
-    lateinit var repository: Repository
+    lateinit var appRepository: AppRepository
 
     @Inject
     lateinit var scraper: Scraper
@@ -119,7 +119,7 @@ class RestoreDataService : Service() {
         job = CoroutineScope(Dispatchers.IO).launch {
             tryAsResponse {
                 restoreData(intentData.uri)
-                repository.eventDataRestored.emit(Unit)
+                appRepository.eventDataRestored.emit(Unit)
             }.onError {
                 Timber.e(it.exception)
             }
@@ -182,7 +182,7 @@ class RestoreDataService : Service() {
                         chapterDao = newDatabase.chapterDao(),
                         operations = newDatabase
                     )
-                    Repository(
+                    AppRepository(
                         db = newDatabase,
                         context = context,
                         name = "temp_database",
@@ -210,21 +210,21 @@ class RestoreDataService : Service() {
                 ) {
                     text = getString(R.string.adding_books)
                 }
-                repository.libraryBooks.insertReplace(backupDatabase.libraryBooks.getAll())
+                appRepository.libraryBooks.insertReplace(backupDatabase.libraryBooks.getAll())
                 notificationsCenter.modifyNotification(
                     notificationBuilder,
                     notificationId = notificationId
                 ) {
                     text = getString(R.string.adding_chapters)
                 }
-                repository.bookChapters.insert(backupDatabase.bookChapters.getAll())
+                appRepository.bookChapters.insert(backupDatabase.bookChapters.getAll())
                 notificationsCenter.modifyNotification(
                     notificationBuilder,
                     notificationId = notificationId
                 ) {
                     text = getString(R.string.adding_chapters_text)
                 }
-                repository.chapterBody.insertReplace(backupDatabase.chapterBody.getAll())
+                appRepository.chapterBody.insertReplace(backupDatabase.chapterBody.getAll())
                 backupDatabase.close()
                 backupDatabase.delete()
             }.onError {
@@ -248,7 +248,7 @@ class RestoreDataService : Service() {
         }
 
         suspend fun mergeToBookFolder(entry: ZipEntry, inputStream: InputStream) {
-            val file = File(repository.settings.folderBooks.parentFile, entry.name)
+            val file = File(appRepository.settings.folderBooks.parentFile, entry.name)
             if (file.isDirectory) return
             file.parentFile?.mkdirs()
             if (file.parentFile?.exists() != true) return

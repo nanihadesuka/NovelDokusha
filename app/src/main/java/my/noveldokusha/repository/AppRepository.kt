@@ -16,7 +16,7 @@ import my.noveldokusha.tools.epub.epubParser
 import my.noveldokusha.utils.tryAsResponse
 import javax.inject.Inject
 
-class Repository @Inject constructor(
+class AppRepository @Inject constructor(
     private val db: AppDatabase,
     @ApplicationContext private val context: Context,
     val name: String,
@@ -52,7 +52,7 @@ class Repository @Inject constructor(
         epubImporter(
             storageFolderName = bookTitle,
             appFileResolver = appFileResolver,
-            repository = this,
+            appRepository = this,
             epub = epub,
             addToLibrary = addToLibrary
         )

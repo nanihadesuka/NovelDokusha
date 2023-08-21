@@ -24,7 +24,7 @@ import my.noveldokusha.isContentUri
 import my.noveldokusha.isLocalUri
 import my.noveldokusha.network.NetworkClient
 import my.noveldokusha.repository.AppFileResolver
-import my.noveldokusha.repository.Repository
+import my.noveldokusha.repository.AppRepository
 import my.noveldokusha.scraper.Scraper
 import my.noveldokusha.scraper.downloadBookCoverImageUrl
 import my.noveldokusha.scraper.downloadBookDescription
@@ -42,7 +42,7 @@ interface ChapterStateBundle {
 
 @HiltViewModel
 class ChaptersViewModel @Inject constructor(
-    private val repository: Repository,
+    private val appRepository: AppRepository,
     private val appScope: AppCoroutineScope,
     private val networkClient: NetworkClient,
     private val scraper: Scraper,
@@ -63,7 +63,7 @@ class ChaptersViewModel @Inject constructor(
     @Volatile
     private var lastSelectedChapterUrl: String? = null
     private val source = scraper.getCompatibleSource(bookUrl)
-    private val book = repository.libraryBooks.getFlow(bookUrl)
+    private val book = appRepository.libraryBooks.getFlow(bookUrl)
         .filterNotNull()
         .map(ChaptersScreenState::BookState)
         .toState(
@@ -85,7 +85,7 @@ class ChaptersViewModel @Inject constructor(
 
     init {
         appScope.launch {
-            if (rawBookUrl.isContentUri && repository.libraryBooks.get(bookUrl) == null) {
+            if (rawBookUrl.isContentUri && appRepository.libraryBooks.get(bookUrl) == null) {
                 importUriContent()
             }
         }
@@ -93,16 +93,16 @@ class ChaptersViewModel @Inject constructor(
         viewModelScope.launch {
             if (state.isLocalSource.value) return@launch
 
-            if (!repository.bookChapters.hasChapters(bookUrl))
+            if (!appRepository.bookChapters.hasChapters(bookUrl))
                 updateChaptersList()
 
-            if (repository.libraryBooks.get(bookUrl) != null)
+            if (appRepository.libraryBooks.get(bookUrl) != null)
                 return@launch
 
             val coverUrl = async { downloadBookCoverImageUrl(scraper, networkClient, bookUrl) }
             val description = async { downloadBookDescription(scraper, networkClient, bookUrl) }
 
-            repository.libraryBooks.insert(
+            appRepository.libraryBooks.insert(
                 Book(
                     title = bookTitle,
                     url = bookUrl,
@@ -113,7 +113,7 @@ class ChaptersViewModel @Inject constructor(
         }
 
         viewModelScope.launch {
-            repository.bookChapters.getChaptersWithContextFlow(bookUrl)
+            appRepository.bookChapters.getChaptersWithContextFlow(bookUrl)
                 .map { removeCommonTextFromTitles(it) }
                 // Sort the chapters given the order preference
                 .combine(appPreferences.CHAPTERS_SORT_ASCENDING.flow()) { chapters, sorted ->
@@ -133,7 +133,7 @@ class ChaptersViewModel @Inject constructor(
 
     fun toggleBookmark() {
         viewModelScope.launch {
-            val isBookmarked = repository.toggleBookmark(bookTitle = bookTitle, bookUrl = bookUrl)
+            val isBookmarked = appRepository.toggleBookmark(bookTitle = bookTitle, bookUrl = bookUrl)
             val msg = if (isBookmarked) R.string.added_to_library else R.string.removed_from_library
             toasty.show(msg)
         }
@@ -159,7 +159,7 @@ class ChaptersViewModel @Inject constructor(
         if (state.isLocalSource.value || book.value.coverImageUrl?.isLocalUri == true) return@launch
         downloadBookCoverImageUrl(scraper, networkClient, bookUrl).onSuccess {
             if (it == null) return@onSuccess
-            repository.libraryBooks.updateCover(bookUrl, it)
+            appRepository.libraryBooks.updateCover(bookUrl, it)
         }
     }
 
@@ -167,7 +167,7 @@ class ChaptersViewModel @Inject constructor(
         if (state.isLocalSource.value) return@launch
         downloadBookDescription(scraper, networkClient, bookUrl).onSuccess {
             if (it == null) return@onSuccess
-            repository.libraryBooks.updateDescription(bookUrl, it)
+            appRepository.libraryBooks.updateDescription(bookUrl, it)
         }
     }
 
@@ -178,8 +178,8 @@ class ChaptersViewModel @Inject constructor(
             state.isRefreshing.value = true
             val rawBookUrl = rawBookUrl
             val bookTitle = bookTitle
-            val isInLibrary = repository.libraryBooks.existInLibrary(bookUrl)
-            repository.importEpubFromContentUri(
+            val isInLibrary = appRepository.libraryBooks.existInLibrary(bookUrl)
+            appRepository.importEpubFromContentUri(
                 contentUri = rawBookUrl,
                 bookTitle = bookTitle,
                 addToLibrary = isInLibrary
@@ -201,7 +201,7 @@ class ChaptersViewModel @Inject constructor(
             ).onSuccess {
                 if (it.isEmpty())
                     toasty.show(R.string.no_chapters_found)
-                repository.bookChapters.merge(newChapters = it, bookUrl = url)
+                appRepository.bookChapters.merge(newChapters = it, bookUrl = url)
             }.onError {
                 state.error.value = it.message
             }
@@ -211,21 +211,21 @@ class ChaptersViewModel @Inject constructor(
     }
 
     suspend fun getLastReadChapter(): String? {
-        return repository.libraryBooks.get(bookUrl)?.lastReadChapter
-            ?: repository.bookChapters.getFirstChapter(bookUrl)?.url
+        return appRepository.libraryBooks.get(bookUrl)?.lastReadChapter
+            ?: appRepository.bookChapters.getFirstChapter(bookUrl)?.url
     }
 
     fun setAsUnreadSelected() {
         val list = state.selectedChaptersUrl.toList()
         appScope.launch(Dispatchers.Default) {
-            repository.bookChapters.setAsUnread(list.map { it.first })
+            appRepository.bookChapters.setAsUnread(list.map { it.first })
         }
     }
 
     fun setAsReadSelected() {
         val list = state.selectedChaptersUrl.toList()
         appScope.launch(Dispatchers.Default) {
-            repository.bookChapters.setAsRead(list.map { it.first })
+            appRepository.bookChapters.setAsRead(list.map { it.first })
         }
     }
 
@@ -233,7 +233,7 @@ class ChaptersViewModel @Inject constructor(
         if (state.isLocalSource.value) return
         val list = state.selectedChaptersUrl.toList()
         appScope.launch(Dispatchers.Default) {
-            list.forEach { repository.chapterBody.fetchBody(it.first) }
+            list.forEach { appRepository.chapterBody.fetchBody(it.first) }
         }
     }
 
@@ -241,7 +241,7 @@ class ChaptersViewModel @Inject constructor(
         if (state.isLocalSource.value) return
         val list = state.selectedChaptersUrl.toList()
         appScope.launch(Dispatchers.Default) {
-            repository.chapterBody.removeRows(list.map { it.first })
+            appRepository.chapterBody.removeRows(list.map { it.first })
         }
     }
 
@@ -256,7 +256,7 @@ class ChaptersViewModel @Inject constructor(
     }
 
     fun saveImageAsCover(uri: Uri) {
-        repository.libraryBooks.saveImageAsCover(imageUri = uri, bookUrl = bookUrl)
+        appRepository.libraryBooks.saveImageAsCover(imageUri = uri, bookUrl = bookUrl)
     }
 
     fun onSelectionModeChapterLongClick(chapter: ChapterWithContext) {
@@ -292,7 +292,7 @@ class ChaptersViewModel @Inject constructor(
     fun onChapterDownload(chapter: ChapterWithContext) {
         if (state.isLocalSource.value) return
         appScope.launch {
-            repository.chapterBody.fetchBody(chapter.chapter.url)
+            appRepository.chapterBody.fetchBody(chapter.chapter.url)
         }
     }
 

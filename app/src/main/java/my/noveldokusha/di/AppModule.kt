@@ -23,7 +23,7 @@ import my.noveldokusha.repository.AppFileResolver
 import my.noveldokusha.repository.BookChaptersRepository
 import my.noveldokusha.repository.ChapterBodyRepository
 import my.noveldokusha.repository.LibraryBooksRepository
-import my.noveldokusha.repository.Repository
+import my.noveldokusha.repository.AppRepository
 import my.noveldokusha.repository.ScraperRepository
 import my.noveldokusha.scraper.Scraper
 import my.noveldokusha.tools.TranslationManager
@@ -62,8 +62,8 @@ abstract class AppModule {
             bookChaptersRepository: BookChaptersRepository,
             chapterBodyRepository: ChapterBodyRepository,
             appFileResolver: AppFileResolver,
-        ): Repository {
-            return Repository(
+        ): AppRepository {
+            return AppRepository(
                 database,
                 context,
                 mainDatabaseName,
@@ -166,14 +166,14 @@ abstract class AppModule {
         @Provides
         @Singleton
         fun provideReaderManager(
-            repository: Repository,
+            appRepository: AppRepository,
             translationManager: TranslationManager,
             appPreferences: AppPreferences,
             appCoroutineScope: AppCoroutineScope,
             @ApplicationContext context: Context
         ): ReaderManager {
             return ReaderManager(
-                repository,
+                appRepository,
                 translationManager,
                 appPreferences,
                 context,

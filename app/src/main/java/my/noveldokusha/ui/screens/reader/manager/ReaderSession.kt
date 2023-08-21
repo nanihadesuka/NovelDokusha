@@ -16,7 +16,7 @@ import kotlinx.coroutines.withContext
 import my.noveldokusha.AppPreferences
 import my.noveldokusha.data.database.tables.Chapter
 import my.noveldokusha.di.AppCoroutineScope
-import my.noveldokusha.repository.Repository
+import my.noveldokusha.repository.AppRepository
 import my.noveldokusha.services.narratorMediaControls.NarratorMediaControlsService
 import my.noveldokusha.tools.TranslationManager
 import my.noveldokusha.tools.Utterance
@@ -37,7 +37,7 @@ class ReaderSession(
     initialChapterUrl: String,
     private val scope: CoroutineScope,
     private val appScope: AppCoroutineScope,
-    private val repository: Repository,
+    private val appRepository: AppRepository,
     translationManager: TranslationManager,
     private val appPreferences: AppPreferences,
     private val context: Context,
@@ -49,7 +49,7 @@ class ReaderSession(
 ) {
     private var chapterUrl: String = initialChapterUrl
 
-    private val readRoutine = ChaptersIsReadRoutine(repository)
+    private val readRoutine = ChaptersIsReadRoutine(appRepository)
     private val orderedChapters = mutableListOf<Chapter>()
 
     var bookTitle: String? = null
@@ -96,7 +96,7 @@ class ReaderSession(
     )
 
     val readerChaptersLoader = ReaderChaptersLoader(
-        repository = repository,
+        appRepository = appRepository,
         translatorTranslateOrNull = { readerLiveTranslation.translatorState?.translate?.invoke(it) },
         translatorIsActive = { readerLiveTranslation.translatorState != null },
         translatorSourceLanguageOrNull = { readerLiveTranslation.translatorState?.sourceLocale?.displayLanguage },
@@ -138,7 +138,7 @@ class ReaderSession(
     fun init() {
         initLoadData()
         scope.launch {
-            repository.libraryBooks.updateLastReadEpochTimeMilli(
+            appRepository.libraryBooks.updateLastReadEpochTimeMilli(
                 bookUrl,
                 System.currentTimeMillis()
             )
@@ -148,11 +148,11 @@ class ReaderSession(
 
     private fun initLoadData() {
         scope.launch {
-            val book = async(Dispatchers.IO) { repository.libraryBooks.get(bookUrl) }
-            val chapter = async(Dispatchers.IO) { repository.bookChapters.get(chapterUrl) }
+            val book = async(Dispatchers.IO) { appRepository.libraryBooks.get(bookUrl) }
+            val chapter = async(Dispatchers.IO) { appRepository.bookChapters.get(chapterUrl) }
             val loadTranslator = async(Dispatchers.IO) { readerLiveTranslation.init() }
             val chaptersList = async(Dispatchers.Default) {
-                orderedChapters.also { it.addAll(repository.bookChapters.chapters(bookUrl)) }
+                orderedChapters.also { it.addAll(appRepository.bookChapters.chapters(bookUrl)) }
             }
             val chapterIndex = async(Dispatchers.Default) {
                 chaptersList.await().indexOfFirst { it.url == chapterUrl }
@@ -294,7 +294,7 @@ class ReaderSession(
             newChapter = newChapter,
             oldChapter = oldChapter,
             scope = appScope,
-            repository = repository,
+            appRepository = appRepository,
         )
     }
 }
@@ -304,22 +304,22 @@ private fun saveBookLastReadPositionState(
     newChapter: ChapterState,
     oldChapter: ChapterState? = null,
     scope: AppCoroutineScope,
-    repository: Repository,
+    appRepository: AppRepository,
 ) {
     scope.launch(Dispatchers.IO) {
-        repository.withTransaction {
-            repository.libraryBooks.updateLastReadChapter(
+        appRepository.withTransaction {
+            appRepository.libraryBooks.updateLastReadChapter(
                 bookUrl = bookUrl,
                 lastReadChapterUrl = newChapter.chapterUrl
             )
 
-            if (oldChapter?.chapterUrl != null) repository.bookChapters.updatePosition(
+            if (oldChapter?.chapterUrl != null) appRepository.bookChapters.updatePosition(
                 chapterUrl = oldChapter.chapterUrl,
                 lastReadPosition = oldChapter.chapterItemPosition,
                 lastReadOffset = oldChapter.offset
             )
 
-            repository.bookChapters.updatePosition(
+            appRepository.bookChapters.updatePosition(
                 chapterUrl = newChapter.chapterUrl,
                 lastReadPosition = newChapter.chapterItemPosition,
                 lastReadOffset = newChapter.offset

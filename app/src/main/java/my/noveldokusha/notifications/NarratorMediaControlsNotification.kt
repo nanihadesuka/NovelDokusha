@@ -1,4 +1,4 @@
-package my.noveldokusha.services.narratorMediaControls
+package my.noveldokusha.notifications
 
 import android.app.Notification
 import android.app.NotificationManager
@@ -27,6 +27,7 @@ import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.launch
 import my.noveldokusha.R
 import my.noveldokusha.data.BookMetadata
+import my.noveldokusha.services.narratorMediaControls.NarratorMediaControlsCallback
 import my.noveldokusha.ui.screens.chaptersList.ChaptersActivity
 import my.noveldokusha.ui.screens.main.MainActivity
 import my.noveldokusha.ui.screens.reader.ReaderActivity

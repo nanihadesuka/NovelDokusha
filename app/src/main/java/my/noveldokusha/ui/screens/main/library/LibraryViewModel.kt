@@ -8,7 +8,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
 import my.noveldokusha.AppPreferences
-import my.noveldokusha.repository.Repository
+import my.noveldokusha.repository.AppRepository
 import my.noveldokusha.ui.BaseViewModel
 import my.noveldokusha.ui.composeViews.BookSettingsDialogState
 import my.noveldokusha.utils.asMutableStateOf
@@ -17,7 +17,7 @@ import javax.inject.Inject
 @HiltViewModel
 class LibraryViewModel @Inject constructor(
     val appPreferences: AppPreferences,
-    private val repository: Repository,
+    private val appRepository: AppRepository,
     private val stateHandle: SavedStateHandle,
 ) : BaseViewModel() {
     var bookSettingsDialogState by stateHandle.asMutableStateOf<BookSettingsDialogState>(
@@ -39,11 +39,11 @@ class LibraryViewModel @Inject constructor(
 
     fun bookCompletedToggle(bookUrl: String) {
         viewModelScope.launch {
-            val book = repository.libraryBooks.get(bookUrl) ?: return@launch
-            repository.libraryBooks.update(book.copy(completed = !book.completed))
+            val book = appRepository.libraryBooks.get(bookUrl) ?: return@launch
+            appRepository.libraryBooks.update(book.copy(completed = !book.completed))
         }
     }
 
-    fun getBook(bookUrl: String) = repository.libraryBooks.getFlow(bookUrl).filterNotNull()
+    fun getBook(bookUrl: String) = appRepository.libraryBooks.getFlow(bookUrl).filterNotNull()
 }
 

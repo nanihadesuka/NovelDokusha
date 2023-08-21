@@ -1,12 +1,12 @@
 package my.noveldokusha.ui.screens.main.library
 
-import android.content.Context
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewModelScope
+import androidx.work.ExistingWorkPolicy
+import androidx.work.WorkManager
 import dagger.hilt.android.lifecycle.HiltViewModel
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
@@ -14,25 +14,25 @@ import kotlinx.coroutines.launch
 import my.noveldokusha.AppPreferences
 import my.noveldokusha.R
 import my.noveldokusha.data.LibraryCategory
-import my.noveldokusha.repository.Repository
-import my.noveldokusha.services.libraryUpdate.LibraryUpdateService
+import my.noveldokusha.repository.AppRepository
 import my.noveldokusha.ui.BaseViewModel
 import my.noveldokusha.ui.Toasty
 import my.noveldokusha.utils.toState
+import my.noveldokusha.workers.LibraryUpdatesWorker
 import javax.inject.Inject
 
 @HiltViewModel
 class LibraryPageViewModel @Inject constructor(
-    private val repository: Repository,
+    private val appRepository: AppRepository,
     private val preferences: AppPreferences,
     private val toasty: Toasty,
-    @ApplicationContext private val context: Context
+    private val workManager: WorkManager
 ) : BaseViewModel() {
     var isPullRefreshing by mutableStateOf(false)
     val listReading by createPageList(isShowCompleted = false)
     val listCompleted by createPageList(isShowCompleted = true)
 
-    private fun createPageList(isShowCompleted: Boolean) = repository.libraryBooks
+    private fun createPageList(isShowCompleted: Boolean) = appRepository.libraryBooks
         .getBooksInLibraryWithContextFlow
         .map { it.filter { book -> book.book.completed == isShowCompleted } }
         .combine(preferences.LIBRARY_FILTER_READ.flow()) { list, filterRead ->
@@ -63,9 +63,11 @@ class LibraryPageViewModel @Inject constructor(
     fun onLibraryCategoryRefresh(libraryCategory: LibraryCategory) {
         showLoadingSpinner()
         toasty.show(R.string.updaing_library)
-        LibraryUpdateService.start(
-            ctx = context,
-            updateCategory = libraryCategory
-        )
+
+        workManager.beginUniqueWork(
+            LibraryUpdatesWorker.TAGManual,
+            ExistingWorkPolicy.REPLACE,
+            LibraryUpdatesWorker.createManualRequest(updateCategory = libraryCategory)
+        ).enqueue()
     }
 }

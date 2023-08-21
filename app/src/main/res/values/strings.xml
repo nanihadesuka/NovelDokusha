@@ -185,4 +185,9 @@
     <string name="failed_to_check_last_app_version">Failed to check last app version</string>
 	<string name="download">Download</string>
 	<string name="new_app_version_found_s">New app version found %s</string>
+	<string name="automatically_check_for_library_updates">Automatically check for library updates</string>
+	<string name="library_update_interval_6_h">6 h</string>
+    <string name="library_update_interval_12_h">12 h</string>
+    <string name="library_update_interval_1_day">1 day</string>
+    <string name="library_update_interval_2_days">2 days</string>
 </resources>

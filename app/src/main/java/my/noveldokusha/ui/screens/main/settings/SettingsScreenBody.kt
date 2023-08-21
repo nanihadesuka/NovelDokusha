@@ -1,5 +1,6 @@
 package my.noveldokusha.ui.screens.main.settings
 
+import androidx.annotation.StringRes
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -23,6 +24,7 @@ import androidx.compose.material.icons.outlined.DoubleArrow
 import androidx.compose.material.icons.outlined.Image
 import androidx.compose.material.icons.outlined.Save
 import androidx.compose.material.icons.outlined.SettingsBackupRestore
+import androidx.compose.material.icons.outlined.Timer
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -252,6 +254,8 @@ fun SettingsScreenBody(
             )
         }
         Divider()
+        LibraryAutoUpdate(state = state.libraryAutoUpdate)
+        Divider()
         AppUpdates(
             state = state.updateAppSetting,
             onCheckForUpdatesManual = onCheckForUpdatesManual
@@ -283,7 +287,6 @@ fun AppUpdates(
             modifier = Modifier.textPadding(),
             color = ColorAccent
         )
-        // Follow system theme
         ListItem(
             modifier = Modifier.clickable {
                 state.appUpdateCheckerEnabled.value = !state.appUpdateCheckerEnabled.value
@@ -339,6 +342,79 @@ fun AppUpdates(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
+@Composable
+fun LibraryAutoUpdate(
+    state: SettingsScreenState.LibraryAutoUpdate,
+) {
+    Column {
+        Text(
+            text = "Library updates",
+            style = MaterialTheme.typography.titleMedium,
+            modifier = Modifier.textPadding(),
+            color = ColorAccent
+        )
+        ListItem(
+            modifier = Modifier.clickable {
+                state.autoUpdateEnabled.value = !state.autoUpdateEnabled.value
+            },
+            headlineContent = {
+                Text(text = stringResource(R.string.automatically_check_for_library_updates))
+            },
+            leadingContent = {
+                Icon(
+                    Icons.Outlined.AutoMode,
+                    null,
+                    tint = MaterialTheme.colorScheme.onPrimary
+                )
+            },
+            trailingContent = {
+                Switch(
+                    checked = state.autoUpdateEnabled.value,
+                    onCheckedChange = {
+                        state.autoUpdateEnabled.value = !state.autoUpdateEnabled.value
+                    },
+                    colors = SwitchDefaults.colors(
+                        checkedThumbColor = ColorAccent,
+                        checkedBorderColor = MaterialTheme.colorScheme.onPrimary,
+                        uncheckedBorderColor = MaterialTheme.colorScheme.onPrimary,
+                    )
+                )
+            }
+        )
+        // Library update interval options
+        ListItem(
+            headlineContent = {
+                FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    libraryUpdateTimes.forEach {
+                        FilterChip(
+                            selected = it.intervalHours == state.autoUpdateIntervalHours.value,
+                            onClick = { state.autoUpdateIntervalHours.value = it.intervalHours },
+                            label = { Text(text = stringResource(id = it.nameRes)) }
+                        )
+                    }
+                }
+            },
+            leadingContent = {
+                Icon(Icons.Outlined.Timer, null, tint = MaterialTheme.colorScheme.onPrimary)
+            }
+        )
+    }
+}
+
+private data class UpdateIntervalTimes(
+    val intervalHours: Int,
+    @StringRes val nameRes: Int
+)
+
+private val libraryUpdateTimes = listOf(
+    UpdateIntervalTimes(intervalHours = 6, nameRes = R.string.library_update_interval_6_h),
+    UpdateIntervalTimes(intervalHours = 12, nameRes = R.string.library_update_interval_12_h),
+    UpdateIntervalTimes(intervalHours = 24, nameRes = R.string.library_update_interval_1_day),
+    UpdateIntervalTimes(intervalHours = 24 * 2, nameRes = R.string.library_update_interval_2_days),
+)
+
+
 @PreviewThemes
 @Composable
 private fun Preview() {
@@ -359,7 +435,7 @@ private fun Preview() {
                         appUpdateCheckerEnabled = remember { mutableStateOf(true) },
                         showNewVersionDialog = remember {
                             mutableStateOf(
-                                RemoteAppVersion(
+                                if (true) null else RemoteAppVersion(
                                     version = AppVersion(1, 1, 1),
                                     sourceUrl = "url"
                                 )
@@ -367,6 +443,10 @@ private fun Preview() {
                         },
                         checkingForNewVersion = remember { mutableStateOf(true) },
                     ),
+                    libraryAutoUpdate = SettingsScreenState.LibraryAutoUpdate(
+                        autoUpdateEnabled = remember { mutableStateOf(true) },
+                        autoUpdateIntervalHours = remember { mutableStateOf(24) },
+                    )
                 ),
                 onFollowSystem = { },
                 onThemeSelected = { },

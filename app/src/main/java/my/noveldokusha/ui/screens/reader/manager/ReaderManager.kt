@@ -8,7 +8,7 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.withContext
 import my.noveldokusha.AppPreferences
 import my.noveldokusha.di.AppCoroutineScope
-import my.noveldokusha.repository.Repository
+import my.noveldokusha.repository.AppRepository
 import my.noveldokusha.tools.TranslationManager
 import my.noveldokusha.ui.screens.reader.tools.InitialPositionChapter
 
@@ -22,7 +22,7 @@ interface ReaderManagerViewCallReferences {
 }
 
 class ReaderManager(
-    private val repository: Repository,
+    private val appRepository: AppRepository,
     private val translationManager: TranslationManager,
     private val appPreferences: AppPreferences,
     private val context: Context,
@@ -71,7 +71,7 @@ class ReaderManager(
             initialChapterUrl = chapterUrl,
             scope = scope,
             appScope = appScope,
-            repository = repository,
+            appRepository = appRepository,
             translationManager = translationManager,
             appPreferences = appPreferences,
             forceUpdateListViewState = { withMainNow { forceUpdateListViewState?.invoke() } },
