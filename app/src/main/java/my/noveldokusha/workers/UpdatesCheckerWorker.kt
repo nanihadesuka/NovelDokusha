@@ -35,10 +35,10 @@ class UpdatesCheckerWorker @AssistedInject constructor(
     companion object {
         const val TAG = "UpdatesChecker"
 
-        fun createRequest(): PeriodicWorkRequest {
+        fun createPeriodicRequest(): PeriodicWorkRequest {
             val builder = PeriodicWorkRequestBuilder<UpdatesCheckerWorker>(
                 repeatInterval = 2,
-                repeatIntervalTimeUnit = TimeUnit.MINUTES,
+                repeatIntervalTimeUnit = TimeUnit.DAYS,
             )
 
             val constrains = Constraints.Builder()
@@ -49,14 +49,13 @@ class UpdatesCheckerWorker @AssistedInject constructor(
             return builder
                 .addTag(TAG)
                 .setConstraints(constrains)
-                .setInitialDelay(5, TimeUnit.SECONDS)
+                .setInitialDelay(1, TimeUnit.MINUTES)
                 .build()
         }
 
     }
 
     private val notificationChannel = "NewAppVersion"
-
 
     override suspend fun doWork(): Result {
         Timber.d("UpdateCheckerWork: starting")

@@ -10,7 +10,7 @@ import my.noveldokusha.AppPreferences
 import my.noveldokusha.R
 import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.network.PagedListIteratorState
-import my.noveldokusha.repository.Repository
+import my.noveldokusha.repository.AppRepository
 import my.noveldokusha.scraper.Scraper
 import my.noveldokusha.ui.BaseViewModel
 import my.noveldokusha.ui.Toasty
@@ -26,7 +26,7 @@ interface SourceCatalogStateBundle {
 
 @HiltViewModel
 class SourceCatalogViewModel @Inject constructor(
-    private val repository: Repository,
+    private val appRepository: AppRepository,
     private val toasty: Toasty,
     stateHandle: SavedStateHandle,
     appPreferences: AppPreferences,
@@ -62,7 +62,7 @@ class SourceCatalogViewModel @Inject constructor(
 
     fun addToLibraryToggle(book: BookMetadata) = viewModelScope.launch(Dispatchers.IO)
     {
-        val isInLibrary = repository.toggleBookmark(bookUrl = book.url, bookTitle = book.title)
+        val isInLibrary = appRepository.toggleBookmark(bookUrl = book.url, bookTitle = book.title)
         val res = if (isInLibrary) R.string.added_to_library else R.string.removed_from_library
         toasty.show(res)
     }

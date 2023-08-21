@@ -13,7 +13,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import my.noveldokusha.R
-import my.noveldokusha.repository.Repository
+import my.noveldokusha.repository.AppRepository
 import my.noveldokusha.utils.Extra_Boolean
 import my.noveldokusha.utils.Extra_Uri
 import my.noveldokusha.utils.NotificationsCenter
@@ -31,7 +31,7 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class BackupDataService : Service() {
     @Inject
-    lateinit var repository: Repository
+    lateinit var appRepository: AppRepository
 
     @Inject
     lateinit var notificationsCenter: NotificationsCenter
@@ -135,7 +135,7 @@ class BackupDataService : Service() {
             // Save database
             run {
                 val entry = ZipEntry("database.sqlite3")
-                val file = this@BackupDataService.getDatabasePath(repository.name)
+                val file = this@BackupDataService.getDatabasePath(appRepository.name)
                 entry.method = ZipOutputStream.DEFLATED
                 file.inputStream().use {
                     zip.putNextEntry(entry)
@@ -151,8 +151,8 @@ class BackupDataService : Service() {
                 ) {
                     text = getString(R.string.copying_images)
                 }
-                val basePath = repository.settings.folderBooks.toPath().parent
-                repository.settings.folderBooks.walkBottomUp().filterNot { it.isDirectory }
+                val basePath = appRepository.settings.folderBooks.toPath().parent
+                appRepository.settings.folderBooks.walkBottomUp().filterNot { it.isDirectory }
                     .forEach { file ->
                         val name = basePath.relativize(file.toPath()).toString()
                         val entry = ZipEntry(name)

@@ -49,10 +49,6 @@
 			android:exported="false"
 			/>
 		<service
-			android:name=".services.libraryUpdate.LibraryUpdateService"
-			android:exported="false"
-			/>
-		<service
 			android:name=".services.EpubImportService"
 			android:exported="false"
 			/>

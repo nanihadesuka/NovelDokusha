@@ -9,7 +9,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import my.noveldokusha.data.Response
 import my.noveldokusha.data.database.tables.Chapter
-import my.noveldokusha.repository.Repository
+import my.noveldokusha.repository.AppRepository
 import my.noveldokusha.ui.screens.reader.ChapterState
 import my.noveldokusha.ui.screens.reader.ChapterStats
 import my.noveldokusha.ui.screens.reader.ChapterUrl
@@ -24,7 +24,7 @@ import timber.log.Timber
 import kotlin.coroutines.CoroutineContext
 
 class ReaderChaptersLoader(
-    private val repository: Repository,
+    private val appRepository: AppRepository,
     private val translatorTranslateOrNull: suspend (text: String) -> String?,
     private val translatorIsActive: () -> Boolean,
     private val translatorSourceLanguageOrNull: () -> String?,
@@ -290,7 +290,7 @@ class ReaderChaptersLoader(
 
         val chapter = orderedChapters[chapterIndex]
         val initialPosition = getInitialChapterItemPosition(
-            repository = repository,
+            appRepository = appRepository,
             bookUrl = bookUrl,
             chapterIndex = chapter.position,
             chapter = chapter,
@@ -451,7 +451,7 @@ class ReaderChaptersLoader(
             forceUpdateListViewState()
         }
 
-        when (val res = repository.chapterBody.fetchBody(chapter.url)) {
+        when (val res = appRepository.chapterBody.fetchBody(chapter.url)) {
             is Response.Success -> {
                 // Split chapter text into items
                 val itemsOriginal = textToItemsConverter(

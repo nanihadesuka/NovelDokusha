@@ -157,6 +157,17 @@ class AppPreferences @Inject constructor(
             override var value by SharedPreference_Boolean(name, preferences, true)
         }
 
+    val GLOBAL_APP_AUTOMATIC_LIBRARY_UPDATES_ENABLED =
+        object : Preference<Boolean>("GLOBAL_APP_AUTOMATIC_LIBRARY_UPDATES_ENABLED") {
+            override var value by SharedPreference_Boolean(name, preferences, true)
+        }
+
+    val GLOBAL_APP_AUTOMATIC_LIBRARY_UPDATES_INTERVAL_HOURS =
+        object : Preference<Int>("GLOBAL_APP_AUTOMATIC_LIBRARY_UPDATES_INTERVAL_HOURS") {
+            override var value by SharedPreference_Int(name, preferences, 24)
+        }
+
+
     @Deprecated("Removed", level = DeprecationLevel.HIDDEN)
     val LOCAL_SOURCES_URI_DIRECTORIES =
         object : Preference<Set<String>>("LOCAL_SOURCES_URI_DIRECTORIES") {

@@ -17,7 +17,7 @@ import my.noveldokusha.R
 import my.noveldokusha.di.AppCoroutineScope
 import my.noveldokusha.repository.AppFileResolver
 import my.noveldokusha.repository.AppRemoteRepository
-import my.noveldokusha.repository.Repository
+import my.noveldokusha.repository.AppRepository
 import my.noveldokusha.tools.TranslationManager
 import my.noveldokusha.ui.BaseViewModel
 import my.noveldokusha.ui.Toasty
@@ -28,7 +28,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SettingsViewModel @Inject constructor(
-    private val repository: Repository,
+    private val appRepository: AppRepository,
     private val appScope: AppCoroutineScope,
     private val appPreferences: AppPreferences,
     private val app: App,
@@ -55,6 +55,14 @@ class SettingsViewModel @Inject constructor(
                 viewModelScope
             ),
             checkingForNewVersion = mutableStateOf(false)
+        ),
+        libraryAutoUpdate = SettingsScreenState.LibraryAutoUpdate(
+            autoUpdateEnabled = appPreferences.GLOBAL_APP_AUTOMATIC_LIBRARY_UPDATES_ENABLED.state(
+                viewModelScope
+            ),
+            autoUpdateIntervalHours = appPreferences.GLOBAL_APP_AUTOMATIC_LIBRARY_UPDATES_INTERVAL_HOURS.state(
+                viewModelScope
+            )
         )
     )
 
@@ -62,7 +70,7 @@ class SettingsViewModel @Inject constructor(
         updateDatabaseSize()
         updateImagesFolderSize()
         viewModelScope.launch {
-            repository.eventDataRestored.collect {
+            appRepository.eventDataRestored.collect {
                 updateDatabaseSize()
                 updateImagesFolderSize()
             }
@@ -78,18 +86,18 @@ class SettingsViewModel @Inject constructor(
     }
 
     fun cleanDatabase() = appScope.launch(Dispatchers.IO) {
-        repository.settings.clearNonLibraryData()
-        repository.vacuum()
+        appRepository.settings.clearNonLibraryData()
+        appRepository.vacuum()
         updateDatabaseSize()
     }
 
     fun cleanImagesFolder() = appScope.launch(Dispatchers.IO) {
-        val libraryFolders = repository.libraryBooks.getAllInLibrary()
+        val libraryFolders = appRepository.libraryBooks.getAllInLibrary()
             .asSequence()
             .map { appFileResolver.getLocalBookFolderName(it.url) }
             .toSet()
 
-        repository.settings.folderBooks.listFiles()
+        appRepository.settings.folderBooks.listFiles()
             ?.asSequence()
             ?.filter { it.isDirectory && it.exists() }
             ?.filter { it.name !in libraryFolders }
@@ -107,12 +115,12 @@ class SettingsViewModel @Inject constructor(
     }
 
     private fun updateDatabaseSize() = viewModelScope.launch {
-        val size = repository.getDatabaseSizeBytes()
+        val size = appRepository.getDatabaseSizeBytes()
         state.databaseSize.value = Formatter.formatFileSize(appPreferences.context, size)
     }
 
     private fun updateImagesFolderSize() = viewModelScope.launch {
-        val size = getFolderSizeBytes(repository.settings.folderBooks)
+        val size = getFolderSizeBytes(appRepository.settings.folderBooks)
         state.imageFolderSize.value = Formatter.formatFileSize(appPreferences.context, size)
     }
 

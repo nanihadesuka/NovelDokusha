@@ -14,12 +14,18 @@ data class SettingsScreenState(
     val currentTheme: State<Themes>,
     val isTranslationSettingsVisible: State<Boolean>,
     val translationModelsStates: SnapshotStateList<TranslationModelState>,
-    val updateAppSetting: UpdateApp
+    val updateAppSetting: UpdateApp,
+    val libraryAutoUpdate: LibraryAutoUpdate,
 ) {
     data class UpdateApp(
         val currentAppVersion: String,
         val appUpdateCheckerEnabled: MutableState<Boolean>,
         val showNewVersionDialog: MutableState<RemoteAppVersion?>,
         val checkingForNewVersion: MutableState<Boolean>,
+    )
+
+    data class LibraryAutoUpdate(
+        val autoUpdateEnabled: MutableState<Boolean>,
+        val autoUpdateIntervalHours: MutableState<Int>,
     )
 }

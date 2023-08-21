@@ -10,7 +10,7 @@ import dagger.hilt.android.HiltAndroidApp
 import my.noveldokusha.di.HiltWorkerFactoryEntryPoint
 import my.noveldokusha.network.NetworkClient
 import my.noveldokusha.network.ScraperNetworkClient
-import my.noveldokusha.workers.WorkersProvider
+import my.noveldokusha.workers.setup.PeriodicWorkersInitializer
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -22,14 +22,14 @@ class App : Application(), ImageLoaderFactory, Configuration.Provider {
     lateinit var networkClient: NetworkClient
 
     @Inject
-    lateinit var workersProvider: WorkersProvider
+    lateinit var periodicWorkersInitializer: PeriodicWorkersInitializer
 
     override fun onCreate() {
         super.onCreate()
         if (BuildConfig.DEBUG) {
             Timber.plant(Timber.DebugTree())
         }
-        workersProvider.init()
+        periodicWorkersInitializer.init()
     }
 
     override fun newImageLoader(): ImageLoader = when (val networkClient = networkClient) {

@@ -8,12 +8,12 @@ import my.noveldokusha.data.database.tables.Book
 import my.noveldokusha.data.database.tables.Chapter
 import my.noveldokusha.data.database.tables.ChapterBody
 import my.noveldokusha.repository.AppFileResolver
-import my.noveldokusha.repository.Repository
+import my.noveldokusha.repository.AppRepository
 import my.noveldokusha.utils.fileImporter
 
 suspend fun epubImporter(
     storageFolderName: String,
-    repository: Repository,
+    appRepository: AppRepository,
     appFileResolver: AppFileResolver,
     epub: EpubBook,
     addToLibrary: Boolean
@@ -21,11 +21,11 @@ suspend fun epubImporter(
     val localBookUrl = appFileResolver.getLocalBookPath(storageFolderName)
 
     // First clean any previous entries from the book
-    repository.bookChapters.chapters(localBookUrl)
+    appRepository.bookChapters.chapters(localBookUrl)
         .map { it.url }
-        .let { repository.chapterBody.removeRows(it) }
-    repository.bookChapters.removeAllFromBook(localBookUrl)
-    repository.libraryBooks.remove(localBookUrl)
+        .let { appRepository.chapterBody.removeRows(it) }
+    appRepository.bookChapters.removeAllFromBook(localBookUrl)
+    appRepository.libraryBooks.remove(localBookUrl)
 
     if (epub.coverImage != null) {
         fileImporter(
@@ -40,7 +40,7 @@ suspend fun epubImporter(
         url = localBookUrl,
         coverImageUrl = appFileResolver.getLocalBookCoverPath(),
         inLibrary = addToLibrary
-    ).let { repository.libraryBooks.insert(it) }
+    ).let { appRepository.libraryBooks.insert(it) }
 
     epub.chapters.mapIndexed { i, chapter ->
         Chapter(
@@ -49,14 +49,14 @@ suspend fun epubImporter(
             bookUrl = localBookUrl,
             position = i
         )
-    }.let { repository.bookChapters.insert(it) }
+    }.let { appRepository.bookChapters.insert(it) }
 
     epub.chapters.map { chapter ->
         ChapterBody(
             url = appFileResolver.getLocalBookChapterPath(storageFolderName, chapter.absPath),
             body = chapter.body
         )
-    }.let { repository.chapterBody.insertReplace(it) }
+    }.let { appRepository.chapterBody.insertReplace(it) }
 
     epub.images.map {
         async {

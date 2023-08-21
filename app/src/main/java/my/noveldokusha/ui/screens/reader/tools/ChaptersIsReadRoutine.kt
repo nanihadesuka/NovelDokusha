@@ -5,11 +5,11 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
-import my.noveldokusha.repository.Repository
+import my.noveldokusha.repository.AppRepository
 import my.noveldokusha.ui.screens.reader.ChapterUrl
 
 class ChaptersIsReadRoutine(
-    val repository: Repository,
+    val appRepository: AppRepository,
     private val scope: CoroutineScope = CoroutineScope(
         Dispatchers.IO + SupervisorJob() + CoroutineName("ChapterIsReadRoutine")
     )
@@ -24,7 +24,7 @@ class ChaptersIsReadRoutine(
     private fun checkLoadStatus(chapterUrl: String, fn: (ChapterReadStatus) -> ChapterReadStatus) =
         scope.launch {
 
-            val chapter = repository.bookChapters.get(chapterUrl) ?: return@launch
+            val chapter = appRepository.bookChapters.get(chapterUrl) ?: return@launch
             val oldStatus = chapterRead.getOrPut(chapterUrl) {
                 when (chapter.read) {
                     true -> ChapterReadStatus(startSeen = true, endSeen = true)
@@ -36,7 +36,7 @@ class ChaptersIsReadRoutine(
 
             val newStatus = fn(oldStatus)
             if (newStatus.startSeen && newStatus.endSeen) {
-                repository.bookChapters.setAsRead(chapterUrl = chapterUrl, read = true)
+                appRepository.bookChapters.setAsRead(chapterUrl = chapterUrl, read = true)
             }
 
             chapterRead[chapterUrl] = newStatus
