@@ -18,6 +18,7 @@ import my.noveldokusha.scraper.sources.NovelHall
 import my.noveldokusha.scraper.sources.ReadLightNovel
 import my.noveldokusha.scraper.sources.ReadNovelFull
 import my.noveldokusha.scraper.sources.Reddit
+import my.noveldokusha.scraper.sources.RoyalRoad
 import my.noveldokusha.scraper.sources.Saikai
 import my.noveldokusha.scraper.sources.Sousetsuka
 import my.noveldokusha.scraper.sources.Wuxia
@@ -43,6 +44,7 @@ class Scraper @Inject constructor(
         LightNovelsTranslations(networkClient),
         ReadLightNovel(networkClient),
         ReadNovelFull(networkClient),
+        RoyalRoad(networkClient),
         my.noveldokusha.scraper.sources.NovelUpdates(networkClient),
         Reddit(networkClient),
         AT(networkClient),

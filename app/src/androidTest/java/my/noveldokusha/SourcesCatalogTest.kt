@@ -40,6 +40,11 @@ class SourcesCatalogTest {
     }
 
     @Test
+    fun source__royalroad() {
+        checkSourceCanBeOpened("Royal Road")
+    }
+
+    @Test
     fun source__bestlightnovel() {
         checkSourceCanBeOpened("BestLightNovel")
     }
