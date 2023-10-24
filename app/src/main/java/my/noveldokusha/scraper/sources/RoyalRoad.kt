@@ -99,7 +99,7 @@ class RoyalRoad(
             val fictionListItems = doc.select(".fiction-list-item")
             val pageBooks = fictionListItems
                 .mapNotNull {
-                    val nullableHref = it.selectFirst("a[href]");
+                    val nullableHref = it.select("a[href]").getOrNull(1);
                     val link = nullableHref ?: return@mapNotNull null
                     val bookCover = it.selectFirst("img[src]")?.attr("src") ?: ""
                     BookMetadata(
@@ -151,7 +151,7 @@ class RoyalRoad(
                 .select(".fiction-list-item");
 
             fictionListItems.mapNotNull {
-                    val link = it.selectFirst("a[href]") ?: return@mapNotNull null
+                    val link = it.select("a[href]").getOrNull(1) ?: return@mapNotNull null
                     val bookCover = it.selectFirst("img[src]")?.attr("src") ?: ""
                     BookMetadata(
                         title = link.text(),
