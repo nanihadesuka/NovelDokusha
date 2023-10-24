@@ -89,15 +89,23 @@ open class MainActivity : BaseActivity() {
             }
         }
 
-        val action: String = intent.action!!
-        val type: String? = intent.type
+        handleIntent(intent)
+    }
 
-        if (Intent.ACTION_SEND == action && type != null) {
-            if ("application/epub+zip" == type) {
-                handleSharedEpub(intent)
+    private fun handleIntent(intent: Intent){
+        val action = intent.action ?: return
+        val type = intent.type
+
+        when (action) {
+            Intent.ACTION_SEND -> {
+                if (type == "application/epub+zip") {
+                    handleSharedEpub(intent)
+                }
             }
-        } else if (Intent.ACTION_VIEW == action) {
-            handleViewedEpub(intent)
+
+            Intent.ACTION_VIEW -> {
+                handleViewedEpub(intent)
+            }
         }
     }
 
@@ -107,6 +115,7 @@ open class MainActivity : BaseActivity() {
             EpubImportService.start(ctx = this, uri = epubUri)
         }
     }
+
     private fun handleSharedEpub(intent: Intent) {
         val epubUri: Uri? = intent.getParcelableExtra(Intent.EXTRA_STREAM)
         if (epubUri != null) {
