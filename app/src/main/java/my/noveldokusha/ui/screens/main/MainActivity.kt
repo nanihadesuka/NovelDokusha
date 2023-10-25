@@ -1,5 +1,7 @@
 package my.noveldokusha.ui.screens.main
 
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
@@ -22,6 +24,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import dagger.hilt.android.AndroidEntryPoint
 import my.noveldokusha.R
+import my.noveldokusha.services.EpubImportService
 import my.noveldokusha.ui.BaseActivity
 import my.noveldokusha.ui.composeViews.AnimatedTransition
 import my.noveldokusha.ui.screens.main.finder.FinderScreen
@@ -84,6 +87,39 @@ open class MainActivity : BaseActivity() {
                     }
                 }
             }
+        }
+
+        handleIntent(intent)
+    }
+
+    private fun handleIntent(intent: Intent){
+        val action = intent.action ?: return
+        val type = intent.type
+
+        when (action) {
+            Intent.ACTION_SEND -> {
+                if (type == "application/epub+zip") {
+                    handleSharedEpub(intent)
+                }
+            }
+
+            Intent.ACTION_VIEW -> {
+                handleViewedEpub(intent)
+            }
+        }
+    }
+
+    private fun handleViewedEpub(intent: Intent) {
+        val epubUri: Uri? = intent.data
+        if (epubUri != null) {
+            EpubImportService.start(ctx = this, uri = epubUri)
+        }
+    }
+
+    private fun handleSharedEpub(intent: Intent) {
+        val epubUri: Uri? = intent.getParcelableExtra(Intent.EXTRA_STREAM)
+        if (epubUri != null) {
+            EpubImportService.start(ctx = this, uri = epubUri)
         }
     }
 }
