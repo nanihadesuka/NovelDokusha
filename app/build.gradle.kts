@@ -39,7 +39,7 @@ android {
     val hasDefaultSigningConfigData = defaultSigningConfigData.hasProperty("storeFile")
     println("hasDefaultSigningConfigData: $hasDefaultSigningConfigData")
 
-    compileSdk = 33
+    compileSdk = 34
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
@@ -56,7 +56,7 @@ android {
     }
 
     composeOptions {
-        kotlinCompilerExtensionVersion = libs.versions.kotlin.compilerVersion.get()
+        kotlinCompilerExtensionVersion = libs.versions.kotlin.compose.compilerVersion.get()
     }
 
     if (cliCustomSettings.splitByAbi) splits {
@@ -69,7 +69,7 @@ android {
     defaultConfig {
         applicationId = "my.noveldokusha"
         minSdk = 26
-        targetSdk = 33
+        targetSdk = 34
         versionCode = 13
         versionName = "2.0.1"
         setProperty("archivesBaseName", "NovelDokusha_v$versionName")

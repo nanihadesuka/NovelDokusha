@@ -1,7 +1,7 @@
 package my.noveldokusha.ui.composeViews
 
 import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.AnimatedContentScope
+import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.ContentTransform
 import androidx.compose.animation.ExperimentalAnimationApi
@@ -18,7 +18,7 @@ import androidx.compose.ui.Modifier
 fun <S> AnimatedTransition(
     targetState: S,
     modifier: Modifier = Modifier,
-    transitionSpec: AnimatedContentScope<S>.() -> ContentTransform = {
+    transitionSpec: AnimatedContentTransitionScope<S>.() -> ContentTransform = {
         fadeIn(animationSpec = tween(220, delayMillis = 90)) with
                 fadeOut(animationSpec = tween(90))
     },

@@ -1,14 +1,14 @@
 [versions]
 
-kotlin = "1.8.21"
-kotlin-compilerVersion = "1.4.7"
+kotlin = "1.9.22"
+kotlin-compose-compilerVersion = "1.5.10"
 
 plugin-agp = "8.2.0-alpha09"
 
 hilt = "2.47"
 hilt-androidx = "1.0.0"
 
-ksp = "1.8.21-1.0.11"
+ksp = "1.9.22-1.0.17"
 
 kotlinx-coroutines-core = "1.7.3"
 kotlinx-coroutines-playServices = "1.6.4"
@@ -45,12 +45,12 @@ androidx-testing-espresso = "3.5.1"
 compose-coil = "2.4.0"
 compose-accompanist = "0.30.1"
 compose-constraintlayout = "1.0.1"
-compose-animation = "1.4.3"
-compose-activity = "1.7.2"
+compose-animation = "1.6.3"
+compose-activity = "1.8.2"
 compose-lazyColumnScrollbar = "1.6.3"
 compose-landscapist-glide = "2.2.5"
-compose-testing-ui = "1.4.3"
-compose-material-icons-extended = "1.4.3"
+compose-testing-ui = "1.6.3"
+compose-material-icons-extended = "1.6.3"
 compose-material3 = "1.1.1"
 
 crux = "5.0"

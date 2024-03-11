@@ -67,7 +67,13 @@ fun LibraryScreenBody(
     onBookLongClick: (BookWithContext) -> Unit,
     viewModel: LibraryPageViewModel = viewModel()
 ) {
-    val pagerState = rememberPagerState()
+    val tabsSizeUpdated = rememberUpdatedState(newValue = tabs.size)
+
+    val pagerState = rememberPagerState(
+        initialPage = 0,
+        initialPageOffsetFraction = 0f ,
+        pageCount = { tabsSizeUpdated.value }
+    )
     val scope = rememberCoroutineScope()
     val updateCompleted = rememberUpdatedState(newValue = pagerState.currentPage)
     val pullRefreshState = rememberPullRefreshState(
@@ -117,7 +123,6 @@ fun LibraryScreenBody(
                 }
             )
             HorizontalPager(
-                pageCount = tabs.size,
                 state = pagerState
             ) { page ->
                 // TODO: improve + make more generic (use database table?)

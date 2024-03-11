@@ -1,7 +1,7 @@
 package my.noveldokusha.ui.composeViews
 
 import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.AnimatedContentScope
+import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.ContentTransform
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.animateColorAsState
@@ -26,18 +26,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFontFamilyResolver
-import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.Paragraph
 import androidx.compose.ui.unit.Constraints
 import my.noveldokusha.utils.ifCase
 
-@OptIn(ExperimentalTextApi::class, ExperimentalAnimationApi::class)
+@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun ExpandableText(
     text: String,
     linesForExpand: Int,
     modifier: Modifier = Modifier,
-    transitionSpec: AnimatedContentScope<String>.() -> ContentTransform = { fadeIn() with fadeOut() }
+    transitionSpec: AnimatedContentTransitionScope<String>.() -> ContentTransform = { fadeIn() with fadeOut() }
 ) {
     AnimatedContent(
         targetState = text,
