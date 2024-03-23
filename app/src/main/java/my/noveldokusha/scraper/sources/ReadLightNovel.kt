@@ -21,17 +21,17 @@ import org.jsoup.nodes.Document
 
 /**
  * Novel main page (chapter list) example:
- * https://www.readlightnovel.org/goat-of-all-ghouls-1
+ * https://www.readlightnovel.today/goat-of-all-ghouls-1
  * Chapter url example:
- * https://www.readlightnovel.org/goat-of-all-ghouls-1/chapter-1
+ * https://www.readlightnovel.today/goat-of-all-ghouls-1/chapter-1
  */
 class ReadLightNovel(
     private val networkClient: NetworkClient
 ) : SourceInterface.Catalog {
     override val id = "read_light_novel"
     override val nameStrId = R.string.source_name_read_light_novel
-    override val baseUrl = "https://www.readlightnovel.me/"
-    override val catalogUrl = "https://www.readlightnovel.me/top-novels/new/1"
+    override val baseUrl = "https://www.readlightnovel.today/"
+    override val catalogUrl = "https://www.readlightnovel.today/top-novels/new/1"
     override val language = LanguageCode.ENGLISH
 
     override suspend fun getChapterTitle(doc: Document): String? =
@@ -88,7 +88,7 @@ class ReadLightNovel(
     ): Response<PagedList<BookMetadata>> = withContext(Dispatchers.Default) {
         tryConnect("index=$index") {
             val page = index + 1
-            val url = "https://www.readlightnovel.me"
+            val url = baseUrl
                 .toUrlBuilderSafe()
                 .addPath("top-novels", "new", page.toString())
 
@@ -124,7 +124,7 @@ class ReadLightNovel(
             if (input.isBlank() || index > 0)
                 return@tryConnect PagedList.createEmpty(index = index)
 
-            val request = postRequest("https://www.readlightnovel.me/search/autocomplete")
+            val request = postRequest("${baseUrl}search/autocomplete")
                 .addHeader("accept", "*/*")
                 .addHeader("accept-encoding", "gzip, deflate, br")
                 .addHeader(
