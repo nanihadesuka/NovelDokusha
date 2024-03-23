@@ -3,7 +3,7 @@
 kotlin = "1.9.22"
 kotlin-compose-compilerVersion = "1.5.10"
 
-plugin-agp = "8.2.0-alpha09"
+plugin-agp = "8.2.2"
 
 hilt = "2.47"
 hilt-androidx = "1.0.0"
