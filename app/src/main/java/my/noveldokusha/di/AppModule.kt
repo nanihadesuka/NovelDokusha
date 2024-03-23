@@ -20,10 +20,10 @@ import my.noveldokusha.data.database.DAOs.LibraryDao
 import my.noveldokusha.network.NetworkClient
 import my.noveldokusha.network.ScraperNetworkClient
 import my.noveldokusha.repository.AppFileResolver
+import my.noveldokusha.repository.AppRepository
 import my.noveldokusha.repository.BookChaptersRepository
 import my.noveldokusha.repository.ChapterBodyRepository
 import my.noveldokusha.repository.LibraryBooksRepository
-import my.noveldokusha.repository.AppRepository
 import my.noveldokusha.repository.ScraperRepository
 import my.noveldokusha.scraper.Scraper
 import my.noveldokusha.tools.TranslationManager
@@ -117,24 +117,6 @@ abstract class AppModule {
             databaseOperations: AppDatabaseOperations
         ): BookChaptersRepository {
             return BookChaptersRepository(chapterDao, databaseOperations)
-        }
-
-        @Provides
-        @Singleton
-        fun provideChapterBodyRepository(
-            database: AppDatabase,
-            networkClient: NetworkClient,
-            scraper: Scraper,
-            bookChaptersRepository: BookChaptersRepository,
-
-            ): ChapterBodyRepository {
-            return ChapterBodyRepository(
-                chapterBodyDao = database.chapterBodyDao(),
-                networkClient = networkClient,
-                scraper = scraper,
-                bookChaptersRepository = bookChaptersRepository,
-                operations = database
-            )
         }
 
         @Provides

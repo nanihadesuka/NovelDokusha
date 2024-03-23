@@ -10,14 +10,15 @@ import my.noveldokusha.data.database.tables.Book
 import my.noveldokusha.data.database.tables.Chapter
 import my.noveldokusha.isLocalUri
 import my.noveldokusha.repository.AppRepository
+import my.noveldokusha.repository.DownloaderRepository
 import my.noveldokusha.scraper.Scraper
-import my.noveldokusha.scraper.downloadChaptersList
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import javax.inject.Inject
 
 class LibraryUpdatesInteractions @Inject constructor(
     private val appRepository: AppRepository,
     private val scraper: Scraper,
+    private val downloaderRepository: DownloaderRepository,
 ) {
     data class NewUpdate(
         val newChapters: List<Chapter>,
@@ -77,7 +78,7 @@ class LibraryUpdatesInteractions @Inject constructor(
             appRepository.bookChapters.chapters(book.url).map { it.url }.toSet()
         }
 
-        downloadChaptersList(scraper, book.url).onSuccess { chapters ->
+        downloaderRepository.bookChaptersList(bookUrl = book.url).onSuccess { chapters ->
             oldChaptersList.join()
             appRepository.bookChapters.merge(chapters, book.url)
             val newChapters = chapters.filter { it.url !in oldChaptersList.await() }

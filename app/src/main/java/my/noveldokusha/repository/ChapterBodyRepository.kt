@@ -6,16 +6,15 @@ import my.noveldokusha.data.database.DAOs.ChapterBodyDao
 import my.noveldokusha.data.database.tables.ChapterBody
 import my.noveldokusha.data.map
 import my.noveldokusha.isLocalUri
-import my.noveldokusha.network.NetworkClient
-import my.noveldokusha.scraper.Scraper
-import my.noveldokusha.scraper.downloadChapter
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class ChapterBodyRepository(
+@Singleton
+class ChapterBodyRepository @Inject constructor(
     private val chapterBodyDao: ChapterBodyDao,
     private val operations: AppDatabaseOperations,
     private val bookChaptersRepository: BookChaptersRepository,
-    private val scraper: Scraper,
-    private val networkClient: NetworkClient
+    private val downloaderRepository: DownloaderRepository,
 ) {
     suspend fun getAll() = chapterBodyDao.getAll()
     suspend fun insertReplace(chapterBodies: List<ChapterBody>) =
@@ -49,7 +48,7 @@ class ChapterBodyRepository(
             )
         }
 
-        return downloadChapter(scraper, networkClient, urlChapter)
+        return downloaderRepository.bookChapter(urlChapter)
             .map {
                 insertWithTitle(
                     chapterBody = ChapterBody(url = urlChapter, body = it.body),

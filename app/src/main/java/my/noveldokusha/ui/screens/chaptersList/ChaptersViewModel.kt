@@ -22,13 +22,10 @@ import my.noveldokusha.data.database.tables.Book
 import my.noveldokusha.di.AppCoroutineScope
 import my.noveldokusha.isContentUri
 import my.noveldokusha.isLocalUri
-import my.noveldokusha.network.NetworkClient
 import my.noveldokusha.repository.AppFileResolver
 import my.noveldokusha.repository.AppRepository
+import my.noveldokusha.repository.DownloaderRepository
 import my.noveldokusha.scraper.Scraper
-import my.noveldokusha.scraper.downloadBookCoverImageUrl
-import my.noveldokusha.scraper.downloadBookDescription
-import my.noveldokusha.scraper.downloadChaptersList
 import my.noveldokusha.ui.BaseViewModel
 import my.noveldokusha.ui.Toasty
 import my.noveldokusha.utils.StateExtra_String
@@ -44,11 +41,11 @@ interface ChapterStateBundle {
 class ChaptersViewModel @Inject constructor(
     private val appRepository: AppRepository,
     private val appScope: AppCoroutineScope,
-    private val networkClient: NetworkClient,
     private val scraper: Scraper,
     private val toasty: Toasty,
     private val appPreferences: AppPreferences,
     private val appFileResolver: AppFileResolver,
+    private val downloaderRepository: DownloaderRepository,
     stateHandle: SavedStateHandle,
 ) : BaseViewModel(), ChapterStateBundle {
 
@@ -99,8 +96,8 @@ class ChaptersViewModel @Inject constructor(
             if (appRepository.libraryBooks.get(bookUrl) != null)
                 return@launch
 
-            val coverUrl = async { downloadBookCoverImageUrl(scraper, networkClient, bookUrl) }
-            val description = async { downloadBookDescription(scraper, networkClient, bookUrl) }
+            val coverUrl = async { downloaderRepository.bookCoverImageUrl(bookUrl = bookUrl) }
+            val description = async { downloaderRepository.bookDescription(bookUrl = bookUrl) }
 
             appRepository.libraryBooks.insert(
                 Book(
@@ -133,7 +130,8 @@ class ChaptersViewModel @Inject constructor(
 
     fun toggleBookmark() {
         viewModelScope.launch {
-            val isBookmarked = appRepository.toggleBookmark(bookTitle = bookTitle, bookUrl = bookUrl)
+            val isBookmarked =
+                appRepository.toggleBookmark(bookTitle = bookTitle, bookUrl = bookUrl)
             val msg = if (isBookmarked) R.string.added_to_library else R.string.removed_from_library
             toasty.show(msg)
         }
@@ -157,7 +155,7 @@ class ChaptersViewModel @Inject constructor(
 
     private fun updateCover() = viewModelScope.launch {
         if (state.isLocalSource.value || book.value.coverImageUrl?.isLocalUri == true) return@launch
-        downloadBookCoverImageUrl(scraper, networkClient, bookUrl).onSuccess {
+        downloaderRepository.bookCoverImageUrl(bookUrl = bookUrl).onSuccess {
             if (it == null) return@onSuccess
             appRepository.libraryBooks.updateCover(bookUrl, it)
         }
@@ -165,7 +163,7 @@ class ChaptersViewModel @Inject constructor(
 
     private fun updateDescription() = viewModelScope.launch {
         if (state.isLocalSource.value) return@launch
-        downloadBookDescription(scraper, networkClient, bookUrl).onSuccess {
+        downloaderRepository.bookDescription(bookUrl = bookUrl).onSuccess {
             if (it == null) return@onSuccess
             appRepository.libraryBooks.updateDescription(bookUrl, it)
         }
@@ -196,15 +194,14 @@ class ChaptersViewModel @Inject constructor(
             state.error.value = ""
             state.isRefreshing.value = true
             val url = bookUrl
-            downloadChaptersList(
-                scraper = scraper, bookUrl = url
-            ).onSuccess {
-                if (it.isEmpty())
-                    toasty.show(R.string.no_chapters_found)
-                appRepository.bookChapters.merge(newChapters = it, bookUrl = url)
-            }.onError {
-                state.error.value = it.message
-            }
+            downloaderRepository.bookChaptersList(bookUrl = url)
+                .onSuccess {
+                    if (it.isEmpty())
+                        toasty.show(R.string.no_chapters_found)
+                    appRepository.bookChapters.merge(newChapters = it, bookUrl = url)
+                }.onError {
+                    state.error.value = it.message
+                }
             state.isRefreshing.value = false
 
         }

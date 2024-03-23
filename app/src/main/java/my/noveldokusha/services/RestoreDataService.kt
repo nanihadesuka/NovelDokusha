@@ -19,10 +19,11 @@ import my.noveldokusha.data.database.AppDatabase
 import my.noveldokusha.di.AppCoroutineScope
 import my.noveldokusha.network.NetworkClient
 import my.noveldokusha.repository.AppFileResolver
+import my.noveldokusha.repository.AppRepository
 import my.noveldokusha.repository.BookChaptersRepository
 import my.noveldokusha.repository.ChapterBodyRepository
+import my.noveldokusha.repository.DownloaderRepository
 import my.noveldokusha.repository.LibraryBooksRepository
-import my.noveldokusha.repository.AppRepository
 import my.noveldokusha.scraper.Scraper
 import my.noveldokusha.ui.Toasty
 import my.noveldokusha.utils.Extra_Uri
@@ -66,6 +67,9 @@ class RestoreDataService : Service() {
 
     @Inject
     lateinit var appCoroutineScope: AppCoroutineScope
+
+    @Inject
+    lateinit var downloaderRepository: DownloaderRepository
 
     private class IntentData : Intent {
         var uri by Extra_Uri()
@@ -182,6 +186,7 @@ class RestoreDataService : Service() {
                         chapterDao = newDatabase.chapterDao(),
                         operations = newDatabase
                     )
+                    // TODO: refactor this, only database repos should be needed.
                     AppRepository(
                         db = newDatabase,
                         context = context,
@@ -191,8 +196,7 @@ class RestoreDataService : Service() {
                             chapterBodyDao = newDatabase.chapterBodyDao(),
                             operations = newDatabase,
                             bookChaptersRepository = bookChaptersRepository,
-                            scraper = scraper,
-                            networkClient = networkClient
+                            downloaderRepository = downloaderRepository
                         ),
                         libraryBooks = LibraryBooksRepository(
                             libraryDao = newDatabase.libraryDao(),
