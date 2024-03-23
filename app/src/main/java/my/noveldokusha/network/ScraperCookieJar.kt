@@ -10,21 +10,13 @@ class ScraperCookieJar : CookieJar {
         it.setAcceptCookie(true)
     }
 
-    private fun String.toCookiesMap(): Map<String, String> = this
-        .split(";")
-        .map { it.trim().split("=") }
-        .filter { it.size == 2 }
-        .associate { it[0] to it[1] }
-
-    private fun get(url: String?): Map<String, String> {
-        url ?: return mapOf()
-        return manager.getCookie(url)?.toCookiesMap() ?: mapOf()
+    private fun getCookieList(url: String?): List<String> {
+        url ?: return emptyList()
+        return manager.getCookie(url)?.split(";") ?: emptyList()
     }
 
     override fun loadForRequest(url: HttpUrl): List<Cookie> {
-        val new = get(url.toString())
-            .mapNotNull { Cookie.parse(url, "${it.key}=${it.value}") }
-        return new
+        return getCookieList(url.toString()).mapNotNull { Cookie.parse(url, it) }
     }
 
     override fun saveFromResponse(url: HttpUrl, cookies: List<Cookie>) {
