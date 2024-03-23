@@ -5,10 +5,9 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
-import android.webkit.*
+import android.webkit.WebView
+import android.webkit.WebViewClient
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import my.noveldokusha.R
 import my.noveldokusha.databinding.ActivityWebviewBinding
 import my.noveldokusha.di.AppCoroutineScope
@@ -54,30 +53,13 @@ class WebViewActivity : BaseActivity() {
 
         viewBind.webview.settings.javaScriptEnabled = true
 
-        CookieManager.getInstance().apply {
-            setAcceptCookie(true)
-            setAcceptThirdPartyCookies(viewBind.webview, true)
-        }
-
         viewBind.webview.webViewClient = object : WebViewClient() {
 
             override fun onPageFinished(view: WebView?, url: String?) {
-                appScope.launch(Dispatchers.IO) {
-                    CookieManager.getInstance().flush()
-                }
-                toasty.show(R.string.cookies_saved)
-
                 super.onPageFinished(view, url)
-            }
-
-            override fun shouldInterceptRequest(
-                view: WebView?,
-                request: WebResourceRequest?
-            ): WebResourceResponse? {
-                appScope.launch(Dispatchers.IO) {
-                    CookieManager.getInstance().flush()
+                if (view != null && url != null) {
+                    toasty.show(R.string.cookies_saved)
                 }
-                return super.shouldInterceptRequest(view, request)
             }
         }
 
