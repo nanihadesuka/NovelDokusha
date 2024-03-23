@@ -32,7 +32,7 @@ class NarratorMediaControlsService : Service() {
         }
 
         fun isRunning(context: Context): Boolean =
-            context.isServiceRunning(BackupDataService::class.java)
+            context.isServiceRunning(NarratorMediaControlsService::class.java)
     }
 
     @Inject
