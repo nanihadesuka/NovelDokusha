@@ -29,7 +29,7 @@
 		android:usesCleartextTraffic="true"
 		>
 		<activity
-			android:name=".ui.screens.main.MainActivity"
+			android:name=".features.main.MainActivity"
 			android:exported="true"
 			android:theme="@style/AppTheme.Launcher"
 			>
@@ -53,13 +53,13 @@
 				<data android:scheme="file" />
 			</intent-filter>
 		</activity>
-		<activity android:name=".ui.screens.sourceCatalog.SourceCatalogActivity" />
-		<activity android:name=".ui.screens.chaptersList.ChaptersActivity" />
-		<activity android:name=".ui.screens.reader.ReaderActivity" />
-		<activity android:name=".ui.screens.databaseSearch.DatabaseSearchActivity" />
-		<activity android:name=".ui.screens.databaseBookInfo.DatabaseBookInfoActivity" />
-		<activity android:name=".ui.screens.globalSourceSearch.GlobalSourceSearchActivity" />
-		<activity android:name=".ui.screens.webView.WebViewActivity" />
+		<activity android:name=".features.sourceCatalog.SourceCatalogActivity" />
+		<activity android:name=".features.chaptersList.ChaptersActivity" />
+		<activity android:name=".features.reader.ReaderActivity" />
+		<activity android:name=".features.databaseSearch.DatabaseSearchActivity" />
+		<activity android:name=".features.databaseBookInfo.DatabaseBookInfoActivity" />
+		<activity android:name=".features.globalSourceSearch.GlobalSourceSearchActivity" />
+		<activity android:name=".features.webView.WebViewActivity" />
 
 		<service
 			android:name=".services.BackupDataService"

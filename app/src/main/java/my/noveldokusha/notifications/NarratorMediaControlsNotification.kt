@@ -27,12 +27,12 @@ import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.launch
 import my.noveldokusha.R
 import my.noveldokusha.data.BookMetadata
+import my.noveldokusha.features.chaptersList.ChaptersActivity
+import my.noveldokusha.features.main.MainActivity
+import my.noveldokusha.features.reader.ReaderActivity
+import my.noveldokusha.features.reader.chapterReadPercentage
+import my.noveldokusha.features.reader.manager.ReaderManager
 import my.noveldokusha.services.narratorMediaControls.NarratorMediaControlsCallback
-import my.noveldokusha.ui.screens.chaptersList.ChaptersActivity
-import my.noveldokusha.ui.screens.main.MainActivity
-import my.noveldokusha.ui.screens.reader.ReaderActivity
-import my.noveldokusha.ui.screens.reader.chapterReadPercentage
-import my.noveldokusha.ui.screens.reader.manager.ReaderManager
 import my.noveldokusha.utils.NotificationsCenter
 import my.noveldokusha.utils.text
 import my.noveldokusha.utils.title

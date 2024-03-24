@@ -135,25 +135,25 @@ class TextToSpeechManager<T : Utterance<T>> constructor(
             }
 
             override fun onDone(utteranceId: String?) {
-                if (utteranceId == null) return
-                val res: T = _queueList.remove(utteranceId)
-                    ?.copyWithState(playState = Utterance.PlayState.FINISHED)
-                    ?: return
-                currentActiveItemState.value = res
-                scope.launch { _currentTextSpeakFlow.emit(res) }
+                onErrorCall(utteranceId = utteranceId)
             }
 
+            @Deprecated("Deprecated in Java")
             override fun onError(utteranceId: String?) {
-                if (utteranceId == null) return
-                val res: T = _queueList.remove(utteranceId)
-                    ?.copyWithState(playState = Utterance.PlayState.FINISHED)
-                    ?: return
-                currentActiveItemState.value = res
-                scope.launch { _currentTextSpeakFlow.emit(res) }
+                onErrorCall(utteranceId = utteranceId)
             }
 
             override fun onRangeStart(utteranceId: String?, start: Int, end: Int, frame: Int) {
                 super.onRangeStart(utteranceId, start, end, frame)
+            }
+
+            private fun onErrorCall(utteranceId: String?) {
+                if (utteranceId == null) return
+                val res: T = _queueList.remove(utteranceId)
+                    ?.copyWithState(playState = Utterance.PlayState.FINISHED)
+                    ?: return
+                currentActiveItemState.value = res
+                scope.launch { _currentTextSpeakFlow.emit(res) }
             }
         })
     }

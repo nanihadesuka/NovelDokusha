@@ -3,7 +3,7 @@ package my.noveldokusha.services.narratorMediaControls
 import android.content.Intent
 import android.support.v4.media.session.MediaSessionCompat
 import android.view.KeyEvent
-import my.noveldokusha.ui.screens.reader.features.ReaderTextToSpeech
+import my.noveldokusha.features.reader.features.ReaderTextToSpeech
 
 class NarratorMediaControlsCallback(
     private val readerTextToSpeech: ReaderTextToSpeech

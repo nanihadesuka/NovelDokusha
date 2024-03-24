@@ -27,7 +27,7 @@ import kotlinx.parcelize.Parcelize
 import my.noveldokusha.R
 import my.noveldokusha.data.database.tables.Book
 import my.noveldokusha.repository.rememberResolvedBookImagePath
-import my.noveldokusha.ui.screens.main.library.LibraryViewModel
+import my.noveldokusha.features.main.library.LibraryViewModel
 import my.noveldokusha.ui.theme.ImageBorderShape
 import my.noveldokusha.ui.theme.colorApp
 

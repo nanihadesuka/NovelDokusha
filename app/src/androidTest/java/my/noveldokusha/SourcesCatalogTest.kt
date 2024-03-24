@@ -15,7 +15,7 @@ import androidx.test.espresso.action.ViewActions.*
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import my.noveldokusha.ui.AppTestTags
-import my.noveldokusha.ui.screens.main.MainActivity
+import my.noveldokusha.features.main.MainActivity
 import org.junit.Assert.*
 import org.junit.Ignore
 import org.junit.Rule

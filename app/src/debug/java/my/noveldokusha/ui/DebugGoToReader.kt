@@ -3,7 +3,7 @@ package my.noveldokusha.ui
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import my.noveldokusha.R
-import my.noveldokusha.ui.screens.reader.ReaderActivity
+import my.noveldokusha.features.reader.ReaderActivity
 
 class DebugGoToReader : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

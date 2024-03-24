@@ -4,16 +4,16 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import my.noveldokusha.data.BookMetadata
+import my.noveldokusha.features.chaptersList.ChaptersActivity
+import my.noveldokusha.features.databaseBookInfo.DatabaseBookInfoActivity
+import my.noveldokusha.features.databaseSearch.DatabaseSearchActivity
+import my.noveldokusha.features.databaseSearch.DatabaseSearchExtras
+import my.noveldokusha.features.globalSourceSearch.GlobalSourceSearchActivity
+import my.noveldokusha.features.reader.ReaderActivity
+import my.noveldokusha.features.sourceCatalog.SourceCatalogActivity
+import my.noveldokusha.features.webView.WebViewActivity
 import my.noveldokusha.scraper.DatabaseInterface
 import my.noveldokusha.scraper.SourceInterface
-import my.noveldokusha.ui.screens.chaptersList.ChaptersActivity
-import my.noveldokusha.ui.screens.databaseBookInfo.DatabaseBookInfoActivity
-import my.noveldokusha.ui.screens.databaseSearch.DatabaseSearchActivity
-import my.noveldokusha.ui.screens.databaseSearch.DatabaseSearchExtras
-import my.noveldokusha.ui.screens.globalSourceSearch.GlobalSourceSearchActivity
-import my.noveldokusha.ui.screens.reader.ReaderActivity
-import my.noveldokusha.ui.screens.sourceCatalog.SourceCatalogActivity
-import my.noveldokusha.ui.screens.webView.WebViewActivity
 
 fun Context.goToSourceCatalog(source: SourceInterface.Catalog) {
     SourceCatalogActivity

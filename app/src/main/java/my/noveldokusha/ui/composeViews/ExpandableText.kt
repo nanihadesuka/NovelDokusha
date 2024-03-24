@@ -3,12 +3,11 @@ package my.noveldokusha.ui.composeViews
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.ContentTransform
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.animation.with
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -30,13 +29,12 @@ import androidx.compose.ui.text.Paragraph
 import androidx.compose.ui.unit.Constraints
 import my.noveldokusha.utils.ifCase
 
-@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun ExpandableText(
     text: String,
     linesForExpand: Int,
     modifier: Modifier = Modifier,
-    transitionSpec: AnimatedContentTransitionScope<String>.() -> ContentTransform = { fadeIn() with fadeOut() }
+    transitionSpec: AnimatedContentTransitionScope<String>.() -> ContentTransform = { fadeIn() togetherWith fadeOut() }
 ) {
     AnimatedContent(
         targetState = text,

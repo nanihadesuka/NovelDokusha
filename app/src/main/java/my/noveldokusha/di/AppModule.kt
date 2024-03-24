@@ -17,6 +17,7 @@ import my.noveldokusha.data.database.AppDatabaseOperations
 import my.noveldokusha.data.database.DAOs.ChapterBodyDao
 import my.noveldokusha.data.database.DAOs.ChapterDao
 import my.noveldokusha.data.database.DAOs.LibraryDao
+import my.noveldokusha.features.reader.manager.ReaderManager
 import my.noveldokusha.network.NetworkClient
 import my.noveldokusha.network.ScraperNetworkClient
 import my.noveldokusha.repository.AppFileResolver
@@ -29,7 +30,6 @@ import my.noveldokusha.scraper.Scraper
 import my.noveldokusha.tools.TranslationManager
 import my.noveldokusha.ui.Toasty
 import my.noveldokusha.ui.ToastyToast
-import my.noveldokusha.ui.screens.reader.manager.ReaderManager
 import my.noveldokusha.utils.NotificationsCenter
 import java.io.File
 import javax.inject.Singleton

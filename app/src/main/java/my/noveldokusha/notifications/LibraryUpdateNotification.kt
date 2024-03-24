@@ -16,9 +16,9 @@ import my.noveldokusha.R
 import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.data.database.tables.Book
 import my.noveldokusha.data.database.tables.Chapter
-import my.noveldokusha.ui.screens.chaptersList.ChaptersActivity
-import my.noveldokusha.ui.screens.main.MainActivity
-import my.noveldokusha.ui.screens.reader.ReaderActivity
+import my.noveldokusha.features.chaptersList.ChaptersActivity
+import my.noveldokusha.features.main.MainActivity
+import my.noveldokusha.features.reader.ReaderActivity
 import my.noveldokusha.utils.NotificationsCenter
 import my.noveldokusha.utils.text
 import my.noveldokusha.utils.title

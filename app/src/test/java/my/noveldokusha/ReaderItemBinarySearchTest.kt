@@ -1,9 +1,9 @@
 package my.noveldokusha
 
 import my.noveldokusha.tools.BookTextMapper
-import my.noveldokusha.ui.screens.reader.ReaderItem
-import my.noveldokusha.ui.screens.reader.tools.indexOfReaderItemBinarySearch
-import my.noveldokusha.ui.screens.reader.tools.indexOfReaderItemLinearSearch
+import my.noveldokusha.features.reader.ReaderItem
+import my.noveldokusha.features.reader.tools.indexOfReaderItemBinarySearch
+import my.noveldokusha.features.reader.tools.indexOfReaderItemLinearSearch
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.junit.runner.RunWith

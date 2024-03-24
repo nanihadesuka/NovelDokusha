@@ -21,7 +21,7 @@ sealed class Response<out T> {
     }
 }
 
-inline fun <T> Response<T>.getOrNull() = toSuccessOrNull()?.data
+fun <T> Response<T>.getOrNull() = toSuccessOrNull()?.data
 
 suspend inline fun <T, R> Response<T>.map(crossinline call: suspend (T) -> R): Response<R> =
     when (this) {
