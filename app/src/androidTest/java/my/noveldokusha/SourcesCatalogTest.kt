@@ -10,29 +10,27 @@ import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollToNode
-import androidx.test.espresso.Espresso.*
-import androidx.test.espresso.action.ViewActions.*
-import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import my.noveldokusha.ui.AppTestTags
 import my.noveldokusha.features.main.MainActivity
-import org.junit.Assert.*
+import my.noveldokusha.ui.AppTestTags
 import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
-/**
- * Instrumented test, which will execute on an Android device.
- *
- * See [testing documentation](http://d.android.com/tools/testing).
- */
 @RunWith(AndroidJUnit4::class)
 class SourcesCatalogTest {
 
     @get:Rule
     val composeTestRule = createAndroidComposeRule<MainActivity>()
 
+    @get:Rule
+    val recordScreenRule = RecordScreenRule()
+
+    @Test
+    fun source__novel_updates() {
+        checkSourceCanBeOpened("Novel Updates")
+    }
 
     @Test
     fun source__1stkissnovel() {
@@ -77,11 +75,6 @@ class SourcesCatalogTest {
     @Test
     fun source__novelhall() {
         checkSourceCanBeOpened("NovelHall")
-    }
-
-    @Test
-    fun source__novel_updates() {
-        checkSourceCanBeOpened("Novel Updates")
     }
 
     @Test
@@ -137,3 +130,4 @@ class SourcesCatalogTest {
         )
     }
 }
+
