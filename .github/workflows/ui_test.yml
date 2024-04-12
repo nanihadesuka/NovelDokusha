@@ -1,0 +1,51 @@
+name: UI Tests
+
+on:
+  workflow_dispatch: # Allows you to run this workflow manually from the Actions tab
+
+jobs:
+  ui_test:
+    name: Build Release APK
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Clone repo
+        uses: actions/checkout@v2
+
+      - name: Set up JDK enviroment
+        uses: actions/setup-java@v1.4.3
+        with:
+          java-version: 17
+
+      - name: Setup Python enviroment
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.11
+
+      - name: Setup Gradle version to 8.1.1
+        uses: gradle/gradle-build-action@v2
+        with:
+          gradle-version: 8.1.1
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Build app
+        run: |
+          gradle assembleRelease -PlocalPropertiesFilePath=custom.properties
+
+      - name: run tests
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 29
+          script: ./gradlew connectedCheck
+
+      - name: pull test video recordings
+        run: |
+          mkdir -p /test_recordings
+          adb -e pull /sdcard/test_recordings /test_recordings
+
+      - name: Archive production artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ui-test-recordings
+          path: test_recordings
