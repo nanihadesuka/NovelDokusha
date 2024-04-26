@@ -47,7 +47,7 @@ compose-accompanist = "0.30.1"
 compose-constraintlayout = "1.0.1"
 compose-animation = "1.6.3"
 compose-activity = "1.8.2"
-compose-lazyColumnScrollbar = "1.6.3"
+compose-lazyColumnScrollbar = "2.0.6"
 compose-landscapist-glide = "2.2.5"
 compose-testing-ui = "1.6.3"
 compose-material-icons-extended = "1.6.3"
@@ -166,6 +166,7 @@ timber = { module = "com.jakewharton.timber:timber", version.ref = "timber" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "plugin-agp" }
+android-library = { id = "com.android.library", version.ref = "plugin-agp" }
 hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-parcelize = { id = "org.jetbrains.kotlin.plugin.parcelize", version.ref = "kotlin" }
