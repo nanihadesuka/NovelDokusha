@@ -1,6 +1,7 @@
 package my.noveldokusha.features.reader.manager
 
 import android.content.Context
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -8,9 +9,11 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.withContext
 import my.noveldokusha.AppPreferences
 import my.noveldokusha.di.AppCoroutineScope
+import my.noveldokusha.features.reader.tools.InitialPositionChapter
 import my.noveldokusha.repository.AppRepository
 import my.noveldokusha.tools.TranslationManager
-import my.noveldokusha.features.reader.tools.InitialPositionChapter
+import javax.inject.Inject
+import javax.inject.Singleton
 
 interface ReaderManagerViewCallReferences {
     var forceUpdateListViewState: (suspend () -> Unit)?
@@ -21,16 +24,18 @@ interface ReaderManagerViewCallReferences {
     var introScrollToCurrentChapter: Boolean
 }
 
-class ReaderManager(
+@Singleton
+class ReaderManager @Inject constructor(
     private val appRepository: AppRepository,
     private val translationManager: TranslationManager,
     private val appPreferences: AppPreferences,
-    private val context: Context,
+    @ApplicationContext private val context: Context,
     private val appScope: AppCoroutineScope,
+) : ReaderManagerViewCallReferences {
+
     private val scope: CoroutineScope = CoroutineScope(
         SupervisorJob() + Dispatchers.Default + CoroutineName("ReaderManager")
     )
-) : ReaderManagerViewCallReferences {
 
     var session: ReaderSession? = null
         private set

@@ -10,11 +10,14 @@ import my.noveldokusha.data.database.DAOs.LibraryDao
 import my.noveldokusha.data.database.tables.Book
 import my.noveldokusha.di.AppCoroutineScope
 import my.noveldokusha.utils.fileImporter
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class LibraryBooksRepository(
+@Singleton
+class LibraryBooksRepository @Inject constructor(
     private val libraryDao: LibraryDao,
     private val operations: AppDatabaseOperations,
-    @ApplicationContext val context: Context,
+    @ApplicationContext private val context: Context,
     private val appFileResolver: AppFileResolver,
     private val appCoroutineScope: AppCoroutineScope,
 ) {

@@ -13,6 +13,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import my.noveldokusha.R
+import my.noveldokusha.data.database.AppDatabase
 import my.noveldokusha.repository.AppRepository
 import my.noveldokusha.utils.Extra_Boolean
 import my.noveldokusha.utils.Extra_Uri
@@ -30,6 +31,10 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class BackupDataService : Service() {
+
+    @Inject
+    lateinit var appDatabase: AppDatabase
+
     @Inject
     lateinit var appRepository: AppRepository
 
@@ -135,7 +140,7 @@ class BackupDataService : Service() {
             // Save database
             run {
                 val entry = ZipEntry("database.sqlite3")
-                val file = this@BackupDataService.getDatabasePath(appRepository.name)
+                val file = this@BackupDataService.getDatabasePath(appDatabase.name)
                 entry.method = ZipOutputStream.DEFLATED
                 file.inputStream().use {
                     zip.putNextEntry(entry)

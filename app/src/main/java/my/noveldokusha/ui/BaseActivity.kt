@@ -8,13 +8,12 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.drop
 import my.noveldokusha.AppPreferences
 import my.noveldokusha.R
-import my.noveldokusha.di.AppModule
 import javax.inject.Inject
 
 @AndroidEntryPoint
 open class BaseActivity : AppCompatActivity() {
 
-    val appPreferences: AppPreferences by lazy { AppModule.provideAppPreferences(applicationContext) }
+    val appPreferences: AppPreferences by lazy { AppPreferences(applicationContext) }
 
     @Inject
     lateinit var toasty: Toasty

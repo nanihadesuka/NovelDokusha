@@ -15,8 +15,10 @@ import java.io.File
 import java.nio.file.Paths
 import java.util.Base64
 import javax.inject.Inject
+import javax.inject.Singleton
 
 
+@Singleton
 class AppFileResolver @Inject constructor(
     @ApplicationContext context: Context,
 ) {

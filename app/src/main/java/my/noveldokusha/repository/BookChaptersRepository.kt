@@ -2,13 +2,14 @@ package my.noveldokusha.repository
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import my.noveldokusha.data.database.AppDatabaseOperations
 import my.noveldokusha.data.database.DAOs.ChapterDao
 import my.noveldokusha.data.database.tables.Chapter
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class BookChaptersRepository(
+@Singleton
+class BookChaptersRepository @Inject constructor(
     private val chapterDao: ChapterDao,
-    private val operations: AppDatabaseOperations
 ) {
     suspend fun update(chapter: Chapter) = chapterDao.update(chapter)
     suspend fun updatePosition(chapterUrl: String, lastReadPosition: Int, lastReadOffset: Int) =

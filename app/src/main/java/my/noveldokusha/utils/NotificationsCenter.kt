@@ -8,9 +8,12 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import dagger.hilt.android.qualifiers.ApplicationContext
 import my.noveldokusha.R
+import javax.inject.Inject
+import javax.inject.Singleton
 import kotlin.reflect.KProperty
 
-class NotificationsCenter(
+@Singleton
+class NotificationsCenter @Inject constructor(
     @ApplicationContext private val context: Context
 ) {
 

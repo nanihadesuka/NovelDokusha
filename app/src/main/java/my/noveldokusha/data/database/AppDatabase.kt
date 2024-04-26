@@ -35,6 +35,8 @@ abstract class AppDatabase : RoomDatabase(), AppDatabaseOperations {
     abstract fun chapterDao(): ChapterDao
     abstract fun chapterBodyDao(): ChapterBodyDao
 
+    lateinit var name: String
+
     override suspend fun <T> transaction(block: suspend () -> T): T = withTransaction(block)
 
     companion object {
@@ -42,11 +44,13 @@ abstract class AppDatabase : RoomDatabase(), AppDatabaseOperations {
             .databaseBuilder(ctx, AppDatabase::class.java, name)
             .addMigrations(*databaseMigrations())
             .build()
+            .also { it.name = name }
 
         fun createRoomFromStream(ctx: Context, name: String, inputStream: InputStream) = Room
             .databaseBuilder(ctx, AppDatabase::class.java, name)
             .addMigrations(*databaseMigrations())
             .createFromInputStream { inputStream }
             .build()
+            .also { it.name = name }
     }
 }

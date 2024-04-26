@@ -10,11 +10,14 @@ import my.noveldokusha.scraper.DatabaseInterface
 import my.noveldokusha.scraper.LanguageCode
 import my.noveldokusha.scraper.Scraper
 import my.noveldokusha.scraper.SourceInterface
+import javax.inject.Inject
+import javax.inject.Singleton
 
 data class LanguageItem(val language: LanguageCode, val active: Boolean)
 data class CatalogItem(val catalog: SourceInterface.Catalog, val pinned: Boolean)
 
-class ScraperRepository(
+@Singleton
+class ScraperRepository @Inject constructor(
     private val appPreferences: AppPreferences,
     private val scraper: Scraper,
 ) {

@@ -3,27 +3,33 @@ package my.noveldokusha.ui
 import android.content.Context
 import android.widget.Toast
 import androidx.annotation.StringRes
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import javax.inject.Inject
+import javax.inject.Singleton
 
 interface Toasty {
     fun show(text: String, shortDuration: Boolean = true)
     fun show(@StringRes id: Int, shortDuration: Boolean = true)
 }
 
-class ToastyToast(private val applicationContext: Context) : Toasty {
+@Singleton
+class ToastyToast @Inject constructor(
+    @ApplicationContext private val context: Context
+) : Toasty {
 
     override fun show(text: String, shortDuration: Boolean) {
         CoroutineScope(Dispatchers.Main).launch {
-            Toast.makeText(applicationContext, text, durationMapper(shortDuration))
+            Toast.makeText(context, text, durationMapper(shortDuration))
                 .show()
         }
     }
 
     override fun show(@StringRes id: Int, shortDuration: Boolean) {
         CoroutineScope(Dispatchers.Main).launch {
-            Toast.makeText(applicationContext, id, durationMapper(shortDuration))
+            Toast.makeText(context, id, durationMapper(shortDuration))
                 .show()
         }
     }

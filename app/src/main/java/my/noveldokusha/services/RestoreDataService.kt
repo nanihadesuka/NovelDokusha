@@ -184,13 +184,11 @@ class RestoreDataService : Service() {
                     val newDatabase = AppDatabase.createRoomFromStream(context, "temp_database", it)
                     val bookChaptersRepository = BookChaptersRepository(
                         chapterDao = newDatabase.chapterDao(),
-                        operations = newDatabase
                     )
                     // TODO: refactor this, only database repos should be needed.
                     AppRepository(
                         db = newDatabase,
                         context = context,
-                        name = "temp_database",
                         bookChapters = bookChaptersRepository,
                         chapterBody = ChapterBodyRepository(
                             chapterBodyDao = newDatabase.chapterBodyDao(),

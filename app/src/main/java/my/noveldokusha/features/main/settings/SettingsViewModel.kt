@@ -1,5 +1,6 @@
 package my.noveldokusha.features.main.settings
 
+import android.content.Context
 import android.text.format.Formatter
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -8,10 +9,10 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.bumptech.glide.Glide
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import my.noveldokusha.App
 import my.noveldokusha.AppPreferences
 import my.noveldokusha.R
 import my.noveldokusha.di.AppCoroutineScope
@@ -31,7 +32,7 @@ class SettingsViewModel @Inject constructor(
     private val appRepository: AppRepository,
     private val appScope: AppCoroutineScope,
     private val appPreferences: AppPreferences,
-    private val app: App,
+    @ApplicationContext private val context: Context,
     private val translationManager: TranslationManager,
     private val stateHandle: SavedStateHandle,
     private val appFileResolver: AppFileResolver,
@@ -103,7 +104,7 @@ class SettingsViewModel @Inject constructor(
             ?.filter { it.name !in libraryFolders }
             ?.forEach { it.deleteRecursively() }
         updateImagesFolderSize()
-        Glide.get(app).clearDiskCache()
+        Glide.get(context).clearDiskCache()
     }
 
     fun onFollowSystemChange(follow: Boolean) {

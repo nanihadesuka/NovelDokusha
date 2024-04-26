@@ -15,11 +15,12 @@ import my.noveldokusha.tools.epub.epubImporter
 import my.noveldokusha.tools.epub.epubParser
 import my.noveldokusha.utils.tryAsResponse
 import javax.inject.Inject
+import javax.inject.Singleton
 
+@Singleton
 class AppRepository @Inject constructor(
     private val db: AppDatabase,
     @ApplicationContext private val context: Context,
-    val name: String,
     val libraryBooks: LibraryBooksRepository,
     val bookChapters: BookChaptersRepository,
     val chapterBody: ChapterBodyRepository,
@@ -59,11 +60,11 @@ class AppRepository @Inject constructor(
     }
 
     suspend fun getDatabaseSizeBytes() = withContext(Dispatchers.IO) {
-        context.getDatabasePath(name).length()
+        context.getDatabasePath(db.name).length()
     }
 
     fun close() = db.close()
-    fun delete() = context.deleteDatabase(name)
+    fun delete() = context.deleteDatabase(db.name)
     fun clearAllTables() = db.clearAllTables()
     suspend fun vacuum() =
         withContext(Dispatchers.IO) { db.openHelper.writableDatabase.execSQL("VACUUM") }
