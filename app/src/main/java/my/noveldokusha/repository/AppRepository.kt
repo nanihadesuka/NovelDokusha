@@ -8,6 +8,8 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.withContext
 import my.noveldokusha.data.Response
 import my.noveldokusha.feature.local_database.AppDatabase
+import my.noveldokusha.feature.local_database.tables.Book
+import my.noveldokusha.feature.local_database.tables.Chapter
 import my.noveldokusha.isContentUri
 import my.noveldokusha.tools.epub.epubImporter
 import my.noveldokusha.tools.epub.epubParser
@@ -85,6 +87,6 @@ class AppRepository @Inject constructor(
 
 }
 
-fun isValid(book: my.noveldokusha.feature.local_database.tables.Book): Boolean = book.url.matches("""^(https?|local)://.*""".toRegex())
-fun isValid(chapter: my.noveldokusha.feature.local_database.tables.Chapter): Boolean =
+fun isValid(book: Book): Boolean = book.url.matches("""^(https?|local)://.*""".toRegex())
+fun isValid(chapter: Chapter): Boolean =
     chapter.url.matches("""^(https?|local)://.*""".toRegex())

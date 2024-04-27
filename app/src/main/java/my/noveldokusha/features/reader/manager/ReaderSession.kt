@@ -4,8 +4,10 @@ import android.content.Context
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.snapshotFlow
+import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.async
 import kotlinx.coroutines.cancelChildren
 import kotlinx.coroutines.flow.collectLatest
@@ -14,7 +16,6 @@ import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import my.noveldokusha.AppPreferences
-import my.noveldokusha.di.AppCoroutineScope
 import my.noveldokusha.features.reader.ChapterState
 import my.noveldokusha.features.reader.ReaderItem
 import my.noveldokusha.features.reader.ReaderState
@@ -26,30 +27,36 @@ import my.noveldokusha.features.reader.features.ReaderTextToSpeech
 import my.noveldokusha.features.reader.tools.ChaptersIsReadRoutine
 import my.noveldokusha.features.reader.tools.InitialPositionChapter
 import my.noveldokusha.repository.AppRepository
+import my.noveldokusha.repository.ReaderRepository
 import my.noveldokusha.services.narratorMediaControls.NarratorMediaControlsService
 import my.noveldokusha.tools.TranslationManager
 import my.noveldokusha.tools.Utterance
 import kotlin.properties.Delegates
 
+
 class ReaderSession(
     val bookUrl: String,
     initialChapterUrl: String,
-    private val scope: CoroutineScope,
-    private val appScope: AppCoroutineScope,
     private val appRepository: AppRepository,
-    translationManager: TranslationManager,
     private val appPreferences: AppPreferences,
+    private val readerRepository: ReaderRepository,
     private val context: Context,
-    val forceUpdateListViewState: suspend () -> Unit,
-    val maintainLastVisiblePosition: suspend (suspend () -> Unit) -> Unit,
-    val maintainStartPosition: suspend (suspend () -> Unit) -> Unit,
-    val setInitialPosition: suspend (InitialPositionChapter) -> Unit,
-    val showInvalidChapterDialog: suspend () -> Unit,
+    translationManager: TranslationManager,
+    private val forceUpdateListViewState: suspend () -> Unit,
+    private val maintainLastVisiblePosition: suspend (suspend () -> Unit) -> Unit,
+    private val maintainStartPosition: suspend (suspend () -> Unit) -> Unit,
+    private val setInitialPosition: suspend (InitialPositionChapter) -> Unit,
+    private val showInvalidChapterDialog: suspend () -> Unit,
 ) {
+    private val scope: CoroutineScope = CoroutineScope(
+        SupervisorJob() + Dispatchers.Default + CoroutineName("ReaderSession")
+    )
+
     private var chapterUrl: String = initialChapterUrl
 
     private val readRoutine = ChaptersIsReadRoutine(appRepository)
-    private val orderedChapters = mutableListOf<my.noveldokusha.feature.local_database.tables.Chapter>()
+    private val orderedChapters =
+        mutableListOf<my.noveldokusha.feature.local_database.tables.Chapter>()
 
     var bookTitle: String? = null
     var bookCoverUrl: String? = null
@@ -66,7 +73,7 @@ class ReaderSession(
             old.chapterUrl != new.chapterUrl &&
             savePositionMode.value == SavePositionMode.Reading
         ) {
-            saveLastReadPositionState(new, old)
+            readerRepository.saveBookLastReadPositionState(bookUrl, new, old)
         }
     }
 
@@ -122,7 +129,9 @@ class ReaderSession(
         isChapterIndexValid = readerChaptersLoader::isChapterIndexValid,
         tryLoadPreviousChapter = readerChaptersLoader::tryLoadPrevious,
         loadNextChapter = readerChaptersLoader::tryLoadNext,
-        customSavedVoices = appPreferences.READER_TEXT_TO_SPEECH_SAVED_PREDEFINED_LIST.state(scope),
+        customSavedVoices = appPreferences.READER_TEXT_TO_SPEECH_SAVED_PREDEFINED_LIST.state(
+            scope
+        ),
         setCustomSavedVoices = {
             appPreferences.READER_TEXT_TO_SPEECH_SAVED_PREDEFINED_LIST.value = it
         },
@@ -243,7 +252,10 @@ class ReaderSession(
     fun close() {
         readerChaptersLoader.coroutineContext.cancelChildren()
         when (savePositionMode.value) {
-            SavePositionMode.Reading -> saveLastReadPositionState(currentChapter)
+            SavePositionMode.Reading -> readerRepository.saveBookLastReadPositionState(
+                bookUrl,
+                currentChapter
+            )
             SavePositionMode.Speaking -> saveLastReadPositionStateSpeaker(
                 item = readerTextToSpeech.currentTextPlaying.value.itemPos
             )
@@ -275,54 +287,13 @@ class ReaderSession(
     }
 
     private fun saveLastReadPositionStateSpeaker(item: ReaderItem.Position) {
-        saveLastReadPositionState(
-            ChapterState(
+        readerRepository.saveBookLastReadPositionState(
+            bookUrl = bookUrl,
+            newChapter = ChapterState(
                 chapterUrl = item.chapterUrl,
                 chapterItemPosition = item.chapterItemPosition,
                 offset = 0
             )
         )
-    }
-
-    private fun saveLastReadPositionState(
-        newChapter: ChapterState,
-        oldChapter: ChapterState? = null,
-    ) {
-        saveBookLastReadPositionState(
-            bookUrl = bookUrl,
-            newChapter = newChapter,
-            oldChapter = oldChapter,
-            scope = appScope,
-            appRepository = appRepository,
-        )
-    }
-}
-
-private fun saveBookLastReadPositionState(
-    bookUrl: String,
-    newChapter: ChapterState,
-    oldChapter: ChapterState? = null,
-    scope: AppCoroutineScope,
-    appRepository: AppRepository,
-) {
-    scope.launch(Dispatchers.IO) {
-        appRepository.withTransaction {
-            appRepository.libraryBooks.updateLastReadChapter(
-                bookUrl = bookUrl,
-                lastReadChapterUrl = newChapter.chapterUrl
-            )
-
-            if (oldChapter?.chapterUrl != null) appRepository.bookChapters.updatePosition(
-                chapterUrl = oldChapter.chapterUrl,
-                lastReadPosition = oldChapter.chapterItemPosition,
-                lastReadOffset = oldChapter.offset
-            )
-
-            appRepository.bookChapters.updatePosition(
-                chapterUrl = newChapter.chapterUrl,
-                lastReadPosition = newChapter.chapterItemPosition,
-                lastReadOffset = newChapter.offset
-            )
-        }
     }
 }

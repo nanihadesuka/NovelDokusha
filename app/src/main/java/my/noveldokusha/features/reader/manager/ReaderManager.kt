@@ -1,17 +1,9 @@
 package my.noveldokusha.features.reader.manager
 
-import android.content.Context
-import dagger.hilt.android.qualifiers.ApplicationContext
-import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.withContext
-import my.noveldokusha.AppPreferences
-import my.noveldokusha.di.AppCoroutineScope
 import my.noveldokusha.features.reader.tools.InitialPositionChapter
-import my.noveldokusha.repository.AppRepository
-import my.noveldokusha.tools.TranslationManager
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -26,16 +18,9 @@ interface ReaderManagerViewCallReferences {
 
 @Singleton
 class ReaderManager @Inject constructor(
-    private val appRepository: AppRepository,
-    private val translationManager: TranslationManager,
-    private val appPreferences: AppPreferences,
-    @ApplicationContext private val context: Context,
-    private val appScope: AppCoroutineScope,
+    private val readerSessionProvider: ReaderSessionProvider,
 ) : ReaderManagerViewCallReferences {
 
-    private val scope: CoroutineScope = CoroutineScope(
-        SupervisorJob() + Dispatchers.Default + CoroutineName("ReaderManager")
-    )
 
     var session: ReaderSession? = null
         private set
@@ -71,14 +56,9 @@ class ReaderManager @Inject constructor(
         currentSession?.close()
         introScrollToCurrentChapter = false
 
-        val newSession = ReaderSession(
+        val newSession = readerSessionProvider.create(
             bookUrl = bookUrl,
             initialChapterUrl = chapterUrl,
-            scope = scope,
-            appScope = appScope,
-            appRepository = appRepository,
-            translationManager = translationManager,
-            appPreferences = appPreferences,
             forceUpdateListViewState = { withMainNow { forceUpdateListViewState?.invoke() } },
             maintainLastVisiblePosition = {
                 withMainNow { maintainLastVisiblePosition?.invoke(it) ?: it() }
@@ -88,8 +68,8 @@ class ReaderManager @Inject constructor(
             },
             setInitialPosition = { withMainNow { setInitialPosition?.invoke(it) } },
             showInvalidChapterDialog = { withMainNow { showInvalidChapterDialog?.invoke() } },
-            context = context
-        )
+
+            )
         session = newSession
         newSession.init()
 
