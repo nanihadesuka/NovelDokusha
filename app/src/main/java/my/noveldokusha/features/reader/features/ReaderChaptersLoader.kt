@@ -8,8 +8,6 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import my.noveldokusha.data.Response
-import my.noveldokusha.data.database.tables.Chapter
-import my.noveldokusha.repository.AppRepository
 import my.noveldokusha.features.reader.ChapterState
 import my.noveldokusha.features.reader.ChapterStats
 import my.noveldokusha.features.reader.ChapterUrl
@@ -20,6 +18,7 @@ import my.noveldokusha.features.reader.tools.InitialPositionChapter
 import my.noveldokusha.features.reader.tools.getInitialChapterItemPosition
 import my.noveldokusha.features.reader.tools.indexOfReaderItem
 import my.noveldokusha.features.reader.tools.textToItemsConverter
+import my.noveldokusha.repository.AppRepository
 import timber.log.Timber
 import kotlin.coroutines.CoroutineContext
 
@@ -30,7 +29,7 @@ class ReaderChaptersLoader(
     private val translatorSourceLanguageOrNull: () -> String?,
     private val translatorTargetLanguageOrNull: () -> String?,
     private val bookUrl: String,
-    val orderedChapters: List<Chapter>,
+    val orderedChapters: List<my.noveldokusha.feature.local_database.tables.Chapter>,
     @Volatile var readerState: ReaderState,
     val forceUpdateListViewState: suspend () -> Unit,
     val maintainLastVisiblePosition: suspend (suspend () -> Unit) -> Unit,

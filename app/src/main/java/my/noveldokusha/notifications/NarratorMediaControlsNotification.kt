@@ -26,7 +26,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.launch
 import my.noveldokusha.R
-import my.noveldokusha.data.BookMetadata
+import my.noveldokusha.feature.local_database.BookMetadata
 import my.noveldokusha.features.chaptersList.ChaptersActivity
 import my.noveldokusha.features.main.MainActivity
 import my.noveldokusha.features.reader.ReaderActivity

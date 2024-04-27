@@ -17,8 +17,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import my.noveldokusha.AppPreferences
 import my.noveldokusha.R
-import my.noveldokusha.data.ChapterWithContext
-import my.noveldokusha.data.database.tables.Book
 import my.noveldokusha.di.AppCoroutineScope
 import my.noveldokusha.isContentUri
 import my.noveldokusha.isLocalUri
@@ -100,7 +98,7 @@ class ChaptersViewModel @Inject constructor(
             val description = async { downloaderRepository.bookDescription(bookUrl = bookUrl) }
 
             appRepository.libraryBooks.insert(
-                Book(
+                my.noveldokusha.feature.local_database.tables.Book(
                     title = bookTitle,
                     url = bookUrl,
                     coverImageUrl = coverUrl.await().toSuccessOrNull()?.data ?: "",
@@ -242,7 +240,7 @@ class ChaptersViewModel @Inject constructor(
         }
     }
 
-    fun onSelectionModeChapterClick(chapter: ChapterWithContext) {
+    fun onSelectionModeChapterClick(chapter: my.noveldokusha.feature.local_database.ChapterWithContext) {
         val url = chapter.chapter.url
         if (state.selectedChaptersUrl.containsKey(url)) {
             state.selectedChaptersUrl.remove(url)
@@ -256,7 +254,7 @@ class ChaptersViewModel @Inject constructor(
         appRepository.libraryBooks.saveImageAsCover(imageUri = uri, bookUrl = bookUrl)
     }
 
-    fun onSelectionModeChapterLongClick(chapter: ChapterWithContext) {
+    fun onSelectionModeChapterLongClick(chapter: my.noveldokusha.feature.local_database.ChapterWithContext) {
         val url = chapter.chapter.url
         if (url != lastSelectedChapterUrl) {
             val indexOld = state.chapters.indexOfFirst { it.chapter.url == lastSelectedChapterUrl }
@@ -280,13 +278,13 @@ class ChaptersViewModel @Inject constructor(
         lastSelectedChapterUrl = url
     }
 
-    fun onChapterLongClick(chapter: ChapterWithContext) {
+    fun onChapterLongClick(chapter: my.noveldokusha.feature.local_database.ChapterWithContext) {
         val url = chapter.chapter.url
         state.selectedChaptersUrl[url] = Unit
         lastSelectedChapterUrl = url
     }
 
-    fun onChapterDownload(chapter: ChapterWithContext) {
+    fun onChapterDownload(chapter: my.noveldokusha.feature.local_database.ChapterWithContext) {
         if (state.isLocalSource.value) return
         appScope.launch {
             appRepository.chapterBody.fetchBody(chapter.chapter.url)

@@ -2,8 +2,8 @@ package my.noveldokusha.repository
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import my.noveldokusha.data.database.DAOs.ChapterDao
-import my.noveldokusha.data.database.tables.Chapter
+import my.noveldokusha.feature.local_database.DAOs.ChapterDao
+import my.noveldokusha.feature.local_database.tables.Chapter
 import javax.inject.Inject
 import javax.inject.Singleton
 

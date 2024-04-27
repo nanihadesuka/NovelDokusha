@@ -43,7 +43,6 @@ import androidx.compose.ui.zIndex
 import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.coroutines.launch
 import my.noveldokusha.R
-import my.noveldokusha.data.BookWithContext
 import my.noveldokusha.data.LibraryCategory
 import my.noveldokusha.isLocalUri
 import my.noveldokusha.repository.rememberResolvedBookImagePath
@@ -63,8 +62,8 @@ fun LibraryScreenBody(
     tabs: List<String>,
     innerPadding: PaddingValues,
     topAppBarState: TopAppBarState,
-    onBookClick: (BookWithContext) -> Unit,
-    onBookLongClick: (BookWithContext) -> Unit,
+    onBookClick: (my.noveldokusha.feature.local_database.BookWithContext) -> Unit,
+    onBookLongClick: (my.noveldokusha.feature.local_database.BookWithContext) -> Unit,
     viewModel: LibraryPageViewModel = viewModel()
 ) {
     val tabsSizeUpdated = rememberUpdatedState(newValue = tabs.size)
@@ -131,7 +130,7 @@ fun LibraryScreenBody(
                         tabs[page] == "Completed"
                     }
                 }
-                val list: List<BookWithContext> by remember {
+                val list: List<my.noveldokusha.feature.local_database.BookWithContext> by remember {
                     derivedStateOf {
                         when (showCompleted) {
                             true -> viewModel.listCompleted
@@ -156,9 +155,9 @@ fun LibraryScreenBody(
 
 @Composable
 private fun LibraryPageBody(
-    list: List<BookWithContext>,
-    onClick: (BookWithContext) -> Unit,
-    onLongClick: (BookWithContext) -> Unit,
+    list: List<my.noveldokusha.feature.local_database.BookWithContext>,
+    onClick: (my.noveldokusha.feature.local_database.BookWithContext) -> Unit,
+    onLongClick: (my.noveldokusha.feature.local_database.BookWithContext) -> Unit,
 ) {
     LazyVerticalGrid(
         columns = GridCells.Adaptive(160.dp),

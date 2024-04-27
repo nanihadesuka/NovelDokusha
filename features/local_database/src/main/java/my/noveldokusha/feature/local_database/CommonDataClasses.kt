@@ -1,8 +1,8 @@
-package my.noveldokusha.data
+package my.noveldokusha.feature.local_database
 
 import androidx.room.Embedded
-import my.noveldokusha.data.database.tables.Book
-import my.noveldokusha.data.database.tables.Chapter
+import my.noveldokusha.feature.local_database.tables.Book
+import my.noveldokusha.feature.local_database.tables.Chapter
 
 data class BookMetadata(
     val title: String,

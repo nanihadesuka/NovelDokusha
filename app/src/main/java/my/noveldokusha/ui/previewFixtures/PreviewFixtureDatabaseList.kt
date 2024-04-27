@@ -1,7 +1,6 @@
 package my.noveldokusha.ui.previewFixtures
 
 import my.noveldokusha.R
-import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.data.Response
 import my.noveldokusha.network.PagedList
 import my.noveldokusha.scraper.DatabaseInterface
@@ -12,19 +11,19 @@ fun previewFixturesDatabaseList(): List<DatabaseInterface> = (0..2).map {
         override val id = "id$it"
         override val nameStrId = R.string.database_name_baka_updates
         override val baseUrl = "baseUrl$it"
-        override suspend fun getCatalog(index: Int): Response<PagedList<BookMetadata>> =
+        override suspend fun getCatalog(index: Int): Response<PagedList<my.noveldokusha.feature.local_database.BookMetadata>> =
             Response.Success(PagedList.createEmpty(0))
 
         override suspend fun searchByTitle(
             index: Int,
             input: String
-        ): Response<PagedList<BookMetadata>> = Response.Success(PagedList.createEmpty(0))
+        ): Response<PagedList<my.noveldokusha.feature.local_database.BookMetadata>> = Response.Success(PagedList.createEmpty(0))
 
         override suspend fun searchByFilters(
             index: Int,
             genresIncludedId: List<String>,
             genresExcludedId: List<String>
-        ): Response<PagedList<BookMetadata>> = Response.Success(PagedList.createEmpty(0))
+        ): Response<PagedList<my.noveldokusha.feature.local_database.BookMetadata>> = Response.Success(PagedList.createEmpty(0))
 
         override suspend fun getSearchFilters(): Response<List<SearchGenre>> =
             Response.Success(listOf())

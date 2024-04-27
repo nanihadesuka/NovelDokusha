@@ -5,9 +5,9 @@ import com.google.gson.stream.JsonReader
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import my.noveldokusha.R
-import my.noveldokusha.data.BookMetadata
-import my.noveldokusha.data.ChapterMetadata
 import my.noveldokusha.data.Response
+import my.noveldokusha.feature.local_database.BookMetadata
+import my.noveldokusha.feature.local_database.ChapterMetadata
 import my.noveldokusha.network.NetworkClient
 import my.noveldokusha.network.PagedList
 import my.noveldokusha.network.tryConnect
@@ -66,7 +66,10 @@ class Saikai(
             val (bookpath, dispUrl, chapterUrl) = Regex("""^.*/(.+)/(\d+)/(.*)$""").find(
                 fullChapterUrl
             )!!.destructured
-            val firstChapter = ChapterMetadata(url = chapterUrl, title = chapterTitle)
+            val firstChapter = ChapterMetadata(
+                url = chapterUrl,
+                title = chapterTitle
+            )
 
             val initialVal = dispUrl.toInt()
 
@@ -91,7 +94,10 @@ class Saikai(
                         .mapNotNull {
                             it["chapter"].asNumber.runCatching { toInt() }.getOrNull()
                                 ?: return@mapNotNull null
-                            ChapterMetadata(url = it["slug"].asString, title = it["title"].asString)
+                            ChapterMetadata(
+                                url = it["slug"].asString,
+                                title = it["title"].asString
+                            )
                         }
                 }
 

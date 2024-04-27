@@ -3,7 +3,6 @@ package my.noveldokusha.repository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import my.noveldokusha.data.Response
-import my.noveldokusha.data.database.tables.Chapter
 import my.noveldokusha.data.map
 import my.noveldokusha.network.NetworkClient
 import my.noveldokusha.network.getRequest
@@ -112,7 +111,7 @@ class DownloaderRepository @Inject constructor(
 
     suspend fun bookChaptersList(
         bookUrl: String,
-    ): Response<List<Chapter>> = withContext(Dispatchers.Default) {
+    ): Response<List<my.noveldokusha.feature.local_database.tables.Chapter>> = withContext(Dispatchers.Default) {
         val error by lazy {
             """
 			Incompatible source.
@@ -129,7 +128,7 @@ class DownloaderRepository @Inject constructor(
         tryFlatConnect { scrap.getChapterList(bookUrl) }
             .map { chapters ->
                 chapters.mapIndexed { index, it ->
-                    Chapter(
+                    my.noveldokusha.feature.local_database.tables.Chapter(
                         title = it.title,
                         url = it.url,
                         bookUrl = bookUrl,

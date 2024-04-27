@@ -5,14 +5,9 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.runtime.SideEffect
-import androidx.compose.ui.graphics.Color
 import androidx.core.view.WindowCompat
-import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import dagger.hilt.android.AndroidEntryPoint
 import my.noveldokusha.composableActions.SetSystemBarTransparent
-import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.scraper.SearchGenre
 import my.noveldokusha.ui.BaseActivity
 import my.noveldokusha.ui.goToDatabaseBookInfo
@@ -20,7 +15,6 @@ import my.noveldokusha.ui.goToDatabaseSearchGenres
 import my.noveldokusha.ui.goToGlobalSearch
 import my.noveldokusha.ui.goToWebBrowser
 import my.noveldokusha.ui.theme.Theme
-import my.noveldokusha.ui.theme.isLightTheme
 import my.noveldokusha.utils.Extra_String
 
 @AndroidEntryPoint
@@ -31,7 +25,7 @@ class DatabaseBookInfoActivity : BaseActivity() {
         override var bookTitle by Extra_String()
 
         constructor(intent: Intent) : super(intent)
-        constructor(ctx: Context, databaseUrlBase: String, bookMetadata: BookMetadata) : super(
+        constructor(ctx: Context, databaseUrlBase: String, bookMetadata: my.noveldokusha.feature.local_database.BookMetadata) : super(
             ctx,
             DatabaseBookInfoActivity::class.java
         ) {
@@ -68,7 +62,7 @@ class DatabaseBookInfoActivity : BaseActivity() {
         databaseUrlBase = viewModel.database.baseUrl
     )
 
-    private fun openBookInfo(book: BookMetadata) = goToDatabaseBookInfo(
+    private fun openBookInfo(book: my.noveldokusha.feature.local_database.BookMetadata) = goToDatabaseBookInfo(
         bookMetadata = book,
         databaseUrlBase = viewModel.database.baseUrl
     )

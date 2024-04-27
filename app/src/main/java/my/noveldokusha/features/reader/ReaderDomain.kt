@@ -1,6 +1,5 @@
 package my.noveldokusha.features.reader
 
-import my.noveldokusha.data.database.tables.Chapter
 import kotlin.math.ceil
 
 /**
@@ -20,7 +19,7 @@ enum class ReaderState {
 
 data class ChapterStats(
     val itemsCount: Int,
-    val chapter: Chapter,
+    val chapter: my.noveldokusha.feature.local_database.tables.Chapter,
     val orderedChaptersIndex: Int
 )
 

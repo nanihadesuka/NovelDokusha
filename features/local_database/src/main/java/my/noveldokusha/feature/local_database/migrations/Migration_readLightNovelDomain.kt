@@ -1,8 +1,8 @@
-package my.noveldokusha.data.database.migrations
+package my.noveldokusha.feature.local_database.migrations
 
 import androidx.sqlite.db.SupportSQLiteDatabase
 
-fun MigrationsList.readLightNovelDomainChange_1(
+internal fun MigrationsList.readLightNovelDomainChange_1(
     it: SupportSQLiteDatabase
 ) {
     // readlightnovel source changed its domain to "today"

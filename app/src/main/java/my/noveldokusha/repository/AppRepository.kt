@@ -7,9 +7,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.withContext
 import my.noveldokusha.data.Response
-import my.noveldokusha.data.database.AppDatabase
-import my.noveldokusha.data.database.tables.Book
-import my.noveldokusha.data.database.tables.Chapter
+import my.noveldokusha.feature.local_database.AppDatabase
 import my.noveldokusha.isContentUri
 import my.noveldokusha.tools.epub.epubImporter
 import my.noveldokusha.tools.epub.epubParser
@@ -63,11 +61,9 @@ class AppRepository @Inject constructor(
         context.getDatabasePath(db.name).length()
     }
 
-    fun close() = db.close()
+    fun close() = db.closeDatabase()
     fun delete() = context.deleteDatabase(db.name)
-    fun clearAllTables() = db.clearAllTables()
-    suspend fun vacuum() =
-        withContext(Dispatchers.IO) { db.openHelper.writableDatabase.execSQL("VACUUM") }
+    suspend fun vacuum() = db.vacuum()
 
     suspend fun <T> withTransaction(fn: suspend () -> T) = db.transaction(fn)
 
@@ -89,6 +85,6 @@ class AppRepository @Inject constructor(
 
 }
 
-fun isValid(book: Book): Boolean = book.url.matches("""^(https?|local)://.*""".toRegex())
-fun isValid(chapter: Chapter): Boolean =
+fun isValid(book: my.noveldokusha.feature.local_database.tables.Book): Boolean = book.url.matches("""^(https?|local)://.*""".toRegex())
+fun isValid(chapter: my.noveldokusha.feature.local_database.tables.Chapter): Boolean =
     chapter.url.matches("""^(https?|local)://.*""".toRegex())

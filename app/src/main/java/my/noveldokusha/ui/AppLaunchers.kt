@@ -3,7 +3,6 @@ package my.noveldokusha.ui
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
-import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.features.chaptersList.ChaptersActivity
 import my.noveldokusha.features.databaseBookInfo.DatabaseBookInfoActivity
 import my.noveldokusha.features.databaseSearch.DatabaseSearchActivity
@@ -73,13 +72,13 @@ fun Context.goToDatabaseSearchGenres(
         .let(::startActivity)
 }
 
-fun Context.goToDatabaseBookInfo(bookMetadata: BookMetadata, databaseUrlBase: String) {
+fun Context.goToDatabaseBookInfo(bookMetadata: my.noveldokusha.feature.local_database.BookMetadata, databaseUrlBase: String) {
     DatabaseBookInfoActivity
         .IntentData(this, databaseUrlBase = databaseUrlBase, bookMetadata = bookMetadata)
         .let(::startActivity)
 }
 
-fun Context.goToBookChapters(bookMetadata: BookMetadata) {
+fun Context.goToBookChapters(bookMetadata: my.noveldokusha.feature.local_database.BookMetadata) {
     ChaptersActivity
         .IntentData(this, bookMetadata = bookMetadata)
         .let(::startActivity)

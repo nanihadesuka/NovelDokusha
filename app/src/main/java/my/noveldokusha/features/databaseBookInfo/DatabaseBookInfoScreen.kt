@@ -10,10 +10,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Public
-import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -34,7 +33,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import my.noveldokusha.R
-import my.noveldokusha.data.BookMetadata
+import my.noveldokusha.feature.local_database.BookMetadata
 import my.noveldokusha.scraper.DatabaseInterface
 import my.noveldokusha.scraper.SearchGenre
 import my.noveldokusha.ui.theme.InternalTheme
@@ -92,7 +91,7 @@ fun DatabaseBookInfoScreen(
                             }
                         }
                     )
-                    Divider(Modifier.alpha(alpha))
+                    HorizontalDivider(Modifier.alpha(alpha))
                 }
             }
         },

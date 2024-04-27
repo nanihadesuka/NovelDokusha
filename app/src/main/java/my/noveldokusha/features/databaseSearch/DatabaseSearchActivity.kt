@@ -9,7 +9,6 @@ import androidx.activity.viewModels
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.parcelize.Parcelize
 import my.noveldokusha.R
-import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.ui.BaseActivity
 import my.noveldokusha.ui.goToDatabaseBookInfo
 import my.noveldokusha.ui.theme.Theme
@@ -73,7 +72,7 @@ class DatabaseSearchActivity : BaseActivity() {
         }
     }
 
-    private fun openBookInfoPage(book: BookMetadata) = goToDatabaseBookInfo(
+    private fun openBookInfoPage(book: my.noveldokusha.feature.local_database.BookMetadata) = goToDatabaseBookInfo(
         databaseUrlBase = viewModel.extras.databaseBaseUrl,
         bookMetadata = book
     )

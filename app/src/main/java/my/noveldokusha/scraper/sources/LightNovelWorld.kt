@@ -3,9 +3,8 @@ package my.noveldokusha.scraper.sources
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import my.noveldokusha.R
-import my.noveldokusha.data.BookMetadata
-import my.noveldokusha.data.ChapterMetadata
 import my.noveldokusha.data.Response
+import my.noveldokusha.feature.local_database.BookMetadata
 import my.noveldokusha.network.NetworkClient
 import my.noveldokusha.network.PagedList
 import my.noveldokusha.network.tryConnect
@@ -61,9 +60,9 @@ class LightNovelWorld(
 
     override suspend fun getChapterList(
         bookUrl: String
-    ): Response<List<ChapterMetadata>> = withContext(Dispatchers.Default) {
+    ): Response<List<my.noveldokusha.feature.local_database.ChapterMetadata>> = withContext(Dispatchers.Default) {
         tryConnect {
-            val list = mutableListOf<ChapterMetadata>()
+            val list = mutableListOf<my.noveldokusha.feature.local_database.ChapterMetadata>()
             val baseChaptersUrl = bookUrl
                 .toUrlBuilderSafe()
                 .addPath("chapters")
@@ -75,7 +74,7 @@ class LightNovelWorld(
                     .toDocument()
                     .select(".chapter-list > li > a")
                     .map {
-                        ChapterMetadata(
+                        my.noveldokusha.feature.local_database.ChapterMetadata(
                             title = it.attr("title"),
                             url = baseUrl + it.attr("href").removePrefix("/")
                         )

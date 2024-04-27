@@ -4,9 +4,9 @@ import android.net.Uri
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import my.noveldokusha.R
-import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.data.Response
 import my.noveldokusha.data.Response.Success
+import my.noveldokusha.feature.local_database.BookMetadata
 import my.noveldokusha.network.NetworkClient
 import my.noveldokusha.network.PagedList
 import my.noveldokusha.network.tryFlatConnect
@@ -154,7 +154,12 @@ class NovelUpdates(
             ?.nextElementSiblings()?.asSequence()
             ?.takeWhile { !it.`is`("h5") }
             ?.filter { it.`is`("a[href]") }
-            ?.map { BookMetadata(it.text(), it.attr("href")) }
+            ?.map {
+                BookMetadata(
+                    it.text(),
+                    it.attr("href")
+                )
+            }
             ?.toList() ?: listOf()
 
         val similarRecommended = doc
@@ -163,7 +168,12 @@ class NovelUpdates(
             ?.nextElementSiblings()?.asSequence()
             ?.takeWhile { !it.`is`("h5") }
             ?.filter { it.`is`("a[href]") }
-            ?.map { BookMetadata(it.text(), it.attr("href")) }
+            ?.map {
+                BookMetadata(
+                    it.text(),
+                    it.attr("href")
+                )
+            }
             ?.toList() ?: listOf()
 
         val authors = doc

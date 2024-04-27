@@ -32,10 +32,10 @@ import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material.icons.outlined.PublishedWithChanges
 import androidx.compose.material.icons.outlined.SelectAll
 import androidx.compose.material3.BottomAppBar
-import androidx.compose.material3.Divider
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -62,7 +62,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import my.nanihadesuka.compose.InternalLazyColumnScrollbar
 import my.noveldokusha.R
-import my.noveldokusha.data.ChapterWithContext
 import my.noveldokusha.isLocalUri
 import my.noveldokusha.ui.goToWebBrowser
 import my.noveldokusha.ui.theme.ColorAccent
@@ -87,11 +86,11 @@ fun ChaptersScreen(
     onSelectedInvertSelection: () -> Unit,
     onSelectAllChapters: () -> Unit,
     onCloseSelectionBar: () -> Unit,
-    onChapterClick: (chapter: ChapterWithContext) -> Unit,
-    onChapterLongClick: (chapter: ChapterWithContext) -> Unit,
-    onSelectionModeChapterClick: (chapter: ChapterWithContext) -> Unit,
-    onSelectionModeChapterLongClick: (chapter: ChapterWithContext) -> Unit,
-    onChapterDownload: (chapter: ChapterWithContext) -> Unit,
+    onChapterClick: (chapter: my.noveldokusha.feature.local_database.ChapterWithContext) -> Unit,
+    onChapterLongClick: (chapter: my.noveldokusha.feature.local_database.ChapterWithContext) -> Unit,
+    onSelectionModeChapterClick: (chapter: my.noveldokusha.feature.local_database.ChapterWithContext) -> Unit,
+    onSelectionModeChapterLongClick: (chapter: my.noveldokusha.feature.local_database.ChapterWithContext) -> Unit,
+    onChapterDownload: (chapter: my.noveldokusha.feature.local_database.ChapterWithContext) -> Unit,
     onPullRefresh: () -> Unit,
     onCoverLongClick: () -> Unit,
     onChangeCover: () -> Unit,
@@ -186,7 +185,7 @@ fun ChaptersScreen(
                             }
                         }
                     )
-                    Divider(Modifier.alpha(alpha))
+                    HorizontalDivider(Modifier.alpha(alpha))
                 }
             }
             AnimatedVisibility(

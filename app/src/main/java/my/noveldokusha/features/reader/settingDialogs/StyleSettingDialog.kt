@@ -42,9 +42,9 @@ import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.toSize
 import my.noveldokusha.R
-import my.noveldokusha.ui.composeViews.MySlider
 import my.noveldokusha.features.reader.ReaderScreenState
 import my.noveldokusha.features.reader.tools.FontsLoader
+import my.noveldokusha.ui.composeViews.MySlider
 import my.noveldokusha.ui.theme.ColorAccent
 import my.noveldokusha.ui.theme.Themes
 

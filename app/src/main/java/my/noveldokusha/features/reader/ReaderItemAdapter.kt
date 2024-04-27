@@ -25,9 +25,9 @@ import my.noveldokusha.databinding.ActivityReaderListItemProgressBarBinding
 import my.noveldokusha.databinding.ActivityReaderListItemSpecialTitleBinding
 import my.noveldokusha.databinding.ActivityReaderListItemTitleBinding
 import my.noveldokusha.databinding.ActivityReaderListItemTranslatingBinding
+import my.noveldokusha.features.reader.features.TextSynthesis
 import my.noveldokusha.repository.AppFileResolver
 import my.noveldokusha.tools.Utterance
-import my.noveldokusha.features.reader.features.TextSynthesis
 import my.noveldokusha.utils.inflater
 
 class ReaderItemAdapter(

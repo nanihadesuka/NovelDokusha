@@ -3,9 +3,9 @@ package my.noveldokusha.scraper.sources
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import my.noveldokusha.R
-import my.noveldokusha.data.BookMetadata
-import my.noveldokusha.data.ChapterMetadata
 import my.noveldokusha.data.Response
+import my.noveldokusha.feature.local_database.BookMetadata
+import my.noveldokusha.feature.local_database.ChapterMetadata
 import my.noveldokusha.network.NetworkClient
 import my.noveldokusha.network.PagedList
 import my.noveldokusha.network.postRequest
@@ -64,7 +64,12 @@ class WuxiaWorld(
             networkClient.call(request)
                 .toDocument()
                 .select(".wp-manga-chapter > a[href]")
-                .map { ChapterMetadata(title = it.text(), url = it.attr("href")) }
+                .map {
+                    ChapterMetadata(
+                        title = it.text(),
+                        url = it.attr("href")
+                    )
+                }
                 .reversed()
         }
     }

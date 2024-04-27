@@ -1,7 +1,6 @@
 package my.noveldokusha.scraper
 
 import androidx.annotation.StringRes
-import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.data.Response
 import my.noveldokusha.network.PagedList
 
@@ -18,15 +17,15 @@ interface DatabaseInterface {
 
     val searchGenresCacheFileName get() = "database_search_genres_v2_$id"
 
-    suspend fun getCatalog(index: Int): Response<PagedList<BookMetadata>>
+    suspend fun getCatalog(index: Int): Response<PagedList<my.noveldokusha.feature.local_database.BookMetadata>>
 
-    suspend fun searchByTitle(index: Int, input: String): Response<PagedList<BookMetadata>>
+    suspend fun searchByTitle(index: Int, input: String): Response<PagedList<my.noveldokusha.feature.local_database.BookMetadata>>
 
     suspend fun searchByFilters(
         index: Int,
         genresIncludedId: List<String>,
         genresExcludedId: List<String>
-    ): Response<PagedList<BookMetadata>>
+    ): Response<PagedList<my.noveldokusha.feature.local_database.BookMetadata>>
 
     suspend fun getSearchFilters(): Response<List<SearchGenre>>
 
@@ -44,15 +43,15 @@ interface DatabaseInterface {
         val tags: List<String>,
         val genres: List<SearchGenre>,
         val bookType: String,
-        val relatedBooks: List<BookMetadata>,
-        val similarRecommended: List<BookMetadata>,
+        val relatedBooks: List<my.noveldokusha.feature.local_database.BookMetadata>,
+        val similarRecommended: List<my.noveldokusha.feature.local_database.BookMetadata>,
         val coverImageUrl: String?
     )
 
     data class AuthorData(
         val name: String,
         val coverImageUrl: String? = null,
-        val books: List<BookMetadata>,
+        val books: List<my.noveldokusha.feature.local_database.BookMetadata>,
         val description: String = "",
         val associatedNames: List<String> = listOf(),
         val genres: List<String> = listOf(),

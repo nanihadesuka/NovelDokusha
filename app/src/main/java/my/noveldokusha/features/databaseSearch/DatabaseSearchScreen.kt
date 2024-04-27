@@ -34,8 +34,8 @@ import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import my.noveldokusha.AppPreferences
 import my.noveldokusha.R
-import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.data.Response
+import my.noveldokusha.feature.local_database.BookMetadata
 import my.noveldokusha.network.PagedList
 import my.noveldokusha.network.PagedListIteratorState
 import my.noveldokusha.ui.composeViews.BooksVerticalView

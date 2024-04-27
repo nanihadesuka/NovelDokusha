@@ -31,7 +31,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import my.noveldokusha.AppPreferences
 import my.noveldokusha.R
-import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.ui.composeViews.AnimatedTransition
 import my.noveldokusha.ui.composeViews.BooksVerticalView
 import my.noveldokusha.ui.composeViews.CollapsibleDivider
@@ -49,8 +48,8 @@ fun SourceCatalogScreen(
     onListLayoutModeChange: (AppPreferences.LIST_LAYOUT_MODE) -> Unit,
     onToolbarModeChange: (ToolbarMode) -> Unit,
     onOpenSourceWebPage: () -> Unit,
-    onBookClicked: (BookMetadata) -> Unit,
-    onBookLongClicked: (BookMetadata) -> Unit,
+    onBookClicked: (my.noveldokusha.feature.local_database.BookMetadata) -> Unit,
+    onBookLongClicked: (my.noveldokusha.feature.local_database.BookMetadata) -> Unit,
     onPressBack: () -> Unit,
 ) {
     val context by rememberUpdatedState(newValue = LocalContext.current)

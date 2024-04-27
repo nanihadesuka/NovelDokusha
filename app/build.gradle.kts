@@ -9,7 +9,6 @@ plugins {
     alias(libs.plugins.kotlin.parcelize)
     alias(libs.plugins.kotlin.scripting)
     alias(libs.plugins.kotlin.serialization)
-
 }
 
 inner class CLICustomSettings {
@@ -154,16 +153,12 @@ fun DependencyHandler.fossImplementation(dependencyNotation: Any): Dependency? =
 
 dependencies {
 
+    implementation(project(":features:local_database"))
+
     // Kotlin
     implementation(libs.kotlinx.coroutines.core)
     implementation(libs.kotlin.script.runtime)
     implementation(libs.kotlin.stdlib)
-
-    // Room components
-    implementation(libs.androidx.room.runtime)
-    implementation(libs.androidx.room.ktx)
-    ksp(libs.androidx.room.compiler)
-    androidTestImplementation(libs.androidx.room.testing)
 
     // Lifecycle components
     implementation(libs.androidx.lifecycle.viewmodel.ktx)

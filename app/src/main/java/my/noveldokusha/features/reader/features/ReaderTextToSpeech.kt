@@ -17,12 +17,12 @@ import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import my.noveldokusha.VoicePredefineState
-import my.noveldokusha.tools.TextToSpeechManager
-import my.noveldokusha.tools.Utterance
-import my.noveldokusha.tools.VoiceData
 import my.noveldokusha.features.reader.ChapterIndex
 import my.noveldokusha.features.reader.ReaderItem
 import my.noveldokusha.features.reader.tools.indexOfReaderItem
+import my.noveldokusha.tools.TextToSpeechManager
+import my.noveldokusha.tools.Utterance
+import my.noveldokusha.tools.VoiceData
 
 data class TextToSpeechSettingData(
     val isPlaying: MutableState<Boolean>,

@@ -25,7 +25,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.distinctUntilChanged
 import my.noveldokusha.R
-import my.noveldokusha.data.ChapterWithContext
 import my.noveldokusha.ui.composeViews.ErrorView
 
 @OptIn(ExperimentalMaterialApi::class)
@@ -34,9 +33,9 @@ fun ChaptersScreenBody(
     state: ChaptersScreenState,
     lazyListState: LazyListState,
     innerPadding: PaddingValues,
-    onChapterClick: (chapter: ChapterWithContext) -> Unit,
-    onChapterLongClick: (chapter: ChapterWithContext) -> Unit,
-    onChapterDownload: (chapter: ChapterWithContext) -> Unit,
+    onChapterClick: (chapter: my.noveldokusha.feature.local_database.ChapterWithContext) -> Unit,
+    onChapterLongClick: (chapter: my.noveldokusha.feature.local_database.ChapterWithContext) -> Unit,
+    onChapterDownload: (chapter: my.noveldokusha.feature.local_database.ChapterWithContext) -> Unit,
     onPullRefresh: () -> Unit,
     onCoverLongClick: () -> Unit,
 ) {

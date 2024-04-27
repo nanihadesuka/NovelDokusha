@@ -6,8 +6,8 @@ import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.TopAppBarState
 import androidx.compose.runtime.Composable
@@ -42,7 +42,7 @@ fun CollapsibleDivider(
         label = "divider fill width fraction",
     )
     Box(modifier = modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-        Divider(color = alpha, modifier = Modifier.padding(horizontal = padding))
+        HorizontalDivider(modifier = Modifier.padding(horizontal = padding), color = alpha)
     }
 }
 
@@ -69,6 +69,6 @@ fun CollapsibleDivider(
         label = "divider fill width fraction",
     )
     Box(modifier = modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-        Divider(color = alpha, modifier = Modifier.padding(horizontal = padding))
+        HorizontalDivider(modifier = Modifier.padding(horizontal = padding), color = alpha)
     }
 }

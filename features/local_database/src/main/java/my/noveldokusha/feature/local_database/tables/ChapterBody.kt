@@ -1,4 +1,4 @@
-package my.noveldokusha.data.database.tables
+package my.noveldokusha.feature.local_database.tables
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey

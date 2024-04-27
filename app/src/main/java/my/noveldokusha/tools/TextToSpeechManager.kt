@@ -29,7 +29,7 @@ data class VoiceData(
     val quality: Int,
 )
 
-class TextToSpeechManager<T : Utterance<T>> constructor(
+class TextToSpeechManager<T : Utterance<T>>(
     private val context: Context,
     private val initialItemState: T,
 ) {

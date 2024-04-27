@@ -16,7 +16,6 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import my.noveldokusha.R
-import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.ui.composeViews.TopAppBarSearch
 import my.noveldokusha.ui.theme.ColorAccent
 import my.noveldokusha.ui.theme.InternalTheme
@@ -29,7 +28,7 @@ fun GlobalSourceSearchScreen(
     listSources: List<SourceResults>,
     onSearchInputChange: (String) -> Unit,
     onSearchInputSubmit: (String) -> Unit,
-    onBookClick: (book: BookMetadata) -> Unit,
+    onBookClick: (book: my.noveldokusha.feature.local_database.BookMetadata) -> Unit,
     onPressBack: () -> Unit
 ) {
     val focusRequester = remember { FocusRequester() }
@@ -59,9 +58,9 @@ fun GlobalSourceSearchScreen(
                     }
                 }
                 LinearProgressIndicator(
-                    progress = progress,
+                    progress = { progress },
+                    modifier = Modifier.fillMaxWidth(),
                     color = ColorAccent,
-                    modifier = Modifier.fillMaxWidth()
                 )
             }
         },

@@ -24,7 +24,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.viewmodel.compose.viewModel
 import my.noveldokusha.R
-import my.noveldokusha.data.BookMetadata
+import my.noveldokusha.feature.local_database.BookMetadata
 import my.noveldokusha.features.chaptersList.ChaptersActivity
 import my.noveldokusha.ui.composeViews.BookSettingsDialog
 import my.noveldokusha.ui.composeViews.BookSettingsDialogState
@@ -90,7 +90,10 @@ fun LibraryScreen(
                 onBookClick = { book ->
                     val intent = ChaptersActivity.IntentData(
                         context,
-                        bookMetadata = BookMetadata(title = book.book.title, url = book.book.url)
+                        bookMetadata = BookMetadata(
+                            title = book.book.title,
+                            url = book.book.url
+                        )
                     )
                     context.startActivity(intent)
                 },

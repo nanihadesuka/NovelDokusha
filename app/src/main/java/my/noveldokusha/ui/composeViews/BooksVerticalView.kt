@@ -24,7 +24,7 @@ import androidx.compose.ui.unit.dp
 import my.noveldokusha.AppPreferences
 import my.noveldokusha.R
 import my.noveldokusha.composableActions.ListGridLoadWatcher
-import my.noveldokusha.data.BookMetadata
+import my.noveldokusha.feature.local_database.BookMetadata
 import my.noveldokusha.network.IteratorState
 import my.noveldokusha.repository.rememberResolvedBookImagePath
 import my.noveldokusha.ui.bounceOnPressed

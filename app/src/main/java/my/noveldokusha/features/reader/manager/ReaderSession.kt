@@ -14,12 +14,7 @@ import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import my.noveldokusha.AppPreferences
-import my.noveldokusha.data.database.tables.Chapter
 import my.noveldokusha.di.AppCoroutineScope
-import my.noveldokusha.repository.AppRepository
-import my.noveldokusha.services.narratorMediaControls.NarratorMediaControlsService
-import my.noveldokusha.tools.TranslationManager
-import my.noveldokusha.tools.Utterance
 import my.noveldokusha.features.reader.ChapterState
 import my.noveldokusha.features.reader.ReaderItem
 import my.noveldokusha.features.reader.ReaderState
@@ -30,6 +25,10 @@ import my.noveldokusha.features.reader.features.ReaderLiveTranslation
 import my.noveldokusha.features.reader.features.ReaderTextToSpeech
 import my.noveldokusha.features.reader.tools.ChaptersIsReadRoutine
 import my.noveldokusha.features.reader.tools.InitialPositionChapter
+import my.noveldokusha.repository.AppRepository
+import my.noveldokusha.services.narratorMediaControls.NarratorMediaControlsService
+import my.noveldokusha.tools.TranslationManager
+import my.noveldokusha.tools.Utterance
 import kotlin.properties.Delegates
 
 class ReaderSession(
@@ -50,7 +49,7 @@ class ReaderSession(
     private var chapterUrl: String = initialChapterUrl
 
     private val readRoutine = ChaptersIsReadRoutine(appRepository)
-    private val orderedChapters = mutableListOf<Chapter>()
+    private val orderedChapters = mutableListOf<my.noveldokusha.feature.local_database.tables.Chapter>()
 
     var bookTitle: String? = null
     var bookCoverUrl: String? = null

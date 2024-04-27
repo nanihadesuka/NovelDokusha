@@ -3,9 +3,9 @@ package my.noveldokusha.scraper.sources
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import my.noveldokusha.R
-import my.noveldokusha.data.BookMetadata
-import my.noveldokusha.data.ChapterMetadata
 import my.noveldokusha.data.Response
+import my.noveldokusha.feature.local_database.BookMetadata
+import my.noveldokusha.feature.local_database.ChapterMetadata
 import my.noveldokusha.network.NetworkClient
 import my.noveldokusha.network.PagedList
 import my.noveldokusha.network.postRequest
@@ -85,7 +85,12 @@ class Wuxia(
 
             (newChapters + oldChapters)
                 .reversed()
-                .map { ChapterMetadata(title = it.text(), url = it.attr("href")) }
+                .map {
+                    ChapterMetadata(
+                        title = it.text(),
+                        url = it.attr("href")
+                    )
+                }
         }
     }
 
@@ -99,7 +104,12 @@ class Wuxia(
             networkClient.get(catalogUrl)
                 .toDocument()
                 .select("td.novel a[href]")
-                .map { BookMetadata(title = it.text(), url = baseUrl + it.attr("href")) }
+                .map {
+                    BookMetadata(
+                        title = it.text(),
+                        url = baseUrl + it.attr("href")
+                    )
+                }
                 .let { PagedList(list = it, index = index, isLastPage = true) }
         }
     }

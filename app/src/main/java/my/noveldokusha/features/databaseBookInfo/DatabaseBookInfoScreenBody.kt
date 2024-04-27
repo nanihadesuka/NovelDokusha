@@ -5,7 +5,6 @@ import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
-import androidx.compose.animation.with
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -48,7 +47,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import my.noveldokusha.R
-import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.scraper.SearchGenre
 import my.noveldokusha.ui.bounceOnPressed
 import my.noveldokusha.ui.composeViews.BookImageButtonView
@@ -70,7 +68,7 @@ fun DatabaseBookInfoScreenBody(
     scrollState: ScrollState,
     onSourcesClick: () -> Unit,
     onGenresClick: (genresIds: List<SearchGenre>) -> Unit,
-    onBookClick: (book: BookMetadata) -> Unit,
+    onBookClick: (book: my.noveldokusha.feature.local_database.BookMetadata) -> Unit,
     innerPadding: PaddingValues,
     modifier: Modifier = Modifier,
 ) {

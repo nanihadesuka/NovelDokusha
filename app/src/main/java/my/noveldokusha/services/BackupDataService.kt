@@ -13,7 +13,6 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import my.noveldokusha.R
-import my.noveldokusha.data.database.AppDatabase
 import my.noveldokusha.repository.AppRepository
 import my.noveldokusha.utils.Extra_Boolean
 import my.noveldokusha.utils.Extra_Uri
@@ -33,7 +32,7 @@ import javax.inject.Inject
 class BackupDataService : Service() {
 
     @Inject
-    lateinit var appDatabase: AppDatabase
+    lateinit var appDatabase: my.noveldokusha.feature.local_database.AppDatabase
 
     @Inject
     lateinit var appRepository: AppRepository

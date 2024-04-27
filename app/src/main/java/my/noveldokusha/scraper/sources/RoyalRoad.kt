@@ -3,14 +3,12 @@ package my.noveldokusha.scraper.sources
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import my.noveldokusha.R
-import my.noveldokusha.data.BookMetadata
-import my.noveldokusha.data.ChapterMetadata
 import my.noveldokusha.data.Response
+import my.noveldokusha.feature.local_database.BookMetadata
+import my.noveldokusha.feature.local_database.ChapterMetadata
 import my.noveldokusha.network.NetworkClient
 import my.noveldokusha.network.PagedList
 import my.noveldokusha.network.getRequest
-import my.noveldokusha.network.postPayload
-import my.noveldokusha.network.postRequest
 import my.noveldokusha.network.tryConnect
 import my.noveldokusha.scraper.LanguageCode
 import my.noveldokusha.scraper.SourceInterface
@@ -78,10 +76,15 @@ class RoyalRoad(
         tryConnect {
             var chapterRows = networkClient.get(bookUrl)
                 .toDocument()
-                .select(".chapter-row");
+                .select(".chapter-row")
 
             chapterRows.select("a[href]")
-                .map { ChapterMetadata(title = it.text(), url = URI(baseUrl).resolve(it.attr("href")).toString()) }
+                .map {
+                    ChapterMetadata(
+                        title = it.text(),
+                        url = URI(baseUrl).resolve(it.attr("href")).toString()
+                    )
+                }
         }
     }
 
@@ -99,7 +102,7 @@ class RoyalRoad(
             val fictionListItems = doc.select(".fiction-list-item")
             val pageBooks = fictionListItems
                 .mapNotNull {
-                    val nullableHref = it.select("a[href]").getOrNull(1);
+                    val nullableHref = it.select("a[href]").getOrNull(1)
                     val link = nullableHref ?: return@mapNotNull null
                     val bookCover = it.selectFirst("img[src]")?.attr("src") ?: ""
                     BookMetadata(
@@ -107,7 +110,7 @@ class RoyalRoad(
                         url = URI(baseUrl).resolve(link.attr("href")).toString(),
                         coverImageUrl = bookCover
                     )
-                };
+                }
 
             PagedList(
                 list = pageBooks,
@@ -146,18 +149,18 @@ class RoyalRoad(
                 .addHeader("sec-fetch-site", "same-origin")
                 .addHeader("x-requested-with", "XMLHttpRequest")
 
-            var fictionListItems = networkClient.call(request)
+            val fictionListItems = networkClient.call(request)
                 .toDocument()
-                .select(".fiction-list-item");
+                .select(".fiction-list-item")
 
             fictionListItems.mapNotNull {
                     val link = it.select("a[href]").getOrNull(1) ?: return@mapNotNull null
                     val bookCover = it.selectFirst("img[src]")?.attr("src") ?: ""
-                    BookMetadata(
-                        title = link.text(),
-                        url =  URI(baseUrl).resolve(link.attr("href")).toString(),
-                        coverImageUrl = bookCover
-                    )
+                BookMetadata(
+                    title = link.text(),
+                    url = URI(baseUrl).resolve(link.attr("href")).toString(),
+                    coverImageUrl = bookCover
+                )
                 }
                 .let {
                     PagedList(

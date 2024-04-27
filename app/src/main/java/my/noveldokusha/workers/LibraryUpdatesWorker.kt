@@ -21,7 +21,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import my.noveldokusha.data.LibraryCategory
 import my.noveldokusha.data.Response
-import my.noveldokusha.data.database.tables.Book
 import my.noveldokusha.interactor.LibraryUpdatesInteractions
 import my.noveldokusha.notifications.LibraryUpdateNotification
 import my.noveldokusha.utils.tryAsResponse
@@ -114,9 +113,9 @@ class LibraryUpdatesWorker @AssistedInject constructor(
 
             val countingUpdating =
                 MutableStateFlow<LibraryUpdatesInteractions.CountingUpdating?>(null)
-            val currentUpdating = MutableStateFlow<Set<Book>>(setOf())
+            val currentUpdating = MutableStateFlow<Set<my.noveldokusha.feature.local_database.tables.Book>>(setOf())
             val newUpdates = MutableStateFlow<Set<LibraryUpdatesInteractions.NewUpdate>>(setOf())
-            val failedUpdates = MutableStateFlow<Set<Book>>(setOf())
+            val failedUpdates = MutableStateFlow<Set<my.noveldokusha.feature.local_database.tables.Book>>(setOf())
 
             val currentUpdatingNotifyJob = launch(Dispatchers.Main) {
                 combine(

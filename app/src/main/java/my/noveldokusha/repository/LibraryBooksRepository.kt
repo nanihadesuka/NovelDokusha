@@ -5,10 +5,10 @@ import android.net.Uri
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import my.noveldokusha.data.database.AppDatabaseOperations
-import my.noveldokusha.data.database.DAOs.LibraryDao
-import my.noveldokusha.data.database.tables.Book
 import my.noveldokusha.di.AppCoroutineScope
+import my.noveldokusha.feature.local_database.AppDatabase
+import my.noveldokusha.feature.local_database.DAOs.LibraryDao
+import my.noveldokusha.feature.local_database.tables.Book
 import my.noveldokusha.utils.fileImporter
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -16,7 +16,7 @@ import javax.inject.Singleton
 @Singleton
 class LibraryBooksRepository @Inject constructor(
     private val libraryDao: LibraryDao,
-    private val operations: AppDatabaseOperations,
+    private val appDatabase: AppDatabase,
     @ApplicationContext private val context: Context,
     private val appFileResolver: AppFileResolver,
     private val appCoroutineScope: AppCoroutineScope,
@@ -57,7 +57,7 @@ class LibraryBooksRepository @Inject constructor(
     suspend fun toggleBookmark(
         bookUrl: String,
         bookTitle: String
-    ): Boolean = operations.transaction {
+    ): Boolean = appDatabase.transaction {
         when (val book = get(bookUrl)) {
             null -> {
                 insert(Book(title = bookTitle, url = bookUrl, inLibrary = true))

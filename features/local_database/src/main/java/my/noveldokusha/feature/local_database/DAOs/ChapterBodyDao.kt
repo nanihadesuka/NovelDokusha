@@ -1,10 +1,10 @@
-package my.noveldokusha.data.database.DAOs
+package my.noveldokusha.feature.local_database.DAOs
 
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import my.noveldokusha.data.database.tables.ChapterBody
+import my.noveldokusha.feature.local_database.tables.ChapterBody
 
 @Dao
 interface ChapterBodyDao {

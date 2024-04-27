@@ -26,9 +26,9 @@ import androidx.compose.ui.window.Dialog
 import my.noveldokusha.R
 import my.noveldokusha.domain.AppVersion
 import my.noveldokusha.domain.RemoteAppVersion
+import my.noveldokusha.features.main.settings.SettingsScreenState
 import my.noveldokusha.ui.composeViews.ImageView
 import my.noveldokusha.ui.composeViews.MyButton
-import my.noveldokusha.features.main.settings.SettingsScreenState
 import my.noveldokusha.ui.theme.InternalTheme
 
 @Composable

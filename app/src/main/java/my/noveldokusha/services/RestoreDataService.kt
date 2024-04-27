@@ -15,8 +15,8 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import my.noveldokusha.R
-import my.noveldokusha.data.database.AppDatabase
 import my.noveldokusha.di.AppCoroutineScope
+import my.noveldokusha.feature.local_database.AppDatabase
 import my.noveldokusha.network.NetworkClient
 import my.noveldokusha.repository.AppFileResolver
 import my.noveldokusha.repository.AppRepository
@@ -192,13 +192,13 @@ class RestoreDataService : Service() {
                         bookChapters = bookChaptersRepository,
                         chapterBody = ChapterBodyRepository(
                             chapterBodyDao = newDatabase.chapterBodyDao(),
-                            operations = newDatabase,
+                            appDatabase = newDatabase,
                             bookChaptersRepository = bookChaptersRepository,
                             downloaderRepository = downloaderRepository
                         ),
                         libraryBooks = LibraryBooksRepository(
                             libraryDao = newDatabase.libraryDao(),
-                            operations = newDatabase,
+                            appDatabase = newDatabase,
                             context = context,
                             appFileResolver = appFileResolver,
                             appCoroutineScope = appCoroutineScope

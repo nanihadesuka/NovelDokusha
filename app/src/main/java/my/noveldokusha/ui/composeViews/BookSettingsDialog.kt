@@ -25,9 +25,8 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.parcelize.Parcelize
 import my.noveldokusha.R
-import my.noveldokusha.data.database.tables.Book
-import my.noveldokusha.repository.rememberResolvedBookImagePath
 import my.noveldokusha.features.main.library.LibraryViewModel
+import my.noveldokusha.repository.rememberResolvedBookImagePath
 import my.noveldokusha.ui.theme.ImageBorderShape
 import my.noveldokusha.ui.theme.colorApp
 
@@ -37,12 +36,12 @@ sealed interface BookSettingsDialogState : Parcelable {
     object Hide : BookSettingsDialogState
 
     @Parcelize
-    data class Show(val book: Book) : BookSettingsDialogState
+    data class Show(val book: my.noveldokusha.feature.local_database.tables.Book) : BookSettingsDialogState
 }
 
 @Composable
 fun BookSettingsDialog(
-    currentBook: Book,
+    currentBook: my.noveldokusha.feature.local_database.tables.Book,
     onDismiss: () -> Unit,
     model: LibraryViewModel = viewModel()
 ) {

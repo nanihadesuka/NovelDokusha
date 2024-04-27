@@ -3,9 +3,8 @@ package my.noveldokusha.scraper.sources
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import my.noveldokusha.R
-import my.noveldokusha.data.BookMetadata
-import my.noveldokusha.data.ChapterMetadata
 import my.noveldokusha.data.Response
+import my.noveldokusha.feature.local_database.BookMetadata
 import my.noveldokusha.network.NetworkClient
 import my.noveldokusha.network.PagedList
 import my.noveldokusha.network.postRequest
@@ -51,7 +50,7 @@ class BoxNovel(
 
     override suspend fun getChapterList(
         bookUrl: String
-    ): Response<List<ChapterMetadata>> = withContext(Dispatchers.Default) {
+    ): Response<List<my.noveldokusha.feature.local_database.ChapterMetadata>> = withContext(Dispatchers.Default) {
         tryConnect {
             val url = bookUrl
                 .toUrlBuilderSafe()
@@ -62,7 +61,12 @@ class BoxNovel(
             networkClient.call(postRequest(url))
                 .toDocument()
                 .select(".wp-manga-chapter > a[href]")
-                .map { ChapterMetadata(title = it.text(), url = it.attr("href")) }
+                .map {
+                    my.noveldokusha.feature.local_database.ChapterMetadata(
+                        title = it.text(),
+                        url = it.attr("href")
+                    )
+                }
                 .reversed()
         }
     }

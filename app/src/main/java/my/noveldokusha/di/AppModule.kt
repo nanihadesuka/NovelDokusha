@@ -12,11 +12,6 @@ import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import my.noveldokusha.App
-import my.noveldokusha.data.database.AppDatabase
-import my.noveldokusha.data.database.AppDatabaseOperations
-import my.noveldokusha.data.database.DAOs.ChapterBodyDao
-import my.noveldokusha.data.database.DAOs.ChapterDao
-import my.noveldokusha.data.database.DAOs.LibraryDao
 import my.noveldokusha.network.NetworkClient
 import my.noveldokusha.network.ScraperNetworkClient
 import my.noveldokusha.ui.Toasty
@@ -38,30 +33,6 @@ abstract class AppModule {
         @Singleton
         fun providesApp(@ApplicationContext context: Context): App {
             return context as App
-        }
-
-        @Provides
-        @Singleton
-        fun provideAppDatabase(@ApplicationContext context: Context): AppDatabase {
-            return AppDatabase.createRoom(context, name = "bookEntry")
-        }
-
-        @Provides
-        @Singleton
-        fun provideLibraryDao(database: AppDatabase): LibraryDao = database.libraryDao()
-
-        @Provides
-        @Singleton
-        fun provideChapterDao(database: AppDatabase): ChapterDao = database.chapterDao()
-
-        @Provides
-        @Singleton
-        fun provideChapterBodyDao(database: AppDatabase): ChapterBodyDao = database.chapterBodyDao()
-
-        @Provides
-        @Singleton
-        fun provideAppDatabaseOperations(database: AppDatabase): AppDatabaseOperations {
-            return database
         }
 
         @Provides

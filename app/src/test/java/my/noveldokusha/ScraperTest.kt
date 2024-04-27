@@ -5,7 +5,9 @@ import my.noveldokusha.network.NetworkClient
 import my.noveldokusha.repository.AppFileResolver
 import my.noveldokusha.scraper.LocalSourcesDirectories
 import my.noveldokusha.scraper.Scraper
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith

@@ -18,7 +18,7 @@ import androidx.compose.material.icons.filled.CloudDownload
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.outlined.Done
 import androidx.compose.material.icons.outlined.Translate
-import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -89,8 +89,7 @@ fun SettingsTranslationModelsDialog(
     setVisible: (Boolean) -> Unit,
 ) {
     val state = rememberLazyListState()
-    if (visible) AlertDialog(
-        onDismissRequest = { setVisible(false) }
+    if (visible) BasicAlertDialog(onDismissRequest = { setVisible(false) }
     ) {
         Card {
             LazyColumn(

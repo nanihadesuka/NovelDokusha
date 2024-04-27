@@ -3,7 +3,7 @@ package my.noveldokusha.ui
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import my.noveldokusha.R
-import my.noveldokusha.data.BookMetadata
+import my.noveldokusha.feature.local_database.BookMetadata
 import my.noveldokusha.features.chaptersList.ChaptersActivity
 
 class DebugGoToChapters : AppCompatActivity() {

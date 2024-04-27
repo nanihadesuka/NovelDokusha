@@ -26,9 +26,9 @@ import androidx.compose.material.icons.outlined.Save
 import androidx.compose.material.icons.outlined.SettingsBackupRestore
 import androidx.compose.material.icons.outlined.Timer
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
@@ -50,8 +50,8 @@ import androidx.compose.ui.unit.dp
 import my.noveldokusha.R
 import my.noveldokusha.domain.AppVersion
 import my.noveldokusha.domain.RemoteAppVersion
-import my.noveldokusha.ui.composeViews.SettingsTranslationModels
 import my.noveldokusha.features.main.settings.views.NewAppUpdateDialog
+import my.noveldokusha.ui.composeViews.SettingsTranslationModels
 import my.noveldokusha.ui.theme.ColorAccent
 import my.noveldokusha.ui.theme.InternalTheme
 import my.noveldokusha.ui.theme.PreviewThemes
@@ -233,29 +233,29 @@ fun SettingsScreenBody(
             onFollowSystemChange = onFollowSystem,
             onCurrentThemeChange = onThemeSelected
         )
-        Divider()
+        HorizontalDivider()
         SettingsData(
             databaseSize = state.databaseSize.value,
             imagesFolderSize = state.imageFolderSize.value,
             onCleanDatabase = onCleanDatabase,
             onCleanImageFolder = onCleanImageFolder
         )
-        Divider()
+        HorizontalDivider()
         SettingsBackup(
             onBackupData = onBackupData,
             onRestoreData = onRestoreData
         )
         if (state.isTranslationSettingsVisible.value) {
-            Divider()
+            HorizontalDivider()
             SettingsTranslationModels(
                 translationModelsStates = state.translationModelsStates,
                 onDownloadTranslationModel = onDownloadTranslationModel,
                 onRemoveTranslationModel = onRemoveTranslationModel
             )
         }
-        Divider()
+        HorizontalDivider()
         LibraryAutoUpdate(state = state.libraryAutoUpdate)
-        Divider()
+        HorizontalDivider()
         AppUpdates(
             state = state.updateAppSetting,
             onCheckForUpdatesManual = onCheckForUpdatesManual

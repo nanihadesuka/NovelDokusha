@@ -24,7 +24,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import my.noveldokusha.R
 import my.noveldokusha.composableActions.ListLoadWatcher
-import my.noveldokusha.data.BookMetadata
+import my.noveldokusha.feature.local_database.BookMetadata
 import my.noveldokusha.network.IteratorState
 import my.noveldokusha.repository.CatalogItem
 import my.noveldokusha.repository.rememberResolvedBookImagePath
@@ -155,7 +155,12 @@ private fun PreviewView() {
         val (catalog, books) = CatalogItem(
             catalog = source,
             pinned = false
-        ) to (0..5).map { BookMetadata(title = "Book $it", url = "") }
+        ) to (0..5).map {
+            BookMetadata(
+                title = "Book $it",
+                url = ""
+            )
+        }
 
         val sr = SourceResults(catalog, "", rememberCoroutineScope())
         when (index) {

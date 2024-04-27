@@ -11,7 +11,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.ripple.rememberRipple
-import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -71,7 +71,7 @@ fun ErrorView(
                         textAlign = TextAlign.Center,
                     )
             }
-            Divider(color = MaterialTheme.colorScheme.onError)
+            HorizontalDivider(color = MaterialTheme.colorScheme.onError)
         }
         SelectionContainer {
             Text(

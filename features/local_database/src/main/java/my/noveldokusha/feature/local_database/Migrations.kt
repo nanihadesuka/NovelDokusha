@@ -1,11 +1,11 @@
-package my.noveldokusha.data.database
+package my.noveldokusha.feature.local_database
 
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
-import my.noveldokusha.data.database.migrations.MigrationsList
-import my.noveldokusha.data.database.migrations.readLightNovelDomainChange_1
+import my.noveldokusha.feature.local_database.migrations.MigrationsList
+import my.noveldokusha.feature.local_database.migrations.readLightNovelDomainChange_1
 
-fun databaseMigrations() = arrayOf(
+internal fun databaseMigrations() = arrayOf(
     migration(1, 2) {
         it.execSQL("ALTER TABLE Chapter ADD COLUMN position INTEGER NOT NULL DEFAULT 0")
     },
@@ -23,7 +23,7 @@ fun databaseMigrations() = arrayOf(
     migration(5, 6, MigrationsList::readLightNovelDomainChange_1)
 )
 
-fun migration(vi: Int, vf: Int, migrate: (SupportSQLiteDatabase) -> Unit) =
+internal fun migration(vi: Int, vf: Int, migrate: (SupportSQLiteDatabase) -> Unit) =
     object : Migration(vi, vf) {
         override fun migrate(database: SupportSQLiteDatabase) = migrate(database)
     }

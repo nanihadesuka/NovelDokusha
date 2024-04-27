@@ -11,7 +11,6 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import my.noveldokusha.composableActions.SetSystemBarTransparent
 import my.noveldokusha.composableActions.onDoAskForImage
-import my.noveldokusha.data.BookMetadata
 import my.noveldokusha.ui.BaseActivity
 import my.noveldokusha.ui.goToDatabaseSearch
 import my.noveldokusha.ui.goToReader
@@ -25,7 +24,7 @@ class ChaptersActivity : BaseActivity() {
         override var bookTitle by Extra_String()
 
         constructor(intent: Intent) : super(intent)
-        constructor(ctx: Context, bookMetadata: BookMetadata) : super(
+        constructor(ctx: Context, bookMetadata: my.noveldokusha.feature.local_database.BookMetadata) : super(
             ctx,
             ChaptersActivity::class.java
         ) {

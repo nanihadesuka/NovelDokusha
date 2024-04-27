@@ -8,3 +8,4 @@ pluginManagement {
 
 rootProject.name = "NovelDokusha"
 include(":app")
+include(":features:local_database")

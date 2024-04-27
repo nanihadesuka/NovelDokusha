@@ -8,7 +8,7 @@ import android.view.WindowManager
 import android.widget.AbsListView
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
-import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
 import androidx.compose.runtime.snapshotFlow
@@ -32,12 +32,12 @@ import kotlinx.coroutines.withContext
 import my.noveldokusha.R
 import my.noveldokusha.composableActions.SetSystemBarTransparent
 import my.noveldokusha.databinding.ActivityReaderBinding
-import my.noveldokusha.tools.Utterance
-import my.noveldokusha.ui.BaseActivity
-import my.noveldokusha.ui.goToWebViewWithUrl
 import my.noveldokusha.features.main.settings.SettingsViewModel
 import my.noveldokusha.features.reader.tools.FontsLoader
 import my.noveldokusha.features.reader.tools.indexOfReaderItem
+import my.noveldokusha.tools.Utterance
+import my.noveldokusha.ui.BaseActivity
+import my.noveldokusha.ui.goToWebViewWithUrl
 import my.noveldokusha.ui.theme.Theme
 import my.noveldokusha.utils.Extra_Boolean
 import my.noveldokusha.utils.Extra_String
@@ -273,10 +273,9 @@ class ReaderActivity : BaseActivity() {
                 )
 
                 if (viewModel.state.showInvalidChapterDialog.value) {
-                    AlertDialog(
-                        onDismissRequest = {
-                            viewModel.state.showInvalidChapterDialog.value = false
-                        }
+                    BasicAlertDialog(onDismissRequest = {
+                        viewModel.state.showInvalidChapterDialog.value = false
+                    }
                     ) {
                         Text(stringResource(id = R.string.invalid_chapter))
                     }
