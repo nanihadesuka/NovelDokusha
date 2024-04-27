@@ -3,7 +3,7 @@ package my.noveldokusha.features.reader.manager
 import android.content.Context
 import dagger.hilt.android.qualifiers.ApplicationContext
 import my.noveldokusha.AppPreferences
-import my.noveldokusha.features.reader.tools.InitialPositionChapter
+import my.noveldokusha.features.reader.features.ReaderViewHandlersActions
 import my.noveldokusha.repository.AppRepository
 import my.noveldokusha.repository.ReaderRepository
 import my.noveldokusha.tools.TranslationManager
@@ -17,15 +17,11 @@ class ReaderSessionProvider @Inject constructor(
     @ApplicationContext private val context: Context,
     private val translationManager: TranslationManager,
     private val readerRepository: ReaderRepository,
+    private val readerViewHandlersActions: ReaderViewHandlersActions,
 ) {
     fun create(
         bookUrl: String,
         initialChapterUrl: String,
-        forceUpdateListViewState: suspend () -> Unit,
-        maintainLastVisiblePosition: suspend (suspend () -> Unit) -> Unit,
-        maintainStartPosition: suspend (suspend () -> Unit) -> Unit,
-        setInitialPosition: suspend (InitialPositionChapter) -> Unit,
-        showInvalidChapterDialog: suspend () -> Unit,
     ): ReaderSession = ReaderSession(
         bookUrl = bookUrl,
         initialChapterUrl = initialChapterUrl,
@@ -33,11 +29,7 @@ class ReaderSessionProvider @Inject constructor(
         translationManager = translationManager,
         appPreferences = appPreferences,
         context = context,
-        forceUpdateListViewState = forceUpdateListViewState,
-        maintainLastVisiblePosition = maintainLastVisiblePosition,
-        maintainStartPosition = maintainStartPosition,
-        setInitialPosition = setInitialPosition,
-        showInvalidChapterDialog = showInvalidChapterDialog,
-        readerRepository = readerRepository
+        readerRepository = readerRepository,
+        readerViewHandlersActions = readerViewHandlersActions,
     )
 }

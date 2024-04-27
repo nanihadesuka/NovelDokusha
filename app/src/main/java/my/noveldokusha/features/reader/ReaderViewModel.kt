@@ -8,8 +8,8 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import my.noveldokusha.AppPreferences
+import my.noveldokusha.features.reader.features.ReaderViewHandlersActions
 import my.noveldokusha.features.reader.manager.ReaderManager
-import my.noveldokusha.features.reader.manager.ReaderManagerViewCallReferences
 import my.noveldokusha.ui.BaseViewModel
 import my.noveldokusha.ui.theme.Themes
 import my.noveldokusha.utils.StateExtra_Boolean
@@ -29,9 +29,8 @@ class ReaderViewModel @Inject constructor(
     stateHandler: SavedStateHandle,
     private val appPreferences: AppPreferences,
     private val readerManager: ReaderManager,
-) : BaseViewModel(),
-    ReaderStateBundle,
-    ReaderManagerViewCallReferences by readerManager {
+    private val readerViewHandlersActions: ReaderViewHandlersActions,
+) : BaseViewModel(), ReaderStateBundle {
 
     override var bookUrl by StateExtra_String(stateHandler)
     override var chapterUrl by StateExtra_String(stateHandler)
@@ -75,13 +74,12 @@ class ReaderViewModel @Inject constructor(
     )
 
     init {
-        showInvalidChapterDialog = {
+        readerViewHandlersActions.showInvalidChapterDialog = {
             withContext(Dispatchers.Main) {
                 state.showInvalidChapterDialog.value = true
             }
         }
     }
-
 
     val items = readerSession.items
     val chaptersLoader = readerSession.readerChaptersLoader
@@ -98,9 +96,6 @@ class ReaderViewModel @Inject constructor(
         readerManager.close()
     }
 
-    fun onViewDestroyed() {
-        readerManager.invalidateViewsHandlers()
-    }
 
     fun startSpeaker(itemIndex: Int) =
         readerSession.startSpeaker(itemIndex = itemIndex)

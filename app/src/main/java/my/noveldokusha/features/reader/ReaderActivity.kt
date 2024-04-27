@@ -33,6 +33,7 @@ import my.noveldokusha.R
 import my.noveldokusha.composableActions.SetSystemBarTransparent
 import my.noveldokusha.databinding.ActivityReaderBinding
 import my.noveldokusha.features.main.settings.SettingsViewModel
+import my.noveldokusha.features.reader.features.ReaderViewHandlersActions
 import my.noveldokusha.features.reader.tools.FontsLoader
 import my.noveldokusha.features.reader.tools.indexOfReaderItem
 import my.noveldokusha.tools.Utterance
@@ -44,6 +45,7 @@ import my.noveldokusha.utils.Extra_String
 import my.noveldokusha.utils.colorAttrRes
 import my.noveldokusha.utils.dpToPx
 import my.noveldokusha.utils.fadeIn
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class ReaderActivity : BaseActivity() {
@@ -67,6 +69,9 @@ class ReaderActivity : BaseActivity() {
             this.introScrollToSpeaker = scrollToSpeakingItem
         }
     }
+
+    @Inject
+    lateinit var readerViewHandlersActions: ReaderViewHandlersActions
 
     private var listIsScrolling = false
     private val fadeInTextLiveData = MutableLiveData<Boolean>(false)
@@ -104,7 +109,7 @@ class ReaderActivity : BaseActivity() {
     }
 
     override fun onDestroy() {
-        viewModel.onViewDestroyed()
+        readerViewHandlersActions.invalidate()
         super.onDestroy()
     }
 
@@ -125,13 +130,13 @@ class ReaderActivity : BaseActivity() {
                 viewModel.reloadReader()
             }
         }
-        viewModel.forceUpdateListViewState = {
+        readerViewHandlersActions.forceUpdateListViewState = {
             withContext(Dispatchers.Main.immediate) {
                 viewAdapter.listView.notifyDataSetChanged()
             }
         }
 
-        viewModel.maintainStartPosition = {
+        readerViewHandlersActions.maintainStartPosition = {
             withContext(Dispatchers.Main.immediate) {
                 it()
                 val titleIndex = (0..viewAdapter.listView.count)
@@ -143,7 +148,7 @@ class ReaderActivity : BaseActivity() {
             }
         }
 
-        viewModel.setInitialPosition = {
+        readerViewHandlersActions.setInitialPosition = {
             withContext(Dispatchers.Main.immediate) {
                 initialScrollToChapterItemPosition(
                     chapterIndex = it.chapterIndex,
@@ -153,7 +158,7 @@ class ReaderActivity : BaseActivity() {
             }
         }
 
-        viewModel.maintainLastVisiblePosition = {
+        readerViewHandlersActions.maintainLastVisiblePosition = {
             withContext(Dispatchers.Main.immediate) {
                 val oldSize = viewAdapter.listView.count
                 val position = viewBind.listView.lastVisiblePosition
@@ -275,8 +280,7 @@ class ReaderActivity : BaseActivity() {
                 if (viewModel.state.showInvalidChapterDialog.value) {
                     BasicAlertDialog(onDismissRequest = {
                         viewModel.state.showInvalidChapterDialog.value = false
-                    }
-                    ) {
+                    }) {
                         Text(stringResource(id = R.string.invalid_chapter))
                     }
                 }
@@ -347,8 +351,8 @@ class ReaderActivity : BaseActivity() {
                 )
             }
             // Use case: user opens reader on the same book, on the same chapter url (session is maintained)
-            viewModel.introScrollToCurrentChapter -> {
-                viewModel.introScrollToCurrentChapter = false
+            readerViewHandlersActions.introScrollToCurrentChapter -> {
+                readerViewHandlersActions.introScrollToCurrentChapter = false
                 val chapterState = viewModel.readingCurrentChapter
                 val chapterStats =
                     viewModel.chaptersLoader.chaptersStats[chapterState.chapterUrl] ?: return

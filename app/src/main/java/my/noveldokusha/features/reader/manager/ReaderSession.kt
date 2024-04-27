@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.snapshotFlow
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -24,6 +25,7 @@ import my.noveldokusha.features.reader.chapterReadPercentage
 import my.noveldokusha.features.reader.features.ReaderChaptersLoader
 import my.noveldokusha.features.reader.features.ReaderLiveTranslation
 import my.noveldokusha.features.reader.features.ReaderTextToSpeech
+import my.noveldokusha.features.reader.features.ReaderViewHandlersActions
 import my.noveldokusha.features.reader.tools.ChaptersIsReadRoutine
 import my.noveldokusha.features.reader.tools.InitialPositionChapter
 import my.noveldokusha.repository.AppRepository
@@ -40,13 +42,9 @@ class ReaderSession(
     private val appRepository: AppRepository,
     private val appPreferences: AppPreferences,
     private val readerRepository: ReaderRepository,
-    private val context: Context,
+    private val readerViewHandlersActions: ReaderViewHandlersActions,
+    @ApplicationContext private val context: Context,
     translationManager: TranslationManager,
-    private val forceUpdateListViewState: suspend () -> Unit,
-    private val maintainLastVisiblePosition: suspend (suspend () -> Unit) -> Unit,
-    private val maintainStartPosition: suspend (suspend () -> Unit) -> Unit,
-    private val setInitialPosition: suspend (InitialPositionChapter) -> Unit,
-    private val showInvalidChapterDialog: suspend () -> Unit,
 ) {
     private val scope: CoroutineScope = CoroutineScope(
         SupervisorJob() + Dispatchers.Default + CoroutineName("ReaderSession")
@@ -110,11 +108,7 @@ class ReaderSession(
         bookUrl = bookUrl,
         orderedChapters = orderedChapters,
         readerState = ReaderState.INITIAL_LOAD,
-        forceUpdateListViewState = forceUpdateListViewState,
-        maintainLastVisiblePosition = maintainLastVisiblePosition,
-        maintainStartPosition = maintainStartPosition,
-        setInitialPosition = setInitialPosition,
-        showInvalidChapterDialog = showInvalidChapterDialog,
+        readerViewHandlersActions = readerViewHandlersActions,
     )
 
     val items = readerChaptersLoader.getItems()
