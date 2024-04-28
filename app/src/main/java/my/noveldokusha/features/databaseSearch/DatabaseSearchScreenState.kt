@@ -5,7 +5,6 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import my.noveldokusha.AppPreferences
 import my.noveldokusha.feature.local_database.BookMetadata
-import my.noveldokusha.network.PagedListIteratorState
 
 data class DatabaseSearchScreenState(
     val databaseNameStrId: State<Int>,

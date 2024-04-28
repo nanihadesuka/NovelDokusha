@@ -12,7 +12,6 @@ import androidx.compose.runtime.snapshotFlow
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.filter
-import my.noveldokusha.network.IteratorState
 
 @OptIn(FlowPreview::class)
 @Composable

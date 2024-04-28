@@ -8,12 +8,8 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
-import kotlinx.coroutines.CoroutineName
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
 import my.noveldokusha.App
 import my.noveldokusha.BuildConfig
-import my.noveldokusha.core.AppCoroutineScope
 import my.noveldokusha.core.AppInternalState
 import my.noveldokusha.ui.Toasty
 import my.noveldokusha.ui.ToastyToast

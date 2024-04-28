@@ -3,8 +3,9 @@ package my.noveldokusha.scraper.sources
 import android.net.Uri
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import my.noveldokusha.core.Response
+import my.noveldokusha.core.LanguageCode
 import my.noveldokusha.core.PagedList
+import my.noveldokusha.core.Response
 import my.noveldokusha.network.NetworkClient
 import my.noveldokusha.network.add
 import my.noveldokusha.network.postPayload
@@ -13,7 +14,6 @@ import my.noveldokusha.network.toDocument
 import my.noveldokusha.network.toUrlBuilderSafe
 import my.noveldokusha.network.tryConnect
 import my.noveldokusha.network.tryFlatConnect
-import my.noveldokusha.core.LanguageCode
 import my.noveldokusha.scraper.R
 import my.noveldokusha.scraper.SourceInterface
 import my.noveldokusha.scraper.TextExtractor

@@ -43,9 +43,9 @@ import androidx.compose.ui.zIndex
 import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.coroutines.launch
 import my.noveldokusha.R
-import my.noveldokusha.data.LibraryCategory
 import my.noveldokusha.core.isLocalUri
 import my.noveldokusha.core.rememberResolvedBookImagePath
+import my.noveldokusha.data.LibraryCategory
 import my.noveldokusha.ui.bounceOnPressed
 import my.noveldokusha.ui.composeViews.BookImageButtonView
 import my.noveldokusha.ui.composeViews.CollapsibleDivider

@@ -8,7 +8,6 @@ import androidx.activity.viewModels
 import androidx.core.view.WindowCompat
 import dagger.hilt.android.AndroidEntryPoint
 import my.noveldokusha.composableActions.SetSystemBarTransparent
-import my.noveldokusha.scraper.SearchGenre
 import my.noveldokusha.ui.BaseActivity
 import my.noveldokusha.ui.goToDatabaseBookInfo
 import my.noveldokusha.ui.goToDatabaseSearchGenres

@@ -27,7 +27,6 @@ import my.noveldokusha.features.reader.features.ReaderLiveTranslation
 import my.noveldokusha.features.reader.features.ReaderTextToSpeech
 import my.noveldokusha.features.reader.features.ReaderViewHandlersActions
 import my.noveldokusha.features.reader.tools.ChaptersIsReadRoutine
-import my.noveldokusha.features.reader.tools.InitialPositionChapter
 import my.noveldokusha.repository.AppRepository
 import my.noveldokusha.repository.ReaderRepository
 import my.noveldokusha.services.narratorMediaControls.NarratorMediaControlsService

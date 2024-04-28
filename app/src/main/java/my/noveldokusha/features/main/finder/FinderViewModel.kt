@@ -4,8 +4,8 @@ import androidx.compose.runtime.getValue
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import my.noveldokusha.AppPreferences
-import my.noveldokusha.repository.ScraperRepository
 import my.noveldokusha.core.LanguageCode
+import my.noveldokusha.repository.ScraperRepository
 import my.noveldokusha.ui.BaseViewModel
 import my.noveldokusha.utils.toState
 import javax.inject.Inject

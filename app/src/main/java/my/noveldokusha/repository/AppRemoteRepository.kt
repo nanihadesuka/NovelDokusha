@@ -6,8 +6,6 @@ import my.noveldokusha.BuildConfig
 import my.noveldokusha.core.Response
 import my.noveldokusha.domain.AppVersion
 import my.noveldokusha.domain.RemoteAppVersion
-import my.noveldokusha.network.NetworkClient
-import my.noveldokusha.network.tryConnect
 import my.noveldokusha.network.toJson
 import javax.inject.Inject
 import javax.inject.Singleton

@@ -16,8 +16,9 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import my.noveldokusha.R
 import my.noveldokusha.core.AppCoroutineScope
-import my.noveldokusha.feature.local_database.AppDatabase
 import my.noveldokusha.core.AppFileResolver
+import my.noveldokusha.core.tryAsResponse
+import my.noveldokusha.feature.local_database.AppDatabase
 import my.noveldokusha.repository.AppRepository
 import my.noveldokusha.repository.BookChaptersRepository
 import my.noveldokusha.repository.ChapterBodyRepository
@@ -31,7 +32,6 @@ import my.noveldokusha.utils.isServiceRunning
 import my.noveldokusha.utils.removeProgressBar
 import my.noveldokusha.utils.text
 import my.noveldokusha.utils.title
-import my.noveldokusha.core.tryAsResponse
 import okhttp3.internal.closeQuietly
 import timber.log.Timber
 import java.io.File

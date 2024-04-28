@@ -9,8 +9,6 @@ import kotlinx.coroutines.withContext
 import my.noveldokusha.core.Response
 import my.noveldokusha.core.asNotNull
 import my.noveldokusha.core.flatMapError
-import my.noveldokusha.scraper.DatabaseInterface
-import my.noveldokusha.scraper.SearchGenre
 import my.noveldokusha.core.tryAsResponse
 import timber.log.Timber
 import java.io.File
