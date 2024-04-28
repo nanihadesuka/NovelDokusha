@@ -24,10 +24,12 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import my.noveldokusha.R
 import my.noveldokusha.composableActions.ListLoadWatcher
+import my.noveldokusha.core.rememberResolvedBookImagePath
 import my.noveldokusha.feature.local_database.BookMetadata
+import my.noveldokusha.mappers.mapToBookMetadata
 import my.noveldokusha.network.IteratorState
 import my.noveldokusha.repository.CatalogItem
-import my.noveldokusha.repository.rememberResolvedBookImagePath
+import my.noveldokusha.scraper.domain.BookResult
 import my.noveldokusha.ui.bounceOnPressed
 import my.noveldokusha.ui.composeViews.BookImageButtonView
 import my.noveldokusha.ui.composeViews.BookTitlePosition
@@ -68,7 +70,7 @@ fun GlobalSourceSearchScreenBody(
 
 @Composable
 private fun SourceListView(
-    list: List<BookMetadata>,
+    list: List<BookResult>,
     loadState: IteratorState,
     error: String?,
     onBookClick: (book: BookMetadata) -> Unit,
@@ -97,7 +99,7 @@ private fun SourceListView(
                     bookUrl = it.url,
                     imagePath = it.coverImageUrl
                 ),
-                onClick = { onBookClick(it) },
+                onClick = { onBookClick(it.mapToBookMetadata()) },
                 onLongClick = { },
                 modifier = Modifier
                     .width(130.dp)
@@ -156,7 +158,7 @@ private fun PreviewView() {
             catalog = source,
             pinned = false
         ) to (0..5).map {
-            BookMetadata(
+            BookResult(
                 title = "Book $it",
                 url = ""
             )

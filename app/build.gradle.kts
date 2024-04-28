@@ -154,6 +154,10 @@ fun DependencyHandler.fossImplementation(dependencyNotation: Any): Dependency? =
 dependencies {
 
     implementation(project(":features:local_database"))
+    implementation(project(":core"))
+    implementation(project(":networking"))
+    implementation(project(":strings"))
+    implementation(project(":scraper"))
 
     // Kotlin
     implementation(libs.kotlinx.coroutines.core)

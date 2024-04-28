@@ -6,9 +6,12 @@ import com.squareup.moshi.Types
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import my.noveldokusha.core.Response
+import my.noveldokusha.core.asNotNull
+import my.noveldokusha.core.flatMapError
 import my.noveldokusha.scraper.DatabaseInterface
 import my.noveldokusha.scraper.SearchGenre
-import my.noveldokusha.utils.tryAsResponse
+import my.noveldokusha.core.tryAsResponse
 import timber.log.Timber
 import java.io.File
 
@@ -51,12 +54,12 @@ class PersistentCacheDataLoader<T>(
 }
 
 fun persistentCacheDatabaseSearchGenres(
-    database: DatabaseInterface,
+    database: my.noveldokusha.scraper.DatabaseInterface,
     appCacheDir: File,
-) = PersistentCacheDataLoader<List<SearchGenre>>(
+) = PersistentCacheDataLoader<List<my.noveldokusha.scraper.SearchGenre>>(
     cacheFile = File(appCacheDir, database.searchGenresCacheFileName),
     adapterProvider = {
-        val listMyData = Types.newParameterizedType(List::class.java, SearchGenre::class.java)
+        val listMyData = Types.newParameterizedType(List::class.java, my.noveldokusha.scraper.SearchGenre::class.java)
         it.adapter(listMyData)
     }
 )

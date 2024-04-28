@@ -2,15 +2,16 @@ package my.noveldokusha.repository
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import my.noveldokusha.data.Response
-import my.noveldokusha.data.map
+import my.noveldokusha.core.Response
+import my.noveldokusha.core.map
+import my.noveldokusha.feature.local_database.tables.Chapter
 import my.noveldokusha.network.NetworkClient
 import my.noveldokusha.network.getRequest
 import my.noveldokusha.network.tryFlatConnect
 import my.noveldokusha.scraper.ChapterDownload
 import my.noveldokusha.scraper.Scraper
 import my.noveldokusha.scraper.TextExtractor
-import my.noveldokusha.utils.toDocument
+import my.noveldokusha.network.toDocument
 import net.dankito.readability4j.extended.Readability4JExtended
 import org.jsoup.nodes.Document
 import javax.inject.Inject
@@ -19,7 +20,7 @@ import javax.inject.Singleton
 @Singleton
 class DownloaderRepository @Inject constructor(
     private val scraper: Scraper,
-    private val networkClient: NetworkClient,
+    private val networkClient: my.noveldokusha.network.NetworkClient,
 ) {
 
     suspend fun bookCoverImageUrl(
@@ -38,7 +39,7 @@ class DownloaderRepository @Inject constructor(
         val scrap = scraper.getCompatibleSourceCatalog(bookUrl)
             ?: return@withContext Response.Error(error, Exception())
 
-        tryFlatConnect {
+        my.noveldokusha.network.tryFlatConnect {
             scrap.getBookCoverImageUrl(bookUrl)
         }
     }
@@ -59,16 +60,16 @@ class DownloaderRepository @Inject constructor(
         val scrap = scraper.getCompatibleSourceCatalog(bookUrl)
             ?: return@withContext Response.Error(error, Exception())
 
-        tryFlatConnect {
+        my.noveldokusha.network.tryFlatConnect {
             scrap.getBookDescription(bookUrl)
         }
     }
 
     suspend fun bookChapter(
         chapterUrl: String,
-    ): Response<ChapterDownload> = withContext(Dispatchers.Default) {
-        tryFlatConnect {
-            val request = getRequest(chapterUrl)
+    ): Response<my.noveldokusha.scraper.ChapterDownload> = withContext(Dispatchers.Default) {
+        my.noveldokusha.network.tryFlatConnect {
+            val request = my.noveldokusha.network.getRequest(chapterUrl)
             val realUrl = networkClient
                 .call(request, followRedirects = true)
                 .request.url
@@ -89,7 +90,7 @@ class DownloaderRepository @Inject constructor(
 
             scraper.getCompatibleSource(realUrl)?.also { source ->
                 val doc = networkClient.get(source.transformChapterUrl(realUrl)).toDocument()
-                val data = ChapterDownload(
+                val data = my.noveldokusha.scraper.ChapterDownload(
                     body = source.getChapterText(doc) ?: return@also,
                     title = source.getChapterTitle(doc)
                 )
@@ -111,7 +112,7 @@ class DownloaderRepository @Inject constructor(
 
     suspend fun bookChaptersList(
         bookUrl: String,
-    ): Response<List<my.noveldokusha.feature.local_database.tables.Chapter>> = withContext(Dispatchers.Default) {
+    ): Response<List<Chapter>> = withContext(Dispatchers.Default) {
         val error by lazy {
             """
 			Incompatible source.
@@ -125,7 +126,7 @@ class DownloaderRepository @Inject constructor(
         val scrap = scraper.getCompatibleSourceCatalog(bookUrl)
             ?: return@withContext Response.Error(error, Exception())
 
-        tryFlatConnect { scrap.getChapterList(bookUrl) }
+        my.noveldokusha.network.tryFlatConnect { scrap.getChapterList(bookUrl) }
             .map { chapters ->
                 chapters.mapIndexed { index, it ->
                     my.noveldokusha.feature.local_database.tables.Chapter(
@@ -140,10 +141,10 @@ class DownloaderRepository @Inject constructor(
 }
 
 
-private fun heuristicChapterExtraction(url: String, document: Document): ChapterDownload? {
+private fun heuristicChapterExtraction(url: String, document: Document): my.noveldokusha.scraper.ChapterDownload? {
     Readability4JExtended(url, document).parse().also { article ->
         val content = article.articleContent ?: return null
-        return ChapterDownload(
+        return my.noveldokusha.scraper.ChapterDownload(
             body = TextExtractor.get(content),
             title = article.title
         )

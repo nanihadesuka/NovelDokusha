@@ -18,7 +18,7 @@ import my.noveldokusha.network.IteratorState
 @Composable
 fun ListLoadWatcher(
     listState: LazyListState,
-    loadState: IteratorState,
+    loadState: my.noveldokusha.network.IteratorState,
     onLoadNext: () -> Unit,
     debounceMilliseconds: Long = 100L
 ) {
@@ -28,7 +28,7 @@ fun ListLoadWatcher(
             val lastVisibleIndex =
                 (listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: 0) + 1
             val isLoadZone = lastVisibleIndex > (listState.layoutInfo.totalItemsCount - 3)
-            val isIDLE = loadStateUpdated == IteratorState.IDLE
+            val isIDLE = loadStateUpdated == my.noveldokusha.network.IteratorState.IDLE
             val state = isLoadZone && isIDLE
             state
         }
@@ -46,7 +46,7 @@ fun ListLoadWatcher(
 @Composable
 fun ListGridLoadWatcher(
     listState: LazyGridState,
-    loadState: IteratorState,
+    loadState: my.noveldokusha.network.IteratorState,
     onLoadNext: () -> Unit,
     debounceMilliseconds: Long = 100L
 ) {
@@ -56,7 +56,7 @@ fun ListGridLoadWatcher(
             val lastVisibleIndex =
                 (listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: 0) + 1
             val isLoadZone = lastVisibleIndex > (listState.layoutInfo.totalItemsCount - 3)
-            val isIDLE = loadStateUpdated == IteratorState.IDLE
+            val isIDLE = loadStateUpdated == my.noveldokusha.network.IteratorState.IDLE
             val state = isLoadZone && isIDLE
             state
         }

@@ -1,8 +1,7 @@
 package my.noveldokusha
 
 import android.content.Context
-import my.noveldokusha.network.NetworkClient
-import my.noveldokusha.repository.AppFileResolver
+import my.noveldokusha.core.AppFileResolver
 import my.noveldokusha.scraper.LocalSourcesDirectories
 import my.noveldokusha.scraper.Scraper
 import org.junit.Assert.assertEquals
@@ -17,7 +16,7 @@ import org.mockito.kotlin.mock
 @RunWith(MockitoJUnitRunner::class)
 class ScraperTest {
 
-    val networkClient: NetworkClient = mock()
+    val networkClient: my.noveldokusha.network.NetworkClient = mock()
     val appContext: Context = mock()
     val localSourcesDirectories: LocalSourcesDirectories = mock()
     val appFileResolver: AppFileResolver = mock()

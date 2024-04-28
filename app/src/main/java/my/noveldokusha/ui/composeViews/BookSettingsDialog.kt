@@ -26,7 +26,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.parcelize.Parcelize
 import my.noveldokusha.R
 import my.noveldokusha.features.main.library.LibraryViewModel
-import my.noveldokusha.repository.rememberResolvedBookImagePath
+import my.noveldokusha.core.rememberResolvedBookImagePath
 import my.noveldokusha.ui.theme.ImageBorderShape
 import my.noveldokusha.ui.theme.colorApp
 

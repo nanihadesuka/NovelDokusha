@@ -38,7 +38,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import my.noveldokusha.R
-import my.noveldokusha.repository.rememberResolvedBookImagePath
+import my.noveldokusha.core.rememberResolvedBookImagePath
 import my.noveldokusha.ui.bounceOnPressed
 import my.noveldokusha.ui.composeViews.BookImageButtonView
 import my.noveldokusha.ui.composeViews.BookTitlePosition

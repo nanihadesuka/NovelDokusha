@@ -35,7 +35,9 @@ import androidx.compose.ui.unit.dp
 import my.noveldokusha.R
 import my.noveldokusha.feature.local_database.BookMetadata
 import my.noveldokusha.scraper.DatabaseInterface
+import my.noveldokusha.scraper.DatabaseInterface.BookData
 import my.noveldokusha.scraper.SearchGenre
+import my.noveldokusha.scraper.domain.BookResult
 import my.noveldokusha.ui.theme.InternalTheme
 import my.noveldokusha.utils.isAtTop
 
@@ -115,7 +117,7 @@ private fun PreviewView() {
     val state = remember {
         DatabaseBookInfoState(
             databaseNameStrId = mutableStateOf(R.string.database_name_baka_updates),
-            book = DatabaseInterface.BookData(
+            book = BookData(
                 title = "Novel title",
                 description = "Novel description goes here and here to and a little more to fill lines",
                 coverImageUrl = "",
@@ -124,10 +126,15 @@ private fun PreviewView() {
                     DatabaseInterface.AuthorMetadata("Author $it", "page url")
                 } + DatabaseInterface.AuthorMetadata("Author", null),
                 tags = (1..20).map { "tag $it" },
-                genres = (1..8).map { SearchGenre(genreName = "genre $it", id = "$it") },
+                genres = (1..8).map {
+                    SearchGenre(
+                        genreName = "genre $it",
+                        id = "$it"
+                    )
+                },
                 bookType = "Web novel",
                 relatedBooks = (1..3).map {
-                    BookMetadata(
+                    BookResult(
                         "novel name $it",
                         "ulr",
                         "coverUrl",
@@ -135,7 +142,7 @@ private fun PreviewView() {
                     )
                 },
                 similarRecommended = (1..6).map {
-                    BookMetadata(
+                    BookResult(
                         "novel name $it",
                         "ulr",
                         "coverUrl",

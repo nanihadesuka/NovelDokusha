@@ -5,7 +5,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.withContext
 import my.noveldokusha.feature.local_database.tables.ChapterBody
-import my.noveldokusha.repository.AppFileResolver
+import my.noveldokusha.core.AppFileResolver
 import my.noveldokusha.repository.AppRepository
 import my.noveldokusha.utils.fileImporter
 

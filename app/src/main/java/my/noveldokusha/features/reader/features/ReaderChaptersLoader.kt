@@ -7,7 +7,7 @@ import kotlinx.coroutines.cancelChildren
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import my.noveldokusha.data.Response
+import my.noveldokusha.core.Response
 import my.noveldokusha.features.reader.ChapterState
 import my.noveldokusha.features.reader.ChapterStats
 import my.noveldokusha.features.reader.ChapterUrl

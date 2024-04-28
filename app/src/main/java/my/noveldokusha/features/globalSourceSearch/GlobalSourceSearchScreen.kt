@@ -16,6 +16,7 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import my.noveldokusha.R
+import my.noveldokusha.feature.local_database.BookMetadata
 import my.noveldokusha.ui.composeViews.TopAppBarSearch
 import my.noveldokusha.ui.theme.ColorAccent
 import my.noveldokusha.ui.theme.InternalTheme
@@ -28,7 +29,7 @@ fun GlobalSourceSearchScreen(
     listSources: List<SourceResults>,
     onSearchInputChange: (String) -> Unit,
     onSearchInputSubmit: (String) -> Unit,
-    onBookClick: (book: my.noveldokusha.feature.local_database.BookMetadata) -> Unit,
+    onBookClick: (book: BookMetadata) -> Unit,
     onPressBack: () -> Unit
 ) {
     val focusRequester = remember { FocusRequester() }

@@ -5,7 +5,8 @@ import android.net.Uri
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import my.noveldokusha.di.AppCoroutineScope
+import my.noveldokusha.core.AppFileResolver
+import my.noveldokusha.core.AppCoroutineScope
 import my.noveldokusha.feature.local_database.AppDatabase
 import my.noveldokusha.feature.local_database.DAOs.LibraryDao
 import my.noveldokusha.feature.local_database.tables.Book

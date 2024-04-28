@@ -20,7 +20,7 @@ import kotlinx.coroutines.withContext
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import my.noveldokusha.scraper.LanguageCode
+import my.noveldokusha.core.LanguageCode
 import my.noveldokusha.utils.SharedPreference_Boolean
 import my.noveldokusha.utils.SharedPreference_Enum
 import my.noveldokusha.utils.SharedPreference_Float

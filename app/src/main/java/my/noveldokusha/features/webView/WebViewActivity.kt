@@ -26,10 +26,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.viewinterop.AndroidView
 import dagger.hilt.android.AndroidEntryPoint
 import my.noveldokusha.R
-import my.noveldokusha.di.AppCoroutineScope
+import my.noveldokusha.core.AppCoroutineScope
+import my.noveldokusha.network.toUrl
 import my.noveldokusha.ui.Toasty
 import my.noveldokusha.utils.Extra_String
-import my.noveldokusha.utils.toUrl
 import javax.inject.Inject
 
 @AndroidEntryPoint

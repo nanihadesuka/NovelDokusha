@@ -15,10 +15,9 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import my.noveldokusha.R
-import my.noveldokusha.di.AppCoroutineScope
+import my.noveldokusha.core.AppCoroutineScope
 import my.noveldokusha.feature.local_database.AppDatabase
-import my.noveldokusha.network.NetworkClient
-import my.noveldokusha.repository.AppFileResolver
+import my.noveldokusha.core.AppFileResolver
 import my.noveldokusha.repository.AppRepository
 import my.noveldokusha.repository.BookChaptersRepository
 import my.noveldokusha.repository.ChapterBodyRepository
@@ -32,7 +31,7 @@ import my.noveldokusha.utils.isServiceRunning
 import my.noveldokusha.utils.removeProgressBar
 import my.noveldokusha.utils.text
 import my.noveldokusha.utils.title
-import my.noveldokusha.utils.tryAsResponse
+import my.noveldokusha.core.tryAsResponse
 import okhttp3.internal.closeQuietly
 import timber.log.Timber
 import java.io.File
@@ -54,7 +53,7 @@ class RestoreDataService : Service() {
     lateinit var scraper: Scraper
 
     @Inject
-    lateinit var networkClient: NetworkClient
+    lateinit var networkClient: my.noveldokusha.network.NetworkClient
 
     @Inject
     lateinit var appFileResolver: AppFileResolver

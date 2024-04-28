@@ -35,6 +35,8 @@ android {
 }
 
 dependencies {
+    implementation(project(":core"))
+    implementation(project(":scraper"))
 
     // Dependency injection
     implementation(libs.hilt.android)

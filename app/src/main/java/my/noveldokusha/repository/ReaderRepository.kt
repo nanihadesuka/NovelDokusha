@@ -2,7 +2,7 @@ package my.noveldokusha.repository
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import my.noveldokusha.di.AppCoroutineScope
+import my.noveldokusha.core.AppCoroutineScope
 import my.noveldokusha.feature.local_database.AppDatabase
 import my.noveldokusha.features.reader.ChapterState
 import javax.inject.Inject

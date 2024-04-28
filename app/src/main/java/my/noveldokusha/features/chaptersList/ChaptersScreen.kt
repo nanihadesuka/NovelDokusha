@@ -62,7 +62,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import my.nanihadesuka.compose.InternalLazyColumnScrollbar
 import my.noveldokusha.R
-import my.noveldokusha.isLocalUri
+import my.noveldokusha.core.isLocalUri
 import my.noveldokusha.ui.goToWebBrowser
 import my.noveldokusha.ui.theme.ColorAccent
 import my.noveldokusha.ui.theme.ColorLike

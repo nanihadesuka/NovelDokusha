@@ -34,9 +34,9 @@ import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import my.noveldokusha.AppPreferences
 import my.noveldokusha.R
-import my.noveldokusha.data.Response
+import my.noveldokusha.core.Response
 import my.noveldokusha.feature.local_database.BookMetadata
-import my.noveldokusha.network.PagedList
+import my.noveldokusha.core.PagedList
 import my.noveldokusha.network.PagedListIteratorState
 import my.noveldokusha.ui.composeViews.BooksVerticalView
 import my.noveldokusha.ui.composeViews.CollapsibleDivider
@@ -193,9 +193,10 @@ private fun PreviewView() {
         )
     }
     val scope = rememberCoroutineScope()
-    val fetchIterator = PagedListIteratorState(list = list, coroutineScope = scope) {
-        Response.Success(PagedList(listOf(), 0, true))
-    }
+    val fetchIterator =
+        my.noveldokusha.network.PagedListIteratorState(list = list, coroutineScope = scope) {
+            Response.Success(PagedList(listOf(), 0, true))
+        }
     val state = remember {
         DatabaseSearchScreenState(
             databaseNameStrId = mutableStateOf(R.string.database_name_baka_updates),

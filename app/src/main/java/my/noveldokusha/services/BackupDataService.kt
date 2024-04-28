@@ -21,7 +21,7 @@ import my.noveldokusha.utils.isServiceRunning
 import my.noveldokusha.utils.removeProgressBar
 import my.noveldokusha.utils.text
 import my.noveldokusha.utils.title
-import my.noveldokusha.utils.tryAsResponse
+import my.noveldokusha.core.tryAsResponse
 import okhttp3.internal.closeQuietly
 import timber.log.Timber
 import java.util.zip.ZipEntry

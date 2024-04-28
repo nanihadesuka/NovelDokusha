@@ -17,10 +17,13 @@ import kotlinx.coroutines.withContext
 import kotlinx.parcelize.Parcelize
 import my.noveldokusha.App
 import my.noveldokusha.AppPreferences
-import my.noveldokusha.data.map
+import my.noveldokusha.core.PagedList
+import my.noveldokusha.core.map
 import my.noveldokusha.data.persistentCacheDatabaseSearchGenres
+import my.noveldokusha.feature.local_database.BookMetadata
 import my.noveldokusha.network.PagedListIteratorState
 import my.noveldokusha.scraper.Scraper
+import my.noveldokusha.scraper.domain.BookResult
 import my.noveldokusha.ui.BaseViewModel
 import my.noveldokusha.utils.StateExtra_Parcelable
 import my.noveldokusha.utils.asMutableListStateOf
@@ -75,20 +78,35 @@ class DatabaseSearchViewModel @Inject constructor(
     @Volatile
     private var booksSearch: SearchInputState = SearchInputState.BookTitle("")
     private val searchGenresCache = persistentCacheDatabaseSearchGenres(database, app.cacheDir)
-    private fun createPageLoaderState() = PagedListIteratorState(viewModelScope) { index ->
-        when (val input = booksSearch) {
-            is SearchInputState.Catalog -> database.getCatalog(index = index)
-            is SearchInputState.BookTitle -> database.searchByTitle(
-                index = index,
-                input = input.text
-            )
-            is SearchInputState.Filters -> database.searchByFilters(
-                index = index,
-                genresIncludedId = input.genresIncludedId,
-                genresExcludedId = input.genresExcludedId
-            )
+    private fun createPageLoaderState() =
+        PagedListIteratorState(viewModelScope) { index ->
+            when (val input = booksSearch) {
+                is SearchInputState.Catalog -> database.getCatalog(index = index)
+                is SearchInputState.BookTitle -> database.searchByTitle(
+                    index = index,
+                    input = input.text
+                )
+                is SearchInputState.Filters -> database.searchByFilters(
+                    index = index,
+                    genresIncludedId = input.genresIncludedId,
+                    genresExcludedId = input.genresExcludedId
+                )
+            }.map { page ->
+                PagedList(
+                    list = page.list.map { it.mapToBookMetadata() },
+                    index = 0,
+                    isLastPage = false
+
+                )
+            }
         }
-    }
+
+    private fun BookResult.mapToBookMetadata() = BookMetadata(
+        title = this.title,
+        url = this.url,
+        coverImageUrl = this.coverImageUrl,
+        description = this.description
+    )
 
 
     init {

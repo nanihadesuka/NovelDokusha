@@ -6,7 +6,7 @@ import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.withContext
-import my.noveldokusha.isLocalUri
+import my.noveldokusha.core.isLocalUri
 import my.noveldokusha.repository.AppRepository
 import my.noveldokusha.repository.DownloaderRepository
 import my.noveldokusha.scraper.Scraper

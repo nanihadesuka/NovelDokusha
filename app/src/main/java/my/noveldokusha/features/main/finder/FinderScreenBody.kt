@@ -31,7 +31,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import my.noveldokusha.R
 import my.noveldokusha.repository.CatalogItem
-import my.noveldokusha.scraper.DatabaseInterface
 import my.noveldokusha.scraper.SourceInterface
 import my.noveldokusha.ui.composeViews.AnimatedTransition
 import my.noveldokusha.ui.composeViews.ImageViewGlide
@@ -45,9 +44,9 @@ import my.noveldokusha.ui.theme.PreviewThemes
 @Composable
 fun FinderScreenBody(
     innerPadding: PaddingValues,
-    databasesList: List<DatabaseInterface>,
+    databasesList: List<my.noveldokusha.scraper.DatabaseInterface>,
     sourcesList: List<CatalogItem>,
-    onDatabaseClick: (DatabaseInterface) -> Unit,
+    onDatabaseClick: (my.noveldokusha.scraper.DatabaseInterface) -> Unit,
     onSourceClick: (SourceInterface.Catalog) -> Unit,
     onSourceSetPinned: (id: String, pinned: Boolean) -> Unit,
 ) {

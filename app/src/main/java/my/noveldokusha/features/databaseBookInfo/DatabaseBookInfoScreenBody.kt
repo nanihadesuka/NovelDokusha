@@ -47,6 +47,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import my.noveldokusha.R
+import my.noveldokusha.feature.local_database.BookMetadata
+import my.noveldokusha.mappers.mapToBookMetadata
 import my.noveldokusha.scraper.SearchGenre
 import my.noveldokusha.ui.bounceOnPressed
 import my.noveldokusha.ui.composeViews.BookImageButtonView
@@ -68,7 +70,7 @@ fun DatabaseBookInfoScreenBody(
     scrollState: ScrollState,
     onSourcesClick: () -> Unit,
     onGenresClick: (genresIds: List<SearchGenre>) -> Unit,
-    onBookClick: (book: my.noveldokusha.feature.local_database.BookMetadata) -> Unit,
+    onBookClick: (book: BookMetadata) -> Unit,
     innerPadding: PaddingValues,
     modifier: Modifier = Modifier,
 ) {
@@ -247,7 +249,7 @@ fun DatabaseBookInfoScreenBody(
                     ) {
                         for (book in state.book.value.relatedBooks) MyButton(
                             text = book.title,
-                            onClick = { onBookClick(book) },
+                            onClick = { onBookClick(book.mapToBookMetadata()) },
                             outerPadding = 0.dp,
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -264,7 +266,7 @@ fun DatabaseBookInfoScreenBody(
                     ) {
                         for (book in state.book.value.similarRecommended) MyButton(
                             text = book.title,
-                            onClick = { onBookClick(book) },
+                            onClick = { onBookClick(book.mapToBookMetadata()) },
                             outerPadding = 0.dp,
                             modifier = Modifier
                                 .fillMaxWidth()

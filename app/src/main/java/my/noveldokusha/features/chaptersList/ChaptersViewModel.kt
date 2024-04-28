@@ -17,10 +17,10 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import my.noveldokusha.AppPreferences
 import my.noveldokusha.R
-import my.noveldokusha.di.AppCoroutineScope
-import my.noveldokusha.isContentUri
-import my.noveldokusha.isLocalUri
-import my.noveldokusha.repository.AppFileResolver
+import my.noveldokusha.core.AppCoroutineScope
+import my.noveldokusha.core.isContentUri
+import my.noveldokusha.core.isLocalUri
+import my.noveldokusha.core.AppFileResolver
 import my.noveldokusha.repository.AppRepository
 import my.noveldokusha.repository.DownloaderRepository
 import my.noveldokusha.scraper.Scraper

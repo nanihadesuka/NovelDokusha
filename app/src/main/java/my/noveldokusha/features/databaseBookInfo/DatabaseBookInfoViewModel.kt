@@ -14,10 +14,11 @@ import timber.log.Timber
 import javax.inject.Inject
 
 interface DatabaseBookInfoStateBundle {
-    val bookMetadata get() = BookMetadata(
-        title = bookTitle,
-        url = bookUrl
-    )
+    val bookMetadata
+        get() = BookMetadata(
+            title = bookTitle,
+            url = bookUrl
+        )
 
     var databaseUrlBase: String
     var bookUrl: String

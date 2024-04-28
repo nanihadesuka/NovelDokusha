@@ -1,11 +1,11 @@
 package my.noveldokusha.repository
 
-import my.noveldokusha.data.Response
-import my.noveldokusha.data.map
+import my.noveldokusha.core.Response
+import my.noveldokusha.core.map
 import my.noveldokusha.feature.local_database.AppDatabase
 import my.noveldokusha.feature.local_database.DAOs.ChapterBodyDao
 import my.noveldokusha.feature.local_database.tables.ChapterBody
-import my.noveldokusha.isLocalUri
+import my.noveldokusha.core.isLocalUri
 import javax.inject.Inject
 import javax.inject.Singleton
 

@@ -10,8 +10,6 @@ import com.bumptech.glide.integration.okhttp3.OkHttpUrlLoader
 import com.bumptech.glide.load.model.GlideUrl
 import com.bumptech.glide.module.AppGlideModule
 import dagger.hilt.android.EntryPointAccessors
-import my.noveldokusha.network.NetworkClient
-import my.noveldokusha.network.ScraperNetworkClient
 import java.io.InputStream
 
 @Excludes(OkHttpLibraryGlideModule::class)
@@ -20,8 +18,8 @@ private class GlideModule : AppGlideModule() {
 
     override fun registerComponents(context: Context, glide: Glide, registry: Registry) {
         val appContext = context.applicationContext
-        val networkClient = EntryPointAccessors.fromApplication<NetworkClient>(appContext)
-        if (networkClient !is ScraperNetworkClient) {
+        val networkClient = EntryPointAccessors.fromApplication<my.noveldokusha.network.NetworkClient>(appContext)
+        if (networkClient !is my.noveldokusha.network.ScraperNetworkClient) {
             return
         }
         registry.replace(

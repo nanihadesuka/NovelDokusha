@@ -69,6 +69,7 @@ readability4j = "1.0.8"
 retrofit = "2.9.0"
 
 timber = "5.0.1"
+junitVersion = "1.1.5"
 
 [libraries]
 
@@ -84,6 +85,7 @@ compose-androidx-activity = { module = "androidx.activity:activity-compose", ver
 compose-androidx-lifecycle-viewmodel = { module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "androidx-lifecycle" }
 compose-androidx-material-icons-extended = { module = "androidx.compose.material:material-icons-extended", version.ref = "compose-material-icons-extended" }
 compose-androidx-runtime-livedata = { module = "androidx.compose.runtime:runtime-livedata", version.ref = "androidx-runtime-livedata" }
+compose-androidx-ui = { module = "androidx.compose.ui:ui", version.ref = "compose-testing-ui" }
 compose-androidx-ui-test-junit4 = { module = "androidx.compose.ui:ui-test-junit4", version.ref = "compose-testing-ui" }
 compose-androidx-ui-tooling = { module = "androidx.compose.ui:ui-tooling", version.ref = "compose-testing-ui" }
 compose-androidx-material3 = { module = "androidx.compose.material3:material3", version.ref = "compose-material3" }
@@ -163,6 +165,7 @@ translate = { module = "com.google.mlkit:translate", version.ref = "translate" }
 
 # Logging
 timber = { module = "com.jakewharton.timber:timber", version.ref = "timber" }
+androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "plugin-agp" }

@@ -4,7 +4,7 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import my.noveldokusha.di.AppCoroutineScope
+import my.noveldokusha.core.AppCoroutineScope
 import my.noveldokusha.tools.TranslationManager
 import javax.inject.Singleton
 

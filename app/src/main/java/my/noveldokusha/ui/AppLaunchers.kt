@@ -3,6 +3,7 @@ package my.noveldokusha.ui
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import my.noveldokusha.feature.local_database.BookMetadata
 import my.noveldokusha.features.chaptersList.ChaptersActivity
 import my.noveldokusha.features.databaseBookInfo.DatabaseBookInfoActivity
 import my.noveldokusha.features.databaseSearch.DatabaseSearchActivity
@@ -11,8 +12,9 @@ import my.noveldokusha.features.globalSourceSearch.GlobalSourceSearchActivity
 import my.noveldokusha.features.reader.ReaderActivity
 import my.noveldokusha.features.sourceCatalog.SourceCatalogActivity
 import my.noveldokusha.features.webView.WebViewActivity
-import my.noveldokusha.scraper.DatabaseInterface
+import my.noveldokusha.mappers.mapToBookMetadata
 import my.noveldokusha.scraper.SourceInterface
+import my.noveldokusha.scraper.domain.BookResult
 
 fun Context.goToSourceCatalog(source: SourceInterface.Catalog) {
     SourceCatalogActivity
@@ -20,7 +22,7 @@ fun Context.goToSourceCatalog(source: SourceInterface.Catalog) {
         .let(::startActivity)
 }
 
-fun Context.goToDatabaseSearch(database: DatabaseInterface) {
+fun Context.goToDatabaseSearch(database: my.noveldokusha.scraper.DatabaseInterface) {
     DatabaseSearchActivity
         .IntentData(this, DatabaseSearchExtras.Catalog(databaseBaseUrl = database.baseUrl))
         .let(::startActivity)
@@ -72,13 +74,17 @@ fun Context.goToDatabaseSearchGenres(
         .let(::startActivity)
 }
 
-fun Context.goToDatabaseBookInfo(bookMetadata: my.noveldokusha.feature.local_database.BookMetadata, databaseUrlBase: String) {
+fun Context.goToDatabaseBookInfo(bookMetadata: BookMetadata, databaseUrlBase: String) {
     DatabaseBookInfoActivity
         .IntentData(this, databaseUrlBase = databaseUrlBase, bookMetadata = bookMetadata)
         .let(::startActivity)
 }
 
-fun Context.goToBookChapters(bookMetadata: my.noveldokusha.feature.local_database.BookMetadata) {
+
+fun Context.goToBookChapters(bookResult: BookResult) =
+    goToBookChapters(bookMetadata = bookResult.mapToBookMetadata())
+
+fun Context.goToBookChapters(bookMetadata: BookMetadata) {
     ChaptersActivity
         .IntentData(this, bookMetadata = bookMetadata)
         .let(::startActivity)

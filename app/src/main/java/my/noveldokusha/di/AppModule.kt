@@ -12,11 +12,11 @@ import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import my.noveldokusha.App
-import my.noveldokusha.network.NetworkClient
-import my.noveldokusha.network.ScraperNetworkClient
+import my.noveldokusha.BuildConfig
+import my.noveldokusha.core.AppCoroutineScope
+import my.noveldokusha.core.AppInternalState
 import my.noveldokusha.ui.Toasty
 import my.noveldokusha.ui.ToastyToast
-import java.io.File
 import javax.inject.Singleton
 
 @InstallIn(SingletonComponent::class)
@@ -36,29 +36,16 @@ abstract class AppModule {
         }
 
         @Provides
-        @Singleton
-        fun provideAppCoroutineScope(): AppCoroutineScope {
-            return object : AppCoroutineScope {
-                override val coroutineContext =
-                    SupervisorJob() + Dispatchers.Main.immediate + CoroutineName("App")
-            }
-        }
-
-        @Provides
-        @Singleton
-        fun provideNetworkClient(app: App, @ApplicationContext appContext: Context): NetworkClient {
-            return ScraperNetworkClient(
-                cacheDir = File(app.cacheDir, "network_cache"),
-                cacheSize = 5L * 1024 * 1024,
-                appContext = appContext
-            )
-        }
-
-        @Provides
         fun providesWorkManager(
             @ApplicationContext context: Context
         ): WorkManager {
             return WorkManager.getInstance(context)
+        }
+
+        @Provides
+        @Singleton
+        fun providesAppInternalState(): AppInternalState = object : AppInternalState {
+            override val isDebugMode = BuildConfig.DEBUG
         }
     }
 }

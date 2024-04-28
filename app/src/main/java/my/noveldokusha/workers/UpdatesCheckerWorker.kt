@@ -16,7 +16,7 @@ import androidx.work.WorkerParameters
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import my.noveldokusha.R
-import my.noveldokusha.data.Response
+import my.noveldokusha.core.Response
 import my.noveldokusha.repository.AppRemoteRepository
 import my.noveldokusha.utils.NotificationsCenter
 import my.noveldokusha.utils.text

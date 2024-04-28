@@ -8,7 +8,6 @@ import coil.ImageLoaderFactory
 import dagger.hilt.EntryPoints
 import dagger.hilt.android.HiltAndroidApp
 import my.noveldokusha.di.HiltWorkerFactoryEntryPoint
-import my.noveldokusha.network.NetworkClient
 import my.noveldokusha.network.ScraperNetworkClient
 import my.noveldokusha.workers.setup.PeriodicWorkersInitializer
 import timber.log.Timber
@@ -19,7 +18,7 @@ import javax.inject.Inject
 class App : Application(), ImageLoaderFactory, Configuration.Provider {
 
     @Inject
-    lateinit var networkClient: NetworkClient
+    lateinit var networkClient: my.noveldokusha.network.NetworkClient
 
     @Inject
     lateinit var periodicWorkersInitializer: PeriodicWorkersInitializer

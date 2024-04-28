@@ -8,6 +8,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import my.noveldokusha.AppPreferences
 import my.noveldokusha.R
+import my.noveldokusha.mappers.mapToBookMetadata
 import my.noveldokusha.network.PagedListIteratorState
 import my.noveldokusha.repository.AppRepository
 import my.noveldokusha.scraper.Scraper
@@ -39,7 +40,9 @@ class SourceCatalogViewModel @Inject constructor(
         sourceCatalogNameStrId = mutableStateOf(source.nameStrId),
         searchTextInput = stateHandle.asMutableStateOf("searchTextInput") { "" },
         toolbarMode = stateHandle.asMutableStateOf("toolbarMode") { ToolbarMode.MAIN },
-        fetchIterator = PagedListIteratorState(viewModelScope) { source.getCatalogList(it) },
+        fetchIterator = PagedListIteratorState(viewModelScope) {
+            source.getCatalogList(it).mapToBookMetadata()
+        },
         listLayoutMode = appPreferences.BOOKS_LIST_LAYOUT_MODE.state(viewModelScope),
     )
 
@@ -48,21 +51,23 @@ class SourceCatalogViewModel @Inject constructor(
     }
 
     fun onSearchCatalog() {
-        state.fetchIterator.setFunction { source.getCatalogList(it) }
+        state.fetchIterator.setFunction { source.getCatalogList(it).mapToBookMetadata() }
         state.fetchIterator.reset()
         state.fetchIterator.fetchNext()
     }
 
     fun onSearchText(input: String) {
-        state.fetchIterator.setFunction { source.getCatalogSearch(it, input) }
+        state.fetchIterator.setFunction { source.getCatalogSearch(it, input).mapToBookMetadata() }
         state.fetchIterator.reset()
         state.fetchIterator.fetchNext()
     }
 
-    fun addToLibraryToggle(book: my.noveldokusha.feature.local_database.BookMetadata) = viewModelScope.launch(Dispatchers.IO)
-    {
-        val isInLibrary = appRepository.toggleBookmark(bookUrl = book.url, bookTitle = book.title)
-        val res = if (isInLibrary) R.string.added_to_library else R.string.removed_from_library
-        toasty.show(res)
-    }
+    fun addToLibraryToggle(book: my.noveldokusha.feature.local_database.BookMetadata) =
+        viewModelScope.launch(Dispatchers.IO)
+        {
+            val isInLibrary =
+                appRepository.toggleBookmark(bookUrl = book.url, bookTitle = book.title)
+            val res = if (isInLibrary) R.string.added_to_library else R.string.removed_from_library
+            toasty.show(res)
+        }
 }

@@ -6,14 +6,15 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.withContext
-import my.noveldokusha.data.Response
+import my.noveldokusha.core.AppFileResolver
+import my.noveldokusha.core.Response
 import my.noveldokusha.feature.local_database.AppDatabase
 import my.noveldokusha.feature.local_database.tables.Book
 import my.noveldokusha.feature.local_database.tables.Chapter
-import my.noveldokusha.isContentUri
+import my.noveldokusha.core.isContentUri
 import my.noveldokusha.tools.epub.epubImporter
 import my.noveldokusha.tools.epub.epubParser
-import my.noveldokusha.utils.tryAsResponse
+import my.noveldokusha.core.tryAsResponse
 import javax.inject.Inject
 import javax.inject.Singleton
 

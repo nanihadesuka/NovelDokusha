@@ -57,7 +57,7 @@ class DatabaseBookInfoActivity : BaseActivity() {
 
     private fun openGlobalSearchPage() = goToGlobalSearch(text = viewModel.state.book.value.title)
 
-    private fun openSearchPageByGenres(genres: List<SearchGenre>) = goToDatabaseSearchGenres(
+    private fun openSearchPageByGenres(genres: List<my.noveldokusha.scraper.SearchGenre>) = goToDatabaseSearchGenres(
         includedGenresIds = genres.map { it.id },
         databaseUrlBase = viewModel.database.baseUrl
     )

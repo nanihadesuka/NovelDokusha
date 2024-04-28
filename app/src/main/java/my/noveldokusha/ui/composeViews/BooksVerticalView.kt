@@ -24,9 +24,8 @@ import androidx.compose.ui.unit.dp
 import my.noveldokusha.AppPreferences
 import my.noveldokusha.R
 import my.noveldokusha.composableActions.ListGridLoadWatcher
+import my.noveldokusha.core.rememberResolvedBookImagePath
 import my.noveldokusha.feature.local_database.BookMetadata
-import my.noveldokusha.network.IteratorState
-import my.noveldokusha.repository.rememberResolvedBookImagePath
 import my.noveldokusha.ui.bounceOnPressed
 import my.noveldokusha.ui.theme.ColorAccent
 
@@ -35,7 +34,7 @@ fun BooksVerticalView(
     list: List<BookMetadata>,
     state: LazyGridState,
     error: String?,
-    loadState: IteratorState,
+    loadState: my.noveldokusha.network.IteratorState,
     layoutMode: AppPreferences.LIST_LAYOUT_MODE,
     onLoadNext: () -> Unit,
     onBookClicked: (book: BookMetadata) -> Unit,
@@ -103,10 +102,10 @@ fun BooksVerticalView(
                     .height(160.dp),
             ) {
                 when (loadState) {
-                    IteratorState.LOADING -> CircularProgressIndicator(
+                    my.noveldokusha.network.IteratorState.LOADING -> CircularProgressIndicator(
                         color = ColorAccent
                     )
-                    IteratorState.CONSUMED -> Text(
+                    my.noveldokusha.network.IteratorState.CONSUMED -> Text(
                         text = when {
                             list.isEmpty() -> stringResource(R.string.no_results_found)
                             else -> stringResource(R.string.no_more_results)

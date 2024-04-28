@@ -6,8 +6,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import my.noveldokusha.AppPreferences
-import my.noveldokusha.scraper.DatabaseInterface
-import my.noveldokusha.scraper.LanguageCode
+import my.noveldokusha.core.LanguageCode
 import my.noveldokusha.scraper.Scraper
 import my.noveldokusha.scraper.SourceInterface
 import javax.inject.Inject
@@ -22,7 +21,7 @@ class ScraperRepository @Inject constructor(
     private val scraper: Scraper,
 ) {
 
-    fun databaseList(): List<DatabaseInterface> {
+    fun databaseList(): List<my.noveldokusha.scraper.DatabaseInterface> {
         return scraper.databasesList.toList()
     }
 

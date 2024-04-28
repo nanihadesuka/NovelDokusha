@@ -15,8 +15,8 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import my.noveldokusha.AppPreferences
 import my.noveldokusha.R
-import my.noveldokusha.di.AppCoroutineScope
-import my.noveldokusha.repository.AppFileResolver
+import my.noveldokusha.core.AppCoroutineScope
+import my.noveldokusha.core.AppFileResolver
 import my.noveldokusha.repository.AppRemoteRepository
 import my.noveldokusha.repository.AppRepository
 import my.noveldokusha.tools.TranslationManager

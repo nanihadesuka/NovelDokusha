@@ -14,18 +14,18 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import my.noveldokusha.R
-import my.noveldokusha.repository.AppFileResolver
+import my.noveldokusha.core.AppFileResolver
 import my.noveldokusha.repository.AppRepository
 import my.noveldokusha.tools.epub.epubImporter
 import my.noveldokusha.tools.epub.epubParser
 import my.noveldokusha.utils.Extra_Uri
 import my.noveldokusha.utils.NotificationsCenter
-import my.noveldokusha.utils.asSequence
+import my.noveldokusha.core.asSequence
 import my.noveldokusha.utils.isServiceRunning
 import my.noveldokusha.utils.removeProgressBar
 import my.noveldokusha.utils.text
 import my.noveldokusha.utils.title
-import my.noveldokusha.utils.tryAsResponse
+import my.noveldokusha.core.tryAsResponse
 import timber.log.Timber
 import javax.inject.Inject
 
