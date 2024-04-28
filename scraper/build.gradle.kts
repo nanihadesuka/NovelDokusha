@@ -32,6 +32,12 @@ android {
             "-opt-in=androidx.lifecycle.viewmodel.compose.SavedStateHandleSaveableApi",
         )
     }
+    composeOptions {
+        kotlinCompilerExtensionVersion = libs.versions.kotlin.compose.compilerVersion.get()
+    }
+    buildFeatures {
+        compose = true
+    }
 }
 
 dependencies {

@@ -12,6 +12,7 @@ import my.noveldokusha.scraper.sources.BoxNovel
 import my.noveldokusha.scraper.sources.KoreanNovelsMTL
 import my.noveldokusha.scraper.sources.LightNovelWorld
 import my.noveldokusha.scraper.sources.LightNovelsTranslations
+import my.noveldokusha.scraper.sources.LocalSource
 import my.noveldokusha.scraper.sources.MTLNovel
 import my.noveldokusha.scraper.sources.NovelHall
 import my.noveldokusha.scraper.sources.ReadLightNovel
@@ -32,14 +33,15 @@ class Scraper @Inject constructor(
     @ApplicationContext appContext: Context,
     localSourcesDirectories: LocalSourcesDirectories,
     appFileResolver: AppFileResolver,
+    localSource: LocalSource
 ) {
-    val databasesList = setOf<my.noveldokusha.scraper.DatabaseInterface>(
+    val databasesList = setOf<DatabaseInterface>(
         NovelUpdates(networkClient),
         BakaUpdates(networkClient)
     )
 
     val sourcesList = setOf<SourceInterface>(
-//        LocalSource(appContext, localSourcesDirectories, appFileResolver),
+        localSource,
         LightNovelsTranslations(networkClient),
         ReadLightNovel(networkClient),
         ReadNovelFull(networkClient),
@@ -75,6 +77,6 @@ class Scraper @Inject constructor(
     fun getCompatibleSourceCatalog(url: String): SourceInterface.Catalog? =
         sourcesCatalogsList.find { url.isCompatibleWithBaseUrl(it.baseUrl) }
 
-    fun getCompatibleDatabase(url: String): my.noveldokusha.scraper.DatabaseInterface? =
+    fun getCompatibleDatabase(url: String): DatabaseInterface? =
         databasesList.find { url.isCompatibleWithBaseUrl(it.baseUrl) }
 }

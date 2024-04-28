@@ -141,7 +141,8 @@ fun FinderScreenBody(
                 },
                 trailingContent = {
                     Row {
-                        if (it.catalog is SourceInterface.Configurable) {
+                        val catalog = it.catalog
+                        if (catalog is SourceInterface.Configurable) {
                             var openConfig by rememberSaveable { mutableStateOf(false) }
                             IconButton(
                                 onClick = { openConfig = !openConfig },
@@ -159,7 +160,7 @@ fun FinderScreenBody(
                                             Text(text = stringResource(R.string.close))
                                         }
                                     },
-                                    text = { it.catalog.ScreenConfig() },
+                                    text = { catalog.ScreenConfig() },
                                     icon = {
                                         Icon(
                                             Icons.Filled.Settings,

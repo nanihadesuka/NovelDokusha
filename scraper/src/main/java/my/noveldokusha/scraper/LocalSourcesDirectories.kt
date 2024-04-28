@@ -3,11 +3,12 @@ package my.noveldokusha.scraper
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
-import androidx.compose.runtime.mutableStateOf
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import my.noveldokusha.core.AppCoroutineScope
 import javax.inject.Inject
 
@@ -18,7 +19,8 @@ class LocalSourcesDirectories @Inject constructor(
     val list: List<Uri>
         get() = appContext.contentResolver.persistedUriPermissions.map { it.uri }
 
-    val listState = mutableStateOf<List<Uri>>(list)
+    private val _listState = MutableStateFlow<List<Uri>>(list)
+    val listState = _listState.asStateFlow()
 
     fun add(uri: Uri) {
         appContext.contentResolver.takePersistableUriPermission(
@@ -35,8 +37,8 @@ class LocalSourcesDirectories @Inject constructor(
     }
 
     private fun updateState() {
-        appCoroutineScope.launch {
-            listState.value = withContext(Dispatchers.IO) { list }
+        appCoroutineScope.launch(Dispatchers.Default) {
+            _listState.update { list }
         }
     }
 }

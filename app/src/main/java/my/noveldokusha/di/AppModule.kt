@@ -11,6 +11,8 @@ import dagger.hilt.components.SingletonComponent
 import my.noveldokusha.App
 import my.noveldokusha.BuildConfig
 import my.noveldokusha.core.AppInternalState
+import my.noveldokusha.scraper.AppLocalSources
+import my.noveldokusha.scraper.sources.LocalSource
 import my.noveldokusha.ui.Toasty
 import my.noveldokusha.ui.ToastyToast
 import javax.inject.Singleton
@@ -22,6 +24,10 @@ abstract class AppModule {
     @Binds
     @Singleton
     abstract fun bindToasty(toast: ToastyToast): Toasty
+
+    @Binds
+    @Singleton
+    abstract fun bindAppLocalSources(v: AppLocalSources): LocalSource
 
     companion object {
 
