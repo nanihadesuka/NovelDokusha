@@ -70,7 +70,7 @@ android {
         minSdk = 26
         targetSdk = 34
         versionCode = 13
-        versionName = "2.0.1"
+        versionName = "2.0.2"
         setProperty("archivesBaseName", "NovelDokusha_v$versionName")
 
         testInstrumentationRunnerArguments["clearPackageData"] = "true"
