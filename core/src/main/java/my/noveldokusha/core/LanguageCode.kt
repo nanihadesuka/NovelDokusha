@@ -11,4 +11,5 @@ enum class LanguageCode(val iso639_1: String, @StringRes val nameResId: Int) {
     PORTUGUESE(iso639_1 = "pt", nameResId = R.string.language_portuguese),
     SPANISH(iso639_1 = "es", nameResId = R.string.language_spanish),
     FRENCH(iso639_1 = "fr", nameResId = R.string.language_french),
+    INDONESIAN(iso639_1 = "id", nameResId = R.string.language_indonesian)
 }
