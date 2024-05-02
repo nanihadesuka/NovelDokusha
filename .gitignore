@@ -11,3 +11,5 @@
 /word_database-shm
 /word_database-wal
 /app/release
+
+megalinter-reports/
