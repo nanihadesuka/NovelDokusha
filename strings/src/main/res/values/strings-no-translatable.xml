@@ -20,4 +20,9 @@
     <string translatable="false" name="source_name_wuxia_world">Wuxia World</string>
     <string translatable="false" name="database_name_baka_updates">Baka-Updates</string>
     <string translatable="false" name="database_name_novel_updates">Novel Updates</string>
+    <string translatable="false" name="source_name_indo_webnovel">Indonesia Webnovel</string>
+    <string translatable="false" name="source_name_baca_lightnovel">Baca Lightnovel</string>
+    <string translatable="false" name="source_name_sakura_novel">Sakura Novel</string>
+    <string translatable="false" name="source_name_meio_novel">Meio Novel</string>
+    <string translatable="false" name="source_name_more_novel">More Novel</string>
 </resources>

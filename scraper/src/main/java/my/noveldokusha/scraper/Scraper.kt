@@ -7,19 +7,24 @@ import my.noveldokusha.network.NetworkClient
 import my.noveldokusha.scraper.databases.BakaUpdates
 import my.noveldokusha.scraper.databases.NovelUpdates
 import my.noveldokusha.scraper.sources.AT
+import my.noveldokusha.scraper.sources.BacaLightnovel
 import my.noveldokusha.scraper.sources.BestLightNovel
 import my.noveldokusha.scraper.sources.BoxNovel
+import my.noveldokusha.scraper.sources.IndoWebnovel
 import my.noveldokusha.scraper.sources.KoreanNovelsMTL
 import my.noveldokusha.scraper.sources.LightNovelWorld
 import my.noveldokusha.scraper.sources.LightNovelsTranslations
 import my.noveldokusha.scraper.sources.LocalSource
 import my.noveldokusha.scraper.sources.MTLNovel
+import my.noveldokusha.scraper.sources.MeioNovel
+import my.noveldokusha.scraper.sources.MoreNovel
 import my.noveldokusha.scraper.sources.NovelHall
 import my.noveldokusha.scraper.sources.ReadLightNovel
 import my.noveldokusha.scraper.sources.ReadNovelFull
 import my.noveldokusha.scraper.sources.Reddit
 import my.noveldokusha.scraper.sources.RoyalRoad
 import my.noveldokusha.scraper.sources.Saikai
+import my.noveldokusha.scraper.sources.SakuraNovel
 import my.noveldokusha.scraper.sources.Sousetsuka
 import my.noveldokusha.scraper.sources.Wuxia
 import my.noveldokusha.scraper.sources.WuxiaWorld
@@ -60,6 +65,11 @@ class Scraper @Inject constructor(
         MTLNovel(networkClient),
         WuxiaWorld(networkClient),
         KoreanNovelsMTL(networkClient),
+        IndoWebnovel(networkClient),
+        BacaLightnovel(networkClient),
+        SakuraNovel(networkClient),
+        MeioNovel(networkClient),
+        MoreNovel(networkClient),
     )
 
     val sourcesCatalogsList = sourcesList.filterIsInstance<SourceInterface.Catalog>()
