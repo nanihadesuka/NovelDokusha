@@ -1,13 +1,11 @@
+
 import org.jetbrains.kotlin.konan.properties.hasProperty
 import java.util.Properties
 
 plugins {
-    alias(libs.plugins.kotlin.android)
-    alias(libs.plugins.android.application)
-    alias(libs.plugins.hilt)
-    alias(libs.plugins.ksp)
+    alias(libs.plugins.noveldokusha.android.application)
+    alias(libs.plugins.noveldokusha.android.compose)
     alias(libs.plugins.kotlin.parcelize)
-    alias(libs.plugins.kotlin.scripting)
     alias(libs.plugins.kotlin.serialization)
 }
 
@@ -38,26 +36,6 @@ android {
     val hasDefaultSigningConfigData = defaultSigningConfigData.hasProperty("storeFile")
     println("hasDefaultSigningConfigData: $hasDefaultSigningConfigData")
 
-    compileSdk = 34
-
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
-    }
-
-    kotlinOptions {
-        jvmTarget = "17"
-        freeCompilerArgs = freeCompilerArgs + listOf(
-            "-opt-in=kotlin.RequiresOptIn",
-            "-Xjvm-default=all-compatibility",
-            "-opt-in=androidx.lifecycle.viewmodel.compose.SavedStateHandleSaveableApi",
-        )
-    }
-
-    composeOptions {
-        kotlinCompilerExtensionVersion = libs.versions.kotlin.compose.compilerVersion.get()
-    }
-
     if (cliCustomSettings.splitByAbi) splits {
         abi {
             isEnable = true
@@ -67,18 +45,9 @@ android {
 
     defaultConfig {
         applicationId = "my.noveldokusha"
-        minSdk = 26
-        targetSdk = 34
         versionCode = 13
         versionName = "2.0.1"
         setProperty("archivesBaseName", "NovelDokusha_v$versionName")
-
-        testInstrumentationRunnerArguments["clearPackageData"] = "true"
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-    }
-
-    testOptions {
-        execution = "ANDROIDX_TEST_ORCHESTRATOR"
     }
 
     signingConfigs {
@@ -140,7 +109,6 @@ android {
 
     buildFeatures {
         viewBinding = true
-        compose = true
     }
     namespace = "my.noveldokusha"
 }
@@ -153,12 +121,12 @@ fun DependencyHandler.fossImplementation(dependencyNotation: Any): Dependency? =
 
 dependencies {
 
-    implementation(project(":features:local_database"))
-    implementation(project(":features:epub_parser"))
-    implementation(project(":core"))
-    implementation(project(":networking"))
-    implementation(project(":strings"))
-    implementation(project(":scraper"))
+    implementation(projects.features.localDatabase)
+    implementation(projects.features.epubParser)
+    implementation(projects.core)
+    implementation(projects.networking)
+    implementation(projects.strings)
+    implementation(projects.scraper)
 
     // Kotlin
     implementation(libs.kotlinx.coroutines.core)
@@ -215,10 +183,7 @@ dependencies {
     implementation(libs.retrofit)
 
     // Dependency injection
-    implementation(libs.hilt.android)
     implementation(libs.hilt.workmanager)
-    ksp(libs.hilt.compiler)
-    ksp(libs.hilt.androidx.compiler)
 
     // HTML text extractor
     implementation(libs.crux)
@@ -229,7 +194,6 @@ dependencies {
     implementation(libs.compose.androidx.activity)
     implementation(libs.compose.androidx.material3)
     implementation(libs.compose.androidx.animation)
-    implementation(libs.compose.androidx.ui.tooling)
     implementation(libs.compose.androidx.runtime.livedata)
     implementation(libs.compose.androidx.lifecycle.viewmodel)
     implementation(libs.compose.androidx.constraintlayout)
@@ -256,3 +220,4 @@ dependencies {
 hilt {
     enableAggregatingTask = true
 }
+

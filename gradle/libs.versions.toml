@@ -16,6 +16,8 @@ kotlinx-serialization-json = "1.5.1"
 
 testing-mockito-kotlin = "5.0.0"
 
+androidTools = "31.3.0"
+
 androidx-navigation-ui-ktx = "2.6.0"
 androidx-navigation-fragment-ktx = "2.6.0"
 androidx-preference-ktx = "1.2.0"
@@ -167,6 +169,12 @@ translate = { module = "com.google.mlkit:translate", version.ref = "translate" }
 timber = { module = "com.jakewharton.timber:timber", version.ref = "timber" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 
+#build-confing deps
+android-gradlePlugin = { group = "com.android.tools.build", name = "gradle", version.ref = "plugin-agp" }
+android-tools-common = { group = "com.android.tools", name = "common", version.ref = "androidTools" }
+kotlin-gradlePlugin = { group = "org.jetbrains.kotlin", name = "kotlin-gradle-plugin", version.ref = "kotlin" }
+ksp-gradlePlugin = { group = "com.google.devtools.ksp", name = "com.google.devtools.ksp.gradle.plugin", version.ref = "ksp" }
+
 [plugins]
 android-application = { id = "com.android.application", version.ref = "plugin-agp" }
 android-library = { id = "com.android.library", version.ref = "plugin-agp" }
@@ -176,6 +184,10 @@ kotlin-parcelize = { id = "org.jetbrains.kotlin.plugin.parcelize", version.ref =
 kotlin-scripting = { id = "org.jetbrains.kotlin.plugin.scripting", version.ref = "kotlin" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
+
+noveldokusha-android-application = { id = "noveldokusha.android.application", version = "unspecified" }
+noveldokusha-android-library = { id = "noveldokusha.android.library", version = "unspecified" }
+noveldokusha-android-compose = { id = "noveldokusha.android.compose", version = "unspecified" }
 
 [bundles]
 
