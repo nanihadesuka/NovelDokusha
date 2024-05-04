@@ -11,7 +11,6 @@ import my.noveldokusha.scraper.databases.NovelUpdates
 import my.noveldokusha.scraper.sources.AT
 import my.noveldokusha.scraper.sources.BestLightNovel
 import my.noveldokusha.scraper.sources.BoxNovel
-import my.noveldokusha.scraper.sources.IndoWebnovel
 import my.noveldokusha.scraper.sources.KoreanNovelsMTL
 import my.noveldokusha.scraper.sources.LightNovelWorld
 import my.noveldokusha.scraper.sources.LightNovelsTranslations
@@ -31,6 +30,7 @@ import my.noveldokusha.scraper.sources.BacaLightnovel
 import my.noveldokusha.scraper.sources.SakuraNovel
 import my.noveldokusha.scraper.sources.MeioNovel
 import my.noveldokusha.scraper.sources.MoreNovel
+import my.noveldokusha.scraper.sources.IndoWebnovel
 
 @Singleton
 class Scraper
