@@ -154,7 +154,7 @@ fun DependencyHandler.fossImplementation(dependencyNotation: Any): Dependency? =
 dependencies {
 
     implementation(project(":features:local_database"))
-    implementation(project(":features:epub_tooling"))
+    implementation(project(":features:epub_parser"))
     implementation(project(":core"))
     implementation(project(":networking"))
     implementation(project(":strings"))

@@ -19,7 +19,7 @@ import my.noveldokusha.core.asSequence
 import my.noveldokusha.core.tryAsResponse
 import my.noveldokusha.repository.AppRepository
 import my.noveldokusha.tools.epub.epubImporter
-import my.noveldokusha.epub_tooling.epubParser
+import my.noveldokusha.epub_parser.epubParser
 import my.noveldokusha.utils.Extra_Uri
 import my.noveldokusha.utils.NotificationsCenter
 import my.noveldokusha.utils.isServiceRunning
@@ -118,7 +118,7 @@ class EpubImportService : Service() {
                     null
                 ).asSequence().map { it.getString(0) }.last()
 
-                val epub = inputStream.use { my.noveldokusha.epub_tooling.epubParser(inputStream = it) }
+                val epub = inputStream.use { my.noveldokusha.epub_parser.epubParser(inputStream = it) }
 
                 notificationsCenter.modifyNotification(
                     notificationBuilder,

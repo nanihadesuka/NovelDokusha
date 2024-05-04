@@ -1,4 +1,4 @@
-package my.noveldokusha.epub_tooling
+package my.noveldokusha.epub_parser
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext

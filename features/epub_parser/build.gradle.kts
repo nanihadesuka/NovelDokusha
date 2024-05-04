@@ -7,7 +7,7 @@ plugins {
 }
 
 android {
-    namespace = "my.noveldokusha.feature.epub_tooling"
+    namespace = "my.noveldokusha.feature.epub_parser"
     compileSdk = 34
 
     defaultConfig {
