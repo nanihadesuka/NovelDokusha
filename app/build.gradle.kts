@@ -134,7 +134,8 @@ android {
         }
 
         create("foss") {
-            ?l}
+            dimension = "dependencies"
+        }
     }
 
     buildFeatures {
