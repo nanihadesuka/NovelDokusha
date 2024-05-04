@@ -2,8 +2,6 @@ package my.noveldokusha.scraper
 
 import android.content.Context
 import dagger.hilt.android.qualifiers.ApplicationContext
-import javax.inject.Inject
-import javax.inject.Singleton
 import my.noveldokusha.core.AppFileResolver
 import my.noveldokusha.network.NetworkClient
 import my.noveldokusha.scraper.databases.BakaUpdates
@@ -11,7 +9,6 @@ import my.noveldokusha.scraper.databases.NovelUpdates
 import my.noveldokusha.scraper.sources.AT
 import my.noveldokusha.scraper.sources.BestLightNovel
 import my.noveldokusha.scraper.sources.BoxNovel
-import my.noveldokusha.scraper.sources.IndoWebnovel
 import my.noveldokusha.scraper.sources.KoreanNovelsMTL
 import my.noveldokusha.scraper.sources.LightNovelWorld
 import my.noveldokusha.scraper.sources.LightNovelsTranslations
@@ -27,51 +24,53 @@ import my.noveldokusha.scraper.sources.Sousetsuka
 import my.noveldokusha.scraper.sources.Wuxia
 import my.noveldokusha.scraper.sources.WuxiaWorld
 import my.noveldokusha.scraper.sources._1stKissNovel
-import my.noveldokusha.scraper.sources.BacaLightnovel
-import my.noveldokusha.scraper.sources.SakuraNovel
-import my.noveldokusha.scraper.sources.MeioNovel
-import my.noveldokusha.scraper.sources.MoreNovel
+import my.noveldokusha.scraper.sources._IndoWebnovel
+import my.noveldokusha.scraper.sources._SakuraNovel
+import my.noveldokusha.scraper.sources._Bacaalightnovel
+import my.noveldokusha.scraper.sources._MeioNovel
+import my.noveldokusha.scraper.sources._MoreNovel
+import javax.inject.Inject
+import javax.inject.Singleton
 
 @Singleton
-class Scraper
-@Inject
-constructor(
+class Scraper @Inject constructor(
     networkClient: NetworkClient,
     @ApplicationContext appContext: Context,
     localSourcesDirectories: LocalSourcesDirectories,
     appFileResolver: AppFileResolver,
     localSource: LocalSource
 ) {
-    val databasesList =
-        setOf<DatabaseInterface>(NovelUpdates(networkClient), BakaUpdates(networkClient))
+    val databasesList = setOf<DatabaseInterface>(
+        NovelUpdates(networkClient),
+        BakaUpdates(networkClient)
+    )
 
-    val sourcesList =
-        setOf<SourceInterface>(
-            localSource,
-            LightNovelsTranslations(networkClient),
-            ReadLightNovel(networkClient),
-            ReadNovelFull(networkClient),
-            RoyalRoad(networkClient),
-            my.noveldokusha.scraper.sources.NovelUpdates(networkClient),
-            Reddit(networkClient),
-            AT(networkClient),
-            Wuxia(networkClient),
-            BestLightNovel(networkClient),
-            _1stKissNovel(networkClient),
-            Sousetsuka(networkClient),
-            Saikai(networkClient),
-            BoxNovel(networkClient),
-            LightNovelWorld(networkClient),
-            NovelHall(networkClient),
-            MTLNovel(networkClient),
-            WuxiaWorld(networkClient),
-            KoreanNovelsMTL(networkClient),
-            IndoWebnovel(networkClient),
-            BacaLightnovel(networkClient),
-            SakuraNovel(networkClient),
-            MeioNovel(networkClient),
-            MoreNovel(networkClient),
-        )
+    val sourcesList = setOf<SourceInterface>(
+        localSource,
+        LightNovelsTranslations(networkClient),
+        ReadLightNovel(networkClient),
+        ReadNovelFull(networkClient),
+        RoyalRoad(networkClient),
+        my.noveldokusha.scraper.sources.NovelUpdates(networkClient),
+        Reddit(networkClient),
+        AT(networkClient),
+        Wuxia(networkClient),
+        BestLightNovel(networkClient),
+        _1stKissNovel(networkClient),
+        Sousetsuka(networkClient),
+        Saikai(networkClient),
+        BoxNovel(networkClient),
+        LightNovelWorld(networkClient),
+        NovelHall(networkClient),
+        MTLNovel(networkClient),
+        WuxiaWorld(networkClient),
+        KoreanNovelsMTL(networkClient),
+        IndoWebnovel(networkClient),
+        SakuraNovel(networkClient),
+        Bacaalightnovel(networkClient),
+        MoreNovel(networkClient),
+        MeioNovel(networkClient),
+    )
 
     val sourcesCatalogsList = sourcesList.filterIsInstance<SourceInterface.Catalog>()
     val sourcesCatalogsLanguagesList = sourcesCatalogsList.mapNotNull { it.language }.toSet()
