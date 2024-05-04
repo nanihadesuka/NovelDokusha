@@ -3,7 +3,7 @@ package my.noveldokusha
 import my.noveldokusha.features.reader.ReaderItem
 import my.noveldokusha.features.reader.tools.indexOfReaderItemBinarySearch
 import my.noveldokusha.features.reader.tools.indexOfReaderItemLinearSearch
-import my.noveldokusha.tools.BookTextMapper
+import my.noveldokusha.core.BookTextMapper
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.junit.runner.RunWith

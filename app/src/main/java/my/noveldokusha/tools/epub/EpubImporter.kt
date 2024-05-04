@@ -5,6 +5,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.withContext
 import my.noveldokusha.core.AppFileResolver
+import my.noveldokusha.epub_tooling.EpubBook
 import my.noveldokusha.feature.local_database.tables.ChapterBody
 import my.noveldokusha.repository.AppRepository
 import my.noveldokusha.utils.fileImporter
@@ -25,10 +26,11 @@ suspend fun epubImporter(
     appRepository.bookChapters.removeAllFromBook(localBookUrl)
     appRepository.libraryBooks.remove(localBookUrl)
 
-    if (epub.coverImage != null) {
+    val coverImage = epub.coverImage
+    if (coverImage != null) {
         fileImporter(
             targetFile = appFileResolver.getStorageBookCoverImageFile(storageFolderName),
-            imageData = epub.coverImage.image
+            imageData = coverImage.image
         )
     }
 

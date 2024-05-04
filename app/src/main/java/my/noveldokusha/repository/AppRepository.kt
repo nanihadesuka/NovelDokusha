@@ -10,11 +10,11 @@ import my.noveldokusha.core.AppFileResolver
 import my.noveldokusha.core.Response
 import my.noveldokusha.core.isContentUri
 import my.noveldokusha.core.tryAsResponse
+import my.noveldokusha.epub_tooling.epubParser
 import my.noveldokusha.feature.local_database.AppDatabase
 import my.noveldokusha.feature.local_database.tables.Book
 import my.noveldokusha.feature.local_database.tables.Chapter
 import my.noveldokusha.tools.epub.epubImporter
-import my.noveldokusha.tools.epub.epubParser
 import javax.inject.Inject
 import javax.inject.Singleton
 

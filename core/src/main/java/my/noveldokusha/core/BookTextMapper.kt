@@ -1,4 +1,4 @@
-package my.noveldokusha.tools
+package my.noveldokusha.core
 
 import org.jsoup.Jsoup
 import org.w3c.dom.Document
@@ -13,6 +13,7 @@ private fun Node.getAttributeValue(attribute: String): String? =
 private fun parseXMLText(text: String): Document? = text.reader().runCatching {
     DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(InputSource(this))
 }.getOrNull()
+
 
 object BookTextMapper {
     // <img yrel="{float}"> {uri} </img>

@@ -1,50 +1,41 @@
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
-    alias(libs.plugins.ksp)
+    alias(libs.plugins.kotlin.parcelize)
     alias(libs.plugins.hilt)
+    alias(libs.plugins.ksp)
 }
 
 android {
-    namespace = "my.noveldokusha.core"
+    namespace = "my.noveldokusha.feature.epub_tooling"
     compileSdk = 34
 
     defaultConfig {
         minSdk = 26
-
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        consumerProguardFiles("consumer-rules.pro")
     }
 
     buildTypes {
         release {
             isMinifyEnabled = false
-            proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
-            )
         }
     }
-
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
     kotlinOptions {
-        jvmTarget = "1.8"
-    }
-    composeOptions {
-        kotlinCompilerExtensionVersion = libs.versions.kotlin.compose.compilerVersion.get()
-
-    }
-    buildFeatures {
-        compose = true
+        jvmTarget = "17"
+        freeCompilerArgs = freeCompilerArgs + listOf(
+            "-opt-in=kotlin.RequiresOptIn",
+            "-Xjvm-default=all-compatibility",
+            "-opt-in=androidx.lifecycle.viewmodel.compose.SavedStateHandleSaveableApi",
+        )
     }
 }
 
 dependencies {
-
-    implementation(project(":strings"))
+    implementation(project(":core"))
 
     // Dependency injection
     implementation(libs.hilt.android)
@@ -52,9 +43,8 @@ dependencies {
     ksp(libs.hilt.compiler)
     ksp(libs.hilt.androidx.compiler)
 
-    implementation(libs.compose.androidx.ui)
-
     implementation(libs.jsoup)
+
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)

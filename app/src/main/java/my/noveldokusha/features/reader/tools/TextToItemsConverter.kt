@@ -5,7 +5,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.withContext
 import my.noveldokusha.features.reader.ReaderItem
-import my.noveldokusha.tools.BookTextMapper
+import my.noveldokusha.core.BookTextMapper
 
 suspend fun textToItemsConverter(
     chapterUrl: String,

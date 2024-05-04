@@ -1,6 +1,6 @@
 package my.noveldokusha.features.reader
 
-import my.noveldokusha.tools.BookTextMapper
+import my.noveldokusha.core.BookTextMapper
 
 sealed interface ReaderItem {
     /**

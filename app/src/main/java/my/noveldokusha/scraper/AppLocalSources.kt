@@ -43,7 +43,7 @@ import my.noveldokusha.network.tryConnect
 import my.noveldokusha.scraper.domain.BookResult
 import my.noveldokusha.scraper.domain.ChapterResult
 import my.noveldokusha.scraper.sources.LocalSource
-import my.noveldokusha.tools.epub.epubCoverParser
+import my.noveldokusha.epub_tooling.epubCoverParser
 import my.noveldokusha.ui.theme.Grey25
 import my.noveldokusha.utils.fileImporter
 import my.noveldokusha.utils.textPadding
@@ -187,7 +187,11 @@ class AppLocalSources @Inject constructor(
         if (!coverFile.exists()) {
             val inputStream = appContext.contentResolver.openInputStream(BookResult.url.toUri())
                 ?: return@withContext BookResult
-            val coverImage = inputStream.use { epubCoverParser(inputStream = inputStream) }
+            val coverImage = inputStream.use {
+                my.noveldokusha.epub_tooling.epubCoverParser(
+                    inputStream = inputStream
+                )
+            }
                 ?: return@withContext BookResult
             fileImporter(
                 targetFile = coverFile,
