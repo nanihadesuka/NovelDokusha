@@ -6,7 +6,7 @@ import my.noveldokusha.core.AppPreferences
 import my.noveldokusha.features.reader.features.ReaderViewHandlersActions
 import my.noveldokusha.repository.AppRepository
 import my.noveldokusha.repository.ReaderRepository
-import my.noveldokusha.tools.TranslationManager
+import my.noveldokusha.text_translator.domain.TranslationManager
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -15,7 +15,7 @@ class ReaderSessionProvider @Inject constructor(
     private val appRepository: AppRepository,
     private val appPreferences: AppPreferences,
     @ApplicationContext private val context: Context,
-    private val translationManager: TranslationManager,
+    private val translationManager: my.noveldokusha.text_translator.domain.TranslationManager,
     private val readerRepository: ReaderRepository,
     private val readerViewHandlersActions: ReaderViewHandlersActions,
 ) {

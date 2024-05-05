@@ -1,4 +1,3 @@
-
 import org.jetbrains.kotlin.konan.properties.hasProperty
 import java.util.Properties
 
@@ -89,17 +88,8 @@ android {
 
     productFlavors {
         flavorDimensions.add("dependencies")
-
         create("full") {
             dimension = "dependencies"
-            // Having the dependencies here the same in the main scope, visually separated
-            dependencies {
-                // Needed to have the Task -> await extension.
-                fullImplementation(libs.kotlinx.coroutines.playServices)
-
-                // Android ML Translation Kit
-                fullImplementation(libs.translate)
-            }
         }
 
         create("foss") {
@@ -123,10 +113,15 @@ dependencies {
 
     implementation(projects.features.localDatabase)
     implementation(projects.features.epubParser)
+    implementation(projects.features.textTranslator.domain)
     implementation(projects.core)
     implementation(projects.networking)
     implementation(projects.strings)
     implementation(projects.scraper)
+
+    // Translation feature
+    fullImplementation(projects.features.textTranslator.translator)
+    fossImplementation(projects.features.textTranslator.translatorNop)
 
     // Kotlin
     implementation(libs.kotlinx.coroutines.core)

@@ -54,7 +54,7 @@ import my.noveldokusha.features.reader.ReaderScreenState.Settings.Type
 import my.noveldokusha.features.reader.features.LiveTranslationSettingData
 import my.noveldokusha.features.reader.features.TextSynthesis
 import my.noveldokusha.features.reader.features.TextToSpeechSettingData
-import my.noveldokusha.tools.TranslationModelState
+import my.noveldokusha.text_translator.domain.TranslationModelState
 import my.noveldokusha.tools.Utterance
 import my.noveldokusha.tools.VoiceData
 import my.noveldokusha.ui.theme.InternalTheme
@@ -242,7 +242,7 @@ private fun ViewsPreview(
         listOfAvailableModels = remember { mutableStateListOf() },
         source = remember {
             mutableStateOf(
-                TranslationModelState(
+                my.noveldokusha.text_translator.domain.TranslationModelState(
                     language = "fr",
                     available = true,
                     downloading = false,
@@ -252,7 +252,7 @@ private fun ViewsPreview(
         },
         target = remember {
             mutableStateOf(
-                TranslationModelState(
+                my.noveldokusha.text_translator.domain.TranslationModelState(
                     language = "en",
                     available = true,
                     downloading = false,

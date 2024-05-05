@@ -19,7 +19,7 @@ import my.noveldokusha.core.AppFileResolver
 import my.noveldokusha.core.AppPreferences
 import my.noveldokusha.repository.AppRemoteRepository
 import my.noveldokusha.repository.AppRepository
-import my.noveldokusha.tools.TranslationManager
+import my.noveldokusha.text_translator.domain.TranslationManager
 import my.noveldokusha.ui.BaseViewModel
 import my.noveldokusha.ui.Toasty
 import my.noveldokusha.ui.theme.Themes

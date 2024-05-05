@@ -1,7 +1,6 @@
-package my.noveldokusha.tools
+package my.noveldokusha.text_translator.domain
 
 import androidx.compose.runtime.snapshots.SnapshotStateList
-import kotlinx.coroutines.Job
 import java.util.Locale
 
 data class TranslationModelState(
@@ -37,7 +36,7 @@ interface TranslationManager {
      */
     fun getTranslator(source: String, target: String): TranslatorState
 
-    fun downloadModel(language: String): Job
+    fun downloadModel(language: String): Unit
 
-    fun removeModel(language: String): Job
+    fun removeModel(language: String): Unit
 }

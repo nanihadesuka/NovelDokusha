@@ -30,7 +30,7 @@ import my.noveldokusha.features.reader.tools.ChaptersIsReadRoutine
 import my.noveldokusha.repository.AppRepository
 import my.noveldokusha.repository.ReaderRepository
 import my.noveldokusha.services.narratorMediaControls.NarratorMediaControlsService
-import my.noveldokusha.tools.TranslationManager
+import my.noveldokusha.text_translator.domain.TranslationManager
 import my.noveldokusha.tools.Utterance
 import kotlin.properties.Delegates
 
@@ -43,7 +43,7 @@ class ReaderSession(
     private val readerRepository: ReaderRepository,
     private val readerViewHandlersActions: ReaderViewHandlersActions,
     @ApplicationContext private val context: Context,
-    translationManager: TranslationManager,
+    translationManager: my.noveldokusha.text_translator.domain.TranslationManager,
 ) {
     private val scope: CoroutineScope = CoroutineScope(
         SupervisorJob() + Dispatchers.Default + CoroutineName("ReaderSession")

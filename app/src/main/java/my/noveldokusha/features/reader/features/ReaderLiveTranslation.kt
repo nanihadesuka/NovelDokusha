@@ -11,24 +11,24 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 import my.noveldokusha.core.AppPreferences
-import my.noveldokusha.tools.TranslationManager
-import my.noveldokusha.tools.TranslationModelState
-import my.noveldokusha.tools.TranslatorState
+import my.noveldokusha.text_translator.domain.TranslationManager
+import my.noveldokusha.text_translator.domain.TranslationModelState
+import my.noveldokusha.text_translator.domain.TranslatorState
 
 data class LiveTranslationSettingData(
     val isAvailable: Boolean,
     val enable: MutableState<Boolean>,
-    val listOfAvailableModels: SnapshotStateList<TranslationModelState>,
-    val source: MutableState<TranslationModelState?>,
-    val target: MutableState<TranslationModelState?>,
+    val listOfAvailableModels: SnapshotStateList<my.noveldokusha.text_translator.domain.TranslationModelState>,
+    val source: MutableState<my.noveldokusha.text_translator.domain.TranslationModelState?>,
+    val target: MutableState<my.noveldokusha.text_translator.domain.TranslationModelState?>,
     val onEnable: (Boolean) -> Unit,
-    val onSourceChange: (TranslationModelState?) -> Unit,
-    val onTargetChange: (TranslationModelState?) -> Unit,
+    val onSourceChange: (my.noveldokusha.text_translator.domain.TranslationModelState?) -> Unit,
+    val onTargetChange: (my.noveldokusha.text_translator.domain.TranslationModelState?) -> Unit,
     val onDownloadTranslationModel: (language: String) -> Unit,
 )
 
 class ReaderLiveTranslation(
-    private val translationManager: TranslationManager,
+    private val translationManager: my.noveldokusha.text_translator.domain.TranslationManager,
     private val appPreferences: AppPreferences,
     private val scope: CoroutineScope = CoroutineScope(
         SupervisorJob() + Dispatchers.Default + CoroutineName("LiveTranslator")
@@ -46,7 +46,7 @@ class ReaderLiveTranslation(
         onDownloadTranslationModel = translationManager::downloadModel
     )
 
-    var translatorState: TranslatorState? = null
+    var translatorState: my.noveldokusha.text_translator.domain.TranslatorState? = null
         private set
 
     private val _onTranslatorChanged = MutableSharedFlow<Unit>()
@@ -60,7 +60,7 @@ class ReaderLiveTranslation(
         updateTranslatorState()
     }
 
-    private suspend fun getValidTranslatorOrNull(language: String): TranslationModelState? {
+    private suspend fun getValidTranslatorOrNull(language: String): my.noveldokusha.text_translator.domain.TranslationModelState? {
         if (language.isBlank()) return null
         return translationManager.hasModelDownloaded(language)
     }
@@ -97,7 +97,7 @@ class ReaderLiveTranslation(
         }
     }
 
-    private fun onSourceChange(it: TranslationModelState?) {
+    private fun onSourceChange(it: my.noveldokusha.text_translator.domain.TranslationModelState?) {
         state.source.value = it
         appPreferences.GLOBAL_TRANSLATION_PREFERRED_SOURCE.value = it?.language ?: ""
         updateTranslatorState()
@@ -106,7 +106,7 @@ class ReaderLiveTranslation(
         }
     }
 
-    private fun onTargetChange(it: TranslationModelState?) {
+    private fun onTargetChange(it: my.noveldokusha.text_translator.domain.TranslationModelState?) {
         state.target.value = it
         appPreferences.GLOBAL_TRANSLATION_PREFERRED_TARGET.value = it?.language ?: ""
         updateTranslatorState()

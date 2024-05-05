@@ -1,21 +1,20 @@
-package my.noveldokusha.foss
+package my.noveldokusha.text_translator
 
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import my.noveldokusha.di.AppCoroutineScope
-import kotlinx.coroutines.CoroutineScope
-import my.noveldokusha.tools.TranslationManager
+import my.noveldokusha.core.AppCoroutineScope
+import my.noveldokusha.text_translator.domain.TranslationManager
 import javax.inject.Singleton
 
 @InstallIn(SingletonComponent::class)
 @Module
-object FossModule {
+object FullModule {
 
     @Provides
     @Singleton
     fun provideTranslationManager(coroutineScope: AppCoroutineScope): TranslationManager {
-        return TranslationManagerEmpty(coroutineScope)
+        return TranslationManagerMLKit(coroutineScope)
     }
 }
