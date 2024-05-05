@@ -8,7 +8,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.launch
-import my.noveldokusha.AppPreferences
+import my.noveldokusha.core.AppPreferences
 import my.noveldokusha.network.PagedListIteratorState
 import my.noveldokusha.repository.CatalogItem
 import my.noveldokusha.repository.ScraperRepository

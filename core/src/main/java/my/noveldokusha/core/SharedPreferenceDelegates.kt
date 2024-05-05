@@ -1,9 +1,9 @@
-package my.noveldokusha.utils
+package my.noveldokusha.core
 
 import android.content.SharedPreferences
 import kotlin.reflect.KProperty
 
-class SharedPreference_Serializable<T>(
+internal class SharedPreference_Serializable<T>(
     val name: String,
     val sharedPreferences: SharedPreferences,
     val defaultValue: T,
@@ -23,7 +23,7 @@ class SharedPreference_Serializable<T>(
     }
 }
 
-class SharedPreference_Enum<T : Enum<T>>(
+internal class SharedPreference_Enum<T : Enum<T>>(
     val name: String,
     val sharedPreferences: SharedPreferences,
     val defaultValue: T,
@@ -37,7 +37,7 @@ class SharedPreference_Enum<T : Enum<T>>(
         sharedPreferences.edit().putString(name, value.name).apply()
 }
 
-class SharedPreference_Int(
+internal class SharedPreference_Int(
     val name: String,
     val sharedPreferences: SharedPreferences,
     val defaultValue: Int
@@ -49,7 +49,7 @@ class SharedPreference_Int(
         sharedPreferences.edit().putInt(name, value).apply()
 }
 
-class SharedPreference_Float(
+internal class SharedPreference_Float(
     val name: String,
     val sharedPreferences: SharedPreferences,
     val defaultValue: Float
@@ -61,7 +61,7 @@ class SharedPreference_Float(
         sharedPreferences.edit().putFloat(name, value).apply()
 }
 
-class SharedPreference_String(
+internal class SharedPreference_String(
     val name: String,
     val sharedPreferences: SharedPreferences,
     val defaultValue: String
@@ -73,7 +73,7 @@ class SharedPreference_String(
         sharedPreferences.edit().putString(name, value).apply()
 }
 
-class SharedPreference_StringSet(
+internal class SharedPreference_StringSet(
     val name: String,
     val sharedPreferences: SharedPreferences,
     val defaultValue: Set<String>
@@ -85,7 +85,7 @@ class SharedPreference_StringSet(
         sharedPreferences.edit().putStringSet(name, value).apply()
 }
 
-class SharedPreference_Boolean(
+internal class SharedPreference_Boolean(
     val name: String,
     val sharedPreferences: SharedPreferences,
     val defaultValue: Boolean

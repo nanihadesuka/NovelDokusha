@@ -29,7 +29,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import my.noveldokusha.AppPreferences
+import my.noveldokusha.core.AppPreferences
 import my.noveldokusha.R
 import my.noveldokusha.feature.local_database.BookMetadata
 import my.noveldokusha.ui.composeViews.AnimatedTransition

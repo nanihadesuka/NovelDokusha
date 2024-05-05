@@ -16,7 +16,7 @@ import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import my.noveldokusha.VoicePredefineState
+import my.noveldokusha.core.VoicePredefineState
 import my.noveldokusha.features.reader.ChapterIndex
 import my.noveldokusha.features.reader.ReaderItem
 import my.noveldokusha.features.reader.tools.indexOfReaderItem

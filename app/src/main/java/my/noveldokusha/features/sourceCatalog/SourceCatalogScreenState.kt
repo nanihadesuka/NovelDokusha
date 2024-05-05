@@ -2,7 +2,7 @@ package my.noveldokusha.features.sourceCatalog
 
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
-import my.noveldokusha.AppPreferences
+import my.noveldokusha.core.AppPreferences
 import my.noveldokusha.feature.local_database.BookMetadata
 import my.noveldokusha.network.PagedListIteratorState
 import my.noveldokusha.ui.composeViews.ToolbarMode

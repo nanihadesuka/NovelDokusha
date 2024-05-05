@@ -153,7 +153,7 @@ fun StyleSettingDialog(
                         .fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
-                    Themes.list.forEach {
+                    Themes.entries.forEach {
                         FilterChip(
                             selected = it == state.currentTheme.value,
                             onClick = { onThemeChange(it) },

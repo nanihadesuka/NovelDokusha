@@ -16,7 +16,7 @@ import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import my.noveldokusha.AppPreferences
+import my.noveldokusha.core.AppPreferences
 import my.noveldokusha.features.reader.ChapterState
 import my.noveldokusha.features.reader.ReaderItem
 import my.noveldokusha.features.reader.ReaderState

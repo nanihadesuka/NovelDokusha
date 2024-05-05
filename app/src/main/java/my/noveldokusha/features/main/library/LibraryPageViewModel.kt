@@ -11,7 +11,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
-import my.noveldokusha.AppPreferences
+import my.noveldokusha.core.AppPreferences
 import my.noveldokusha.R
 import my.noveldokusha.data.LibraryCategory
 import my.noveldokusha.repository.AppRepository

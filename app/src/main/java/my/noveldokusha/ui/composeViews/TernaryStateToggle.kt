@@ -25,7 +25,7 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import my.noveldokusha.AppPreferences.TERNARY_STATE
+import my.noveldokusha.core.AppPreferences.TERNARY_STATE
 import my.noveldokusha.ui.theme.InternalTheme
 
 @OptIn(ExperimentalAnimationApi::class)

@@ -13,16 +13,18 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import my.noveldokusha.AppPreferences
 import my.noveldokusha.R
 import my.noveldokusha.core.AppCoroutineScope
 import my.noveldokusha.core.AppFileResolver
+import my.noveldokusha.core.AppPreferences
 import my.noveldokusha.repository.AppRemoteRepository
 import my.noveldokusha.repository.AppRepository
 import my.noveldokusha.tools.TranslationManager
 import my.noveldokusha.ui.BaseViewModel
 import my.noveldokusha.ui.Toasty
 import my.noveldokusha.ui.theme.Themes
+import my.noveldokusha.ui.toPreferenceTheme
+import my.noveldokusha.ui.toTheme
 import my.noveldokusha.utils.asMutableStateOf
 import java.io.File
 import javax.inject.Inject
@@ -46,7 +48,7 @@ class SettingsViewModel @Inject constructor(
         databaseSize = stateHandle.asMutableStateOf("databaseSize") { "" },
         imageFolderSize = stateHandle.asMutableStateOf("imageFolderSize") { "" },
         followsSystemTheme = appPreferences.THEME_FOLLOW_SYSTEM.state(viewModelScope),
-        currentTheme = derivedStateOf { Themes.fromIDTheme(themeId) },
+        currentTheme = derivedStateOf { themeId.toTheme },
         isTranslationSettingsVisible = mutableStateOf(translationManager.available),
         translationModelsStates = translationManager.models,
         updateAppSetting = SettingsScreenState.UpdateApp(
@@ -112,7 +114,7 @@ class SettingsViewModel @Inject constructor(
     }
 
     fun onThemeChange(themes: Themes) {
-        appPreferences.THEME_ID.value = themes.themeId
+        appPreferences.THEME_ID.value = themes.toPreferenceTheme
     }
 
     private fun updateDatabaseSize() = viewModelScope.launch {

@@ -14,8 +14,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
-import my.noveldokusha.AppPreferences
 import my.noveldokusha.R
+import my.noveldokusha.core.AppPreferences
+import my.noveldokusha.ui.toTheme
 
 
 enum class Themes(
@@ -38,11 +39,6 @@ enum class Themes(
         nameId = R.string.theme_name_black,
         themeId = R.style.AppTheme_BaseDark_Black,
     );
-
-    companion object {
-        val list = Themes.values().toList()
-        fun fromIDTheme(@StyleRes id: Int) = list.find { it.themeId == id } ?: LIGHT
-    }
 }
 
 @Composable
@@ -52,7 +48,7 @@ fun Theme(
 ) {
     val followSystemsTheme by appPreferences.THEME_FOLLOW_SYSTEM.state(rememberCoroutineScope())
     val selectedThemeId = appPreferences.THEME_ID.state(rememberCoroutineScope())
-    val selectedTheme by remember { derivedStateOf { Themes.fromIDTheme(selectedThemeId.value) } }
+    val selectedTheme by remember { derivedStateOf { selectedThemeId.value.toTheme } }
     val isSystemThemeLight = !isSystemInDarkTheme()
     val theme: Themes = when (followSystemsTheme) {
         true -> when {

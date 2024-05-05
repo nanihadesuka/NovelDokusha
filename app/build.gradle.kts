@@ -139,9 +139,6 @@ dependencies {
     implementation(libs.androidx.lifecycle.common.java8)
     implementation(libs.androidx.coordinatorlayout)
 
-    // Preferences
-    implementation(libs.androidx.preference.ktx)
-
     // Local storage directory access
     implementation(libs.androidx.documentfile)
 

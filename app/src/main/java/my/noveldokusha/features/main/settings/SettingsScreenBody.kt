@@ -104,7 +104,7 @@ private fun SettingsTheme(
         ListItem(
             headlineContent = {
                 FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Themes.list.forEach {
+                    Themes.entries.forEach {
                         FilterChip(
                             selected = it == currentTheme,
                             onClick = { onCurrentThemeChange(it) },

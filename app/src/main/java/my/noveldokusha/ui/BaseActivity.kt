@@ -6,8 +6,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.asLiveData
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.drop
-import my.noveldokusha.AppPreferences
-import my.noveldokusha.R
+import my.noveldokusha.core.AppPreferences
+import my.noveldokusha.ui.theme.Themes
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -19,16 +19,14 @@ open class BaseActivity : AppCompatActivity() {
     lateinit var toasty: Toasty
 
     private fun getAppTheme(): Int {
+        val theme = appPreferences.THEME_ID.value.toTheme
         if (!appPreferences.THEME_FOLLOW_SYSTEM.value)
-            return appPreferences.THEME_ID.value
+            return theme.themeId
 
         val isSystemThemeLight = !isSystemInDarkTheme()
-        val isThemeLight =
-            AppPreferences.globalThemeListLight.contains(appPreferences.THEME_ID.value)
-
-        if (isSystemThemeLight && !isThemeLight) return R.style.AppTheme_Light
-        if (!isSystemThemeLight && isThemeLight) return R.style.AppTheme_BaseDark_Dark
-        return appPreferences.THEME_ID.value
+        if (isSystemThemeLight && !theme.isLight) return Themes.LIGHT.themeId
+        if (!isSystemThemeLight && theme.isLight) return Themes.DARK.themeId
+        return theme.themeId
     }
 
     private fun isSystemInDarkTheme(): Boolean {

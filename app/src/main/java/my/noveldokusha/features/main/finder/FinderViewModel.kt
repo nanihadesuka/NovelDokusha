@@ -3,7 +3,7 @@ package my.noveldokusha.features.main.finder
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import my.noveldokusha.AppPreferences
+import my.noveldokusha.core.AppPreferences
 import my.noveldokusha.core.LanguageCode
 import my.noveldokusha.repository.ScraperRepository
 import my.noveldokusha.ui.BaseViewModel

@@ -87,7 +87,7 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.withContext
 import my.noveldokusha.R
-import my.noveldokusha.VoicePredefineState
+import my.noveldokusha.core.VoicePredefineState
 import my.noveldokusha.composableActions.debouncedAction
 import my.noveldokusha.features.reader.features.TextToSpeechSettingData
 import my.noveldokusha.tools.VoiceData

@@ -16,7 +16,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.parcelize.Parcelize
 import my.noveldokusha.App
-import my.noveldokusha.AppPreferences
+import my.noveldokusha.core.AppPreferences
 import my.noveldokusha.core.PagedList
 import my.noveldokusha.core.map
 import my.noveldokusha.data.persistentCacheDatabaseSearchGenres

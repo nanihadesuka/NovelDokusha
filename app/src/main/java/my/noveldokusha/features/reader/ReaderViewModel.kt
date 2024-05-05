@@ -7,11 +7,11 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import my.noveldokusha.AppPreferences
+import my.noveldokusha.core.AppPreferences
 import my.noveldokusha.features.reader.features.ReaderViewHandlersActions
 import my.noveldokusha.features.reader.manager.ReaderManager
 import my.noveldokusha.ui.BaseViewModel
-import my.noveldokusha.ui.theme.Themes
+import my.noveldokusha.ui.toTheme
 import my.noveldokusha.utils.StateExtra_Boolean
 import my.noveldokusha.utils.StateExtra_String
 import timber.log.Timber
@@ -65,7 +65,7 @@ class ReaderViewModel @Inject constructor(
             liveTranslation = readerSession.readerLiveTranslation.state,
             style = ReaderScreenState.Settings.StyleSettingsData(
                 followSystem = appPreferences.THEME_FOLLOW_SYSTEM.state(viewModelScope),
-                currentTheme = derivedStateOf { Themes.fromIDTheme(themeId.value) },
+                currentTheme = derivedStateOf { themeId.value.toTheme },
                 textFont = appPreferences.READER_FONT_FAMILY.state(viewModelScope),
                 textSize = appPreferences.READER_FONT_SIZE.state(viewModelScope),
             )

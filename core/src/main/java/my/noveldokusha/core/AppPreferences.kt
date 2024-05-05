@@ -1,6 +1,6 @@
 @file:Suppress("PropertyName")
 
-package my.noveldokusha
+package my.noveldokusha.core
 
 import android.content.Context
 import android.content.SharedPreferences
@@ -20,14 +20,6 @@ import kotlinx.coroutines.withContext
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import my.noveldokusha.core.LanguageCode
-import my.noveldokusha.utils.SharedPreference_Boolean
-import my.noveldokusha.utils.SharedPreference_Enum
-import my.noveldokusha.utils.SharedPreference_Float
-import my.noveldokusha.utils.SharedPreference_Int
-import my.noveldokusha.utils.SharedPreference_Serializable
-import my.noveldokusha.utils.SharedPreference_String
-import my.noveldokusha.utils.SharedPreference_StringSet
 import javax.inject.Inject
 
 @Serializable
@@ -38,26 +30,19 @@ data class VoicePredefineState(
     val speed: Float
 )
 
+enum class PreferenceThemes { Light, Dark, Black }
+
 class AppPreferences @Inject constructor(
     @ApplicationContext val context: Context
 ) {
-    companion object {
-        val globalThemeListLight = mapOf(
-            R.style.AppTheme_Light to "Light"
-        )
-        val globalThemeListDark = mapOf(
-            R.style.AppTheme_BaseDark_Dark to "Dark",
-            R.style.AppTheme_BaseDark_Grey to "Grey",
-            R.style.AppTheme_BaseDark_Black to "Black"
-        )
-    }
-
     private val preferences = PreferenceManager.getDefaultSharedPreferences(context)
     private val preferencesChangeListeners =
         mutableSetOf<SharedPreferences.OnSharedPreferenceChangeListener>()
 
-    val THEME_ID = object : Preference<Int>("THEME_ID") {
-        override var value by SharedPreference_Int(name, preferences, R.style.AppTheme_Light)
+    val THEME_ID = object : Preference<PreferenceThemes>("THEME_ID") {
+        override var value by SharedPreference_Enum(name, preferences, PreferenceThemes.Light) {
+            enumValueOf(it)
+        }
     }
     val THEME_FOLLOW_SYSTEM = object : Preference<Boolean>("THEME_FOLLOW_SYSTEM") {
         override var value by SharedPreference_Boolean(name, preferences, true)

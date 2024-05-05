@@ -5,7 +5,7 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.runtime.snapshots.SnapshotStateMap
-import my.noveldokusha.AppPreferences
+import my.noveldokusha.core.AppPreferences
 
 data class ChaptersScreenState(
     val book: State<BookState>,
