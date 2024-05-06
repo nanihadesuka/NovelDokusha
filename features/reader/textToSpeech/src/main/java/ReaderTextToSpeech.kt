@@ -1,5 +1,3 @@
-package my.noveldokusha.features.reader.features
-
 import android.content.Context
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
@@ -17,12 +15,13 @@ import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import my.noveldokusha.core.VoicePredefineState
-import my.noveldokusha.features.reader.ChapterIndex
-import my.noveldokusha.features.reader.ReaderItem
-import my.noveldokusha.features.reader.tools.indexOfReaderItem
-import my.noveldokusha.tools.TextToSpeechManager
-import my.noveldokusha.tools.Utterance
-import my.noveldokusha.tools.VoiceData
+import my.noveldokusha.features.reader.domain.ChapterIndex
+import my.noveldokusha.features.reader.domain.ChapterLoaded
+import my.noveldokusha.features.reader.domain.ReaderItem
+import my.noveldokusha.features.reader.domain.indexOfReaderItem
+import my.noveldokusha.texttospeech.TextToSpeechManager
+import my.noveldokusha.texttospeech.Utterance
+import my.noveldokusha.texttospeech.VoiceData
 
 data class TextToSpeechSettingData(
     val isPlaying: MutableState<Boolean>,
@@ -59,7 +58,7 @@ class ReaderTextToSpeech(
     private val coroutineScope: CoroutineScope,
     private val context: Context,
     private val items: List<ReaderItem>,
-    private val chapterLoadedFlow: Flow<ReaderChaptersLoader.ChapterLoaded>,
+    private val chapterLoadedFlow: Flow<ChapterLoaded>,
     private val customSavedVoices: State<List<VoicePredefineState>>,
     private val setCustomSavedVoices: (List<VoicePredefineState>) -> Unit,
     private val isChapterIndexValid: (chapterIndex: Int) -> Boolean,

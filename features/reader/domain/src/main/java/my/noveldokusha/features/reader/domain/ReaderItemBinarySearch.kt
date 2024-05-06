@@ -1,6 +1,4 @@
-package my.noveldokusha.features.reader.tools
-
-import my.noveldokusha.features.reader.ReaderItem
+package my.noveldokusha.features.reader.domain
 
 fun indexOfReaderItem(
     list: List<ReaderItem>,

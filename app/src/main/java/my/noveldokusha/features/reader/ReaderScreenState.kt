@@ -3,7 +3,7 @@ package my.noveldokusha.features.reader
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import my.noveldokusha.features.reader.features.LiveTranslationSettingData
-import my.noveldokusha.features.reader.features.TextToSpeechSettingData
+import TextToSpeechSettingData
 import my.noveldokusha.ui.theme.Themes
 
 data class ReaderScreenState(

@@ -52,11 +52,11 @@ import androidx.compose.ui.unit.dp
 import my.noveldokusha.R
 import my.noveldokusha.features.reader.ReaderScreenState.Settings.Type
 import my.noveldokusha.features.reader.features.LiveTranslationSettingData
-import my.noveldokusha.features.reader.features.TextSynthesis
-import my.noveldokusha.features.reader.features.TextToSpeechSettingData
-import my.noveldokusha.text_translator.domain.TranslationModelState
-import my.noveldokusha.tools.Utterance
-import my.noveldokusha.tools.VoiceData
+import TextSynthesis
+import TextToSpeechSettingData
+import my.noveldokusha.features.reader.domain.ReaderItem
+import my.noveldokusha.texttospeech.Utterance
+import my.noveldokusha.texttospeech.VoiceData
 import my.noveldokusha.ui.theme.InternalTheme
 import my.noveldokusha.ui.theme.Themes
 import my.noveldokusha.ui.theme.colorApp

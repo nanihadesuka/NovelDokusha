@@ -2,6 +2,7 @@ package my.noveldokusha
 
 import android.content.Context
 import my.noveldokusha.core.AppFileResolver
+import my.noveldokusha.scraper.AppLocalSources
 import my.noveldokusha.scraper.LocalSourcesDirectories
 import my.noveldokusha.scraper.Scraper
 import org.junit.Assert.assertEquals
@@ -25,7 +26,8 @@ class ScraperTest {
         networkClient = networkClient,
         appContext = appContext,
         localSourcesDirectories = localSourcesDirectories,
-        appFileResolver = appFileResolver
+        appFileResolver = appFileResolver,
+        localSource = AppLocalSources(mock(), mock(), mock())
     )
 
     @Before

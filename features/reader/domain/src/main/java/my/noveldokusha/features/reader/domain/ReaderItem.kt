@@ -1,6 +1,4 @@
-package my.noveldokusha.features.reader
-
-import my.noveldokusha.core.BookTextMapper
+package my.noveldokusha.features.reader.domain
 
 sealed interface ReaderItem {
     /**
@@ -51,11 +49,11 @@ sealed interface ReaderItem {
 
     data class Image(
         override val chapterUrl: String,
-        override val chapterIndex: Int,
         override val chapterItemPosition: Int,
         override val location: Location,
+        override val chapterIndex: Int,
         val text: String,
-        val image: BookTextMapper.ImgEntry
+        val image: ImgEntry,
     ) : ReaderItem, Position, ParagraphLocation
 
     data class Translating(

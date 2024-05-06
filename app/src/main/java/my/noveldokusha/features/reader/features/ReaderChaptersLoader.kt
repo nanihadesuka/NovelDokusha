@@ -8,15 +8,16 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import my.noveldokusha.core.Response
-import my.noveldokusha.features.reader.ChapterState
 import my.noveldokusha.features.reader.ChapterStats
-import my.noveldokusha.features.reader.ChapterUrl
-import my.noveldokusha.features.reader.ReaderItem
-import my.noveldokusha.features.reader.ReaderState
-import my.noveldokusha.features.reader.ReadingChapterPosStats
+import my.noveldokusha.features.reader.domain.ReaderItem
+import my.noveldokusha.features.reader.domain.ChapterLoaded
+import my.noveldokusha.features.reader.domain.ChapterState
+import my.noveldokusha.features.reader.domain.ChapterUrl
+import my.noveldokusha.features.reader.domain.ReaderState
+import my.noveldokusha.features.reader.domain.ReadingChapterPosStats
 import my.noveldokusha.features.reader.tools.InitialPositionChapter
 import my.noveldokusha.features.reader.tools.getInitialChapterItemPosition
-import my.noveldokusha.features.reader.tools.indexOfReaderItem
+import my.noveldokusha.features.reader.domain.indexOfReaderItem
 import my.noveldokusha.features.reader.tools.textToItemsConverter
 import my.noveldokusha.repository.AppRepository
 import timber.log.Timber
@@ -35,10 +36,6 @@ class ReaderChaptersLoader(
 ) : CoroutineScope {
 
     override val coroutineContext: CoroutineContext = SupervisorJob() + Dispatchers.Main.immediate
-
-    data class ChapterLoaded(val chapterIndex: Int, val type: Type) {
-        enum class Type { Previous, Next, Initial }
-    }
 
     private sealed interface LoadChapter {
         enum class Type { RestartInitial, Initial, Previous, Next }

@@ -33,10 +33,12 @@ import my.noveldokusha.R
 import my.noveldokusha.composableActions.SetSystemBarTransparent
 import my.noveldokusha.databinding.ActivityReaderBinding
 import my.noveldokusha.features.main.settings.SettingsViewModel
+import my.noveldokusha.features.reader.domain.ChapterState
+import my.noveldokusha.features.reader.domain.ReaderItem
+import my.noveldokusha.features.reader.domain.ReaderState
+import my.noveldokusha.features.reader.domain.indexOfReaderItem
 import my.noveldokusha.features.reader.features.ReaderViewHandlersActions
 import my.noveldokusha.features.reader.tools.FontsLoader
-import my.noveldokusha.features.reader.tools.indexOfReaderItem
-import my.noveldokusha.tools.Utterance
 import my.noveldokusha.ui.BaseActivity
 import my.noveldokusha.ui.goToWebViewWithUrl
 import my.noveldokusha.ui.theme.Theme
@@ -195,7 +197,7 @@ class ReaderActivity : BaseActivity() {
         }
 
         viewModel.readerSpeaker.currentReaderItem
-            .filter { it.playState == Utterance.PlayState.PLAYING || it.playState == Utterance.PlayState.LOADING }
+            .filter { it.playState == my.noveldokusha.texttospeech.Utterance.PlayState.PLAYING || it.playState == my.noveldokusha.texttospeech.Utterance.PlayState.LOADING }
             .asLiveData().observe(this) {
                 scrollToReadingPositionOptional(
                     chapterIndex = it.itemPos.chapterIndex,

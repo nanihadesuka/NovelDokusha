@@ -1,15 +1,10 @@
-package my.noveldokusha
-
-import my.noveldokusha.features.reader.ReaderItem
-import my.noveldokusha.features.reader.tools.indexOfReaderItemBinarySearch
-import my.noveldokusha.features.reader.tools.indexOfReaderItemLinearSearch
-import my.noveldokusha.core.BookTextMapper
+import my.noveldokusha.features.reader.domain.ReaderItem
+import my.noveldokusha.features.reader.domain.indexOfReaderItemBinarySearch
+import my.noveldokusha.features.reader.domain.indexOfReaderItemLinearSearch
+import my.noveldokusha.features.reader.domain.ImgEntry
 import org.junit.Assert.assertEquals
 import org.junit.Test
-import org.junit.runner.RunWith
-import org.mockito.junit.MockitoJUnitRunner
 
-@RunWith(MockitoJUnitRunner::class)
 class ReaderItemBinarySearchTest {
 
     private val list = listOf<ReaderItem>(
@@ -29,10 +24,10 @@ class ReaderItemBinarySearchTest {
         ReaderItem.Body(chapterUrl = "", chapterIndex = 1, chapterItemPosition = 1, text = "", location = ReaderItem.Location.MIDDLE),
         ReaderItem.Body(chapterUrl = "", chapterIndex = 1, chapterItemPosition = 2, text = "", location = ReaderItem.Location.FIRST),
         ReaderItem.Body(chapterUrl = "", chapterIndex = 1, chapterItemPosition = 3, text = "", location = ReaderItem.Location.MIDDLE),
-        ReaderItem.Image(chapterUrl = "", chapterIndex = 1, chapterItemPosition = 4, text = "", location = ReaderItem.Location.MIDDLE, image = BookTextMapper.ImgEntry("",1f)),
+        ReaderItem.Image(chapterUrl = "", chapterIndex = 1, chapterItemPosition = 4, text = "", location = ReaderItem.Location.MIDDLE, image = ImgEntry("",1f)),
         ReaderItem.Body(chapterUrl = "", chapterIndex = 1, chapterItemPosition = 5, text = "", location = ReaderItem.Location.MIDDLE),
         ReaderItem.Body(chapterUrl = "", chapterIndex = 1, chapterItemPosition = 6, text = "", location = ReaderItem.Location.LAST),
-        ReaderItem.Image(chapterUrl = "", chapterIndex = 1, chapterItemPosition = 7, text = "", location = ReaderItem.Location.MIDDLE, image = BookTextMapper.ImgEntry("",1f)),
+        ReaderItem.Image(chapterUrl = "", chapterIndex = 1, chapterItemPosition = 7, text = "", location = ReaderItem.Location.MIDDLE, image = ImgEntry("",1f)),
         ReaderItem.Error(chapterIndex = 1, text = ""),
         ReaderItem.Padding(chapterIndex = 1),
 
@@ -43,10 +38,10 @@ class ReaderItemBinarySearchTest {
         ReaderItem.Body(chapterUrl = "", chapterIndex = 2, chapterItemPosition = 1, text = "", location = ReaderItem.Location.MIDDLE),
         ReaderItem.Body(chapterUrl = "", chapterIndex = 2, chapterItemPosition = 2, text = "", location = ReaderItem.Location.FIRST),
         ReaderItem.Body(chapterUrl = "", chapterIndex = 2, chapterItemPosition = 3, text = "", location = ReaderItem.Location.MIDDLE),
-        ReaderItem.Image(chapterUrl = "", chapterIndex = 2, chapterItemPosition = 4, text = "", location = ReaderItem.Location.MIDDLE, image = BookTextMapper.ImgEntry("",1f)),
+        ReaderItem.Image(chapterUrl = "", chapterIndex = 2, chapterItemPosition = 4, text = "", location = ReaderItem.Location.MIDDLE, image = ImgEntry("",1f)),
         ReaderItem.Body(chapterUrl = "", chapterIndex = 2, chapterItemPosition = 5, text = "", location = ReaderItem.Location.MIDDLE),
         ReaderItem.Body(chapterUrl = "", chapterIndex = 2, chapterItemPosition = 6, text = "", location = ReaderItem.Location.LAST),
-        ReaderItem.Image(chapterUrl = "", chapterIndex = 2, chapterItemPosition = 7, text = "", location = ReaderItem.Location.MIDDLE, image = BookTextMapper.ImgEntry("",1f)),
+        ReaderItem.Image(chapterUrl = "", chapterIndex = 2, chapterItemPosition = 7, text = "", location = ReaderItem.Location.MIDDLE, image = ImgEntry("",1f)),
         ReaderItem.Error(chapterIndex = 2, text = ""),
         ReaderItem.Padding(chapterIndex = 2),
 
@@ -57,10 +52,10 @@ class ReaderItemBinarySearchTest {
         ReaderItem.Body(chapterUrl = "", chapterIndex = 3, chapterItemPosition = 1, text = "", location = ReaderItem.Location.MIDDLE),
         ReaderItem.Body(chapterUrl = "", chapterIndex = 3, chapterItemPosition = 2, text = "", location = ReaderItem.Location.FIRST),
         ReaderItem.Body(chapterUrl = "", chapterIndex = 3, chapterItemPosition = 3, text = "", location = ReaderItem.Location.MIDDLE),
-        ReaderItem.Image(chapterUrl = "", chapterIndex = 3, chapterItemPosition = 4, text = "", location = ReaderItem.Location.MIDDLE, image = BookTextMapper.ImgEntry("",1f)),
+        ReaderItem.Image(chapterUrl = "", chapterIndex = 3, chapterItemPosition = 4, text = "", location = ReaderItem.Location.MIDDLE, image = ImgEntry("",1f)),
         ReaderItem.Body(chapterUrl = "", chapterIndex = 3, chapterItemPosition = 5, text = "", location = ReaderItem.Location.MIDDLE),
         ReaderItem.Body(chapterUrl = "", chapterIndex = 3, chapterItemPosition = 6, text = "", location = ReaderItem.Location.LAST),
-        ReaderItem.Image(chapterUrl = "", chapterIndex = 3, chapterItemPosition = 7, text = "", location = ReaderItem.Location.MIDDLE, image = BookTextMapper.ImgEntry("",1f)),
+        ReaderItem.Image(chapterUrl = "", chapterIndex = 3, chapterItemPosition = 7, text = "", location = ReaderItem.Location.MIDDLE, image = ImgEntry("",1f)),
         ReaderItem.Error( chapterIndex = 3 , text = ""),
         ReaderItem.Padding( chapterIndex = 3),
 

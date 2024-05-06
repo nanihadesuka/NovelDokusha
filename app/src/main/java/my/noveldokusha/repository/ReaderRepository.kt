@@ -5,6 +5,7 @@ import kotlinx.coroutines.launch
 import my.noveldokusha.core.AppCoroutineScope
 import my.noveldokusha.feature.local_database.AppDatabase
 import my.noveldokusha.features.reader.ChapterState
+import my.noveldokusha.features.reader.domain.ChapterState
 import javax.inject.Inject
 import javax.inject.Singleton
 

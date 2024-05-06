@@ -17,21 +17,20 @@ import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import my.noveldokusha.core.AppPreferences
-import my.noveldokusha.features.reader.ChapterState
-import my.noveldokusha.features.reader.ReaderItem
-import my.noveldokusha.features.reader.ReaderState
-import my.noveldokusha.features.reader.ReadingChapterPosStats
+import my.noveldokusha.features.reader.domain.ReaderItem
 import my.noveldokusha.features.reader.chapterReadPercentage
 import my.noveldokusha.features.reader.features.ReaderChaptersLoader
 import my.noveldokusha.features.reader.features.ReaderLiveTranslation
-import my.noveldokusha.features.reader.features.ReaderTextToSpeech
+import ReaderTextToSpeech
+import my.noveldokusha.features.reader.domain.ChapterLoaded
+import my.noveldokusha.features.reader.domain.ChapterState
+import my.noveldokusha.features.reader.domain.ReaderState
+import my.noveldokusha.features.reader.domain.ReadingChapterPosStats
 import my.noveldokusha.features.reader.features.ReaderViewHandlersActions
 import my.noveldokusha.features.reader.tools.ChaptersIsReadRoutine
 import my.noveldokusha.repository.AppRepository
 import my.noveldokusha.repository.ReaderRepository
 import my.noveldokusha.services.narratorMediaControls.NarratorMediaControlsService
-import my.noveldokusha.text_translator.domain.TranslationManager
-import my.noveldokusha.tools.Utterance
 import kotlin.properties.Delegates
 
 
@@ -186,7 +185,7 @@ class ReaderSession(
                     } else launch {
                         readerChaptersLoader.tryLoadNext()
                         readerChaptersLoader.chapterLoadedFlow
-                            .filter { it.type == ReaderChaptersLoader.ChapterLoaded.Type.Next }
+                            .filter { it.type == ChapterLoaded.Type.Next }
                             .take(1)
                             .collect {
                                 readerTextToSpeech.readChapterStartingFromStart(
@@ -209,7 +208,7 @@ class ReaderSession(
         scope.launch(Dispatchers.Main.immediate) {
             readerTextToSpeech
                 .currentReaderItem
-                .filter { it.playState == Utterance.PlayState.PLAYING }
+                .filter { it.playState == my.noveldokusha.texttospeech.Utterance.PlayState.PLAYING }
                 .filter { savePositionMode.value == SavePositionMode.Speaking }
                 .collect { saveLastReadPositionStateSpeaker(it.itemPos) }
         }
@@ -217,7 +216,7 @@ class ReaderSession(
         scope.launch(Dispatchers.Main.immediate) {
             readerTextToSpeech
                 .currentReaderItem
-                .filter { it.playState == Utterance.PlayState.PLAYING }
+                .filter { it.playState == my.noveldokusha.texttospeech.Utterance.PlayState.PLAYING }
                 .filter { savePositionMode.value == SavePositionMode.Speaking }
                 .collect {
                     val item = it.itemPos

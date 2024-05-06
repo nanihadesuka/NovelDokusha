@@ -22,7 +22,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
@@ -89,8 +88,7 @@ import kotlinx.coroutines.withContext
 import my.noveldokusha.R
 import my.noveldokusha.core.VoicePredefineState
 import my.noveldokusha.composableActions.debouncedAction
-import my.noveldokusha.features.reader.features.TextToSpeechSettingData
-import my.noveldokusha.tools.VoiceData
+import TextToSpeechSettingData
 import my.noveldokusha.ui.composeViews.MyOutlinedTextField
 import my.noveldokusha.ui.composeViews.MySlider
 import my.noveldokusha.ui.theme.ColorAccent
@@ -310,18 +308,18 @@ fun VoiceReaderSettingDialog(
 @OptIn(ExperimentalFoundationApi::class, FlowPreview::class)
 @Composable
 private fun VoiceSelectorDialog(
-    availableVoices: List<VoiceData>,
-    currentVoice: VoiceData?,
+    availableVoices: List<my.noveldokusha.texttospeech.VoiceData>,
+    currentVoice: my.noveldokusha.texttospeech.VoiceData?,
     inputTextFilter: MutableState<String>,
     setVoice: (voiceId: String) -> Unit,
     isDialogOpen: Boolean,
     setDialogOpen: (Boolean) -> Unit,
 ) {
-    val voicesSorted = remember { mutableStateListOf<VoiceData>() }
+    val voicesSorted = remember { mutableStateListOf<my.noveldokusha.texttospeech.VoiceData>() }
     LaunchedEffect(availableVoices) {
         withContext(Dispatchers.Default) {
             availableVoices.sortedWith(
-                compareBy<VoiceData> { it.language }
+                compareBy<my.noveldokusha.texttospeech.VoiceData> { it.language }
                     .thenByDescending { it.quality }
                     .thenBy { it.needsInternet }
             )
@@ -329,7 +327,7 @@ private fun VoiceSelectorDialog(
     }
 
     val voicesFiltered = remember {
-        mutableStateListOf<VoiceData>().apply { addAll(availableVoices) }
+        mutableStateListOf<my.noveldokusha.texttospeech.VoiceData>().apply { addAll(availableVoices) }
     }
 
     LaunchedEffect(Unit) {
@@ -469,7 +467,7 @@ private fun VoiceSelectorDialog(
 private fun DropdownCustomSavedVoices(
     expanded: MutableState<Boolean>,
     list: List<VoicePredefineState>,
-    currentVoice: VoiceData?,
+    currentVoice: my.noveldokusha.texttospeech.VoiceData?,
     currentVoiceSpeed: Float,
     currentVoicePitch: Float,
     onPredefinedSelected: (VoicePredefineState) -> Unit,
@@ -589,7 +587,7 @@ private fun VoiceSelectorDialogContentPreview() {
     InternalTheme {
         VoiceSelectorDialog(
             availableVoices = (0..7).map {
-                VoiceData(
+                my.noveldokusha.texttospeech.VoiceData(
                     id = "$it",
                     language = "lang${it / 2}",
                     needsInternet = (it % 2) == 0,
@@ -598,7 +596,7 @@ private fun VoiceSelectorDialogContentPreview() {
             },
             setVoice = {},
             inputTextFilter = remember { mutableStateOf("hello") },
-            currentVoice = VoiceData(
+            currentVoice = my.noveldokusha.texttospeech.VoiceData(
                 id = "2",
                 language = "",
                 needsInternet = false,
