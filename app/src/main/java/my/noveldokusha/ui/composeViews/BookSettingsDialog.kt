@@ -36,12 +36,12 @@ sealed interface BookSettingsDialogState : Parcelable {
     object Hide : BookSettingsDialogState
 
     @Parcelize
-    data class Show(val book: my.noveldokusha.feature.local_database.tables.Book) : BookSettingsDialogState
+    data class Show(val book: my.noveldokusha.tooling.local_database.tables.Book) : BookSettingsDialogState
 }
 
 @Composable
 fun BookSettingsDialog(
-    currentBook: my.noveldokusha.feature.local_database.tables.Book,
+    currentBook: my.noveldokusha.tooling.local_database.tables.Book,
     onDismiss: () -> Unit,
     model: LibraryViewModel = viewModel()
 ) {

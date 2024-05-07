@@ -62,7 +62,7 @@ class SourceCatalogViewModel @Inject constructor(
         state.fetchIterator.fetchNext()
     }
 
-    fun addToLibraryToggle(book: my.noveldokusha.feature.local_database.BookMetadata) =
+    fun addToLibraryToggle(book: my.noveldokusha.tooling.local_database.BookMetadata) =
         viewModelScope.launch(Dispatchers.IO)
         {
             val isInLibrary =

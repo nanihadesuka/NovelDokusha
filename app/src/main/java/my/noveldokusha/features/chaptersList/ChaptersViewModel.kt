@@ -98,7 +98,7 @@ class ChaptersViewModel @Inject constructor(
             val description = async { downloaderRepository.bookDescription(bookUrl = bookUrl) }
 
             appRepository.libraryBooks.insert(
-                my.noveldokusha.feature.local_database.tables.Book(
+                my.noveldokusha.tooling.local_database.tables.Book(
                     title = bookTitle,
                     url = bookUrl,
                     coverImageUrl = coverUrl.await().toSuccessOrNull()?.data ?: "",
@@ -240,7 +240,7 @@ class ChaptersViewModel @Inject constructor(
         }
     }
 
-    fun onSelectionModeChapterClick(chapter: my.noveldokusha.feature.local_database.ChapterWithContext) {
+    fun onSelectionModeChapterClick(chapter: my.noveldokusha.tooling.local_database.ChapterWithContext) {
         val url = chapter.chapter.url
         if (state.selectedChaptersUrl.containsKey(url)) {
             state.selectedChaptersUrl.remove(url)
@@ -254,7 +254,7 @@ class ChaptersViewModel @Inject constructor(
         appRepository.libraryBooks.saveImageAsCover(imageUri = uri, bookUrl = bookUrl)
     }
 
-    fun onSelectionModeChapterLongClick(chapter: my.noveldokusha.feature.local_database.ChapterWithContext) {
+    fun onSelectionModeChapterLongClick(chapter: my.noveldokusha.tooling.local_database.ChapterWithContext) {
         val url = chapter.chapter.url
         if (url != lastSelectedChapterUrl) {
             val indexOld = state.chapters.indexOfFirst { it.chapter.url == lastSelectedChapterUrl }
@@ -278,13 +278,13 @@ class ChaptersViewModel @Inject constructor(
         lastSelectedChapterUrl = url
     }
 
-    fun onChapterLongClick(chapter: my.noveldokusha.feature.local_database.ChapterWithContext) {
+    fun onChapterLongClick(chapter: my.noveldokusha.tooling.local_database.ChapterWithContext) {
         val url = chapter.chapter.url
         state.selectedChaptersUrl[url] = Unit
         lastSelectedChapterUrl = url
     }
 
-    fun onChapterDownload(chapter: my.noveldokusha.feature.local_database.ChapterWithContext) {
+    fun onChapterDownload(chapter: my.noveldokusha.tooling.local_database.ChapterWithContext) {
         if (state.isLocalSource.value) return
         appScope.launch {
             appRepository.chapterBody.fetchBody(chapter.chapter.url)

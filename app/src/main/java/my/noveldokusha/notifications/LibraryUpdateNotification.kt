@@ -13,7 +13,7 @@ import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
 import dagger.hilt.android.qualifiers.ApplicationContext
 import my.noveldokusha.R
-import my.noveldokusha.feature.local_database.BookMetadata
+import my.noveldokusha.tooling.local_database.BookMetadata
 import my.noveldokusha.features.chaptersList.ChaptersActivity
 import my.noveldokusha.features.main.MainActivity
 import my.noveldokusha.features.reader.ReaderActivity
@@ -64,7 +64,7 @@ class LibraryUpdateNotification @Inject constructor(
     fun updateUpdatingNotification(
         countingUpdated: Int,
         countingTotal: Int,
-        books: Set<my.noveldokusha.feature.local_database.tables.Book>
+        books: Set<my.noveldokusha.tooling.local_database.tables.Book>
     ) {
         notificationsCenter.modifyNotification(notificationBuilder, notificationId) {
             title = context.getString(R.string.updating_library, countingUpdated, countingTotal)
@@ -74,8 +74,8 @@ class LibraryUpdateNotification @Inject constructor(
     }
 
     fun showNewChaptersNotification(
-        book: my.noveldokusha.feature.local_database.tables.Book,
-        newChapters: List<my.noveldokusha.feature.local_database.tables.Chapter>,
+        book: my.noveldokusha.tooling.local_database.tables.Book,
+        newChapters: List<my.noveldokusha.tooling.local_database.tables.Chapter>,
         silent: Boolean
     ) {
         val chain = mutableListOf<Intent>().also {
@@ -168,7 +168,7 @@ class LibraryUpdateNotification @Inject constructor(
     }
 
     fun showFailedNotification(
-        books: Set<my.noveldokusha.feature.local_database.tables.Book>,
+        books: Set<my.noveldokusha.tooling.local_database.tables.Book>,
     ) {
         notificationsCenter.showNotification(
             notificationId = notifyFailedUpdates.notificationId,

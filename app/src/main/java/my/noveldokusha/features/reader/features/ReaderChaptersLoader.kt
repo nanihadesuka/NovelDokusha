@@ -30,7 +30,7 @@ class ReaderChaptersLoader(
     private val translatorSourceLanguageOrNull: () -> String?,
     private val translatorTargetLanguageOrNull: () -> String?,
     private val bookUrl: String,
-    val orderedChapters: List<my.noveldokusha.feature.local_database.tables.Chapter>,
+    val orderedChapters: List<my.noveldokusha.tooling.local_database.tables.Chapter>,
     @Volatile var readerState: ReaderState,
     private val readerViewHandlersActions: ReaderViewHandlersActions,
 ) : CoroutineScope {

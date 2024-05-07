@@ -315,9 +315,9 @@ class ReaderItemAdapter(
         if (!isReadingItem) return null
 
         return when (textSynthesis.playState) {
-            my.noveldokusha.texttospeech.Utterance.PlayState.PLAYING -> currentReadingAloudDrawable
-            my.noveldokusha.texttospeech.Utterance.PlayState.LOADING -> currentReadingAloudLoadingDrawable
-            my.noveldokusha.texttospeech.Utterance.PlayState.FINISHED -> null
+            my.noveldokusha.tooling.texttospeech.Utterance.PlayState.PLAYING -> currentReadingAloudDrawable
+            my.noveldokusha.tooling.texttospeech.Utterance.PlayState.LOADING -> currentReadingAloudLoadingDrawable
+            my.noveldokusha.tooling.texttospeech.Utterance.PlayState.FINISHED -> null
         }
     }
 

@@ -21,9 +21,9 @@ import my.noveldokusha.features.reader.domain.ChapterIndex
 import my.noveldokusha.features.reader.domain.ChapterLoaded
 import my.noveldokusha.features.reader.domain.ReaderItem
 import my.noveldokusha.features.reader.domain.indexOfReaderItem
-import my.noveldokusha.texttospeech.TextToSpeechManager
-import my.noveldokusha.texttospeech.Utterance
-import my.noveldokusha.texttospeech.VoiceData
+import my.noveldokusha.tooling.texttospeech.TextToSpeechManager
+import my.noveldokusha.tooling.texttospeech.Utterance
+import my.noveldokusha.tooling.texttospeech.VoiceData
 
 data class TextToSpeechSettingData(
     val isPlaying: MutableState<Boolean>,

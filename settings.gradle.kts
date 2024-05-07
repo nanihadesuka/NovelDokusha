@@ -21,15 +21,19 @@ enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 
 rootProject.name = "NovelDokusha"
 include(":app")
-include(":features:local_database")
 include(":scraper")
 include(":strings")
 include(":core")
 include(":networking")
-include(":features:epub_parser")
-include(":features:text_translator:translator")
-include(":features:text_translator:domain")
-include(":features:text_translator:translator_nop")
-include(":features:textToSpeech")
-include(":features:reader:textToSpeech")
-include(":features:reader:domain")
+include(":coreui")
+include(":data")
+
+include(":tooling:local_database")
+include(":tooling:epub_parser")
+include(":tooling:text_translator:translator")
+include(":tooling:text_translator:domain")
+include(":tooling:text_translator:translator_nop")
+include(":tooling:textToSpeech")
+
+include(":features:reader")
+

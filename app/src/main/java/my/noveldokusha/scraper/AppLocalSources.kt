@@ -43,9 +43,8 @@ import my.noveldokusha.network.tryConnect
 import my.noveldokusha.scraper.domain.BookResult
 import my.noveldokusha.scraper.domain.ChapterResult
 import my.noveldokusha.scraper.sources.LocalSource
-import my.noveldokusha.epub_parser.epubCoverParser
 import my.noveldokusha.ui.theme.Grey25
-import my.noveldokusha.utils.fileImporter
+import my.noveldokusha.core.fileImporter
 import my.noveldokusha.utils.textPadding
 import javax.inject.Inject
 import javax.inject.Singleton

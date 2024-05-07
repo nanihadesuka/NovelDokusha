@@ -25,7 +25,7 @@ import androidx.compose.ui.unit.dp
 import my.noveldokusha.R
 import my.noveldokusha.composableActions.ListLoadWatcher
 import my.noveldokusha.core.rememberResolvedBookImagePath
-import my.noveldokusha.feature.local_database.BookMetadata
+import my.noveldokusha.tooling.local_database.BookMetadata
 import my.noveldokusha.mappers.mapToBookMetadata
 import my.noveldokusha.network.IteratorState
 import my.noveldokusha.repository.CatalogItem

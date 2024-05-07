@@ -39,7 +39,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import my.noveldokusha.R
-import my.noveldokusha.text_translator.domain.TranslationModelState
+import my.noveldokusha.tooling.text_translator.domain.TranslationModelState
 import my.noveldokusha.ui.theme.ColorAccent
 import my.noveldokusha.utils.textPadding
 

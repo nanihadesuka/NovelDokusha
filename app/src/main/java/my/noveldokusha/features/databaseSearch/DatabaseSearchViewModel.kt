@@ -20,7 +20,7 @@ import my.noveldokusha.core.AppPreferences
 import my.noveldokusha.core.PagedList
 import my.noveldokusha.core.map
 import my.noveldokusha.data.persistentCacheDatabaseSearchGenres
-import my.noveldokusha.feature.local_database.BookMetadata
+import my.noveldokusha.tooling.local_database.BookMetadata
 import my.noveldokusha.network.PagedListIteratorState
 import my.noveldokusha.scraper.Scraper
 import my.noveldokusha.scraper.domain.BookResult

@@ -19,8 +19,8 @@ class LibraryUpdatesInteractions @Inject constructor(
     private val downloaderRepository: DownloaderRepository,
 ) {
     data class NewUpdate(
-        val newChapters: List<my.noveldokusha.feature.local_database.tables.Chapter>,
-        val book: my.noveldokusha.feature.local_database.tables.Book
+        val newChapters: List<my.noveldokusha.tooling.local_database.tables.Chapter>,
+        val book: my.noveldokusha.tooling.local_database.tables.Book
     )
 
     data class CountingUpdating(
@@ -31,9 +31,9 @@ class LibraryUpdatesInteractions @Inject constructor(
     suspend fun updateLibraryBooks(
         completedOnes: Boolean,
         countingUpdating: MutableStateFlow<CountingUpdating?>,
-        currentUpdating: MutableStateFlow<Set<my.noveldokusha.feature.local_database.tables.Book>>,
+        currentUpdating: MutableStateFlow<Set<my.noveldokusha.tooling.local_database.tables.Book>>,
         newUpdates: MutableStateFlow<Set<NewUpdate>>,
-        failedUpdates: MutableStateFlow<Set<my.noveldokusha.feature.local_database.tables.Book>>,
+        failedUpdates: MutableStateFlow<Set<my.noveldokusha.tooling.local_database.tables.Book>>,
     ): Unit = withContext(Dispatchers.Default) {
         appRepository.libraryBooks.getAllInLibrary()
             .filter { it.completed == completedOnes }
@@ -65,11 +65,11 @@ class LibraryUpdatesInteractions @Inject constructor(
 
 
     private suspend fun updateBook(
-        book: my.noveldokusha.feature.local_database.tables.Book,
+        book: my.noveldokusha.tooling.local_database.tables.Book,
         countingUpdating: MutableStateFlow<CountingUpdating?>,
-        currentUpdating: MutableStateFlow<Set<my.noveldokusha.feature.local_database.tables.Book>>,
+        currentUpdating: MutableStateFlow<Set<my.noveldokusha.tooling.local_database.tables.Book>>,
         newUpdates: MutableStateFlow<Set<NewUpdate>>,
-        failedUpdates: MutableStateFlow<Set<my.noveldokusha.feature.local_database.tables.Book>>,
+        failedUpdates: MutableStateFlow<Set<my.noveldokusha.tooling.local_database.tables.Book>>,
     ): Unit = withContext(Dispatchers.Default) {
         currentUpdating.update { it + book }
         val oldChaptersList = async(Dispatchers.IO) {

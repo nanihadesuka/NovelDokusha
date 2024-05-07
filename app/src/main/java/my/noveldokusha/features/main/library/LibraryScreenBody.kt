@@ -62,8 +62,8 @@ fun LibraryScreenBody(
     tabs: List<String>,
     innerPadding: PaddingValues,
     topAppBarState: TopAppBarState,
-    onBookClick: (my.noveldokusha.feature.local_database.BookWithContext) -> Unit,
-    onBookLongClick: (my.noveldokusha.feature.local_database.BookWithContext) -> Unit,
+    onBookClick: (my.noveldokusha.tooling.local_database.BookWithContext) -> Unit,
+    onBookLongClick: (my.noveldokusha.tooling.local_database.BookWithContext) -> Unit,
     viewModel: LibraryPageViewModel = viewModel()
 ) {
     val tabsSizeUpdated = rememberUpdatedState(newValue = tabs.size)
@@ -130,7 +130,7 @@ fun LibraryScreenBody(
                         tabs[page] == "Completed"
                     }
                 }
-                val list: List<my.noveldokusha.feature.local_database.BookWithContext> by remember {
+                val list: List<my.noveldokusha.tooling.local_database.BookWithContext> by remember {
                     derivedStateOf {
                         when (showCompleted) {
                             true -> viewModel.listCompleted
@@ -155,9 +155,9 @@ fun LibraryScreenBody(
 
 @Composable
 private fun LibraryPageBody(
-    list: List<my.noveldokusha.feature.local_database.BookWithContext>,
-    onClick: (my.noveldokusha.feature.local_database.BookWithContext) -> Unit,
-    onLongClick: (my.noveldokusha.feature.local_database.BookWithContext) -> Unit,
+    list: List<my.noveldokusha.tooling.local_database.BookWithContext>,
+    onClick: (my.noveldokusha.tooling.local_database.BookWithContext) -> Unit,
+    onLongClick: (my.noveldokusha.tooling.local_database.BookWithContext) -> Unit,
 ) {
     LazyVerticalGrid(
         columns = GridCells.Adaptive(160.dp),

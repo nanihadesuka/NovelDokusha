@@ -4,6 +4,9 @@ plugins {
 
 android {
     namespace = "my.noveldokusha.strings"
+    androidResources {
+        resourcePrefix = ""
+    }
 }
 
 dependencies {

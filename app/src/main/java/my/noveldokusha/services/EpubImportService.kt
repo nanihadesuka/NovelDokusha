@@ -18,8 +18,7 @@ import my.noveldokusha.core.AppFileResolver
 import my.noveldokusha.core.asSequence
 import my.noveldokusha.core.tryAsResponse
 import my.noveldokusha.repository.AppRepository
-import my.noveldokusha.tools.epub.epubImporter
-import my.noveldokusha.epub_parser.epubParser
+import my.noveldoksuha.data.epubImporter
 import my.noveldokusha.utils.Extra_Uri
 import my.noveldokusha.utils.NotificationsCenter
 import my.noveldokusha.utils.isServiceRunning

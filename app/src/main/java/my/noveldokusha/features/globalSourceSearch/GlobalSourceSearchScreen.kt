@@ -16,7 +16,7 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import my.noveldokusha.R
-import my.noveldokusha.feature.local_database.BookMetadata
+import my.noveldokusha.tooling.local_database.BookMetadata
 import my.noveldokusha.ui.composeViews.TopAppBarSearch
 import my.noveldokusha.ui.theme.ColorAccent
 import my.noveldokusha.ui.theme.InternalTheme

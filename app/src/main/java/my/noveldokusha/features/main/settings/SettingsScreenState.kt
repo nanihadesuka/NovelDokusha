@@ -4,7 +4,7 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import my.noveldokusha.domain.RemoteAppVersion
-import my.noveldokusha.text_translator.domain.TranslationModelState
+import my.noveldokusha.tooling.text_translator.domain.TranslationModelState
 import my.noveldokusha.ui.theme.Themes
 
 data class SettingsScreenState(
@@ -13,7 +13,7 @@ data class SettingsScreenState(
     val followsSystemTheme: State<Boolean>,
     val currentTheme: State<Themes>,
     val isTranslationSettingsVisible: State<Boolean>,
-    val translationModelsStates: SnapshotStateList<my.noveldokusha.text_translator.domain.TranslationModelState>,
+    val translationModelsStates: SnapshotStateList<my.noveldokusha.tooling.text_translator.domain.TranslationModelState>,
     val updateAppSetting: UpdateApp,
     val libraryAutoUpdate: LibraryAutoUpdate,
 ) {

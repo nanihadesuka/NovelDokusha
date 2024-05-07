@@ -9,8 +9,8 @@ android {
 
 dependencies {
     implementation(projects.core)
-    implementation(projects.features.reader.domain)
-    implementation(projects.features.textToSpeech)
+    implementation(projects.tooling.textToSpeech)
+    implementation(projects.tooling.textTranslator.domain)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)

@@ -197,7 +197,7 @@ class ReaderActivity : BaseActivity() {
         }
 
         viewModel.readerSpeaker.currentReaderItem
-            .filter { it.playState == my.noveldokusha.texttospeech.Utterance.PlayState.PLAYING || it.playState == my.noveldokusha.texttospeech.Utterance.PlayState.LOADING }
+            .filter { it.playState == my.noveldokusha.tooling.texttospeech.Utterance.PlayState.PLAYING || it.playState == my.noveldokusha.tooling.texttospeech.Utterance.PlayState.LOADING }
             .asLiveData().observe(this) {
                 scrollToReadingPositionOptional(
                     chapterIndex = it.itemPos.chapterIndex,

@@ -20,7 +20,7 @@ import my.noveldokusha.core.AppPreferences
 import my.noveldokusha.features.reader.domain.ReaderItem
 import my.noveldokusha.features.reader.chapterReadPercentage
 import my.noveldokusha.features.reader.features.ReaderChaptersLoader
-import my.noveldokusha.features.reader.features.ReaderLiveTranslation
+import my.noveldokusha.features.reader.ReaderLiveTranslation
 import my.noveldokusha.features.reader.ReaderTextToSpeech
 import my.noveldokusha.features.reader.domain.ChapterLoaded
 import my.noveldokusha.features.reader.domain.ChapterState
@@ -42,7 +42,7 @@ class ReaderSession(
     private val readerRepository: ReaderRepository,
     private val readerViewHandlersActions: ReaderViewHandlersActions,
     @ApplicationContext private val context: Context,
-    translationManager: my.noveldokusha.text_translator.domain.TranslationManager,
+    translationManager: my.noveldokusha.tooling.text_translator.domain.TranslationManager,
 ) {
     private val scope: CoroutineScope = CoroutineScope(
         SupervisorJob() + Dispatchers.Default + CoroutineName("ReaderSession")
@@ -52,7 +52,7 @@ class ReaderSession(
 
     private val readRoutine = ChaptersIsReadRoutine(appRepository)
     private val orderedChapters =
-        mutableListOf<my.noveldokusha.feature.local_database.tables.Chapter>()
+        mutableListOf<my.noveldokusha.tooling.local_database.tables.Chapter>()
 
     var bookTitle: String? = null
     var bookCoverUrl: String? = null
@@ -208,7 +208,7 @@ class ReaderSession(
         scope.launch(Dispatchers.Main.immediate) {
             readerTextToSpeech
                 .currentReaderItem
-                .filter { it.playState == my.noveldokusha.texttospeech.Utterance.PlayState.PLAYING }
+                .filter { it.playState == my.noveldokusha.tooling.texttospeech.Utterance.PlayState.PLAYING }
                 .filter { savePositionMode.value == SavePositionMode.Speaking }
                 .collect { saveLastReadPositionStateSpeaker(it.itemPos) }
         }
@@ -216,7 +216,7 @@ class ReaderSession(
         scope.launch(Dispatchers.Main.immediate) {
             readerTextToSpeech
                 .currentReaderItem
-                .filter { it.playState == my.noveldokusha.texttospeech.Utterance.PlayState.PLAYING }
+                .filter { it.playState == my.noveldokusha.tooling.texttospeech.Utterance.PlayState.PLAYING }
                 .filter { savePositionMode.value == SavePositionMode.Speaking }
                 .collect {
                     val item = it.itemPos

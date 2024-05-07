@@ -18,7 +18,7 @@ import my.noveldokusha.R
 import my.noveldokusha.core.AppCoroutineScope
 import my.noveldokusha.core.AppFileResolver
 import my.noveldokusha.core.tryAsResponse
-import my.noveldokusha.feature.local_database.AppDatabase
+import my.noveldokusha.tooling.local_database.AppDatabase
 import my.noveldokusha.repository.AppRepository
 import my.noveldokusha.repository.BookChaptersRepository
 import my.noveldokusha.repository.ChapterBodyRepository

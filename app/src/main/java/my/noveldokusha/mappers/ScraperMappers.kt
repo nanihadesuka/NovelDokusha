@@ -3,8 +3,8 @@ package my.noveldokusha.mappers
 import my.noveldokusha.core.PagedList
 import my.noveldokusha.core.Response
 import my.noveldokusha.core.syncMap
-import my.noveldokusha.feature.local_database.BookMetadata
-import my.noveldokusha.feature.local_database.ChapterMetadata
+import my.noveldokusha.tooling.local_database.BookMetadata
+import my.noveldokusha.tooling.local_database.ChapterMetadata
 import my.noveldokusha.scraper.domain.BookResult
 import my.noveldokusha.scraper.domain.ChapterResult
 

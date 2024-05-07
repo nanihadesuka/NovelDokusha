@@ -33,9 +33,9 @@ fun ChaptersScreenBody(
     state: ChaptersScreenState,
     lazyListState: LazyListState,
     innerPadding: PaddingValues,
-    onChapterClick: (chapter: my.noveldokusha.feature.local_database.ChapterWithContext) -> Unit,
-    onChapterLongClick: (chapter: my.noveldokusha.feature.local_database.ChapterWithContext) -> Unit,
-    onChapterDownload: (chapter: my.noveldokusha.feature.local_database.ChapterWithContext) -> Unit,
+    onChapterClick: (chapter: my.noveldokusha.tooling.local_database.ChapterWithContext) -> Unit,
+    onChapterLongClick: (chapter: my.noveldokusha.tooling.local_database.ChapterWithContext) -> Unit,
+    onChapterDownload: (chapter: my.noveldokusha.tooling.local_database.ChapterWithContext) -> Unit,
     onPullRefresh: () -> Unit,
     onCoverLongClick: () -> Unit,
 ) {

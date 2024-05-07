@@ -2,6 +2,7 @@ package my.noveldokusha.features.reader.tools
 
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
+import my.noveldokusha.tooling.local_database.tables.Chapter
 import my.noveldokusha.repository.AppRepository
 
 data class InitialPositionChapter(
@@ -14,7 +15,7 @@ suspend fun getInitialChapterItemPosition(
     appRepository: AppRepository,
     bookUrl: String,
     chapterIndex: Int,
-    chapter: my.noveldokusha.feature.local_database.tables.Chapter,
+    chapter: Chapter,
 ): InitialPositionChapter = coroutineScope {
     val titleChapterItemPosition = 0 // Hardcode or no?
     val book = async { appRepository.libraryBooks.get(bookUrl) }

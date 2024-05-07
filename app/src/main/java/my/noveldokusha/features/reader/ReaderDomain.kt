@@ -1,6 +1,6 @@
 package my.noveldokusha.features.reader
 
-import my.noveldokusha.feature.local_database.tables.Chapter
+import my.noveldokusha.tooling.local_database.tables.Chapter
 import my.noveldokusha.features.reader.domain.ReadingChapterPosStats
 import kotlin.math.ceil
 

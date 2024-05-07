@@ -24,7 +24,7 @@ class DatabaseBookInfoActivity : BaseActivity() {
         override var bookTitle by Extra_String()
 
         constructor(intent: Intent) : super(intent)
-        constructor(ctx: Context, databaseUrlBase: String, bookMetadata: my.noveldokusha.feature.local_database.BookMetadata) : super(
+        constructor(ctx: Context, databaseUrlBase: String, bookMetadata: my.noveldokusha.tooling.local_database.BookMetadata) : super(
             ctx,
             DatabaseBookInfoActivity::class.java
         ) {
@@ -61,7 +61,7 @@ class DatabaseBookInfoActivity : BaseActivity() {
         databaseUrlBase = viewModel.database.baseUrl
     )
 
-    private fun openBookInfo(book: my.noveldokusha.feature.local_database.BookMetadata) = goToDatabaseBookInfo(
+    private fun openBookInfo(book: my.noveldokusha.tooling.local_database.BookMetadata) = goToDatabaseBookInfo(
         bookMetadata = book,
         databaseUrlBase = viewModel.database.baseUrl
     )

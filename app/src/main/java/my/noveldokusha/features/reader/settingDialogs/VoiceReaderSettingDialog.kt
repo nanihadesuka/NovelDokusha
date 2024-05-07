@@ -308,18 +308,18 @@ fun VoiceReaderSettingDialog(
 @OptIn(ExperimentalFoundationApi::class, FlowPreview::class)
 @Composable
 private fun VoiceSelectorDialog(
-    availableVoices: List<my.noveldokusha.texttospeech.VoiceData>,
-    currentVoice: my.noveldokusha.texttospeech.VoiceData?,
+    availableVoices: List<my.noveldokusha.tooling.texttospeech.VoiceData>,
+    currentVoice: my.noveldokusha.tooling.texttospeech.VoiceData?,
     inputTextFilter: MutableState<String>,
     setVoice: (voiceId: String) -> Unit,
     isDialogOpen: Boolean,
     setDialogOpen: (Boolean) -> Unit,
 ) {
-    val voicesSorted = remember { mutableStateListOf<my.noveldokusha.texttospeech.VoiceData>() }
+    val voicesSorted = remember { mutableStateListOf<my.noveldokusha.tooling.texttospeech.VoiceData>() }
     LaunchedEffect(availableVoices) {
         withContext(Dispatchers.Default) {
             availableVoices.sortedWith(
-                compareBy<my.noveldokusha.texttospeech.VoiceData> { it.language }
+                compareBy<my.noveldokusha.tooling.texttospeech.VoiceData> { it.language }
                     .thenByDescending { it.quality }
                     .thenBy { it.needsInternet }
             )
@@ -327,7 +327,7 @@ private fun VoiceSelectorDialog(
     }
 
     val voicesFiltered = remember {
-        mutableStateListOf<my.noveldokusha.texttospeech.VoiceData>().apply { addAll(availableVoices) }
+        mutableStateListOf<my.noveldokusha.tooling.texttospeech.VoiceData>().apply { addAll(availableVoices) }
     }
 
     LaunchedEffect(Unit) {
@@ -467,7 +467,7 @@ private fun VoiceSelectorDialog(
 private fun DropdownCustomSavedVoices(
     expanded: MutableState<Boolean>,
     list: List<VoicePredefineState>,
-    currentVoice: my.noveldokusha.texttospeech.VoiceData?,
+    currentVoice: my.noveldokusha.tooling.texttospeech.VoiceData?,
     currentVoiceSpeed: Float,
     currentVoicePitch: Float,
     onPredefinedSelected: (VoicePredefineState) -> Unit,
@@ -587,7 +587,7 @@ private fun VoiceSelectorDialogContentPreview() {
     InternalTheme {
         VoiceSelectorDialog(
             availableVoices = (0..7).map {
-                my.noveldokusha.texttospeech.VoiceData(
+                my.noveldokusha.tooling.texttospeech.VoiceData(
                     id = "$it",
                     language = "lang${it / 2}",
                     needsInternet = (it % 2) == 0,
@@ -596,7 +596,7 @@ private fun VoiceSelectorDialogContentPreview() {
             },
             setVoice = {},
             inputTextFilter = remember { mutableStateOf("hello") },
-            currentVoice = my.noveldokusha.texttospeech.VoiceData(
+            currentVoice = my.noveldokusha.tooling.texttospeech.VoiceData(
                 id = "2",
                 language = "",
                 needsInternet = false,

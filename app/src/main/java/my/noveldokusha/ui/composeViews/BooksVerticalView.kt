@@ -25,7 +25,7 @@ import my.noveldokusha.core.AppPreferences
 import my.noveldokusha.R
 import my.noveldokusha.composableActions.ListGridLoadWatcher
 import my.noveldokusha.core.rememberResolvedBookImagePath
-import my.noveldokusha.feature.local_database.BookMetadata
+import my.noveldokusha.tooling.local_database.BookMetadata
 import my.noveldokusha.ui.bounceOnPressed
 import my.noveldokusha.ui.theme.ColorAccent
 

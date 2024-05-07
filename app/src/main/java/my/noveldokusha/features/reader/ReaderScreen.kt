@@ -51,10 +51,10 @@ import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import my.noveldokusha.R
 import my.noveldokusha.features.reader.ReaderScreenState.Settings.Type
-import my.noveldokusha.features.reader.features.LiveTranslationSettingData
 import my.noveldokusha.features.reader.domain.ReaderItem
-import my.noveldokusha.texttospeech.Utterance
-import my.noveldokusha.texttospeech.VoiceData
+import my.noveldokusha.tooling.text_translator.domain.TranslationModelState
+import my.noveldokusha.tooling.texttospeech.Utterance
+import my.noveldokusha.tooling.texttospeech.VoiceData
 import my.noveldokusha.ui.theme.InternalTheme
 import my.noveldokusha.ui.theme.Themes
 import my.noveldokusha.ui.theme.colorApp
@@ -240,7 +240,7 @@ private fun ViewsPreview(
         listOfAvailableModels = remember { mutableStateListOf() },
         source = remember {
             mutableStateOf(
-                my.noveldokusha.text_translator.domain.TranslationModelState(
+                TranslationModelState(
                     language = "fr",
                     available = true,
                     downloading = false,
@@ -250,7 +250,7 @@ private fun ViewsPreview(
         },
         target = remember {
             mutableStateOf(
-                my.noveldokusha.text_translator.domain.TranslationModelState(
+                TranslationModelState(
                     language = "en",
                     available = true,
                     downloading = false,

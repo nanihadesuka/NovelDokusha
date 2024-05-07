@@ -111,20 +111,21 @@ fun DependencyHandler.fossImplementation(dependencyNotation: Any): Dependency? =
 
 dependencies {
 
-    implementation(projects.features.localDatabase)
-    implementation(projects.features.epubParser)
-    implementation(projects.features.textTranslator.domain)
-    implementation(projects.features.textToSpeech)
-    implementation(projects.features.reader.domain)
-    implementation(projects.features.reader.textToSpeech)
+    implementation(projects.tooling.localDatabase)
+    implementation(projects.tooling.epubParser)
+    implementation(projects.tooling.textTranslator.domain)
+    implementation(projects.tooling.textToSpeech)
+    implementation(projects.features.reader)
+    implementation(projects.data)
     implementation(projects.core)
+    implementation(projects.coreui)
     implementation(projects.networking)
     implementation(projects.strings)
     implementation(projects.scraper)
 
     // Translation feature
-    fullImplementation(projects.features.textTranslator.translator)
-    fossImplementation(projects.features.textTranslator.translatorNop)
+    fullImplementation(projects.tooling.textTranslator.translator)
+    fossImplementation(projects.tooling.textTranslator.translatorNop)
 
     // Kotlin
     implementation(libs.kotlinx.coroutines.core)

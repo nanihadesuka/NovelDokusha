@@ -18,7 +18,6 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ElevatedCard
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -43,11 +42,10 @@ import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.toSize
 import my.noveldokusha.R
-import my.noveldokusha.features.reader.features.LiveTranslationSettingData
+import my.noveldokusha.features.reader.LiveTranslationSettingData
 import my.noveldokusha.utils.clickableWithUnboundedIndicator
 import my.noveldokusha.utils.ifCase
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TranslatorSettingDialog(
     state: LiveTranslationSettingData

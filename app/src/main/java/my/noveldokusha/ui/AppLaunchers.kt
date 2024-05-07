@@ -3,7 +3,7 @@ package my.noveldokusha.ui
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
-import my.noveldokusha.feature.local_database.BookMetadata
+import my.noveldokusha.tooling.local_database.BookMetadata
 import my.noveldokusha.features.chaptersList.ChaptersActivity
 import my.noveldokusha.features.databaseBookInfo.DatabaseBookInfoActivity
 import my.noveldokusha.features.databaseSearch.DatabaseSearchActivity

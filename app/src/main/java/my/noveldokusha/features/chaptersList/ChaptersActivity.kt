@@ -24,7 +24,7 @@ class ChaptersActivity : BaseActivity() {
         override var bookTitle by Extra_String()
 
         constructor(intent: Intent) : super(intent)
-        constructor(ctx: Context, bookMetadata: my.noveldokusha.feature.local_database.BookMetadata) : super(
+        constructor(ctx: Context, bookMetadata: my.noveldokusha.tooling.local_database.BookMetadata) : super(
             ctx,
             ChaptersActivity::class.java
         ) {

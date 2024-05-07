@@ -32,7 +32,7 @@ import javax.inject.Inject
 class BackupDataService : Service() {
 
     @Inject
-    lateinit var appDatabase: my.noveldokusha.feature.local_database.AppDatabase
+    lateinit var appDatabase: my.noveldokusha.tooling.local_database.AppDatabase
 
     @Inject
     lateinit var appRepository: AppRepository

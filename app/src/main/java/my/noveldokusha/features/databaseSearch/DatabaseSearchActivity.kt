@@ -72,7 +72,7 @@ class DatabaseSearchActivity : BaseActivity() {
         }
     }
 
-    private fun openBookInfoPage(book: my.noveldokusha.feature.local_database.BookMetadata) = goToDatabaseBookInfo(
+    private fun openBookInfoPage(book: my.noveldokusha.tooling.local_database.BookMetadata) = goToDatabaseBookInfo(
         databaseUrlBase = viewModel.extras.databaseBaseUrl,
         bookMetadata = book
     )
