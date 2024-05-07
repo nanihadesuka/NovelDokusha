@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-    namespace = "my.noveldokusha.reader.texttospeech"
+    namespace = "my.noveldokusha.reader"
 }
 
 dependencies {
@@ -14,5 +14,6 @@ dependencies {
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
-    implementation(libs.material)
+
+    testImplementation(libs.test.junit)
 }

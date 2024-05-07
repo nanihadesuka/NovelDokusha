@@ -88,7 +88,7 @@ import kotlinx.coroutines.withContext
 import my.noveldokusha.R
 import my.noveldokusha.core.VoicePredefineState
 import my.noveldokusha.composableActions.debouncedAction
-import TextToSpeechSettingData
+import my.noveldokusha.features.reader.TextToSpeechSettingData
 import my.noveldokusha.ui.composeViews.MyOutlinedTextField
 import my.noveldokusha.ui.composeViews.MySlider
 import my.noveldokusha.ui.theme.ColorAccent

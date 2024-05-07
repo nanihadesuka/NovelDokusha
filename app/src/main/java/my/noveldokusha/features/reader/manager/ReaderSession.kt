@@ -21,7 +21,7 @@ import my.noveldokusha.features.reader.domain.ReaderItem
 import my.noveldokusha.features.reader.chapterReadPercentage
 import my.noveldokusha.features.reader.features.ReaderChaptersLoader
 import my.noveldokusha.features.reader.features.ReaderLiveTranslation
-import ReaderTextToSpeech
+import my.noveldokusha.features.reader.ReaderTextToSpeech
 import my.noveldokusha.features.reader.domain.ChapterLoaded
 import my.noveldokusha.features.reader.domain.ChapterState
 import my.noveldokusha.features.reader.domain.ReaderState

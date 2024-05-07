@@ -1,3 +1,5 @@
+package my.noveldokusha.features.reader
+
 import android.content.Context
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State

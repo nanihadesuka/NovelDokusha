@@ -52,8 +52,6 @@ import androidx.compose.ui.unit.dp
 import my.noveldokusha.R
 import my.noveldokusha.features.reader.ReaderScreenState.Settings.Type
 import my.noveldokusha.features.reader.features.LiveTranslationSettingData
-import TextSynthesis
-import TextToSpeechSettingData
 import my.noveldokusha.features.reader.domain.ReaderItem
 import my.noveldokusha.texttospeech.Utterance
 import my.noveldokusha.texttospeech.VoiceData
