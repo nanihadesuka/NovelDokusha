@@ -9,9 +9,9 @@ import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
 import my.noveldokusha.core.AppPreferences
 import my.noveldokusha.repository.AppRepository
-import my.noveldokusha.ui.BaseViewModel
+import my.noveldokusha.core.BaseViewModel
 import my.noveldokusha.ui.composeViews.BookSettingsDialogState
-import my.noveldokusha.utils.asMutableStateOf
+import my.noveldokusha.core.utils.asMutableStateOf
 import javax.inject.Inject
 
 @HiltViewModel

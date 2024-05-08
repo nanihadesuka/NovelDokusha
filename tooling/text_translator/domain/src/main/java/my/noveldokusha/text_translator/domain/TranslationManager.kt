@@ -1,4 +1,4 @@
-package my.noveldokusha.tooling.text_translator.domain
+package my.noveldokusha.text_translator.domain
 
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import java.util.Locale

@@ -7,10 +7,10 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import my.noveldokusha.core.AppCoroutineScope
 import my.noveldokusha.core.AppFileResolver
+import my.noveldokusha.core.fileImporter
 import my.noveldokusha.tooling.local_database.AppDatabase
 import my.noveldokusha.tooling.local_database.DAOs.LibraryDao
 import my.noveldokusha.tooling.local_database.tables.Book
-import my.noveldokusha.utils.fileImporter
 import javax.inject.Inject
 import javax.inject.Singleton
 

@@ -19,12 +19,12 @@ import my.noveldokusha.core.asSequence
 import my.noveldokusha.core.tryAsResponse
 import my.noveldokusha.repository.AppRepository
 import my.noveldoksuha.data.epubImporter
-import my.noveldokusha.utils.Extra_Uri
-import my.noveldokusha.utils.NotificationsCenter
-import my.noveldokusha.utils.isServiceRunning
-import my.noveldokusha.utils.removeProgressBar
-import my.noveldokusha.utils.text
-import my.noveldokusha.utils.title
+import my.noveldokusha.core.utils.Extra_Uri
+import my.noveldokusha.core.utils.NotificationsCenter
+import my.noveldokusha.core.utils.isServiceRunning
+import my.noveldokusha.core.utils.removeProgressBar
+import my.noveldokusha.core.utils.text
+import my.noveldokusha.core.utils.title
 import timber.log.Timber
 import javax.inject.Inject
 

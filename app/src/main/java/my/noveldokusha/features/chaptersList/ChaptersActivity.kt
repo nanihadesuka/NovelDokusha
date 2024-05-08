@@ -9,13 +9,14 @@ import androidx.core.view.WindowCompat
 import androidx.lifecycle.lifecycleScope
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
-import my.noveldokusha.composableActions.SetSystemBarTransparent
+import my.noveldoksuha.coreui.composableActions.SetSystemBarTransparent
+import my.noveldoksuha.coreui.theme.Theme
 import my.noveldokusha.composableActions.onDoAskForImage
-import my.noveldokusha.ui.BaseActivity
+import my.noveldokusha.core.BaseActivity
+import my.noveldokusha.core.utils.Extra_String
+import my.noveldokusha.tooling.local_database.BookMetadata
 import my.noveldokusha.ui.goToDatabaseSearch
 import my.noveldokusha.ui.goToReader
-import my.noveldokusha.ui.theme.Theme
-import my.noveldokusha.utils.Extra_String
 
 @AndroidEntryPoint
 class ChaptersActivity : BaseActivity() {
@@ -24,7 +25,7 @@ class ChaptersActivity : BaseActivity() {
         override var bookTitle by Extra_String()
 
         constructor(intent: Intent) : super(intent)
-        constructor(ctx: Context, bookMetadata: my.noveldokusha.tooling.local_database.BookMetadata) : super(
+        constructor(ctx: Context, bookMetadata: BookMetadata) : super(
             ctx,
             ChaptersActivity::class.java
         ) {
@@ -39,7 +40,7 @@ class ChaptersActivity : BaseActivity() {
         super.onCreate(savedInstanceState)
         WindowCompat.setDecorFitsSystemWindows(window, false)
         setContent {
-            Theme(appPreferences = appPreferences) {
+            Theme(themeProvider = themeProvider) {
                 SetSystemBarTransparent()
                 ChaptersScreen(
                     state = viewModel.state,

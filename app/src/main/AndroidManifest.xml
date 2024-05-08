@@ -55,7 +55,6 @@
 		</activity>
 		<activity android:name=".features.sourceCatalog.SourceCatalogActivity" />
 		<activity android:name=".features.chaptersList.ChaptersActivity" />
-		<activity android:name=".features.reader.ReaderActivity" />
 		<activity android:name=".features.databaseSearch.DatabaseSearchActivity" />
 		<activity android:name=".features.databaseBookInfo.DatabaseBookInfoActivity" />
 		<activity android:name=".features.globalSourceSearch.GlobalSourceSearchActivity" />
@@ -73,24 +72,6 @@
 			android:name=".services.EpubImportService"
 			android:exported="false"
 			/>
-		<service
-			android:name=".services.narratorMediaControls.NarratorMediaControlsService"
-			android:exported="false"
-			android:foregroundServiceType="mediaPlayback"
-			>
-			<intent-filter>
-				<action android:name="android.intent.action.MEDIA_BUTTON" />
-			</intent-filter>
-		</service>
-
-		<receiver
-			android:name="androidx.media.session.MediaButtonReceiver"
-			android:exported="true"
-			>
-			<intent-filter>
-				<action android:name="android.intent.action.MEDIA_BUTTON" />
-			</intent-filter>
-		</receiver>
 
 		<provider
 			android:name="androidx.startup.InitializationProvider"

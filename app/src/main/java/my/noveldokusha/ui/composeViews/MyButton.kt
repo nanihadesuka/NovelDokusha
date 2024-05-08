@@ -36,11 +36,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import my.noveldokusha.ui.theme.ColorAccent
-import my.noveldokusha.ui.theme.InternalTheme
-import my.noveldokusha.ui.theme.Themes
-import my.noveldokusha.ui.theme.selectableMinHeight
-import my.noveldokusha.utils.ifCase
+import my.noveldoksuha.coreui.theme.ColorAccent
+import my.noveldoksuha.coreui.theme.InternalTheme
+import my.noveldoksuha.coreui.theme.Themes
+import my.noveldoksuha.coreui.theme.selectableMinHeight
+import my.noveldoksuha.coreui.theme.ifCase
 
 @Composable
 fun MyButton(

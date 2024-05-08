@@ -11,13 +11,13 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import my.noveldoksuha.data.AppRepository
 import my.noveldokusha.core.AppPreferences
 import my.noveldokusha.R
 import my.noveldokusha.data.LibraryCategory
-import my.noveldokusha.repository.AppRepository
-import my.noveldokusha.ui.BaseViewModel
-import my.noveldokusha.ui.Toasty
-import my.noveldokusha.utils.toState
+import my.noveldokusha.core.BaseViewModel
+import my.noveldokusha.core.Toasty
+import my.noveldokusha.core.utils.toState
 import my.noveldokusha.workers.LibraryUpdatesWorker
 import javax.inject.Inject
 

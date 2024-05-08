@@ -27,7 +27,7 @@ import my.noveldokusha.composableActions.ListGridLoadWatcher
 import my.noveldokusha.core.rememberResolvedBookImagePath
 import my.noveldokusha.tooling.local_database.BookMetadata
 import my.noveldokusha.ui.bounceOnPressed
-import my.noveldokusha.ui.theme.ColorAccent
+import my.noveldoksuha.coreui.theme.ColorAccent
 
 @Composable
 fun BooksVerticalView(

@@ -18,7 +18,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import my.noveldokusha.R
 import my.noveldokusha.ui.composeViews.TernaryStateToggle
-import my.noveldokusha.ui.theme.ColorAccent
+import my.noveldoksuha.coreui.theme.ColorAccent
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

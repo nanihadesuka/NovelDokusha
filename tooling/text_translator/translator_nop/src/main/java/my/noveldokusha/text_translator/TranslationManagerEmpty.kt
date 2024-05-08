@@ -1,9 +1,9 @@
 package my.noveldoksuha.text_translator.translator_nop
 
 import androidx.compose.runtime.mutableStateListOf
-import my.noveldokusha.tooling.text_translator.domain.TranslationManager
-import my.noveldokusha.tooling.text_translator.domain.TranslationModelState
-import my.noveldokusha.tooling.text_translator.domain.TranslatorState
+import my.noveldokusha.text_translator.domain.TranslationManager
+import my.noveldokusha.text_translator.domain.TranslationModelState
+import my.noveldokusha.text_translator.domain.TranslatorState
 
 class TranslationManagerEmpty : TranslationManager {
 

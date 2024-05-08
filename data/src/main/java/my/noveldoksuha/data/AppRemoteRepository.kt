@@ -2,17 +2,19 @@ package my.noveldoksuha.data
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import my.noveldokusha.BuildConfig
+import my.noveldokusha.core.AppInternalState
 import my.noveldokusha.core.Response
-import my.noveldokusha.domain.AppVersion
-import my.noveldokusha.domain.RemoteAppVersion
+import my.noveldokusha.core.domain.AppVersion
+import my.noveldokusha.core.domain.RemoteAppVersion
+import my.noveldokusha.network.NetworkClient
 import my.noveldokusha.network.toJson
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class AppRemoteRepository @Inject constructor(
-    private val networkClient: my.noveldokusha.network.NetworkClient,
+    private val networkClient: NetworkClient,
+    private val appInternalState: AppInternalState,
 ) {
 
     private val lastReleaseUrl =
@@ -33,5 +35,5 @@ class AppRemoteRepository @Inject constructor(
         }
     }
 
-    fun getCurrentAppVersion() = AppVersion.fromString(BuildConfig.VERSION_NAME)
+    fun getCurrentAppVersion() = AppVersion.fromString(appInternalState.versionName)
 }

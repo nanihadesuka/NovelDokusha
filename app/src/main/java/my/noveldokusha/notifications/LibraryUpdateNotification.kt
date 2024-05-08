@@ -17,9 +17,9 @@ import my.noveldokusha.tooling.local_database.BookMetadata
 import my.noveldokusha.features.chaptersList.ChaptersActivity
 import my.noveldokusha.features.main.MainActivity
 import my.noveldokusha.features.reader.ReaderActivity
-import my.noveldokusha.utils.NotificationsCenter
-import my.noveldokusha.utils.text
-import my.noveldokusha.utils.title
+import my.noveldokusha.core.utils.NotificationsCenter
+import my.noveldokusha.core.utils.text
+import my.noveldokusha.core.utils.title
 import javax.inject.Inject
 
 class LibraryUpdateNotification @Inject constructor(

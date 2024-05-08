@@ -40,10 +40,10 @@ import my.noveldokusha.tooling.local_database.BookMetadata
 import my.noveldokusha.ui.composeViews.BooksVerticalView
 import my.noveldokusha.ui.composeViews.CollapsibleDivider
 import my.noveldokusha.ui.composeViews.TopAppBarSearch
-import my.noveldokusha.ui.theme.ColorNotice
-import my.noveldokusha.ui.theme.Grey25
-import my.noveldokusha.ui.theme.InternalTheme
-import my.noveldokusha.ui.theme.PreviewThemes
+import my.noveldoksuha.coreui.theme.ColorNotice
+import my.noveldoksuha.coreui.theme.Grey25
+import my.noveldoksuha.coreui.theme.InternalTheme
+import my.noveldoksuha.coreui.theme.PreviewThemes
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

@@ -14,24 +14,25 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import my.noveldoksuha.data.AppRepository
+import my.noveldoksuha.data.BookChaptersRepository
+import my.noveldoksuha.data.ChapterBodyRepository
+import my.noveldoksuha.data.DownloaderRepository
+import my.noveldoksuha.data.LibraryBooksRepository
 import my.noveldokusha.R
 import my.noveldokusha.core.AppCoroutineScope
 import my.noveldokusha.core.AppFileResolver
 import my.noveldokusha.core.tryAsResponse
-import my.noveldokusha.tooling.local_database.AppDatabase
-import my.noveldokusha.repository.AppRepository
-import my.noveldokusha.repository.BookChaptersRepository
-import my.noveldokusha.repository.ChapterBodyRepository
-import my.noveldokusha.repository.DownloaderRepository
-import my.noveldokusha.repository.LibraryBooksRepository
+import my.noveldokusha.network.NetworkClient
 import my.noveldokusha.scraper.Scraper
-import my.noveldokusha.ui.Toasty
-import my.noveldokusha.utils.Extra_Uri
-import my.noveldokusha.utils.NotificationsCenter
-import my.noveldokusha.utils.isServiceRunning
-import my.noveldokusha.utils.removeProgressBar
-import my.noveldokusha.utils.text
-import my.noveldokusha.utils.title
+import my.noveldokusha.tooling.local_database.AppDatabase
+import my.noveldokusha.core.Toasty
+import my.noveldokusha.core.utils.Extra_Uri
+import my.noveldokusha.core.utils.NotificationsCenter
+import my.noveldokusha.core.utils.isServiceRunning
+import my.noveldokusha.core.utils.removeProgressBar
+import my.noveldokusha.core.utils.text
+import my.noveldokusha.core.utils.title
 import okhttp3.internal.closeQuietly
 import timber.log.Timber
 import java.io.File
@@ -53,7 +54,7 @@ class RestoreDataService : Service() {
     lateinit var scraper: Scraper
 
     @Inject
-    lateinit var networkClient: my.noveldokusha.network.NetworkClient
+    lateinit var networkClient: NetworkClient
 
     @Inject
     lateinit var appFileResolver: AppFileResolver

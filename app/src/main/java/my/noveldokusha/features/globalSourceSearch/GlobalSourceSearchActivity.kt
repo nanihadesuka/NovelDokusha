@@ -6,10 +6,10 @@ import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import dagger.hilt.android.AndroidEntryPoint
-import my.noveldokusha.ui.BaseActivity
+import my.noveldoksuha.coreui.theme.Theme
+import my.noveldokusha.core.BaseActivity
+import my.noveldokusha.core.utils.Extra_String
 import my.noveldokusha.ui.goToBookChapters
-import my.noveldokusha.ui.theme.Theme
-import my.noveldokusha.utils.Extra_String
 
 @AndroidEntryPoint
 class GlobalSourceSearchActivity : BaseActivity() {
@@ -31,7 +31,7 @@ class GlobalSourceSearchActivity : BaseActivity() {
         super.onCreate(savedInstanceState)
 
         setContent {
-            Theme(appPreferences = appPreferences) {
+            Theme(themeProvider = themeProvider) {
                 GlobalSourceSearchScreen(
                     searchInput = viewModel.searchInput.value,
                     listSources = viewModel.sourcesResults,

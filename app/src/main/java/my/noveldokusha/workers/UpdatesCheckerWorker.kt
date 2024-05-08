@@ -18,9 +18,9 @@ import dagger.assisted.AssistedInject
 import my.noveldokusha.R
 import my.noveldokusha.core.Response
 import my.noveldokusha.repository.AppRemoteRepository
-import my.noveldokusha.utils.NotificationsCenter
-import my.noveldokusha.utils.text
-import my.noveldokusha.utils.title
+import my.noveldokusha.core.utils.NotificationsCenter
+import my.noveldokusha.core.utils.text
+import my.noveldokusha.core.utils.title
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
 

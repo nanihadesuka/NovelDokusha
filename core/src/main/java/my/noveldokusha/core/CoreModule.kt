@@ -1,5 +1,6 @@
 package my.noveldokusha.core
 
+import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -7,12 +8,17 @@ import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import my.noveldoksuha.coreui.theme.ThemeProvider
 import javax.inject.Singleton
 
 
 @InstallIn(SingletonComponent::class)
 @Module
 abstract class CoreModule {
+
+    @Binds
+    @Singleton
+    internal abstract fun themeProviderBinder(appThemeProvider: AppThemeProvider): ThemeProvider
 
 
     companion object {

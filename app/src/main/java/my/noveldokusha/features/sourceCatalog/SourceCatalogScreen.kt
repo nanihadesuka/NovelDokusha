@@ -37,7 +37,7 @@ import my.noveldokusha.ui.composeViews.BooksVerticalView
 import my.noveldokusha.ui.composeViews.CollapsibleDivider
 import my.noveldokusha.ui.composeViews.ToolbarMode
 import my.noveldokusha.ui.composeViews.TopAppBarSearch
-import my.noveldokusha.utils.actionCopyToClipboard
+import my.noveldokusha.core.utils.actionCopyToClipboard
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalAnimationApi::class)
 @Composable

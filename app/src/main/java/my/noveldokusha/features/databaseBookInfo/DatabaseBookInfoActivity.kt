@@ -7,14 +7,14 @@ import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.core.view.WindowCompat
 import dagger.hilt.android.AndroidEntryPoint
-import my.noveldokusha.composableActions.SetSystemBarTransparent
-import my.noveldokusha.ui.BaseActivity
+import my.noveldoksuha.coreui.composableActions.SetSystemBarTransparent
+import my.noveldoksuha.coreui.theme.Theme
+import my.noveldokusha.core.BaseActivity
+import my.noveldokusha.core.utils.Extra_String
 import my.noveldokusha.ui.goToDatabaseBookInfo
 import my.noveldokusha.ui.goToDatabaseSearchGenres
 import my.noveldokusha.ui.goToGlobalSearch
 import my.noveldokusha.ui.goToWebBrowser
-import my.noveldokusha.ui.theme.Theme
-import my.noveldokusha.utils.Extra_String
 
 @AndroidEntryPoint
 class DatabaseBookInfoActivity : BaseActivity() {
@@ -40,7 +40,7 @@ class DatabaseBookInfoActivity : BaseActivity() {
         super.onCreate(savedInstanceState)
         WindowCompat.setDecorFitsSystemWindows(window, false)
         setContent {
-            Theme(appPreferences = appPreferences) {
+            Theme(themeProvider = themeProvider) {
                 SetSystemBarTransparent()
                 DatabaseBookInfoScreen(
                     state = viewModel.state,

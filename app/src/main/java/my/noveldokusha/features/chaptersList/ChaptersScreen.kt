@@ -61,15 +61,15 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import my.nanihadesuka.compose.InternalLazyColumnScrollbar
+import my.noveldoksuha.coreui.theme.ColorAccent
+import my.noveldoksuha.coreui.theme.ColorLike
+import my.noveldoksuha.coreui.theme.ColorNotice
+import my.noveldoksuha.coreui.theme.colorApp
+import my.noveldoksuha.coreui.theme.isAtTop
 import my.noveldokusha.R
 import my.noveldokusha.core.isLocalUri
+import my.noveldoksuha.coreui.theme.textPadding
 import my.noveldokusha.ui.goToWebBrowser
-import my.noveldokusha.ui.theme.ColorAccent
-import my.noveldokusha.ui.theme.ColorLike
-import my.noveldokusha.ui.theme.ColorNotice
-import my.noveldokusha.ui.theme.colorApp
-import my.noveldokusha.utils.isAtTop
-import my.noveldokusha.utils.textPadding
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

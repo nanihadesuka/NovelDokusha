@@ -8,12 +8,13 @@ import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.parcelize.Parcelize
+import my.noveldoksuha.coreui.theme.Theme
+import my.noveldoksuha.coreui.theme.colorAttrRes
 import my.noveldokusha.R
-import my.noveldokusha.ui.BaseActivity
+import my.noveldokusha.core.BaseActivity
+import my.noveldokusha.core.utils.Extra_Parcelable
+import my.noveldokusha.tooling.local_database.BookMetadata
 import my.noveldokusha.ui.goToDatabaseBookInfo
-import my.noveldokusha.ui.theme.Theme
-import my.noveldokusha.utils.Extra_Parcelable
-import my.noveldokusha.utils.colorAttrRes
 
 
 sealed interface DatabaseSearchExtras : Parcelable {
@@ -56,7 +57,7 @@ class DatabaseSearchActivity : BaseActivity() {
         super.onCreate(savedInstanceState)
         window.statusBarColor = R.attr.colorSurface.colorAttrRes(this)
         setContent {
-            Theme(appPreferences = appPreferences) {
+            Theme(themeProvider = themeProvider) {
                 DatabaseSearchScreen(
                     state = viewModel.state,
                     onSearchCatalogSubmit = viewModel::onSearchCatalogSubmit,
@@ -72,7 +73,7 @@ class DatabaseSearchActivity : BaseActivity() {
         }
     }
 
-    private fun openBookInfoPage(book: my.noveldokusha.tooling.local_database.BookMetadata) = goToDatabaseBookInfo(
+    private fun openBookInfoPage(book: BookMetadata) = goToDatabaseBookInfo(
         databaseUrlBase = viewModel.extras.databaseBaseUrl,
         bookMetadata = book
     )

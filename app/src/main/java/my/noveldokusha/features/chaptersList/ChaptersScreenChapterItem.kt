@@ -24,10 +24,10 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import my.noveldokusha.R
 import my.noveldokusha.ui.composeViews.AnimatedTransition
-import my.noveldokusha.ui.theme.ColorNotice
-import my.noveldokusha.ui.theme.InternalTheme
-import my.noveldokusha.ui.theme.PreviewThemes
-import my.noveldokusha.ui.theme.colorApp
+import my.noveldoksuha.coreui.theme.ColorNotice
+import my.noveldoksuha.coreui.theme.InternalTheme
+import my.noveldoksuha.coreui.theme.PreviewThemes
+import my.noveldoksuha.coreui.theme.colorApp
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalAnimationApi::class)
 @Composable

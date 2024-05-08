@@ -8,13 +8,13 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.launch
+import my.noveldoksuha.data.CatalogItem
+import my.noveldoksuha.data.ScraperRepository
 import my.noveldokusha.core.AppPreferences
+import my.noveldokusha.core.BaseViewModel
+import my.noveldokusha.core.utils.StateExtra_String
+import my.noveldokusha.core.utils.asMutableStateOf
 import my.noveldokusha.network.PagedListIteratorState
-import my.noveldokusha.repository.CatalogItem
-import my.noveldokusha.repository.ScraperRepository
-import my.noveldokusha.ui.BaseViewModel
-import my.noveldokusha.utils.StateExtra_String
-import my.noveldokusha.utils.asMutableStateOf
 import javax.inject.Inject
 
 interface GlobalSourceSearchStateBundle {

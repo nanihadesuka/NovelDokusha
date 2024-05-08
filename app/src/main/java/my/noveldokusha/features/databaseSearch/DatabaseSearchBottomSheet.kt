@@ -35,10 +35,10 @@ import androidx.compose.ui.unit.dp
 import my.noveldokusha.R
 import my.noveldokusha.ui.composeViews.CollapsibleDivider
 import my.noveldokusha.ui.composeViews.next
-import my.noveldokusha.ui.theme.ColorAccent
-import my.noveldokusha.ui.theme.InternalTheme
-import my.noveldokusha.ui.theme.PreviewThemes
-import my.noveldokusha.ui.theme.colorApp
+import my.noveldoksuha.coreui.theme.ColorAccent
+import my.noveldoksuha.coreui.theme.InternalTheme
+import my.noveldoksuha.coreui.theme.PreviewThemes
+import my.noveldoksuha.coreui.theme.colorApp
 
 
 @OptIn(ExperimentalLayoutApi::class, ExperimentalMaterial3Api::class)

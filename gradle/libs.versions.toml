@@ -54,6 +54,8 @@ compose-landscapist-glide = "2.2.5"
 compose-testing-ui = "1.6.3"
 compose-material-icons-extended = "1.6.3"
 compose-material3 = "1.1.1"
+compose-material3Android = "1.2.1"
+
 
 crux = "5.0"
 gson = "2.10.1"
@@ -94,6 +96,7 @@ compose-androidx-material3 = { module = "androidx.compose.material3:material3", 
 compose-lazyColumnScrollbar = { module = "com.github.nanihadesuka:LazyColumnScrollbar", version.ref = "compose-lazyColumnScrollbar" }
 compose-coil = { module = "io.coil-kt:coil-compose", version.ref = "compose-coil" }
 compose-landscapist-glide = { module = "com.github.skydoves:landscapist-glide", version.ref = "compose-landscapist-glide" }
+compose-material3-android = { group = "androidx.compose.material3", name = "material3-android", version.ref = "compose-material3Android" }
 
 # Hilt
 hilt-compiler = { module = "com.google.dagger:hilt-compiler", version.ref = "hilt" }

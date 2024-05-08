@@ -28,15 +28,15 @@ import my.noveldokusha.core.rememberResolvedBookImagePath
 import my.noveldokusha.tooling.local_database.BookMetadata
 import my.noveldokusha.mappers.mapToBookMetadata
 import my.noveldokusha.network.IteratorState
-import my.noveldokusha.repository.CatalogItem
 import my.noveldokusha.scraper.domain.BookResult
 import my.noveldokusha.ui.bounceOnPressed
 import my.noveldokusha.ui.composeViews.BookImageButtonView
 import my.noveldokusha.ui.composeViews.BookTitlePosition
 import my.noveldokusha.ui.previewFixtures.previewFixturesCatalogList
-import my.noveldokusha.ui.theme.ColorAccent
-import my.noveldokusha.ui.theme.InternalTheme
-import my.noveldokusha.ui.theme.PreviewThemes
+import my.noveldoksuha.coreui.theme.ColorAccent
+import my.noveldoksuha.coreui.theme.InternalTheme
+import my.noveldoksuha.coreui.theme.PreviewThemes
+import my.noveldoksuha.data.CatalogItem
 
 @Composable
 fun GlobalSourceSearchScreenBody(

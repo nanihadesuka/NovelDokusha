@@ -32,12 +32,12 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import my.noveldokusha.R
 import my.noveldokusha.ui.AppTestTags
-import my.noveldokusha.ui.theme.Grey25
-import my.noveldokusha.ui.theme.Grey800
-import my.noveldokusha.ui.theme.ImageBorderShape
-import my.noveldokusha.ui.theme.InternalTheme
-import my.noveldokusha.ui.theme.PreviewThemes
-import my.noveldokusha.ui.theme.colorApp
+import my.noveldoksuha.coreui.theme.Grey25
+import my.noveldoksuha.coreui.theme.Grey800
+import my.noveldoksuha.coreui.theme.ImageBorderShape
+import my.noveldoksuha.coreui.theme.InternalTheme
+import my.noveldoksuha.coreui.theme.PreviewThemes
+import my.noveldoksuha.coreui.theme.colorApp
 
 enum class BookTitlePosition {
     Inside, Outside, Hidden

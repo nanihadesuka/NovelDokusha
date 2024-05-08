@@ -4,7 +4,7 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import my.noveldokusha.tooling.text_translator.domain.TranslationManager
+import my.noveldokusha.text_translator.domain.TranslationManager
 import javax.inject.Singleton
 
 @InstallIn(SingletonComponent::class)

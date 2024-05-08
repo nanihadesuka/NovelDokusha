@@ -36,9 +36,9 @@ import my.noveldokusha.ui.composeViews.AnimatedTransition
 import my.noveldokusha.ui.composeViews.ImageViewGlide
 import my.noveldokusha.ui.previewFixtures.previewFixturesCatalogList
 import my.noveldokusha.ui.previewFixtures.previewFixturesDatabaseList
-import my.noveldokusha.ui.theme.ColorAccent
-import my.noveldokusha.ui.theme.InternalTheme
-import my.noveldokusha.ui.theme.PreviewThemes
+import my.noveldoksuha.coreui.theme.ColorAccent
+import my.noveldoksuha.coreui.theme.InternalTheme
+import my.noveldoksuha.coreui.theme.PreviewThemes
 
 @OptIn(ExperimentalAnimationApi::class, ExperimentalFoundationApi::class)
 @Composable

@@ -24,10 +24,10 @@ import my.noveldokusha.tooling.local_database.BookMetadata
 import my.noveldokusha.network.PagedListIteratorState
 import my.noveldokusha.scraper.Scraper
 import my.noveldokusha.scraper.domain.BookResult
-import my.noveldokusha.ui.BaseViewModel
-import my.noveldokusha.utils.StateExtra_Parcelable
-import my.noveldokusha.utils.asMutableListStateOf
-import my.noveldokusha.utils.asMutableStateOf
+import my.noveldokusha.core.BaseViewModel
+import my.noveldokusha.core.utils.StateExtra_Parcelable
+import my.noveldokusha.core.utils.asMutableListStateOf
+import my.noveldokusha.core.utils.asMutableStateOf
 import javax.inject.Inject
 
 interface DatabaseSearchStateBundle {

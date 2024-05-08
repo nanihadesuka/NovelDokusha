@@ -56,9 +56,9 @@ import my.noveldokusha.ui.composeViews.BookTitlePosition
 import my.noveldokusha.ui.composeViews.ExpandableText
 import my.noveldokusha.ui.composeViews.ImageView
 import my.noveldokusha.ui.composeViews.MyButton
-import my.noveldokusha.ui.theme.ColorAccent
-import my.noveldokusha.utils.clickableNoIndicator
-import my.noveldokusha.utils.textPadding
+import my.noveldoksuha.coreui.theme.ColorAccent
+import my.noveldoksuha.coreui.theme.clickableNoIndicator
+import my.noveldoksuha.coreui.theme.textPadding
 
 @OptIn(
     ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class,

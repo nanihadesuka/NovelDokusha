@@ -24,12 +24,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import my.noveldokusha.R
-import my.noveldokusha.domain.AppVersion
-import my.noveldokusha.domain.RemoteAppVersion
+import my.noveldokusha.core.domain.AppVersion
+import my.noveldokusha.core.domain.RemoteAppVersion
 import my.noveldokusha.features.main.settings.SettingsScreenState
 import my.noveldokusha.ui.composeViews.ImageView
 import my.noveldokusha.ui.composeViews.MyButton
-import my.noveldokusha.ui.theme.InternalTheme
+import my.noveldoksuha.coreui.theme.InternalTheme
 
 @Composable
 fun NewAppUpdateDialog(

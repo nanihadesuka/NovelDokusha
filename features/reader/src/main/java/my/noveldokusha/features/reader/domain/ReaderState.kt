@@ -1,5 +1,7 @@
 package my.noveldokusha.features.reader.domain
 
+import kotlin.math.ceil
+
 /**
  * Only use it on definitions where the primitive data type
  * doesn't convey enough meaning
@@ -29,3 +31,8 @@ data class ReadingChapterPosStats(
     val chapterTitle: String,
     val chapterUrl: String,
 )
+
+fun ReadingChapterPosStats.chapterReadPercentage() = when (chapterItemsCount) {
+    0 -> 100f
+    else -> ceil((chapterItemPosition.toFloat() / chapterItemsCount.toFloat()) * 100f)
+}

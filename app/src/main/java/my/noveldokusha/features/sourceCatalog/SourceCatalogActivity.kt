@@ -9,11 +9,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.platform.LocalContext
 import dagger.hilt.android.AndroidEntryPoint
-import my.noveldokusha.ui.BaseActivity
+import my.noveldoksuha.coreui.theme.Theme
+import my.noveldokusha.core.BaseActivity
+import my.noveldokusha.core.utils.Extra_String
 import my.noveldokusha.ui.goToBookChapters
 import my.noveldokusha.ui.goToWebViewWithUrl
-import my.noveldokusha.ui.theme.Theme
-import my.noveldokusha.utils.Extra_String
 
 
 @AndroidEntryPoint
@@ -38,7 +38,7 @@ class SourceCatalogActivity : BaseActivity() {
         setContent {
             val context by rememberUpdatedState(LocalContext.current)
 
-            Theme(appPreferences = appPreferences) {
+            Theme(themeProvider = themeProvider) {
                 SourceCatalogScreen(
                     state = viewModel.state,
                     onSearchTextInputChange = viewModel.state.searchTextInput::value::set,

@@ -6,17 +6,17 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import my.noveldoksuha.data.AppRepository
 import my.noveldokusha.core.AppPreferences
 import my.noveldokusha.R
 import my.noveldokusha.mappers.mapToBookMetadata
 import my.noveldokusha.network.PagedListIteratorState
-import my.noveldokusha.repository.AppRepository
 import my.noveldokusha.scraper.Scraper
-import my.noveldokusha.ui.BaseViewModel
-import my.noveldokusha.ui.Toasty
+import my.noveldokusha.core.BaseViewModel
+import my.noveldokusha.core.Toasty
 import my.noveldokusha.ui.composeViews.ToolbarMode
-import my.noveldokusha.utils.StateExtra_String
-import my.noveldokusha.utils.asMutableStateOf
+import my.noveldokusha.core.utils.StateExtra_String
+import my.noveldokusha.core.utils.asMutableStateOf
 import javax.inject.Inject
 
 interface SourceCatalogStateBundle {

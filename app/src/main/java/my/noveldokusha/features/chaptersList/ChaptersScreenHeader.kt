@@ -45,7 +45,7 @@ import my.noveldokusha.ui.composeViews.BookTitlePosition
 import my.noveldokusha.ui.composeViews.ExpandableText
 import my.noveldokusha.ui.composeViews.ImageView
 import my.noveldokusha.ui.goToGlobalSearch
-import my.noveldokusha.utils.clickableNoIndicator
+import my.noveldoksuha.coreui.theme.clickableNoIndicator
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable

@@ -49,9 +49,9 @@ import my.noveldokusha.data.LibraryCategory
 import my.noveldokusha.ui.bounceOnPressed
 import my.noveldokusha.ui.composeViews.BookImageButtonView
 import my.noveldokusha.ui.composeViews.CollapsibleDivider
-import my.noveldokusha.ui.theme.ColorAccent
-import my.noveldokusha.ui.theme.ImageBorderShape
-import my.noveldokusha.ui.theme.colorApp
+import my.noveldoksuha.coreui.theme.ColorAccent
+import my.noveldoksuha.coreui.theme.ImageBorderShape
+import my.noveldoksuha.coreui.theme.colorApp
 
 @OptIn(
     ExperimentalMaterialApi::class, ExperimentalFoundationApi::class,

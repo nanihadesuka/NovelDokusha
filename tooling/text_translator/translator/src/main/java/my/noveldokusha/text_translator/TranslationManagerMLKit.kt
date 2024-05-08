@@ -12,8 +12,9 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import my.noveldokusha.core.AppCoroutineScope
-import my.noveldokusha.tooling.text_translator.domain.TranslationManager
-import my.noveldokusha.tooling.text_translator.domain.TranslationModelState
+import my.noveldokusha.text_translator.domain.TranslationManager
+import my.noveldokusha.text_translator.domain.TranslationModelState
+import my.noveldokusha.text_translator.domain.TranslatorState
 
 class TranslationManagerMLKit(
     private val coroutineScope: AppCoroutineScope
@@ -68,7 +69,7 @@ class TranslationManagerMLKit(
     override fun getTranslator(
         source: String,
         target: String
-    ): my.noveldokusha.tooling.text_translator.domain.TranslatorState {
+    ): TranslatorState {
         val option = TranslatorOptions.Builder()
             .setSourceLanguage(source)
             .setTargetLanguage(target)
@@ -76,7 +77,7 @@ class TranslationManagerMLKit(
 
         val translator = Translation.getClient(option)
 
-        return my.noveldokusha.tooling.text_translator.domain.TranslatorState(
+        return TranslatorState(
             source = source,
             target = target,
             translate = { input -> translator.translate(input).await() },

@@ -5,6 +5,8 @@ package my.noveldokusha.core
 import android.content.Context
 import android.content.SharedPreferences
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.State
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.preference.PreferenceManager
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -20,7 +22,10 @@ import kotlinx.coroutines.withContext
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import my.noveldoksuha.coreui.theme.ThemeProvider
+import my.noveldoksuha.coreui.theme.Themes
 import javax.inject.Inject
+import javax.inject.Singleton
 
 @Serializable
 data class VoicePredefineState(
@@ -32,8 +37,9 @@ data class VoicePredefineState(
 
 enum class PreferenceThemes { Light, Dark, Black }
 
+@Singleton
 class AppPreferences @Inject constructor(
-    @ApplicationContext val context: Context
+    @ApplicationContext val context: Context,
 ) {
     private val preferences = PreferenceManager.getDefaultSharedPreferences(context)
     private val preferencesChangeListeners =

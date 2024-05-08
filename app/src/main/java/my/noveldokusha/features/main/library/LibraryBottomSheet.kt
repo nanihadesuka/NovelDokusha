@@ -20,8 +20,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import my.noveldokusha.R
 import my.noveldokusha.ui.composeViews.PosNegCheckbox
 import my.noveldokusha.ui.composeViews.TernaryStateToggle
-import my.noveldokusha.ui.theme.ColorAccent
-import my.noveldokusha.utils.toToggleableState
+import my.noveldoksuha.coreui.theme.ColorAccent
+import my.noveldokusha.core.utils.toToggleableState
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

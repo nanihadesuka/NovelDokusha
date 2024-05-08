@@ -11,7 +11,12 @@ android {
 }
 
 dependencies {
+    implementation(projects.strings)
+
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
+    implementation(libs.compose.androidx.material3)
+    implementation(libs.compose.accompanist.systemuicontroller)
+    implementation(libs.compose.androidx.material.icons.extended)
 }

@@ -38,8 +38,8 @@ import my.noveldokusha.scraper.DatabaseInterface
 import my.noveldokusha.scraper.DatabaseInterface.BookData
 import my.noveldokusha.scraper.SearchGenre
 import my.noveldokusha.scraper.domain.BookResult
-import my.noveldokusha.ui.theme.InternalTheme
-import my.noveldokusha.utils.isAtTop
+import my.noveldoksuha.coreui.theme.InternalTheme
+import my.noveldoksuha.coreui.theme.isAtTop
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -57,7 +57,7 @@ fun DatabaseBookInfoScreen(
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
-            val isAtTop by scrollState.isAtTop(threshold = 40.dp)
+            val isAtTop by my.noveldoksuha.coreui.theme.isAtTop(threshold = 40.dp)
             val alpha by animateFloatAsState(targetValue = if (isAtTop) 0f else 1f, label = "")
             val backgroundColor by animateColorAsState(
                 targetValue = MaterialTheme.colorScheme.background.copy(alpha = alpha),

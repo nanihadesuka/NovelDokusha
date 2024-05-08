@@ -24,10 +24,10 @@ import my.noveldokusha.core.isLocalUri
 import my.noveldokusha.repository.AppRepository
 import my.noveldokusha.repository.DownloaderRepository
 import my.noveldokusha.scraper.Scraper
-import my.noveldokusha.ui.BaseViewModel
-import my.noveldokusha.ui.Toasty
-import my.noveldokusha.utils.StateExtra_String
-import my.noveldokusha.utils.toState
+import my.noveldokusha.core.BaseViewModel
+import my.noveldokusha.core.Toasty
+import my.noveldokusha.core.utils.StateExtra_String
+import my.noveldokusha.core.utils.toState
 import javax.inject.Inject
 
 interface ChapterStateBundle {

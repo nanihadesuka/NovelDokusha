@@ -48,16 +48,16 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import my.noveldokusha.R
-import my.noveldokusha.domain.AppVersion
-import my.noveldokusha.domain.RemoteAppVersion
+import my.noveldokusha.core.domain.AppVersion
+import my.noveldokusha.core.domain.RemoteAppVersion
 import my.noveldokusha.features.main.settings.views.NewAppUpdateDialog
 import my.noveldokusha.ui.composeViews.SettingsTranslationModels
-import my.noveldokusha.ui.theme.ColorAccent
-import my.noveldokusha.ui.theme.InternalTheme
-import my.noveldokusha.ui.theme.PreviewThemes
-import my.noveldokusha.ui.theme.Themes
-import my.noveldokusha.utils.debouncedClickable
-import my.noveldokusha.utils.textPadding
+import my.noveldoksuha.coreui.theme.ColorAccent
+import my.noveldoksuha.coreui.theme.InternalTheme
+import my.noveldoksuha.coreui.theme.PreviewThemes
+import my.noveldoksuha.coreui.theme.Themes
+import my.noveldoksuha.coreui.theme.debouncedClickable
+import my.noveldoksuha.coreui.theme.textPadding
 
 @OptIn(ExperimentalLayoutApi::class, ExperimentalMaterial3Api::class)
 @Composable

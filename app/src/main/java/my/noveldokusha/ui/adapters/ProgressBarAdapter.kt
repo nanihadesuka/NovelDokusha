@@ -4,7 +4,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import my.noveldokusha.databinding.ProgressBarBinding
 import my.noveldokusha.databinding.ProgressBarHorizontalBinding
-import my.noveldokusha.utils.inflater
+import my.noveldokusha.core.utils.inflater
 import kotlin.properties.Delegates
 
 class ProgressBarAdapter : RecyclerView.Adapter<ProgressBarAdapter.ViewBinder>() {

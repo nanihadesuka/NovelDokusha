@@ -4,10 +4,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import my.noveldokusha.core.Response
 import my.noveldokusha.core.map
-import my.noveldokusha.tooling.local_database.tables.Chapter
 import my.noveldokusha.network.toDocument
 import my.noveldokusha.scraper.Scraper
 import my.noveldokusha.scraper.TextExtractor
+import my.noveldokusha.tooling.local_database.tables.Chapter
 import net.dankito.readability4j.extended.Readability4JExtended
 import org.jsoup.nodes.Document
 import javax.inject.Inject
@@ -125,7 +125,7 @@ class DownloaderRepository @Inject constructor(
         my.noveldokusha.network.tryFlatConnect { scrap.getChapterList(bookUrl) }
             .map { chapters ->
                 chapters.mapIndexed { index, it ->
-                    my.noveldokusha.tooling.local_database.tables.Chapter(
+                    Chapter(
                         title = it.title,
                         url = it.url,
                         bookUrl = bookUrl,

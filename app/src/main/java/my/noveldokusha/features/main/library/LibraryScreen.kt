@@ -28,7 +28,7 @@ import my.noveldokusha.tooling.local_database.BookMetadata
 import my.noveldokusha.features.chaptersList.ChaptersActivity
 import my.noveldokusha.ui.composeViews.BookSettingsDialog
 import my.noveldokusha.ui.composeViews.BookSettingsDialogState
-import my.noveldokusha.ui.theme.ColorNotice
+import my.noveldoksuha.coreui.theme.ColorNotice
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

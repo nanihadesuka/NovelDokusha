@@ -27,7 +27,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFontFamilyResolver
 import androidx.compose.ui.text.Paragraph
 import androidx.compose.ui.unit.Constraints
-import my.noveldokusha.utils.ifCase
+import my.noveldoksuha.coreui.theme.ifCase
 
 @Composable
 fun ExpandableText(

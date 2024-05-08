@@ -18,7 +18,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import my.noveldokusha.R
-import my.noveldokusha.ui.theme.Info400
+import my.noveldoksuha.coreui.theme.Info400
 
 @Composable
 fun rememberPermissionsDeniedDialog(): MutableState<Boolean> {

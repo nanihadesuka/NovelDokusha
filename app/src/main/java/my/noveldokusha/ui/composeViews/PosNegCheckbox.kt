@@ -22,8 +22,8 @@ import androidx.compose.ui.state.ToggleableState
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import my.noveldokusha.ui.theme.InternalTheme
-import my.noveldokusha.ui.theme.colorApp
+import my.noveldoksuha.coreui.theme.InternalTheme
+import my.noveldoksuha.coreui.theme.colorApp
 
 fun ToggleableState.next() = when (this) {
     ToggleableState.On -> ToggleableState.Indeterminate

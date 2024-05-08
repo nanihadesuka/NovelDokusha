@@ -24,14 +24,14 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.core.content.IntentCompat
 import dagger.hilt.android.AndroidEntryPoint
+import my.noveldoksuha.coreui.theme.Theme
 import my.noveldokusha.R
+import my.noveldokusha.core.BaseActivity
 import my.noveldokusha.features.main.finder.FinderScreen
 import my.noveldokusha.features.main.library.LibraryScreen
 import my.noveldokusha.features.main.settings.SettingsScreen
 import my.noveldokusha.services.EpubImportService
-import my.noveldokusha.ui.BaseActivity
 import my.noveldokusha.ui.composeViews.AnimatedTransition
-import my.noveldokusha.ui.theme.Theme
 
 private data class Page(
     @DrawableRes val iconRes: Int,
@@ -58,7 +58,7 @@ open class MainActivity : BaseActivity() {
                 activePageIndex = 0
             }
 
-            Theme(appPreferences = appPreferences) {
+            Theme(themeProvider = themeProvider) {
                 Column(Modifier.fillMaxSize()) {
                     Box(Modifier.weight(1f)) {
                         AnimatedTransition(targetState = activePageIndex) {

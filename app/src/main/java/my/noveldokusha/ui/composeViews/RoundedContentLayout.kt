@@ -6,8 +6,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import my.noveldokusha.utils.backgroundCircle
-import my.noveldokusha.utils.outlineCircle
+import my.noveldoksuha.coreui.theme.backgroundCircle
+import my.noveldoksuha.coreui.theme.outlineCircle
 
 @Composable
 fun RoundedContentLayout(

@@ -26,7 +26,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import my.noveldokusha.core.AppPreferences.TERNARY_STATE
-import my.noveldokusha.ui.theme.InternalTheme
+import my.noveldoksuha.coreui.theme.InternalTheme
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable

@@ -18,8 +18,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import my.noveldokusha.R
 import my.noveldokusha.tooling.local_database.BookMetadata
 import my.noveldokusha.ui.composeViews.TopAppBarSearch
-import my.noveldokusha.ui.theme.ColorAccent
-import my.noveldokusha.ui.theme.InternalTheme
+import my.noveldoksuha.coreui.theme.ColorAccent
+import my.noveldoksuha.coreui.theme.InternalTheme
 
 
 @OptIn(ExperimentalMaterial3Api::class)

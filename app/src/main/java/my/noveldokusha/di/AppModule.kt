@@ -13,8 +13,8 @@ import my.noveldokusha.BuildConfig
 import my.noveldokusha.core.AppInternalState
 import my.noveldokusha.scraper.AppLocalSources
 import my.noveldokusha.scraper.sources.LocalSource
-import my.noveldokusha.ui.Toasty
-import my.noveldokusha.ui.ToastyToast
+import my.noveldokusha.core.Toasty
+import my.noveldokusha.core.ToastyToast
 import javax.inject.Singleton
 
 @InstallIn(SingletonComponent::class)
@@ -48,6 +48,8 @@ abstract class AppModule {
         @Singleton
         fun providesAppInternalState(): AppInternalState = object : AppInternalState {
             override val isDebugMode = BuildConfig.DEBUG
+            override val versionCode = BuildConfig.VERSION_CODE
+            override val versionName = BuildConfig.VERSION_NAME
         }
     }
 }

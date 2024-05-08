@@ -28,8 +28,8 @@ import dagger.hilt.android.AndroidEntryPoint
 import my.noveldokusha.R
 import my.noveldokusha.core.AppCoroutineScope
 import my.noveldokusha.network.toUrl
-import my.noveldokusha.ui.Toasty
-import my.noveldokusha.utils.Extra_String
+import my.noveldokusha.core.Toasty
+import my.noveldokusha.core.utils.Extra_String
 import javax.inject.Inject
 
 @AndroidEntryPoint
