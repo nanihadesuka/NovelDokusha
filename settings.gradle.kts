@@ -37,3 +37,4 @@ include(":tooling:textToSpeech")
 
 include(":features:reader")
 
+include(":navigation")

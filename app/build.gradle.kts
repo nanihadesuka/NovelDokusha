@@ -119,6 +119,7 @@ dependencies {
     implementation(projects.data)
     implementation(projects.core)
     implementation(projects.coreui)
+    implementation(projects.navigation)
     implementation(projects.networking)
     implementation(projects.strings)
     implementation(projects.scraper)
@@ -188,7 +189,7 @@ dependencies {
 
     // Jetpack compose
     implementation(libs.compose.androidx.activity)
-    implementation(libs.compose.androidx.material3)
+    implementation(libs.compose.material3.android)
     implementation(libs.compose.androidx.animation)
     implementation(libs.compose.androidx.runtime.livedata)
     implementation(libs.compose.androidx.lifecycle.viewmodel)

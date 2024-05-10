@@ -100,7 +100,7 @@ import my.noveldokusha.reader.R
 import my.noveldokusha.tooling.texttospeech.VoiceData
 
 
-@OptIn(ExperimentalAnimationApi::class, ExperimentalLayoutApi::class)
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun VoiceReaderSettingDialog(
     state: TextToSpeechSettingData

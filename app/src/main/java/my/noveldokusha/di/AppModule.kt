@@ -9,17 +9,23 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import my.noveldokusha.App
+import my.noveldokusha.AppNavigationRoutes
 import my.noveldokusha.BuildConfig
 import my.noveldokusha.core.AppInternalState
-import my.noveldokusha.scraper.AppLocalSources
-import my.noveldokusha.scraper.sources.LocalSource
 import my.noveldokusha.core.Toasty
 import my.noveldokusha.core.ToastyToast
+import my.noveldokusha.navigation.NavigationRoutes
+import my.noveldokusha.scraper.AppLocalSources
+import my.noveldokusha.scraper.sources.LocalSource
 import javax.inject.Singleton
 
 @InstallIn(SingletonComponent::class)
 @Module
 abstract class AppModule {
+
+    @Binds
+    @Singleton
+    abstract fun bindAppNavigationRoutes(nav: AppNavigationRoutes): NavigationRoutes
 
     @Binds
     @Singleton

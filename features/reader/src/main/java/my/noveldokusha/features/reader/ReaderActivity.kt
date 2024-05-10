@@ -118,7 +118,6 @@ class ReaderActivity : BaseActivity() {
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         viewBind.listView.adapter = viewAdapter.listView
 
         fadeInTextLiveData.distinctUntilChanged().observe(this) {
@@ -271,7 +270,7 @@ class ReaderActivity : BaseActivity() {
                     onOpenChapterInWeb = {
                         val url = viewModel.state.readerInfo.chapterUrl.value
                         if (url.isNotBlank()) {
-                            goToWebViewWithUrl(url)
+                            navigationRoutes.webView(this, url = url).let(::startActivity)
                         }
                     },
                     readerContent = {

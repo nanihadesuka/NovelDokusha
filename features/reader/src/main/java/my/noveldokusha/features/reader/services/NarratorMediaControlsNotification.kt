@@ -25,20 +25,22 @@ import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.launch
-import my.noveldokusha.tooling.local_database.BookMetadata
-import my.noveldokusha.features.reader.ReaderActivity
-import my.noveldokusha.features.reader.manager.ReaderManager
 import my.noveldokusha.core.utils.NotificationsCenter
 import my.noveldokusha.core.utils.text
 import my.noveldokusha.core.utils.title
+import my.noveldokusha.features.reader.ReaderActivity
 import my.noveldokusha.features.reader.domain.chapterReadPercentage
+import my.noveldokusha.features.reader.manager.ReaderManager
+import my.noveldokusha.navigation.NavigationRoutes
 import my.noveldokusha.reader.R
+import my.noveldokusha.tooling.local_database.BookMetadata
 import javax.inject.Inject
 
 class NarratorMediaControlsNotification @Inject constructor(
     @ApplicationContext private val context: Context,
     private val notificationsCenter: NotificationsCenter,
     private val readerManager: ReaderManager,
+    private val navigationRoutes: NavigationRoutes,
 ) {
     private val scope: CoroutineScope = CoroutineScope(
         SupervisorJob() + Dispatchers.Main.immediate + CoroutineName("NarratorNotificationService")
@@ -96,9 +98,9 @@ class NarratorMediaControlsNotification @Inject constructor(
         )
 
         val chain = listOf<Intent>(
-            Intent(context, MainActivity::class.java)
+            navigationRoutes.main(context)
                 .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK),
-            ChaptersActivity.IntentData(
+            navigationRoutes.chapters(
                 context,
                 BookMetadata(
                     url = readerSession.bookUrl,

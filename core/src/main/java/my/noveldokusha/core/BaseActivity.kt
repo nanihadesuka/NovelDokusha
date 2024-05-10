@@ -8,6 +8,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.drop
 import my.noveldoksuha.coreui.theme.ThemeProvider
 import my.noveldoksuha.coreui.theme.Themes
+import my.noveldokusha.navigation.NavigationRoutes
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -17,6 +18,9 @@ open class BaseActivity : AppCompatActivity() {
 
     @Inject
     lateinit var themeProvider: ThemeProvider
+
+    @Inject
+    lateinit var navigationRoutes : NavigationRoutes
 
     @Inject
     lateinit var toasty: Toasty
