@@ -29,9 +29,9 @@ internal class SharedPreference_Enum<T : Enum<T>>(
     val defaultValue: T,
     val deserializer: (String) -> T
 ) {
-    operator fun getValue(thisRef: Any?, property: KProperty<*>): T =
-        sharedPreferences.getString(name, null)
-            ?.let { kotlin.runCatching { deserializer(it) }.getOrNull() } ?: defaultValue
+    operator fun getValue(thisRef: Any?, property: KProperty<*>): T = kotlin.runCatching {
+        sharedPreferences.getString(name, null)?.let { deserializer(it) }
+    }.getOrNull() ?: defaultValue
 
     operator fun setValue(thisRef: Any?, property: KProperty<*>, value: T) =
         sharedPreferences.edit().putString(name, value.name).apply()

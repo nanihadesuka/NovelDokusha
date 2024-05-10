@@ -20,7 +20,7 @@ import my.noveldoksuha.coreui.theme.ColorAccent
 import my.noveldokusha.reader.R
 
 @Composable
-fun MoreSettingDialog(
+internal fun MoreSettingDialog(
     allowTextSelection: Boolean,
     onAllowTextSelectionChange: (Boolean) -> Unit,
     keepScreenOn: Boolean,

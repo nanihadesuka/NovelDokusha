@@ -6,9 +6,9 @@ import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.withContext
+import my.noveldoksuha.data.AppRepository
+import my.noveldoksuha.data.DownloaderRepository
 import my.noveldokusha.core.isLocalUri
-import my.noveldokusha.repository.AppRepository
-import my.noveldokusha.repository.DownloaderRepository
 import my.noveldokusha.scraper.Scraper
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import javax.inject.Inject

@@ -1,6 +1,6 @@
 package my.noveldokusha.features.reader.domain
 
-sealed interface ReaderItem {
+internal sealed interface ReaderItem {
     /**
      * Corresponds to index in the ordered chapter list.
      * Unique by chapter row

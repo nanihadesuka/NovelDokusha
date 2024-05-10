@@ -11,7 +11,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class ReaderSessionProvider @Inject constructor(
+internal class ReaderSessionProvider @Inject constructor(
     private val appRepository: AppRepository,
     private val appPreferences: AppPreferences,
     @ApplicationContext private val context: Context,

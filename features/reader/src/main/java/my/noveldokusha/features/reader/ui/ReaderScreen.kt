@@ -67,7 +67,7 @@ import my.noveldokusha.tooling.texttospeech.VoiceData
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ReaderScreen(
+internal fun ReaderScreen(
     state: ReaderScreenState,
     onSelectableTextChange: (Boolean) -> Unit,
     onKeepScreenOn: (Boolean) -> Unit,

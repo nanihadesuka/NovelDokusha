@@ -15,7 +15,7 @@ import my.noveldokusha.text_translator.domain.TranslationManager
 import my.noveldokusha.text_translator.domain.TranslationModelState
 import my.noveldokusha.text_translator.domain.TranslatorState
 
-data class LiveTranslationSettingData(
+internal data class LiveTranslationSettingData(
     val isAvailable: Boolean,
     val enable: MutableState<Boolean>,
     val listOfAvailableModels: SnapshotStateList<TranslationModelState>,
@@ -27,7 +27,7 @@ data class LiveTranslationSettingData(
     val onDownloadTranslationModel: (language: String) -> Unit,
 )
 
-class ReaderLiveTranslation(
+internal class ReaderLiveTranslation(
     private val translationManager: TranslationManager,
     private val appPreferences: AppPreferences,
     private val scope: CoroutineScope = CoroutineScope(

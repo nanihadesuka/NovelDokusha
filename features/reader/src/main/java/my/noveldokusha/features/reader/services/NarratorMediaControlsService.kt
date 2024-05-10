@@ -12,7 +12,7 @@ import javax.inject.Inject
 
 
 @AndroidEntryPoint
-class NarratorMediaControlsService : Service() {
+internal class NarratorMediaControlsService : Service() {
 
     companion object {
         fun start(ctx: Context) {

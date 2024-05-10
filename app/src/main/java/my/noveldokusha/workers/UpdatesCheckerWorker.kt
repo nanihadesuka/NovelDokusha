@@ -15,9 +15,9 @@ import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkerParameters
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
+import my.noveldoksuha.data.AppRemoteRepository
 import my.noveldokusha.R
 import my.noveldokusha.core.Response
-import my.noveldokusha.repository.AppRemoteRepository
 import my.noveldokusha.core.utils.NotificationsCenter
 import my.noveldokusha.core.utils.text
 import my.noveldokusha.core.utils.title

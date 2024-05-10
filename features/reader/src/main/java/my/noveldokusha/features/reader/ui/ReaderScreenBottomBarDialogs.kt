@@ -16,7 +16,7 @@ import my.noveldokusha.features.reader.ui.settingDialogs.TranslatorSettingDialog
 import my.noveldokusha.features.reader.ui.settingDialogs.VoiceReaderSettingDialog
 
 @Composable
-fun ReaderScreenBottomBarDialogs(
+internal fun ReaderScreenBottomBarDialogs(
     settings: ReaderScreenState.Settings,
     onTextFontChanged: (String) -> Unit,
     onTextSizeChanged: (Float) -> Unit,

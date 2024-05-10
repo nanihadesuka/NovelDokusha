@@ -35,7 +35,7 @@ import my.noveldokusha.text_translator.domain.TranslationManager
 import kotlin.properties.Delegates
 
 
-class ReaderSession(
+internal class ReaderSession(
     val bookUrl: String,
     initialChapterUrl: String,
     private val appRepository: AppRepository,

@@ -9,7 +9,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-internal class AppThemeProvider @Inject constructor(
+class AppThemeProvider @Inject constructor(
     private val appPreferences: AppPreferences
 ) : ThemeProvider {
 

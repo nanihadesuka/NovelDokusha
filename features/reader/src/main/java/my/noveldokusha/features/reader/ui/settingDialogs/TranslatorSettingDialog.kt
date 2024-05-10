@@ -47,7 +47,7 @@ import my.noveldokusha.features.reader.features.LiveTranslationSettingData
 import my.noveldokusha.reader.R
 
 @Composable
-fun TranslatorSettingDialog(
+internal fun TranslatorSettingDialog(
     state: LiveTranslationSettingData
 ) {
     var modelSelectorExpanded by rememberSaveable { mutableStateOf(false) }

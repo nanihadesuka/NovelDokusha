@@ -18,7 +18,7 @@ abstract class CoreModule {
 
     @Binds
     @Singleton
-    internal abstract fun themeProviderBinder(appThemeProvider: AppThemeProvider): ThemeProvider
+    abstract fun themeProviderBinder(appThemeProvider: AppThemeProvider): ThemeProvider
 
 
     companion object {

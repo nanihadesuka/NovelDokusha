@@ -50,7 +50,7 @@ import my.noveldokusha.reader.R
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun StyleSettingDialog(
+internal fun StyleSettingDialog(
     state: ReaderScreenState.Settings.StyleSettingsData,
     onTextSizeChange: (Float) -> Unit,
     onTextFontChange: (String) -> Unit,

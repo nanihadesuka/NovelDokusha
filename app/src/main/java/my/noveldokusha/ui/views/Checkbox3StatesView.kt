@@ -7,8 +7,8 @@ import android.util.TypedValue
 import android.widget.FrameLayout
 import androidx.core.content.ContextCompat
 import my.noveldokusha.R
-import my.noveldokusha.databinding.ViewCheckboxBinding
 import my.noveldokusha.core.utils.inflater
+import my.noveldokusha.reader.databinding.ViewCheckboxBinding
 
 class Checkbox3StatesView : FrameLayout {
     private val holder by lazy { ViewCheckboxBinding.inflate(inflater, this, false) }

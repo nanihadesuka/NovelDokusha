@@ -29,16 +29,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import my.noveldoksuha.coreui.theme.ColorAccent
+import my.noveldoksuha.coreui.theme.InternalTheme
+import my.noveldoksuha.coreui.theme.PreviewThemes
+import my.noveldoksuha.data.CatalogItem
 import my.noveldokusha.R
-import my.noveldokusha.repository.CatalogItem
 import my.noveldokusha.scraper.SourceInterface
 import my.noveldokusha.ui.composeViews.AnimatedTransition
 import my.noveldokusha.ui.composeViews.ImageViewGlide
 import my.noveldokusha.ui.previewFixtures.previewFixturesCatalogList
 import my.noveldokusha.ui.previewFixtures.previewFixturesDatabaseList
-import my.noveldoksuha.coreui.theme.ColorAccent
-import my.noveldoksuha.coreui.theme.InternalTheme
-import my.noveldoksuha.coreui.theme.PreviewThemes
 
 @OptIn(ExperimentalAnimationApi::class, ExperimentalFoundationApi::class)
 @Composable

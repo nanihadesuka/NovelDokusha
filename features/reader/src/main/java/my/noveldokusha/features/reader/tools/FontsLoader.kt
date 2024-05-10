@@ -3,7 +3,7 @@ package my.noveldokusha.features.reader.tools
 import android.graphics.Typeface
 import androidx.compose.ui.text.font.FontFamily
 
-class FontsLoader {
+internal class FontsLoader {
     companion object {
         val availableFonts = listOf(
             "casual",

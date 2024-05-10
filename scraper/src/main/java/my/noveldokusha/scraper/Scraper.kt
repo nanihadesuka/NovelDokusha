@@ -1,8 +1,5 @@
 package my.noveldokusha.scraper
 
-import android.content.Context
-import dagger.hilt.android.qualifiers.ApplicationContext
-import my.noveldokusha.core.AppFileResolver
 import my.noveldokusha.network.NetworkClient
 import my.noveldokusha.scraper.databases.BakaUpdates
 import my.noveldokusha.scraper.databases.NovelUpdates
@@ -35,9 +32,6 @@ import javax.inject.Singleton
 @Singleton
 class Scraper @Inject constructor(
     networkClient: NetworkClient,
-    @ApplicationContext appContext: Context,
-    localSourcesDirectories: LocalSourcesDirectories,
-    appFileResolver: AppFileResolver,
     localSource: LocalSource
 ) {
     val databasesList = setOf<DatabaseInterface>(

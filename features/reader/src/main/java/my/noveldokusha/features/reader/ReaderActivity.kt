@@ -46,6 +46,7 @@ import my.noveldokusha.features.reader.domain.indexOfReaderItem
 import my.noveldokusha.features.reader.tools.FontsLoader
 import my.noveldokusha.features.reader.ui.ReaderScreen
 import my.noveldokusha.features.reader.ui.ReaderViewHandlersActions
+import my.noveldokusha.navigation.NavigationRoutes
 import my.noveldokusha.reader.R
 import my.noveldokusha.reader.databinding.ActivityReaderBinding
 import javax.inject.Inject
@@ -74,7 +75,10 @@ class ReaderActivity : BaseActivity() {
     }
 
     @Inject
-    lateinit var readerViewHandlersActions: ReaderViewHandlersActions
+    lateinit var navigationRoutes : NavigationRoutes
+
+    @Inject
+    internal lateinit var readerViewHandlersActions: ReaderViewHandlersActions
 
     private var listIsScrolling = false
     private val fadeInTextLiveData = MutableLiveData<Boolean>(false)
@@ -470,7 +474,7 @@ class ReaderActivity : BaseActivity() {
         viewBind.listView.doOnNextLayout { updateReadingState() }
     }
 
-    fun updateInfoView() {
+    private fun updateInfoView() {
         val lastVisiblePosition = viewBind.listView.lastVisiblePosition
         val itemIndex = viewAdapter.listView.fromPositionToIndex(lastVisiblePosition)
         viewModel.updateInfoViewTo(itemIndex)

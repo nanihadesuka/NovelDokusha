@@ -5,13 +5,13 @@ import kotlinx.coroutines.coroutineScope
 import my.noveldoksuha.data.AppRepository
 import my.noveldokusha.tooling.local_database.tables.Chapter
 
-data class InitialPositionChapter(
+internal data class InitialPositionChapter(
     val chapterIndex: Int,
     val chapterItemPosition: Int,
     val chapterItemOffset: Int
 )
 
-suspend fun getInitialChapterItemPosition(
+internal suspend fun getInitialChapterItemPosition(
     appRepository: AppRepository,
     bookUrl: String,
     chapterIndex: Int,

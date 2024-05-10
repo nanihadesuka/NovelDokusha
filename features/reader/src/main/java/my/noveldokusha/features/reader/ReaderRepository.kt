@@ -11,7 +11,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class ReaderRepository @Inject constructor(
+internal class ReaderRepository @Inject constructor(
     private val scope: AppCoroutineScope,
     private val database: AppDatabase,
     private val bookChaptersRepository: BookChaptersRepository,

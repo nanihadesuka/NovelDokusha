@@ -7,11 +7,11 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
+import my.noveldoksuha.data.AppRepository
 import my.noveldokusha.core.AppPreferences
-import my.noveldokusha.repository.AppRepository
 import my.noveldokusha.core.BaseViewModel
-import my.noveldokusha.ui.composeViews.BookSettingsDialogState
 import my.noveldokusha.core.utils.asMutableStateOf
+import my.noveldokusha.ui.composeViews.BookSettingsDialogState
 import javax.inject.Inject
 
 @HiltViewModel

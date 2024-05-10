@@ -25,7 +25,7 @@ interface ReaderStateBundle {
 }
 
 @HiltViewModel
-class ReaderViewModel @Inject constructor(
+internal class ReaderViewModel @Inject constructor(
     stateHandler: SavedStateHandle,
     private val appPreferences: AppPreferences,
     private val readerManager: ReaderManager,

@@ -5,7 +5,7 @@ import android.support.v4.media.session.MediaSessionCompat
 import android.view.KeyEvent
 import my.noveldokusha.features.reader.features.ReaderTextToSpeech
 
-class NarratorMediaControlsCallback(
+internal class NarratorMediaControlsCallback(
     private val readerTextToSpeech: ReaderTextToSpeech
 ) : MediaSessionCompat.Callback() {
 

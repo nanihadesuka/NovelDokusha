@@ -7,7 +7,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class ReaderViewHandlersActions @Inject constructor() {
+internal class ReaderViewHandlersActions @Inject constructor() {
 
     suspend fun doForceUpdateListViewState() {
         withContext(Dispatchers.Main.immediate) {

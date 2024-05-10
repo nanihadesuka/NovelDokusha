@@ -5,7 +5,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class ReaderManager @Inject constructor(
+internal class ReaderManager @Inject constructor(
     private val readerSessionProvider: ReaderSessionProvider,
     private val readerViewHandlersActions: ReaderViewHandlersActions
 ) {

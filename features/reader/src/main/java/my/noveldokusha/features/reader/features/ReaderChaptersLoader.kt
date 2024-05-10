@@ -24,7 +24,7 @@ import my.noveldokusha.features.reader.ui.ReaderViewHandlersActions
 import my.noveldokusha.tooling.local_database.tables.Chapter
 import kotlin.coroutines.CoroutineContext
 
-class ReaderChaptersLoader(
+internal class ReaderChaptersLoader(
     private val appRepository: AppRepository,
     private val translatorTranslateOrNull: suspend (text: String) -> String?,
     private val translatorIsActive: () -> Boolean,

@@ -8,7 +8,7 @@ import my.noveldokusha.core.BookTextMapper
 import my.noveldokusha.features.reader.domain.ImgEntry
 import my.noveldokusha.features.reader.domain.ReaderItem
 
-suspend fun textToItemsConverter(
+internal suspend fun textToItemsConverter(
     chapterUrl: String,
     chapterIndex: Int,
     chapterItemPositionDisplacement: Int,

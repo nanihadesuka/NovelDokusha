@@ -6,7 +6,7 @@ import my.noveldoksuha.coreui.theme.Themes
 import my.noveldokusha.features.reader.features.LiveTranslationSettingData
 import my.noveldokusha.features.reader.features.TextToSpeechSettingData
 
-data class ReaderScreenState(
+internal data class ReaderScreenState(
     val showReaderInfo: MutableState<Boolean>,
     val readerInfo: CurrentInfo,
     val settings: Settings,

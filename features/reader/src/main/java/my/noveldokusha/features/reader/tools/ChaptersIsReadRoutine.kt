@@ -8,7 +8,7 @@ import kotlinx.coroutines.launch
 import my.noveldoksuha.data.AppRepository
 import my.noveldokusha.features.reader.domain.ChapterUrl
 
-class ChaptersIsReadRoutine(
+internal class ChaptersIsReadRoutine(
     val appRepository: AppRepository,
     private val scope: CoroutineScope = CoroutineScope(
         Dispatchers.IO + SupervisorJob() + CoroutineName("ChapterIsReadRoutine")

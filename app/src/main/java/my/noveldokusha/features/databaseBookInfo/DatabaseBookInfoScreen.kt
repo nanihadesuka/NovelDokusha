@@ -32,14 +32,14 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import my.noveldoksuha.coreui.theme.InternalTheme
+import my.noveldoksuha.coreui.theme.isAtTop
 import my.noveldokusha.R
-import my.noveldokusha.tooling.local_database.BookMetadata
 import my.noveldokusha.scraper.DatabaseInterface
 import my.noveldokusha.scraper.DatabaseInterface.BookData
 import my.noveldokusha.scraper.SearchGenre
 import my.noveldokusha.scraper.domain.BookResult
-import my.noveldoksuha.coreui.theme.InternalTheme
-import my.noveldoksuha.coreui.theme.isAtTop
+import my.noveldokusha.tooling.local_database.BookMetadata
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -57,7 +57,7 @@ fun DatabaseBookInfoScreen(
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
-            val isAtTop by my.noveldoksuha.coreui.theme.isAtTop(threshold = 40.dp)
+            val isAtTop by scrollState.isAtTop(threshold = 40.dp)
             val alpha by animateFloatAsState(targetValue = if (isAtTop) 0f else 1f, label = "")
             val backgroundColor by animateColorAsState(
                 targetValue = MaterialTheme.colorScheme.background.copy(alpha = alpha),

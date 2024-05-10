@@ -5,10 +5,10 @@ import android.util.Log
 import androidx.work.ListenableWorker
 import androidx.work.WorkerFactory
 import androidx.work.WorkerParameters
+import my.noveldoksuha.data.AppRemoteRepository
+import my.noveldokusha.core.utils.NotificationsCenter
 import my.noveldokusha.interactor.LibraryUpdatesInteractions
 import my.noveldokusha.notifications.LibraryUpdateNotification
-import my.noveldokusha.repository.AppRemoteRepository
-import my.noveldokusha.core.utils.NotificationsCenter
 import my.noveldokusha.workers.LibraryUpdatesWorker
 import my.noveldokusha.workers.UpdatesCheckerWorker
 import javax.inject.Inject

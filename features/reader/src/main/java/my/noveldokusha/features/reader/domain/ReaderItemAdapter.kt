@@ -29,7 +29,7 @@ import my.noveldokusha.reader.databinding.ActivityReaderListItemSpecialTitleBind
 import my.noveldokusha.reader.databinding.ActivityReaderListItemTitleBinding
 import my.noveldokusha.reader.databinding.ActivityReaderListItemTranslatingBinding
 
-class ReaderItemAdapter(
+internal class ReaderItemAdapter(
     private val ctx: Context,
     list: List<ReaderItem>,
     private val bookUrl: String,

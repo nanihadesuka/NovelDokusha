@@ -1,6 +1,6 @@
 package my.noveldokusha.features.reader.domain
 
-fun indexOfReaderItem(
+internal fun indexOfReaderItem(
     list: List<ReaderItem>,
     chapterIndex: Int,
     chapterItemPosition: Int
@@ -20,7 +20,7 @@ fun indexOfReaderItem(
 /**
  * O(n) search
  */
-fun indexOfReaderItemLinearSearch(
+internal fun indexOfReaderItemLinearSearch(
     list: List<ReaderItem>,
     chapterIndex: Int,
     chapterItemPosition: Int
@@ -33,7 +33,7 @@ fun indexOfReaderItemLinearSearch(
 /**
  * O(log2(n)) search
  */
-fun indexOfReaderItemBinarySearch(
+internal fun indexOfReaderItemBinarySearch(
     list: List<ReaderItem>,
     chapterIndex: Int,
     chapterItemPosition: Int

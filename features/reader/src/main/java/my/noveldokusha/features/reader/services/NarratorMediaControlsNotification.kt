@@ -36,7 +36,7 @@ import my.noveldokusha.reader.R
 import my.noveldokusha.tooling.local_database.BookMetadata
 import javax.inject.Inject
 
-class NarratorMediaControlsNotification @Inject constructor(
+internal class NarratorMediaControlsNotification @Inject constructor(
     @ApplicationContext private val context: Context,
     private val notificationsCenter: NotificationsCenter,
     private val readerManager: ReaderManager,
