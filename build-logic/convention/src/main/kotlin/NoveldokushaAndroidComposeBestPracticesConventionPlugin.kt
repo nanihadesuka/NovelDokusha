@@ -1,6 +1,6 @@
+
 import com.android.build.api.dsl.ApplicationExtension
 import com.android.build.api.dsl.LibraryExtension
-import my.noveldoksuha.convention.plugin.debugImplementation
 import my.noveldoksuha.convention.plugin.implementation
 import my.noveldoksuha.convention.plugin.libs
 import org.gradle.api.Plugin
@@ -27,7 +27,7 @@ class NoveldokushaAndroidComposeBestPracticesConventionPlugin : Plugin<Project> 
 
                 dependencies {
                     implementation(libs.findLibrary("compose-androidx-ui").get())
-                    debugImplementation(libs.findLibrary("compose-androidx-ui-tooling").get())
+                    implementation(libs.findLibrary("compose-androidx-ui-tooling").get())
                 }
 
                 testOptions {
