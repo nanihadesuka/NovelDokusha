@@ -12,7 +12,9 @@ import my.noveldokusha.core.isLocalUri
 import my.noveldokusha.scraper.Scraper
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import javax.inject.Inject
+import javax.inject.Singleton
 
+@Singleton
 class LibraryUpdatesInteractions @Inject constructor(
     private val appRepository: AppRepository,
     private val scraper: Scraper,
