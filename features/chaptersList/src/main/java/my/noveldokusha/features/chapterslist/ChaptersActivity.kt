@@ -1,4 +1,4 @@
-package my.noveldokusha.features.chaptersList
+package my.noveldokusha.features.chapterslist
 
 import android.content.Context
 import android.content.Intent
@@ -10,13 +10,13 @@ import androidx.lifecycle.lifecycleScope
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import my.noveldoksuha.coreui.composableActions.SetSystemBarTransparent
+import my.noveldoksuha.coreui.composableActions.onDoAskForImage
 import my.noveldoksuha.coreui.theme.Theme
-import my.noveldokusha.composableActions.onDoAskForImage
 import my.noveldokusha.core.BaseActivity
 import my.noveldokusha.core.utils.Extra_String
+import my.noveldokusha.navigation.NavigationRoutes
 import my.noveldokusha.tooling.local_database.BookMetadata
-import my.noveldokusha.ui.goToDatabaseSearch
-import my.noveldokusha.ui.goToReader
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class ChaptersActivity : BaseActivity() {
@@ -34,7 +34,10 @@ class ChaptersActivity : BaseActivity() {
         }
     }
 
-    val viewModel by viewModels<ChaptersViewModel>()
+    @Inject
+    internal lateinit var navigationRoutes: NavigationRoutes
+
+    private val viewModel by viewModels<ChaptersViewModel>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -61,8 +64,10 @@ class ChaptersActivity : BaseActivity() {
                     onSelectionModeChapterLongClick = viewModel::onSelectionModeChapterLongClick,
                     onChapterDownload = viewModel::onChapterDownload,
                     onPullRefresh = viewModel::onPullRefresh,
-                    onCoverLongClick = { goToDatabaseSearch(input = viewModel.bookTitle) },
-                    onChangeCover = onDoAskForImage { viewModel.saveImageAsCover(it) }
+                    onCoverLongClick = { searchBookInDatabase(input = viewModel.bookTitle) },
+                    onChangeCover = onDoAskForImage { viewModel.saveImageAsCover(it) },
+                    onOpenInBrowser = { navigationRoutes.webView(this, url = it) },
+                    onGlobalSearchClick = { navigationRoutes.globalSearch(this, text = it) }
                 )
             }
         }
@@ -78,11 +83,14 @@ class ChaptersActivity : BaseActivity() {
         }
     }
 
-    private fun searchBookInDatabase() = goToDatabaseSearch(
-        input = viewModel.state.book.value.title
-    )
+    private fun searchBookInDatabase(
+        input: String = viewModel.state.book.value.title
+    ) = navigationRoutes.databaseSearch(
+        this,
+        input = input
+    ).let(::startActivity)
 
-    private fun openBookAtChapter(chapterUrl: String) = goToReader(
-        bookUrl = viewModel.state.book.value.url, chapterUrl = chapterUrl
-    )
+    private fun openBookAtChapter(chapterUrl: String) = navigationRoutes.reader(
+        this, bookUrl = viewModel.state.book.value.url, chapterUrl = chapterUrl
+    ).let(::startActivity)
 }

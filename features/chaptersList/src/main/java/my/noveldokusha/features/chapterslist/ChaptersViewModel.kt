@@ -1,4 +1,4 @@
-package my.noveldokusha.features.chaptersList
+package my.noveldokusha.features.chapterslist
 
 import android.net.Uri
 import androidx.compose.runtime.mutableStateListOf
@@ -17,7 +17,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import my.noveldoksuha.data.AppRepository
 import my.noveldoksuha.data.DownloaderRepository
-import my.noveldokusha.R
+import my.noveldokusha.chapterslist.R
 import my.noveldokusha.core.AppCoroutineScope
 import my.noveldokusha.core.AppFileResolver
 import my.noveldokusha.core.AppPreferences
@@ -28,6 +28,7 @@ import my.noveldokusha.core.isLocalUri
 import my.noveldokusha.core.utils.StateExtra_String
 import my.noveldokusha.core.utils.toState
 import my.noveldokusha.scraper.Scraper
+import my.noveldokusha.tooling.local_database.tables.Book
 import javax.inject.Inject
 
 interface ChapterStateBundle {
@@ -36,7 +37,7 @@ interface ChapterStateBundle {
 }
 
 @HiltViewModel
-class ChaptersViewModel @Inject constructor(
+internal class ChaptersViewModel @Inject constructor(
     private val appRepository: AppRepository,
     private val appScope: AppCoroutineScope,
     private val scraper: Scraper,
@@ -98,7 +99,7 @@ class ChaptersViewModel @Inject constructor(
             val description = async { downloaderRepository.bookDescription(bookUrl = bookUrl) }
 
             appRepository.libraryBooks.insert(
-                my.noveldokusha.tooling.local_database.tables.Book(
+                Book(
                     title = bookTitle,
                     url = bookUrl,
                     coverImageUrl = coverUrl.await().toSuccessOrNull()?.data ?: "",

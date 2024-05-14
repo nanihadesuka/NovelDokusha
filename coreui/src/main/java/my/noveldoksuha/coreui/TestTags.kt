@@ -1,4 +1,4 @@
-package my.noveldokusha.ui
+package my.noveldoksuha.coreui
 
 object AppTestTags {
     const val bookImageButtonView = "bookImageButtonView"

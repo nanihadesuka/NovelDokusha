@@ -42,16 +42,16 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.coroutines.launch
+import my.noveldoksuha.coreui.components.BookImageButtonView
+import my.noveldoksuha.coreui.theme.ColorAccent
+import my.noveldoksuha.coreui.theme.ImageBorderShape
+import my.noveldoksuha.coreui.theme.colorApp
 import my.noveldokusha.R
 import my.noveldokusha.core.isLocalUri
 import my.noveldokusha.core.rememberResolvedBookImagePath
 import my.noveldokusha.data.LibraryCategory
 import my.noveldokusha.ui.bounceOnPressed
-import my.noveldokusha.ui.composeViews.BookImageButtonView
 import my.noveldokusha.ui.composeViews.CollapsibleDivider
-import my.noveldoksuha.coreui.theme.ColorAccent
-import my.noveldoksuha.coreui.theme.ImageBorderShape
-import my.noveldoksuha.coreui.theme.colorApp
 
 @OptIn(
     ExperimentalMaterialApi::class, ExperimentalFoundationApi::class,

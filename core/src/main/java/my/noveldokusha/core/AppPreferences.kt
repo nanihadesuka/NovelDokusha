@@ -5,8 +5,6 @@ package my.noveldokusha.core
 import android.content.Context
 import android.content.SharedPreferences
 import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.State
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.preference.PreferenceManager
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -22,8 +20,7 @@ import kotlinx.coroutines.withContext
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import my.noveldoksuha.coreui.theme.ThemeProvider
-import my.noveldoksuha.coreui.theme.Themes
+import my.noveldoksuha.coreui.components.TernaryState
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -253,3 +250,17 @@ class AppPreferences @Inject constructor(
         override fun component2() = ::value::set
     }
 }
+
+val AppPreferences.TERNARY_STATE.toTernaryState
+    get() = when (this) {
+        AppPreferences.TERNARY_STATE.active -> TernaryState.Active
+        AppPreferences.TERNARY_STATE.inverse -> TernaryState.Inverse
+        AppPreferences.TERNARY_STATE.inactive -> TernaryState.Inactive
+    }
+
+val TernaryState.toTERNARY_STATE
+    get() = when (this) {
+        TernaryState.Active -> AppPreferences.TERNARY_STATE.active
+        TernaryState.Inverse -> AppPreferences.TERNARY_STATE.inverse
+        TernaryState.Inactive -> AppPreferences.TERNARY_STATE.inactive
+    }

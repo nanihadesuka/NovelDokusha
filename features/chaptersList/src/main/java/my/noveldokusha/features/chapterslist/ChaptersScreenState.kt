@@ -1,4 +1,4 @@
-package my.noveldokusha.features.chaptersList
+package my.noveldokusha.features.chapterslist
 
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
@@ -7,7 +7,7 @@ import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.runtime.snapshots.SnapshotStateMap
 import my.noveldokusha.core.AppPreferences
 
-data class ChaptersScreenState(
+internal data class ChaptersScreenState(
     val book: State<BookState>,
     val error: MutableState<String>,
     val selectedChaptersUrl: SnapshotStateMap<String, Unit>,

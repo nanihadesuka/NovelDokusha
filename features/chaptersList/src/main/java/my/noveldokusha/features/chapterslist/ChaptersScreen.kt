@@ -1,4 +1,4 @@
-package my.noveldokusha.features.chaptersList
+package my.noveldokusha.features.chapterslist
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
@@ -47,7 +47,6 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -56,7 +55,6 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -66,14 +64,14 @@ import my.noveldoksuha.coreui.theme.ColorLike
 import my.noveldoksuha.coreui.theme.ColorNotice
 import my.noveldoksuha.coreui.theme.colorApp
 import my.noveldoksuha.coreui.theme.isAtTop
-import my.noveldokusha.R
-import my.noveldokusha.core.isLocalUri
 import my.noveldoksuha.coreui.theme.textPadding
-import my.noveldokusha.ui.goToWebBrowser
+import my.noveldokusha.chapterslist.R
+import my.noveldokusha.core.isLocalUri
+import my.noveldokusha.tooling.local_database.ChapterWithContext
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ChaptersScreen(
+internal fun ChaptersScreen(
     state: ChaptersScreenState,
     onLibraryToggle: () -> Unit,
     onSearchBookInDatabase: () -> Unit,
@@ -86,16 +84,17 @@ fun ChaptersScreen(
     onSelectedInvertSelection: () -> Unit,
     onSelectAllChapters: () -> Unit,
     onCloseSelectionBar: () -> Unit,
-    onChapterClick: (chapter: my.noveldokusha.tooling.local_database.ChapterWithContext) -> Unit,
-    onChapterLongClick: (chapter: my.noveldokusha.tooling.local_database.ChapterWithContext) -> Unit,
-    onSelectionModeChapterClick: (chapter: my.noveldokusha.tooling.local_database.ChapterWithContext) -> Unit,
-    onSelectionModeChapterLongClick: (chapter: my.noveldokusha.tooling.local_database.ChapterWithContext) -> Unit,
-    onChapterDownload: (chapter: my.noveldokusha.tooling.local_database.ChapterWithContext) -> Unit,
+    onChapterClick: (chapter: ChapterWithContext) -> Unit,
+    onChapterLongClick: (chapter: ChapterWithContext) -> Unit,
+    onSelectionModeChapterClick: (chapter: ChapterWithContext) -> Unit,
+    onSelectionModeChapterLongClick: (chapter: ChapterWithContext) -> Unit,
+    onChapterDownload: (chapter: ChapterWithContext) -> Unit,
     onPullRefresh: () -> Unit,
     onCoverLongClick: () -> Unit,
     onChangeCover: () -> Unit,
+    onOpenInBrowser: (url: String) -> Unit,
+    onGlobalSearchClick: (input: String) -> Unit,
 ) {
-    val context by rememberUpdatedState(newValue = LocalContext.current)
     var showDropDown by rememberSaveable { mutableStateOf(false) }
     var showBottomSheet by rememberSaveable { mutableStateOf(false) }
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
@@ -174,7 +173,7 @@ fun ChaptersScreen(
                                         isLocalSource = state.isLocalSource.value,
                                         openInBrowser = {
                                             if (!state.book.value.url.isLocalUri) {
-                                                context.goToWebBrowser(url = state.book.value.url)
+                                                onOpenInBrowser(state.book.value.url)
                                             }
                                         },
                                         onSearchBookInDatabase = onSearchBookInDatabase,
@@ -240,13 +239,14 @@ fun ChaptersScreen(
         content = { innerPadding ->
             ChaptersScreenBody(
                 state = state,
-                innerPadding = innerPadding,
                 lazyListState = lazyListState,
+                innerPadding = innerPadding,
                 onChapterClick = if (state.isInSelectionMode.value) onSelectionModeChapterClick else onChapterClick,
                 onChapterLongClick = if (state.isInSelectionMode.value) onSelectionModeChapterLongClick else onChapterLongClick,
                 onChapterDownload = onChapterDownload,
                 onPullRefresh = onPullRefresh,
                 onCoverLongClick = onCoverLongClick,
+                onGlobalSearchClick = onGlobalSearchClick,
             )
             Box(Modifier.padding(innerPadding)) {
                 InternalLazyColumnScrollbar(state = lazyListState)

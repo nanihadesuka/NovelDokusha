@@ -1,4 +1,4 @@
-package my.noveldokusha.features.chaptersList
+package my.noveldokusha.features.chapterslist
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -24,20 +24,22 @@ import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.distinctUntilChanged
-import my.noveldokusha.R
-import my.noveldokusha.ui.composeViews.ErrorView
+import my.noveldoksuha.coreui.components.ErrorView
+import my.noveldokusha.chapterslist.R
+import my.noveldokusha.tooling.local_database.ChapterWithContext
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun ChaptersScreenBody(
+internal fun ChaptersScreenBody(
     state: ChaptersScreenState,
     lazyListState: LazyListState,
     innerPadding: PaddingValues,
-    onChapterClick: (chapter: my.noveldokusha.tooling.local_database.ChapterWithContext) -> Unit,
-    onChapterLongClick: (chapter: my.noveldokusha.tooling.local_database.ChapterWithContext) -> Unit,
-    onChapterDownload: (chapter: my.noveldokusha.tooling.local_database.ChapterWithContext) -> Unit,
+    onChapterClick: (chapter: ChapterWithContext) -> Unit,
+    onChapterLongClick: (chapter: ChapterWithContext) -> Unit,
+    onChapterDownload: (chapter: ChapterWithContext) -> Unit,
     onPullRefresh: () -> Unit,
     onCoverLongClick: () -> Unit,
+    onGlobalSearchClick: (input: String) -> Unit,
 ) {
     var isRefreshingDelayed by remember { mutableStateOf(state.isRefreshing.value) }
     LaunchedEffect(Unit) {
@@ -73,7 +75,8 @@ fun ChaptersScreenBody(
                     numberOfChapters = state.chapters.size,
                     paddingValues = innerPadding,
                     modifier = Modifier.padding(bottom = 12.dp),
-                    onCoverLongClick = onCoverLongClick
+                    onCoverLongClick = onCoverLongClick,
+                    onGlobalSearchClick = onGlobalSearchClick,
                 )
             }
 

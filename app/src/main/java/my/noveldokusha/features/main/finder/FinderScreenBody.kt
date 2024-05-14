@@ -35,8 +35,8 @@ import my.noveldoksuha.coreui.theme.PreviewThemes
 import my.noveldoksuha.data.CatalogItem
 import my.noveldokusha.R
 import my.noveldokusha.scraper.SourceInterface
-import my.noveldokusha.ui.composeViews.AnimatedTransition
-import my.noveldokusha.ui.composeViews.ImageViewGlide
+import my.noveldoksuha.coreui.components.AnimatedTransition
+import my.noveldoksuha.coreui.components.ImageViewGlide
 import my.noveldokusha.ui.previewFixtures.previewFixturesCatalogList
 import my.noveldokusha.ui.previewFixtures.previewFixturesDatabaseList
 

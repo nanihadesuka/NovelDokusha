@@ -1,5 +1,6 @@
-package my.noveldokusha.ui.composeViews
+package my.noveldoksuha.coreui.components
 
+import android.widget.ImageView
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Indication
 import androidx.compose.foundation.LocalIndication
@@ -30,8 +31,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import my.noveldokusha.R
-import my.noveldokusha.ui.AppTestTags
+import my.noveldoksuha.coreui.AppTestTags
+import my.noveldoksuha.coreui.R
 import my.noveldoksuha.coreui.theme.Grey25
 import my.noveldoksuha.coreui.theme.Grey800
 import my.noveldoksuha.coreui.theme.ImageBorderShape

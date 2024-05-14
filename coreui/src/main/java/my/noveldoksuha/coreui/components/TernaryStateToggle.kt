@@ -1,8 +1,7 @@
-package my.noveldokusha.ui.composeViews
+package my.noveldoksuha.coreui.components
 
 import android.content.res.Configuration
 import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.defaultMinSize
@@ -25,15 +24,15 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import my.noveldokusha.core.AppPreferences.TERNARY_STATE
 import my.noveldoksuha.coreui.theme.InternalTheme
 
-@OptIn(ExperimentalAnimationApi::class)
+enum class TernaryState { Active, Inverse, Inactive }
+
 @Composable
 fun TernaryStateToggle(
     text: String,
-    state: TERNARY_STATE,
-    onStateChange: (TERNARY_STATE) -> Unit,
+    state: TernaryState,
+    onStateChange: (TernaryState) -> Unit,
     activeIcon: @Composable (() -> Unit),
     inverseIcon: @Composable (() -> Unit),
     inactiveIcon: @Composable (() -> Unit),
@@ -54,9 +53,9 @@ fun TernaryStateToggle(
     ) {
         AnimatedContent(targetState = updatedState, label = "") {
             when (it) {
-                TERNARY_STATE.active -> activeIcon()
-                TERNARY_STATE.inverse -> inverseIcon()
-                TERNARY_STATE.inactive -> inactiveIcon()
+                TernaryState.Active -> activeIcon()
+                TernaryState.Inverse -> inverseIcon()
+                TernaryState.Inactive -> inactiveIcon()
             }
         }
         Text(
@@ -73,7 +72,7 @@ fun TernaryStateToggle(
 private fun PreviewView() {
 
     @Composable
-    fun draw(text: String, state: TERNARY_STATE) {
+    fun draw(text: String, state: TernaryState) {
         TernaryStateToggle(
             text = text,
             state = state,
@@ -85,11 +84,11 @@ private fun PreviewView() {
         )
     }
 
-    InternalTheme{
+    InternalTheme {
         Column {
-            draw(text = "Up", state = TERNARY_STATE.active)
-            draw(text = "Down", state = TERNARY_STATE.inverse)
-            draw(text = "Inactive", state = TERNARY_STATE.inactive)
+            draw(text = "Up", state = TernaryState.Active)
+            draw(text = "Down", state = TernaryState.Inverse)
+            draw(text = "Inactive", state = TernaryState.Inactive)
         }
     }
 }

@@ -30,8 +30,8 @@ import my.noveldokusha.mappers.mapToBookMetadata
 import my.noveldokusha.network.IteratorState
 import my.noveldokusha.scraper.domain.BookResult
 import my.noveldokusha.ui.bounceOnPressed
-import my.noveldokusha.ui.composeViews.BookImageButtonView
-import my.noveldokusha.ui.composeViews.BookTitlePosition
+import my.noveldoksuha.coreui.components.BookImageButtonView
+import my.noveldoksuha.coreui.components.BookTitlePosition
 import my.noveldokusha.ui.previewFixtures.previewFixturesCatalogList
 import my.noveldoksuha.coreui.theme.ColorAccent
 import my.noveldoksuha.coreui.theme.InternalTheme

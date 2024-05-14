@@ -14,7 +14,7 @@ import com.bumptech.glide.request.transition.Transition
 import dagger.hilt.android.qualifiers.ApplicationContext
 import my.noveldokusha.R
 import my.noveldokusha.tooling.local_database.BookMetadata
-import my.noveldokusha.features.chaptersList.ChaptersActivity
+import my.noveldokusha.features.chapterslist.ChaptersActivity
 import my.noveldokusha.features.main.MainActivity
 import my.noveldokusha.features.reader.ReaderActivity
 import my.noveldokusha.core.utils.NotificationsCenter

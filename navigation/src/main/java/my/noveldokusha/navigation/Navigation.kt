@@ -11,4 +11,19 @@ interface NavigationRoutes {
     fun chapters(context: Context, bookMetadata: BookMetadata): Intent
 
     fun webView(context: Context, url: String): Intent
+
+    fun reader(
+        context: Context,
+        bookUrl: String,
+        chapterUrl: String,
+        scrollToSpeakingItem: Boolean = false
+    ): Intent
+
+    fun databaseSearch(
+        context: Context,
+        input: String,
+        databaseUrlBase: String = "https://www.novelupdates.com/"
+    ): Intent
+
+    fun globalSearch(context: Context, text: String): Intent
 }

@@ -1,4 +1,4 @@
-package my.noveldokusha.features.chaptersList
+package my.noveldokusha.features.chapterslist
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -16,13 +16,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import my.noveldokusha.R
-import my.noveldokusha.ui.composeViews.TernaryStateToggle
+import my.noveldoksuha.coreui.components.TernaryStateToggle
 import my.noveldoksuha.coreui.theme.ColorAccent
+import my.noveldokusha.chapterslist.R
+import my.noveldokusha.core.toTERNARY_STATE
+import my.noveldokusha.core.toTernaryState
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ChaptersBottomSheet(
+internal fun ChaptersBottomSheet(
     visible: Boolean,
     onDismiss: () -> Unit,
     state: ChaptersScreenState,
@@ -41,8 +43,8 @@ fun ChaptersBottomSheet(
             )
             TernaryStateToggle(
                 text = stringResource(R.string.by_chapter_name),
-                state = state.settingChapterSort.value,
-                onStateChange = { state.settingChapterSort.value = it.next() },
+                state = state.settingChapterSort.value.toTernaryState,
+                onStateChange = { state.settingChapterSort.value = it.toTERNARY_STATE.next() },
                 modifier = Modifier.fillMaxWidth(),
                 activeIcon = { Icon(imageVector = Icons.Filled.ArrowUpward, null) },
                 inverseIcon = { Icon(imageVector = Icons.Filled.ArrowDownward, null) },

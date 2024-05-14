@@ -51,10 +51,10 @@ import my.noveldokusha.tooling.local_database.BookMetadata
 import my.noveldokusha.mappers.mapToBookMetadata
 import my.noveldokusha.scraper.SearchGenre
 import my.noveldokusha.ui.bounceOnPressed
-import my.noveldokusha.ui.composeViews.BookImageButtonView
-import my.noveldokusha.ui.composeViews.BookTitlePosition
-import my.noveldokusha.ui.composeViews.ExpandableText
-import my.noveldokusha.ui.composeViews.ImageView
+import my.noveldoksuha.coreui.components.BookImageButtonView
+import my.noveldoksuha.coreui.components.BookTitlePosition
+import my.noveldoksuha.coreui.components.ExpandableText
+import my.noveldoksuha.coreui.components.ImageView
 import my.noveldokusha.ui.composeViews.MyButton
 import my.noveldoksuha.coreui.theme.ColorAccent
 import my.noveldoksuha.coreui.theme.clickableNoIndicator

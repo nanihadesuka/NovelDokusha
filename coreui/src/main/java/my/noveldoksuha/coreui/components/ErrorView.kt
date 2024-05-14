@@ -1,4 +1,4 @@
-package my.noveldokusha.ui.composeViews
+package my.noveldoksuha.coreui.components
 
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -23,7 +23,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import my.noveldokusha.R
+import my.noveldoksuha.coreui.R
 
 @Composable
 fun ErrorView(

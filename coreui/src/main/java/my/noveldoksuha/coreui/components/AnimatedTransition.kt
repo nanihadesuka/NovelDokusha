@@ -1,4 +1,4 @@
-package my.noveldokusha.ui.composeViews
+package my.noveldoksuha.coreui.components
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedContentTransitionScope

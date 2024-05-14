@@ -1,4 +1,4 @@
-package my.noveldokusha.features.chaptersList
+package my.noveldokusha.features.chapterslist
 
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.animateContentSize
@@ -22,17 +22,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
-import my.noveldokusha.R
-import my.noveldokusha.ui.composeViews.AnimatedTransition
+import my.noveldoksuha.coreui.components.AnimatedTransition
 import my.noveldoksuha.coreui.theme.ColorNotice
 import my.noveldoksuha.coreui.theme.InternalTheme
 import my.noveldoksuha.coreui.theme.PreviewThemes
 import my.noveldoksuha.coreui.theme.colorApp
+import my.noveldokusha.chapterslist.R
+import my.noveldokusha.tooling.local_database.ChapterWithContext
+import my.noveldokusha.tooling.local_database.tables.Chapter
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalAnimationApi::class)
 @Composable
-fun ChaptersScreenChapterItem(
-    chapterWithContext: my.noveldokusha.tooling.local_database.ChapterWithContext,
+internal fun ChaptersScreenChapterItem(
+    chapterWithContext: ChapterWithContext,
     selected: Boolean,
     isLocalSource: Boolean,
     modifier: Modifier = Modifier,
@@ -114,15 +116,15 @@ private fun PreviewView(
 
 
 private data class PreviewProviderState(
-    val chapterWithContext: my.noveldokusha.tooling.local_database.ChapterWithContext,
+    val chapterWithContext: ChapterWithContext,
     val selected: Boolean
 )
 
 private class PreviewProvider : PreviewParameterProvider<PreviewProviderState> {
     override val values = sequenceOf(
         PreviewProviderState(
-            chapterWithContext = my.noveldokusha.tooling.local_database.ChapterWithContext(
-                chapter = my.noveldokusha.tooling.local_database.tables.Chapter(
+            chapterWithContext = ChapterWithContext(
+                chapter = Chapter(
                     title = "Title of the chapter",
                     url = "url",
                     bookUrl = "bookUrl",
@@ -137,8 +139,8 @@ private class PreviewProvider : PreviewParameterProvider<PreviewProviderState> {
             selected = false
         ),
         PreviewProviderState(
-            chapterWithContext = my.noveldokusha.tooling.local_database.ChapterWithContext(
-                chapter = my.noveldokusha.tooling.local_database.tables.Chapter(
+            chapterWithContext = ChapterWithContext(
+                chapter = Chapter(
                     title = "Title of the chapter, Title of the chapter, Title of the chapter, Title of the chapter, Title of the chapter,Title of the chapter ,Title of the chapter",
                     url = "url",
                     bookUrl = "bookUrl",
@@ -153,8 +155,8 @@ private class PreviewProvider : PreviewParameterProvider<PreviewProviderState> {
             selected = false
         ),
         PreviewProviderState(
-            chapterWithContext = my.noveldokusha.tooling.local_database.ChapterWithContext(
-                chapter = my.noveldokusha.tooling.local_database.tables.Chapter(
+            chapterWithContext = ChapterWithContext(
+                chapter = Chapter(
                     title = "Title of the chapter",
                     url = "url",
                     bookUrl = "bookUrl",

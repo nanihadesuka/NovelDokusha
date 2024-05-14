@@ -17,11 +17,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import my.noveldokusha.R
-import my.noveldokusha.ui.composeViews.PosNegCheckbox
-import my.noveldokusha.ui.composeViews.TernaryStateToggle
+import my.noveldoksuha.coreui.components.TernaryStateToggle
 import my.noveldoksuha.coreui.theme.ColorAccent
+import my.noveldokusha.R
+import my.noveldokusha.core.toTernaryState
 import my.noveldokusha.core.utils.toToggleableState
+import my.noveldokusha.ui.composeViews.PosNegCheckbox
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -59,7 +60,7 @@ fun LibraryBottomSheet(
             )
             TernaryStateToggle(
                 text = stringResource(id = R.string.last_read),
-                state = model.readSort,
+                state = model.readSort.toTernaryState,
                 onStateChange = { model.readSortToggle() },
                 modifier = Modifier.fillMaxWidth(),
                 activeIcon = { Icon(imageVector = Icons.Filled.ArrowUpward, null) },

@@ -54,7 +54,7 @@
 			</intent-filter>
 		</activity>
 		<activity android:name=".features.sourceCatalog.SourceCatalogActivity" />
-		<activity android:name=".features.chaptersList.ChaptersActivity" />
+		<activity android:name=".features.chapterslist.ChaptersActivity" />
 		<activity android:name=".features.databaseSearch.DatabaseSearchActivity" />
 		<activity android:name=".features.databaseBookInfo.DatabaseBookInfoActivity" />
 		<activity android:name=".features.globalSourceSearch.GlobalSourceSearchActivity" />

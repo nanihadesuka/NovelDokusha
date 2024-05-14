@@ -32,7 +32,7 @@ import androidx.compose.ui.res.stringResource
 import my.noveldokusha.core.AppPreferences
 import my.noveldokusha.R
 import my.noveldokusha.tooling.local_database.BookMetadata
-import my.noveldokusha.ui.composeViews.AnimatedTransition
+import my.noveldoksuha.coreui.components.AnimatedTransition
 import my.noveldokusha.ui.composeViews.BooksVerticalView
 import my.noveldokusha.ui.composeViews.CollapsibleDivider
 import my.noveldokusha.ui.composeViews.ToolbarMode

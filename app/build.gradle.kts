@@ -116,6 +116,7 @@ dependencies {
     implementation(projects.tooling.textTranslator.domain)
     implementation(projects.tooling.textToSpeech)
     implementation(projects.features.reader)
+    implementation(projects.features.chaptersList)
     implementation(projects.data)
     implementation(projects.core)
     implementation(projects.coreui)

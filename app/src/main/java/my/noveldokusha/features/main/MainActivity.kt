@@ -31,7 +31,7 @@ import my.noveldokusha.features.main.finder.FinderScreen
 import my.noveldokusha.features.main.library.LibraryScreen
 import my.noveldokusha.features.main.settings.SettingsScreen
 import my.noveldokusha.services.EpubImportService
-import my.noveldokusha.ui.composeViews.AnimatedTransition
+import my.noveldoksuha.coreui.components.AnimatedTransition
 
 private data class Page(
     @DrawableRes val iconRes: Int,

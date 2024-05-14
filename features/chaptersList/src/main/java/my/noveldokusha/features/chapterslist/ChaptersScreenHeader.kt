@@ -1,6 +1,5 @@
-package my.noveldokusha.features.chaptersList
+package my.noveldokusha.features.chapterslist
 
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
@@ -37,25 +36,24 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-import my.noveldokusha.R
-import my.noveldokusha.core.rememberResolvedBookImagePath
-import my.noveldokusha.ui.bounceOnPressed
-import my.noveldokusha.ui.composeViews.BookImageButtonView
-import my.noveldokusha.ui.composeViews.BookTitlePosition
-import my.noveldokusha.ui.composeViews.ExpandableText
-import my.noveldokusha.ui.composeViews.ImageView
-import my.noveldokusha.ui.goToGlobalSearch
+import my.noveldoksuha.coreui.components.BookImageButtonView
+import my.noveldoksuha.coreui.components.BookTitlePosition
+import my.noveldoksuha.coreui.components.ExpandableText
+import my.noveldoksuha.coreui.components.ImageView
+import my.noveldoksuha.coreui.modifiers.bounceOnPressed
 import my.noveldoksuha.coreui.theme.clickableNoIndicator
+import my.noveldokusha.chapterslist.R
+import my.noveldokusha.core.rememberResolvedBookImagePath
 
-@OptIn(ExperimentalAnimationApi::class)
 @Composable
-fun ChaptersScreenHeader(
+internal fun ChaptersScreenHeader(
     bookState: ChaptersScreenState.BookState,
     sourceCatalogName: String,
     numberOfChapters: Int,
     paddingValues: PaddingValues,
     modifier: Modifier = Modifier,
     onCoverLongClick: () -> Unit,
+    onGlobalSearchClick: (input: String) -> Unit,
 ) {
     val context by rememberUpdatedState(LocalContext.current)
     val coverImageModel = bookState.coverImageUrl?.let {
@@ -140,7 +138,7 @@ fun ChaptersScreenHeader(
                             fontWeight = FontWeight.Bold,
                             maxLines = 5,
                             modifier = Modifier.clickableNoIndicator {
-                                context.goToGlobalSearch(bookState.title)
+                                onGlobalSearchClick(bookState.title)
                             }
                         )
                     }

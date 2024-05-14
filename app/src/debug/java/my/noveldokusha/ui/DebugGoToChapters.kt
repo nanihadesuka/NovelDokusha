@@ -4,7 +4,7 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import my.noveldokusha.R
 import my.noveldokusha.tooling.local_database.BookMetadata
-import my.noveldokusha.features.chaptersList.ChaptersActivity
+import my.noveldokusha.features.chapterslist.ChaptersActivity
 
 class DebugGoToChapters : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

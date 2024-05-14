@@ -3,8 +3,7 @@ package my.noveldokusha.ui
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
-import my.noveldokusha.tooling.local_database.BookMetadata
-import my.noveldokusha.features.chaptersList.ChaptersActivity
+import my.noveldokusha.features.chapterslist.ChaptersActivity
 import my.noveldokusha.features.databaseBookInfo.DatabaseBookInfoActivity
 import my.noveldokusha.features.databaseSearch.DatabaseSearchActivity
 import my.noveldokusha.features.databaseSearch.DatabaseSearchExtras
@@ -15,6 +14,7 @@ import my.noveldokusha.features.webView.WebViewActivity
 import my.noveldokusha.mappers.mapToBookMetadata
 import my.noveldokusha.scraper.SourceInterface
 import my.noveldokusha.scraper.domain.BookResult
+import my.noveldokusha.tooling.local_database.BookMetadata
 
 fun Context.goToSourceCatalog(source: SourceInterface.Catalog) {
     SourceCatalogActivity

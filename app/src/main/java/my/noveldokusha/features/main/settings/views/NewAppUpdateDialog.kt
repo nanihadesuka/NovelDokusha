@@ -27,7 +27,7 @@ import my.noveldokusha.R
 import my.noveldokusha.core.domain.AppVersion
 import my.noveldokusha.core.domain.RemoteAppVersion
 import my.noveldokusha.features.main.settings.SettingsScreenState
-import my.noveldokusha.ui.composeViews.ImageView
+import my.noveldoksuha.coreui.components.ImageView
 import my.noveldokusha.ui.composeViews.MyButton
 import my.noveldoksuha.coreui.theme.InternalTheme
 

@@ -36,5 +36,6 @@ include(":tooling:text_translator:translator_nop")
 include(":tooling:textToSpeech")
 
 include(":features:reader")
+include(":features:chaptersList")
 
 include(":navigation")

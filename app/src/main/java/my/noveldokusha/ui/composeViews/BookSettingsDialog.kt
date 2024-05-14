@@ -24,6 +24,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.parcelize.Parcelize
+import my.noveldoksuha.coreui.components.ImageView
 import my.noveldokusha.R
 import my.noveldokusha.core.rememberResolvedBookImagePath
 import my.noveldokusha.features.main.library.LibraryViewModel

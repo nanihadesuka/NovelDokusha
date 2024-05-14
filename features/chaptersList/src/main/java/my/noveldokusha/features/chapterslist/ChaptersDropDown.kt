@@ -1,4 +1,4 @@
-package my.noveldokusha.features.chaptersList
+package my.noveldokusha.features.chapterslist
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Image
@@ -10,10 +10,10 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
-import my.noveldokusha.R
+import my.noveldokusha.chapterslist.R
 
 @Composable
-fun ChaptersDropDown(
+internal fun ChaptersDropDown(
     isLocalSource: Boolean,
     openInBrowser: () -> Unit,
     onSearchBookInDatabase: () -> Unit,
