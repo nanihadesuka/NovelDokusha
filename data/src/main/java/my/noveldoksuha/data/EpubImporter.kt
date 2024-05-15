@@ -7,6 +7,8 @@ import kotlinx.coroutines.withContext
 import my.noveldokusha.core.AppFileResolver
 import my.noveldokusha.core.fileImporter
 import my.noveldokusha.tooling.epub_parser.EpubBook
+import my.noveldokusha.tooling.local_database.tables.Book
+import my.noveldokusha.tooling.local_database.tables.Chapter
 import my.noveldokusha.tooling.local_database.tables.ChapterBody
 
 suspend fun epubImporter(
@@ -34,7 +36,7 @@ suspend fun epubImporter(
     }
 
     // Insert new book data
-    my.noveldokusha.tooling.local_database.tables.Book(
+    Book(
         title = storageFolderName,
         url = localBookUrl,
         coverImageUrl = appFileResolver.getLocalBookCoverPath(),
@@ -42,7 +44,7 @@ suspend fun epubImporter(
     ).let { appRepository.libraryBooks.insert(it) }
 
     epub.chapters.mapIndexed { i, chapter ->
-        my.noveldokusha.tooling.local_database.tables.Chapter(
+        Chapter(
             title = chapter.title,
             url = appFileResolver.getLocalBookChapterPath(storageFolderName, chapter.absPath),
             bookUrl = localBookUrl,

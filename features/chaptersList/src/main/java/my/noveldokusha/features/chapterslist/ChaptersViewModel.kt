@@ -9,10 +9,7 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.async
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import my.noveldoksuha.data.AppRepository
@@ -28,7 +25,6 @@ import my.noveldokusha.core.isLocalUri
 import my.noveldokusha.core.utils.StateExtra_String
 import my.noveldokusha.core.utils.toState
 import my.noveldokusha.scraper.Scraper
-import my.noveldokusha.tooling.local_database.tables.Book
 import javax.inject.Inject
 
 interface ChapterStateBundle {
@@ -45,6 +41,7 @@ internal class ChaptersViewModel @Inject constructor(
     private val appPreferences: AppPreferences,
     private val appFileResolver: AppFileResolver,
     private val downloaderRepository: DownloaderRepository,
+    private val chaptersRepository: ChaptersRepository,
     stateHandle: SavedStateHandle,
 ) : BaseViewModel(), ChapterStateBundle {
 
@@ -95,35 +92,14 @@ internal class ChaptersViewModel @Inject constructor(
             if (appRepository.libraryBooks.get(bookUrl) != null)
                 return@launch
 
-            val coverUrl = async { downloaderRepository.bookCoverImageUrl(bookUrl = bookUrl) }
-            val description = async { downloaderRepository.bookDescription(bookUrl = bookUrl) }
-
-            appRepository.libraryBooks.insert(
-                Book(
-                    title = bookTitle,
-                    url = bookUrl,
-                    coverImageUrl = coverUrl.await().toSuccessOrNull()?.data ?: "",
-                    description = description.await().toSuccessOrNull()?.data ?: ""
-                )
-            )
+            chaptersRepository.downloadBookMetadata(bookUrl = bookUrl, bookTitle = bookTitle)
         }
 
         viewModelScope.launch {
-            appRepository.bookChapters.getChaptersWithContextFlow(bookUrl)
-                .map { removeCommonTextFromTitles(it) }
-                // Sort the chapters given the order preference
-                .combine(appPreferences.CHAPTERS_SORT_ASCENDING.flow()) { chapters, sorted ->
-                    when (sorted) {
-                        AppPreferences.TERNARY_STATE.active -> chapters.sortedBy { it.chapter.position }
-                        AppPreferences.TERNARY_STATE.inverse -> chapters.sortedByDescending { it.chapter.position }
-                        AppPreferences.TERNARY_STATE.inactive -> chapters
-                    }
-                }
-                .flowOn(Dispatchers.Default)
-                .collect {
-                    state.chapters.clear()
-                    state.chapters.addAll(it)
-                }
+            chaptersRepository.getChaptersSortedFlow(bookUrl = bookUrl).collect {
+                state.chapters.clear()
+                state.chapters.addAll(it)
+            }
         }
     }
 
@@ -173,8 +149,6 @@ internal class ChaptersViewModel @Inject constructor(
         loadChaptersJob = appScope.launch {
             state.error.value = ""
             state.isRefreshing.value = true
-            val rawBookUrl = rawBookUrl
-            val bookTitle = bookTitle
             val isInLibrary = appRepository.libraryBooks.existInLibrary(bookUrl)
             appRepository.importEpubFromContentUri(
                 contentUri = rawBookUrl,
@@ -206,10 +180,8 @@ internal class ChaptersViewModel @Inject constructor(
         }
     }
 
-    suspend fun getLastReadChapter(): String? {
-        return appRepository.libraryBooks.get(bookUrl)?.lastReadChapter
-            ?: appRepository.bookChapters.getFirstChapter(bookUrl)?.url
-    }
+    suspend fun getLastReadChapter(): String? =
+        chaptersRepository.getLastReadChapter(bookUrl = bookUrl)
 
     fun setAsUnreadSelected() {
         val list = state.selectedChaptersUrl.toList()
