@@ -32,8 +32,8 @@ import kotlinx.coroutines.withContext
 import my.noveldoksuha.coreui.composableActions.SetSystemBarTransparent
 import my.noveldoksuha.coreui.theme.Theme
 import my.noveldoksuha.coreui.theme.colorAttrRes
-import my.noveldokusha.core.BaseActivity
-import my.noveldokusha.core.toPreferenceTheme
+import my.noveldoksuha.coreui.BaseActivity
+import my.noveldoksuha.coreui.mappers.toPreferenceTheme
 import my.noveldokusha.core.utils.Extra_Boolean
 import my.noveldokusha.core.utils.Extra_String
 import my.noveldokusha.core.utils.dpToPx

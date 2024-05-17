@@ -29,16 +29,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import my.noveldoksuha.coreui.components.AnimatedTransition
+import my.noveldoksuha.coreui.components.ImageViewGlide
 import my.noveldoksuha.coreui.theme.ColorAccent
 import my.noveldoksuha.coreui.theme.InternalTheme
 import my.noveldoksuha.coreui.theme.PreviewThemes
 import my.noveldoksuha.data.CatalogItem
 import my.noveldokusha.R
 import my.noveldokusha.scraper.SourceInterface
-import my.noveldoksuha.coreui.components.AnimatedTransition
-import my.noveldoksuha.coreui.components.ImageViewGlide
-import my.noveldokusha.ui.previewFixtures.previewFixturesCatalogList
-import my.noveldokusha.ui.previewFixtures.previewFixturesDatabaseList
+import my.noveldokusha.scraper.fixtures.fixturesCatalogList
+import my.noveldokusha.scraper.fixtures.fixturesDatabaseList
 
 @OptIn(ExperimentalAnimationApi::class, ExperimentalFoundationApi::class)
 @Composable
@@ -191,7 +191,7 @@ fun FinderScreenBody(
 @PreviewThemes
 @Composable
 private fun PreviewView() {
-    val catalogItemsList = previewFixturesCatalogList().mapIndexed { index, it ->
+    val catalogItemsList = fixturesCatalogList().mapIndexed { index, it ->
         CatalogItem(
             catalog = it,
             pinned = index % 2 == 0,
@@ -201,7 +201,7 @@ private fun PreviewView() {
     InternalTheme {
         FinderScreenBody(
             innerPadding = PaddingValues(),
-            databasesList = previewFixturesDatabaseList(),
+            databasesList = fixturesDatabaseList(),
             sourcesList = catalogItemsList,
             onDatabaseClick = {},
             onSourceClick = {},

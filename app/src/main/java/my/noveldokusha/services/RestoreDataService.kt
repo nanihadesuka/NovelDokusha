@@ -28,11 +28,11 @@ import my.noveldokusha.scraper.Scraper
 import my.noveldokusha.tooling.local_database.AppDatabase
 import my.noveldokusha.core.Toasty
 import my.noveldokusha.core.utils.Extra_Uri
-import my.noveldokusha.core.utils.NotificationsCenter
+import my.noveldoksuha.coreui.states.NotificationsCenter
 import my.noveldokusha.core.utils.isServiceRunning
-import my.noveldokusha.core.utils.removeProgressBar
-import my.noveldokusha.core.utils.text
-import my.noveldokusha.core.utils.title
+import my.noveldoksuha.coreui.states.removeProgressBar
+import my.noveldoksuha.coreui.states.text
+import my.noveldoksuha.coreui.states.title
 import okhttp3.internal.closeQuietly
 import timber.log.Timber
 import java.io.File

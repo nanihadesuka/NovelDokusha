@@ -11,13 +11,14 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import my.noveldoksuha.coreui.BaseViewModel
 import my.noveldoksuha.data.AppRepository
-import my.noveldokusha.core.AppPreferences
 import my.noveldokusha.R
-import my.noveldokusha.data.LibraryCategory
-import my.noveldokusha.core.BaseViewModel
 import my.noveldokusha.core.Toasty
+import my.noveldokusha.core.appPreferences.AppPreferences
+import my.noveldokusha.core.appPreferences.TernaryState
 import my.noveldokusha.core.utils.toState
+import my.noveldokusha.data.LibraryCategory
 import my.noveldokusha.workers.LibraryUpdatesWorker
 import javax.inject.Inject
 
@@ -37,15 +38,15 @@ class LibraryPageViewModel @Inject constructor(
         .map { it.filter { book -> book.book.completed == isShowCompleted } }
         .combine(preferences.LIBRARY_FILTER_READ.flow()) { list, filterRead ->
             when (filterRead) {
-                AppPreferences.TERNARY_STATE.active -> list.filter { it.chaptersCount == it.chaptersReadCount }
-                AppPreferences.TERNARY_STATE.inverse -> list.filter { it.chaptersCount != it.chaptersReadCount }
-                AppPreferences.TERNARY_STATE.inactive -> list
+                TernaryState.active -> list.filter { it.chaptersCount == it.chaptersReadCount }
+                TernaryState.inverse -> list.filter { it.chaptersCount != it.chaptersReadCount }
+                TernaryState.inactive -> list
             }
         }.combine(preferences.LIBRARY_SORT_LAST_READ.flow()) { list, sortRead ->
             when (sortRead) {
-                AppPreferences.TERNARY_STATE.active -> list.sortedByDescending { it.book.lastReadEpochTimeMilli }
-                AppPreferences.TERNARY_STATE.inverse -> list.sortedBy { it.book.lastReadEpochTimeMilli }
-                AppPreferences.TERNARY_STATE.inactive -> list
+                TernaryState.active -> list.sortedByDescending { it.book.lastReadEpochTimeMilli }
+                TernaryState.inverse -> list.sortedBy { it.book.lastReadEpochTimeMilli }
+                TernaryState.inactive -> list
             }
         }
         .toState(viewModelScope, listOf())

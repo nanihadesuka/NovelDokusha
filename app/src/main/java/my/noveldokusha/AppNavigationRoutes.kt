@@ -5,10 +5,10 @@ import android.content.Intent
 import my.noveldokusha.features.chapterslist.ChaptersActivity
 import my.noveldokusha.features.databaseSearch.DatabaseSearchActivity
 import my.noveldokusha.features.databaseSearch.DatabaseSearchExtras
-import my.noveldokusha.features.globalSourceSearch.GlobalSourceSearchActivity
 import my.noveldokusha.features.main.MainActivity
 import my.noveldokusha.features.reader.ReaderActivity
 import my.noveldokusha.features.webView.WebViewActivity
+import my.noveldokusha.globalsourcesearch.GlobalSourceSearchActivity
 import my.noveldokusha.navigation.NavigationRoutes
 import my.noveldokusha.tooling.local_database.BookMetadata
 import javax.inject.Inject
@@ -55,8 +55,7 @@ class AppNavigationRoutes @Inject constructor() : NavigationRoutes {
         context: Context,
         text: String,
     ): Intent {
-        return GlobalSourceSearchActivity
-            .IntentData(context, text)
+        return GlobalSourceSearchActivity.IntentData(context, text)
     }
 
     override fun webView(context: Context, url: String): Intent {

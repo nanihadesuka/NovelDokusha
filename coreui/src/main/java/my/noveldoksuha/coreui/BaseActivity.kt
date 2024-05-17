@@ -1,4 +1,4 @@
-package my.noveldokusha.core
+package my.noveldoksuha.coreui
 
 import android.content.res.Configuration
 import android.os.Bundle
@@ -6,8 +6,11 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.asLiveData
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.drop
+import my.noveldoksuha.coreui.mappers.toTheme
 import my.noveldoksuha.coreui.theme.ThemeProvider
 import my.noveldoksuha.coreui.theme.Themes
+import my.noveldokusha.core.appPreferences.AppPreferences
+import my.noveldokusha.core.Toasty
 import javax.inject.Inject
 
 @AndroidEntryPoint

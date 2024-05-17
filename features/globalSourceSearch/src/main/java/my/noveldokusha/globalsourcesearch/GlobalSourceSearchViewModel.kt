@@ -1,4 +1,4 @@
-package my.noveldokusha.features.globalSourceSearch
+package my.noveldokusha.globalsourcesearch
 
 import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.SavedStateHandle
@@ -8,21 +8,21 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.launch
+import my.noveldoksuha.coreui.BaseViewModel
+import my.noveldoksuha.coreui.states.PagedListIteratorState
 import my.noveldoksuha.data.CatalogItem
 import my.noveldoksuha.data.ScraperRepository
-import my.noveldokusha.core.AppPreferences
-import my.noveldokusha.core.BaseViewModel
+import my.noveldokusha.core.appPreferences.AppPreferences
 import my.noveldokusha.core.utils.StateExtra_String
 import my.noveldokusha.core.utils.asMutableStateOf
-import my.noveldokusha.network.PagedListIteratorState
 import javax.inject.Inject
 
-interface GlobalSourceSearchStateBundle {
+internal interface GlobalSourceSearchStateBundle {
     val initialInput: String
 }
 
 @HiltViewModel
-class GlobalSourceSearchViewModel @Inject constructor(
+internal class GlobalSourceSearchViewModel @Inject constructor(
     state: SavedStateHandle,
     val appPreferences: AppPreferences,
     private val scraperRepository: ScraperRepository,
@@ -61,15 +61,14 @@ class GlobalSourceSearchViewModel @Inject constructor(
 
 }
 
-data class SourceResults(
+internal data class SourceResults(
     val source: CatalogItem,
     val searchInput: String,
     val coroutineScope: CoroutineScope
 ) {
-    val fetchIterator =
-        PagedListIteratorState(coroutineScope) {
-            source.catalog.getCatalogSearch(it, searchInput)
-        }
+    val fetchIterator = PagedListIteratorState(coroutineScope) {
+        source.catalog.getCatalogSearch(it, searchInput)
+    }
 
     init {
         fetchIterator.fetchNext()

@@ -20,11 +20,11 @@ import my.noveldokusha.core.AppFileResolver
 import my.noveldokusha.core.asSequence
 import my.noveldokusha.core.tryAsResponse
 import my.noveldokusha.core.utils.Extra_Uri
-import my.noveldokusha.core.utils.NotificationsCenter
+import my.noveldoksuha.coreui.states.NotificationsCenter
 import my.noveldokusha.core.utils.isServiceRunning
-import my.noveldokusha.core.utils.removeProgressBar
-import my.noveldokusha.core.utils.text
-import my.noveldokusha.core.utils.title
+import my.noveldoksuha.coreui.states.removeProgressBar
+import my.noveldoksuha.coreui.states.text
+import my.noveldoksuha.coreui.states.title
 import timber.log.Timber
 import javax.inject.Inject
 

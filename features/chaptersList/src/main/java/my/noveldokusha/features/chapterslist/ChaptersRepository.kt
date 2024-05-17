@@ -8,7 +8,8 @@ import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import my.noveldoksuha.data.AppRepository
 import my.noveldoksuha.data.DownloaderRepository
-import my.noveldokusha.core.AppPreferences
+import my.noveldokusha.core.appPreferences.AppPreferences
+import my.noveldokusha.core.appPreferences.TernaryState
 import my.noveldokusha.tooling.local_database.tables.Book
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -41,9 +42,9 @@ internal class ChaptersRepository @Inject constructor(
         // Sort the chapters given the order preference
         .combine(appPreferences.CHAPTERS_SORT_ASCENDING.flow()) { chapters, sorted ->
             when (sorted) {
-                AppPreferences.TERNARY_STATE.active -> chapters.sortedBy { it.chapter.position }
-                AppPreferences.TERNARY_STATE.inverse -> chapters.sortedByDescending { it.chapter.position }
-                AppPreferences.TERNARY_STATE.inactive -> chapters
+                TernaryState.active -> chapters.sortedBy { it.chapter.position }
+                TernaryState.inverse -> chapters.sortedByDescending { it.chapter.position }
+                TernaryState.inactive -> chapters
             }
         }
         .flowOn(Dispatchers.Default)

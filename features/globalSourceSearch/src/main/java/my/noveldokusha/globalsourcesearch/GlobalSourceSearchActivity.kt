@@ -1,4 +1,4 @@
-package my.noveldokusha.features.globalSourceSearch
+package my.noveldokusha.globalsourcesearch
 
 import android.content.Context
 import android.content.Intent
@@ -6,10 +6,11 @@ import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import dagger.hilt.android.AndroidEntryPoint
+import my.noveldoksuha.coreui.BaseActivity
 import my.noveldoksuha.coreui.theme.Theme
-import my.noveldokusha.core.BaseActivity
 import my.noveldokusha.core.utils.Extra_String
-import my.noveldokusha.ui.goToBookChapters
+import my.noveldokusha.navigation.NavigationRoutes
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class GlobalSourceSearchActivity : BaseActivity() {
@@ -25,6 +26,9 @@ class GlobalSourceSearchActivity : BaseActivity() {
         }
     }
 
+    @Inject
+    internal lateinit var navigationRoutes: NavigationRoutes
+
     private val viewModel by viewModels<GlobalSourceSearchViewModel>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -35,7 +39,7 @@ class GlobalSourceSearchActivity : BaseActivity() {
                 GlobalSourceSearchScreen(
                     searchInput = viewModel.searchInput.value,
                     listSources = viewModel.sourcesResults,
-                    onBookClick = ::goToBookChapters,
+                    onBookClick = { navigationRoutes.chapters(this, it) },
                     onPressBack = ::onBackPressed,
                     onSearchInputChange = viewModel.searchInput::value::set,
                     onSearchInputSubmit = viewModel::search,

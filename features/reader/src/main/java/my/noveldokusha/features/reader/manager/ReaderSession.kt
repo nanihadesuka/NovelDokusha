@@ -17,7 +17,7 @@ import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import my.noveldoksuha.data.AppRepository
-import my.noveldokusha.core.AppPreferences
+import my.noveldokusha.core.appPreferences.AppPreferences
 import my.noveldokusha.features.reader.ReaderRepository
 import my.noveldokusha.features.reader.domain.ChapterLoaded
 import my.noveldokusha.features.reader.domain.ChapterState

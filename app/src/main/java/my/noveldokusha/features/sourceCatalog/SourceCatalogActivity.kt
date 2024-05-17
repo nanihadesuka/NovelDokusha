@@ -10,7 +10,7 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.platform.LocalContext
 import dagger.hilt.android.AndroidEntryPoint
 import my.noveldoksuha.coreui.theme.Theme
-import my.noveldokusha.core.BaseActivity
+import my.noveldoksuha.coreui.BaseActivity
 import my.noveldokusha.core.utils.Extra_String
 import my.noveldokusha.ui.goToBookChapters
 import my.noveldokusha.ui.goToWebViewWithUrl

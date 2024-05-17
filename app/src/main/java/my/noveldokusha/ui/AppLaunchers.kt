@@ -7,10 +7,10 @@ import my.noveldokusha.features.chapterslist.ChaptersActivity
 import my.noveldokusha.features.databaseBookInfo.DatabaseBookInfoActivity
 import my.noveldokusha.features.databaseSearch.DatabaseSearchActivity
 import my.noveldokusha.features.databaseSearch.DatabaseSearchExtras
-import my.noveldokusha.features.globalSourceSearch.GlobalSourceSearchActivity
 import my.noveldokusha.features.reader.ReaderActivity
 import my.noveldokusha.features.sourceCatalog.SourceCatalogActivity
 import my.noveldokusha.features.webView.WebViewActivity
+import my.noveldokusha.globalsourcesearch.GlobalSourceSearchActivity
 import my.noveldokusha.mappers.mapToBookMetadata
 import my.noveldokusha.scraper.SourceInterface
 import my.noveldokusha.scraper.domain.BookResult

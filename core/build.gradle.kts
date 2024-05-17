@@ -9,7 +9,6 @@ android {
 
 dependencies {
     implementation(projects.strings)
-    implementation(projects.coreui)
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.jsoup)
     implementation(libs.androidx.lifecycle.livedata.ktx)

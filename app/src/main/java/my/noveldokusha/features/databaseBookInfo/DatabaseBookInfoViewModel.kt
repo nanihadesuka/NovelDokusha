@@ -8,7 +8,7 @@ import kotlinx.coroutines.launch
 import my.noveldokusha.tooling.local_database.BookMetadata
 import my.noveldokusha.scraper.DatabaseInterface
 import my.noveldokusha.scraper.Scraper
-import my.noveldokusha.core.BaseViewModel
+import my.noveldoksuha.coreui.BaseViewModel
 import my.noveldokusha.core.utils.StateExtra_String
 import timber.log.Timber
 import javax.inject.Inject

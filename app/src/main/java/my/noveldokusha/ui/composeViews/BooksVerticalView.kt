@@ -23,21 +23,22 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import my.noveldoksuha.coreui.components.BookImageButtonView
 import my.noveldoksuha.coreui.components.ErrorView
-import my.noveldokusha.core.AppPreferences
 import my.noveldokusha.R
-import my.noveldokusha.composableActions.ListGridLoadWatcher
+import my.noveldoksuha.coreui.composableActions.ListGridLoadWatcher
+import my.noveldoksuha.coreui.states.IteratorState
 import my.noveldokusha.core.rememberResolvedBookImagePath
 import my.noveldokusha.tooling.local_database.BookMetadata
 import my.noveldokusha.ui.bounceOnPressed
 import my.noveldoksuha.coreui.theme.ColorAccent
+import my.noveldokusha.core.appPreferences.ListLayoutMode
 
 @Composable
 fun BooksVerticalView(
     list: List<BookMetadata>,
     state: LazyGridState,
     error: String?,
-    loadState: my.noveldokusha.network.IteratorState,
-    layoutMode: AppPreferences.LIST_LAYOUT_MODE,
+    loadState: IteratorState,
+    layoutMode: ListLayoutMode,
     onLoadNext: () -> Unit,
     onBookClicked: (book: BookMetadata) -> Unit,
     onBookLongClicked: (bookItem: BookMetadata) -> Unit,
@@ -50,8 +51,8 @@ fun BooksVerticalView(
     val columns by remember(layoutMode, cells) {
         derivedStateOf {
             when (layoutMode) {
-                AppPreferences.LIST_LAYOUT_MODE.verticalList -> GridCells.Fixed(1)
-                AppPreferences.LIST_LAYOUT_MODE.verticalGrid -> cells
+                ListLayoutMode.verticalList -> GridCells.Fixed(1)
+                ListLayoutMode.verticalGrid -> cells
             }
         }
     }
@@ -73,7 +74,7 @@ fun BooksVerticalView(
         items(list) {
             val interactionSource = remember { MutableInteractionSource() }
             when (layoutMode) {
-                AppPreferences.LIST_LAYOUT_MODE.verticalList -> MyButton(
+                ListLayoutMode.verticalList -> MyButton(
                     text = it.title,
                     onClick = { onBookClicked(it) },
                     onLongClick = { onBookLongClicked(it) },
@@ -82,7 +83,7 @@ fun BooksVerticalView(
                         .fillMaxWidth()
                         .bounceOnPressed(interactionSource)
                 )
-                AppPreferences.LIST_LAYOUT_MODE.verticalGrid -> BookImageButtonView(
+                ListLayoutMode.verticalGrid -> BookImageButtonView(
                     title = it.title,
                     coverImageModel = rememberResolvedBookImagePath(
                         bookUrl = it.url,
@@ -104,10 +105,10 @@ fun BooksVerticalView(
                     .height(160.dp),
             ) {
                 when (loadState) {
-                    my.noveldokusha.network.IteratorState.LOADING -> CircularProgressIndicator(
+                    IteratorState.LOADING -> CircularProgressIndicator(
                         color = ColorAccent
                     )
-                    my.noveldokusha.network.IteratorState.CONSUMED -> Text(
+                    IteratorState.CONSUMED -> Text(
                         text = when {
                             list.isEmpty() -> stringResource(R.string.no_results_found)
                             else -> stringResource(R.string.no_more_results)

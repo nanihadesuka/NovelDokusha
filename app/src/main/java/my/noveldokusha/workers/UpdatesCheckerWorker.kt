@@ -18,9 +18,9 @@ import dagger.assisted.AssistedInject
 import my.noveldoksuha.data.AppRemoteRepository
 import my.noveldokusha.R
 import my.noveldokusha.core.Response
-import my.noveldokusha.core.utils.NotificationsCenter
-import my.noveldokusha.core.utils.text
-import my.noveldokusha.core.utils.title
+import my.noveldoksuha.coreui.states.NotificationsCenter
+import my.noveldoksuha.coreui.states.text
+import my.noveldoksuha.coreui.states.title
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
 

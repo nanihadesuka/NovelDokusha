@@ -19,8 +19,6 @@ import androidx.compose.ui.unit.dp
 import my.noveldoksuha.coreui.components.TernaryStateToggle
 import my.noveldoksuha.coreui.theme.ColorAccent
 import my.noveldokusha.chapterslist.R
-import my.noveldokusha.core.toTERNARY_STATE
-import my.noveldokusha.core.toTernaryState
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -43,8 +41,8 @@ internal fun ChaptersBottomSheet(
             )
             TernaryStateToggle(
                 text = stringResource(R.string.by_chapter_name),
-                state = state.settingChapterSort.value.toTernaryState,
-                onStateChange = { state.settingChapterSort.value = it.toTERNARY_STATE.next() },
+                state = state.settingChapterSort.value,
+                onStateChange = { state.settingChapterSort.value = it.next() },
                 modifier = Modifier.fillMaxWidth(),
                 activeIcon = { Icon(imageVector = Icons.Filled.ArrowUpward, null) },
                 inverseIcon = { Icon(imageVector = Icons.Filled.ArrowDownward, null) },

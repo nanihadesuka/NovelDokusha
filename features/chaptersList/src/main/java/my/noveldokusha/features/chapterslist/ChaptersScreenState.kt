@@ -5,7 +5,7 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.runtime.snapshots.SnapshotStateMap
-import my.noveldokusha.core.AppPreferences
+import my.noveldokusha.core.appPreferences.TernaryState
 
 internal data class ChaptersScreenState(
     val book: State<BookState>,
@@ -14,7 +14,7 @@ internal data class ChaptersScreenState(
     val chapters: SnapshotStateList<my.noveldokusha.tooling.local_database.ChapterWithContext>,
     val isRefreshing: MutableState<Boolean>,
     val sourceCatalogNameStrRes: State<Int?>,
-    val settingChapterSort: MutableState<AppPreferences.TERNARY_STATE>,
+    val settingChapterSort: MutableState<TernaryState>,
     val isLocalSource: State<Boolean>,
     val isRefreshable: State<Boolean>,
 ) {

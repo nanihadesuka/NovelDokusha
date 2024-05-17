@@ -18,12 +18,12 @@ import my.noveldoksuha.data.AppRepository
 import my.noveldokusha.R
 import my.noveldokusha.core.AppCoroutineScope
 import my.noveldokusha.core.AppFileResolver
-import my.noveldokusha.core.AppPreferences
-import my.noveldokusha.core.BaseViewModel
+import my.noveldokusha.core.appPreferences.AppPreferences
+import my.noveldoksuha.coreui.BaseViewModel
 import my.noveldoksuha.coreui.theme.Themes
 import my.noveldokusha.core.Toasty
-import my.noveldokusha.core.toPreferenceTheme
-import my.noveldokusha.core.toTheme
+import my.noveldoksuha.coreui.mappers.toPreferenceTheme
+import my.noveldoksuha.coreui.mappers.toTheme
 import my.noveldokusha.core.utils.asMutableStateOf
 import my.noveldokusha.text_translator.domain.TranslationManager
 import java.io.File

@@ -1,4 +1,4 @@
-package my.noveldokusha.core.utils
+package my.noveldoksuha.coreui.states
 
 import android.annotation.SuppressLint
 import android.app.NotificationChannel
@@ -7,7 +7,7 @@ import android.content.Context
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import dagger.hilt.android.qualifiers.ApplicationContext
-import my.noveldokusha.core.R
+import my.noveldoksuha.coreui.R
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.reflect.KProperty

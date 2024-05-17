@@ -25,8 +25,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import my.noveldoksuha.coreui.theme.InternalTheme
-
-enum class TernaryState { Active, Inverse, Inactive }
+import my.noveldokusha.core.appPreferences.TernaryState
 
 @Composable
 fun TernaryStateToggle(
@@ -53,9 +52,9 @@ fun TernaryStateToggle(
     ) {
         AnimatedContent(targetState = updatedState, label = "") {
             when (it) {
-                TernaryState.Active -> activeIcon()
-                TernaryState.Inverse -> inverseIcon()
-                TernaryState.Inactive -> inactiveIcon()
+                TernaryState.active -> activeIcon()
+                TernaryState.inverse -> inverseIcon()
+                TernaryState.inactive -> inactiveIcon()
             }
         }
         Text(
@@ -86,9 +85,9 @@ private fun PreviewView() {
 
     InternalTheme {
         Column {
-            draw(text = "Up", state = TernaryState.Active)
-            draw(text = "Down", state = TernaryState.Inverse)
-            draw(text = "Inactive", state = TernaryState.Inactive)
+            draw(text = "Up", state = TernaryState.active)
+            draw(text = "Down", state = TernaryState.inverse)
+            draw(text = "Inactive", state = TernaryState.inactive)
         }
     }
 }

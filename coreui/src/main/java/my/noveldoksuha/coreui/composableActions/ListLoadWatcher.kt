@@ -1,4 +1,4 @@
-package my.noveldokusha.composableActions
+package my.noveldoksuha.coreui.composableActions
 
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.grid.LazyGridState
@@ -12,12 +12,13 @@ import androidx.compose.runtime.snapshotFlow
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.filter
+import my.noveldoksuha.coreui.states.IteratorState
 
 @OptIn(FlowPreview::class)
 @Composable
 fun ListLoadWatcher(
     listState: LazyListState,
-    loadState: my.noveldokusha.network.IteratorState,
+    loadState: IteratorState,
     onLoadNext: () -> Unit,
     debounceMilliseconds: Long = 100L
 ) {
@@ -27,7 +28,7 @@ fun ListLoadWatcher(
             val lastVisibleIndex =
                 (listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: 0) + 1
             val isLoadZone = lastVisibleIndex > (listState.layoutInfo.totalItemsCount - 3)
-            val isIDLE = loadStateUpdated == my.noveldokusha.network.IteratorState.IDLE
+            val isIDLE = loadStateUpdated == IteratorState.IDLE
             val state = isLoadZone && isIDLE
             state
         }
@@ -45,7 +46,7 @@ fun ListLoadWatcher(
 @Composable
 fun ListGridLoadWatcher(
     listState: LazyGridState,
-    loadState: my.noveldokusha.network.IteratorState,
+    loadState: IteratorState,
     onLoadNext: () -> Unit,
     debounceMilliseconds: Long = 100L
 ) {
@@ -55,7 +56,7 @@ fun ListGridLoadWatcher(
             val lastVisibleIndex =
                 (listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: 0) + 1
             val isLoadZone = lastVisibleIndex > (listState.layoutInfo.totalItemsCount - 3)
-            val isIDLE = loadStateUpdated == my.noveldokusha.network.IteratorState.IDLE
+            val isIDLE = loadStateUpdated == IteratorState.IDLE
             val state = isLoadZone && isIDLE
             state
         }

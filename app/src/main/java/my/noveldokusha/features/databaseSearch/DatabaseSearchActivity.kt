@@ -11,7 +11,7 @@ import kotlinx.parcelize.Parcelize
 import my.noveldoksuha.coreui.theme.Theme
 import my.noveldoksuha.coreui.theme.colorAttrRes
 import my.noveldokusha.R
-import my.noveldokusha.core.BaseActivity
+import my.noveldoksuha.coreui.BaseActivity
 import my.noveldokusha.core.utils.Extra_Parcelable
 import my.noveldokusha.tooling.local_database.BookMetadata
 import my.noveldokusha.ui.goToDatabaseBookInfo

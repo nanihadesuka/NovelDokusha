@@ -37,5 +37,6 @@ include(":tooling:textToSpeech")
 
 include(":features:reader")
 include(":features:chaptersList")
+include(":features:globalSourceSearch")
 
 include(":navigation")

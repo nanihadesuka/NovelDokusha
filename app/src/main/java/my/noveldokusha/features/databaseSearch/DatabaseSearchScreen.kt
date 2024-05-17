@@ -32,18 +32,19 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
-import my.noveldokusha.core.AppPreferences
+import my.noveldoksuha.coreui.states.PagedListIteratorState
 import my.noveldokusha.R
 import my.noveldokusha.core.PagedList
 import my.noveldokusha.core.Response
 import my.noveldokusha.tooling.local_database.BookMetadata
 import my.noveldokusha.ui.composeViews.BooksVerticalView
 import my.noveldokusha.ui.composeViews.CollapsibleDivider
-import my.noveldokusha.ui.composeViews.TopAppBarSearch
+import my.noveldoksuha.coreui.components.TopAppBarSearch
 import my.noveldoksuha.coreui.theme.ColorNotice
 import my.noveldoksuha.coreui.theme.Grey25
 import my.noveldoksuha.coreui.theme.InternalTheme
 import my.noveldoksuha.coreui.theme.PreviewThemes
+import my.noveldokusha.core.appPreferences.ListLayoutMode
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -193,7 +194,7 @@ private fun PreviewView() {
     }
     val scope = rememberCoroutineScope()
     val fetchIterator =
-        my.noveldokusha.network.PagedListIteratorState(list = list, coroutineScope = scope) {
+        PagedListIteratorState(list = list, coroutineScope = scope) {
             Response.Success(PagedList(listOf(), 0, true))
         }
     val state = remember {
@@ -203,7 +204,7 @@ private fun PreviewView() {
             genresList = genresList,
             searchTextInput = mutableStateOf(""),
             fetchIterator = fetchIterator,
-            listLayoutMode = mutableStateOf(AppPreferences.LIST_LAYOUT_MODE.verticalGrid),
+            listLayoutMode = mutableStateOf(ListLayoutMode.verticalGrid),
         )
     }
 

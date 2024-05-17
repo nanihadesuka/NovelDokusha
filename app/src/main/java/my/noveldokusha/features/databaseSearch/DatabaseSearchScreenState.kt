@@ -3,7 +3,8 @@ package my.noveldokusha.features.databaseSearch
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.snapshots.SnapshotStateList
-import my.noveldokusha.core.AppPreferences
+import my.noveldoksuha.coreui.states.PagedListIteratorState
+import my.noveldokusha.core.appPreferences.ListLayoutMode
 import my.noveldokusha.tooling.local_database.BookMetadata
 
 data class DatabaseSearchScreenState(
@@ -11,6 +12,6 @@ data class DatabaseSearchScreenState(
     val searchMode: MutableState<SearchMode>,
     val searchTextInput: MutableState<String>,
     val genresList: SnapshotStateList<GenreItem>,
-    val listLayoutMode: MutableState<AppPreferences.LIST_LAYOUT_MODE>,
-    val fetchIterator: my.noveldokusha.network.PagedListIteratorState<BookMetadata>,
+    val listLayoutMode: MutableState<ListLayoutMode>,
+    val fetchIterator: PagedListIteratorState<BookMetadata>,
 )

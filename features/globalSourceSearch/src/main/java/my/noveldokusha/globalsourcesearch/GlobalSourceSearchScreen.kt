@@ -1,4 +1,4 @@
-package my.noveldokusha.features.globalSourceSearch
+package my.noveldokusha.globalsourcesearch
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -15,16 +15,15 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import my.noveldokusha.R
-import my.noveldokusha.tooling.local_database.BookMetadata
-import my.noveldokusha.ui.composeViews.TopAppBarSearch
+import my.noveldoksuha.coreui.components.TopAppBarSearch
 import my.noveldoksuha.coreui.theme.ColorAccent
 import my.noveldoksuha.coreui.theme.InternalTheme
+import my.noveldokusha.tooling.local_database.BookMetadata
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun GlobalSourceSearchScreen(
+internal fun GlobalSourceSearchScreen(
     searchInput: String,
     listSources: List<SourceResults>,
     onSearchInputChange: (String) -> Unit,

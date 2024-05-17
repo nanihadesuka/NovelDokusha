@@ -1,6 +1,6 @@
 @file:Suppress("PropertyName")
 
-package my.noveldokusha.core
+package my.noveldokusha.core.appPreferences
 
 import android.content.Context
 import android.content.SharedPreferences
@@ -17,22 +17,18 @@ import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onSubscription
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import my.noveldoksuha.coreui.components.TernaryState
+import my.noveldokusha.core.LanguageCode
+import my.noveldokusha.core.SharedPreference_Boolean
+import my.noveldokusha.core.SharedPreference_Enum
+import my.noveldokusha.core.SharedPreference_Float
+import my.noveldokusha.core.SharedPreference_Int
+import my.noveldokusha.core.SharedPreference_Serializable
+import my.noveldokusha.core.SharedPreference_String
+import my.noveldokusha.core.SharedPreference_StringSet
 import javax.inject.Inject
 import javax.inject.Singleton
-
-@Serializable
-data class VoicePredefineState(
-    val savedName: String,
-    val voiceId: String,
-    val pitch: Float,
-    val speed: Float
-)
-
-enum class PreferenceThemes { Light, Dark, Black }
 
 @Singleton
 class AppPreferences @Inject constructor(
@@ -90,11 +86,11 @@ class AppPreferences @Inject constructor(
         override var value by SharedPreference_Boolean(name, preferences, false)
     }
 
-    val CHAPTERS_SORT_ASCENDING = object : Preference<TERNARY_STATE>("CHAPTERS_SORT_ASCENDING") {
+    val CHAPTERS_SORT_ASCENDING = object : Preference<TernaryState>("CHAPTERS_SORT_ASCENDING") {
         override var value by SharedPreference_Enum(
             name,
             preferences,
-            TERNARY_STATE.active
+            TernaryState.active
         ) { enumValueOf(it) }
     }
     val SOURCES_LANGUAGES_ISO639_1 = object : Preference<Set<String>>("SOURCES_LANGUAGES") {
@@ -107,25 +103,25 @@ class AppPreferences @Inject constructor(
     val FINDER_SOURCES_PINNED = object : Preference<Set<String>>("FINDER_SOURCES_PINNED") {
         override var value by SharedPreference_StringSet(name, preferences, setOf())
     }
-    val LIBRARY_FILTER_READ = object : Preference<TERNARY_STATE>("LIBRARY_FILTER_READ") {
+    val LIBRARY_FILTER_READ = object : Preference<TernaryState>("LIBRARY_FILTER_READ") {
         override var value by SharedPreference_Enum(
             name,
             preferences,
-            TERNARY_STATE.inactive
+            TernaryState.inactive
         ) { enumValueOf(it) }
     }
-    val LIBRARY_SORT_LAST_READ = object : Preference<TERNARY_STATE>("LIBRARY_SORT_LAST_READ") {
+    val LIBRARY_SORT_LAST_READ = object : Preference<TernaryState>("LIBRARY_SORT_LAST_READ") {
         override var value by SharedPreference_Enum(
             name,
             preferences,
-            TERNARY_STATE.inverse
+            TernaryState.inverse
         ) { enumValueOf(it) }
     }
-    val BOOKS_LIST_LAYOUT_MODE = object : Preference<LIST_LAYOUT_MODE>("BOOKS_LIST_LAYOUT_MODE") {
+    val BOOKS_LIST_LAYOUT_MODE = object : Preference<ListLayoutMode>("BOOKS_LIST_LAYOUT_MODE") {
         override var value by SharedPreference_Enum(
             name,
             preferences,
-            LIST_LAYOUT_MODE.verticalGrid
+            ListLayoutMode.verticalGrid
         ) { enumValueOf(it) }
     }
     val GLOBAL_TRANSLATION_ENABLED = object : Preference<Boolean>("GLOBAL_TRANSLATION_ENABLED") {
@@ -163,27 +159,13 @@ class AppPreferences @Inject constructor(
         }
 
     @Deprecated("Removed", level = DeprecationLevel.HIDDEN)
-    val LIBRARY_SORT_READ = object : Preference<TERNARY_STATE>("LIBRARY_SORT_READ") {
+    val LIBRARY_SORT_READ = object : Preference<TernaryState>("LIBRARY_SORT_READ") {
         override var value by SharedPreference_Enum(
             name,
             preferences,
-            TERNARY_STATE.active
+            TernaryState.active
         ) { enumValueOf(it) }
     }
-
-    enum class TERNARY_STATE {
-        active,
-        inverse,
-        inactive;
-
-        fun next() = when (this) {
-            active -> inverse
-            inverse -> inactive
-            inactive -> active
-        }
-    }
-
-    enum class LIST_LAYOUT_MODE { verticalList, verticalGrid }
 
     abstract inner class Preference<T>(val name: String) {
         abstract var value: T
@@ -198,7 +180,7 @@ class AppPreferences @Inject constructor(
      * had any change.
      * Notice: will always return an initial value.
      */
-    fun <T> toFlow(key: String, mapper: (String) -> T): Flow<T> {
+    private fun <T> toFlow(key: String, mapper: (String) -> T): Flow<T> {
         val flow = MutableStateFlow(mapper(key))
         val scope = CoroutineScope(Dispatchers.Default)
         val listener = SharedPreferences.OnSharedPreferenceChangeListener { _, vkey ->
@@ -220,7 +202,7 @@ class AppPreferences @Inject constructor(
      * This custom implementation has probably some details wrong
      * Use only OUTSIDE of composable scope (e.g. viewModel)
      */
-    fun <T> toState(
+    private fun <T> toState(
         scope: CoroutineScope,
         key: String,
         mapper: (String) -> T,
@@ -250,17 +232,3 @@ class AppPreferences @Inject constructor(
         override fun component2() = ::value::set
     }
 }
-
-val AppPreferences.TERNARY_STATE.toTernaryState
-    get() = when (this) {
-        AppPreferences.TERNARY_STATE.active -> TernaryState.Active
-        AppPreferences.TERNARY_STATE.inverse -> TernaryState.Inverse
-        AppPreferences.TERNARY_STATE.inactive -> TernaryState.Inactive
-    }
-
-val TernaryState.toTERNARY_STATE
-    get() = when (this) {
-        TernaryState.Active -> AppPreferences.TERNARY_STATE.active
-        TernaryState.Inverse -> AppPreferences.TERNARY_STATE.inverse
-        TernaryState.Inactive -> AppPreferences.TERNARY_STATE.inactive
-    }

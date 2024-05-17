@@ -12,6 +12,7 @@ android {
 
 dependencies {
     implementation(projects.strings)
+    implementation(projects.core)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
@@ -19,6 +20,7 @@ dependencies {
     implementation(libs.compose.landscapist.glide)
     implementation(libs.compose.coil)
     implementation(libs.compose.androidx.activity)
+    implementation(libs.androidx.lifecycle.livedata.ktx)
     implementation(libs.compose.material3.android)
     implementation(libs.compose.accompanist.systemuicontroller)
     implementation(libs.compose.androidx.material.icons.extended)

@@ -7,9 +7,9 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import my.noveldokusha.core.AppPreferences
-import my.noveldokusha.core.BaseViewModel
-import my.noveldokusha.core.toTheme
+import my.noveldokusha.core.appPreferences.AppPreferences
+import my.noveldoksuha.coreui.BaseViewModel
+import my.noveldoksuha.coreui.mappers.toTheme
 import my.noveldokusha.core.utils.StateExtra_Boolean
 import my.noveldokusha.core.utils.StateExtra_String
 import my.noveldokusha.features.reader.manager.ReaderManager

@@ -17,8 +17,8 @@ import my.noveldoksuha.data.DownloaderRepository
 import my.noveldokusha.chapterslist.R
 import my.noveldokusha.core.AppCoroutineScope
 import my.noveldokusha.core.AppFileResolver
-import my.noveldokusha.core.AppPreferences
-import my.noveldokusha.core.BaseViewModel
+import my.noveldokusha.core.appPreferences.AppPreferences
+import my.noveldoksuha.coreui.BaseViewModel
 import my.noveldokusha.core.Toasty
 import my.noveldokusha.core.isContentUri
 import my.noveldokusha.core.isLocalUri

@@ -1,4 +1,4 @@
-package my.noveldokusha.network
+package my.noveldoksuha.coreui.states
 
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue

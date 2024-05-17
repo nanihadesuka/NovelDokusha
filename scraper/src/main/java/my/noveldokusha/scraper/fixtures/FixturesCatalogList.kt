@@ -1,14 +1,14 @@
-package my.noveldokusha.ui.previewFixtures
+package my.noveldokusha.scraper.fixtures
 
-import my.noveldokusha.R
 import my.noveldokusha.core.LanguageCode
 import my.noveldokusha.core.PagedList
 import my.noveldokusha.core.Response
+import my.noveldokusha.scraper.R
 import my.noveldokusha.scraper.SourceInterface
 import my.noveldokusha.scraper.domain.BookResult
 import my.noveldokusha.scraper.domain.ChapterResult
 
-fun previewFixturesCatalogList(): List<SourceInterface.Catalog> = (0..7).map {
+fun fixturesCatalogList(): List<SourceInterface.Catalog> = (0..7).map {
     object : SourceInterface.Catalog {
         override val catalogUrl = "catalogUrl$it"
         override val language = LanguageCode.ENGLISH

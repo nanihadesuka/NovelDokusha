@@ -117,6 +117,7 @@ dependencies {
     implementation(projects.tooling.textToSpeech)
     implementation(projects.features.reader)
     implementation(projects.features.chaptersList)
+    implementation(projects.features.globalSourceSearch)
     implementation(projects.data)
     implementation(projects.core)
     implementation(projects.coreui)

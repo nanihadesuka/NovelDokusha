@@ -9,11 +9,9 @@ import android.view.View
 import androidx.activity.ComponentActivity
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.ui.state.ToggleableState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
-import my.noveldokusha.core.AppPreferences
 
 val View.inflater: LayoutInflater get() = LayoutInflater.from(context)
 

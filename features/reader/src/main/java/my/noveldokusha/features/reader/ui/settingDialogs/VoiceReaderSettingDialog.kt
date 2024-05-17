@@ -93,7 +93,7 @@ import my.noveldoksuha.coreui.theme.ColorNotice
 import my.noveldoksuha.coreui.theme.InternalTheme
 import my.noveldoksuha.coreui.theme.colorApp
 import my.noveldoksuha.coreui.theme.rememberMutableStateOf
-import my.noveldokusha.core.VoicePredefineState
+import my.noveldokusha.core.appPreferences.VoicePredefineState
 import my.noveldokusha.features.reader.features.TextToSpeechSettingData
 import my.noveldokusha.reader.R
 import my.noveldokusha.tooling.texttospeech.VoiceData

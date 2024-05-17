@@ -16,7 +16,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import my.noveldokusha.core.AppPreferences.LIST_LAYOUT_MODE
+import my.noveldokusha.core.appPreferences.ListLayoutMode
 import my.noveldokusha.R
 import my.noveldokusha.ui.composeViews.MyButton
 
@@ -24,8 +24,8 @@ import my.noveldokusha.ui.composeViews.MyButton
 fun SourceCatalogDropDown(
     expanded: Boolean,
     onDismiss: () -> Unit,
-    listLayoutMode: LIST_LAYOUT_MODE,
-    onListLayoutModeChange: (mode: LIST_LAYOUT_MODE) -> Unit
+    listLayoutMode: ListLayoutMode,
+    onListLayoutModeChange: (mode: ListLayoutMode) -> Unit
 ) {
     DropdownMenu(
         expanded = expanded,
@@ -42,8 +42,8 @@ fun SourceCatalogDropDown(
             OutlinedCard {
                 MyButton(
                     text = stringResource(id = R.string.list),
-                    onClick = { onListLayoutModeChange(LIST_LAYOUT_MODE.verticalList) },
-                    selected = listLayoutMode == LIST_LAYOUT_MODE.verticalList,
+                    onClick = { onListLayoutModeChange(ListLayoutMode.verticalList) },
+                    selected = listLayoutMode == ListLayoutMode.verticalList,
                     borderWidth = Dp.Unspecified,
                     textAlign = TextAlign.Center,
                     outerPadding = 0.dp,
@@ -52,8 +52,8 @@ fun SourceCatalogDropDown(
                 )
                 MyButton(
                     text = stringResource(id = R.string.grid),
-                    onClick = { onListLayoutModeChange(LIST_LAYOUT_MODE.verticalGrid) },
-                    selected = listLayoutMode == LIST_LAYOUT_MODE.verticalGrid,
+                    onClick = { onListLayoutModeChange(ListLayoutMode.verticalGrid) },
+                    selected = listLayoutMode == ListLayoutMode.verticalGrid,
                     borderWidth = Dp.Unspecified,
                     textAlign = TextAlign.Center,
                     outerPadding = 0.dp,

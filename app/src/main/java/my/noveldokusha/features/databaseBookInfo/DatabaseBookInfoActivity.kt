@@ -9,7 +9,7 @@ import androidx.core.view.WindowCompat
 import dagger.hilt.android.AndroidEntryPoint
 import my.noveldoksuha.coreui.composableActions.SetSystemBarTransparent
 import my.noveldoksuha.coreui.theme.Theme
-import my.noveldokusha.core.BaseActivity
+import my.noveldoksuha.coreui.BaseActivity
 import my.noveldokusha.core.utils.Extra_String
 import my.noveldokusha.ui.goToDatabaseBookInfo
 import my.noveldokusha.ui.goToDatabaseSearchGenres

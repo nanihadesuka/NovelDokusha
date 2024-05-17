@@ -1,12 +1,12 @@
-package my.noveldokusha.ui.previewFixtures
+package my.noveldokusha.scraper.fixtures
 
-import my.noveldokusha.R
 import my.noveldokusha.core.PagedList
 import my.noveldokusha.core.Response
 import my.noveldokusha.scraper.DatabaseInterface
+import my.noveldokusha.scraper.R
 import my.noveldokusha.scraper.domain.BookResult
 
-fun previewFixturesDatabaseList(): List<DatabaseInterface> = (0..2).map {
+fun fixturesDatabaseList(): List<DatabaseInterface> = (0..2).map {
     object : DatabaseInterface {
         override val id = "id$it"
         override val nameStrId = R.string.database_name_baka_updates

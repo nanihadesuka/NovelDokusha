@@ -1,6 +1,7 @@
-package my.noveldokusha.core
+package my.noveldoksuha.coreui.mappers
 
 import my.noveldoksuha.coreui.theme.Themes
+import my.noveldokusha.core.appPreferences.PreferenceThemes
 
 val PreferenceThemes.toTheme
     get() = when (this) {

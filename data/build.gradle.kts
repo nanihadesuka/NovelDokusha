@@ -9,7 +9,6 @@ android {
 
 dependencies {
     implementation(projects.core)
-    implementation(projects.core)
     implementation(projects.networking)
     implementation(projects.scraper)
     implementation(projects.tooling.localDatabase)

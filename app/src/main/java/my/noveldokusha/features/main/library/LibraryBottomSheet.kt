@@ -20,7 +20,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import my.noveldoksuha.coreui.components.TernaryStateToggle
 import my.noveldoksuha.coreui.theme.ColorAccent
 import my.noveldokusha.R
-import my.noveldokusha.core.toTernaryState
 import my.noveldokusha.core.utils.toToggleableState
 import my.noveldokusha.ui.composeViews.PosNegCheckbox
 
@@ -60,7 +59,7 @@ fun LibraryBottomSheet(
             )
             TernaryStateToggle(
                 text = stringResource(id = R.string.last_read),
-                state = model.readSort.toTernaryState,
+                state = model.readSort,
                 onStateChange = { model.readSortToggle() },
                 modifier = Modifier.fillMaxWidth(),
                 activeIcon = { Icon(imageVector = Icons.Filled.ArrowUpward, null) },

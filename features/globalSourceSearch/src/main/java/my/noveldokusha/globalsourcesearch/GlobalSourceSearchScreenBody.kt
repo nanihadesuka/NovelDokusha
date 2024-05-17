@@ -1,4 +1,4 @@
-package my.noveldokusha.features.globalSourceSearch
+package my.noveldokusha.globalsourcesearch
 
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -22,24 +22,23 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import my.noveldokusha.R
-import my.noveldokusha.composableActions.ListLoadWatcher
-import my.noveldokusha.core.rememberResolvedBookImagePath
-import my.noveldokusha.tooling.local_database.BookMetadata
-import my.noveldokusha.mappers.mapToBookMetadata
-import my.noveldokusha.network.IteratorState
-import my.noveldokusha.scraper.domain.BookResult
-import my.noveldokusha.ui.bounceOnPressed
 import my.noveldoksuha.coreui.components.BookImageButtonView
 import my.noveldoksuha.coreui.components.BookTitlePosition
-import my.noveldokusha.ui.previewFixtures.previewFixturesCatalogList
+import my.noveldoksuha.coreui.composableActions.ListLoadWatcher
+import my.noveldoksuha.coreui.modifiers.bounceOnPressed
+import my.noveldoksuha.coreui.states.IteratorState
 import my.noveldoksuha.coreui.theme.ColorAccent
 import my.noveldoksuha.coreui.theme.InternalTheme
 import my.noveldoksuha.coreui.theme.PreviewThemes
 import my.noveldoksuha.data.CatalogItem
+import my.noveldoksuha.mappers.mapToBookMetadata
+import my.noveldokusha.core.rememberResolvedBookImagePath
+import my.noveldokusha.scraper.domain.BookResult
+import my.noveldokusha.scraper.fixtures.fixturesCatalogList
+import my.noveldokusha.tooling.local_database.BookMetadata
 
 @Composable
-fun GlobalSourceSearchScreenBody(
+internal fun GlobalSourceSearchScreenBody(
     listSources: List<SourceResults>,
     contentPadding: PaddingValues,
     onBookClick: (book: BookMetadata) -> Unit
@@ -153,7 +152,7 @@ private fun SourceListView(
 private fun PreviewView() {
 
 
-    val list = previewFixturesCatalogList().mapIndexed { index, source ->
+    val list = fixturesCatalogList().mapIndexed { index, source ->
         val (catalog, books) = CatalogItem(
             catalog = source,
             pinned = false

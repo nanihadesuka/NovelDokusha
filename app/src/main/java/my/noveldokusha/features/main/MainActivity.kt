@@ -26,7 +26,7 @@ import androidx.core.content.IntentCompat
 import dagger.hilt.android.AndroidEntryPoint
 import my.noveldoksuha.coreui.theme.Theme
 import my.noveldokusha.R
-import my.noveldokusha.core.BaseActivity
+import my.noveldoksuha.coreui.BaseActivity
 import my.noveldokusha.features.main.finder.FinderScreen
 import my.noveldokusha.features.main.library.LibraryScreen
 import my.noveldokusha.features.main.settings.SettingsScreen

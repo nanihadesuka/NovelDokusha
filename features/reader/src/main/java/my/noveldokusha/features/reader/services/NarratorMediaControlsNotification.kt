@@ -25,9 +25,9 @@ import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.launch
-import my.noveldokusha.core.utils.NotificationsCenter
-import my.noveldokusha.core.utils.text
-import my.noveldokusha.core.utils.title
+import my.noveldoksuha.coreui.states.NotificationsCenter
+import my.noveldoksuha.coreui.states.text
+import my.noveldoksuha.coreui.states.title
 import my.noveldokusha.features.reader.ReaderActivity
 import my.noveldokusha.features.reader.domain.chapterReadPercentage
 import my.noveldokusha.features.reader.manager.ReaderManager

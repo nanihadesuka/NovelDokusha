@@ -57,7 +57,7 @@
 		<activity android:name=".features.chapterslist.ChaptersActivity" />
 		<activity android:name=".features.databaseSearch.DatabaseSearchActivity" />
 		<activity android:name=".features.databaseBookInfo.DatabaseBookInfoActivity" />
-		<activity android:name=".features.globalSourceSearch.GlobalSourceSearchActivity" />
+		<activity android:name=".globalsourcesearch.GlobalSourceSearchActivity" />
 		<activity android:name=".features.webView.WebViewActivity" />
 
 		<service

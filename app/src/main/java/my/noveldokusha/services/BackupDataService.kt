@@ -17,11 +17,11 @@ import my.noveldokusha.R
 import my.noveldokusha.core.tryAsResponse
 import my.noveldokusha.core.utils.Extra_Boolean
 import my.noveldokusha.core.utils.Extra_Uri
-import my.noveldokusha.core.utils.NotificationsCenter
+import my.noveldoksuha.coreui.states.NotificationsCenter
 import my.noveldokusha.core.utils.isServiceRunning
-import my.noveldokusha.core.utils.removeProgressBar
-import my.noveldokusha.core.utils.text
-import my.noveldokusha.core.utils.title
+import my.noveldoksuha.coreui.states.removeProgressBar
+import my.noveldoksuha.coreui.states.text
+import my.noveldoksuha.coreui.states.title
 import okhttp3.internal.closeQuietly
 import timber.log.Timber
 import java.util.zip.ZipEntry

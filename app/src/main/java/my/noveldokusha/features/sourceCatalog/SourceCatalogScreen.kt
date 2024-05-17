@@ -29,14 +29,14 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import my.noveldokusha.core.AppPreferences
 import my.noveldokusha.R
 import my.noveldokusha.tooling.local_database.BookMetadata
 import my.noveldoksuha.coreui.components.AnimatedTransition
 import my.noveldokusha.ui.composeViews.BooksVerticalView
 import my.noveldokusha.ui.composeViews.CollapsibleDivider
-import my.noveldokusha.ui.composeViews.ToolbarMode
-import my.noveldokusha.ui.composeViews.TopAppBarSearch
+import my.noveldoksuha.coreui.components.ToolbarMode
+import my.noveldoksuha.coreui.components.TopAppBarSearch
+import my.noveldokusha.core.appPreferences.ListLayoutMode
 import my.noveldokusha.core.utils.actionCopyToClipboard
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalAnimationApi::class)
@@ -46,7 +46,7 @@ fun SourceCatalogScreen(
     onSearchTextInputChange: (String) -> Unit,
     onSearchTextInputSubmit: (String) -> Unit,
     onSearchCatalogSubmit: () -> Unit,
-    onListLayoutModeChange: (AppPreferences.LIST_LAYOUT_MODE) -> Unit,
+    onListLayoutModeChange: (ListLayoutMode) -> Unit,
     onToolbarModeChange: (ToolbarMode) -> Unit,
     onOpenSourceWebPage: () -> Unit,
     onBookClicked: (BookMetadata) -> Unit,
