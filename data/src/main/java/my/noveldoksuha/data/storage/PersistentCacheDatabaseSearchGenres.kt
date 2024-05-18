@@ -25,14 +25,3 @@ class PersistentCacheDatabaseSearchGenresProvider @Inject constructor(
         )
     }
 }
-
-fun persistentCacheDatabaseSearchGenres(
-    database: DatabaseInterface,
-    appCacheDir: File,
-) = PersistentCacheDataLoader<List<SearchGenre>>(
-    cacheFile = File(appCacheDir, database.searchGenresCacheFileName),
-    adapterProvider = {
-        val listMyData = Types.newParameterizedType(List::class.java, SearchGenre::class.java)
-        it.adapter(listMyData)
-    }
-)
