@@ -16,6 +16,7 @@ import my.noveldokusha.scraper.sources.MTLNovel
 import my.noveldokusha.scraper.sources.MeioNovel
 import my.noveldokusha.scraper.sources.MoreNovel
 import my.noveldokusha.scraper.sources.NovelHall
+import my.noveldokusha.scraper.sources.Novelku
 import my.noveldokusha.scraper.sources.ReadLightNovel
 import my.noveldokusha.scraper.sources.ReadNovelFull
 import my.noveldokusha.scraper.sources.Reddit
@@ -23,6 +24,7 @@ import my.noveldokusha.scraper.sources.RoyalRoad
 import my.noveldokusha.scraper.sources.Saikai
 import my.noveldokusha.scraper.sources.SakuraNovel
 import my.noveldokusha.scraper.sources.Sousetsuka
+import my.noveldokusha.scraper.sources.WbNovel
 import my.noveldokusha.scraper.sources.Wuxia
 import my.noveldokusha.scraper.sources.WuxiaWorld
 import my.noveldokusha.scraper.sources._1stKissNovel
@@ -64,6 +66,8 @@ class Scraper @Inject constructor(
         SakuraNovel(networkClient),
         MeioNovel(networkClient),
         MoreNovel(networkClient),
+        Novelku(networkClient),
+        WbNovel(networkClient),
     )
 
     val sourcesCatalogsList = sourcesList.filterIsInstance<SourceInterface.Catalog>()
