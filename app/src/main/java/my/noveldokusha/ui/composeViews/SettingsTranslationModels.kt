@@ -38,10 +38,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import my.noveldokusha.R
-import my.noveldokusha.text_translator.domain.TranslationModelState
 import my.noveldoksuha.coreui.theme.ColorAccent
 import my.noveldoksuha.coreui.theme.textPadding
+import my.noveldokusha.R
+import my.noveldokusha.text_translator.domain.TranslationModelState
 
 @Composable
 fun SettingsTranslationModels(
@@ -81,7 +81,7 @@ fun SettingsTranslationModels(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SettingsTranslationModelsDialog(
+private fun SettingsTranslationModelsDialog(
     translationModelsStates: List<TranslationModelState>,
     onDownloadTranslationModel: (lang: String) -> Unit,
     onRemoveTranslationModel: (lang: String) -> Unit,

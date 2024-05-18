@@ -43,6 +43,8 @@ import androidx.compose.ui.zIndex
 import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.coroutines.launch
 import my.noveldoksuha.coreui.components.BookImageButtonView
+import my.noveldoksuha.coreui.components.CollapsibleDivider
+import my.noveldoksuha.coreui.modifiers.bounceOnPressed
 import my.noveldoksuha.coreui.theme.ColorAccent
 import my.noveldoksuha.coreui.theme.ImageBorderShape
 import my.noveldoksuha.coreui.theme.colorApp
@@ -50,8 +52,6 @@ import my.noveldokusha.R
 import my.noveldokusha.core.isLocalUri
 import my.noveldokusha.core.rememberResolvedBookImagePath
 import my.noveldokusha.data.LibraryCategory
-import my.noveldokusha.ui.bounceOnPressed
-import my.noveldoksuha.coreui.components.CollapsibleDivider
 
 @OptIn(
     ExperimentalMaterialApi::class, ExperimentalFoundationApi::class,
