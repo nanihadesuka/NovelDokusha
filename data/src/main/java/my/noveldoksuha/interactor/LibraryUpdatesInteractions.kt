@@ -1,4 +1,4 @@
-package my.noveldokusha.interactor
+package my.noveldoksuha.interactor
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
@@ -9,7 +9,6 @@ import kotlinx.coroutines.withContext
 import my.noveldoksuha.data.AppRepository
 import my.noveldoksuha.data.DownloaderRepository
 import my.noveldokusha.core.isLocalUri
-import my.noveldokusha.scraper.Scraper
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -17,7 +16,6 @@ import javax.inject.Singleton
 @Singleton
 class LibraryUpdatesInteractions @Inject constructor(
     private val appRepository: AppRepository,
-    private val scraper: Scraper,
     private val downloaderRepository: DownloaderRepository,
 ) {
     data class NewUpdate(
