@@ -21,7 +21,7 @@ import my.noveldoksuha.coreui.components.TernaryStateToggle
 import my.noveldoksuha.coreui.theme.ColorAccent
 import my.noveldokusha.R
 import my.noveldokusha.core.utils.toToggleableState
-import my.noveldokusha.ui.composeViews.PosNegCheckbox
+import my.noveldoksuha.coreui.components.PosNegCheckbox
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

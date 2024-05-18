@@ -32,8 +32,8 @@ import androidx.compose.ui.res.stringResource
 import my.noveldokusha.R
 import my.noveldokusha.tooling.local_database.BookMetadata
 import my.noveldoksuha.coreui.components.AnimatedTransition
-import my.noveldokusha.ui.composeViews.BooksVerticalView
-import my.noveldokusha.ui.composeViews.CollapsibleDivider
+import my.noveldoksuha.coreui.components.BooksVerticalView
+import my.noveldoksuha.coreui.components.CollapsibleDivider
 import my.noveldoksuha.coreui.components.ToolbarMode
 import my.noveldoksuha.coreui.components.TopAppBarSearch
 import my.noveldokusha.core.appPreferences.ListLayoutMode

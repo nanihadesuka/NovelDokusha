@@ -17,7 +17,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import my.noveldokusha.R
 import my.noveldokusha.composableActions.onDoBackup
 import my.noveldokusha.composableActions.onDoRestore
-import my.noveldokusha.ui.composeViews.CollapsibleDivider
+import my.noveldoksuha.coreui.components.CollapsibleDivider
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

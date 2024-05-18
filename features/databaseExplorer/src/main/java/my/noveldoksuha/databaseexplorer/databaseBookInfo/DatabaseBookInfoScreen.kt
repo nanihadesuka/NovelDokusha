@@ -1,4 +1,4 @@
-package my.noveldokusha.features.databaseBookInfo
+package my.noveldoksuha.databaseexplorer.databaseBookInfo
 
 import android.content.res.Configuration
 import androidx.compose.animation.animateColorAsState
@@ -34,7 +34,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import my.noveldoksuha.coreui.theme.InternalTheme
 import my.noveldoksuha.coreui.theme.isAtTop
-import my.noveldokusha.R
+import my.noveldoksuha.databaseexplorer.R
 import my.noveldokusha.scraper.DatabaseInterface
 import my.noveldokusha.scraper.DatabaseInterface.BookData
 import my.noveldokusha.scraper.SearchGenre
@@ -43,7 +43,7 @@ import my.noveldokusha.tooling.local_database.BookMetadata
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DatabaseBookInfoScreen(
+internal fun DatabaseBookInfoScreen(
     state: DatabaseBookInfoState,
     onSourcesClick: () -> Unit,
     onGenresClick: (List<SearchGenre>) -> Unit,

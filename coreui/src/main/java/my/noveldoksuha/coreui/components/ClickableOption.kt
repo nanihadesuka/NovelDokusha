@@ -1,4 +1,4 @@
-package my.noveldokusha.ui.composeViews
+package my.noveldoksuha.coreui.components
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column

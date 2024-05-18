@@ -118,6 +118,7 @@ dependencies {
     implementation(projects.features.reader)
     implementation(projects.features.chaptersList)
     implementation(projects.features.globalSourceSearch)
+    implementation(projects.features.databaseExplorer)
     implementation(projects.data)
     implementation(projects.core)
     implementation(projects.coreui)
@@ -191,12 +192,12 @@ dependencies {
 
     // Jetpack compose
     implementation(libs.compose.androidx.activity)
-    implementation(libs.compose.material3.android)
     implementation(libs.compose.androidx.animation)
     implementation(libs.compose.androidx.runtime.livedata)
     implementation(libs.compose.androidx.lifecycle.viewmodel)
     implementation(libs.compose.androidx.constraintlayout)
     implementation(libs.compose.androidx.material.icons.extended)
+    implementation(libs.compose.material3.android)
     implementation(libs.compose.accompanist.systemuicontroller)
     implementation(libs.compose.accompanist.swiperefresh)
     implementation(libs.compose.accompanist.insets)

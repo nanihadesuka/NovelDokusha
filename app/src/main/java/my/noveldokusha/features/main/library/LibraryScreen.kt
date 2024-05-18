@@ -12,6 +12,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -23,12 +24,12 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.viewmodel.compose.viewModel
-import my.noveldokusha.R
-import my.noveldokusha.tooling.local_database.BookMetadata
-import my.noveldokusha.features.chapterslist.ChaptersActivity
-import my.noveldokusha.ui.composeViews.BookSettingsDialog
-import my.noveldokusha.ui.composeViews.BookSettingsDialogState
+import my.noveldoksuha.coreui.components.BookSettingsDialog
+import my.noveldoksuha.coreui.components.BookSettingsDialogState
 import my.noveldoksuha.coreui.theme.ColorNotice
+import my.noveldokusha.R
+import my.noveldokusha.features.chapterslist.ChaptersActivity
+import my.noveldokusha.tooling.local_database.BookMetadata
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -107,9 +108,13 @@ fun LibraryScreen(
     // Book selected options dialog
     when (val state = libraryModel.bookSettingsDialogState) {
         is BookSettingsDialogState.Show -> {
+
             BookSettingsDialog(
-                currentBook = state.book,
+                book = libraryModel.getBook(state.book.url)
+                    .collectAsState(initial = state.book)
+                    .value,
                 onDismiss = { libraryModel.bookSettingsDialogState = BookSettingsDialogState.Hide },
+                onToggleCompleted = { libraryModel.bookCompletedToggle(state.book.url) }
             )
         }
 

@@ -23,7 +23,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.viewmodel.compose.viewModel
 import my.noveldokusha.R
-import my.noveldokusha.ui.composeViews.CollapsibleDivider
+import my.noveldoksuha.coreui.components.CollapsibleDivider
 import my.noveldokusha.ui.goToDatabaseSearch
 import my.noveldokusha.ui.goToGlobalSearch
 import my.noveldokusha.ui.goToSourceCatalog

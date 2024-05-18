@@ -18,7 +18,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import my.noveldokusha.core.appPreferences.ListLayoutMode
 import my.noveldokusha.R
-import my.noveldokusha.ui.composeViews.MyButton
+import my.noveldoksuha.coreui.components.MyButton
 
 @Composable
 fun SourceCatalogDropDown(

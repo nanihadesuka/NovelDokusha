@@ -1,4 +1,4 @@
-package my.noveldokusha.features.databaseBookInfo
+package my.noveldoksuha.databaseexplorer.databaseBookInfo
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.ExperimentalAnimationApi
@@ -24,7 +24,6 @@ import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
@@ -46,26 +45,23 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-import my.noveldokusha.R
-import my.noveldokusha.tooling.local_database.BookMetadata
-import my.noveldokusha.mappers.mapToBookMetadata
-import my.noveldokusha.scraper.SearchGenre
-import my.noveldokusha.ui.bounceOnPressed
 import my.noveldoksuha.coreui.components.BookImageButtonView
 import my.noveldoksuha.coreui.components.BookTitlePosition
 import my.noveldoksuha.coreui.components.ExpandableText
 import my.noveldoksuha.coreui.components.ImageView
-import my.noveldokusha.ui.composeViews.MyButton
+import my.noveldoksuha.coreui.components.MyButton
+import my.noveldoksuha.coreui.modifiers.bounceOnPressed
 import my.noveldoksuha.coreui.theme.ColorAccent
 import my.noveldoksuha.coreui.theme.clickableNoIndicator
 import my.noveldoksuha.coreui.theme.textPadding
+import my.noveldoksuha.databaseexplorer.R
+import my.noveldoksuha.mappers.mapToBookMetadata
+import my.noveldokusha.scraper.SearchGenre
+import my.noveldokusha.tooling.local_database.BookMetadata
 
-@OptIn(
-    ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class,
-    ExperimentalAnimationApi::class
-)
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun DatabaseBookInfoScreenBody(
+internal fun DatabaseBookInfoScreenBody(
     state: DatabaseBookInfoState,
     scrollState: ScrollState,
     onSourcesClick: () -> Unit,

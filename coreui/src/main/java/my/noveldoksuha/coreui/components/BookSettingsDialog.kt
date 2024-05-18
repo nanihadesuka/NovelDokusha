@@ -1,4 +1,4 @@
-package my.noveldokusha.ui.composeViews
+package my.noveldoksuha.coreui.components
 
 import android.os.Parcelable
 import androidx.compose.foundation.clickable
@@ -15,39 +15,34 @@ import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.parcelize.Parcelize
-import my.noveldoksuha.coreui.components.ImageView
-import my.noveldokusha.R
-import my.noveldokusha.core.rememberResolvedBookImagePath
-import my.noveldokusha.features.main.library.LibraryViewModel
+import my.noveldoksuha.coreui.R
 import my.noveldoksuha.coreui.theme.ImageBorderShape
 import my.noveldoksuha.coreui.theme.colorApp
+import my.noveldokusha.core.rememberResolvedBookImagePath
+import my.noveldokusha.tooling.local_database.tables.Book
 
 
 sealed interface BookSettingsDialogState : Parcelable {
     @Parcelize
-    object Hide : BookSettingsDialogState
+    data object Hide : BookSettingsDialogState
 
     @Parcelize
-    data class Show(val book: my.noveldokusha.tooling.local_database.tables.Book) : BookSettingsDialogState
+    data class Show(val book: Book) :
+        BookSettingsDialogState
 }
 
 @Composable
 fun BookSettingsDialog(
-    currentBook: my.noveldokusha.tooling.local_database.tables.Book,
+    book: Book,
     onDismiss: () -> Unit,
-    model: LibraryViewModel = viewModel()
+    onToggleCompleted: () -> Unit,
 ) {
-    val book by model.getBook(currentBook.url).collectAsState(initial = currentBook)
-
     AlertDialog(
         onDismissRequest = onDismiss,
         icon = {
@@ -73,7 +68,7 @@ fun BookSettingsDialog(
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                 modifier = Modifier
                     .clip(CircleShape)
-                    .clickable { model.bookCompletedToggle(book.url) }
+                    .clickable(onClick = onToggleCompleted)
                     .fillMaxWidth()
                     .padding(16.dp)
             ) {

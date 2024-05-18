@@ -1,4 +1,4 @@
-package my.noveldokusha.ui.composeViews
+package my.noveldoksuha.coreui.components
 
 import android.content.res.Configuration
 import androidx.compose.animation.animateColorAsState

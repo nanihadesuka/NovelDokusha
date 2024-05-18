@@ -40,3 +40,4 @@ include(":features:chaptersList")
 include(":features:globalSourceSearch")
 
 include(":navigation")
+include(":features:databaseExplorer")

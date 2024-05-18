@@ -1,4 +1,4 @@
-package my.noveldokusha.features.databaseSearch
+package my.noveldoksuha.databaseexplorer.databaseSearch
 
 import android.content.Context
 import android.content.Intent
@@ -8,13 +8,13 @@ import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.parcelize.Parcelize
+import my.noveldoksuha.coreui.BaseActivity
 import my.noveldoksuha.coreui.theme.Theme
 import my.noveldoksuha.coreui.theme.colorAttrRes
-import my.noveldokusha.R
-import my.noveldoksuha.coreui.BaseActivity
+import my.noveldoksuha.databaseexplorer.R
+import my.noveldoksuha.databaseexplorer.databaseBookInfo.DatabaseBookInfoActivity
 import my.noveldokusha.core.utils.Extra_Parcelable
 import my.noveldokusha.tooling.local_database.BookMetadata
-import my.noveldokusha.ui.goToDatabaseBookInfo
 
 
 sealed interface DatabaseSearchExtras : Parcelable {
@@ -73,7 +73,8 @@ class DatabaseSearchActivity : BaseActivity() {
         }
     }
 
-    private fun openBookInfoPage(book: BookMetadata) = goToDatabaseBookInfo(
+    private fun openBookInfoPage(book: BookMetadata) = DatabaseBookInfoActivity.IntentData(
+        ctx = this,
         databaseUrlBase = viewModel.extras.databaseBaseUrl,
         bookMetadata = book
     )

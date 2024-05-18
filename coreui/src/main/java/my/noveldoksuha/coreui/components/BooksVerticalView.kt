@@ -1,4 +1,4 @@
-package my.noveldokusha.ui.composeViews
+package my.noveldoksuha.coreui.components
 
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
@@ -21,16 +21,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import my.noveldoksuha.coreui.components.BookImageButtonView
-import my.noveldoksuha.coreui.components.ErrorView
-import my.noveldokusha.R
+import my.noveldoksuha.coreui.R
 import my.noveldoksuha.coreui.composableActions.ListGridLoadWatcher
+import my.noveldoksuha.coreui.modifiers.bounceOnPressed
 import my.noveldoksuha.coreui.states.IteratorState
-import my.noveldokusha.core.rememberResolvedBookImagePath
-import my.noveldokusha.tooling.local_database.BookMetadata
-import my.noveldokusha.ui.bounceOnPressed
 import my.noveldoksuha.coreui.theme.ColorAccent
 import my.noveldokusha.core.appPreferences.ListLayoutMode
+import my.noveldokusha.core.rememberResolvedBookImagePath
+import my.noveldokusha.tooling.local_database.BookMetadata
 
 @Composable
 fun BooksVerticalView(

@@ -55,8 +55,8 @@
 		</activity>
 		<activity android:name=".features.sourceCatalog.SourceCatalogActivity" />
 		<activity android:name=".features.chapterslist.ChaptersActivity" />
-		<activity android:name=".features.databaseSearch.DatabaseSearchActivity" />
-		<activity android:name=".features.databaseBookInfo.DatabaseBookInfoActivity" />
+		<activity android:name="my.noveldoksuha.databaseexplorer.databaseSearch.DatabaseSearchActivity" />
+		<activity android:name="my.noveldoksuha.databaseexplorer.databaseBookInfo.DatabaseBookInfoActivity" />
 		<activity android:name=".globalsourcesearch.GlobalSourceSearchActivity" />
 		<activity android:name=".features.webView.WebViewActivity" />
 

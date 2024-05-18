@@ -1,15 +1,15 @@
-package my.noveldokusha.features.databaseBookInfo
+package my.noveldoksuha.databaseexplorer.databaseBookInfo
 
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
-import my.noveldokusha.tooling.local_database.BookMetadata
-import my.noveldokusha.scraper.DatabaseInterface
-import my.noveldokusha.scraper.Scraper
 import my.noveldoksuha.coreui.BaseViewModel
 import my.noveldokusha.core.utils.StateExtra_String
+import my.noveldokusha.scraper.DatabaseInterface
+import my.noveldokusha.scraper.Scraper
+import my.noveldokusha.tooling.local_database.BookMetadata
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -37,7 +37,7 @@ class DatabaseBookInfoViewModel @Inject constructor(
 
     val database = scraper.getCompatibleDatabase(databaseUrlBase)!!
 
-    val state = DatabaseBookInfoState(
+    internal val state = DatabaseBookInfoState(
         databaseNameStrId = mutableStateOf(database.nameStrId),
         book = mutableStateOf(
             DatabaseInterface.BookData(

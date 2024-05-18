@@ -1,4 +1,4 @@
-package my.noveldokusha.features.databaseSearch
+package my.noveldoksuha.databaseexplorer.databaseSearch
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -16,7 +16,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.RemoveCircle
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
@@ -32,18 +31,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.state.ToggleableState
 import androidx.compose.ui.unit.dp
-import my.noveldokusha.R
-import my.noveldokusha.ui.composeViews.CollapsibleDivider
-import my.noveldokusha.ui.composeViews.next
+import my.noveldoksuha.coreui.components.CollapsibleDivider
+import my.noveldoksuha.coreui.components.next
 import my.noveldoksuha.coreui.theme.ColorAccent
 import my.noveldoksuha.coreui.theme.InternalTheme
 import my.noveldoksuha.coreui.theme.PreviewThemes
 import my.noveldoksuha.coreui.theme.colorApp
+import my.noveldoksuha.databaseexplorer.R
 
 
-@OptIn(ExperimentalLayoutApi::class, ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun DatabaseSearchBottomSheet(
+internal fun DatabaseSearchBottomSheet(
     genresList: SnapshotStateList<GenreItem>,
     onGenresFiltersSubmit: () -> Unit,
 ) {

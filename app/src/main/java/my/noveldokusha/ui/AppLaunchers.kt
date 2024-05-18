@@ -4,9 +4,9 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import my.noveldokusha.features.chapterslist.ChaptersActivity
-import my.noveldokusha.features.databaseBookInfo.DatabaseBookInfoActivity
-import my.noveldokusha.features.databaseSearch.DatabaseSearchActivity
-import my.noveldokusha.features.databaseSearch.DatabaseSearchExtras
+import my.noveldoksuha.databaseexplorer.databaseBookInfo.DatabaseBookInfoActivity
+import my.noveldoksuha.databaseexplorer.databaseSearch.DatabaseSearchActivity
+import my.noveldoksuha.databaseexplorer.databaseSearch.DatabaseSearchExtras
 import my.noveldokusha.features.reader.ReaderActivity
 import my.noveldokusha.features.sourceCatalog.SourceCatalogActivity
 import my.noveldokusha.features.webView.WebViewActivity

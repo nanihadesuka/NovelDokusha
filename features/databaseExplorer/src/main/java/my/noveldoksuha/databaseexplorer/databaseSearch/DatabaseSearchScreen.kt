@@ -1,4 +1,4 @@
-package my.noveldokusha.features.databaseSearch
+package my.noveldoksuha.databaseexplorer.databaseSearch
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -32,23 +32,23 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
-import my.noveldoksuha.coreui.states.PagedListIteratorState
-import my.noveldokusha.R
-import my.noveldokusha.core.PagedList
-import my.noveldokusha.core.Response
-import my.noveldokusha.tooling.local_database.BookMetadata
-import my.noveldokusha.ui.composeViews.BooksVerticalView
-import my.noveldokusha.ui.composeViews.CollapsibleDivider
+import my.noveldoksuha.coreui.components.BooksVerticalView
+import my.noveldoksuha.coreui.components.CollapsibleDivider
 import my.noveldoksuha.coreui.components.TopAppBarSearch
+import my.noveldoksuha.coreui.states.PagedListIteratorState
 import my.noveldoksuha.coreui.theme.ColorNotice
 import my.noveldoksuha.coreui.theme.Grey25
 import my.noveldoksuha.coreui.theme.InternalTheme
 import my.noveldoksuha.coreui.theme.PreviewThemes
+import my.noveldoksuha.databaseexplorer.R
+import my.noveldokusha.core.PagedList
+import my.noveldokusha.core.Response
 import my.noveldokusha.core.appPreferences.ListLayoutMode
+import my.noveldokusha.tooling.local_database.BookMetadata
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DatabaseSearchScreen(
+internal fun DatabaseSearchScreen(
     state: DatabaseSearchScreenState,
     onSearchCatalogSubmit: () -> Unit,
     onGenresFiltersSubmit: () -> Unit,

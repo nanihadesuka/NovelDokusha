@@ -1,4 +1,4 @@
-package my.noveldokusha.features.databaseSearch
+package my.noveldoksuha.databaseexplorer.databaseSearch
 
 import android.os.Parcelable
 import androidx.compose.runtime.derivedStateOf
@@ -15,19 +15,18 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.parcelize.Parcelize
-import my.noveldokusha.App
-import my.noveldokusha.core.appPreferences.AppPreferences
-import my.noveldokusha.core.PagedList
-import my.noveldokusha.core.map
-import my.noveldokusha.data.persistentCacheDatabaseSearchGenres
-import my.noveldokusha.tooling.local_database.BookMetadata
-import my.noveldoksuha.coreui.states.PagedListIteratorState
-import my.noveldokusha.scraper.Scraper
-import my.noveldokusha.scraper.domain.BookResult
 import my.noveldoksuha.coreui.BaseViewModel
+import my.noveldoksuha.coreui.states.PagedListIteratorState
+import my.noveldoksuha.data.storage.PersistentCacheDatabaseSearchGenresProvider
+import my.noveldokusha.core.PagedList
+import my.noveldokusha.core.appPreferences.AppPreferences
+import my.noveldokusha.core.map
 import my.noveldokusha.core.utils.StateExtra_Parcelable
 import my.noveldokusha.core.utils.asMutableListStateOf
 import my.noveldokusha.core.utils.asMutableStateOf
+import my.noveldokusha.scraper.Scraper
+import my.noveldokusha.scraper.domain.BookResult
+import my.noveldokusha.tooling.local_database.BookMetadata
 import javax.inject.Inject
 
 interface DatabaseSearchStateBundle {
@@ -46,7 +45,7 @@ enum class SearchMode {
 }
 
 private sealed interface SearchInputState {
-    object Catalog : SearchInputState
+    data object Catalog : SearchInputState
     data class BookTitle(val text: String) : SearchInputState
     data class Filters(
         val genresIncludedId: List<String>,
@@ -58,15 +57,15 @@ private sealed interface SearchInputState {
 class DatabaseSearchViewModel @Inject constructor(
     stateHandle: SavedStateHandle,
     scraper: Scraper,
-    val appPreferences: AppPreferences,
-    app: App
+    private val appPreferences: AppPreferences,
+    private val searchGenresProvider: PersistentCacheDatabaseSearchGenresProvider
 ) : BaseViewModel(), DatabaseSearchStateBundle {
 
     override val extras: DatabaseSearchExtras by StateExtra_Parcelable(stateHandle)
     private var firstLoad by stateHandle.asMutableStateOf("firstLoad") { true }
 
     private val database = scraper.getCompatibleDatabase(extras.databaseBaseUrl)!!
-    val state = DatabaseSearchScreenState(
+    internal val state = DatabaseSearchScreenState(
         databaseNameStrId = derivedStateOf { database.nameStrId },
         searchMode = stateHandle.asMutableStateOf("searchMode") { SearchMode.Catalog },
         searchTextInput = stateHandle.asMutableStateOf("searchTextInput") { "" },
@@ -77,7 +76,7 @@ class DatabaseSearchViewModel @Inject constructor(
 
     @Volatile
     private var booksSearch: SearchInputState = SearchInputState.BookTitle("")
-    private val searchGenresCache = persistentCacheDatabaseSearchGenres(database, app.cacheDir)
+    private val searchGenresCache = searchGenresProvider.provide(database)
     private fun createPageLoaderState() =
         PagedListIteratorState(viewModelScope) { index ->
             when (val input = booksSearch) {

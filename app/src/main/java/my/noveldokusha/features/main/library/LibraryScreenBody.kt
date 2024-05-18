@@ -51,7 +51,7 @@ import my.noveldokusha.core.isLocalUri
 import my.noveldokusha.core.rememberResolvedBookImagePath
 import my.noveldokusha.data.LibraryCategory
 import my.noveldokusha.ui.bounceOnPressed
-import my.noveldokusha.ui.composeViews.CollapsibleDivider
+import my.noveldoksuha.coreui.components.CollapsibleDivider
 
 @OptIn(
     ExperimentalMaterialApi::class, ExperimentalFoundationApi::class,

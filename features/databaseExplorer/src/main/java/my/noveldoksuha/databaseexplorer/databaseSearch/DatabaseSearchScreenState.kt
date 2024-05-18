@@ -1,4 +1,4 @@
-package my.noveldokusha.features.databaseSearch
+package my.noveldoksuha.databaseexplorer.databaseSearch
 
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
@@ -7,7 +7,7 @@ import my.noveldoksuha.coreui.states.PagedListIteratorState
 import my.noveldokusha.core.appPreferences.ListLayoutMode
 import my.noveldokusha.tooling.local_database.BookMetadata
 
-data class DatabaseSearchScreenState(
+internal data class DatabaseSearchScreenState(
     val databaseNameStrId: State<Int>,
     val searchMode: MutableState<SearchMode>,
     val searchTextInput: MutableState<String>,

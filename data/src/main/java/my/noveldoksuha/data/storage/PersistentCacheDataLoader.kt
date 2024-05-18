@@ -1,8 +1,7 @@
-package my.noveldokusha.data
+package my.noveldoksuha.data.storage
 
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
-import com.squareup.moshi.Types
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -51,13 +50,3 @@ class PersistentCacheDataLoader<T>(
     ): Response<T> = if (tryCache) cache { getRemote() } else getRemote()
 }
 
-fun persistentCacheDatabaseSearchGenres(
-    database: my.noveldokusha.scraper.DatabaseInterface,
-    appCacheDir: File,
-) = PersistentCacheDataLoader<List<my.noveldokusha.scraper.SearchGenre>>(
-    cacheFile = File(appCacheDir, database.searchGenresCacheFileName),
-    adapterProvider = {
-        val listMyData = Types.newParameterizedType(List::class.java, my.noveldokusha.scraper.SearchGenre::class.java)
-        it.adapter(listMyData)
-    }
-)
