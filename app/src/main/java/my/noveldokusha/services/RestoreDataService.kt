@@ -14,25 +14,26 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import my.noveldoksuha.coreui.states.NotificationsCenter
+import my.noveldoksuha.coreui.states.removeProgressBar
+import my.noveldoksuha.coreui.states.text
+import my.noveldoksuha.coreui.states.title
 import my.noveldoksuha.data.AppRepository
 import my.noveldoksuha.data.BookChaptersRepository
 import my.noveldoksuha.data.ChapterBodyRepository
 import my.noveldoksuha.data.DownloaderRepository
+import my.noveldoksuha.data.EpubImporterRepository
 import my.noveldoksuha.data.LibraryBooksRepository
 import my.noveldokusha.R
 import my.noveldokusha.core.AppCoroutineScope
 import my.noveldokusha.core.AppFileResolver
+import my.noveldokusha.core.Toasty
 import my.noveldokusha.core.tryAsResponse
+import my.noveldokusha.core.utils.Extra_Uri
+import my.noveldokusha.core.utils.isServiceRunning
 import my.noveldokusha.network.NetworkClient
 import my.noveldokusha.scraper.Scraper
 import my.noveldokusha.tooling.local_database.AppDatabase
-import my.noveldokusha.core.Toasty
-import my.noveldokusha.core.utils.Extra_Uri
-import my.noveldoksuha.coreui.states.NotificationsCenter
-import my.noveldokusha.core.utils.isServiceRunning
-import my.noveldoksuha.coreui.states.removeProgressBar
-import my.noveldoksuha.coreui.states.text
-import my.noveldoksuha.coreui.states.title
 import okhttp3.internal.closeQuietly
 import timber.log.Timber
 import java.io.File
@@ -58,6 +59,9 @@ class RestoreDataService : Service() {
 
     @Inject
     lateinit var appFileResolver: AppFileResolver
+
+    @Inject
+    lateinit var epubImporterRepository: EpubImporterRepository
 
     @Inject
     lateinit var toasty: Toasty
@@ -180,31 +184,28 @@ class RestoreDataService : Service() {
                 ) {
                     text = getString(R.string.loading_database)
                 }
-                val backupDatabase = inputStream.use {
-                    val newDatabase = AppDatabase.createRoomFromStream(context, "temp_database", it)
-                    val bookChaptersRepository = BookChaptersRepository(
+                val backupDatabase = object {
+                    val newDatabase = inputStream.use {
+                        AppDatabase.createRoomFromStream(context, "temp_database", it)
+                    }
+                    val bookChapters = BookChaptersRepository(
                         chapterDao = newDatabase.chapterDao(),
                     )
-                    // TODO: refactor this, only database repos should be needed.
-                    AppRepository(
-                        db = newDatabase,
-                        context = context,
-                        bookChapters = bookChaptersRepository,
-                        chapterBody = ChapterBodyRepository(
-                            chapterBodyDao = newDatabase.chapterBodyDao(),
-                            appDatabase = newDatabase,
-                            bookChaptersRepository = bookChaptersRepository,
-                            downloaderRepository = downloaderRepository
-                        ),
-                        libraryBooks = LibraryBooksRepository(
-                            libraryDao = newDatabase.libraryDao(),
-                            appDatabase = newDatabase,
-                            context = context,
-                            appFileResolver = appFileResolver,
-                            appCoroutineScope = appCoroutineScope
-                        ),
-                        appFileResolver = appFileResolver
+                    val chapterBody = ChapterBodyRepository(
+                        chapterBodyDao = newDatabase.chapterBodyDao(),
+                        appDatabase = newDatabase,
+                        bookChaptersRepository = bookChapters,
+                        downloaderRepository = downloaderRepository
                     )
+                    val libraryBooks = LibraryBooksRepository(
+                        libraryDao = newDatabase.libraryDao(),
+                        appDatabase = newDatabase,
+                        context = context,
+                        appFileResolver = appFileResolver,
+                        appCoroutineScope = appCoroutineScope
+                    )
+                    fun close() = newDatabase.closeDatabase()
+                    fun delete() = newDatabase.clearDatabase()
                 }
                 notificationsCenter.modifyNotification(
                     notificationBuilder,

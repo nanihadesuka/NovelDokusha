@@ -13,18 +13,19 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import my.noveldoksuha.coreui.states.NotificationsCenter
+import my.noveldoksuha.coreui.states.removeProgressBar
+import my.noveldoksuha.coreui.states.text
+import my.noveldoksuha.coreui.states.title
 import my.noveldoksuha.data.AppRepository
-import my.noveldoksuha.data.epubImporter
+import my.noveldoksuha.data.EpubImporterRepository
 import my.noveldokusha.R
 import my.noveldokusha.core.AppFileResolver
 import my.noveldokusha.core.asSequence
 import my.noveldokusha.core.tryAsResponse
 import my.noveldokusha.core.utils.Extra_Uri
-import my.noveldoksuha.coreui.states.NotificationsCenter
 import my.noveldokusha.core.utils.isServiceRunning
-import my.noveldoksuha.coreui.states.removeProgressBar
-import my.noveldoksuha.coreui.states.text
-import my.noveldoksuha.coreui.states.title
+import my.noveldokusha.epub_parser.epubParser
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -38,6 +39,9 @@ class EpubImportService : Service() {
 
     @Inject
     lateinit var appFileResolver: AppFileResolver
+
+    @Inject
+    lateinit var epubImporterRepository: EpubImporterRepository
 
     private class IntentData : Intent {
         var uri by Extra_Uri()
@@ -117,7 +121,7 @@ class EpubImportService : Service() {
                     null
                 ).asSequence().map { it.getString(0) }.last()
 
-                val epub = inputStream.use { my.noveldokusha.epub_parser.epubParser(inputStream = it) }
+                val epub = inputStream.use { epubParser(inputStream = it) }
 
                 notificationsCenter.modifyNotification(
                     notificationBuilder,
@@ -125,10 +129,8 @@ class EpubImportService : Service() {
                 ) {
                     text = getString(R.string.importing_epub)
                 }
-                epubImporter(
+                epubImporterRepository.epubImporter(
                     storageFolderName = fileName,
-                    appFileResolver = appFileResolver,
-                    appRepository = appRepository,
                     epub = epub,
                     addToLibrary = true
                 )

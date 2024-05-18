@@ -1,7 +1,6 @@
 package my.noveldoksuha.data
 
 import android.content.Context
-import androidx.core.net.toUri
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -9,8 +8,6 @@ import kotlinx.coroutines.withContext
 import my.noveldokusha.core.AppFileResolver
 import my.noveldokusha.core.Response
 import my.noveldokusha.core.isContentUri
-import my.noveldokusha.core.tryAsResponse
-import my.noveldokusha.epub_parser.epubParser
 import my.noveldokusha.tooling.local_database.AppDatabase
 import my.noveldokusha.tooling.local_database.tables.Book
 import my.noveldokusha.tooling.local_database.tables.Chapter
@@ -25,6 +22,7 @@ class AppRepository @Inject constructor(
     val bookChapters: BookChaptersRepository,
     val chapterBody: ChapterBodyRepository,
     private val appFileResolver: AppFileResolver,
+    private val epubImporterRepository: EpubImporterRepository
 ) {
     val settings = Settings()
     val eventDataRestored = MutableSharedFlow<Unit>()
@@ -32,7 +30,7 @@ class AppRepository @Inject constructor(
     suspend fun toggleBookmark(bookUrl: String, bookTitle: String): Boolean {
         val realUrl = appFileResolver.getLocalIfContentType(bookUrl, bookFolderName = bookTitle)
         return if (bookUrl.isContentUri && libraryBooks.get(realUrl) == null) {
-            importEpubFromContentUri(
+            epubImporterRepository.importEpubFromContentUri(
                 contentUri = bookUrl,
                 bookTitle = bookTitle,
                 addToLibrary = true
@@ -40,23 +38,6 @@ class AppRepository @Inject constructor(
         } else {
             libraryBooks.toggleBookmark(bookUrl = realUrl, bookTitle = bookTitle)
         }
-    }
-
-    suspend fun importEpubFromContentUri(
-        contentUri: String,
-        bookTitle: String,
-        addToLibrary: Boolean = false
-    ) = tryAsResponse {
-        val inputStream = context.contentResolver.openInputStream(contentUri.toUri())
-            ?: return@tryAsResponse
-        val epub = inputStream.use { epubParser(inputStream = inputStream) }
-        epubImporter(
-            storageFolderName = bookTitle,
-            appFileResolver = appFileResolver,
-            appRepository = this,
-            epub = epub,
-            addToLibrary = addToLibrary
-        )
     }
 
     suspend fun getDatabaseSizeBytes() = withContext(Dispatchers.IO) {

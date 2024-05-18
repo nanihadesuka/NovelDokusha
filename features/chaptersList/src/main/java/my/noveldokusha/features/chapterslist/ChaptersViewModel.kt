@@ -12,14 +12,15 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import my.noveldoksuha.coreui.BaseViewModel
 import my.noveldoksuha.data.AppRepository
 import my.noveldoksuha.data.DownloaderRepository
+import my.noveldoksuha.data.EpubImporterRepository
 import my.noveldokusha.chapterslist.R
 import my.noveldokusha.core.AppCoroutineScope
 import my.noveldokusha.core.AppFileResolver
-import my.noveldokusha.core.appPreferences.AppPreferences
-import my.noveldoksuha.coreui.BaseViewModel
 import my.noveldokusha.core.Toasty
+import my.noveldokusha.core.appPreferences.AppPreferences
 import my.noveldokusha.core.isContentUri
 import my.noveldokusha.core.isLocalUri
 import my.noveldokusha.core.utils.StateExtra_String
@@ -42,6 +43,7 @@ internal class ChaptersViewModel @Inject constructor(
     private val appFileResolver: AppFileResolver,
     private val downloaderRepository: DownloaderRepository,
     private val chaptersRepository: ChaptersRepository,
+    private val epubImporterRepository: EpubImporterRepository,
     stateHandle: SavedStateHandle,
 ) : BaseViewModel(), ChapterStateBundle {
 
@@ -150,7 +152,7 @@ internal class ChaptersViewModel @Inject constructor(
             state.error.value = ""
             state.isRefreshing.value = true
             val isInLibrary = appRepository.libraryBooks.existInLibrary(bookUrl)
-            appRepository.importEpubFromContentUri(
+            epubImporterRepository.importEpubFromContentUri(
                 contentUri = rawBookUrl,
                 bookTitle = bookTitle,
                 addToLibrary = isInLibrary
