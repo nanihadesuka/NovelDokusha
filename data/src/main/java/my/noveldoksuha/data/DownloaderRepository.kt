@@ -4,6 +4,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import my.noveldokusha.core.Response
 import my.noveldokusha.core.map
+import my.noveldokusha.network.NetworkClient
 import my.noveldokusha.network.toDocument
 import my.noveldokusha.scraper.Scraper
 import my.noveldokusha.scraper.TextExtractor
@@ -16,7 +17,7 @@ import javax.inject.Singleton
 @Singleton
 class DownloaderRepository @Inject constructor(
     private val scraper: Scraper,
-    private val networkClient: my.noveldokusha.network.NetworkClient,
+    private val networkClient: NetworkClient,
 ) {
 
     suspend fun bookCoverImageUrl(

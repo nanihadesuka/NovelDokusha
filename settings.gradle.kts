@@ -41,3 +41,4 @@ include(":features:globalSourceSearch")
 
 include(":navigation")
 include(":features:databaseExplorer")
+include(":features:sourceExplorer")

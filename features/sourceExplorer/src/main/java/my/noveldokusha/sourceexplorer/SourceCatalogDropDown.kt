@@ -1,4 +1,4 @@
-package my.noveldokusha.features.sourceCatalog
+package my.noveldokusha.sourceexplorer
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -16,12 +16,11 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import my.noveldokusha.core.appPreferences.ListLayoutMode
-import my.noveldokusha.R
 import my.noveldoksuha.coreui.components.MyButton
+import my.noveldokusha.core.appPreferences.ListLayoutMode
 
 @Composable
-fun SourceCatalogDropDown(
+internal fun SourceCatalogDropDown(
     expanded: Boolean,
     onDismiss: () -> Unit,
     listLayoutMode: ListLayoutMode,

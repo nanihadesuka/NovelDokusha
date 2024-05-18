@@ -1,4 +1,4 @@
-package my.noveldokusha.features.sourceCatalog
+package my.noveldokusha.sourceexplorer
 
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.layout.Column
@@ -29,8 +29,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import my.noveldokusha.R
-import my.noveldokusha.tooling.local_database.BookMetadata
 import my.noveldoksuha.coreui.components.AnimatedTransition
 import my.noveldoksuha.coreui.components.BooksVerticalView
 import my.noveldoksuha.coreui.components.CollapsibleDivider
@@ -38,10 +36,11 @@ import my.noveldoksuha.coreui.components.ToolbarMode
 import my.noveldoksuha.coreui.components.TopAppBarSearch
 import my.noveldokusha.core.appPreferences.ListLayoutMode
 import my.noveldokusha.core.utils.actionCopyToClipboard
+import my.noveldokusha.tooling.local_database.BookMetadata
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalAnimationApi::class)
 @Composable
-fun SourceCatalogScreen(
+internal fun SourceCatalogScreen(
     state: SourceCatalogScreenState,
     onSearchTextInputChange: (String) -> Unit,
     onSearchTextInputSubmit: (String) -> Unit,

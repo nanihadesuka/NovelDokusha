@@ -119,6 +119,7 @@ dependencies {
     implementation(projects.features.chaptersList)
     implementation(projects.features.globalSourceSearch)
     implementation(projects.features.databaseExplorer)
+    implementation(projects.features.sourceExplorer)
     implementation(projects.data)
     implementation(projects.core)
     implementation(projects.coreui)

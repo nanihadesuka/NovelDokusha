@@ -53,7 +53,7 @@
 				<data android:scheme="file" />
 			</intent-filter>
 		</activity>
-		<activity android:name=".features.sourceCatalog.SourceCatalogActivity" />
+		<activity android:name=".sourceexplorer.SourceCatalogActivity" />
 		<activity android:name=".features.chapterslist.ChaptersActivity" />
 		<activity android:name="my.noveldoksuha.databaseexplorer.databaseSearch.DatabaseSearchActivity" />
 		<activity android:name="my.noveldoksuha.databaseexplorer.databaseBookInfo.DatabaseBookInfoActivity" />

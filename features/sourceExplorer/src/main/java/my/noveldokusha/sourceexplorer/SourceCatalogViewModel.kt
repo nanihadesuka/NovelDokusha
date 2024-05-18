@@ -1,4 +1,4 @@
-package my.noveldokusha.features.sourceCatalog
+package my.noveldokusha.sourceexplorer
 
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.SavedStateHandle
@@ -6,17 +6,16 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import my.noveldoksuha.data.AppRepository
-import my.noveldokusha.core.appPreferences.AppPreferences
-import my.noveldokusha.R
-import my.noveldokusha.mappers.mapToBookMetadata
-import my.noveldoksuha.coreui.states.PagedListIteratorState
-import my.noveldokusha.scraper.Scraper
 import my.noveldoksuha.coreui.BaseViewModel
-import my.noveldokusha.core.Toasty
 import my.noveldoksuha.coreui.components.ToolbarMode
+import my.noveldoksuha.coreui.states.PagedListIteratorState
+import my.noveldoksuha.data.AppRepository
+import my.noveldoksuha.mappers.mapToBookMetadata
+import my.noveldokusha.core.Toasty
+import my.noveldokusha.core.appPreferences.AppPreferences
 import my.noveldokusha.core.utils.StateExtra_String
 import my.noveldokusha.core.utils.asMutableStateOf
+import my.noveldokusha.scraper.Scraper
 import javax.inject.Inject
 
 interface SourceCatalogStateBundle {
@@ -25,7 +24,7 @@ interface SourceCatalogStateBundle {
 
 
 @HiltViewModel
-class SourceCatalogViewModel @Inject constructor(
+internal class SourceCatalogViewModel @Inject constructor(
     private val appRepository: AppRepository,
     private val toasty: Toasty,
     stateHandle: SavedStateHandle,

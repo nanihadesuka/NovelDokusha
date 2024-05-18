@@ -1,19 +1,16 @@
-package my.noveldokusha.features.sourceCatalog
+package my.noveldokusha.sourceexplorer
 
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rememberUpdatedState
-import androidx.compose.ui.platform.LocalContext
 import dagger.hilt.android.AndroidEntryPoint
-import my.noveldoksuha.coreui.theme.Theme
 import my.noveldoksuha.coreui.BaseActivity
+import my.noveldoksuha.coreui.theme.Theme
 import my.noveldokusha.core.utils.Extra_String
-import my.noveldokusha.ui.goToBookChapters
-import my.noveldokusha.ui.goToWebViewWithUrl
+import my.noveldokusha.navigation.NavigationRoutes
+import javax.inject.Inject
 
 
 @AndroidEntryPoint
@@ -32,12 +29,13 @@ class SourceCatalogActivity : BaseActivity() {
 
     private val viewModel by viewModels<SourceCatalogViewModel>()
 
+    @Inject
+    internal lateinit var navigationRoutes: NavigationRoutes
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         setContent {
-            val context by rememberUpdatedState(LocalContext.current)
-
             Theme(themeProvider = themeProvider) {
                 SourceCatalogScreen(
                     state = viewModel.state,
@@ -46,14 +44,14 @@ class SourceCatalogActivity : BaseActivity() {
                     onSearchCatalogSubmit = viewModel::onSearchCatalog,
                     onListLayoutModeChange = viewModel.state.listLayoutMode::value::set,
                     onToolbarModeChange = viewModel.state.toolbarMode::value::set,
-                    onOpenSourceWebPage = ::openSourceWebPage,
-                    onBookClicked = context::goToBookChapters,
+                    onOpenSourceWebPage = {
+                        navigationRoutes.webView(this, viewModel.sourceBaseUrl)
+                    },
+                    onBookClicked = { navigationRoutes.chapters(this, it) },
                     onBookLongClicked = viewModel::addToLibraryToggle,
                     onPressBack = ::onBackPressed
                 )
             }
         }
     }
-
-    private fun openSourceWebPage() = goToWebViewWithUrl(viewModel.sourceBaseUrl)
 }

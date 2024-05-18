@@ -3,17 +3,17 @@ package my.noveldokusha.ui
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
-import my.noveldokusha.features.chapterslist.ChaptersActivity
 import my.noveldoksuha.databaseexplorer.databaseBookInfo.DatabaseBookInfoActivity
 import my.noveldoksuha.databaseexplorer.databaseSearch.DatabaseSearchActivity
 import my.noveldoksuha.databaseexplorer.databaseSearch.DatabaseSearchExtras
+import my.noveldokusha.features.chapterslist.ChaptersActivity
 import my.noveldokusha.features.reader.ReaderActivity
-import my.noveldokusha.features.sourceCatalog.SourceCatalogActivity
 import my.noveldokusha.features.webView.WebViewActivity
 import my.noveldokusha.globalsourcesearch.GlobalSourceSearchActivity
 import my.noveldokusha.mappers.mapToBookMetadata
 import my.noveldokusha.scraper.SourceInterface
 import my.noveldokusha.scraper.domain.BookResult
+import my.noveldokusha.sourceexplorer.SourceCatalogActivity
 import my.noveldokusha.tooling.local_database.BookMetadata
 
 fun Context.goToSourceCatalog(source: SourceInterface.Catalog) {
