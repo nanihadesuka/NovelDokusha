@@ -28,6 +28,7 @@ import my.noveldokusha.reader.databinding.ActivityReaderListItemProgressBarBindi
 import my.noveldokusha.reader.databinding.ActivityReaderListItemSpecialTitleBinding
 import my.noveldokusha.reader.databinding.ActivityReaderListItemTitleBinding
 import my.noveldokusha.reader.databinding.ActivityReaderListItemTranslatingBinding
+import my.noveldokusha.texttospeech.Utterance
 
 internal class ReaderItemAdapter(
     private val ctx: Context,
@@ -314,9 +315,9 @@ internal class ReaderItemAdapter(
         if (!isReadingItem) return null
 
         return when (textSynthesis.playState) {
-            my.noveldokusha.tooling.texttospeech.Utterance.PlayState.PLAYING -> currentReadingAloudDrawable
-            my.noveldokusha.tooling.texttospeech.Utterance.PlayState.LOADING -> currentReadingAloudLoadingDrawable
-            my.noveldokusha.tooling.texttospeech.Utterance.PlayState.FINISHED -> null
+            Utterance.PlayState.PLAYING -> currentReadingAloudDrawable
+            Utterance.PlayState.LOADING -> currentReadingAloudLoadingDrawable
+            Utterance.PlayState.FINISHED -> null
         }
     }
 

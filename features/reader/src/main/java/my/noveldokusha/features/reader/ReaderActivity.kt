@@ -49,6 +49,7 @@ import my.noveldokusha.features.reader.ui.ReaderViewHandlersActions
 import my.noveldokusha.navigation.NavigationRoutes
 import my.noveldokusha.reader.R
 import my.noveldokusha.reader.databinding.ActivityReaderBinding
+import my.noveldokusha.texttospeech.Utterance
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -200,7 +201,7 @@ class ReaderActivity : BaseActivity() {
         }
 
         viewModel.readerSpeaker.currentReaderItem
-            .filter { it.playState == my.noveldokusha.tooling.texttospeech.Utterance.PlayState.PLAYING || it.playState == my.noveldokusha.tooling.texttospeech.Utterance.PlayState.LOADING }
+            .filter { it.playState == Utterance.PlayState.PLAYING || it.playState == Utterance.PlayState.LOADING }
             .asLiveData().observe(this) {
                 scrollToReadingPositionOptional(
                     chapterIndex = it.itemPos.chapterIndex,

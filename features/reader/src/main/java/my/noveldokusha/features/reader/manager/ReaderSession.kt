@@ -32,6 +32,7 @@ import my.noveldokusha.features.reader.services.NarratorMediaControlsService
 import my.noveldokusha.features.reader.tools.ChaptersIsReadRoutine
 import my.noveldokusha.features.reader.ui.ReaderViewHandlersActions
 import my.noveldokusha.text_translator.domain.TranslationManager
+import my.noveldokusha.texttospeech.Utterance
 import kotlin.properties.Delegates
 
 
@@ -209,7 +210,7 @@ internal class ReaderSession(
         scope.launch(Dispatchers.Main.immediate) {
             readerTextToSpeech
                 .currentReaderItem
-                .filter { it.playState == my.noveldokusha.tooling.texttospeech.Utterance.PlayState.PLAYING }
+                .filter { it.playState == Utterance.PlayState.PLAYING }
                 .filter { savePositionMode.value == SavePositionMode.Speaking }
                 .collect { saveLastReadPositionStateSpeaker(it.itemPos) }
         }
@@ -217,7 +218,7 @@ internal class ReaderSession(
         scope.launch(Dispatchers.Main.immediate) {
             readerTextToSpeech
                 .currentReaderItem
-                .filter { it.playState == my.noveldokusha.tooling.texttospeech.Utterance.PlayState.PLAYING }
+                .filter { it.playState == Utterance.PlayState.PLAYING }
                 .filter { savePositionMode.value == SavePositionMode.Speaking }
                 .collect {
                     val item = it.itemPos

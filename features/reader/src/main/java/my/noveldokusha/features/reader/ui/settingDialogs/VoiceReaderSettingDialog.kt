@@ -96,7 +96,7 @@ import my.noveldoksuha.coreui.theme.rememberMutableStateOf
 import my.noveldokusha.core.appPreferences.VoicePredefineState
 import my.noveldokusha.features.reader.features.TextToSpeechSettingData
 import my.noveldokusha.reader.R
-import my.noveldokusha.tooling.texttospeech.VoiceData
+import my.noveldokusha.texttospeech.VoiceData
 
 
 @OptIn(ExperimentalLayoutApi::class)
