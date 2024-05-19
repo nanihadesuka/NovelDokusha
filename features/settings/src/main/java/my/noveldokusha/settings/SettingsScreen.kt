@@ -15,15 +15,12 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.viewmodel.compose.viewModel
 import my.noveldoksuha.coreui.components.CollapsibleDivider
-import my.noveldokusha.navigation.NavigationRoutes
 import my.noveldokusha.tooling.backup_create.onBackupCreate
 import my.noveldokusha.tooling.backup_restore.onBackupRestore
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SettingsScreen(
-    navigationRoutes: NavigationRoutes = viewModel()
-) {
+fun SettingsScreen() {
     val viewModel: SettingsViewModel = viewModel()
 
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(
