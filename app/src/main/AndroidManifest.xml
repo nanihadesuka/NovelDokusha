@@ -60,14 +60,8 @@
 		<activity android:name=".globalsourcesearch.GlobalSourceSearchActivity" />
 		<activity android:name=".features.webView.WebViewActivity" />
 
-		<service
-			android:name=".services.BackupDataService"
-			android:exported="false"
-			/>
-		<service
-			android:name=".services.RestoreDataService"
-			android:exported="false"
-			/>
+
+
 		<service
 			android:name=".services.EpubImportService"
 			android:exported="false"

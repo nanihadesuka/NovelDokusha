@@ -8,7 +8,7 @@ import kotlinx.coroutines.withContext
 import my.noveldokusha.core.AppFileResolver
 import my.noveldokusha.core.Response
 import my.noveldokusha.core.isContentUri
-import my.noveldokusha.tooling.local_database.AppDatabase
+import my.noveldokusha.feature.local_database.AppDatabase
 import my.noveldokusha.tooling.local_database.tables.Book
 import my.noveldokusha.tooling.local_database.tables.Chapter
 import javax.inject.Inject

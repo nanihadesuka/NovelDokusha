@@ -55,7 +55,6 @@ internal fun ChaptersScreenHeader(
     onCoverLongClick: () -> Unit,
     onGlobalSearchClick: (input: String) -> Unit,
 ) {
-    val context by rememberUpdatedState(LocalContext.current)
     val coverImageModel = bookState.coverImageUrl?.let {
         rememberResolvedBookImagePath(
             bookUrl = bookState.url,

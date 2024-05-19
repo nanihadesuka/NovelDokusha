@@ -3,7 +3,7 @@ package my.noveldoksuha.data
 import my.noveldokusha.core.Response
 import my.noveldokusha.core.isLocalUri
 import my.noveldokusha.core.map
-import my.noveldokusha.tooling.local_database.AppDatabase
+import my.noveldokusha.feature.local_database.AppDatabase
 import my.noveldokusha.tooling.local_database.DAOs.ChapterBodyDao
 import my.noveldokusha.tooling.local_database.tables.ChapterBody
 import javax.inject.Inject
