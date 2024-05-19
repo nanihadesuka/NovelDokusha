@@ -1,4 +1,4 @@
-package my.noveldokusha.features.main.library
+package my.noveldokusha.libraryexplorer
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.FilterList
@@ -27,15 +27,16 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import my.noveldoksuha.coreui.components.BookSettingsDialog
 import my.noveldoksuha.coreui.components.BookSettingsDialogState
 import my.noveldoksuha.coreui.theme.ColorNotice
-import my.noveldokusha.R
-import my.noveldokusha.features.chapterslist.ChaptersActivity
+import my.noveldokusha.navigation.NavigationRouteViewModel
 import my.noveldokusha.tooling.local_database.BookMetadata
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LibraryScreen(
-    libraryModel: LibraryViewModel = viewModel()
+    navigationRouteViewModel: NavigationRouteViewModel = viewModel()
 ) {
+    val libraryModel: LibraryViewModel = viewModel()
+
     val context by rememberUpdatedState(LocalContext.current)
     var showDropDown by remember { mutableStateOf(false) }
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(
@@ -89,14 +90,13 @@ fun LibraryScreen(
                 innerPadding = innerPadding,
                 topAppBarState = scrollBehavior.state,
                 onBookClick = { book ->
-                    val intent = ChaptersActivity.IntentData(
-                        context,
+                    navigationRouteViewModel.chapters(
+                        context = context,
                         bookMetadata = BookMetadata(
                             title = book.book.title,
                             url = book.book.url
                         )
-                    )
-                    context.startActivity(intent)
+                    ).let(context::startActivity)
                 },
                 onBookLongClick = {
                     libraryModel.bookSettingsDialogState = BookSettingsDialogState.Show(it.book)

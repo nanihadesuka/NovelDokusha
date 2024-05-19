@@ -1,4 +1,4 @@
-package my.noveldokusha.services
+package my.noveldokusha.tooling.epub_importer
 
 import android.app.Service
 import android.content.Context
@@ -17,28 +17,20 @@ import my.noveldoksuha.coreui.states.NotificationsCenter
 import my.noveldoksuha.coreui.states.removeProgressBar
 import my.noveldoksuha.coreui.states.text
 import my.noveldoksuha.coreui.states.title
-import my.noveldoksuha.data.AppRepository
 import my.noveldoksuha.data.EpubImporterRepository
-import my.noveldokusha.R
-import my.noveldokusha.core.AppFileResolver
 import my.noveldokusha.core.asSequence
 import my.noveldokusha.core.tryAsResponse
 import my.noveldokusha.core.utils.Extra_Uri
 import my.noveldokusha.core.utils.isServiceRunning
-import my.noveldokusha.epub_parser.epubParser
+import my.noveldokusha.epub_tooling.epubParser
 import timber.log.Timber
 import javax.inject.Inject
 
 @AndroidEntryPoint
 class EpubImportService : Service() {
-    @Inject
-    lateinit var appRepository: AppRepository
 
     @Inject
     lateinit var notificationsCenter: NotificationsCenter
-
-    @Inject
-    lateinit var appFileResolver: AppFileResolver
 
     @Inject
     lateinit var epubImporterRepository: EpubImporterRepository

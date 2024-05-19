@@ -6,9 +6,9 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
-import my.noveldokusha.core.appPreferences.AppPreferences
 import my.noveldokusha.core.AppCoroutineScope
-import my.noveldokusha.data.LibraryCategory
+import my.noveldokusha.core.appPreferences.AppPreferences
+import my.noveldokusha.core.domain.LibraryCategory
 import my.noveldokusha.workers.LibraryUpdatesWorker
 import my.noveldokusha.workers.UpdatesCheckerWorker
 import timber.log.Timber

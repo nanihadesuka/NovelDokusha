@@ -1,4 +1,4 @@
-package my.noveldokusha.features.main.library
+package my.noveldokusha.libraryexplorer
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -17,15 +17,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import my.noveldoksuha.coreui.components.PosNegCheckbox
 import my.noveldoksuha.coreui.components.TernaryStateToggle
 import my.noveldoksuha.coreui.theme.ColorAccent
-import my.noveldokusha.R
 import my.noveldokusha.core.utils.toToggleableState
-import my.noveldoksuha.coreui.components.PosNegCheckbox
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LibraryBottomSheet(
+internal fun LibraryBottomSheet(
     visible: Boolean,
     onDismiss: () -> Unit,
     model: LibraryViewModel = viewModel()

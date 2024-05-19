@@ -1,4 +1,4 @@
-package my.noveldokusha.features.main.library
+package my.noveldokusha.libraryexplorer
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.FileOpen
@@ -8,11 +8,10 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
-import my.noveldokusha.R
-import my.noveldokusha.composableActions.onDoImportEPUB
+import my.noveldokusha.tooling.epub_importer.onDoImportEPUB
 
 @Composable
-fun LibraryDropDown(
+internal fun LibraryDropDown(
     expanded: Boolean,
     onDismiss: () -> Unit
 ) {

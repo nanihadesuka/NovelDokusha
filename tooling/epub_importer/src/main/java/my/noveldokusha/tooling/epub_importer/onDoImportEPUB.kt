@@ -1,10 +1,9 @@
-package my.noveldokusha.composableActions
+package my.noveldokusha.tooling.epub_importer
 
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
-import my.noveldokusha.services.EpubImportService
 
 @Composable
 fun onDoImportEPUB(): () -> Unit {

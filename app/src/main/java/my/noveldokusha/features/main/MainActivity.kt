@@ -29,9 +29,9 @@ import my.noveldoksuha.coreui.components.AnimatedTransition
 import my.noveldoksuha.coreui.theme.Theme
 import my.noveldokusha.R
 import my.noveldokusha.catalogexplorer.CatalogExplorerScreen
-import my.noveldokusha.features.main.library.LibraryScreen
-import my.noveldokusha.services.EpubImportService
+import my.noveldokusha.libraryexplorer.LibraryScreen
 import my.noveldokusha.settings.SettingsScreen
+import my.noveldokusha.tooling.epub_importer.EpubImportService
 
 private data class Page(
     @DrawableRes val iconRes: Int,

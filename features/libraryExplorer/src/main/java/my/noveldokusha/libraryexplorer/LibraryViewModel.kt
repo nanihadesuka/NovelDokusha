@@ -1,4 +1,4 @@
-package my.noveldokusha.features.main.library
+package my.noveldokusha.libraryexplorer
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
@@ -15,8 +15,8 @@ import my.noveldokusha.core.utils.asMutableStateOf
 import javax.inject.Inject
 
 @HiltViewModel
-class LibraryViewModel @Inject constructor(
-    val appPreferences: AppPreferences,
+internal class LibraryViewModel @Inject constructor(
+    private val appPreferences: AppPreferences,
     private val appRepository: AppRepository,
     private val stateHandle: SavedStateHandle,
 ) : BaseViewModel() {

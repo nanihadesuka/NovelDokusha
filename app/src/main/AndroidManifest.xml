@@ -63,7 +63,7 @@
 
 
 		<service
-			android:name=".services.EpubImportService"
+			android:name=".tooling.epub_importer.EpubImportService"
 			android:exported="false"
 			/>
 
