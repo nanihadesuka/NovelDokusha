@@ -36,6 +36,7 @@ import my.noveldoksuha.coreui.theme.InternalTheme
 import my.noveldoksuha.coreui.theme.PreviewThemes
 import my.noveldoksuha.data.CatalogItem
 import my.noveldokusha.R
+import my.noveldokusha.scraper.DatabaseInterface
 import my.noveldokusha.scraper.SourceInterface
 import my.noveldokusha.scraper.fixtures.fixturesCatalogList
 import my.noveldokusha.scraper.fixtures.fixturesDatabaseList
@@ -44,9 +45,9 @@ import my.noveldokusha.scraper.fixtures.fixturesDatabaseList
 @Composable
 fun FinderScreenBody(
     innerPadding: PaddingValues,
-    databasesList: List<my.noveldokusha.scraper.DatabaseInterface>,
+    databasesList: List<DatabaseInterface>,
     sourcesList: List<CatalogItem>,
-    onDatabaseClick: (my.noveldokusha.scraper.DatabaseInterface) -> Unit,
+    onDatabaseClick: (DatabaseInterface) -> Unit,
     onSourceClick: (SourceInterface.Catalog) -> Unit,
     onSourceSetPinned: (id: String, pinned: Boolean) -> Unit,
 ) {

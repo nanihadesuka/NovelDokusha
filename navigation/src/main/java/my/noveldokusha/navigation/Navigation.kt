@@ -2,6 +2,7 @@ package my.noveldokusha.navigation
 
 import android.content.Context
 import android.content.Intent
+import androidx.lifecycle.ViewModel
 import my.noveldokusha.tooling.local_database.BookMetadata
 
 interface NavigationRoutes {
@@ -25,5 +26,13 @@ interface NavigationRoutes {
         databaseUrlBase: String = "https://www.novelupdates.com/"
     ): Intent
 
+    fun databaseSearch(
+        context: Context,
+        databaseBaseUrl: String
+    ): Intent
+
     fun globalSearch(context: Context, text: String): Intent
+    fun sourceCatalog(context: Context, sourceBaseUrl: String): Intent
 }
+
+abstract class NavigationRouteViewModel : NavigationRoutes, ViewModel()

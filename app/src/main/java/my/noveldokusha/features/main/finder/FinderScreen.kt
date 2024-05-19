@@ -22,16 +22,15 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.viewmodel.compose.viewModel
-import my.noveldokusha.R
 import my.noveldoksuha.coreui.components.CollapsibleDivider
-import my.noveldokusha.ui.goToDatabaseSearch
-import my.noveldokusha.ui.goToGlobalSearch
-import my.noveldokusha.ui.goToSourceCatalog
+import my.noveldokusha.R
+import my.noveldokusha.navigation.NavigationRouteViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FinderScreen(
-    viewModel: FinderViewModel = viewModel()
+    viewModel: FinderViewModel = viewModel(),
+    navigationRouteViewModel: NavigationRouteViewModel = viewModel()
 ) {
     val context by rememberUpdatedState(newValue = LocalContext.current)
     var languagesOptionsExpanded by rememberSaveable { mutableStateOf(false) }
@@ -57,7 +56,12 @@ fun FinderScreen(
                         )
                     },
                     actions = {
-                        IconButton(onClick = { context.goToGlobalSearch(text = "") }) {
+                        IconButton(onClick = {
+                            navigationRouteViewModel.globalSearch(
+                                context,
+                                text = ""
+                            ).let(context::startActivity)
+                        }) {
                             Icon(
                                 painter = painterResource(id = R.drawable.ic_baseline_search_24),
                                 contentDescription = stringResource(R.string.search_for_title)
@@ -87,8 +91,18 @@ fun FinderScreen(
                 innerPadding = innerPadding,
                 databasesList = viewModel.databaseList,
                 sourcesList = viewModel.sourcesList,
-                onDatabaseClick = context::goToDatabaseSearch,
-                onSourceClick = context::goToSourceCatalog,
+                onDatabaseClick = {
+                    navigationRouteViewModel.databaseSearch(
+                        context,
+                        databaseBaseUrl = it.baseUrl
+                    ).let(context::startActivity)
+                },
+                onSourceClick = {
+                    navigationRouteViewModel.sourceCatalog(
+                        context,
+                        sourceBaseUrl = it.baseUrl
+                    ).let(context::startActivity)
+                },
                 onSourceSetPinned = viewModel::onSourceSetPinned
             )
         }
