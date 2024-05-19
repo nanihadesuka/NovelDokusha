@@ -59,7 +59,7 @@ compose-material3Android = "1.2.1"
 
 crux = "5.0"
 gson = "2.10.1"
-jsoup = "1.16.1"
+jsoup = "1.17.2"
 translate = "17.0.1"
 moshi = "1.15.0"
 room = "2.5.2"
