@@ -3,7 +3,6 @@ package my.noveldokusha.webview
 import android.content.Context
 import android.view.View
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.MaterialTheme.colors
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.ButtonDefaults
@@ -84,7 +83,8 @@ private fun WebViewScreenPreview() {
         WebViewScreen(
             toolbarTitle = "Title",
             webViewFactory = { View(it) },
-            onBackClicked = {}
+            onBackClicked = {},
+            onReloadClicked = {},
         )
     }
 }
