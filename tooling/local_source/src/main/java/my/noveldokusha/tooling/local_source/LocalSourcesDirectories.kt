@@ -1,4 +1,4 @@
-package my.noveldokusha.scraper
+package my.noveldokusha.tooling.local_source
 
 import android.content.Context
 import android.content.Intent
@@ -11,7 +11,9 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import my.noveldokusha.core.AppCoroutineScope
 import javax.inject.Inject
+import javax.inject.Singleton
 
+@Singleton
 class LocalSourcesDirectories @Inject constructor(
     @ApplicationContext private val appContext: Context,
     private val appCoroutineScope: AppCoroutineScope,

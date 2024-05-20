@@ -16,8 +16,6 @@ import my.noveldokusha.core.Toasty
 import my.noveldokusha.core.ToastyToast
 import my.noveldokusha.navigation.NavigationRouteViewModel
 import my.noveldokusha.navigation.NavigationRoutes
-import my.noveldokusha.scraper.AppLocalSources
-import my.noveldokusha.scraper.sources.LocalSource
 import javax.inject.Singleton
 
 @InstallIn(SingletonComponent::class)
@@ -35,10 +33,6 @@ abstract class AppModule {
     @Binds
     @Singleton
     abstract fun bindToasty(toast: ToastyToast): Toasty
-
-    @Binds
-    @Singleton
-    abstract fun bindAppLocalSources(v: AppLocalSources): LocalSource
 
     companion object {
 

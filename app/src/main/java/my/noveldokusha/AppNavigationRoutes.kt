@@ -7,12 +7,12 @@ import my.noveldoksuha.databaseexplorer.databaseSearch.DatabaseSearchExtras
 import my.noveldokusha.features.chapterslist.ChaptersActivity
 import my.noveldokusha.features.main.MainActivity
 import my.noveldokusha.features.reader.ReaderActivity
-import my.noveldokusha.features.webView.WebViewActivity
 import my.noveldokusha.globalsourcesearch.GlobalSourceSearchActivity
 import my.noveldokusha.navigation.NavigationRouteViewModel
 import my.noveldokusha.navigation.NavigationRoutes
 import my.noveldokusha.sourceexplorer.SourceCatalogActivity
 import my.noveldokusha.tooling.local_database.BookMetadata
+import my.noveldokusha.webview.WebViewActivity
 import javax.inject.Inject
 import javax.inject.Singleton
 

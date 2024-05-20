@@ -117,6 +117,8 @@ dependencies {
     implementation(projects.tooling.textToSpeech)
     implementation(projects.tooling.epubImporter)
     implementation(projects.tooling.applicationWorkers)
+    implementation(projects.tooling.localSource)
+
     implementation(projects.features.reader)
     implementation(projects.features.chaptersList)
     implementation(projects.features.globalSourceSearch)
@@ -125,6 +127,8 @@ dependencies {
     implementation(projects.features.catalogExplorer)
     implementation(projects.features.libraryExplorer)
     implementation(projects.features.settings)
+    implementation(projects.features.webview)
+
     implementation(projects.data)
     implementation(projects.core)
     implementation(projects.coreui)

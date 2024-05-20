@@ -1,4 +1,4 @@
-package my.noveldokusha.features.webView
+package my.noveldokusha.webview
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -25,8 +25,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.viewinterop.AndroidView
 import dagger.hilt.android.AndroidEntryPoint
-import my.noveldokusha.R
-import my.noveldokusha.core.AppCoroutineScope
 import my.noveldokusha.core.Toasty
 import my.noveldokusha.core.utils.Extra_String
 import my.noveldokusha.network.toUrl
@@ -34,8 +32,6 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class WebViewActivity : ComponentActivity() {
-    @Inject
-    lateinit var appScope: AppCoroutineScope
 
     @Inject
     lateinit var toasty: Toasty
