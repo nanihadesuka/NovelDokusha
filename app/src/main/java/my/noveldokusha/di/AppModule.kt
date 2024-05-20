@@ -1,14 +1,12 @@
 package my.noveldokusha.di
 
 import android.content.Context
-import androidx.work.WorkManager
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
-import my.noveldoksuha.interactor.WorkersInteractions
 import my.noveldokusha.App
 import my.noveldokusha.AppNavigationRoutes
 import my.noveldokusha.AppNavigationRoutesViewModel
@@ -20,7 +18,6 @@ import my.noveldokusha.navigation.NavigationRouteViewModel
 import my.noveldokusha.navigation.NavigationRoutes
 import my.noveldokusha.scraper.AppLocalSources
 import my.noveldokusha.scraper.sources.LocalSource
-import my.noveldokusha.workers.AppWorkersInteractions
 import javax.inject.Singleton
 
 @InstallIn(SingletonComponent::class)
@@ -43,23 +40,12 @@ abstract class AppModule {
     @Singleton
     abstract fun bindAppLocalSources(v: AppLocalSources): LocalSource
 
-    @Binds
-    @Singleton
-    abstract fun bindAppWorkersInteractions(v: AppWorkersInteractions): WorkersInteractions
-
     companion object {
 
         @Provides
         @Singleton
         fun providesApp(@ApplicationContext context: Context): App {
             return context as App
-        }
-
-        @Provides
-        fun providesWorkManager(
-            @ApplicationContext context: Context
-        ): WorkManager {
-            return WorkManager.getInstance(context)
         }
 
         @Provides

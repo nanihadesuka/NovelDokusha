@@ -1,4 +1,4 @@
-package my.noveldokusha.workers
+package my.noveldokusha.tooling.application_workers
 
 import android.content.Context
 import androidx.hilt.work.HiltWorker
@@ -23,13 +23,13 @@ import my.noveldoksuha.interactor.LibraryUpdatesInteractions
 import my.noveldokusha.core.Response
 import my.noveldokusha.core.domain.LibraryCategory
 import my.noveldokusha.core.tryAsResponse
-import my.noveldokusha.notifications.LibraryUpdateNotification
+import my.noveldokusha.tooling.application_workers.notifications.LibraryUpdateNotification
 import my.noveldokusha.tooling.local_database.tables.Book
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
 
 @HiltWorker
-class LibraryUpdatesWorker @AssistedInject constructor(
+internal class LibraryUpdatesWorker @AssistedInject constructor(
     @Assisted private val context: Context,
     @Assisted workerParameters: WorkerParameters,
     private val libraryUpdateNotification: LibraryUpdateNotification,

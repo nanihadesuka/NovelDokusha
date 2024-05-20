@@ -1,4 +1,4 @@
-package my.noveldokusha.workers
+package my.noveldokusha.tooling.application_workers
 
 import android.app.NotificationManager
 import android.app.PendingIntent
@@ -15,17 +15,16 @@ import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkerParameters
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
-import my.noveldoksuha.data.AppRemoteRepository
-import my.noveldokusha.R
-import my.noveldokusha.core.Response
 import my.noveldoksuha.coreui.states.NotificationsCenter
 import my.noveldoksuha.coreui.states.text
 import my.noveldoksuha.coreui.states.title
+import my.noveldoksuha.data.AppRemoteRepository
+import my.noveldokusha.core.Response
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
 
 @HiltWorker
-class UpdatesCheckerWorker @AssistedInject constructor(
+internal class UpdatesCheckerWorker @AssistedInject constructor(
     @Assisted private val context: Context,
     @Assisted workerParameters: WorkerParameters,
     private val appRemoteRepository: AppRemoteRepository,

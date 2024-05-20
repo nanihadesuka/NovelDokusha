@@ -7,9 +7,10 @@ import coil.ImageLoader
 import coil.ImageLoaderFactory
 import dagger.hilt.EntryPoints
 import dagger.hilt.android.HiltAndroidApp
-import my.noveldokusha.di.HiltWorkerFactoryEntryPoint
+import my.noveldokusha.di.HiltAppEntryPoint
+import my.noveldokusha.network.NetworkClient
 import my.noveldokusha.network.ScraperNetworkClient
-import my.noveldokusha.workers.setup.PeriodicWorkersInitializer
+import my.noveldokusha.tooling.application_workers.setup.PeriodicWorkersInitializer
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -18,7 +19,7 @@ import javax.inject.Inject
 class App : Application(), ImageLoaderFactory, Configuration.Provider {
 
     @Inject
-    lateinit var networkClient: my.noveldokusha.network.NetworkClient
+    lateinit var networkClient: NetworkClient
 
     @Inject
     lateinit var periodicWorkersInitializer: PeriodicWorkersInitializer
@@ -43,7 +44,7 @@ class App : Application(), ImageLoaderFactory, Configuration.Provider {
     // WorkManager
     override fun getWorkManagerConfiguration(): Configuration {
         val appWorkerFactory = EntryPoints
-            .get(this, HiltWorkerFactoryEntryPoint::class.java)
+            .get(this, HiltAppEntryPoint::class.java)
             .workerFactory()
 
         return Configuration.Builder()

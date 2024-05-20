@@ -1,4 +1,4 @@
-package my.noveldokusha.notifications
+package my.noveldokusha.tooling.application_workers.notifications
 
 import android.app.Notification
 import android.app.NotificationManager
@@ -12,24 +12,23 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
 import dagger.hilt.android.qualifiers.ApplicationContext
-import my.noveldokusha.R
-import my.noveldokusha.tooling.local_database.BookMetadata
-import my.noveldokusha.features.chapterslist.ChaptersActivity
-import my.noveldokusha.features.main.MainActivity
-import my.noveldokusha.features.reader.ReaderActivity
 import my.noveldoksuha.coreui.states.NotificationsCenter
 import my.noveldoksuha.coreui.states.text
 import my.noveldoksuha.coreui.states.title
+import my.noveldokusha.navigation.NavigationRoutes
+import my.noveldokusha.tooling.application_workers.R
+import my.noveldokusha.tooling.local_database.BookMetadata
 import javax.inject.Inject
 
-class LibraryUpdateNotification @Inject constructor(
+internal class LibraryUpdateNotification @Inject constructor(
     @ApplicationContext private val context: Context,
-    private val notificationsCenter: NotificationsCenter
+    private val notificationsCenter: NotificationsCenter,
+    private val navigationRoutes: NavigationRoutes,
 ) {
 
     private val channelName = context.getString(R.string.notification_channel_name_library_update)
     private val channelId = "Library update"
-    val notificationId: Int = channelId.hashCode()
+    private val notificationId: Int = channelId.hashCode()
 
     private val notifyNewChapters = object {
         val channelName = context.getString(R.string.notification_channel_name_new_chapters)
@@ -80,12 +79,13 @@ class LibraryUpdateNotification @Inject constructor(
     ) {
         val chain = mutableListOf<Intent>().also {
             it.add(
-                Intent(context, MainActivity::class.java)
+                navigationRoutes.main(context)
                     .setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK)
             )
             it.add(
-                ChaptersActivity.IntentData(
-                    context, bookMetadata = BookMetadata(
+                navigationRoutes.chapters(
+                    context = context,
+                    bookMetadata = BookMetadata(
                         coverImageUrl = book.coverImageUrl,
                         description = book.description,
                         title = book.title,
@@ -95,8 +95,8 @@ class LibraryUpdateNotification @Inject constructor(
             )
             newChapters.firstOrNull()?.let { chapter ->
                 it.add(
-                    ReaderActivity.IntentData(
-                        ctx = context,
+                    navigationRoutes.reader(
+                        context = context,
                         bookUrl = book.url,
                         chapterUrl = chapter.url,
                         scrollToSpeakingItem = false
