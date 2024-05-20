@@ -9,21 +9,6 @@ import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.viewinterop.AndroidView
 import dagger.hilt.android.AndroidEntryPoint
 import my.noveldokusha.core.Toasty
 import my.noveldokusha.core.utils.Extra_String
@@ -47,7 +32,6 @@ class WebViewActivity : ComponentActivity() {
 
     private val extras by lazy { IntentData(intent) }
 
-    @OptIn(ExperimentalMaterial3Api::class)
     @SuppressLint("SetJavaScriptEnabled")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -56,36 +40,11 @@ class WebViewActivity : ComponentActivity() {
             it.loadUrl(extras.url)
         }
         setContent {
-            Scaffold(
-                topBar = {
-                    Surface {
-                        TopAppBar(
-                            colors = TopAppBarDefaults.topAppBarColors(
-                                containerColor = Color.Unspecified,
-                                scrolledContainerColor = Color.Unspecified,
-                            ),
-                            title = {
-                                Text(
-                                    text = extras.url,
-                                    style = MaterialTheme.typography.headlineSmall
-                                )
-                            },
-                            navigationIcon = {
-                                IconButton(
-                                    onClick = { this@WebViewActivity.onBackPressed() }
-                                ) {
-                                    Icon(Icons.AutoMirrored.Filled.ArrowBack, null)
-                                }
-                            },
-                        )
-                    }
-                },
-                content = {
-                    AndroidView(
-                        modifier = Modifier.padding(it),
-                        factory = { webView }
-                    )
-                }
+            WebViewScreen(
+                toolbarTitle = extras.url,
+                webViewFactory = { webView },
+                onBackClicked = { this@WebViewActivity.onBackPressed() },
+                onReloadClicked = { webView.reload() }
             )
         }
 
