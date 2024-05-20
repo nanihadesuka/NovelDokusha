@@ -115,11 +115,15 @@ dependencies {
     implementation(projects.tooling.epubParser)
     implementation(projects.tooling.textTranslator.domain)
     implementation(projects.tooling.textToSpeech)
+    implementation(projects.tooling.epubImporter)
     implementation(projects.features.reader)
     implementation(projects.features.chaptersList)
     implementation(projects.features.globalSourceSearch)
     implementation(projects.features.databaseExplorer)
     implementation(projects.features.sourceExplorer)
+    implementation(projects.features.catalogExplorer)
+    implementation(projects.features.libraryExplorer)
+    implementation(projects.features.settings)
     implementation(projects.data)
     implementation(projects.core)
     implementation(projects.coreui)
@@ -159,9 +163,6 @@ dependencies {
     implementation(libs.androidx.fragment.ktx)
     implementation(libs.androidx.constraintlayout)
     implementation(libs.material)
-
-    // Media session controls
-    implementation(libs.androidx.media)
 
     // Test
     testImplementation(libs.test.junit)

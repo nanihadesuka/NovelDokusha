@@ -1,4 +1,4 @@
-package my.noveldokusha.tooling.local_database
+package my.noveldokusha.feature.local_database
 
 import android.content.Context
 import androidx.room.Database
@@ -10,6 +10,7 @@ import kotlinx.coroutines.withContext
 import my.noveldokusha.tooling.local_database.DAOs.ChapterBodyDao
 import my.noveldokusha.tooling.local_database.DAOs.ChapterDao
 import my.noveldokusha.tooling.local_database.DAOs.LibraryDao
+import my.noveldokusha.tooling.local_database.databaseMigrations
 import my.noveldokusha.tooling.local_database.tables.Book
 import my.noveldokusha.tooling.local_database.tables.Chapter
 import my.noveldokusha.tooling.local_database.tables.ChapterBody

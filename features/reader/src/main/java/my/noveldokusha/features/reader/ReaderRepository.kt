@@ -6,7 +6,7 @@ import my.noveldoksuha.data.BookChaptersRepository
 import my.noveldoksuha.data.LibraryBooksRepository
 import my.noveldokusha.core.AppCoroutineScope
 import my.noveldokusha.features.reader.domain.ChapterState
-import my.noveldokusha.tooling.local_database.AppDatabase
+import my.noveldokusha.feature.local_database.AppDatabase
 import javax.inject.Inject
 import javax.inject.Singleton
 

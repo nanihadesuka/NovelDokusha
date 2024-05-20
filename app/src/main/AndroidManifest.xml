@@ -53,25 +53,9 @@
 				<data android:scheme="file" />
 			</intent-filter>
 		</activity>
-		<activity android:name=".sourceexplorer.SourceCatalogActivity" />
-		<activity android:name=".features.chapterslist.ChaptersActivity" />
-		<activity android:name="my.noveldoksuha.databaseexplorer.databaseSearch.DatabaseSearchActivity" />
-		<activity android:name="my.noveldoksuha.databaseexplorer.databaseBookInfo.DatabaseBookInfoActivity" />
-		<activity android:name=".globalsourcesearch.GlobalSourceSearchActivity" />
+
 		<activity android:name=".features.webView.WebViewActivity" />
 
-		<service
-			android:name=".services.BackupDataService"
-			android:exported="false"
-			/>
-		<service
-			android:name=".services.RestoreDataService"
-			android:exported="false"
-			/>
-		<service
-			android:name=".services.EpubImportService"
-			android:exported="false"
-			/>
 
 		<provider
 			android:name="androidx.startup.InitializationProvider"
