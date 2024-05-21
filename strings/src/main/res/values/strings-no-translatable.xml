@@ -25,4 +25,6 @@
     <string translatable="false" name="source_name_sakura_novel">Sakura Novel</string>
     <string translatable="false" name="source_name_meio_novel">Meio Novel</string>
     <string translatable="false" name="source_name_more_novel">More Novel</string>
+    <string translatable="false" name="source_name_wb_novel">Wb Novel</string>
+    <string translatable="false" name="source_name_novelbin">NovelBin</string>
 </resources>
