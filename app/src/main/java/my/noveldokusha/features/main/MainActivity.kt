@@ -16,7 +16,7 @@ import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -24,14 +24,14 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.core.content.IntentCompat
 import dagger.hilt.android.AndroidEntryPoint
+import my.noveldoksuha.coreui.BaseActivity
+import my.noveldoksuha.coreui.components.AnimatedTransition
 import my.noveldoksuha.coreui.theme.Theme
 import my.noveldokusha.R
-import my.noveldoksuha.coreui.BaseActivity
-import my.noveldokusha.features.main.finder.FinderScreen
-import my.noveldokusha.features.main.library.LibraryScreen
-import my.noveldokusha.features.main.settings.SettingsScreen
-import my.noveldokusha.services.EpubImportService
-import my.noveldoksuha.coreui.components.AnimatedTransition
+import my.noveldokusha.catalogexplorer.CatalogExplorerScreen
+import my.noveldokusha.libraryexplorer.LibraryScreen
+import my.noveldokusha.settings.SettingsScreen
+import my.noveldokusha.tooling.epub_importer.EpubImportService
 
 private data class Page(
     @DrawableRes val iconRes: Int,
@@ -52,7 +52,7 @@ open class MainActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            var activePageIndex by rememberSaveable { mutableStateOf(0) }
+            var activePageIndex by rememberSaveable { mutableIntStateOf(0) }
 
             BackHandler(enabled = activePageIndex != 0) {
                 activePageIndex = 0
@@ -64,7 +64,7 @@ open class MainActivity : BaseActivity() {
                         AnimatedTransition(targetState = activePageIndex) {
                             when (it) {
                                 0 -> LibraryScreen()
-                                1 -> FinderScreen()
+                                1 -> CatalogExplorerScreen()
                                 2 -> SettingsScreen()
                             }
                         }

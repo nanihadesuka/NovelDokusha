@@ -10,7 +10,7 @@ import kotlinx.coroutines.withContext
 import my.noveldokusha.core.AppFileResolver
 import my.noveldokusha.core.fileImporter
 import my.noveldokusha.core.tryAsResponse
-import my.noveldokusha.epub_parser.epubParser
+import my.noveldokusha.epub_tooling.epubParser
 import my.noveldokusha.tooling.epub_parser.EpubBook
 import my.noveldokusha.tooling.local_database.tables.Book
 import my.noveldokusha.tooling.local_database.tables.Chapter

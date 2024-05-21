@@ -2,15 +2,17 @@ package my.noveldokusha
 
 import android.content.Context
 import android.content.Intent
-import my.noveldokusha.features.chapterslist.ChaptersActivity
 import my.noveldoksuha.databaseexplorer.databaseSearch.DatabaseSearchActivity
 import my.noveldoksuha.databaseexplorer.databaseSearch.DatabaseSearchExtras
+import my.noveldokusha.features.chapterslist.ChaptersActivity
 import my.noveldokusha.features.main.MainActivity
 import my.noveldokusha.features.reader.ReaderActivity
-import my.noveldokusha.features.webView.WebViewActivity
 import my.noveldokusha.globalsourcesearch.GlobalSourceSearchActivity
+import my.noveldokusha.navigation.NavigationRouteViewModel
 import my.noveldokusha.navigation.NavigationRoutes
+import my.noveldokusha.sourceexplorer.SourceCatalogActivity
 import my.noveldokusha.tooling.local_database.BookMetadata
+import my.noveldokusha.webview.WebViewActivity
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -51,6 +53,24 @@ class AppNavigationRoutes @Inject constructor() : NavigationRoutes {
         )
     }
 
+    override fun databaseSearch(
+        context: Context,
+        databaseBaseUrl: String
+    ): Intent {
+        return DatabaseSearchActivity.IntentData(
+            context,
+            DatabaseSearchExtras.Catalog(databaseBaseUrl = databaseBaseUrl)
+        )
+    }
+
+    override fun sourceCatalog(
+        context: Context,
+        sourceBaseUrl: String,
+    ): Intent {
+        return SourceCatalogActivity
+            .IntentData(context, sourceBaseUrl = sourceBaseUrl)
+    }
+
     override fun globalSearch(
         context: Context,
         text: String,
@@ -63,3 +83,8 @@ class AppNavigationRoutes @Inject constructor() : NavigationRoutes {
     }
 
 }
+
+@Singleton
+class AppNavigationRoutesViewModel @Inject constructor(
+    private val appNavigationRoutes: AppNavigationRoutes
+) : NavigationRouteViewModel(), NavigationRoutes by appNavigationRoutes

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+	<application>
+		<service
+			android:name="my.noveldokusha.tooling.backup_restore.RestoreDataService"
+			android:exported="false"
+			android:foregroundServiceType="dataSync"
+			/>
+	</application>
+</manifest>

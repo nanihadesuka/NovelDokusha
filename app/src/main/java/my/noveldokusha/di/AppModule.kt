@@ -1,7 +1,6 @@
 package my.noveldokusha.di
 
 import android.content.Context
-import androidx.work.WorkManager
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
@@ -10,13 +9,13 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import my.noveldokusha.App
 import my.noveldokusha.AppNavigationRoutes
+import my.noveldokusha.AppNavigationRoutesViewModel
 import my.noveldokusha.BuildConfig
 import my.noveldokusha.core.AppInternalState
 import my.noveldokusha.core.Toasty
 import my.noveldokusha.core.ToastyToast
+import my.noveldokusha.navigation.NavigationRouteViewModel
 import my.noveldokusha.navigation.NavigationRoutes
-import my.noveldokusha.scraper.AppLocalSources
-import my.noveldokusha.scraper.sources.LocalSource
 import javax.inject.Singleton
 
 @InstallIn(SingletonComponent::class)
@@ -29,11 +28,11 @@ abstract class AppModule {
 
     @Binds
     @Singleton
-    abstract fun bindToasty(toast: ToastyToast): Toasty
+    abstract fun bindAppNavigationRoutesViewModel(nav: AppNavigationRoutesViewModel): NavigationRouteViewModel
 
     @Binds
     @Singleton
-    abstract fun bindAppLocalSources(v: AppLocalSources): LocalSource
+    abstract fun bindToasty(toast: ToastyToast): Toasty
 
     companion object {
 
@@ -41,13 +40,6 @@ abstract class AppModule {
         @Singleton
         fun providesApp(@ApplicationContext context: Context): App {
             return context as App
-        }
-
-        @Provides
-        fun providesWorkManager(
-            @ApplicationContext context: Context
-        ): WorkManager {
-            return WorkManager.getInstance(context)
         }
 
         @Provides
