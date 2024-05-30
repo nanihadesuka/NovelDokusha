@@ -3,7 +3,9 @@ package my.noveldokusha.navigation
 import android.content.Context
 import android.content.Intent
 import androidx.lifecycle.ViewModel
+import dagger.hilt.android.lifecycle.HiltViewModel
 import my.noveldokusha.tooling.local_database.BookMetadata
+import javax.inject.Inject
 
 interface NavigationRoutes {
 
@@ -35,4 +37,7 @@ interface NavigationRoutes {
     fun sourceCatalog(context: Context, sourceBaseUrl: String): Intent
 }
 
-abstract class NavigationRouteViewModel : NavigationRoutes, ViewModel()
+@HiltViewModel
+class NavigationRouteViewModel @Inject constructor(
+    private val appNavigationRoutes: NavigationRoutes
+) : NavigationRoutes by appNavigationRoutes, ViewModel()

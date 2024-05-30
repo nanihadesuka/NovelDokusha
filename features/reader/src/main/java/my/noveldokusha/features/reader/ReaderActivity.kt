@@ -8,12 +8,13 @@ import android.view.WindowManager
 import android.widget.AbsListView
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
 import androidx.compose.runtime.snapshotFlow
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
@@ -29,11 +30,11 @@ import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import my.noveldoksuha.coreui.BaseActivity
 import my.noveldoksuha.coreui.composableActions.SetSystemBarTransparent
+import my.noveldoksuha.coreui.mappers.toPreferenceTheme
 import my.noveldoksuha.coreui.theme.Theme
 import my.noveldoksuha.coreui.theme.colorAttrRes
-import my.noveldoksuha.coreui.BaseActivity
-import my.noveldoksuha.coreui.mappers.toPreferenceTheme
 import my.noveldokusha.core.utils.Extra_Boolean
 import my.noveldokusha.core.utils.Extra_String
 import my.noveldokusha.core.utils.dpToPx
@@ -44,6 +45,7 @@ import my.noveldokusha.features.reader.domain.ReaderItemAdapter
 import my.noveldokusha.features.reader.domain.ReaderState
 import my.noveldokusha.features.reader.domain.indexOfReaderItem
 import my.noveldokusha.features.reader.tools.FontsLoader
+import my.noveldokusha.features.reader.ui.ReaderBookContent
 import my.noveldokusha.features.reader.ui.ReaderScreen
 import my.noveldokusha.features.reader.ui.ReaderViewHandlersActions
 import my.noveldokusha.navigation.NavigationRoutes
@@ -76,7 +78,7 @@ class ReaderActivity : BaseActivity() {
     }
 
     @Inject
-    lateinit var navigationRoutes : NavigationRoutes
+    lateinit var navigationRoutes: NavigationRoutes
 
     @Inject
     internal lateinit var readerViewHandlersActions: ReaderViewHandlersActions
@@ -279,7 +281,11 @@ class ReaderActivity : BaseActivity() {
                         }
                     },
                     readerContent = {
-                        AndroidView(factory = { viewBind.root })
+                        ReaderBookContent(
+                            items = viewModel.items,
+                            bookUrl = viewModel.bookUrl,
+                            modifier = Modifier.padding(it)
+                        )
                     },
                 )
 
