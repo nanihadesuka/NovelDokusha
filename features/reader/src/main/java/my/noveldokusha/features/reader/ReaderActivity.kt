@@ -119,12 +119,6 @@ class ReaderActivity : BaseActivity() {
         readerViewHandlersActions.maintainStartPosition = {
             withContext(Dispatchers.Main.immediate) {
                 it()
-//                val titleIndex = (0..viewAdapter.listView.count)
-//                    .indexOfFirst { viewAdapter.listView.getItem(it) is ReaderItem.Title }
-//
-//                if (titleIndex != -1) {
-//                    viewBind.listView.setSelection(titleIndex)
-//                }
             }
         }
 
@@ -140,13 +134,7 @@ class ReaderActivity : BaseActivity() {
 
         readerViewHandlersActions.maintainLastVisiblePosition = {
             withContext(Dispatchers.Main.immediate) {
-//                val oldSize = viewAdapter.listView.count
-//                val position = viewBind.listView.lastVisiblePosition
-//                val positionView = position - viewBind.listView.firstVisiblePosition
-//                val top = viewBind.listView.getChildAt(positionView).run { top - paddingTop }
                 it()
-//                val displacement = viewAdapter.listView.count - oldSize
-//                viewBind.listView.setSelectionFromTop(position + displacement, top)
             }
         }
 
@@ -376,20 +364,15 @@ class ReaderActivity : BaseActivity() {
                 item is ReaderItem.Position &&
                 item.chapterItemPosition == chapterItemPosition
             ) {
-                val currentOffsetPx = visibleItem.offset
                 val newOffsetPx = -200.dpToPx(this@ReaderActivity)
-                // Scroll if item below new scroll position
-                if (true) {
-//                if (currentOffsetPx > newOffsetPx) {
-                    lifecycle.coroutineScope.launch {
-                        scrollActions.emit(
-                            ScrollToPositionAction(
-                                index = visibleItem.index,
-                                offset = newOffsetPx,
-                                animated = true,
-                            )
+                lifecycle.coroutineScope.launch {
+                    scrollActions.emit(
+                        ScrollToPositionAction(
+                            index = visibleItem.index,
+                            offset = newOffsetPx,
+                            animated = true,
                         )
-                    }
+                    )
                 }
                 return
             }
@@ -453,16 +436,12 @@ class ReaderActivity : BaseActivity() {
             visibleItemCount != 0 && (firstVisiblePosition + visibleItemCount) >= totalItemCount - 1
 
         when (viewModel.chaptersLoader.readerState) {
-            ReaderState.IDLE -> {
-                if (isBottom) {
-                    viewModel.chaptersLoader.tryLoadNext()
-                }
-                if (isTop) {
-                    viewModel.chaptersLoader.tryLoadPrevious()
-                }
+            ReaderState.IDLE -> when {
+                isBottom -> viewModel.chaptersLoader.tryLoadNext()
+                isTop -> viewModel.chaptersLoader.tryLoadPrevious()
             }
-            ReaderState.LOADING -> run {}
-            ReaderState.INITIAL_LOAD -> run {}
+            ReaderState.LOADING -> Unit
+            ReaderState.INITIAL_LOAD -> Unit
         }
     }
 
