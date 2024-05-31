@@ -299,7 +299,7 @@ internal class ReaderTextToSpeech(
             return
         }
 
-        coroutineScope.launch {
+        coroutineScope.launch(Dispatchers.Main) {
             val currentItemPos = state.currentActiveItemState.value.itemPos
             val itemIndex = indexOfReaderItem(
                 list = items,
@@ -329,7 +329,7 @@ internal class ReaderTextToSpeech(
             return
         }
 
-        coroutineScope.launch {
+        coroutineScope.launch(Dispatchers.Main) {
             val currentItemPos = state.currentActiveItemState.value.itemPos
             val itemIndex = indexOfReaderItem(
                 list = items,

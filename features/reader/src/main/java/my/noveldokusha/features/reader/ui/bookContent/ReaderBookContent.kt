@@ -2,6 +2,7 @@ package my.noveldokusha.features.reader.ui.bookContent
 
 import android.content.res.Configuration
 import android.graphics.Typeface
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -54,8 +55,8 @@ internal fun ReaderBookContent(
     items: List<ReaderItem>,
     bookUrl: String,
     modifier: Modifier = Modifier,
-    fontFamily: FontFamily? = null,
-    fontSize: TextUnit = TextUnit.Unspecified,
+    fontSize: TextUnit,
+    fontFamily: FontFamily,
     currentTextSelectability: () -> Boolean,
     currentSpeakerActiveItem: () -> TextSynthesis,
     onChapterStartVisible: (chapterUrl: String) -> Unit,
@@ -63,6 +64,17 @@ internal fun ReaderBookContent(
     onReloadReader: () -> Unit,
     onClick: () -> Unit,
 ) {
+    LaunchedEffect(fontSize) {
+        Log.w("STATES", "fontSize: $fontSize")
+    }
+    LaunchedEffect(fontFamily) {
+        Log.w("STATES", "fontFamily: $fontFamily")
+    }
+    LaunchedEffect(currentTextSelectability) {
+        Log.w("STATES", "currentTextSelectability: $currentTextSelectability")
+    }
+
+
     Surface(
         color = MaterialTheme.colorScheme.surface,
         modifier = Modifier.clickable(

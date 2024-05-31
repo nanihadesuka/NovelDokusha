@@ -2,6 +2,7 @@ package my.noveldokusha.features.reader
 
 import android.content.Context
 import android.content.Intent
+import android.graphics.Typeface
 import android.os.Build
 import android.os.Bundle
 import android.view.WindowManager
@@ -13,8 +14,11 @@ import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.sp
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
@@ -193,6 +197,16 @@ class ReaderActivity : BaseActivity() {
             )
         }
 
+        val fontFamilyState = appPreferences.READER_FONT_FAMILY.state(lifecycleScope)
+
+        val fontSizeState = derivedStateOf {
+            appPreferences.READER_FONT_SIZE.state(lifecycleScope).value.sp
+        }
+        val textSelectableState: () -> Boolean = {
+            appPreferences.READER_SELECTABLE_TEXT.state(lifecycleScope).value
+        }
+        val currentSpeakerActiveItem = { viewModel.readerSpeaker.currentTextPlaying.value }
+
         // Set current screen to be kept bright always or not
         snapshotFlow { viewModel.state.settings.keepScreenOn.value }
             .asLiveData()
@@ -225,20 +239,26 @@ class ReaderActivity : BaseActivity() {
                         }
                     },
                     readerContent = {
+                        val fontFamily = remember {
+                            derivedStateOf {
+                                FontFamily(Typeface.create(fontFamilyState.value, Typeface.NORMAL))
+                            }
+                        }
+
                         ReaderBookContent(
                             state = listState,
                             items = viewModel.items,
                             bookUrl = viewModel.bookUrl,
 //                            modifier = Modifier.padding(it),
-                            currentTextSelectability = { appPreferences.READER_SELECTABLE_TEXT.value },
-                            currentSpeakerActiveItem = { viewModel.readerSpeaker.currentTextPlaying.value },
-                            fontSize = appPreferences.READER_FONT_SIZE.value.sp,
+                            currentTextSelectability = textSelectableState,
+                            currentSpeakerActiveItem = currentSpeakerActiveItem,
+                            fontSize = fontSizeState.value,
+                            fontFamily = fontFamily.value,
                             onChapterStartVisible = viewModel::markChapterStartAsSeen,
                             onChapterEndVisible = viewModel::markChapterEndAsSeen,
                             onReloadReader = viewModel::reloadReader,
                             onClick = {
-                                viewModel.state.showReaderInfo.value =
-                                    !viewModel.state.showReaderInfo.value
+                                viewModel.state.showReaderInfo.run { value = !value }
                             },
                         )
                     },
