@@ -8,6 +8,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalInspectionMode
@@ -24,7 +25,8 @@ fun ImageView(
     fadeInDurationMillis: Int = 250,
     contentDescription: String? = null,
     contentScale: ContentScale = ContentScale.Crop,
-    @DrawableRes error: Int = R.drawable.default_book_cover
+    @DrawableRes error: Int = R.drawable.default_book_cover,
+    colorFilter: ColorFilter? = null,
 ) {
     val model by remember(imageModel, error) {
         derivedStateOf {
@@ -36,11 +38,16 @@ fun ImageView(
         }
     }
     if (LocalInspectionMode.current) {
+        val res = when (val modelCopy = model) {
+            is Int -> modelCopy
+            else -> error
+        }
         Image(
-            painterResource(error),
+            painter = painterResource(res),
             contentDescription = contentDescription,
             contentScale = contentScale,
-            modifier = modifier
+            modifier = modifier,
+            colorFilter = colorFilter,
         )
     } else {
         val context by rememberUpdatedState(LocalContext.current)
@@ -67,6 +74,7 @@ fun ImageView(
             contentDescription = contentDescription,
             contentScale = contentScale,
             modifier = modifier,
+            colorFilter = colorFilter,
             error = rememberAsyncImagePainter(
                 model = imageErrorRequest,
                 contentScale = contentScale

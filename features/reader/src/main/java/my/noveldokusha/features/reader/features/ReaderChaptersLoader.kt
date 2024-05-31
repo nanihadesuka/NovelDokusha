@@ -1,5 +1,7 @@
 package my.noveldokusha.features.reader.features
 
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -49,7 +51,7 @@ internal class ReaderChaptersLoader(
     val chaptersStats = mutableMapOf<ChapterUrl, ChapterStats>()
     val loadedChapters = mutableSetOf<ChapterUrl>()
     val chapterLoadedFlow = MutableSharedFlow<ChapterLoaded>()
-    private val items: MutableList<ReaderItem> = ArrayList()
+    private val items: SnapshotStateList<ReaderItem> = mutableStateListOf<ReaderItem>()
     private val loaderQueue = mutableSetOf<LoadChapter.Type>()
     private val chapterLoaderFlow = MutableSharedFlow<LoadChapter>()
 

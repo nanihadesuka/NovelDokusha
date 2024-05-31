@@ -45,9 +45,9 @@ class SourceCatalogActivity : BaseActivity() {
                     onListLayoutModeChange = viewModel.state.listLayoutMode::value::set,
                     onToolbarModeChange = viewModel.state.toolbarMode::value::set,
                     onOpenSourceWebPage = {
-                        navigationRoutes.webView(this, viewModel.sourceBaseUrl)
+                        navigationRoutes.webView(this, viewModel.sourceBaseUrl).let(::startActivity)
                     },
-                    onBookClicked = { navigationRoutes.chapters(this, it) },
+                    onBookClicked = { navigationRoutes.chapters(this, it).let(::startActivity) },
                     onBookLongClicked = viewModel::addToLibraryToggle,
                     onPressBack = ::onBackPressed
                 )
