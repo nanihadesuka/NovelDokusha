@@ -3,11 +3,13 @@ package my.noveldokusha.features.reader.ui.bookContent
 import android.content.res.Configuration
 import android.graphics.Typeface
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -30,6 +32,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
@@ -42,6 +45,7 @@ import androidx.compose.ui.unit.sp
 import my.noveldoksuha.coreui.R
 import my.noveldoksuha.coreui.components.ImageView
 import my.noveldoksuha.coreui.theme.ColorAccent
+import my.noveldoksuha.coreui.theme.Grey400
 import my.noveldoksuha.coreui.theme.InternalTheme
 import my.noveldokusha.core.rememberResolvedBookImagePath
 import my.noveldokusha.features.reader.domain.ImgEntry
@@ -57,6 +61,7 @@ internal fun ReaderBookContent(
     modifier: Modifier = Modifier,
     fontSize: TextUnit,
     fontFamily: FontFamily,
+    paddingValues: PaddingValues = PaddingValues(),
     currentTextSelectability: () -> Boolean,
     currentSpeakerActiveItem: () -> TextSynthesis,
     onChapterStartVisible: (chapterUrl: String) -> Unit,
@@ -77,7 +82,7 @@ internal fun ReaderBookContent(
                 state = state,
                 modifier = modifier.fillMaxWidth(),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                contentPadding = PaddingValues(vertical = 400.dp)
+                contentPadding = paddingValues
             ) {
                 items(
                     items = items,
@@ -93,6 +98,7 @@ internal fun ReaderBookContent(
                                     currentSpeakerActiveItem
                                 ).value
                             )
+                            .border(1.dp, Color.Red)
                     ) {
                         when (item) {
                             is ReaderItem.Body -> {
@@ -162,10 +168,12 @@ internal fun ReaderBookContent(
                                 Text(
                                     text = item.textToDisplay,
                                     style = MaterialTheme.typography.titleLarge,
-                                    modifier = Modifier.padding(
-                                        horizontal = 10.dp,
-                                        vertical = 24.dp
-                                    ),
+                                    modifier = Modifier
+                                        .padding(
+                                            horizontal = 10.dp,
+                                            vertical = 24.dp
+                                        )
+                                        .padding(top = 30.dp),
                                     fontFamily = fontFamily,
                                     fontWeight = FontWeight.ExtraBold,
                                     fontSize = fontSize * 2f,
@@ -209,17 +217,21 @@ internal fun ReaderBookContent(
                                 Spacer(modifier = Modifier.height(700.dp))
                             }
                             is ReaderItem.Progressbar -> {
-                                CircularProgressIndicator(
+                                if (item.visible.value) Box(
                                     modifier = Modifier
-                                        .padding(12.dp)
-                                        .size(36.dp)
-                                        .align(Alignment.TopCenter)
-                                        .padding(vertical = 24.dp),
-                                    color = ColorAccent,
-                                )
+                                        .padding(vertical = 80.dp)
+                                        .align(Alignment.TopCenter),
+                                ) {
+                                    CircularProgressIndicator(
+                                        modifier = Modifier
+                                            .size(42.dp)
+                                            .align(Alignment.Center),
+                                        color = ColorAccent,
+                                    )
+                                }
                             }
                             is ReaderItem.Translating -> {
-                                Text(
+                                if (item.visible.value) Text(
                                     text = stringResource(
                                         my.noveldokusha.reader.R.string.translating_from_lang_a_to_lang_b,
                                         item.sourceLang,
@@ -230,6 +242,17 @@ internal fun ReaderBookContent(
                                         .padding(vertical = 12.dp),
                                     fontFamily = fontFamily,
                                     fontSize = fontSize,
+                                )
+                            }
+                        }
+
+                        Row(Modifier.align(Alignment.TopEnd)) {
+                            if (item is ReaderItem.Position) {
+                                Text(
+                                    text = "${item.chapterItemPosition}",
+                                    modifier = Modifier
+                                        .background(Grey400, RoundedCornerShape(4.dp))
+
                                 )
                             }
                         }

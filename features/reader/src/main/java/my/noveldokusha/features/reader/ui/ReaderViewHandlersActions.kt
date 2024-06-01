@@ -2,18 +2,12 @@ package my.noveldokusha.features.reader.ui
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import my.noveldokusha.features.reader.tools.InitialPositionChapter
+import my.noveldokusha.features.reader.domain.InitialPositionChapter
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 internal class ReaderViewHandlersActions @Inject constructor() {
-
-    suspend fun doForceUpdateListViewState() {
-        withContext(Dispatchers.Main.immediate) {
-            forceUpdateListViewState?.invoke()
-        }
-    }
 
     suspend fun doMaintainLastVisiblePosition(fn: suspend () -> Unit) {
         withContext(Dispatchers.Main.immediate) {
@@ -40,9 +34,6 @@ internal class ReaderViewHandlersActions @Inject constructor() {
     }
 
     @Volatile
-    var forceUpdateListViewState: (suspend () -> Unit)? = null
-
-    @Volatile
     var maintainLastVisiblePosition: (suspend (suspend () -> Unit) -> Unit)? = null
 
     @Volatile
@@ -59,7 +50,6 @@ internal class ReaderViewHandlersActions @Inject constructor() {
 
 
     fun invalidate() {
-        forceUpdateListViewState = null
         maintainLastVisiblePosition = null
         maintainStartPosition = null
         setInitialPosition = null

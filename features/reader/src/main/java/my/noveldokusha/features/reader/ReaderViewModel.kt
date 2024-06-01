@@ -97,6 +97,7 @@ internal class ReaderViewModel @Inject constructor(
     val ttsScrolledToTheBottom = readerSession.readerTextToSpeech.scrolledToTheBottom
 
     fun onCloseManually() {
+        updateCurrentReadingPosSavingState()
         readerManager.close()
     }
 
@@ -120,7 +121,8 @@ internal class ReaderViewModel @Inject constructor(
         readerSession.markChapterEndAsSeen(chapterUrl = chapterUrl)
 
 
-    fun updateCurrentReadingPosSavingState(firstVisibleItemIndex: Int) {
+    fun updateCurrentReadingPosSavingState() {
+        val firstVisibleItemIndex = listState.firstVisibleItemIndex
         val item = items.getOrNull(firstVisibleItemIndex) ?: return
         if (item !is ReaderItem.Position) return
 
@@ -132,24 +134,18 @@ internal class ReaderViewModel @Inject constructor(
         )
     }
 
-    fun updateReadingState(
-        firstVisiblePosition: Int,
-        lastVisiblePosition: Int,
-        totalItemCount: Int,
-    ) {
-        val visibleItemCount = when (totalItemCount) {
-            0 -> 0
-            else -> lastVisiblePosition - firstVisiblePosition + 1
-        }
-
-        val isTop = visibleItemCount != 0 && firstVisiblePosition <= 1
-        val isBottom =
-            visibleItemCount != 0 && (firstVisiblePosition + visibleItemCount) >= totalItemCount - 1
-
+    fun updateReadingState() {
         when (chaptersLoader.readerState) {
-            ReaderState.IDLE -> when {
-                isBottom -> chaptersLoader.tryLoadNext()
-                isTop -> chaptersLoader.tryLoadPrevious()
+            ReaderState.IDLE -> {
+                val isTop = listState.firstVisibleItemIndex == 0
+                val isBottom = listState.layoutInfo.visibleItemsInfo.lastOrNull()?.let {
+                    it.index == listState.layoutInfo.totalItemsCount - 1
+                } ?: true
+
+                when {
+                    isBottom -> chaptersLoader.tryLoadNext()
+                    isTop -> chaptersLoader.tryLoadPrevious()
+                }
             }
             ReaderState.LOADING -> Unit
             ReaderState.INITIAL_LOAD -> Unit

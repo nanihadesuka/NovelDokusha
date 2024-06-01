@@ -33,6 +33,7 @@ import my.noveldokusha.features.reader.tools.ChaptersIsReadRoutine
 import my.noveldokusha.features.reader.ui.ReaderViewHandlersActions
 import my.noveldokusha.text_translator.domain.TranslationManager
 import my.noveldokusha.texttospeech.Utterance
+import my.noveldokusha.tooling.local_database.tables.Chapter
 import kotlin.properties.Delegates
 
 
@@ -53,8 +54,7 @@ internal class ReaderSession(
     private var chapterUrl: String = initialChapterUrl
 
     private val readRoutine = ChaptersIsReadRoutine(appRepository)
-    private val orderedChapters =
-        mutableListOf<my.noveldokusha.tooling.local_database.tables.Chapter>()
+    private val orderedChapters = mutableListOf<Chapter>()
 
     var bookTitle: String? = null
     var bookCoverUrl: String? = null
@@ -100,7 +100,7 @@ internal class ReaderSession(
     )
 
     val readerChaptersLoader = ReaderChaptersLoader(
-        appRepository = appRepository,
+        readerRepository = readerRepository,
         translatorTranslateOrNull = { readerLiveTranslation.translatorState?.translate?.invoke(it) },
         translatorIsActive = { readerLiveTranslation.translatorState != null },
         translatorSourceLanguageOrNull = { readerLiveTranslation.translatorState?.sourceLocale?.displayLanguage },

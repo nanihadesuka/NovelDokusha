@@ -9,7 +9,7 @@ import my.noveldoksuha.data.AppRepository
 import my.noveldokusha.features.reader.domain.ChapterUrl
 
 internal class ChaptersIsReadRoutine(
-    val appRepository: AppRepository,
+    private val appRepository: AppRepository,
     private val scope: CoroutineScope = CoroutineScope(
         Dispatchers.IO + SupervisorJob() + CoroutineName("ChapterIsReadRoutine")
     )

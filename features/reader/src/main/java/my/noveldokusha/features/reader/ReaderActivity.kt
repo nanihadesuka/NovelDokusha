@@ -3,12 +3,12 @@ package my.noveldokusha.features.reader
 import android.content.Context
 import android.content.Intent
 import android.graphics.Typeface
-import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.WindowManager
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
@@ -18,17 +18,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.view.WindowCompat
-import androidx.core.view.WindowInsetsCompat
-import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.coroutineScope
 import androidx.lifecycle.lifecycleScope
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -36,7 +33,6 @@ import my.noveldoksuha.coreui.BaseActivity
 import my.noveldoksuha.coreui.composableActions.SetSystemBarTransparent
 import my.noveldoksuha.coreui.mappers.toPreferenceTheme
 import my.noveldoksuha.coreui.theme.Theme
-import my.noveldoksuha.coreui.theme.colorAttrRes
 import my.noveldokusha.core.appPreferences.AppPreferences
 import my.noveldokusha.core.utils.Extra_Boolean
 import my.noveldokusha.core.utils.Extra_String
@@ -73,6 +69,8 @@ class ReaderActivity : BaseActivity() {
             this.introScrollToSpeaker = scrollToSpeakingItem
         }
     }
+
+    val readerPadding = 0.dp
 
     @Inject
     lateinit var navigationRoutes: NavigationRoutes
@@ -141,7 +139,7 @@ class ReaderActivity : BaseActivity() {
         viewModel.ttsScrolledToTheTop.asLiveData().observe(this) {
             if (viewModel.listState.layoutInfo.totalItemsCount < 1) return@observe
 
-            val offset = (-300).dpToPx(this)
+            val offset = 300.dpToPx(this)
             lifecycle.coroutineScope.launch {
                 scrollActions.emit(ScrollToPositionAction(index = 0, offset = offset))
             }
@@ -150,7 +148,7 @@ class ReaderActivity : BaseActivity() {
         viewModel.ttsScrolledToTheBottom.asLiveData().observe(this) {
             if (viewModel.listState.layoutInfo.totalItemsCount < 2) return@observe
 
-            val offset = (-300).dpToPx(this)
+            val offset = 300.dpToPx(this)
             lifecycle.coroutineScope.launch {
                 scrollActions.emit(
                     ScrollToPositionAction(
@@ -215,6 +213,8 @@ class ReaderActivity : BaseActivity() {
             Theme(themeProvider) {
                 SetSystemBarTransparent()
 
+                val readerPaddingValues = remember { PaddingValues(vertical = readerPadding) }
+
                 // Reader info
                 ReaderScreen(
                     state = viewModel.state,
@@ -240,7 +240,6 @@ class ReaderActivity : BaseActivity() {
                                 FontFamily(Typeface.create(fontFamilyState.value, Typeface.NORMAL))
                             }
                         }
-
                         ReaderBookContent(
                             state = viewModel.listState,
                             items = viewModel.items,
@@ -249,12 +248,11 @@ class ReaderActivity : BaseActivity() {
                             currentSpeakerActiveItem = currentSpeakerActiveItem,
                             fontSize = fontSizeState.value,
                             fontFamily = fontFamily.value,
+                            paddingValues = readerPaddingValues,
                             onChapterStartVisible = viewModel::markChapterStartAsSeen,
                             onChapterEndVisible = viewModel::markChapterEndAsSeen,
                             onReloadReader = viewModel::reloadReader,
-                            onClick = {
-                                viewModel.state.showReaderInfo.run { value = !value }
-                            },
+                            onClick = { viewModel.state.showReaderInfo.run { value = !value } },
                         )
                     },
                 )
@@ -268,7 +266,8 @@ class ReaderActivity : BaseActivity() {
                 }
 
                 LaunchedEffect(Unit) {
-                    scrollActions.collectLatest {
+                    scrollActions.collect {
+                        Log.w("INFOMESS", "scrollActions $it")
                         if (it.animated) {
                             viewModel.listState.animateScrollToItem(
                                 index = it.index,
@@ -277,7 +276,7 @@ class ReaderActivity : BaseActivity() {
                         } else {
                             viewModel.listState.scrollToItem(
                                 index = it.index,
-                                scrollOffset = it.offset
+                                scrollOffset = it.offset,
                             )
                         }
                     }
@@ -289,8 +288,8 @@ class ReaderActivity : BaseActivity() {
         lifecycle.coroutineScope.launch {
             snapshotFlow {
                 viewModel.listState.firstVisibleItemIndex
-            }.collect { firstVisibleItemIndex ->
-                viewModel.updateCurrentReadingPosSavingState(firstVisibleItemIndex = firstVisibleItemIndex)
+            }.collect {
+                viewModel.updateCurrentReadingPosSavingState()
             }
         }
 
@@ -309,12 +308,8 @@ class ReaderActivity : BaseActivity() {
                     viewModel.listState.firstVisibleItemIndex + viewModel.listState.layoutInfo.visibleItemsInfo.lastIndex,
                     viewModel.listState.layoutInfo.totalItemsCount
                 )
-            }.collect { (firstVisibleItemIndex, lastVisibleItemIndex, totalItemCount) ->
-                viewModel.updateReadingState(
-                    firstVisiblePosition = firstVisibleItemIndex,
-                    lastVisiblePosition = lastVisibleItemIndex,
-                    totalItemCount = totalItemCount
-                )
+            }.collect {
+                viewModel.updateReadingState()
             }
         }
 
@@ -344,26 +339,26 @@ class ReaderActivity : BaseActivity() {
     }
 
     private fun setupSystemBar() {
-        enableEdgeToEdge()
-
-        // Fullscreen mode that ignores any cutout, notch etc.
-        WindowCompat.setDecorFitsSystemWindows(window, false)
-        val controller = WindowInsetsControllerCompat(window, window.decorView)
-        controller.hide(WindowInsetsCompat.Type.displayCutout())
-        controller.hide(WindowInsetsCompat.Type.systemBars())
-
-        snapshotFlow { viewModel.state.showReaderInfo.value }
-            .asLiveData()
-            .observe(this) { show ->
-                if (show) controller.show(WindowInsetsCompat.Type.statusBars())
-                else controller.hide(WindowInsetsCompat.Type.statusBars())
-            }
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-            window.attributes.layoutInDisplayCutoutMode =
-                WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES
-        }
-        window.statusBarColor = R.attr.colorSurface.colorAttrRes(this)
+//        enableEdgeToEdge()
+//
+//        // Fullscreen mode that ignores any cutout, notch etc.
+//        WindowCompat.setDecorFitsSystemWindows(window, false)
+//        val controller = WindowInsetsControllerCompat(window, window.decorView)
+//        controller.hide(WindowInsetsCompat.Type.displayCutout())
+//        controller.hide(WindowInsetsCompat.Type.systemBars())
+//
+//        snapshotFlow { viewModel.state.showReaderInfo.value }
+//            .asLiveData()
+//            .observe(this) { show ->
+//                if (show) controller.show(WindowInsetsCompat.Type.statusBars())
+//                else controller.hide(WindowInsetsCompat.Type.statusBars())
+//            }
+//
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+//            window.attributes.layoutInDisplayCutoutMode =
+//                WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES
+//        }
+//        window.statusBarColor = R.attr.colorSurface.colorAttrRes(this)
     }
 
     private fun scrollToReadingPositionOptional(chapterIndex: Int, chapterItemPosition: Int) {
@@ -379,7 +374,7 @@ class ReaderActivity : BaseActivity() {
                 item is ReaderItem.Position &&
                 item.chapterItemPosition == chapterItemPosition
             ) {
-                val newOffsetPx = (-200).dpToPx(this)
+                val newOffsetPx = 200.dpToPx(this)
                 lifecycle.coroutineScope.launch {
                     scrollActions.emit(
                         ScrollToPositionAction(
@@ -403,7 +398,7 @@ class ReaderActivity : BaseActivity() {
         )
         if (itemIndex == -1) return
 
-        val newOffsetPx = (-200).dpToPx(this)
+        val newOffsetPx = 200.dpToPx(this)
         lifecycle.coroutineScope.launch {
             scrollActions.emit(
                 ScrollToPositionAction(
@@ -412,7 +407,6 @@ class ReaderActivity : BaseActivity() {
                     animated = true
                 )
             )
-
         }
     }
 
@@ -425,7 +419,7 @@ class ReaderActivity : BaseActivity() {
         )
         if (itemIndex == -1) return
 
-        val newOffsetPx = (-200).dpToPx(this)
+        val newOffsetPx = 200.dpToPx(this)
         lifecycle.coroutineScope.launch {
             scrollActions.emit(
                 ScrollToPositionAction(
@@ -446,7 +440,11 @@ class ReaderActivity : BaseActivity() {
             chapterIndex = chapterIndex,
             chapterItemPosition = chapterItemPosition
         )
-        if (index == -1) return
+
+        if (index == -1) {
+            return
+        }
+        Log.w("INFOMESS", "item ${viewModel.items[index]}")
 
         lifecycle.coroutineScope.launch {
             scrollActions.emit(
@@ -459,9 +457,7 @@ class ReaderActivity : BaseActivity() {
     }
 
     override fun onPause() {
-        viewModel.updateCurrentReadingPosSavingState(
-            firstVisibleItemIndex = viewModel.listState.firstVisibleItemIndex
-        )
+        viewModel.updateCurrentReadingPosSavingState()
         super.onPause()
     }
 }

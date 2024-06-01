@@ -1,5 +1,7 @@
 package my.noveldokusha.features.reader.domain
 
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
 import java.util.concurrent.atomic.AtomicInteger
 
 private val counter = AtomicInteger(0)
@@ -71,7 +73,8 @@ internal sealed interface ReaderItem {
     data class Translating(
         override val chapterIndex: Int,
         val sourceLang: String,
-        val targetLang: String
+        val targetLang: String,
+        val visible: MutableState<Boolean> = mutableStateOf(true)
     ) : ReaderItem {
         override val itemUniqueId: Int = counter.incrementAndGet()
     }
@@ -80,7 +83,10 @@ internal sealed interface ReaderItem {
         override val itemUniqueId: Int = counter.incrementAndGet()
     }
 
-    data class Progressbar(override val chapterIndex: Int) : ReaderItem {
+    data class Progressbar(
+        override val chapterIndex: Int,
+        val visible: MutableState<Boolean> = mutableStateOf(true)
+    ) : ReaderItem {
         override val itemUniqueId: Int = counter.incrementAndGet()
     }
 
