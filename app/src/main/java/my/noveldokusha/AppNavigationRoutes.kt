@@ -8,7 +8,6 @@ import my.noveldokusha.features.chapterslist.ChaptersActivity
 import my.noveldokusha.features.main.MainActivity
 import my.noveldokusha.features.reader.ReaderActivity
 import my.noveldokusha.globalsourcesearch.GlobalSourceSearchActivity
-import my.noveldokusha.navigation.NavigationRouteViewModel
 import my.noveldokusha.navigation.NavigationRoutes
 import my.noveldokusha.sourceexplorer.SourceCatalogActivity
 import my.noveldokusha.tooling.local_database.BookMetadata
@@ -84,7 +83,7 @@ class AppNavigationRoutes @Inject constructor() : NavigationRoutes {
 
 }
 
-@Singleton
-class AppNavigationRoutesViewModel @Inject constructor(
-    private val appNavigationRoutes: AppNavigationRoutes
-) : NavigationRouteViewModel(), NavigationRoutes by appNavigationRoutes
+//@Singleton
+//class AppNavigationRoutesViewModel @Inject constructor(
+//    private val appNavigationRoutes: AppNavigationRoutes
+//) : NavigationRouteViewModel(), NavigationRoutes by appNavigationRoutes

@@ -27,4 +27,6 @@
     <string translatable="false" name="source_name_more_novel">More Novel</string>
     <string translatable="false" name="source_name_novelbin">NovelBin</string>
     <string translatable="false" name="source_name_novelku">NovelKu</string>
+    <string translatable="false" name="source_name_wb_novel">Wb Novel</string>
+
 </resources>

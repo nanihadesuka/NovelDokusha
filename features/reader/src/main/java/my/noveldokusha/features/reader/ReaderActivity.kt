@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.view.WindowManager
 import android.widget.AbsListView
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -29,11 +30,11 @@ import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import my.noveldoksuha.coreui.BaseActivity
 import my.noveldoksuha.coreui.composableActions.SetSystemBarTransparent
+import my.noveldoksuha.coreui.mappers.toPreferenceTheme
 import my.noveldoksuha.coreui.theme.Theme
 import my.noveldoksuha.coreui.theme.colorAttrRes
-import my.noveldoksuha.coreui.BaseActivity
-import my.noveldoksuha.coreui.mappers.toPreferenceTheme
 import my.noveldokusha.core.utils.Extra_Boolean
 import my.noveldokusha.core.utils.Extra_String
 import my.noveldokusha.core.utils.dpToPx
@@ -319,25 +320,8 @@ class ReaderActivity : BaseActivity() {
                 }
             })
 
-        // Fullscreen mode that ignores any cutout, notch etc.
-        WindowCompat.setDecorFitsSystemWindows(window, false)
-        val controller = WindowInsetsControllerCompat(window, window.decorView)
-        controller.hide(WindowInsetsCompat.Type.displayCutout())
-        controller.hide(WindowInsetsCompat.Type.systemBars())
+        setupSystemBar()
 
-        snapshotFlow { viewModel.state.showReaderInfo.value }
-            .asLiveData()
-            .observe(this) { show ->
-                if (show) controller.show(WindowInsetsCompat.Type.statusBars())
-                else controller.hide(WindowInsetsCompat.Type.statusBars())
-            }
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-            window.attributes.layoutInDisplayCutoutMode =
-                WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES
-        }
-
-        window.statusBarColor = R.attr.colorSurface.colorAttrRes(this)
         viewAdapter.listView.notifyDataSetChanged()
         lifecycleScope.launch {
             delay(200)
@@ -369,6 +353,29 @@ class ReaderActivity : BaseActivity() {
                 )
             }
         }
+    }
+
+    private fun setupSystemBar() {
+        enableEdgeToEdge()
+
+        // Fullscreen mode that ignores any cutout, notch etc.
+        WindowCompat.setDecorFitsSystemWindows(window, false)
+        val controller = WindowInsetsControllerCompat(window, window.decorView)
+        controller.hide(WindowInsetsCompat.Type.displayCutout())
+        controller.hide(WindowInsetsCompat.Type.systemBars())
+
+        snapshotFlow { viewModel.state.showReaderInfo.value }
+            .asLiveData()
+            .observe(this) { show ->
+                if (show) controller.show(WindowInsetsCompat.Type.statusBars())
+                else controller.hide(WindowInsetsCompat.Type.statusBars())
+            }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            window.attributes.layoutInDisplayCutoutMode =
+                WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES
+        }
+        window.statusBarColor = R.attr.colorSurface.colorAttrRes(this)
     }
 
     private fun scrollToReadingPositionOptional(chapterIndex: Int, chapterItemPosition: Int) {

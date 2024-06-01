@@ -14,7 +14,7 @@ data class TranslationModelState(
 
 data class TranslatorState(
     val source: String,
-    var target: String,
+    val target: String,
     val translate: suspend (input: String) -> String,
 ) {
     val sourceLocale = Locale(source)
