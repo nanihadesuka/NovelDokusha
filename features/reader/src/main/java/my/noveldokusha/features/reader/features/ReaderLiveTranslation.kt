@@ -65,34 +65,41 @@ internal class ReaderLiveTranslation(
         return translationManager.hasModelDownloaded(language)
     }
 
-    private fun updateTranslatorState() {
+    /**
+     * @return true if reader session needs to be updated
+     */
+    private fun updateTranslatorState(): Boolean {
         val isEnabled = state.enable.value
         val source = state.source.value
         val target = state.target.value
-        translatorState = if (
-            !isEnabled ||
-            source == null ||
-            target == null ||
-            source.language == target.language
-        ) {
-            if (translatorState == null) return
-            null
-        } else {
-            val old = translatorState
-            if (old != null && old.source == source.language && old.target == target.language)
-                return
-            translationManager.getTranslator(
+
+        val old = translatorState
+        val new = when {
+            !isEnabled || source == null || target == null || source.language == target.language -> null
+            else -> translationManager.getTranslator(
                 source = source.language,
                 target = target.language
             )
+        }.also { this.translatorState = it }
+
+
+        return when {
+            old != null && new != null -> when {
+                old.source != new.source && old.target != new.target -> true
+                else -> false
+            }
+            old == null && new == null -> false
+            old == null && new != null -> new.source != new.target
+            old != null && new == null -> old.source != old.target
+            else -> true
         }
     }
 
     private fun onEnable(it: Boolean) {
         state.enable.value = it
         appPreferences.GLOBAL_TRANSLATION_ENABLED.value = it
-        updateTranslatorState()
-        scope.launch {
+        val update = updateTranslatorState()
+        if (update) scope.launch {
             _onTranslatorChanged.emit(Unit)
         }
     }
@@ -100,8 +107,8 @@ internal class ReaderLiveTranslation(
     private fun onSourceChange(it: TranslationModelState?) {
         state.source.value = it
         appPreferences.GLOBAL_TRANSLATION_PREFERRED_SOURCE.value = it?.language ?: ""
-        updateTranslatorState()
-        scope.launch {
+        val update = updateTranslatorState()
+        if (update) scope.launch {
             _onTranslatorChanged.emit(Unit)
         }
     }
@@ -109,8 +116,8 @@ internal class ReaderLiveTranslation(
     private fun onTargetChange(it: TranslationModelState?) {
         state.target.value = it
         appPreferences.GLOBAL_TRANSLATION_PREFERRED_TARGET.value = it?.language ?: ""
-        updateTranslatorState()
-        scope.launch {
+        val update = updateTranslatorState()
+        if (update) scope.launch {
             _onTranslatorChanged.emit(Unit)
         }
     }
