@@ -1,11 +1,17 @@
 package my.noveldokusha.features.reader.domain
 
+import java.util.concurrent.atomic.AtomicInteger
+
+private val counter = AtomicInteger(0)
+
 internal sealed interface ReaderItem {
     /**
      * Corresponds to index in the ordered chapter list.
      * Unique by chapter row
      */
     val chapterIndex: Int
+
+    val itemUniqueId: Int
 
     sealed interface Chapter : ReaderItem {
         val chapterUrl: String
@@ -36,7 +42,9 @@ internal sealed interface ReaderItem {
         override val chapterItemPosition: Int,
         override val text: String,
         override val textTranslated: String? = null
-    ) : ReaderItem, Text, Position
+    ) : ReaderItem, Text, Position {
+        override val itemUniqueId: Int = counter.incrementAndGet()
+    }
 
     data class Body(
         override val chapterUrl: String,
@@ -45,7 +53,9 @@ internal sealed interface ReaderItem {
         override val text: String,
         override val location: Location,
         override val textTranslated: String? = null
-    ) : ReaderItem, Text, Position, ParagraphLocation
+    ) : ReaderItem, Text, Position, ParagraphLocation {
+        override val itemUniqueId: Int = counter.incrementAndGet()
+    }
 
     data class Image(
         override val chapterUrl: String,
@@ -54,20 +64,44 @@ internal sealed interface ReaderItem {
         override val chapterIndex: Int,
         val text: String,
         val image: ImgEntry,
-    ) : ReaderItem, Position, ParagraphLocation
+    ) : ReaderItem, Position, ParagraphLocation {
+        override val itemUniqueId: Int = counter.incrementAndGet()
+    }
 
     data class Translating(
         override val chapterIndex: Int,
         val sourceLang: String,
         val targetLang: String
-    ) : ReaderItem
+    ) : ReaderItem {
+        override val itemUniqueId: Int = counter.incrementAndGet()
+    }
 
-    data class GoogleTranslateAttribution(override val chapterIndex: Int) : ReaderItem
-    data class Progressbar(override val chapterIndex: Int) : ReaderItem
-    data class Divider(override val chapterIndex: Int) : ReaderItem
-    data class BookEnd(override val chapterIndex: Int) : ReaderItem
-    data class BookStart(override val chapterIndex: Int) : ReaderItem
-    data class Error(override val chapterIndex: Int, val text: String) : ReaderItem
-    data class Padding(override val chapterIndex: Int) : ReaderItem
+    data class GoogleTranslateAttribution(override val chapterIndex: Int) : ReaderItem {
+        override val itemUniqueId: Int = counter.incrementAndGet()
+    }
+
+    data class Progressbar(override val chapterIndex: Int) : ReaderItem {
+        override val itemUniqueId: Int = counter.incrementAndGet()
+    }
+
+    data class Divider(override val chapterIndex: Int) : ReaderItem {
+        override val itemUniqueId: Int = counter.incrementAndGet()
+    }
+
+    data class BookEnd(override val chapterIndex: Int) : ReaderItem {
+        override val itemUniqueId: Int = counter.incrementAndGet()
+    }
+
+    data class BookStart(override val chapterIndex: Int) : ReaderItem {
+        override val itemUniqueId: Int = counter.incrementAndGet()
+    }
+
+    data class Error(override val chapterIndex: Int, val text: String) : ReaderItem {
+        override val itemUniqueId: Int = counter.incrementAndGet()
+    }
+
+    data class Padding(override val chapterIndex: Int) : ReaderItem {
+        override val itemUniqueId: Int = counter.incrementAndGet()
+    }
 }
 
