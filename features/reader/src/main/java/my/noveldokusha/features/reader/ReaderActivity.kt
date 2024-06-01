@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.WindowManager
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.material3.BasicAlertDialog
@@ -34,6 +35,7 @@ import my.noveldoksuha.coreui.composableActions.SetSystemBarTransparent
 import my.noveldoksuha.coreui.mappers.toPreferenceTheme
 import my.noveldoksuha.coreui.theme.Theme
 import my.noveldokusha.core.appPreferences.AppPreferences
+import my.noveldoksuha.coreui.theme.colorAttrRes
 import my.noveldokusha.core.utils.Extra_Boolean
 import my.noveldokusha.core.utils.Extra_String
 import my.noveldokusha.core.utils.dpToPx
@@ -299,6 +301,11 @@ class ReaderActivity : BaseActivity() {
             }.collect { lastVisibleItemIndex ->
                 viewModel.updateInfoViewTo(lastVisibleItemIndex)
             }
+
+        viewAdapter.listView.notifyDataSetChanged()
+        lifecycleScope.launch {
+            delay(200)
+            fadeInTextLiveData.postValue(true)
         }
 
         lifecycle.coroutineScope.launch {
