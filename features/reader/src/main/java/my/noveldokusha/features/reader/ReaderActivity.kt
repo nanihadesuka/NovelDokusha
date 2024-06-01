@@ -9,7 +9,6 @@ import android.view.WindowManager
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
-import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
@@ -42,9 +41,7 @@ import my.noveldokusha.core.appPreferences.AppPreferences
 import my.noveldokusha.core.utils.Extra_Boolean
 import my.noveldokusha.core.utils.Extra_String
 import my.noveldokusha.core.utils.dpToPx
-import my.noveldokusha.features.reader.domain.ChapterState
 import my.noveldokusha.features.reader.domain.ReaderItem
-import my.noveldokusha.features.reader.domain.ReaderState
 import my.noveldokusha.features.reader.domain.indexOfReaderItem
 import my.noveldokusha.features.reader.ui.ReaderScreen
 import my.noveldokusha.features.reader.ui.ReaderViewHandlersActions
@@ -88,7 +85,6 @@ class ReaderActivity : BaseActivity() {
 
     private val viewModel by viewModels<ReaderViewModel>()
 
-    private val listState = LazyListState()
 
     private data class ScrollToPositionAction(
         val index: Int,
@@ -143,22 +139,22 @@ class ReaderActivity : BaseActivity() {
         }
 
         viewModel.ttsScrolledToTheTop.asLiveData().observe(this) {
-            if (listState.layoutInfo.totalItemsCount < 1) return@observe
+            if (viewModel.listState.layoutInfo.totalItemsCount < 1) return@observe
 
-            val offset = -300.dpToPx(this)
+            val offset = (-300).dpToPx(this)
             lifecycle.coroutineScope.launch {
                 scrollActions.emit(ScrollToPositionAction(index = 0, offset = offset))
             }
         }
 
         viewModel.ttsScrolledToTheBottom.asLiveData().observe(this) {
-            if (listState.layoutInfo.totalItemsCount < 2) return@observe
+            if (viewModel.listState.layoutInfo.totalItemsCount < 2) return@observe
 
-            val offset = -300.dpToPx(this)
+            val offset = (-300).dpToPx(this)
             lifecycle.coroutineScope.launch {
                 scrollActions.emit(
                     ScrollToPositionAction(
-                        index = listState.layoutInfo.totalItemsCount - 1,
+                        index = viewModel.listState.layoutInfo.totalItemsCount - 1,
                         offset = offset,
                         animated = true
                     )
@@ -193,7 +189,7 @@ class ReaderActivity : BaseActivity() {
 
         viewModel.readerSpeaker.startReadingFromFirstVisibleItem.asLiveData().observe(this) {
             viewModel.startSpeaker(
-                itemIndex = listState.firstVisibleItemIndex
+                itemIndex = viewModel.listState.firstVisibleItemIndex
             )
         }
 
@@ -246,10 +242,9 @@ class ReaderActivity : BaseActivity() {
                         }
 
                         ReaderBookContent(
-                            state = listState,
+                            state = viewModel.listState,
                             items = viewModel.items,
                             bookUrl = viewModel.bookUrl,
-//                            modifier = Modifier.padding(it),
                             currentTextSelectability = textSelectableState,
                             currentSpeakerActiveItem = currentSpeakerActiveItem,
                             fontSize = fontSizeState.value,
@@ -275,12 +270,12 @@ class ReaderActivity : BaseActivity() {
                 LaunchedEffect(Unit) {
                     scrollActions.collectLatest {
                         if (it.animated) {
-                            listState.animateScrollToItem(
+                            viewModel.listState.animateScrollToItem(
                                 index = it.index,
                                 scrollOffset = it.offset,
                             )
                         } else {
-                            listState.scrollToItem(
+                            viewModel.listState.scrollToItem(
                                 index = it.index,
                                 scrollOffset = it.offset
                             )
@@ -293,15 +288,15 @@ class ReaderActivity : BaseActivity() {
 
         lifecycle.coroutineScope.launch {
             snapshotFlow {
-                listState.firstVisibleItemIndex
+                viewModel.listState.firstVisibleItemIndex
             }.collect { firstVisibleItemIndex ->
-                updateCurrentReadingPosSavingState(firstVisibleItemIndex = firstVisibleItemIndex)
+                viewModel.updateCurrentReadingPosSavingState(firstVisibleItemIndex = firstVisibleItemIndex)
             }
         }
 
         lifecycle.coroutineScope.launch {
             snapshotFlow {
-                listState.firstVisibleItemIndex + listState.layoutInfo.visibleItemsInfo.lastIndex
+                viewModel.listState.firstVisibleItemIndex + viewModel.listState.layoutInfo.visibleItemsInfo.lastIndex
             }.collect { lastVisibleItemIndex ->
                 viewModel.updateInfoViewTo(lastVisibleItemIndex)
             }
@@ -310,12 +305,12 @@ class ReaderActivity : BaseActivity() {
         lifecycle.coroutineScope.launch {
             snapshotFlow {
                 listOf(
-                    listState.firstVisibleItemIndex,
-                    listState.firstVisibleItemIndex + listState.layoutInfo.visibleItemsInfo.lastIndex,
-                    listState.layoutInfo.totalItemsCount
+                    viewModel.listState.firstVisibleItemIndex,
+                    viewModel.listState.firstVisibleItemIndex + viewModel.listState.layoutInfo.visibleItemsInfo.lastIndex,
+                    viewModel.listState.layoutInfo.totalItemsCount
                 )
             }.collect { (firstVisibleItemIndex, lastVisibleItemIndex, totalItemCount) ->
-                updateReadingState(
+                viewModel.updateReadingState(
                     firstVisiblePosition = firstVisibleItemIndex,
                     lastVisiblePosition = lastVisibleItemIndex,
                     totalItemCount = totalItemCount
@@ -373,18 +368,18 @@ class ReaderActivity : BaseActivity() {
 
     private fun scrollToReadingPositionOptional(chapterIndex: Int, chapterItemPosition: Int) {
         // If user already scrolling ignore
-        if (listState.isScrollInProgress) {
+        if (viewModel.listState.isScrollInProgress) {
             return
         }
         // Search for the item being read otherwise do nothing
-        for (visibleItem in listState.layoutInfo.visibleItemsInfo) {
+        for (visibleItem in viewModel.listState.layoutInfo.visibleItemsInfo) {
             val item = viewModel.items[visibleItem.index]
             if (
                 item.chapterIndex == chapterIndex &&
                 item is ReaderItem.Position &&
                 item.chapterItemPosition == chapterItemPosition
             ) {
-                val newOffsetPx = -200.dpToPx(this@ReaderActivity)
+                val newOffsetPx = (-200).dpToPx(this)
                 lifecycle.coroutineScope.launch {
                     scrollActions.emit(
                         ScrollToPositionAction(
@@ -408,7 +403,7 @@ class ReaderActivity : BaseActivity() {
         )
         if (itemIndex == -1) return
 
-        val newOffsetPx = -200.dpToPx(this@ReaderActivity)
+        val newOffsetPx = (-200).dpToPx(this)
         lifecycle.coroutineScope.launch {
             scrollActions.emit(
                 ScrollToPositionAction(
@@ -430,7 +425,7 @@ class ReaderActivity : BaseActivity() {
         )
         if (itemIndex == -1) return
 
-        val newOffsetPx = -200.dpToPx(this@ReaderActivity)
+        val newOffsetPx = (-200).dpToPx(this)
         lifecycle.coroutineScope.launch {
             scrollActions.emit(
                 ScrollToPositionAction(
@@ -438,30 +433,6 @@ class ReaderActivity : BaseActivity() {
                     offset = newOffsetPx,
                 )
             )
-        }
-    }
-
-    private fun updateReadingState(
-        firstVisiblePosition: Int,
-        lastVisiblePosition: Int,
-        totalItemCount: Int,
-    ) {
-        val visibleItemCount = when (totalItemCount) {
-            0 -> 0
-            else -> lastVisiblePosition - firstVisiblePosition + 1
-        }
-
-        val isTop = visibleItemCount != 0 && firstVisiblePosition <= 1
-        val isBottom =
-            visibleItemCount != 0 && (firstVisiblePosition + visibleItemCount) >= totalItemCount - 1
-
-        when (viewModel.chaptersLoader.readerState) {
-            ReaderState.IDLE -> when {
-                isBottom -> viewModel.chaptersLoader.tryLoadNext()
-                isTop -> viewModel.chaptersLoader.tryLoadPrevious()
-            }
-            ReaderState.LOADING -> Unit
-            ReaderState.INITIAL_LOAD -> Unit
         }
     }
 
@@ -488,21 +459,9 @@ class ReaderActivity : BaseActivity() {
     }
 
     override fun onPause() {
-        updateCurrentReadingPosSavingState(
-            firstVisibleItemIndex = listState.firstVisibleItemIndex
+        viewModel.updateCurrentReadingPosSavingState(
+            firstVisibleItemIndex = viewModel.listState.firstVisibleItemIndex
         )
         super.onPause()
-    }
-
-    private fun updateCurrentReadingPosSavingState(firstVisibleItemIndex: Int) {
-        val item = viewModel.items.getOrNull(firstVisibleItemIndex) ?: return
-        if (item !is ReaderItem.Position) return
-
-        val offset = listState.firstVisibleItemScrollOffset
-        viewModel.readingCurrentChapter = ChapterState(
-            chapterUrl = item.chapterUrl,
-            chapterItemPosition = item.chapterItemPosition,
-            offset = offset
-        )
     }
 }

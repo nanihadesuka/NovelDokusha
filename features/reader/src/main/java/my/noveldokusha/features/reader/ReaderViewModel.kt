@@ -1,5 +1,6 @@
 package my.noveldokusha.features.reader
 
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.SavedStateHandle
@@ -7,11 +8,14 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import my.noveldokusha.core.appPreferences.AppPreferences
 import my.noveldoksuha.coreui.BaseViewModel
 import my.noveldoksuha.coreui.mappers.toTheme
+import my.noveldokusha.core.appPreferences.AppPreferences
 import my.noveldokusha.core.utils.StateExtra_Boolean
 import my.noveldokusha.core.utils.StateExtra_String
+import my.noveldokusha.features.reader.domain.ChapterState
+import my.noveldokusha.features.reader.domain.ReaderItem
+import my.noveldokusha.features.reader.domain.ReaderState
 import my.noveldokusha.features.reader.manager.ReaderManager
 import my.noveldokusha.features.reader.ui.ReaderScreenState
 import my.noveldokusha.features.reader.ui.ReaderViewHandlersActions
@@ -44,6 +48,7 @@ internal class ReaderViewModel @Inject constructor(
     private val readingPosStats = readerSession.readingStats
     private val themeId = appPreferences.THEME_ID.state(viewModelScope)
 
+    val listState = LazyListState()
     val state = ReaderScreenState(
         showReaderInfo = mutableStateOf(false),
         readerInfo = ReaderScreenState.CurrentInfo(
@@ -113,4 +118,41 @@ internal class ReaderViewModel @Inject constructor(
 
     fun markChapterEndAsSeen(chapterUrl: String) =
         readerSession.markChapterEndAsSeen(chapterUrl = chapterUrl)
+
+
+    fun updateCurrentReadingPosSavingState(firstVisibleItemIndex: Int) {
+        val item = items.getOrNull(firstVisibleItemIndex) ?: return
+        if (item !is ReaderItem.Position) return
+
+        val offset = listState.firstVisibleItemScrollOffset
+        readingCurrentChapter = ChapterState(
+            chapterUrl = item.chapterUrl,
+            chapterItemPosition = item.chapterItemPosition,
+            offset = offset
+        )
+    }
+
+    fun updateReadingState(
+        firstVisiblePosition: Int,
+        lastVisiblePosition: Int,
+        totalItemCount: Int,
+    ) {
+        val visibleItemCount = when (totalItemCount) {
+            0 -> 0
+            else -> lastVisiblePosition - firstVisiblePosition + 1
+        }
+
+        val isTop = visibleItemCount != 0 && firstVisiblePosition <= 1
+        val isBottom =
+            visibleItemCount != 0 && (firstVisiblePosition + visibleItemCount) >= totalItemCount - 1
+
+        when (chaptersLoader.readerState) {
+            ReaderState.IDLE -> when {
+                isBottom -> chaptersLoader.tryLoadNext()
+                isTop -> chaptersLoader.tryLoadPrevious()
+            }
+            ReaderState.LOADING -> Unit
+            ReaderState.INITIAL_LOAD -> Unit
+        }
+    }
 }
