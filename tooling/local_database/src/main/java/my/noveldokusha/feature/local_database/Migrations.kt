@@ -3,7 +3,8 @@ package my.noveldokusha.tooling.local_database
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import my.noveldokusha.tooling.local_database.migrations.MigrationsList
-import my.noveldokusha.tooling.local_database.migrations.readLightNovelDomainChange_1
+import my.noveldokusha.tooling.local_database.migrations.readLightNovelDomainChange_1_today
+import my.noveldokusha.tooling.local_database.migrations.readLightNovelDomainChange_2_meme
 
 internal fun databaseMigrations() = arrayOf(
     migration(1, 2) {
@@ -20,7 +21,8 @@ internal fun databaseMigrations() = arrayOf(
     migration(4, 5) {
         it.execSQL("ALTER TABLE Book ADD COLUMN lastReadEpochTimeMilli INTEGER NOT NULL DEFAULT 0")
     },
-    migration(5, 6, MigrationsList::readLightNovelDomainChange_1)
+    migration(5, 6, MigrationsList::readLightNovelDomainChange_1_today),
+    migration(6, 7, MigrationsList::readLightNovelDomainChange_2_meme)
 )
 
 internal fun migration(vi: Int, vf: Int, migrate: (SupportSQLiteDatabase) -> Unit) =
