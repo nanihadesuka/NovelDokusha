@@ -53,8 +53,6 @@
 			</intent-filter>
 		</activity>
 
-		<activity android:name=".features.webView.WebViewActivity" />
-
 		<provider
 			android:name="androidx.startup.InitializationProvider"
 			android:authorities="${applicationId}.androidx-startup"
