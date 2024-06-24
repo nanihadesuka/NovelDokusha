@@ -77,5 +77,5 @@ class DatabaseSearchActivity : BaseActivity() {
         ctx = this,
         databaseUrlBase = viewModel.extras.databaseBaseUrl,
         bookMetadata = book
-    )
+    ).let(::startActivity)
 }
