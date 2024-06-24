@@ -35,6 +35,7 @@ class NovelUpdates(
     override val baseUrl = "https://www.novelupdates.com/"
     override val catalogUrl = "https://www.novelupdates.com/novelslisting/?sort=7&order=1&status=1"
     override val language = LanguageCode.ENGLISH
+    override val requiresLogin = true // Requires login for chapters
 
     override suspend fun getChapterTitle(doc: Document): String? = null
 

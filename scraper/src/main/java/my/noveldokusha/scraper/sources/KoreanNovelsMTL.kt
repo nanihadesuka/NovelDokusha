@@ -28,6 +28,7 @@ class KoreanNovelsMTL(
     override val baseUrl = "https://www.koreanmtl.online/"
     override val catalogUrl = "https://www.koreanmtl.online/p/novels-listing.html?m=1"
     override val language = LanguageCode.ENGLISH
+    override val requiresLogin = true // Google account required
 
     override suspend fun getChapterTitle(doc: Document): String? = null
     override suspend fun getChapterText(doc: Document): String? = null
