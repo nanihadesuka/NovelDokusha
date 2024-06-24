@@ -25,8 +25,8 @@ class _1stKissNovel(
 ) : SourceInterface.Catalog {
     override val id = "1stkissnovel"
     override val nameStrId = R.string.source_name_1stkissnovel
-    override val catalogUrl = "https://1stkissnovel.love/novel/?m_orderby=alphabet"
-    override val baseUrl = "https://1stkissnovel.love/"
+    override val catalogUrl = "https://1stkissnovel.org/novel/?m_orderby=alphabet"
+    override val baseUrl = "https://1stkissnovel.org/"
     override val iconUrl =
         "https://1stkissnovel.org/wp-content/uploads/2023/04/cropped-Im-3-32x32.png"
     override val language = LanguageCode.ENGLISH
