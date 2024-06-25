@@ -9,12 +9,6 @@ import javax.inject.Singleton
 @Singleton
 internal class ReaderViewHandlersActions @Inject constructor() {
 
-    suspend fun doForceUpdateListViewState() {
-        withContext(Dispatchers.Main.immediate) {
-            forceUpdateListViewState?.invoke()
-        }
-    }
-
     suspend fun doMaintainLastVisiblePosition(fn: suspend () -> Unit) {
         withContext(Dispatchers.Main.immediate) {
             maintainLastVisiblePosition?.invoke(fn) ?: fn()
@@ -40,9 +34,6 @@ internal class ReaderViewHandlersActions @Inject constructor() {
     }
 
     @Volatile
-    var forceUpdateListViewState: (suspend () -> Unit)? = null
-
-    @Volatile
     var maintainLastVisiblePosition: (suspend (suspend () -> Unit) -> Unit)? = null
 
     @Volatile
@@ -59,7 +50,6 @@ internal class ReaderViewHandlersActions @Inject constructor() {
 
 
     fun invalidate() {
-        forceUpdateListViewState = null
         maintainLastVisiblePosition = null
         maintainStartPosition = null
         setInitialPosition = null

@@ -1,5 +1,8 @@
 package my.noveldokusha.features.reader.features
 
+import android.util.Log
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -48,7 +51,7 @@ internal class ReaderChaptersLoader(
     val chaptersStats = mutableMapOf<ChapterUrl, ChapterStats>()
     val loadedChapters = mutableSetOf<ChapterUrl>()
     val chapterLoadedFlow = MutableSharedFlow<ChapterLoaded>()
-    private val items: MutableList<ReaderItem> = ArrayList()
+    private val items: SnapshotStateList<ReaderItem> = mutableStateListOf<ReaderItem>()
     private val loaderQueue = mutableSetOf<LoadChapter.Type>()
     private val chapterLoaderFlow = MutableSharedFlow<LoadChapter>()
 
@@ -141,7 +144,6 @@ internal class ReaderChaptersLoader(
         loaderQueue.clear()
         launch(Dispatchers.Main.immediate) {
             items.clear()
-            readerViewHandlersActions.doForceUpdateListViewState()
             loadedChapters.clear()
             readerState = ReaderState.INITIAL_LOAD
             startChapterLoaderWatcher()
@@ -184,24 +186,20 @@ internal class ReaderChaptersLoader(
     ) = withContext(Dispatchers.Main.immediate) {
         readerState = ReaderState.INITIAL_LOAD
         items.clear()
-        readerViewHandlersActions.doForceUpdateListViewState()
 
         val insert: suspend (ReaderItem) -> Unit = {
             withContext(Dispatchers.Main.immediate) {
                 items.add(it)
-                readerViewHandlersActions.doForceUpdateListViewState()
             }
         }
         val insertAll: suspend (Collection<ReaderItem>) -> Unit = {
             withContext(Dispatchers.Main.immediate) {
                 items.addAll(it)
-                readerViewHandlersActions.doForceUpdateListViewState()
             }
         }
         val remove: suspend (ReaderItem) -> Unit = {
             withContext(Dispatchers.Main.immediate) {
                 items.remove(it)
-                readerViewHandlersActions.doForceUpdateListViewState()
             }
         }
         val index = orderedChapters.indexOfFirst { it.url == chapterLastState.chapterUrl }
@@ -218,7 +216,6 @@ internal class ReaderChaptersLoader(
             maintainPosition = readerViewHandlersActions::doMaintainStartPosition,
         )
 
-        readerViewHandlersActions.doForceUpdateListViewState()
         readerViewHandlersActions.doSetInitialPosition(
             InitialPositionChapter(
                 chapterIndex = index,
@@ -242,7 +239,6 @@ internal class ReaderChaptersLoader(
     ) = withContext(Dispatchers.Main.immediate) {
         readerState = ReaderState.INITIAL_LOAD
         items.clear()
-        readerViewHandlersActions.doForceUpdateListViewState()
 
         val validIndex = chapterIndex >= 0 && chapterIndex < orderedChapters.size
         if (!validIndex) {
@@ -253,21 +249,18 @@ internal class ReaderChaptersLoader(
         val insert: suspend (ReaderItem) -> Unit = {
             withContext(Dispatchers.Main.immediate) {
                 items.add(it)
-                readerViewHandlersActions.doForceUpdateListViewState()
             }
         }
 
         val insertAll: suspend (Collection<ReaderItem>) -> Unit = {
             withContext(Dispatchers.Main.immediate) {
                 items.addAll(it)
-                readerViewHandlersActions.doForceUpdateListViewState()
             }
         }
 
         val remove: suspend (ReaderItem) -> Unit = {
             withContext(Dispatchers.Main.immediate) {
                 items.remove(it)
-                readerViewHandlersActions.doForceUpdateListViewState()
             }
         }
 
@@ -287,8 +280,8 @@ internal class ReaderChaptersLoader(
             chapter = chapter,
         )
 
-        readerViewHandlersActions.doForceUpdateListViewState()
         readerViewHandlersActions.doSetInitialPosition(initialPosition)
+        Log.w("INFOMESS", "initialPosition: $initialPosition")
 
         chapterLoadedFlow.emit(
             ChapterLoaded(
@@ -314,14 +307,12 @@ internal class ReaderChaptersLoader(
             withContext(Dispatchers.Main.immediate) {
                 items.add(listIndex, it)
                 listIndex += 1
-                readerViewHandlersActions.doForceUpdateListViewState()
             }
         }
         val insertAll: suspend (Collection<ReaderItem>) -> Unit = {
             withContext(Dispatchers.Main.immediate) {
                 items.addAll(listIndex, it)
                 listIndex += it.size
-                readerViewHandlersActions.doForceUpdateListViewState()
             }
         }
         val remove: suspend (ReaderItem) -> Unit = {
@@ -330,7 +321,6 @@ internal class ReaderChaptersLoader(
                 if (isRemoved) {
                     listIndex -= 1
                 }
-                readerViewHandlersActions.doForceUpdateListViewState()
             }
         }
 
@@ -338,7 +328,6 @@ internal class ReaderChaptersLoader(
         if (previousIndex < 0) {
             readerViewHandlersActions.doMaintainLastVisiblePosition {
                 insert(ReaderItem.BookStart(chapterIndex = previousIndex))
-                readerViewHandlersActions.doForceUpdateListViewState()
             }
             readerState = ReaderState.IDLE
             return@withContext
@@ -374,26 +363,22 @@ internal class ReaderChaptersLoader(
         val insert: suspend (ReaderItem) -> Unit = {
             withContext(Dispatchers.Main.immediate) {
                 items.add(it)
-                readerViewHandlersActions.doForceUpdateListViewState()
             }
         }
         val insertAll: suspend (Collection<ReaderItem>) -> Unit = {
             withContext(Dispatchers.Main.immediate) {
                 items.addAll(it)
-                readerViewHandlersActions.doForceUpdateListViewState()
             }
         }
         val remove: suspend (ReaderItem) -> Unit = {
             withContext(Dispatchers.Main.immediate) {
                 items.remove(it)
-                readerViewHandlersActions.doForceUpdateListViewState()
             }
         }
 
         val nextIndex = lastItem.chapterIndex + 1
         if (nextIndex >= orderedChapters.size) {
             insert(ReaderItem.BookEnd(chapterIndex = nextIndex))
-            readerViewHandlersActions.doForceUpdateListViewState()
             readerState = ReaderState.IDLE
             return@withContext
         }
@@ -435,11 +420,10 @@ internal class ReaderChaptersLoader(
         )
         chapterItemPosition += 1
 
-        maintainPosition {
+        withContext(Dispatchers.Main.immediate) {
             insert(ReaderItem.Divider(chapterIndex = chapterIndex))
             insert(itemTitle)
             insert(itemProgressBar)
-            readerViewHandlersActions.doForceUpdateListViewState()
         }
 
         when (val res = readerRepository.downloadChapter(chapter.url)) {
@@ -468,7 +452,6 @@ internal class ReaderChaptersLoader(
                 if (itemTranslating != null) {
                     maintainPosition {
                         insert(itemTranslating)
-                        readerViewHandlersActions.doForceUpdateListViewState()
                     }
                 }
 
@@ -491,6 +474,10 @@ internal class ReaderChaptersLoader(
                 }
 
                 maintainPosition {
+//                    withContext(Dispatchers.Main.immediate) {
+//                        itemProgressBar.visible.value = false
+//                        itemTranslating?.visible?.value = false
+//                    }
                     remove(itemProgressBar)
                     itemTranslating?.let {
                         remove(it)
@@ -500,7 +487,6 @@ internal class ReaderChaptersLoader(
                     }
                     insertAll(items)
                     insert(ReaderItem.Divider(chapterIndex = chapterIndex))
-                    readerViewHandlersActions.doForceUpdateListViewState()
                 }
                 withContext(Dispatchers.Main.immediate) {
                     loadedChapters.add(chapter.url)
@@ -515,9 +501,11 @@ internal class ReaderChaptersLoader(
                     )
                 }
                 maintainPosition {
+//                    withContext(Dispatchers.Main.immediate) {
+//                        itemProgressBar.visible.value = false
+//                    }
                     remove(itemProgressBar)
                     insert(ReaderItem.Error(chapterIndex = chapterIndex, text = res.message))
-                    readerViewHandlersActions.doForceUpdateListViewState()
                 }
                 withContext(Dispatchers.Main.immediate) {
                     loadedChapters.add(chapter.url)

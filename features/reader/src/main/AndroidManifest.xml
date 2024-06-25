@@ -2,7 +2,11 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
 	<application>
-		<activity android:name="my.noveldokusha.features.reader.ReaderActivity" />
+		<activity
+			android:name="my.noveldokusha.features.reader.ReaderActivity"
+			android:windowSoftInputMode="adjustResize"
+			android:theme="@style/AppTheme.Light"
+			/>
 
 		<service
 			android:name="my.noveldokusha.features.reader.services.NarratorMediaControlsService"
