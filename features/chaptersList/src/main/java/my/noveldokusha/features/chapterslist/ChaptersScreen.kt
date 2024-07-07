@@ -123,8 +123,8 @@ internal fun ChaptersScreen(
                     TopAppBar(
                         scrollBehavior = scrollBehavior,
                         colors = TopAppBarDefaults.topAppBarColors(
-                            containerColor = Color.Unspecified,
-                            scrolledContainerColor = Color.Unspecified,
+                            containerColor = Color.Transparent,
+                            scrolledContainerColor = Color.Transparent,
                         ),
                         title = {
                             Text(
@@ -198,8 +198,8 @@ internal fun ChaptersScreen(
                     TopAppBar(
                         scrollBehavior = scrollBehavior,
                         colors = TopAppBarDefaults.topAppBarColors(
-                            containerColor = Color.Unspecified,
-                            scrolledContainerColor = Color.Unspecified,
+                            containerColor = MaterialTheme.colorApp.tintedSurface,
+                            scrolledContainerColor = MaterialTheme.colorApp.tintedSurface,
                         ),
                         title = {
                             Text(

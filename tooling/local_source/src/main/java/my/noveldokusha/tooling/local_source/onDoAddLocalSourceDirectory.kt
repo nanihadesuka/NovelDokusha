@@ -1,4 +1,4 @@
-package my.noveldokusha.composableActions
+package my.noveldokusha.tooling.local_source
 
 import android.content.Context
 import android.content.Intent
@@ -8,7 +8,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
 
 @Composable
-fun onDoAddLocalSourceDirectory(
+internal fun onDoAddLocalSourceDirectory(
     onResult: (uri: Uri) -> Unit
 ): () -> Unit {
     val directorySelector = rememberLauncherForActivityResult(

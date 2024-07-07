@@ -1,4 +1,4 @@
-package my.noveldokusha.workers.setup
+package my.noveldokusha.tooling.application_workers.setup
 
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.WorkManager
@@ -9,8 +9,8 @@ import kotlinx.coroutines.launch
 import my.noveldokusha.core.AppCoroutineScope
 import my.noveldokusha.core.appPreferences.AppPreferences
 import my.noveldokusha.core.domain.LibraryCategory
-import my.noveldokusha.workers.LibraryUpdatesWorker
-import my.noveldokusha.workers.UpdatesCheckerWorker
+import my.noveldokusha.tooling.application_workers.LibraryUpdatesWorker
+import my.noveldokusha.tooling.application_workers.UpdatesCheckerWorker
 import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Singleton

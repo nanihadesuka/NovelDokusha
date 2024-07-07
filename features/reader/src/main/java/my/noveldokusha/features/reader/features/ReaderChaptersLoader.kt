@@ -7,25 +7,24 @@ import kotlinx.coroutines.cancelChildren
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import my.noveldoksuha.data.AppRepository
 import my.noveldokusha.core.Response
+import my.noveldokusha.features.reader.ReaderRepository
 import my.noveldokusha.features.reader.domain.ChapterLoaded
 import my.noveldokusha.features.reader.domain.ChapterState
 import my.noveldokusha.features.reader.domain.ChapterStats
 import my.noveldokusha.features.reader.domain.ChapterUrl
+import my.noveldokusha.features.reader.domain.InitialPositionChapter
 import my.noveldokusha.features.reader.domain.ReaderItem
 import my.noveldokusha.features.reader.domain.ReaderState
 import my.noveldokusha.features.reader.domain.ReadingChapterPosStats
 import my.noveldokusha.features.reader.domain.indexOfReaderItem
-import my.noveldokusha.features.reader.tools.InitialPositionChapter
-import my.noveldokusha.features.reader.tools.getInitialChapterItemPosition
 import my.noveldokusha.features.reader.tools.textToItemsConverter
 import my.noveldokusha.features.reader.ui.ReaderViewHandlersActions
 import my.noveldokusha.tooling.local_database.tables.Chapter
 import kotlin.coroutines.CoroutineContext
 
 internal class ReaderChaptersLoader(
-    private val appRepository: AppRepository,
+    private val readerRepository: ReaderRepository,
     private val translatorTranslateOrNull: suspend (text: String) -> String?,
     private val translatorIsActive: () -> Boolean,
     private val translatorSourceLanguageOrNull: () -> String?,
@@ -282,8 +281,7 @@ internal class ReaderChaptersLoader(
 
 
         val chapter = orderedChapters[chapterIndex]
-        val initialPosition = getInitialChapterItemPosition(
-            appRepository = appRepository,
+        val initialPosition = readerRepository.getInitialChapterItemPosition(
             bookUrl = bookUrl,
             chapterIndex = chapter.position,
             chapter = chapter,
@@ -444,7 +442,7 @@ internal class ReaderChaptersLoader(
             readerViewHandlersActions.doForceUpdateListViewState()
         }
 
-        when (val res = appRepository.chapterBody.fetchBody(chapter.url)) {
+        when (val res = readerRepository.downloadChapter(chapter.url)) {
             is Response.Success -> {
                 // Split chapter text into items
                 val itemsOriginal = textToItemsConverter(

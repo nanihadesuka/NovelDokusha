@@ -2,7 +2,7 @@ package my.noveldokusha.features.reader.ui
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import my.noveldokusha.features.reader.tools.InitialPositionChapter
+import my.noveldokusha.features.reader.domain.InitialPositionChapter
 import javax.inject.Inject
 import javax.inject.Singleton
 

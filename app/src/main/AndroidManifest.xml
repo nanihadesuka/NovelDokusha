@@ -17,7 +17,6 @@
 	<uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 	<uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
 
-
 	<application
 		android:name=".App"
 		android:allowBackup="true"
@@ -53,9 +52,6 @@
 				<data android:scheme="file" />
 			</intent-filter>
 		</activity>
-
-		<activity android:name=".features.webView.WebViewActivity" />
-
 
 		<provider
 			android:name="androidx.startup.InitializationProvider"

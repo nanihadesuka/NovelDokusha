@@ -1,19 +1,19 @@
-package my.noveldokusha.workers.setup
+package my.noveldokusha.tooling.application_workers.setup
 
 import android.content.Context
 import android.util.Log
 import androidx.work.ListenableWorker
 import androidx.work.WorkerFactory
 import androidx.work.WorkerParameters
-import my.noveldoksuha.data.AppRemoteRepository
 import my.noveldoksuha.coreui.states.NotificationsCenter
+import my.noveldoksuha.data.AppRemoteRepository
 import my.noveldoksuha.interactor.LibraryUpdatesInteractions
-import my.noveldokusha.notifications.LibraryUpdateNotification
-import my.noveldokusha.workers.LibraryUpdatesWorker
-import my.noveldokusha.workers.UpdatesCheckerWorker
+import my.noveldokusha.tooling.application_workers.LibraryUpdatesWorker
+import my.noveldokusha.tooling.application_workers.UpdatesCheckerWorker
+import my.noveldokusha.tooling.application_workers.notifications.LibraryUpdateNotification
 import javax.inject.Inject
 
-class AppWorkerFactory @Inject constructor(
+class AppWorkerFactory @Inject internal constructor(
     private val appRemoteRepository: AppRemoteRepository,
     private val notificationsCenter: NotificationsCenter,
     private val libraryUpdateNotification: LibraryUpdateNotification,

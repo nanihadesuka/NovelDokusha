@@ -1,4 +1,4 @@
-package my.noveldokusha.scraper
+package my.noveldokusha.tooling.local_source
 
 import android.content.Context
 import android.net.Uri
@@ -33,19 +33,19 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.withContext
-import my.noveldokusha.composableActions.onDoAddLocalSourceDirectory
+import my.noveldoksuha.coreui.theme.Grey25
+import my.noveldoksuha.coreui.theme.textPadding
 import my.noveldokusha.core.AppFileResolver
 import my.noveldokusha.core.PagedList
 import my.noveldokusha.core.Response
 import my.noveldokusha.core.asSequence
+import my.noveldokusha.core.fileImporter
 import my.noveldokusha.core.getOrNull
 import my.noveldokusha.network.tryConnect
+import my.noveldokusha.scraper.R
 import my.noveldokusha.scraper.domain.BookResult
 import my.noveldokusha.scraper.domain.ChapterResult
 import my.noveldokusha.scraper.sources.LocalSource
-import my.noveldoksuha.coreui.theme.Grey25
-import my.noveldokusha.core.fileImporter
-import my.noveldoksuha.coreui.theme.textPadding
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -180,24 +180,24 @@ class AppLocalSources @Inject constructor(
     }
 
     private suspend fun addCover(
-        BookResult: BookResult
+        bookResult: BookResult
     ): BookResult = withContext(Dispatchers.IO) {
-        val coverFile = appFileResolver.getStorageBookCoverImageFile(BookResult.title)
+        val coverFile = appFileResolver.getStorageBookCoverImageFile(bookResult.title)
         if (!coverFile.exists()) {
-            val inputStream = appContext.contentResolver.openInputStream(BookResult.url.toUri())
-                ?: return@withContext BookResult
+            val inputStream = appContext.contentResolver.openInputStream(bookResult.url.toUri())
+                ?: return@withContext bookResult
             val coverImage = inputStream.use {
                 my.noveldokusha.epub_parser.epubCoverParser(
                     inputStream = inputStream
                 )
             }
-                ?: return@withContext BookResult
+                ?: return@withContext bookResult
             fileImporter(
                 targetFile = coverFile,
                 imageData = coverImage.image,
             )
         }
-        BookResult.copy(
+        bookResult.copy(
             coverImageUrl = coverFile.canonicalFile.absolutePath
         )
     }

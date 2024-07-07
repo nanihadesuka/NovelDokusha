@@ -44,8 +44,8 @@ android {
 
     defaultConfig {
         applicationId = "my.noveldokusha"
-        versionCode = 13
-        versionName = "2.0.1"
+        versionCode = 14
+        versionName = "2.1.0"
         setProperty("archivesBaseName", "NovelDokusha_v$versionName")
     }
 
@@ -116,6 +116,9 @@ dependencies {
     implementation(projects.tooling.textTranslator.domain)
     implementation(projects.tooling.textToSpeech)
     implementation(projects.tooling.epubImporter)
+    implementation(projects.tooling.applicationWorkers)
+    implementation(projects.tooling.localSource)
+
     implementation(projects.features.reader)
     implementation(projects.features.chaptersList)
     implementation(projects.features.globalSourceSearch)
@@ -124,6 +127,8 @@ dependencies {
     implementation(projects.features.catalogExplorer)
     implementation(projects.features.libraryExplorer)
     implementation(projects.features.settings)
+    implementation(projects.features.webview)
+
     implementation(projects.data)
     implementation(projects.core)
     implementation(projects.coreui)

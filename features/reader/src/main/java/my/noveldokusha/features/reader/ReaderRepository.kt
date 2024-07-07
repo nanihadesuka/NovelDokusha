@@ -1,12 +1,17 @@
 package my.noveldokusha.features.reader
 
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
+import my.noveldoksuha.data.AppRepository
 import my.noveldoksuha.data.BookChaptersRepository
 import my.noveldoksuha.data.LibraryBooksRepository
 import my.noveldokusha.core.AppCoroutineScope
-import my.noveldokusha.features.reader.domain.ChapterState
 import my.noveldokusha.feature.local_database.AppDatabase
+import my.noveldokusha.features.reader.domain.ChapterState
+import my.noveldokusha.features.reader.domain.InitialPositionChapter
+import my.noveldokusha.tooling.local_database.tables.Chapter
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -16,6 +21,7 @@ internal class ReaderRepository @Inject constructor(
     private val database: AppDatabase,
     private val bookChaptersRepository: BookChaptersRepository,
     private val libraryBooksRepository: LibraryBooksRepository,
+    private val appRepository: AppRepository,
 ) {
 
     fun saveBookLastReadPositionState(
@@ -44,4 +50,31 @@ internal class ReaderRepository @Inject constructor(
             }
         }
     }
+
+    suspend fun getInitialChapterItemPosition(
+        bookUrl: String,
+        chapterIndex: Int,
+        chapter: Chapter,
+    ): InitialPositionChapter = coroutineScope {
+        val titleChapterItemPosition = 0 // Hardcode or no?
+        val book = async { appRepository.libraryBooks.get(bookUrl) }
+        val position = InitialPositionChapter(
+            chapterIndex = chapterIndex,
+            chapterItemPosition = chapter.lastReadPosition,
+            chapterItemOffset = chapter.lastReadOffset,
+        )
+
+        when {
+            chapter.url == book.await()?.lastReadChapter -> position
+            chapter.read -> InitialPositionChapter(
+                chapterIndex = chapterIndex,
+                chapterItemPosition = titleChapterItemPosition,
+                chapterItemOffset = 0,
+            )
+            else -> position
+        }
+    }
+
+    suspend fun downloadChapter(chapterUrl: String) =
+        appRepository.chapterBody.fetchBody(chapterUrl)
 }

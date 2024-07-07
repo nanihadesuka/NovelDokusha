@@ -21,18 +21,17 @@ import org.jsoup.nodes.Document
 
 /**
  * Novel main page (chapter list) example:
- * https://www.readlightnovel.today/goat-of-all-ghouls-1
+ * https://www.readlightnovel.meme/goat-of-all-ghouls-1
  * Chapter url example:
- * https://www.readlightnovel.today/goat-of-all-ghouls-1/chapter-1
+ * https://www.readlightnovel.meme/goat-of-all-ghouls-1/chapter-1
  */
-// TODO: website changed domain to .meme
 class ReadLightNovel(
     private val networkClient: NetworkClient
 ) : SourceInterface.Catalog {
     override val id = "read_light_novel"
     override val nameStrId = R.string.source_name_read_light_novel
-    override val baseUrl = "https://www.readlightnovel.today/"
-    override val catalogUrl = "https://www.readlightnovel.today/top-novels/new/1"
+    override val baseUrl = "https://www.readlightnovel.meme/"
+    override val catalogUrl = "https://www.readlightnovel.meme/top-novels/new/1"
     override val language = LanguageCode.ENGLISH
 
     override suspend fun getChapterTitle(doc: Document): String? =

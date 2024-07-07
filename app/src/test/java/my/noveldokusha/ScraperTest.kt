@@ -1,8 +1,8 @@
 package my.noveldokusha
 
 import my.noveldokusha.network.NetworkClient
-import my.noveldokusha.scraper.AppLocalSources
 import my.noveldokusha.scraper.Scraper
+import my.noveldokusha.tooling.local_source.AppLocalSources
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue

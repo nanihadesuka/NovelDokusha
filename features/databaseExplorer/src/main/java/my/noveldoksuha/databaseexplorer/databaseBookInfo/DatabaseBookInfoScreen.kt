@@ -72,8 +72,8 @@ internal fun DatabaseBookInfoScreen(
                     TopAppBar(
                         scrollBehavior = scrollBehavior,
                         colors = TopAppBarDefaults.topAppBarColors(
-                            containerColor = Color.Unspecified,
-                            scrolledContainerColor = Color.Unspecified,
+                            containerColor = Color.Transparent,
+                            scrolledContainerColor = Color.Transparent,
                         ),
                         title = {
                             Text(

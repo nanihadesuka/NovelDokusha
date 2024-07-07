@@ -1,4 +1,4 @@
-package my.noveldokusha.workers
+package my.noveldokusha.tooling.application_workers
 
 import androidx.work.ExistingWorkPolicy
 import androidx.work.WorkManager
@@ -8,7 +8,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class AppWorkersInteractions @Inject constructor(
+internal class AppWorkersInteractions @Inject constructor(
     private val workManager: WorkManager
 ): WorkersInteractions {
 

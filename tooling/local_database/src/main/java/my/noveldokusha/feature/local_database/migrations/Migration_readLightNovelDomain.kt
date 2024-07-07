@@ -1,8 +1,11 @@
+@file:Suppress("FunctionName")
+
 package my.noveldokusha.tooling.local_database.migrations
 
 import androidx.sqlite.db.SupportSQLiteDatabase
+import my.noveldokusha.feature.local_database.migrations.websiteDomainChangeHelper
 
-internal fun MigrationsList.readLightNovelDomainChange_1(
+internal fun MigrationsList.readLightNovelDomainChange_1_today(
     it: SupportSQLiteDatabase
 ) {
     // readlightnovel source changed its domain to "today"
@@ -41,3 +44,11 @@ internal fun MigrationsList.readLightNovelDomainChange_1(
         """.trimIndent()
     )
 }
+
+internal fun MigrationsList.readLightNovelDomainChange_2_meme(
+    it: SupportSQLiteDatabase,
+) = this.websiteDomainChangeHelper(
+    it,
+    oldDomain = "www.readlightnovel.today",
+    newDomain = "www.readlightnovel.meme",
+)

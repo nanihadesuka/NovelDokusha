@@ -67,8 +67,7 @@ fun TopAppBarSearch(
             colors = TopAppBarDefaults.topAppBarColors(
                 containerColor = Color.Transparent,
                 scrolledContainerColor = Color.Transparent,
-
-                ),
+            ),
             navigationIcon = {
                 IconButton(onClick = onClose, modifier = Modifier.padding(start = 2.dp)) {
                     Icon(

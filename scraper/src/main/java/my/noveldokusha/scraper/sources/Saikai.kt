@@ -19,6 +19,7 @@ import my.noveldokusha.scraper.domain.BookResult
 import my.noveldokusha.scraper.domain.ChapterResult
 import java.io.StringReader
 
+// Cloudfare blocked
 class Saikai(
     private val networkClient: NetworkClient
 ) : SourceInterface.Catalog {
