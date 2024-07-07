@@ -4,6 +4,7 @@
 	<application>
 		<service
 			android:name=".EpubImportService"
+			android:foregroundServiceType="dataSync"
 			android:exported="false"
 			/>
 	</application>
