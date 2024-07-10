@@ -16,5 +16,5 @@ fun onBackupRestore(): () -> Unit {
         }
     )
 
-    return { fileExplorer.launch("application/*") }
+    return { fileExplorer.launch("*/*") }
 }
