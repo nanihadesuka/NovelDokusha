@@ -36,8 +36,8 @@ class WuxiaWorld(
         tryConnect {
             networkClient.get(bookUrl).toDocument()
                 .selectFirst("div.summary_image")
-                ?.selectFirst("img[src]")
-                ?.attr("src")
+                ?.selectFirst("img[data-src]")
+                ?.attr("data-src")
         }
     }
 
@@ -90,8 +90,9 @@ class WuxiaWorld(
                 .mapNotNull {
                     val link = it.selectFirst("a[href]") ?: return@mapNotNull null
                     val bookCover = it
-                        .selectFirst("img[src]")
-                        ?.attr("src") ?: ""
+                        .selectFirst("img[data-src]")
+                        ?.attr("data-src")
+                        ?: ""
 
                     BookResult(
                         title = link.attr("title"),
@@ -134,8 +135,10 @@ class WuxiaWorld(
             doc.select(".c-tabs-item__content")
                 .mapNotNull {
                     val link = it.selectFirst("a[href]") ?: return@mapNotNull null
-                    val bookCover = it.selectFirst("img[src]")
-                        ?.attr("src") ?: ""
+                    val bookCover = it
+                        .selectFirst("img[data-src]")
+                        ?.attr("data-src")
+                        ?: ""
 
                     BookResult(
                         title = link.attr("title"),
