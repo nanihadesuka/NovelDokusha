@@ -112,9 +112,12 @@ class NovelUpdates(
         tryFlatConnect {
             val page = index + 1
             val url = baseUrl.toUrlBuilderSafe().apply {
-                if (page > 1) appendPath("page").appendPath(page.toString())
-                add("s", input)
-                add("post_type", "seriesplans")
+                appendPath("series-finder")
+                add("sf", 1)
+                add("sh", input)
+                add("sort", "sdate")
+                add("order", "desc")
+                if (page > 1) add("pg", page)
             }
             getSearchList(index, url)
         }

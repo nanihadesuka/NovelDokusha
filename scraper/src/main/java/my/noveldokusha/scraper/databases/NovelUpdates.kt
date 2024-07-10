@@ -65,9 +65,12 @@ class NovelUpdates(
     ) = withContext(Dispatchers.Default) {
         val page = index + 1
         val url = baseUrl.toUrlBuilderSafe().apply {
-            if (page > 1) appendPath("page").appendPath(page.toString())
-            add("s", input)
-            add("post_type", "seriesplans")
+            appendPath("series-finder")
+            add("sf", 1)
+            add("sh", input)
+            add("sort", "sdate")
+            add("order", "desc")
+            if (page > 1) add("pg", page)
         }
 
         getSearchList(page, url)
@@ -79,19 +82,22 @@ class NovelUpdates(
         genresExcludedId: List<String>
     ) = withContext(Dispatchers.Default) {
         val page = index + 1
-        val url = "https://www.novelupdates.com/series-finder/?sf=1"
-            .toUrlBuilderSafe()
-            .apply {
-                if (genresIncludedId.isNotEmpty()) add(
+        val url = baseUrl.toUrlBuilderSafe().apply {
+            appendPath("series-finder")
+            add("sf", 1)
+            if (genresIncludedId.isNotEmpty()) {
+                add(
                     "gi" to genresIncludedId.joinToString(","),
                     "mgi" to "and"
                 )
-                if (genresExcludedId.isNotEmpty())
-                    add("ge", genresExcludedId.joinToString(","))
-                add("sort", "sdate")
-                add("order", "desc")
-                if (page > 1) add("pg", page)
             }
+            if (genresExcludedId.isNotEmpty()) {
+                add("ge", genresExcludedId.joinToString(","))
+            }
+            add("sort", "sdate")
+            add("order", "desc")
+            if (page > 1) add("pg", page)
+        }
 
         getSearchList(index, url)
     }
