@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.Color
 import androidx.annotation.AttrRes
 import androidx.annotation.ColorInt
+import androidx.core.content.res.use
 
 @ColorInt
 fun @receiver:AttrRes Int.colorAttrRes(ctx: Context): Int =

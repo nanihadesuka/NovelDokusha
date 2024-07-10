@@ -22,7 +22,7 @@ androidTools = "31.3.0"
 androidx-navigation-ui-ktx = "2.6.0"
 androidx-navigation-fragment-ktx = "2.6.0"
 androidx-preference-ktx = "1.2.0"
-androidx-core-ktx = "1.10.1"
+androidx-core-ktx = "1.13.1"
 androidx-activity-ktx = "1.7.2"
 androidx-fragment-ktx = "1.6.1"
 
