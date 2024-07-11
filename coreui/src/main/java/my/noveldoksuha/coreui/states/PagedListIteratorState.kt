@@ -30,7 +30,7 @@ class PagedListIteratorState<T>(
     private var job: Job? = null
 
     var state by mutableStateOf(IteratorState.IDLE)
-    var error by mutableStateOf<String?>(null)
+    var error by mutableStateOf<Response.Error?>(null)
 
     fun reset() {
         job?.cancel()
@@ -70,7 +70,7 @@ class PagedListIteratorState<T>(
                 }
 
                 is Response.Error -> {
-                    error = res.message
+                    error = res
                     IteratorState.CONSUMED
                 }
             }

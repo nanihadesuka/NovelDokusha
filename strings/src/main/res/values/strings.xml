@@ -191,4 +191,8 @@
     <string name="library_update_interval_12_h">12 h</string>
     <string name="library_update_interval_1_day">1 day</string>
     <string name="library_update_interval_2_days">2 days</string>
+	<string name="cloudfare_firewall_detected">Cloudfare firewall detected</string>
+    <string name="please_open_webview_and_try_verify_then_reload">Please open webview and try verify, then reload</string>
+    <string name="cloudfare_firewall_failed_bypass">Cloudfare firewall failed bypass</string>
+    <string name="tried_but_failed_to_bypass_cloudfare_firewall">Tried but failed to bypass cloudfare firewall</string>
 </resources>

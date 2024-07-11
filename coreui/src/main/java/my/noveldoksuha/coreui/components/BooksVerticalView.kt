@@ -26,7 +26,10 @@ import my.noveldoksuha.coreui.composableActions.ListGridLoadWatcher
 import my.noveldoksuha.coreui.modifiers.bounceOnPressed
 import my.noveldoksuha.coreui.states.IteratorState
 import my.noveldoksuha.coreui.theme.ColorAccent
+import my.noveldokusha.core.Response
 import my.noveldokusha.core.appPreferences.ListLayoutMode
+import my.noveldokusha.core.domain.CloudfareVerificationBypassFailedException
+import my.noveldokusha.core.domain.WebViewCookieManagerInitializationFailedException
 import my.noveldokusha.core.rememberResolvedBookImagePath
 import my.noveldokusha.tooling.local_database.BookMetadata
 
@@ -34,7 +37,7 @@ import my.noveldokusha.tooling.local_database.BookMetadata
 fun BooksVerticalView(
     list: List<BookMetadata>,
     state: LazyGridState,
-    error: String?,
+    error: Response.Error?,
     loadState: IteratorState,
     layoutMode: ListLayoutMode,
     onLoadNext: () -> Unit,
@@ -42,6 +45,7 @@ fun BooksVerticalView(
     onBookLongClicked: (bookItem: BookMetadata) -> Unit,
     onReload: () -> Unit = {},
     onCopyError: (String) -> Unit = {},
+    onWebViewOpen: () -> Unit = {},
     cells: GridCells = GridCells.Adaptive(160.dp),
     innerPadding: PaddingValues = PaddingValues(),
 ) {
@@ -118,8 +122,32 @@ fun BooksVerticalView(
             }
         }
 
+        when (error?.exception) {
+            is WebViewCookieManagerInitializationFailedException -> {
+                item(span = { GridItemSpan(maxLineSpan) }) {
+                    ClickableOption(
+                        title = stringResource(R.string.cloudfare_firewall_detected),
+                        subtitle = stringResource(R.string.please_open_webview_and_try_verify_then_reload),
+                        onClick = onWebViewOpen,
+                        modifier = Modifier.padding(12.dp)
+                    )
+                }
+            }
+            is CloudfareVerificationBypassFailedException -> {
+                item(span = { GridItemSpan(maxLineSpan) }) {
+                    ClickableOption(
+                        title = stringResource(R.string.cloudfare_firewall_failed_bypass),
+                        subtitle = stringResource(R.string.tried_but_failed_to_bypass_cloudfare_firewall),
+                        onClick = onWebViewOpen,
+                        modifier = Modifier.padding(12.dp)
+                    )
+                }
+            }
+            null -> Unit
+        }
+
         if (error != null) item(span = { GridItemSpan(maxLineSpan) }) {
-            ErrorView(error = error, onReload = onReload, onCopyError = onCopyError)
+            ErrorView(error = error.message, onReload = onReload, onCopyError = onCopyError)
         }
     }
 }

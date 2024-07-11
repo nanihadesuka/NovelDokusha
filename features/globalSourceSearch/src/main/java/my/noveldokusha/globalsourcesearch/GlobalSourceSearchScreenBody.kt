@@ -32,6 +32,7 @@ import my.noveldoksuha.coreui.theme.InternalTheme
 import my.noveldoksuha.coreui.theme.PreviewThemes
 import my.noveldoksuha.data.CatalogItem
 import my.noveldoksuha.mappers.mapToBookMetadata
+import my.noveldokusha.core.Response
 import my.noveldokusha.core.rememberResolvedBookImagePath
 import my.noveldokusha.scraper.domain.BookResult
 import my.noveldokusha.scraper.fixtures.fixturesCatalogList
@@ -59,7 +60,7 @@ internal fun GlobalSourceSearchScreenBody(
             SourceListView(
                 list = entry.fetchIterator.list,
                 loadState = entry.fetchIterator.state,
-                error = entry.fetchIterator.error,
+                error = entry.fetchIterator.error?.message,
                 onBookClick = onBookClick,
                 onLoadNext = { entry.fetchIterator.fetchNext() },
             )
@@ -175,13 +176,13 @@ private fun PreviewView() {
             }
 
             2 -> {
-                sr.fetchIterator.error = "Error here"
+                sr.fetchIterator.error = Response.Error("Error here", Exception())
             }
 
             else -> {
                 sr.fetchIterator.list.addAll(books.take(2))
                 sr.fetchIterator.state = IteratorState.CONSUMED
-                sr.fetchIterator.error = "Error here"
+                sr.fetchIterator.error = Response.Error("Error here", Exception())
             }
         }
         sr

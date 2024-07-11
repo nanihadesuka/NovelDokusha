@@ -153,6 +153,7 @@ internal fun SourceCatalogScreen(
                 onBookLongClicked = onBookLongClicked,
                 onReload = state.fetchIterator::reloadFailedLastLoad,
                 onCopyError = context::actionCopyToClipboard,
+                onWebViewOpen = onOpenSourceWebPage,
                 innerPadding = innerPadding
             )
         }

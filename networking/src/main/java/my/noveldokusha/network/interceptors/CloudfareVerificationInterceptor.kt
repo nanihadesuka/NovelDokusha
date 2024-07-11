@@ -12,6 +12,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
+import my.noveldokusha.core.domain.CloudfareVerificationBypassFailedException
+import my.noveldokusha.core.domain.WebViewCookieManagerInitializationFailedException
 import okhttp3.Interceptor
 import okhttp3.Request
 import okhttp3.Response
@@ -47,29 +49,37 @@ internal class CloudFareVerificationInterceptor(
 
         return lock.withLock {
             try {
+                val cookieManager = CookieManager.getInstance()
+                    ?: throw WebViewCookieManagerInitializationFailedException()
+
                 response.close()
                 // Remove old cf_clearance from the cookie
-                val cookie = CookieManager
-                    .getInstance()
+                val cookie = cookieManager
                     .getCookie(request.url.toString())
-                    .splitToSequence(";")
-                    .map { it.split("=").map(String::trim) }
-                    .filter { it[0] != "cf_clearance" }
-                    .joinToString(";") { it.joinToString("=") }
+                    ?.splitToSequence(";")
+                    ?.map { it.split("=").map(String::trim) }
+                    ?.filter { it[0] != "cf_clearance" }
+                    ?.joinToString(";") { it.joinToString("=") }
 
-                CookieManager
-                    .getInstance()
-                    .setCookie(request.url.toString(), cookie)
+                cookieManager.setCookie(request.url.toString(), cookie)
 
                 runBlocking(Dispatchers.IO) {
-                    resolveWithWebView(request)
+                    resolveWithWebView(request, cookieManager)
                 }
 
-                chain.proceed(request)
+                val responseCloudfare = chain.proceed(request)
+
+                if (!isNotCloudFare(responseCloudfare)) {
+                    throw CloudfareVerificationBypassFailedException()
+                }
+
+                responseCloudfare
             } catch (e: CancellationException) {
                 throw e
+            } catch (e: IOException) {
+                throw e
             } catch (e: Exception) {
-                throw IOException(e)
+                throw IOException(e.message, e.cause)
             }
         }
     }
@@ -80,13 +90,15 @@ internal class CloudFareVerificationInterceptor(
     }
 
     @SuppressLint("SetJavaScriptEnabled")
-    private suspend fun resolveWithWebView(request: Request) = withContext(Dispatchers.Default) {
+    private suspend fun resolveWithWebView(
+        request: Request,
+        cookieManager: CookieManager
+    ) = withContext(Dispatchers.Default) {
         val headers = request
             .headers
             .toMultimap()
             .mapValues { it.value.firstOrNull() ?: "" }
 
-        val cookieManager = CookieManager.getInstance()
         WebSettings.getDefaultUserAgent(appContext)
 
         withContext(Dispatchers.Main) {
