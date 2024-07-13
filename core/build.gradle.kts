@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.noveldokusha.android.library)
     alias(libs.plugins.noveldokusha.android.compose)
+    alias(libs.plugins.kotlin.serialization)
 }
 
 android {
