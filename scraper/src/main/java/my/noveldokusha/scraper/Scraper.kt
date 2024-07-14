@@ -37,12 +37,12 @@ class Scraper @Inject constructor(
     networkClient: NetworkClient,
     localSource: LocalSource
 ) {
-    val databasesList = setOf<DatabaseInterface>(
+    val databasesList = setOf(
         NovelUpdates(networkClient),
         BakaUpdates(networkClient)
     )
 
-    val sourcesList = setOf<SourceInterface>(
+    val sourcesList = setOf(
         localSource,
         LightNovelsTranslations(networkClient),
         ReadLightNovel(networkClient),

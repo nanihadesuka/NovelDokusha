@@ -25,8 +25,8 @@ internal class SharedPreference_Serializable<T>(
 
 internal class SharedPreference_Enum<T : Enum<T>>(
     val name: String,
-    val sharedPreferences: SharedPreferences,
-    val defaultValue: T,
+    private val sharedPreferences: SharedPreferences,
+    private val defaultValue: T,
     val deserializer: (String) -> T
 ) {
     operator fun getValue(thisRef: Any?, property: KProperty<*>): T = kotlin.runCatching {
@@ -39,8 +39,8 @@ internal class SharedPreference_Enum<T : Enum<T>>(
 
 internal class SharedPreference_Int(
     val name: String,
-    val sharedPreferences: SharedPreferences,
-    val defaultValue: Int
+    private val sharedPreferences: SharedPreferences,
+    private val defaultValue: Int
 ) {
     operator fun getValue(thisRef: Any?, property: KProperty<*>) =
         sharedPreferences.getInt(name, defaultValue)
@@ -51,8 +51,8 @@ internal class SharedPreference_Int(
 
 internal class SharedPreference_Float(
     val name: String,
-    val sharedPreferences: SharedPreferences,
-    val defaultValue: Float
+    private val sharedPreferences: SharedPreferences,
+    private val defaultValue: Float
 ) {
     operator fun getValue(thisRef: Any?, property: KProperty<*>) =
         sharedPreferences.getFloat(name, defaultValue)
@@ -63,8 +63,8 @@ internal class SharedPreference_Float(
 
 internal class SharedPreference_String(
     val name: String,
-    val sharedPreferences: SharedPreferences,
-    val defaultValue: String
+    private val sharedPreferences: SharedPreferences,
+    private val defaultValue: String
 ) {
     operator fun getValue(thisRef: Any?, property: KProperty<*>) =
         sharedPreferences.getString(name, null) ?: defaultValue
@@ -75,8 +75,8 @@ internal class SharedPreference_String(
 
 internal class SharedPreference_StringSet(
     val name: String,
-    val sharedPreferences: SharedPreferences,
-    val defaultValue: Set<String>
+    private val sharedPreferences: SharedPreferences,
+    private val defaultValue: Set<String>
 ) {
     operator fun getValue(thisRef: Any?, property: KProperty<*>) =
         sharedPreferences.getStringSet(name, null)?.toSet() ?: defaultValue
@@ -87,8 +87,8 @@ internal class SharedPreference_StringSet(
 
 internal class SharedPreference_Boolean(
     val name: String,
-    val sharedPreferences: SharedPreferences,
-    val defaultValue: Boolean
+    private val sharedPreferences: SharedPreferences,
+    private val defaultValue: Boolean
 ) {
     operator fun getValue(thisRef: Any?, property: KProperty<*>) =
         sharedPreferences.getBoolean(name, defaultValue)

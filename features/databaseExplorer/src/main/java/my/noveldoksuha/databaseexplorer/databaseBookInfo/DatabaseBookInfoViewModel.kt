@@ -1,5 +1,6 @@
 package my.noveldoksuha.databaseexplorer.databaseBookInfo
 
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
@@ -9,7 +10,7 @@ import my.noveldoksuha.coreui.BaseViewModel
 import my.noveldokusha.core.utils.StateExtra_String
 import my.noveldokusha.scraper.DatabaseInterface
 import my.noveldokusha.scraper.Scraper
-import my.noveldokusha.tooling.local_database.BookMetadata
+import my.noveldokusha.feature.local_database.BookMetadata
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -38,7 +39,7 @@ class DatabaseBookInfoViewModel @Inject constructor(
     val database = scraper.getCompatibleDatabase(databaseUrlBase)!!
 
     internal val state = DatabaseBookInfoState(
-        databaseNameStrId = mutableStateOf(database.nameStrId),
+        databaseNameStrId = mutableIntStateOf(database.nameStrId),
         book = mutableStateOf(
             DatabaseInterface.BookData(
                 title = bookTitle,

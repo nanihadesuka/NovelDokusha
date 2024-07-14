@@ -18,7 +18,7 @@ class AppFileResolver @Inject constructor(
     @ApplicationContext context: Context,
 ) {
     companion object {
-        const val coverPathRelativeToBook = "__cover_image"
+        const val COVER_PATH_RELATIVE_TO_BOOK = "__cover_image"
     }
 
     val folderBooks = File(context.filesDir, "books")
@@ -27,7 +27,7 @@ class AppFileResolver @Inject constructor(
         if (url.isContentUri) bookFolderName.addLocalUriPrefix else url
 
     fun getLocalBookCoverPath(): String = Paths.get(
-        coverPathRelativeToBook
+        COVER_PATH_RELATIVE_TO_BOOK
     ).toString().addLocalUriPrefix
 
     fun getLocalBookChapterPath(bookFolderName: String, chapterName: String): String = Paths.get(
@@ -42,7 +42,7 @@ class AppFileResolver @Inject constructor(
     fun getStorageBookCoverImageFile(bookFolderName: String): File = Paths.get(
         folderBooks.absolutePath,
         bookFolderName.removeLocalUriPrefix,
-        coverPathRelativeToBook
+        COVER_PATH_RELATIVE_TO_BOOK
     ).toFile()
 
     fun getStorageBookImageFile(bookFolderName: String, imagePath: String): File {

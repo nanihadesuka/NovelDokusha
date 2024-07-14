@@ -1,8 +1,7 @@
-package my.noveldokusha.epub_parser
+package my.noveldokusha.epub_tooling
 
 import android.graphics.BitmapFactory
 import my.noveldokusha.core.BookTextMapper
-import my.noveldokusha.tooling.epub_parser.EpubFile
 import org.jsoup.Jsoup
 import org.jsoup.nodes.TextNode
 import java.io.File

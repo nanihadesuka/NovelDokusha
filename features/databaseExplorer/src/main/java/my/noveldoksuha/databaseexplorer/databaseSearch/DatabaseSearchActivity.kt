@@ -14,7 +14,7 @@ import my.noveldoksuha.coreui.theme.colorAttrRes
 import my.noveldoksuha.databaseexplorer.R
 import my.noveldoksuha.databaseexplorer.databaseBookInfo.DatabaseBookInfoActivity
 import my.noveldokusha.core.utils.Extra_Parcelable
-import my.noveldokusha.tooling.local_database.BookMetadata
+import my.noveldokusha.feature.local_database.BookMetadata
 
 
 sealed interface DatabaseSearchExtras : Parcelable {

@@ -73,7 +73,7 @@ class RestoreDataService : Service() {
                 ContextCompat.startForegroundService(ctx, IntentData(ctx, uri))
         }
 
-        fun isRunning(context: Context): Boolean =
+        private fun isRunning(context: Context): Boolean =
             context.isServiceRunning(RestoreDataService::class.java)
     }
 

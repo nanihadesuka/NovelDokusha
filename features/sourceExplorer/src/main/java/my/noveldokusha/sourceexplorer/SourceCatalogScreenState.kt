@@ -5,7 +5,7 @@ import androidx.compose.runtime.State
 import my.noveldoksuha.coreui.components.ToolbarMode
 import my.noveldoksuha.coreui.states.PagedListIteratorState
 import my.noveldokusha.core.appPreferences.ListLayoutMode
-import my.noveldokusha.tooling.local_database.BookMetadata
+import my.noveldokusha.feature.local_database.BookMetadata
 
 internal data class SourceCatalogScreenState(
     val sourceCatalogNameStrId: State<Int>,

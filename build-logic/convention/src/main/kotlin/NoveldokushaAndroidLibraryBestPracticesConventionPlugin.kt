@@ -19,7 +19,7 @@ class NoveldokushaAndroidLibraryBestPracticesConventionPlugin : Plugin<Project> 
 
             extensions.configure<LibraryExtension> {
                 configureAndroid(this)
-                defaultConfig.targetSdk = appConfig.targetSdk
+                defaultConfig.targetSdk = appConfig.TARGET_SDK
                 // The resource prefix is derived from the module name,
                 // so resources inside ":core:module1" must be prefixed with "core_module1_"
                 resourcePrefix = path

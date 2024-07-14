@@ -29,7 +29,7 @@ class WbNovel(private val networkClient: NetworkClient) : SourceInterface.Catalo
         "https://wbnovel.com/wp-content/uploads/2019/01/cropped-w-32x32.png"
     override val language = LanguageCode.INDONESIAN
 
-    suspend fun getPagesList(
+    private suspend fun getPagesList(
         index: Int,
         url: String,
         isSearch: Boolean = false,

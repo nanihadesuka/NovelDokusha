@@ -18,7 +18,7 @@ class NoveldokushaAndroidApplicationBestPracticesConventionPlugin : Plugin<Proje
 
             extensions.configure<ApplicationExtension> {
                 configureAndroid(this)
-                defaultConfig.targetSdk = appConfig.targetSdk
+                defaultConfig.targetSdk = appConfig.TARGET_SDK
             }
         }
     }

@@ -33,7 +33,7 @@ import my.noveldokusha.features.reader.domain.chapterReadPercentage
 import my.noveldokusha.features.reader.manager.ReaderManager
 import my.noveldokusha.navigation.NavigationRoutes
 import my.noveldokusha.reader.R
-import my.noveldokusha.tooling.local_database.BookMetadata
+import my.noveldokusha.feature.local_database.BookMetadata
 import javax.inject.Inject
 
 internal class NarratorMediaControlsNotification @Inject constructor(
@@ -97,7 +97,7 @@ internal class NarratorMediaControlsNotification @Inject constructor(
                     or Intent.FLAG_ACTIVITY_SINGLE_TOP
         )
 
-        val chain = listOf<Intent>(
+        val chain = listOf(
             navigationRoutes.main(context)
                 .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK),
             navigationRoutes.chapters(

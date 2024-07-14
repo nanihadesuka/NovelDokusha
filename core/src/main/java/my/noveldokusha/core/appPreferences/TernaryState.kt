@@ -1,13 +1,13 @@
 package my.noveldokusha.core.appPreferences
 
 enum class TernaryState {
-    active,
-    inverse,
-    inactive;
+    Active,
+    Inverse,
+    Inactive;
 
     fun next() = when (this) {
-        active -> inverse
-        inverse -> inactive
-        inactive -> active
+        Active -> Inverse
+        Inverse -> Inactive
+        Inactive -> Active
     }
 }

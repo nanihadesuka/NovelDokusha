@@ -4,7 +4,7 @@ import android.content.Context
 import android.content.Intent
 import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
-import my.noveldokusha.tooling.local_database.BookMetadata
+import my.noveldokusha.feature.local_database.BookMetadata
 import javax.inject.Inject
 
 interface NavigationRoutes {

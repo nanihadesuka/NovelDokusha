@@ -11,7 +11,7 @@ import my.noveldokusha.core.AppCoroutineScope
 import my.noveldokusha.feature.local_database.AppDatabase
 import my.noveldokusha.features.reader.domain.ChapterState
 import my.noveldokusha.features.reader.domain.InitialPositionChapter
-import my.noveldokusha.tooling.local_database.tables.Chapter
+import my.noveldokusha.feature.local_database.tables.Chapter
 import javax.inject.Inject
 import javax.inject.Singleton
 

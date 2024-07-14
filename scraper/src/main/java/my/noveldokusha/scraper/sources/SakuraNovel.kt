@@ -28,7 +28,7 @@ class SakuraNovel(private val networkClient: NetworkClient) : SourceInterface.Ca
         "https://sakuranovel.id/wp-content/uploads/2023/07/cropped-cropped-Icon-1-32x32.png"
     override val language = LanguageCode.INDONESIAN
 
-    suspend fun getPagesList(
+    private suspend fun getPagesList(
         index: Int,
         url: String,
     ): Response<PagedList<BookResult>> =

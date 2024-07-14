@@ -1,4 +1,4 @@
-package my.noveldokusha.tooling.local_database.DAOs
+package my.noveldokusha.feature.local_database.DAOs
 
 import androidx.room.Dao
 import androidx.room.Delete
@@ -7,8 +7,8 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
 import kotlinx.coroutines.flow.Flow
-import my.noveldokusha.tooling.local_database.BookWithContext
-import my.noveldokusha.tooling.local_database.tables.Book
+import my.noveldokusha.feature.local_database.BookWithContext
+import my.noveldokusha.feature.local_database.tables.Book
 
 @Dao
 interface LibraryDao {

@@ -23,7 +23,7 @@ fun <S> AnimatedTransition(
                 fadeOut(animationSpec = tween(90))
     },
     contentAlignment: Alignment = Alignment.TopStart,
-    content: @Composable() AnimatedVisibilityScope.(targetState: S) -> Unit
+    content: @Composable AnimatedVisibilityScope.(targetState: S) -> Unit
 ) {
     AnimatedContent(
         targetState = targetState,

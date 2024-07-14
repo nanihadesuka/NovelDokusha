@@ -23,6 +23,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -39,7 +40,7 @@ import my.noveldokusha.scraper.DatabaseInterface
 import my.noveldokusha.scraper.DatabaseInterface.BookData
 import my.noveldokusha.scraper.SearchGenre
 import my.noveldokusha.scraper.domain.BookResult
-import my.noveldokusha.tooling.local_database.BookMetadata
+import my.noveldokusha.feature.local_database.BookMetadata
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -116,7 +117,7 @@ internal fun DatabaseBookInfoScreen(
 private fun PreviewView() {
     val state = remember {
         DatabaseBookInfoState(
-            databaseNameStrId = mutableStateOf(R.string.database_name_baka_updates),
+            databaseNameStrId = mutableIntStateOf(R.string.database_name_baka_updates),
             book = BookData(
                 title = "Novel title",
                 description = "Novel description goes here and here to and a little more to fill lines",

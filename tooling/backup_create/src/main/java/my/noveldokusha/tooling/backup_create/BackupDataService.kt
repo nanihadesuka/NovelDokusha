@@ -64,7 +64,7 @@ internal class BackupDataService : Service() {
                 ctx.startService(IntentData(ctx, uri, backupImages))
         }
 
-        fun isRunning(context: Context): Boolean =
+        private fun isRunning(context: Context): Boolean =
             context.isServiceRunning(BackupDataService::class.java)
     }
 
@@ -114,7 +114,7 @@ internal class BackupDataService : Service() {
      * This function assumes the WRITE_EXTERNAL_STORAGE permission is granted.
      * This function will also show a status notificaton of the backup progress.
      */
-    suspend fun backupData(uri: Uri, backupImages: Boolean) = withContext(Dispatchers.IO) {
+    private suspend fun backupData(uri: Uri, backupImages: Boolean) = withContext(Dispatchers.IO) {
 
         notificationsCenter.showNotification(
             notificationId = notificationId,

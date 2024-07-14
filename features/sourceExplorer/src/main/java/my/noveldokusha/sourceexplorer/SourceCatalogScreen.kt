@@ -36,7 +36,7 @@ import my.noveldoksuha.coreui.components.ToolbarMode
 import my.noveldoksuha.coreui.components.TopAppBarSearch
 import my.noveldokusha.core.appPreferences.ListLayoutMode
 import my.noveldokusha.core.utils.actionCopyToClipboard
-import my.noveldokusha.tooling.local_database.BookMetadata
+import my.noveldokusha.feature.local_database.BookMetadata
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalAnimationApi::class)
 @Composable

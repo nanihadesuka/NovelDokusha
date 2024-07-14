@@ -21,6 +21,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -44,7 +45,7 @@ import my.noveldoksuha.databaseexplorer.R
 import my.noveldokusha.core.PagedList
 import my.noveldokusha.core.Response
 import my.noveldokusha.core.appPreferences.ListLayoutMode
-import my.noveldokusha.tooling.local_database.BookMetadata
+import my.noveldokusha.feature.local_database.BookMetadata
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -186,7 +187,7 @@ private fun PreviewView() {
 
     val genresList = remember { mutableStateListOf<GenreItem>() }
     val list = remember {
-        mutableStateListOf<BookMetadata>(
+        mutableStateListOf(
             BookMetadata(title = "title1", url = "url1"),
             BookMetadata(title = "title2", url = "url2"),
             BookMetadata(title = "title3", url = "url3"),
@@ -199,12 +200,12 @@ private fun PreviewView() {
         }
     val state = remember {
         DatabaseSearchScreenState(
-            databaseNameStrId = mutableStateOf(R.string.database_name_baka_updates),
+            databaseNameStrId = mutableIntStateOf(R.string.database_name_baka_updates),
             searchMode = mutableStateOf(SearchMode.BookGenres),
             genresList = genresList,
             searchTextInput = mutableStateOf(""),
             fetchIterator = fetchIterator,
-            listLayoutMode = mutableStateOf(ListLayoutMode.verticalGrid),
+            listLayoutMode = mutableStateOf(ListLayoutMode.VerticalGrid),
         )
     }
 

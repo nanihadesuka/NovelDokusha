@@ -33,15 +33,15 @@ internal class LibraryPageViewModel @Inject constructor(
         .map { it.filter { book -> book.book.completed == isShowCompleted } }
         .combine(preferences.LIBRARY_FILTER_READ.flow()) { list, filterRead ->
             when (filterRead) {
-                TernaryState.active -> list.filter { it.chaptersCount == it.chaptersReadCount }
-                TernaryState.inverse -> list.filter { it.chaptersCount != it.chaptersReadCount }
-                TernaryState.inactive -> list
+                TernaryState.Active -> list.filter { it.chaptersCount == it.chaptersReadCount }
+                TernaryState.Inverse -> list.filter { it.chaptersCount != it.chaptersReadCount }
+                TernaryState.Inactive -> list
             }
         }.combine(preferences.LIBRARY_SORT_LAST_READ.flow()) { list, sortRead ->
             when (sortRead) {
-                TernaryState.active -> list.sortedByDescending { it.book.lastReadEpochTimeMilli }
-                TernaryState.inverse -> list.sortedBy { it.book.lastReadEpochTimeMilli }
-                TernaryState.inactive -> list
+                TernaryState.Active -> list.sortedByDescending { it.book.lastReadEpochTimeMilli }
+                TernaryState.Inverse -> list.sortedBy { it.book.lastReadEpochTimeMilli }
+                TernaryState.Inactive -> list
             }
         }
         .toState(viewModelScope, listOf())

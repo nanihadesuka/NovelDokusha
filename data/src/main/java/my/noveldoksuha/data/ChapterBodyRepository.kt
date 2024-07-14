@@ -4,8 +4,8 @@ import my.noveldokusha.core.Response
 import my.noveldokusha.core.isLocalUri
 import my.noveldokusha.core.map
 import my.noveldokusha.feature.local_database.AppDatabase
-import my.noveldokusha.tooling.local_database.DAOs.ChapterBodyDao
-import my.noveldokusha.tooling.local_database.tables.ChapterBody
+import my.noveldokusha.feature.local_database.DAOs.ChapterBodyDao
+import my.noveldokusha.feature.local_database.tables.ChapterBody
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -20,13 +20,13 @@ class ChapterBodyRepository @Inject constructor(
     suspend fun insertReplace(chapterBodies: List<ChapterBody>) =
         chapterBodyDao.insertReplace(chapterBodies)
 
-    suspend fun insertReplace(chapterBody: ChapterBody) =
+    private suspend fun insertReplace(chapterBody: ChapterBody) =
         chapterBodyDao.insertReplace(chapterBody)
 
     suspend fun removeRows(chaptersUrl: List<String>) =
         chaptersUrl.chunked(500).forEach { chapterBodyDao.removeChapterRows(it) }
 
-    suspend fun insertWithTitle(chapterBody: ChapterBody, title: String?) = appDatabase.transaction {
+    private suspend fun insertWithTitle(chapterBody: ChapterBody, title: String?) = appDatabase.transaction {
         insertReplace(chapterBody)
         if (title != null)
             bookChaptersRepository.updateTitle(chapterBody.url, title)

@@ -8,7 +8,7 @@ import my.noveldokusha.network.NetworkClient
 import my.noveldokusha.network.toDocument
 import my.noveldokusha.scraper.Scraper
 import my.noveldokusha.scraper.TextExtractor
-import my.noveldokusha.tooling.local_database.tables.Chapter
+import my.noveldokusha.feature.local_database.tables.Chapter
 import net.dankito.readability4j.extended.Readability4JExtended
 import org.jsoup.nodes.Document
 import javax.inject.Inject

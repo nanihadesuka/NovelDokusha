@@ -11,6 +11,7 @@
         android:layout_height="34dp"
         android:layout_gravity="center_vertical|end"
         android:layout_margin="4dp"
+        android:importantForAccessibility="no"
         android:paddingHorizontal="10dp"
         android:paddingVertical="4dp"
         android:scaleType="fitCenter"

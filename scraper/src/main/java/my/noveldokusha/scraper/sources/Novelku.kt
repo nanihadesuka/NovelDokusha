@@ -29,7 +29,7 @@ class Novelku(private val networkClient: NetworkClient) : SourceInterface.Catalo
         "https://novelku.id/wp-content/uploads/2022/03/cropped-fvc-novelku.id_-32x32.png"
     override val language = LanguageCode.INDONESIAN
 
-    suspend fun getPagesList(
+    private suspend fun getPagesList(
         index: Int,
         url: String,
         isSearch: Boolean = false,

@@ -5,8 +5,8 @@ import my.noveldokusha.core.Response
 import my.noveldokusha.core.syncMap
 import my.noveldokusha.scraper.domain.BookResult
 import my.noveldokusha.scraper.domain.ChapterResult
-import my.noveldokusha.tooling.local_database.BookMetadata
-import my.noveldokusha.tooling.local_database.ChapterMetadata
+import my.noveldokusha.feature.local_database.BookMetadata
+import my.noveldokusha.feature.local_database.ChapterMetadata
 
 fun ChapterResult.mapToChapterMetadata() = ChapterMetadata(
     title = this.title,

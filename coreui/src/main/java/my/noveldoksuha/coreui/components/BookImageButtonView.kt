@@ -55,7 +55,7 @@ fun BookImageButtonView(
     onClick: () -> Unit,
     onLongClick: () -> Unit = { },
 ) {
-    Column(modifier = modifier.testTag(AppTestTags.bookImageButtonView)) {
+    Column(modifier = modifier.testTag(AppTestTags.BOOK_IMAGE_BUTTON_VIEW)) {
         Box(
             Modifier
                 .padding(4.dp)

@@ -1,3 +1,3 @@
 package my.noveldokusha.core.appPreferences
 
-enum class ListLayoutMode { verticalList, verticalGrid }
+enum class ListLayoutMode { VerticalList, VerticalGrid }

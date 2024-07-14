@@ -129,7 +129,7 @@ internal fun DatabaseSearchBottomSheet(
 @Composable
 private fun PreviewView() {
     val list = remember {
-        mutableStateListOf<GenreItem>(
+        mutableStateListOf(
             GenreItem("Fantasy", "fn", ToggleableState.On),
             GenreItem("Horror", "fn", ToggleableState.Off),
             GenreItem("Honesty", "fn", ToggleableState.Off),

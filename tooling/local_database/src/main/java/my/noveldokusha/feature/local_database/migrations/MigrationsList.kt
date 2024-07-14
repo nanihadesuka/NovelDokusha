@@ -1,3 +1,3 @@
-package my.noveldokusha.tooling.local_database.migrations
+package my.noveldokusha.feature.local_database.migrations
 
 internal object MigrationsList

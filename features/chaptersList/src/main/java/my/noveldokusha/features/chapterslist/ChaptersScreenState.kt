@@ -6,12 +6,14 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.runtime.snapshots.SnapshotStateMap
 import my.noveldokusha.core.appPreferences.TernaryState
+import my.noveldokusha.feature.local_database.ChapterWithContext
+import my.noveldokusha.feature.local_database.tables.Book
 
 internal data class ChaptersScreenState(
     val book: State<BookState>,
     val error: MutableState<String>,
     val selectedChaptersUrl: SnapshotStateMap<String, Unit>,
-    val chapters: SnapshotStateList<my.noveldokusha.tooling.local_database.ChapterWithContext>,
+    val chapters: SnapshotStateList<ChapterWithContext>,
     val isRefreshing: MutableState<Boolean>,
     val sourceCatalogNameStrRes: State<Int?>,
     val settingChapterSort: MutableState<TernaryState>,
@@ -30,7 +32,7 @@ internal data class ChaptersScreenState(
         val coverImageUrl: String? = null,
         val description: String = "",
     ) {
-        constructor(book: my.noveldokusha.tooling.local_database.tables.Book) : this(
+        constructor(book: Book) : this(
             title = book.title,
             url = book.url,
             completed = book.completed,

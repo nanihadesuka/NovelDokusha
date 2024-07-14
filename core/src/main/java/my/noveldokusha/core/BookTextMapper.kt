@@ -25,10 +25,10 @@ object BookTextMapper {
         companion object {
 
             fun fromXMLString(text: String): ImgEntry? {
-                return fromXMLString_v0(text) ?: fromXMLString_v1(text)
+                return fromXMLStringV0(text) ?: fromXMLStringV1(text)
             }
 
-            private fun fromXMLString_v1(text: String): ImgEntry? {
+            private fun fromXMLStringV1(text: String): ImgEntry? {
                 return Jsoup.parse(text).selectFirst("img")?.let {
                     ImgEntry(
                         path = it.attr("src") ?: return null,
@@ -39,7 +39,7 @@ object BookTextMapper {
 
             private val XMLForm_v0 = """^\W*<img .*>.+</img>\W*$""".toRegex()
 
-            private fun fromXMLString_v0(text: String): ImgEntry? {
+            private fun fromXMLStringV0(text: String): ImgEntry? {
                 // Fast discard filter
 
                 if (!text.matches(XMLForm_v0))

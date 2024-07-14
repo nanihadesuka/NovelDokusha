@@ -77,7 +77,7 @@ internal class ReaderTextToSpeech(
 ) {
     private val halfBuffer = 2
     private var updateJob: Job? = null
-    private val manager = TextToSpeechManager<TextSynthesis>(
+    private val manager = TextToSpeechManager(
         context = context,
         initialItemState = TextSynthesis(
             itemPos = ReaderItem.Title(

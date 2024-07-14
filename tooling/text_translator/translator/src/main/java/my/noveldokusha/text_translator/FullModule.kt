@@ -1,4 +1,4 @@
-package my.noveldokusha.tooling.text_translator
+package my.noveldokusha.text_translator
 
 import dagger.Module
 import dagger.Provides

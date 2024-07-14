@@ -36,6 +36,7 @@ import kotlinx.coroutines.launch
 import my.noveldoksuha.coreui.components.CollapsibleDivider
 import my.noveldoksuha.coreui.theme.colorApp
 import my.noveldokusha.core.domain.LibraryCategory
+import my.noveldokusha.feature.local_database.BookWithContext
 
 @OptIn(
     ExperimentalFoundationApi::class,
@@ -47,8 +48,8 @@ internal fun LibraryScreenBody(
     tabs: List<String>,
     innerPadding: PaddingValues,
     topAppBarState: TopAppBarState,
-    onBookClick: (my.noveldokusha.tooling.local_database.BookWithContext) -> Unit,
-    onBookLongClick: (my.noveldokusha.tooling.local_database.BookWithContext) -> Unit,
+    onBookClick: (BookWithContext) -> Unit,
+    onBookLongClick: (BookWithContext) -> Unit,
     viewModel: LibraryPageViewModel = viewModel()
 ) {
     val tabsSizeUpdated = rememberUpdatedState(newValue = tabs.size)
@@ -115,7 +116,7 @@ internal fun LibraryScreenBody(
                         tabs[page] == "Completed"
                     }
                 }
-                val list: List<my.noveldokusha.tooling.local_database.BookWithContext> by remember {
+                val list: List<BookWithContext> by remember {
                     derivedStateOf {
                         when (showCompleted) {
                             true -> viewModel.listCompleted

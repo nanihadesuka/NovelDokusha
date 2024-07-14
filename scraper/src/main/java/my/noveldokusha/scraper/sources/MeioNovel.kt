@@ -29,7 +29,7 @@ class MeioNovel(private val networkClient: NetworkClient) : SourceInterface.Cata
         "https://meionovel.id/wp-content/uploads/2021/01/cropped-logoa-sa-32x32.png"
     override val language = LanguageCode.INDONESIAN
 
-    suspend fun getPagesList(
+    private suspend fun getPagesList(
         index: Int,
         url: String,
         isSearch: Boolean = false,

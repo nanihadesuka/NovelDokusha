@@ -10,7 +10,7 @@ import my.noveldokusha.features.reader.ReaderActivity
 import my.noveldokusha.globalsourcesearch.GlobalSourceSearchActivity
 import my.noveldokusha.navigation.NavigationRoutes
 import my.noveldokusha.sourceexplorer.SourceCatalogActivity
-import my.noveldokusha.tooling.local_database.BookMetadata
+import my.noveldokusha.feature.local_database.BookMetadata
 import my.noveldokusha.webview.WebViewActivity
 import javax.inject.Inject
 import javax.inject.Singleton

@@ -27,7 +27,7 @@ internal class NarratorMediaControlsService : Service() {
             ctx.stopService(Intent(ctx, NarratorMediaControlsService::class.java))
         }
 
-        fun isRunning(context: Context): Boolean =
+        private fun isRunning(context: Context): Boolean =
             context.isServiceRunning(NarratorMediaControlsService::class.java)
     }
 

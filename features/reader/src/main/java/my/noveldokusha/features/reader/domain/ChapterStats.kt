@@ -1,6 +1,6 @@
 package my.noveldokusha.features.reader.domain
 
-import my.noveldokusha.tooling.local_database.tables.Chapter
+import my.noveldokusha.feature.local_database.tables.Chapter
 
 internal data class ChapterStats(
     val itemsCount: Int,

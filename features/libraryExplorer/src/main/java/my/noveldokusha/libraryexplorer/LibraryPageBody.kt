@@ -25,12 +25,13 @@ import my.noveldoksuha.coreui.theme.ColorAccent
 import my.noveldoksuha.coreui.theme.ImageBorderShape
 import my.noveldokusha.core.isLocalUri
 import my.noveldokusha.core.rememberResolvedBookImagePath
+import my.noveldokusha.feature.local_database.BookWithContext
 
 @Composable
 internal fun LibraryPageBody(
-    list: List<my.noveldokusha.tooling.local_database.BookWithContext>,
-    onClick: (my.noveldokusha.tooling.local_database.BookWithContext) -> Unit,
-    onLongClick: (my.noveldokusha.tooling.local_database.BookWithContext) -> Unit,
+    list: List<BookWithContext>,
+    onClick: (BookWithContext) -> Unit,
+    onLongClick: (BookWithContext) -> Unit,
 ) {
     LazyVerticalGrid(
         columns = GridCells.Adaptive(160.dp),

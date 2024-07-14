@@ -28,8 +28,8 @@ import my.noveldoksuha.coreui.theme.InternalTheme
 import my.noveldoksuha.coreui.theme.PreviewThemes
 import my.noveldoksuha.coreui.theme.colorApp
 import my.noveldokusha.chapterslist.R
-import my.noveldokusha.tooling.local_database.ChapterWithContext
-import my.noveldokusha.tooling.local_database.tables.Chapter
+import my.noveldokusha.feature.local_database.ChapterWithContext
+import my.noveldokusha.feature.local_database.tables.Chapter
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalAnimationApi::class)
 @Composable

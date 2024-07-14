@@ -1,4 +1,4 @@
-package my.noveldokusha.epub_parser
+package my.noveldokusha.epub_tooling
 
 import org.w3c.dom.Document
 import org.w3c.dom.Element

@@ -13,7 +13,7 @@ import kotlinx.coroutines.launch
 // The implementation might not be perfect but should work
 // most of the time and is the simplest one that I can think of
 class LiveEvent<T> : MutableLiveData<T>() {
-    var setTime = System.currentTimeMillis()
+    private var setTime = System.currentTimeMillis()
 
     @MainThread
     override fun observe(owner: LifecycleOwner, observer: Observer<in T>) {

@@ -67,7 +67,7 @@ object TextExtractor {
         val relPathEncoded = (node as? Element)?.attr("src") ?: return ""
         val text = BookTextMapper.ImgEntry(
             path = relPathEncoded,
-            yrel = 1.45f
+            yRel = 1.45f
         ).toXMLString()
         return "\n\n$text\n\n"
     }

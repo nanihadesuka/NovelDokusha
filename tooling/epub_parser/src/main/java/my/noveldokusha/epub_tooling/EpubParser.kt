@@ -2,16 +2,7 @@ package my.noveldokusha.epub_tooling
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import my.noveldokusha.epub_parser.EpubXMLFileParser
-import my.noveldokusha.epub_parser.asFileName
-import my.noveldokusha.epub_parser.decodedURL
-import my.noveldokusha.epub_parser.entries
-import my.noveldokusha.epub_parser.getAttributeValue
-import my.noveldokusha.epub_parser.parseXMLFile
-import my.noveldokusha.epub_parser.selectChildTag
-import my.noveldokusha.epub_parser.selectFirstChildTag
-import my.noveldokusha.epub_parser.selectFirstTag
-import my.noveldokusha.tooling.epub_parser.EpubBook.*
+import my.noveldokusha.epub_tooling.EpubBook.*
 import my.noveldokusha.tooling.epub_parser.*
 import org.jsoup.Jsoup
 import java.io.File

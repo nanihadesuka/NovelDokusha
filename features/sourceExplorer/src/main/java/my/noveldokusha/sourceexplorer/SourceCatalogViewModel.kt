@@ -1,6 +1,6 @@
 package my.noveldokusha.sourceexplorer
 
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -15,6 +15,7 @@ import my.noveldokusha.core.Toasty
 import my.noveldokusha.core.appPreferences.AppPreferences
 import my.noveldokusha.core.utils.StateExtra_String
 import my.noveldokusha.core.utils.asMutableStateOf
+import my.noveldokusha.feature.local_database.BookMetadata
 import my.noveldokusha.scraper.Scraper
 import javax.inject.Inject
 
@@ -36,7 +37,7 @@ internal class SourceCatalogViewModel @Inject constructor(
     private val source = scraper.getCompatibleSourceCatalog(sourceBaseUrl)!!
 
     val state = SourceCatalogScreenState(
-        sourceCatalogNameStrId = mutableStateOf(source.nameStrId),
+        sourceCatalogNameStrId = mutableIntStateOf(source.nameStrId),
         searchTextInput = stateHandle.asMutableStateOf("searchTextInput") { "" },
         toolbarMode = stateHandle.asMutableStateOf("toolbarMode") { ToolbarMode.MAIN },
         fetchIterator = PagedListIteratorState(viewModelScope) {
@@ -61,7 +62,7 @@ internal class SourceCatalogViewModel @Inject constructor(
         state.fetchIterator.fetchNext()
     }
 
-    fun addToLibraryToggle(book: my.noveldokusha.tooling.local_database.BookMetadata) =
+    fun addToLibraryToggle(book: BookMetadata) =
         viewModelScope.launch(Dispatchers.IO)
         {
             val isInLibrary =
