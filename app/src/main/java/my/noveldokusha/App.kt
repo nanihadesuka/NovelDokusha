@@ -42,12 +42,12 @@ class App : Application(), ImageLoaderFactory, Configuration.Provider {
     }
 
     // WorkManager
-    override fun getWorkManagerConfiguration(): Configuration {
+    override val workManagerConfiguration: Configuration by lazy {
         val appWorkerFactory = EntryPoints
             .get(this, HiltAppEntryPoint::class.java)
             .workerFactory()
 
-        return Configuration.Builder()
+        Configuration.Builder()
             .setMinimumLoggingLevel(if (BuildConfig.DEBUG) Log.DEBUG else Log.INFO)
             .setWorkerFactory(appWorkerFactory)
             .build()
