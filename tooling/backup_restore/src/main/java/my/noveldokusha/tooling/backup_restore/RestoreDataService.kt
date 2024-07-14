@@ -22,11 +22,9 @@ import my.noveldoksuha.data.AppRepository
 import my.noveldoksuha.data.BookChaptersRepository
 import my.noveldoksuha.data.ChapterBodyRepository
 import my.noveldoksuha.data.DownloaderRepository
-import my.noveldoksuha.data.EpubImporterRepository
 import my.noveldoksuha.data.LibraryBooksRepository
 import my.noveldokusha.core.AppCoroutineScope
 import my.noveldokusha.core.AppFileResolver
-import my.noveldokusha.core.Toasty
 import my.noveldokusha.core.tryAsResponse
 import my.noveldokusha.core.utils.Extra_Uri
 import my.noveldokusha.core.utils.isServiceRunning
@@ -235,7 +233,7 @@ class RestoreDataService : Service() {
             }
         }
 
-        suspend fun mergeToBookFolder(entry: ZipEntry, inputStream: InputStream) {
+        fun mergeToBookFolder(entry: ZipEntry, inputStream: InputStream) {
             val file = File(appRepository.settings.folderBooks.parentFile, entry.name)
             if (file.isDirectory) return
             file.parentFile?.mkdirs()

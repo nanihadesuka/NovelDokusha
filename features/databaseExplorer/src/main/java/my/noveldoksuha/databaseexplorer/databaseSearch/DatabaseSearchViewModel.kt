@@ -57,8 +57,8 @@ private sealed interface SearchInputState {
 class DatabaseSearchViewModel @Inject constructor(
     stateHandle: SavedStateHandle,
     scraper: Scraper,
-    private val appPreferences: AppPreferences,
-    private val searchGenresProvider: PersistentCacheDatabaseSearchGenresProvider
+    appPreferences: AppPreferences,
+    searchGenresProvider: PersistentCacheDatabaseSearchGenresProvider
 ) : BaseViewModel(), DatabaseSearchStateBundle {
 
     override val extras: DatabaseSearchExtras by StateExtra_Parcelable(stateHandle)

@@ -54,14 +54,15 @@ object BookTextMapper {
         }
 
         fun toXMLString(): String {
-            return toXMLString_v1()
+            return toXMLStringV1()
         }
 
-        private fun toXMLString_v1(): String {
+        private fun toXMLStringV1(): String {
             return """<img src="$path" yrel="${"%.2f".format(yrel)}">"""
         }
 
-        private fun toXMLString_v0(): String {
+        @Suppress("unused")
+        private fun toXMLStringV0(): String {
             return """<img yrel="${"%.2f".format(yrel)}">$path</img>"""
         }
     }

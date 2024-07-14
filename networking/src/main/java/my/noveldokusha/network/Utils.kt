@@ -4,7 +4,6 @@ import android.net.Uri
 import java.net.URLEncoder
 
 fun String.toUrlBuilderSafe(): Uri.Builder = toUrl()?.buildUpon()!!
-fun String.urlEncode(): String = URLEncoder.encode(this, "utf-8")
 fun String.toUrl(): Uri? = runCatching { Uri.parse(this) }.getOrNull()
 fun String.toUrlBuilder(): Uri.Builder? = toUrl()?.buildUpon()
 

@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.speech.tts.TextToSpeech
 import android.speech.tts.UtteranceProgressListener
 import android.speech.tts.Voice
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import kotlinx.coroutines.CoroutineScope
@@ -30,15 +31,15 @@ data class VoiceData(
 )
 
 class TextToSpeechManager<T : Utterance<T>>(
-    private val context: Context,
-    private val initialItemState: T,
+    context: Context,
+    initialItemState: T,
 ) {
     private val scope = CoroutineScope(Dispatchers.Default)
     private val _queueList = mutableMapOf<String, T>()
     private val _currentTextSpeakFlow = MutableSharedFlow<T>()
     val availableVoices = mutableStateListOf<VoiceData>()
-    val voiceSpeed = mutableStateOf<Float>(1f)
-    val voicePitch = mutableStateOf<Float>(1f)
+    val voiceSpeed = mutableFloatStateOf(1f)
+    val voicePitch = mutableFloatStateOf(1f)
     val activeVoice = mutableStateOf<VoiceData?>(null)
     val serviceLoadedFlow = MutableSharedFlow<Unit>(replay = 1)
 
@@ -92,7 +93,7 @@ class TextToSpeechManager<T : Utterance<T>>(
         if (value < 0.1 || value > 5) return false
         val result = service.setPitch(value)
         if (result == TextToSpeech.SUCCESS) {
-            voicePitch.value = value
+            voicePitch.floatValue = value
             return true
         }
         return false
@@ -102,7 +103,7 @@ class TextToSpeechManager<T : Utterance<T>>(
         if (value < 0.1 || value > 5) return false
         val result = service.setSpeechRate(value)
         if (result == TextToSpeech.SUCCESS) {
-            voiceSpeed.value = value
+            voiceSpeed.floatValue = value
             return true
         }
         return false

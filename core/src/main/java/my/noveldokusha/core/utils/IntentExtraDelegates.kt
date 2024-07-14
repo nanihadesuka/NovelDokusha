@@ -1,3 +1,5 @@
+@file:Suppress("unused")
+
 package my.noveldokusha.core.utils
 
 import android.content.Intent

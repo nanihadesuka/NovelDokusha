@@ -49,6 +49,8 @@ val black_appColor = AppColor(
 )
 
 val LocalAppColor = compositionLocalOf { light_appColor }
+
+@Suppress("UnusedReceiverParameter")
 val MaterialTheme.colorApp: AppColor
     @Composable
     @ReadOnlyComposable

@@ -2,15 +2,12 @@ package my.noveldokusha.scraper.sources
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import my.noveldokusha.network.NetworkClient
 import my.noveldokusha.scraper.R
 import my.noveldokusha.scraper.SourceInterface
 import my.noveldokusha.scraper.TextExtractor
 import org.jsoup.nodes.Document
 
-class Sousetsuka(
-    private val networkClient: NetworkClient
-) : SourceInterface.Base {
+class Sousetsuka: SourceInterface.Base {
     override val id = "sousetsuka"
     override val nameStrId = R.string.source_name_sousetsuka
     override val baseUrl = "https://www.sousetsuka.com/"

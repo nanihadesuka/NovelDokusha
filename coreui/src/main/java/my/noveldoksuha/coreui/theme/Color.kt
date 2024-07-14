@@ -1,3 +1,5 @@
+@file:Suppress("unused")
+
 package my.noveldoksuha.coreui.theme
 
 import androidx.compose.ui.graphics.Color

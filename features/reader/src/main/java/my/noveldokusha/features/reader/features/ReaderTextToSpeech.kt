@@ -58,11 +58,11 @@ internal data class TextSynthesis(
 
 internal class ReaderTextToSpeech(
     private val coroutineScope: CoroutineScope,
-    private val context: Context,
+    context: Context,
     private val items: List<ReaderItem>,
     private val chapterLoadedFlow: Flow<ChapterLoaded>,
-    private val customSavedVoices: State<List<VoicePredefineState>>,
-    private val setCustomSavedVoices: (List<VoicePredefineState>) -> Unit,
+    customSavedVoices: State<List<VoicePredefineState>>,
+    setCustomSavedVoices: (List<VoicePredefineState>) -> Unit,
     private val isChapterIndexValid: (chapterIndex: Int) -> Boolean,
     private val isChapterIndexTheLast: (chapterIndex: Int) -> Boolean,
     private val isChapterIndexLoaded: (chapterIndex: Int) -> Boolean,
@@ -123,13 +123,6 @@ internal class ReaderTextToSpeech(
         setVoicePitch = ::setVoicePitch,
         setVoiceSpeed = ::setVoiceSpeed,
     )
-
-    val isAtFirstItem = derivedStateOf {
-        currentTextPlaying.value.itemPos.chapterIndex == 0
-    }
-    val isAtLastItem = derivedStateOf {
-        !isAtFirstItem.value && isChapterIndexTheLast(currentTextPlaying.value.itemPos.chapterIndex)
-    }
 
     val isActive = derivedStateOf { state.isThereActiveItem.value || state.isPlaying.value }
     val isSpeaking = derivedStateOf { state.isThereActiveItem.value && state.isPlaying.value }

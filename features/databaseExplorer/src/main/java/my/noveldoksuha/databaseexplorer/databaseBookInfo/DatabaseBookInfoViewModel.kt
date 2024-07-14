@@ -29,7 +29,7 @@ interface DatabaseBookInfoStateBundle {
 @HiltViewModel
 class DatabaseBookInfoViewModel @Inject constructor(
     stateHandle: SavedStateHandle,
-    private val scraper: Scraper
+    scraper: Scraper
 ) : BaseViewModel(), DatabaseBookInfoStateBundle {
     override var databaseUrlBase: String by StateExtra_String(stateHandle)
     override var bookUrl: String by StateExtra_String(stateHandle)

@@ -37,10 +37,10 @@ interface ChapterStateBundle {
 internal class ChaptersViewModel @Inject constructor(
     private val appRepository: AppRepository,
     private val appScope: AppCoroutineScope,
-    private val scraper: Scraper,
+    scraper: Scraper,
     private val toasty: Toasty,
-    private val appPreferences: AppPreferences,
-    private val appFileResolver: AppFileResolver,
+    appPreferences: AppPreferences,
+    appFileResolver: AppFileResolver,
     private val downloaderRepository: DownloaderRepository,
     private val chaptersRepository: ChaptersRepository,
     private val epubImporterRepository: EpubImporterRepository,

@@ -1,6 +1,5 @@
 package my.noveldoksuha.coreui.components
 
-import android.widget.ImageView
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Indication
 import androidx.compose.foundation.LocalIndication

@@ -14,7 +14,7 @@ import javax.inject.Inject
 @HiltViewModel
 internal class CatalogExplorerViewModel @Inject constructor(
     private val appPreferences: AppPreferences,
-    private val scraperRepository: ScraperRepository,
+    scraperRepository: ScraperRepository,
 ) : BaseViewModel() {
     val databaseList = scraperRepository.databaseList()
     val sourcesList by scraperRepository.sourcesCatalogListFlow()

@@ -14,7 +14,7 @@ import java.io.File
 
 class PersistentCacheDataLoader<T>(
     private val cacheFile: File,
-    private val adapterProvider: (moshi: Moshi) -> JsonAdapter<T>
+    adapterProvider: (moshi: Moshi) -> JsonAdapter<T>
 ) {
     private val moshi: Moshi = Moshi.Builder()
         .addLast(KotlinJsonAdapterFactory())

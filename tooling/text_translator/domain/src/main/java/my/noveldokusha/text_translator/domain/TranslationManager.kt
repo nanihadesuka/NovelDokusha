@@ -36,7 +36,7 @@ interface TranslationManager {
      */
     fun getTranslator(source: String, target: String): TranslatorState
 
-    fun downloadModel(language: String): Unit
+    fun downloadModel(language: String)
 
-    fun removeModel(language: String): Unit
+    fun removeModel(language: String)
 }

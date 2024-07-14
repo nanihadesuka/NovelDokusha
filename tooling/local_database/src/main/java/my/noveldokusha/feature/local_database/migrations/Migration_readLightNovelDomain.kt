@@ -5,6 +5,7 @@ package my.noveldokusha.tooling.local_database.migrations
 import androidx.sqlite.db.SupportSQLiteDatabase
 import my.noveldokusha.feature.local_database.migrations.websiteDomainChangeHelper
 
+@Suppress("UnusedReceiverParameter")
 internal fun MigrationsList.readLightNovelDomainChange_1_today(
     it: SupportSQLiteDatabase
 ) {

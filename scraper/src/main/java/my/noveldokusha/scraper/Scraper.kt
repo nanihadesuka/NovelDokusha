@@ -15,9 +15,9 @@ import my.noveldokusha.scraper.sources.LocalSource
 import my.noveldokusha.scraper.sources.MTLNovel
 import my.noveldokusha.scraper.sources.MeioNovel
 import my.noveldokusha.scraper.sources.MoreNovel
+import my.noveldokusha.scraper.sources.NovelBin
 import my.noveldokusha.scraper.sources.NovelHall
 import my.noveldokusha.scraper.sources.Novelku
-import my.noveldokusha.scraper.sources.NovelBin
 import my.noveldokusha.scraper.sources.ReadLightNovel
 import my.noveldokusha.scraper.sources.ReadNovelFull
 import my.noveldokusha.scraper.sources.Reddit
@@ -50,11 +50,11 @@ class Scraper @Inject constructor(
         RoyalRoad(networkClient),
         my.noveldokusha.scraper.sources.NovelUpdates(networkClient),
         Reddit(networkClient),
-        AT(networkClient),
+        AT(),
         Wuxia(networkClient),
         BestLightNovel(networkClient),
         _1stKissNovel(networkClient),
-        Sousetsuka(networkClient),
+        Sousetsuka(),
         Saikai(networkClient),
         BoxNovel(networkClient),
         LightNovelWorld(networkClient),

@@ -43,7 +43,7 @@ internal class ReaderSession(
     private val appRepository: AppRepository,
     private val appPreferences: AppPreferences,
     private val readerRepository: ReaderRepository,
-    private val readerViewHandlersActions: ReaderViewHandlersActions,
+    readerViewHandlersActions: ReaderViewHandlersActions,
     @ApplicationContext private val context: Context,
     translationManager: TranslationManager,
 ) {
