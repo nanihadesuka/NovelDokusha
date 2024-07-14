@@ -62,8 +62,8 @@ import my.noveldokusha.features.reader.features.TextToSpeechSettingData
 import my.noveldokusha.features.reader.ui.ReaderScreenState.Settings.Type
 import my.noveldokusha.reader.R
 import my.noveldokusha.text_translator.domain.TranslationModelState
-import my.noveldokusha.texttospeech.Utterance
-import my.noveldokusha.texttospeech.VoiceData
+import my.noveldokusha.text_to_speech.Utterance
+import my.noveldokusha.text_to_speech.VoiceData
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

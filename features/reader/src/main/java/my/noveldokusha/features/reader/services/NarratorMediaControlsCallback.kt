@@ -10,9 +10,9 @@ internal class NarratorMediaControlsCallback(
 ) : MediaSessionCompat.Callback() {
 
     override fun onMediaButtonEvent(mediaButtonEvent: Intent?): Boolean {
-        val keyEvent =
-            mediaButtonEvent?.getParcelableExtra<KeyEvent>(Intent.EXTRA_KEY_EVENT)
-                ?: return super.onMediaButtonEvent(mediaButtonEvent)
+        @Suppress("DEPRECATION")
+        val keyEvent = mediaButtonEvent?.getParcelableExtra<KeyEvent>(Intent.EXTRA_KEY_EVENT)
+            ?: return super.onMediaButtonEvent(mediaButtonEvent)
 
         if (keyEvent.action == KeyEvent.ACTION_DOWN) {
             when (keyEvent.keyCode) {

@@ -15,6 +15,7 @@ import kotlinx.coroutines.launch
 
 val View.inflater: LayoutInflater get() = LayoutInflater.from(context)
 
+@Suppress("DEPRECATION")
 fun Context.isServiceRunning(serviceClass: Class<*>): Boolean {
     val className = serviceClass.name
     val manager = getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager

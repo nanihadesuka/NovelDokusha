@@ -40,7 +40,6 @@ private fun Project.configureKotlin() {
             freeCompilerArgs = freeCompilerArgs + listOf(
                 "-opt-in=kotlin.RequiresOptIn",
                 "-Xjvm-default=all-compatibility",
-                "-opt-in=androidx.lifecycle.viewmodel.compose.SavedStateHandleSaveableApi",
             )
         }
     }
