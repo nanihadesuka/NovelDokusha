@@ -45,22 +45,6 @@
 			</intent-filter>
 		</activity>
 
-		<provider
-			android:name="androidx.startup.InitializationProvider"
-			android:authorities="${applicationId}.androidx-startup"
-			android:exported="false"
-			tools:node="merge"
-			>
-			<!-- Remove and manually initialize with Configuration.Provider
-				 so we can inject a custom worker factory.
-			-->
-			<meta-data
-				android:name="androidx.work.WorkManagerInitializer"
-				android:value="androidx.startup"
-				tools:node="remove"
-				/>
-		</provider>
-
 	</application>
 
 </manifest>

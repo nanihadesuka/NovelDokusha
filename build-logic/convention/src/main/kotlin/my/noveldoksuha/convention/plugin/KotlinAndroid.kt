@@ -27,6 +27,12 @@ internal fun Project.configureAndroid(
             targetCompatibility = appConfig.javaVersion
         }
 
+        lint {
+            showAll = true
+            abortOnError = false
+            lintConfig = rootProject.file("lint.xml")
+        }
+
         testOptions {
             execution = "ANDROIDX_TEST_ORCHESTRATOR"
         }

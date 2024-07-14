@@ -2,6 +2,7 @@
 buildscript {
     repositories {
         google()
+        //noinspection JcenterRepositoryObsolete
         jcenter()
         mavenCentral()
     }
