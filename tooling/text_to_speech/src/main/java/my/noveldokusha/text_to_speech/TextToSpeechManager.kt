@@ -1,4 +1,4 @@
-package my.noveldokusha.texttospeech
+package my.noveldokusha.text_to_speech
 
 import android.content.Context
 import android.os.Bundle

@@ -28,7 +28,7 @@ import my.noveldokusha.reader.databinding.ActivityReaderListItemProgressBarBindi
 import my.noveldokusha.reader.databinding.ActivityReaderListItemSpecialTitleBinding
 import my.noveldokusha.reader.databinding.ActivityReaderListItemTitleBinding
 import my.noveldokusha.reader.databinding.ActivityReaderListItemTranslatingBinding
-import my.noveldokusha.texttospeech.Utterance
+import my.noveldokusha.text_to_speech.Utterance
 
 internal class ReaderItemAdapter(
     private val ctx: Context,

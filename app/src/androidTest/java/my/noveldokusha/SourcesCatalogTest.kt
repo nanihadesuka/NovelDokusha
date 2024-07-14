@@ -123,7 +123,6 @@ class SourcesCatalogTest {
             timeoutMillis = 30_000
         )
 
-        // TODO: check the cloudfare null pointer error
         composeTestRule.waitUntilAtLeastOneExists(
             matcher = hasTestTag(AppTestTags.BOOK_IMAGE_BUTTON_VIEW),
             timeoutMillis = 5_000

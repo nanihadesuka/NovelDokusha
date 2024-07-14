@@ -29,10 +29,10 @@ fun fixturesDatabaseList(): List<DatabaseInterface> = (0..2).map {
             Response.Success(listOf())
 
         override suspend fun getBookData(bookUrl: String): Response<DatabaseInterface.BookData> =
-            TODO()
+            throw NotImplementedError()
 
         override suspend fun getAuthorData(authorUrl: String): Response<DatabaseInterface.AuthorData> =
-            TODO()
+            throw NotImplementedError()
     }
 }
 

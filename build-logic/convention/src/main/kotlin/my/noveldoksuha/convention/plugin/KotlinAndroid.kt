@@ -18,6 +18,10 @@ internal fun Project.configureAndroid(
             testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         }
 
+        buildFeatures {
+            buildConfig = true
+        }
+
         compileOptions {
             sourceCompatibility = appConfig.javaVersion
             targetCompatibility = appConfig.javaVersion
@@ -40,7 +44,6 @@ private fun Project.configureKotlin() {
             freeCompilerArgs = freeCompilerArgs + listOf(
                 "-opt-in=kotlin.RequiresOptIn",
                 "-Xjvm-default=all-compatibility",
-                "-opt-in=androidx.lifecycle.viewmodel.compose.SavedStateHandleSaveableApi",
             )
         }
     }

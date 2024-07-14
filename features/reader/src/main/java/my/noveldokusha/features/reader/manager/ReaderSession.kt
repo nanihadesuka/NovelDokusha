@@ -32,7 +32,7 @@ import my.noveldokusha.features.reader.services.NarratorMediaControlsService
 import my.noveldokusha.features.reader.tools.ChaptersIsReadRoutine
 import my.noveldokusha.features.reader.ui.ReaderViewHandlersActions
 import my.noveldokusha.text_translator.domain.TranslationManager
-import my.noveldokusha.texttospeech.Utterance
+import my.noveldokusha.text_to_speech.Utterance
 import my.noveldokusha.feature.local_database.tables.Chapter
 import kotlin.properties.Delegates
 

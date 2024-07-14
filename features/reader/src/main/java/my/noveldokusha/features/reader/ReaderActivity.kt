@@ -50,7 +50,7 @@ import my.noveldokusha.features.reader.ui.ReaderViewHandlersActions
 import my.noveldokusha.navigation.NavigationRoutes
 import my.noveldokusha.reader.R
 import my.noveldokusha.reader.databinding.ActivityReaderBinding
-import my.noveldokusha.texttospeech.Utterance
+import my.noveldokusha.text_to_speech.Utterance
 import javax.inject.Inject
 
 @AndroidEntryPoint
