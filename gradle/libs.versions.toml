@@ -7,7 +7,7 @@ plugin-agp = "8.2.2"
 plugin-autonomousapps = "1.31.0"
 
 hilt = "2.47"
-hilt-androidx = "1.0.0"
+hilt-androidx = "1.2.0"
 
 ksp = "1.9.22-1.0.17"
 
