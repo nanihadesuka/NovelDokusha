@@ -21,7 +21,7 @@ class AT : SourceInterface.Base {
 
         data class CSSData(val id: String, val type: String, val text: String)
 
-        val cssData = """\.(\w+)::(before|after) \{content: \'(.+?)';\}"""
+        val cssData = """\.(\w+)::(before|after) \{content: '(.+?)';\}"""
             .toRegex()
             .findAll(raw)
             .map {

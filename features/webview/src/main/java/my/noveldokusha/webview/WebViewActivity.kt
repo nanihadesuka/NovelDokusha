@@ -56,7 +56,7 @@ class WebViewActivity : ComponentActivity() {
         }
 
         if (!packageManager.hasSystemFeature(PackageManager.FEATURE_WEBVIEW)) {
-            toasty.show(R.string.webview_not_available)
+            toasty.show(R.string.web_view_not_available)
             finish()
             return
         }

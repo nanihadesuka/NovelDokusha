@@ -35,12 +35,14 @@ inline fun <T, R> Response<T>.syncMap(crossinline call: (T) -> R): Response<R> =
         is Success -> Success(call(data))
     }
 
+@Suppress("unused")
 suspend inline fun <T> Response<T>.mapError(crossinline call: suspend (Error) -> T): Response<T> =
     when (this) {
         is Error -> Success(call(this))
         is Success -> Success(data)
     }
 
+@Suppress("unused")
 suspend inline fun <T, R> Response<T>.flatMap(crossinline call: suspend (T) -> Response<R>): Response<R> =
     when (this) {
         is Error -> this
@@ -71,6 +73,7 @@ fun <T> Response<Response<T>>.flatten(): Response<T> =
         }
     }
 
+@Suppress("unused")
 fun <T> Response<T>.toResult() = when (this) {
     is Error -> Result.failure<T>(exception)
     is Success -> Result.success(this)

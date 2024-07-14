@@ -271,7 +271,7 @@ internal fun ChaptersScreen(
                             IconButton(onClick = onSelectedDeleteDownloads) {
                                 Icon(
                                     Icons.Outlined.Delete,
-                                    stringResource(id = R.string.remove_selected_chapters_dowloads)
+                                    stringResource(id = R.string.remove_selected_chapters_downloads)
                                 )
                             }
                             IconButton(onClick = onSelectedDownload) {

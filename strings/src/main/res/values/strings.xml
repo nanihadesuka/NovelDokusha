@@ -30,7 +30,7 @@
     <string name="failed_to_restore_cant_access_file">Failed to restore, can\'t access file</string>
     <string name="failed_to_restore_invalid_backup_database">Failed to restore, invalid backup database</string>
     <string name="database_restored">Database restored</string>
-    <string name="webview_not_available">Webview not available</string>
+    <string name="web_view_not_available">Web view not available</string>
     <string name="invalid_URL">Invalid URL</string>
     <string name="cookies_saved">Tasty cookies saved</string>
     <string name="database">Database</string>
@@ -45,7 +45,7 @@
     <string name="image">image</string>
     <string name="importing_epub">Importing epub</string>
     <string name="no_results_found">No results found</string>
-    <string name="updaing_library">Updating library</string>
+    <string name="updating_library_notice">Updating library</string>
     <string name="search_by_title">Search by title</string>
     <string name="clean_images_folder">Clean images folder</string>
     <string name="preserve_only_images_from_library_books">Preserve only images from library books</string>
@@ -72,7 +72,7 @@
     <string name="grid">Grid</string>
     <string name="copy_error">Copy error</string>
     <string name="reload">Reload</string>
-    <string name="remove_selected_chapters_dowloads">Remove selected chapters\' downloads</string>
+    <string name="remove_selected_chapters_downloads">Remove selected chapters\' downloads</string>
     <string name="download_selected_chapters">Download selected chapters</string>
     <string name="set_as_read_selected_chapters">Set as read selected chapters</string>
     <string name="set_as_not_read_selected_chapters">Set as not read selected chapters</string>
@@ -192,7 +192,7 @@
     <string name="library_update_interval_1_day">1 day</string>
     <string name="library_update_interval_2_days">2 days</string>
 	<string name="cloudfare_firewall_detected">Cloudfare firewall detected</string>
-    <string name="please_open_webview_and_try_verify_then_reload">Please open webview and try verify, then reload</string>
+    <string name="please_open_web_view_and_try_verify_then_reload">Please open web view and try verify, then reload</string>
     <string name="cloudfare_firewall_failed_bypass">Cloudfare firewall failed bypass</string>
     <string name="tried_but_failed_to_bypass_cloudfare_firewall">Tried but failed to bypass cloudfare firewall</string>
 </resources>

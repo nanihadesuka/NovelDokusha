@@ -8,4 +8,5 @@ import androidx.compose.ui.tooling.preview.Preview
 annotation class PreviewThemes
 
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Suppress("unused")
 annotation class PreviewDark

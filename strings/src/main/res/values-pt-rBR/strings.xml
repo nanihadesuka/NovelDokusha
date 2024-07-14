@@ -30,7 +30,7 @@
 	<string name="failed_to_restore_cant_access_file">Falha ao restaurar, não é possível acessar o arquivo</string>
 	<string name="failed_to_restore_invalid_backup_database">Falha ao restaurar, banco de dados de backup inválido</string>
 	<string name="database_restored">Banco de dados restaurado</string>
-	<string name="webview_not_available">Webview não disponível</string>
+	<string name="web_view_not_available">Webview não disponível</string>
 	<string name="invalid_URL">URL inválida</string>
 	<string name="cookies_saved">Cookies saborosos salvos</string>
     <string name="database">Banco de dados</string>
@@ -45,7 +45,7 @@
 	<string name="image">imagem</string>
 	<string name="importing_epub">Importando epub</string>
 	<string name="no_results_found">Nenhum resultado encontrado</string>
-    <string name="updaing_library">Atualizando biblioteca</string>
+    <string name="updating_library_notice">Atualizando biblioteca</string>
 	<string name="search_by_title">Pesquisar por título</string>
 	<string name="clean_images_folder">Limpar pasta de imagens</string>
 	<string name="preserve_only_images_from_library_books">Preservar apenas imagens de livros da biblioteca</string>
@@ -72,7 +72,7 @@
 	<string name="grid">Grade</string>
 	<string name="copy_error">Erro de cópia</string>
 	<string name="reload">Recarregar</string>
-	<string name="remove_selected_chapters_dowloads">Remover downloads de capítulos selecionados</string>
+	<string name="remove_selected_chapters_downloads">Remover downloads de capítulos selecionados</string>
 	<string name="download_selected_chapters">Baixar capítulos selecionados</string>
 	<string name="set_as_read_selected_chapters">Definir como lidos os capítulos selecionados</string>
 	<string name="set_as_not_read_selected_chapters">Definir como não lidos os capítulos selecionados</string>

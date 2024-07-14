@@ -36,7 +36,3 @@ fun <T> Flow<T>.toState(scope: CoroutineScope, initialValue: T): State<T> {
     }
     return mutableState
 }
-
-
-
-fun <T> List<T>.hasValidIndex(index: Int): Boolean = (0 >= index) && (index <= lastIndex)

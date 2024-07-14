@@ -28,11 +28,13 @@ class LibraryBooksRepository @Inject constructor(
 
     fun getFlow(url: String) = libraryDao.getFlow(url)
     suspend fun insert(book: Book) = if (isValid(book)) libraryDao.insert(book) else Unit
+    @Suppress("unused")
     suspend fun insert(books: List<Book>) = libraryDao.insert(books.filter(::isValid))
     suspend fun insertReplace(books: List<Book>) =
         libraryDao.insertReplace(books.filter(::isValid))
 
     suspend fun remove(bookUrl: String) = libraryDao.remove(bookUrl)
+    @Suppress("unused")
     suspend fun remove(book: Book) = libraryDao.remove(book)
     suspend fun update(book: Book) = libraryDao.update(book)
     suspend fun updateLastReadEpochTimeMilli(bookUrl: String, lastReadEpochTimeMilli: Long) =

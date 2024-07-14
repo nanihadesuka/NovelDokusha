@@ -45,9 +45,11 @@ class AppRepository @Inject constructor(
     }
 
     fun close() = db.closeDatabase()
+    @Suppress("unused")
     fun delete() = context.deleteDatabase(db.name)
     suspend fun vacuum() = db.vacuum()
 
+    @Suppress("unused")
     suspend fun <T> withTransaction(fn: suspend () -> T) = db.transaction(fn)
 
     inner class Settings {

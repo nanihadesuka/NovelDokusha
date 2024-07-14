@@ -23,6 +23,7 @@ internal fun parseXMLFile(inputSteam: InputStream): Document? =
     DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(inputSteam)
 
 internal fun parseXMLFile(byteArray: ByteArray): Document? = parseXMLFile(byteArray.inputStream())
+@Suppress("unused")
 internal fun parseXMLText(text: String): Document? = text.reader().runCatching {
     DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(InputSource(this))
 }.getOrNull()

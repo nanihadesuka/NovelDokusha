@@ -60,6 +60,6 @@ internal class LibraryPageViewModel @Inject constructor(
     @Suppress("UNUSED_PARAMETER")
     fun onLibraryCategoryRefresh(libraryCategory: LibraryCategory) {
         showLoadingSpinner()
-        toasty.show(R.string.updaing_library)
+        toasty.show(R.string.updating_library_notice)
     }
 }

@@ -110,7 +110,7 @@ internal class CloudFareVerificationInterceptor(
                 settings.loadWithOverviewMode = true
                 settings.cacheMode = WebSettings.LOAD_DEFAULT
                 settings.userAgentString = request.header("user-agent")
-                    ?: UserAgentInterceptor.DEFAULT_USERAGENT
+                    ?: UserAgentInterceptor.DEFAULT_USER_AGENT
 
                 cookieManager.setAcceptCookie(true)
                 cookieManager.setAcceptThirdPartyCookies(this, true)

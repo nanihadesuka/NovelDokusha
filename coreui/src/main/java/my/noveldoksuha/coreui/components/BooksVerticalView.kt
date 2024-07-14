@@ -127,7 +127,7 @@ fun BooksVerticalView(
                 item(span = { GridItemSpan(maxLineSpan) }) {
                     ClickableOption(
                         title = stringResource(R.string.cloudfare_firewall_detected),
-                        subtitle = stringResource(R.string.please_open_webview_and_try_verify_then_reload),
+                        subtitle = stringResource(R.string.please_open_web_view_and_try_verify_then_reload),
                         onClick = onWebViewOpen,
                         modifier = Modifier.padding(12.dp)
                     )

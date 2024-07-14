@@ -64,7 +64,6 @@ internal class ReaderTextToSpeech(
     customSavedVoices: State<List<VoicePredefineState>>,
     setCustomSavedVoices: (List<VoicePredefineState>) -> Unit,
     private val isChapterIndexValid: (chapterIndex: Int) -> Boolean,
-    private val isChapterIndexTheLast: (chapterIndex: Int) -> Boolean,
     private val isChapterIndexLoaded: (chapterIndex: Int) -> Boolean,
     private val tryLoadPreviousChapter: () -> Unit,
     private val loadNextChapter: () -> Unit,

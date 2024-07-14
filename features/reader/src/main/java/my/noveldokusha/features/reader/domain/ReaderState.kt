@@ -9,7 +9,6 @@ import kotlin.math.ceil
 internal typealias ChapterUrl = String
 internal typealias ItemIndex = Int // refers to [items]
 internal typealias ChapterIndex = Int // refers to [orderedChapters]
-internal typealias ChapterItemPosition = Int
 
 internal enum class ReaderState {
     IDLE,

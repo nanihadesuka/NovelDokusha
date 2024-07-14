@@ -15,6 +15,3 @@ fun DependencyHandler.implementation(dependencyNotation: Any): Dependency? =
 
 fun DependencyHandler.testImplementation(dependencyNotation: Any): Dependency? =
     add("testImplementation", dependencyNotation)
-
-fun DependencyHandler.debugImplementation(dependencyNotation: Any): Dependency? =
-    add("debugImplementation", dependencyNotation)

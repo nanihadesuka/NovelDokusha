@@ -57,7 +57,7 @@ internal class LibraryUpdateNotification @Inject constructor(
             importance = NotificationManager.IMPORTANCE_LOW
         ) {
             setStyle(NotificationCompat.BigTextStyle())
-            title = context.getString(R.string.updaing_library)
+            title = context.getString(R.string.updating_library_notice)
         }
         return notificationBuilder.build()
     }

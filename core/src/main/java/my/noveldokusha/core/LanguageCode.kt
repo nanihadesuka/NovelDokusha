@@ -12,7 +12,9 @@ enum class LanguageCode(
 ) {
     ENGLISH(iso639_1 = "en", nameResId = R.string.language_english),
     PORTUGUESE(iso639_1 = "pt", nameResId = R.string.language_portuguese),
+    @Suppress("unused")
     SPANISH(iso639_1 = "es", nameResId = R.string.language_spanish),
+    @Suppress("unused")
     FRENCH(iso639_1 = "fr", nameResId = R.string.language_french),
     INDONESIAN(iso639_1 = "id", nameResId = R.string.language_indonesian)
 }

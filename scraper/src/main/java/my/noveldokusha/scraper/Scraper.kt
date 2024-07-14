@@ -49,7 +49,7 @@ class Scraper @Inject constructor(
         ReadNovelFull(networkClient),
         RoyalRoad(networkClient),
         my.noveldokusha.scraper.sources.NovelUpdates(networkClient),
-        Reddit(networkClient),
+        Reddit(),
         AT(),
         Wuxia(networkClient),
         BestLightNovel(networkClient),

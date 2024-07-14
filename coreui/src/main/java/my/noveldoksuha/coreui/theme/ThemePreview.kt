@@ -284,15 +284,15 @@ private fun PreviewMiscellaneous() {
                 )
             }
             ListItem(
-                overlineContent = { Text(text = "overlineContent") },
+                overlineContent = { Text(text = "over-line content") },
                 headlineContent = { Text(text = "Headline") },
-                supportingContent = { Text(text = "supportingContent") },
+                supportingContent = { Text(text = "supporting content") },
                 leadingContent = { Icon(Icons.Filled.Face, null) },
                 trailingContent = { Icon(Icons.Filled.Face, null) },
             )
             // Other stuff
             Snackbar {
-                Text(text = "Snackbar")
+                Text(text = "Snack bar")
             }
             Row {
                 Switch(checked = false, onCheckedChange = {})
@@ -307,8 +307,8 @@ private fun PreviewMiscellaneous() {
 }
 
 
-@Preview(group = "textfields")
-@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES, group = "textfields")
+@Preview(group = "text fields")
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES, group = "text fields")
 @Composable
 private fun PreviewTextFields() {
     InternalTheme {

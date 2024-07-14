@@ -119,7 +119,6 @@ internal class ReaderSession(
         items = items,
         chapterLoadedFlow = readerChaptersLoader.chapterLoadedFlow,
         isChapterIndexLoaded = readerChaptersLoader::isChapterIndexLoaded,
-        isChapterIndexTheLast = readerChaptersLoader::isChapterIndexTheLast,
         isChapterIndexValid = readerChaptersLoader::isChapterIndexValid,
         tryLoadPreviousChapter = readerChaptersLoader::tryLoadPrevious,
         loadNextChapter = readerChaptersLoader::tryLoadNext,
