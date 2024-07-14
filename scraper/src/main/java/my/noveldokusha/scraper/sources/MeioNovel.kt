@@ -59,7 +59,7 @@ class MeioNovel(private val networkClient: NetworkClient) : SourceInterface.Cata
             }
         }
 
-    override suspend fun getChapterTitle(doc: Document): String? =
+    override suspend fun getChapterTitle(doc: Document): String =
         withContext(Dispatchers.Default) { doc.selectFirst(".reading-content h1")?.text() ?: "" }
 
     override suspend fun getChapterText(doc: Document): String =
@@ -67,7 +67,7 @@ class MeioNovel(private val networkClient: NetworkClient) : SourceInterface.Cata
             doc.selectFirst(".reading-content")!!.let {
                 it.selectFirst("h1")?.remove()
                 TextExtractor.get(it)
-            } ?: ""
+            }
         }
 
     override suspend fun getBookCoverImageUrl(bookUrl: String): Response<String?> =
@@ -100,8 +100,8 @@ class MeioNovel(private val networkClient: NetworkClient) : SourceInterface.Cata
                     .toDocument()
                     .select("li[class=wp-manga-chapter]")
                     .map {
-                        it?.selectFirst("span")?.remove()
-                        ChapterResult(it?.text() ?: "", it?.selectFirst("a")?.attr("href") ?: "")
+                        it.selectFirst("span")?.remove()
+                        ChapterResult(it.text() ?: "", it.selectFirst("a")?.attr("href") ?: "")
                     }
                     .reversed()
             }

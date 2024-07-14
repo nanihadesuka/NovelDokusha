@@ -28,7 +28,7 @@ class IndoWebnovel(private val networkClient: NetworkClient) : SourceInterface.C
         "https://indowebnovel.id/wp-content/uploads/2022/12/cropped-Phoenix-PNG-32x32.png"
     override val language = LanguageCode.INDONESIAN
 
-    suspend fun getPagesList(
+    private suspend fun getPagesList(
         index: Int,
         url: String,
     ): Response<PagedList<BookResult>> =
@@ -55,7 +55,7 @@ class IndoWebnovel(private val networkClient: NetworkClient) : SourceInterface.C
             }
         }
 
-    override suspend fun getChapterTitle(doc: Document): String? =
+    override suspend fun getChapterTitle(doc: Document): String =
         withContext(Dispatchers.Default) { doc.selectFirst("h2 > .title-chapter")?.text() ?: "" }
 
     override suspend fun getChapterText(doc: Document): String =
@@ -91,7 +91,7 @@ class IndoWebnovel(private val networkClient: NetworkClient) : SourceInterface.C
                     .get(bookUrl)
                     .toDocument()
                     .select(".series-chapterlist .flexch-infoz a")
-                    .map { ChapterResult(it?.attr("title") ?: "", it?.attr("href") ?: "") }
+                    .map { ChapterResult(it.attr("title") ?: "", it.attr("href") ?: "") }
                     .reversed()
             }
         }

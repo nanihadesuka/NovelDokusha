@@ -6,10 +6,10 @@ import my.noveldokusha.core.LanguageCode
 import my.noveldokusha.core.PagedList
 import my.noveldokusha.core.Response
 import my.noveldokusha.network.NetworkClient
-import my.noveldokusha.network.postRequest
 import my.noveldokusha.network.add
 import my.noveldokusha.network.addPath
 import my.noveldokusha.network.ifCase
+import my.noveldokusha.network.postRequest
 import my.noveldokusha.network.toDocument
 import my.noveldokusha.network.toUrlBuilderSafe
 import my.noveldokusha.network.tryConnect
@@ -58,7 +58,7 @@ class Novelku(private val networkClient: NetworkClient) : SourceInterface.Catalo
             }
         }
 
-    override suspend fun getChapterTitle(doc: Document): String? =
+    override suspend fun getChapterTitle(doc: Document): String =
         withContext(Dispatchers.Default) {
             doc.selectFirst(".container#chapter-heding")?.text() ?: ""
         }
@@ -66,7 +66,7 @@ class Novelku(private val networkClient: NetworkClient) : SourceInterface.Catalo
     override suspend fun getChapterText(doc: Document): String =
         withContext(Dispatchers.Default) {
             doc.selectFirst(".read-container .text-left")!!.let {
-                it.select("script")?.remove()
+                it.select("script").remove()
                 TextExtractor.get(it)
             }
         }
@@ -102,8 +102,8 @@ class Novelku(private val networkClient: NetworkClient) : SourceInterface.Catalo
                     .toDocument()
                     .select("li[class=wp-manga-chapter]")
                     .map {
-                        it?.selectFirst("span")?.remove()
-                        ChapterResult(it?.text() ?: "", it?.selectFirst("a")?.attr("href") ?: "")
+                        it.selectFirst("span")?.remove()
+                        ChapterResult(it.text() ?: "", it.selectFirst("a")?.attr("href") ?: "")
                     }
                     .reversed()
             }

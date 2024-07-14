@@ -28,7 +28,7 @@ class BacaLightnovel(private val networkClient: NetworkClient) : SourceInterface
         "https://bacalightnovel.co/wp-content/uploads/2022/09/cropped-fav-32x32.png"
     override val language = LanguageCode.INDONESIAN
 
-    suspend fun getPagesList(
+    private suspend fun getPagesList(
         index: Int,
         url: String,
         isSearch: Boolean = false,
@@ -39,9 +39,9 @@ class BacaLightnovel(private val networkClient: NetworkClient) : SourceInterface
                 doc.select(".listupd > .maindet .mdthumb a")
                     .mapNotNull {
                         BookResult(
-                            title = it?.selectFirst("img")?.attr("title") ?: "",
-                            url = it?.attr("href") ?: "",
-                            coverImageUrl = it?.selectFirst("img")?.attr("src") ?: "",
+                            title = it.selectFirst("img")?.attr("title") ?: "",
+                            url = it.attr("href") ?: "",
+                            coverImageUrl = it.selectFirst("img")?.attr("src") ?: "",
                         )
                     }
                     .let {
@@ -54,7 +54,7 @@ class BacaLightnovel(private val networkClient: NetworkClient) : SourceInterface
             }
         }
 
-    override suspend fun getChapterTitle(doc: Document): String? =
+    override suspend fun getChapterTitle(doc: Document): String =
         withContext(Dispatchers.Default) { doc.selectFirst("h1[class=entry-title]")?.text() ?: "" }
 
     override suspend fun getChapterText(doc: Document): String =
@@ -91,8 +91,8 @@ class BacaLightnovel(private val networkClient: NetworkClient) : SourceInterface
                     .select(".eplister li")
                     .map {
                         ChapterResult(
-                            it?.selectFirst(".epl-title")?.text() ?: "",
-                            it?.selectFirst("a")?.attr("href") ?: ""
+                            it.selectFirst(".epl-title")?.text() ?: "",
+                            it.selectFirst("a")?.attr("href") ?: ""
                         )
                     }
                     .reversed()

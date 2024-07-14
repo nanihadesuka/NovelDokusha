@@ -48,6 +48,7 @@ import androidx.compose.material3.Divider
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.FilledTonalButton
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
@@ -373,7 +374,7 @@ private fun VoiceSelectorDialog(
                                 .padding(12.dp)
                                 .focusRequester(inputFocusRequester)
                         )
-                        Divider(Modifier.padding(top = 0.dp))
+                        HorizontalDivider(Modifier.padding(top = 0.dp))
                     }
                 }
                 LaunchedEffect(Unit) {
@@ -493,7 +494,7 @@ private fun DropdownCustomSavedVoices(
             },
             modifier = Modifier.clickable { expandedAddNextEntry = true }
         )
-        Divider()
+        HorizontalDivider()
         if (list.isEmpty()) {
             Text(text = stringResource(R.string.no_voices_saved), Modifier.padding(16.dp))
         }

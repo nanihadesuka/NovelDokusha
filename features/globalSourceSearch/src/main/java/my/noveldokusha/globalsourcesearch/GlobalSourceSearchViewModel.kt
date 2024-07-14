@@ -24,7 +24,6 @@ internal interface GlobalSourceSearchStateBundle {
 @HiltViewModel
 internal class GlobalSourceSearchViewModel @Inject constructor(
     state: SavedStateHandle,
-    val appPreferences: AppPreferences,
     private val scraperRepository: ScraperRepository,
 ) : BaseViewModel(), GlobalSourceSearchStateBundle {
     override val initialInput by StateExtra_String(state)
