@@ -23,8 +23,8 @@ import my.noveldoksuha.interactor.LibraryUpdatesInteractions
 import my.noveldokusha.core.Response
 import my.noveldokusha.core.domain.LibraryCategory
 import my.noveldokusha.core.tryAsResponse
+import my.noveldokusha.feature.local_database.tables.Book
 import my.noveldokusha.tooling.application_workers.notifications.LibraryUpdateNotification
-import my.noveldokusha.tooling.local_database.tables.Book
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
 
@@ -40,9 +40,9 @@ internal class LibraryUpdatesWorker @AssistedInject constructor(
 
         // TODO: solve when both are run at the same time (notifications will get weird)
         const val TAG = "LibraryUpdates"
-        const val TAGManual = "LibraryUpdatesManual"
+        const val TAG_MANUAL = "LibraryUpdatesManual"
 
-        private const val data_updateCategory = "updateCategory"
+        private const val DATA_UPDATE_CATEGORY = "updateCategory"
 
         fun createPeriodicRequest(
             updateCategory: LibraryCategory,
@@ -72,7 +72,7 @@ internal class LibraryUpdatesWorker @AssistedInject constructor(
             val builder = OneTimeWorkRequestBuilder<LibraryUpdatesWorker>()
             PeriodicWorkRequest.MIN_PERIODIC_FLEX_MILLIS
             return builder
-                .addTag(TAGManual)
+                .addTag(TAG_MANUAL)
                 .setInitialDelay(0, TimeUnit.SECONDS)
                 .setInputData(createInputData(updateCategory))
                 .build()
@@ -81,13 +81,13 @@ internal class LibraryUpdatesWorker @AssistedInject constructor(
         private fun createInputData(
             updateCategory: LibraryCategory
         ) = Data.Builder()
-            .putString(data_updateCategory, updateCategory.name)
+            .putString(DATA_UPDATE_CATEGORY, updateCategory.name)
             .build()
     }
 
     override suspend fun doWork(): Result {
         val updateCategory: LibraryCategory =
-            inputData.getString(data_updateCategory)?.let(LibraryCategory::valueOf)
+            inputData.getString(DATA_UPDATE_CATEGORY)?.let(LibraryCategory::valueOf)
                 ?: LibraryCategory.DEFAULT
 
         Timber.d("LibraryUpdatesWorker: starting $updateCategory")

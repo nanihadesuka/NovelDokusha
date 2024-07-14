@@ -10,7 +10,7 @@ import my.noveldoksuha.data.AppRepository
 import my.noveldoksuha.data.DownloaderRepository
 import my.noveldokusha.core.appPreferences.AppPreferences
 import my.noveldokusha.core.appPreferences.TernaryState
-import my.noveldokusha.tooling.local_database.tables.Book
+import my.noveldokusha.feature.local_database.tables.Book
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -42,9 +42,9 @@ internal class ChaptersRepository @Inject constructor(
         // Sort the chapters given the order preference
         .combine(appPreferences.CHAPTERS_SORT_ASCENDING.flow()) { chapters, sorted ->
             when (sorted) {
-                TernaryState.active -> chapters.sortedBy { it.chapter.position }
-                TernaryState.inverse -> chapters.sortedByDescending { it.chapter.position }
-                TernaryState.inactive -> chapters
+                TernaryState.Active -> chapters.sortedBy { it.chapter.position }
+                TernaryState.Inverse -> chapters.sortedByDescending { it.chapter.position }
+                TernaryState.Inactive -> chapters
             }
         }
         .flowOn(Dispatchers.Default)

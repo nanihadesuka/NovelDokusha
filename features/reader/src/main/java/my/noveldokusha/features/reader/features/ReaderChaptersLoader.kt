@@ -20,7 +20,7 @@ import my.noveldokusha.features.reader.domain.ReadingChapterPosStats
 import my.noveldokusha.features.reader.domain.indexOfReaderItem
 import my.noveldokusha.features.reader.tools.textToItemsConverter
 import my.noveldokusha.features.reader.ui.ReaderViewHandlersActions
-import my.noveldokusha.tooling.local_database.tables.Chapter
+import my.noveldokusha.feature.local_database.tables.Chapter
 import kotlin.coroutines.CoroutineContext
 
 internal class ReaderChaptersLoader(

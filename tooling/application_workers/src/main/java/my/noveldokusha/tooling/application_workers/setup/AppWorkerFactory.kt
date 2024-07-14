@@ -1,5 +1,6 @@
 package my.noveldokusha.tooling.application_workers.setup
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.util.Log
 import androidx.work.ListenableWorker
@@ -19,6 +20,7 @@ class AppWorkerFactory @Inject internal constructor(
     private val libraryUpdateNotification: LibraryUpdateNotification,
     private val libraryUpdatesInteractions: LibraryUpdatesInteractions,
 ) : WorkerFactory() {
+    @SuppressLint("LogNotTimber")
     override fun createWorker(
         appContext: Context,
         workerClassName: String,

@@ -1,21 +1,20 @@
-package my.noveldokusha.epub_parser
+package my.noveldokusha.epub_tooling
 
 import android.graphics.BitmapFactory
 import my.noveldokusha.core.BookTextMapper
-import my.noveldokusha.tooling.epub_parser.EpubFile
 import org.jsoup.Jsoup
 import org.jsoup.nodes.TextNode
 import java.io.File
 import kotlin.io.path.invariantSeparatorsPathString
 
 internal class EpubXMLFileParser(
-    val fileAbsolutePath: String,
+    fileAbsolutePath: String,
     val data: ByteArray,
-    val zipFile: Map<String, EpubFile>
+    private val zipFile: Map<String, EpubFile>
 ) {
     data class Output(val title: String?, val body: String)
 
-    val fileParentFolder: File = File(fileAbsolutePath).parentFile ?: File("")
+    private val fileParentFolder: File = File(fileAbsolutePath).parentFile ?: File("")
 
 
     fun parseAsDocument(): Output {

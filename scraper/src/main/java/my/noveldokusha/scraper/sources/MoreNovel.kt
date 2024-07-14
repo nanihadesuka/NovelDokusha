@@ -28,7 +28,7 @@ class MoreNovel(private val networkClient: NetworkClient) : SourceInterface.Cata
     override val iconUrl = "https://morenovel.net/wp-content/uploads/2020/03/cropped-m2-32x32.png"
     override val language = LanguageCode.INDONESIAN
 
-    suspend fun getPagesList(
+    private suspend fun getPagesList(
         index: Int,
         url: String,
         isSearch: Boolean = false,
@@ -57,7 +57,7 @@ class MoreNovel(private val networkClient: NetworkClient) : SourceInterface.Cata
             }
         }
 
-    override suspend fun getChapterTitle(doc: Document): String? =
+    override suspend fun getChapterTitle(doc: Document): String =
         withContext(Dispatchers.Default) { doc.selectFirst("#chapter-heading")?.text() ?: "" }
 
     override suspend fun getChapterText(doc: Document): String =
@@ -100,8 +100,8 @@ class MoreNovel(private val networkClient: NetworkClient) : SourceInterface.Cata
                     .toDocument()
                     .select("li[class=wp-manga-chapter]")
                     .map {
-                        it?.selectFirst("span")?.remove()
-                        ChapterResult(it?.text() ?: "", it?.selectFirst("a")?.attr("href") ?: "")
+                        it.selectFirst("span")?.remove()
+                        ChapterResult(it.text() ?: "", it.selectFirst("a")?.attr("href") ?: "")
                     }
                     .reversed()
             }

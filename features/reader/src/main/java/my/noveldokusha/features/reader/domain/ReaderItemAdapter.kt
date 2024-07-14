@@ -44,7 +44,7 @@ internal class ReaderItemAdapter(
     private val onReloadReader: () -> Unit,
     private val onClick: () -> Unit,
 ) : ArrayAdapter<ReaderItem>(ctx, 0, list) {
-    val appFileResolver = AppFileResolver(ctx)
+    private val appFileResolver = AppFileResolver(ctx)
     override fun getCount() = super.getCount() + 2
     override fun getItem(position: Int): ReaderItem = when (position) {
         0 -> topPadding

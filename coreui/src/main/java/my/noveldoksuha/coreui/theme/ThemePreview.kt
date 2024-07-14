@@ -148,7 +148,6 @@ private fun PreviewButtons() {
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Preview(group = "card & chip")
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES, group = "card & chip")
 @Composable

@@ -26,7 +26,7 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.distinctUntilChanged
 import my.noveldoksuha.coreui.components.ErrorView
 import my.noveldokusha.chapterslist.R
-import my.noveldokusha.tooling.local_database.ChapterWithContext
+import my.noveldokusha.feature.local_database.ChapterWithContext
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable

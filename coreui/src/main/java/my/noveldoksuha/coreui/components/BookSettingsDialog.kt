@@ -25,7 +25,7 @@ import my.noveldoksuha.coreui.R
 import my.noveldoksuha.coreui.theme.ImageBorderShape
 import my.noveldoksuha.coreui.theme.colorApp
 import my.noveldokusha.core.rememberResolvedBookImagePath
-import my.noveldokusha.tooling.local_database.tables.Book
+import my.noveldokusha.feature.local_database.tables.Book
 
 
 sealed interface BookSettingsDialogState : Parcelable {

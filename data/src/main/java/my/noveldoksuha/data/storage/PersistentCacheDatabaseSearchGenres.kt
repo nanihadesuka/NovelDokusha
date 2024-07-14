@@ -15,7 +15,7 @@ class PersistentCacheDatabaseSearchGenresProvider @Inject constructor(
 ) {
 
     fun provide(database: DatabaseInterface): PersistentCacheDataLoader<List<SearchGenre>> {
-        return PersistentCacheDataLoader<List<SearchGenre>>(
+        return PersistentCacheDataLoader(
             cacheFile = File(appContext.cacheDir, database.searchGenresCacheFileName),
             adapterProvider = {
                 val listMyData =

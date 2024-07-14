@@ -2,8 +2,8 @@ package my.noveldoksuha.data
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import my.noveldokusha.tooling.local_database.DAOs.ChapterDao
-import my.noveldokusha.tooling.local_database.tables.Chapter
+import my.noveldokusha.feature.local_database.DAOs.ChapterDao
+import my.noveldokusha.feature.local_database.tables.Chapter
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -37,7 +37,7 @@ class BookChaptersRepository @Inject constructor(
     suspend fun insert(chapters: List<Chapter>) =
         chapterDao.insert(chapters.filter(::isValid))
 
-    suspend fun insertReplace(chapters: List<Chapter>) =
+    private suspend fun insertReplace(chapters: List<Chapter>) =
         chapterDao.insertReplace(chapters.filter(::isValid))
 
     suspend fun removeAllFromBook(bookUrl: String) = chapterDao.removeAllFromBook(bookUrl)

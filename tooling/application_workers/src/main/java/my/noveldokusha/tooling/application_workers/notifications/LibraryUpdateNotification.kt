@@ -15,9 +15,11 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import my.noveldoksuha.coreui.states.NotificationsCenter
 import my.noveldoksuha.coreui.states.text
 import my.noveldoksuha.coreui.states.title
+import my.noveldokusha.feature.local_database.tables.Book
+import my.noveldokusha.feature.local_database.tables.Chapter
 import my.noveldokusha.navigation.NavigationRoutes
 import my.noveldokusha.tooling.application_workers.R
-import my.noveldokusha.tooling.local_database.BookMetadata
+import my.noveldokusha.feature.local_database.BookMetadata
 import javax.inject.Inject
 
 internal class LibraryUpdateNotification @Inject constructor(
@@ -63,7 +65,7 @@ internal class LibraryUpdateNotification @Inject constructor(
     fun updateUpdatingNotification(
         countingUpdated: Int,
         countingTotal: Int,
-        books: Set<my.noveldokusha.tooling.local_database.tables.Book>
+        books: Set<Book>
     ) {
         notificationsCenter.modifyNotification(notificationBuilder, notificationId) {
             title = context.getString(R.string.updating_library, countingUpdated, countingTotal)
@@ -73,8 +75,8 @@ internal class LibraryUpdateNotification @Inject constructor(
     }
 
     fun showNewChaptersNotification(
-        book: my.noveldokusha.tooling.local_database.tables.Book,
-        newChapters: List<my.noveldokusha.tooling.local_database.tables.Chapter>,
+        book: Book,
+        newChapters: List<Chapter>,
         silent: Boolean
     ) {
         val chain = mutableListOf<Intent>().also {
@@ -168,7 +170,7 @@ internal class LibraryUpdateNotification @Inject constructor(
     }
 
     fun showFailedNotification(
-        books: Set<my.noveldokusha.tooling.local_database.tables.Book>,
+        books: Set<Book>,
     ) {
         notificationsCenter.showNotification(
             notificationId = notifyFailedUpdates.notificationId,

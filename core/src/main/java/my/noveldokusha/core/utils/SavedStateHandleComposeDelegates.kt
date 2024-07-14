@@ -1,7 +1,6 @@
 package my.noveldokusha.core.utils
 
 import android.os.Binder
-import android.os.Build
 import android.os.Bundle
 import android.os.Parcelable
 import android.util.Size
@@ -103,13 +102,7 @@ private object Validators {
         Short::class.javaPrimitiveType,
         ShortArray::class.java,
         SparseArray::class.java,
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
-            Size::class.java
-        else
-            Int::class.javaPrimitiveType,
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
-            SizeF::class.java
-        else
-            Int::class.javaPrimitiveType
+        Size::class.java,
+        SizeF::class.java
     )
 }

@@ -35,7 +35,7 @@ internal class SettingsViewModel @Inject constructor(
     private val appPreferences: AppPreferences,
     @ApplicationContext private val context: Context,
     private val translationManager: TranslationManager,
-    private val stateHandle: SavedStateHandle,
+    stateHandle: SavedStateHandle,
     private val appFileResolver: AppFileResolver,
     private val appRemoteRepository: AppRemoteRepository,
     private val toasty: Toasty,

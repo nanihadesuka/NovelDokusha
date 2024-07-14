@@ -27,7 +27,7 @@ import my.noveldoksuha.coreui.components.BookSettingsDialog
 import my.noveldoksuha.coreui.components.BookSettingsDialogState
 import my.noveldoksuha.coreui.theme.ColorNotice
 import my.noveldokusha.navigation.NavigationRouteViewModel
-import my.noveldokusha.tooling.local_database.BookMetadata
+import my.noveldokusha.feature.local_database.BookMetadata
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

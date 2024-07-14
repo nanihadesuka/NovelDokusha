@@ -83,7 +83,7 @@ class ReaderActivity : BaseActivity() {
     internal lateinit var readerViewHandlersActions: ReaderViewHandlersActions
 
     private var listIsScrolling = false
-    private val fadeInTextLiveData = MutableLiveData<Boolean>(false)
+    private val fadeInTextLiveData = MutableLiveData(false)
 
     private val viewModel by viewModels<ReaderViewModel>()
 

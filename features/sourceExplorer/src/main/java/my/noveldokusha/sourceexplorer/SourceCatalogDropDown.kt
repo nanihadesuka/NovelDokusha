@@ -41,8 +41,8 @@ internal fun SourceCatalogDropDown(
             OutlinedCard {
                 MyButton(
                     text = stringResource(id = R.string.list),
-                    onClick = { onListLayoutModeChange(ListLayoutMode.verticalList) },
-                    selected = listLayoutMode == ListLayoutMode.verticalList,
+                    onClick = { onListLayoutModeChange(ListLayoutMode.VerticalList) },
+                    selected = listLayoutMode == ListLayoutMode.VerticalList,
                     borderWidth = Dp.Unspecified,
                     textAlign = TextAlign.Center,
                     outerPadding = 0.dp,
@@ -51,8 +51,8 @@ internal fun SourceCatalogDropDown(
                 )
                 MyButton(
                     text = stringResource(id = R.string.grid),
-                    onClick = { onListLayoutModeChange(ListLayoutMode.verticalGrid) },
-                    selected = listLayoutMode == ListLayoutMode.verticalGrid,
+                    onClick = { onListLayoutModeChange(ListLayoutMode.VerticalGrid) },
+                    selected = listLayoutMode == ListLayoutMode.VerticalGrid,
                     borderWidth = Dp.Unspecified,
                     textAlign = TextAlign.Center,
                     outerPadding = 0.dp,

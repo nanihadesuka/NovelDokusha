@@ -39,8 +39,8 @@ import androidx.compose.ui.unit.dp
 import my.noveldoksuha.coreui.theme.ColorAccent
 import my.noveldoksuha.coreui.theme.InternalTheme
 import my.noveldoksuha.coreui.theme.Themes
-import my.noveldoksuha.coreui.theme.selectableMinHeight
 import my.noveldoksuha.coreui.theme.ifCase
+import my.noveldoksuha.coreui.theme.selectableMinHeight
 
 @Composable
 fun MyButton(
@@ -155,7 +155,7 @@ private fun InternalButton(
 @Composable
 fun Preview() {
     Column {
-        for (theme in Themes.values()) InternalTheme(theme) {
+        for (theme in Themes.entries) InternalTheme(theme) {
             MyButton(
                 text = "Theme ${theme.name}",
                 modifier = Modifier.fillMaxWidth(),

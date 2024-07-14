@@ -125,7 +125,7 @@ class SourcesCatalogTest {
 
         // TODO: check the cloudfare null pointer error
         composeTestRule.waitUntilAtLeastOneExists(
-            matcher = hasTestTag(AppTestTags.bookImageButtonView),
+            matcher = hasTestTag(AppTestTags.BOOK_IMAGE_BUTTON_VIEW),
             timeoutMillis = 5_000
         )
     }

@@ -1,4 +1,4 @@
-package my.noveldoksuha.text_translator.translator_nop
+package my.noveldokusha.text_translator
 
 import androidx.compose.runtime.mutableStateListOf
 import my.noveldokusha.text_translator.domain.TranslationManager

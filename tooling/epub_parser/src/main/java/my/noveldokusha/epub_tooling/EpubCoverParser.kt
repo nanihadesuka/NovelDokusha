@@ -1,9 +1,7 @@
-package my.noveldokusha.epub_parser
+package my.noveldokusha.epub_tooling
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import my.noveldokusha.epub_tooling.getZipFiles
-import my.noveldokusha.tooling.epub_parser.EpubBook
 import java.io.File
 import java.io.InputStream
 import kotlin.io.path.invariantSeparatorsPathString

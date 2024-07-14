@@ -1,6 +1,6 @@
 package my.noveldokusha.features.chapterslist
 
-import my.noveldokusha.tooling.local_database.ChapterWithContext
+import my.noveldokusha.feature.local_database.ChapterWithContext
 
 internal fun removeCommonTextFromTitles(list: List<ChapterWithContext>): List<ChapterWithContext> {
     // Try removing repetitive title text from chapters

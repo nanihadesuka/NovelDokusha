@@ -67,7 +67,7 @@ import my.noveldoksuha.coreui.theme.isAtTop
 import my.noveldoksuha.coreui.theme.textPadding
 import my.noveldokusha.chapterslist.R
 import my.noveldokusha.core.isLocalUri
-import my.noveldokusha.tooling.local_database.ChapterWithContext
+import my.noveldokusha.feature.local_database.ChapterWithContext
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

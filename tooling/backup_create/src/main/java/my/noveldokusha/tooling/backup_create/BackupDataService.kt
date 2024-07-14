@@ -22,7 +22,6 @@ import my.noveldokusha.core.utils.Extra_Boolean
 import my.noveldokusha.core.utils.Extra_Uri
 import my.noveldokusha.core.utils.isServiceRunning
 import my.noveldokusha.feature.local_database.AppDatabase
-import my.noveldokusha.tooling.backup_create.R
 import okhttp3.internal.closeQuietly
 import timber.log.Timber
 import java.util.zip.ZipEntry
@@ -65,7 +64,7 @@ internal class BackupDataService : Service() {
                 ctx.startService(IntentData(ctx, uri, backupImages))
         }
 
-        fun isRunning(context: Context): Boolean =
+        private fun isRunning(context: Context): Boolean =
             context.isServiceRunning(BackupDataService::class.java)
     }
 
@@ -115,7 +114,7 @@ internal class BackupDataService : Service() {
      * This function assumes the WRITE_EXTERNAL_STORAGE permission is granted.
      * This function will also show a status notificaton of the backup progress.
      */
-    suspend fun backupData(uri: Uri, backupImages: Boolean) = withContext(Dispatchers.IO) {
+    private suspend fun backupData(uri: Uri, backupImages: Boolean) = withContext(Dispatchers.IO) {
 
         notificationsCenter.showNotification(
             notificationId = notificationId,

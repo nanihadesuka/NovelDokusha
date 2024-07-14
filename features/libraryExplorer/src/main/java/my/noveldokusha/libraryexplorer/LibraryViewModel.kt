@@ -16,9 +16,9 @@ import javax.inject.Inject
 
 @HiltViewModel
 internal class LibraryViewModel @Inject constructor(
-    private val appPreferences: AppPreferences,
+    appPreferences: AppPreferences,
     private val appRepository: AppRepository,
-    private val stateHandle: SavedStateHandle,
+    stateHandle: SavedStateHandle,
 ) : BaseViewModel() {
     var bookSettingsDialogState by stateHandle.asMutableStateOf<BookSettingsDialogState>(
         key = "bookSettingsDialogState",

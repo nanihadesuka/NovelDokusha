@@ -52,9 +52,9 @@ fun TernaryStateToggle(
     ) {
         AnimatedContent(targetState = updatedState, label = "") {
             when (it) {
-                TernaryState.active -> activeIcon()
-                TernaryState.inverse -> inverseIcon()
-                TernaryState.inactive -> inactiveIcon()
+                TernaryState.Active -> activeIcon()
+                TernaryState.Inverse -> inverseIcon()
+                TernaryState.Inactive -> inactiveIcon()
             }
         }
         Text(
@@ -85,9 +85,9 @@ private fun PreviewView() {
 
     InternalTheme {
         Column {
-            draw(text = "Up", state = TernaryState.active)
-            draw(text = "Down", state = TernaryState.inverse)
-            draw(text = "Inactive", state = TernaryState.inactive)
+            draw(text = "Up", state = TernaryState.Active)
+            draw(text = "Down", state = TernaryState.Inverse)
+            draw(text = "Inactive", state = TernaryState.Inactive)
         }
     }
 }

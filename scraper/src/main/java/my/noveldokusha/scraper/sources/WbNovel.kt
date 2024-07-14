@@ -6,10 +6,10 @@ import my.noveldokusha.core.LanguageCode
 import my.noveldokusha.core.PagedList
 import my.noveldokusha.core.Response
 import my.noveldokusha.network.NetworkClient
-import my.noveldokusha.network.postRequest
 import my.noveldokusha.network.add
 import my.noveldokusha.network.addPath
 import my.noveldokusha.network.ifCase
+import my.noveldokusha.network.postRequest
 import my.noveldokusha.network.toDocument
 import my.noveldokusha.network.toUrlBuilderSafe
 import my.noveldokusha.network.tryConnect
@@ -19,7 +19,6 @@ import my.noveldokusha.scraper.TextExtractor
 import my.noveldokusha.scraper.domain.BookResult
 import my.noveldokusha.scraper.domain.ChapterResult
 import org.jsoup.nodes.Document
-import my.noveldokusha.scraper.sources.MoreNovel
 
 class WbNovel(private val networkClient: NetworkClient) : SourceInterface.Catalog {
     override val id = "wbnovel"
@@ -30,7 +29,7 @@ class WbNovel(private val networkClient: NetworkClient) : SourceInterface.Catalo
         "https://wbnovel.com/wp-content/uploads/2019/01/cropped-w-32x32.png"
     override val language = LanguageCode.INDONESIAN
 
-    suspend fun getPagesList(
+    private suspend fun getPagesList(
         index: Int,
         url: String,
         isSearch: Boolean = false,
@@ -59,7 +58,7 @@ class WbNovel(private val networkClient: NetworkClient) : SourceInterface.Catalo
             }
         }
 
-    override suspend fun getChapterTitle(doc: Document): String? =
+    override suspend fun getChapterTitle(doc: Document): String =
         withContext(Dispatchers.Default) { doc.selectFirst("#chapter-heading")?.text() ?: "" }
 
     override suspend fun getChapterText(doc: Document): String =
@@ -102,8 +101,8 @@ class WbNovel(private val networkClient: NetworkClient) : SourceInterface.Catalo
                     .toDocument()
                     .select("li[class=wp-manga-chapter]")
                     .map {
-                        it?.selectFirst("span")?.remove()
-                        ChapterResult(it?.text() ?: "", it?.selectFirst("a")?.attr("href") ?: "")
+                        it.selectFirst("span")?.remove()
+                        ChapterResult(it.text() ?: "", it.selectFirst("a")?.attr("href") ?: "")
                     }
                     .reversed()
             }

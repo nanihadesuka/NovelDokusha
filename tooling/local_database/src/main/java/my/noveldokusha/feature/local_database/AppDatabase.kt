@@ -7,13 +7,12 @@ import androidx.room.RoomDatabase
 import androidx.room.withTransaction
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import my.noveldokusha.tooling.local_database.DAOs.ChapterBodyDao
-import my.noveldokusha.tooling.local_database.DAOs.ChapterDao
-import my.noveldokusha.tooling.local_database.DAOs.LibraryDao
-import my.noveldokusha.tooling.local_database.databaseMigrations
-import my.noveldokusha.tooling.local_database.tables.Book
-import my.noveldokusha.tooling.local_database.tables.Chapter
-import my.noveldokusha.tooling.local_database.tables.ChapterBody
+import my.noveldokusha.feature.local_database.DAOs.ChapterBodyDao
+import my.noveldokusha.feature.local_database.DAOs.ChapterDao
+import my.noveldokusha.feature.local_database.DAOs.LibraryDao
+import my.noveldokusha.feature.local_database.tables.Book
+import my.noveldokusha.feature.local_database.tables.Chapter
+import my.noveldokusha.feature.local_database.tables.ChapterBody
 import java.io.InputStream
 
 

@@ -7,9 +7,9 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import my.noveldokusha.core.appPreferences.AppPreferences
 import my.noveldoksuha.coreui.BaseViewModel
 import my.noveldoksuha.coreui.mappers.toTheme
+import my.noveldokusha.core.appPreferences.AppPreferences
 import my.noveldokusha.core.utils.StateExtra_Boolean
 import my.noveldokusha.core.utils.StateExtra_String
 import my.noveldokusha.features.reader.manager.ReaderManager
@@ -27,9 +27,9 @@ interface ReaderStateBundle {
 @HiltViewModel
 internal class ReaderViewModel @Inject constructor(
     stateHandler: SavedStateHandle,
-    private val appPreferences: AppPreferences,
+    appPreferences: AppPreferences,
     private val readerManager: ReaderManager,
-    private val readerViewHandlersActions: ReaderViewHandlersActions,
+    readerViewHandlersActions: ReaderViewHandlersActions,
 ) : BaseViewModel(), ReaderStateBundle {
 
     override var bookUrl by StateExtra_String(stateHandler)

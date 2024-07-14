@@ -110,6 +110,7 @@ class WuxiaWorld(
         }
     }
 
+    @Suppress("KotlinConstantConditions")
     override suspend fun getCatalogSearch(
         index: Int,
         input: String

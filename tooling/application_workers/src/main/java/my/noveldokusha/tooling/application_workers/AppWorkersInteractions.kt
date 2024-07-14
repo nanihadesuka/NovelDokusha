@@ -14,7 +14,7 @@ internal class AppWorkersInteractions @Inject constructor(
 
     override fun checkForLibraryUpdates(libraryCategory: LibraryCategory) {
         workManager.beginUniqueWork(
-            LibraryUpdatesWorker.TAGManual,
+            LibraryUpdatesWorker.TAG_MANUAL,
             ExistingWorkPolicy.REPLACE,
             LibraryUpdatesWorker.createManualRequest(updateCategory = libraryCategory)
         ).enqueue()

@@ -1,4 +1,4 @@
-package my.noveldokusha.tooling.local_database.DAOs
+package my.noveldokusha.feature.local_database.DAOs
 
 import androidx.room.Dao
 import androidx.room.Insert
@@ -6,8 +6,8 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
 import kotlinx.coroutines.flow.Flow
-import my.noveldokusha.tooling.local_database.ChapterWithContext
-import my.noveldokusha.tooling.local_database.tables.Chapter
+import my.noveldokusha.feature.local_database.ChapterWithContext
+import my.noveldokusha.feature.local_database.tables.Chapter
 
 @Dao
 interface ChapterDao {

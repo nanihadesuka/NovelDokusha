@@ -1,7 +1,6 @@
 package my.noveldoksuha.databaseexplorer.databaseBookInfo
 
 import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
@@ -57,7 +56,7 @@ import my.noveldoksuha.coreui.theme.textPadding
 import my.noveldoksuha.databaseexplorer.R
 import my.noveldoksuha.mappers.mapToBookMetadata
 import my.noveldokusha.scraper.SearchGenre
-import my.noveldokusha.tooling.local_database.BookMetadata
+import my.noveldokusha.feature.local_database.BookMetadata
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -303,7 +302,6 @@ private fun Container(
     )
 }
 
-@OptIn(ExperimentalAnimationApi::class)
 @Composable
 private fun TextAnimated(
     text: String,

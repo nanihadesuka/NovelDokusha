@@ -21,7 +21,7 @@ class LocalSourcesDirectories @Inject constructor(
     val list: List<Uri>
         get() = appContext.contentResolver.persistedUriPermissions.map { it.uri }
 
-    private val _listState = MutableStateFlow<List<Uri>>(list)
+    private val _listState = MutableStateFlow(list)
     val listState = _listState.asStateFlow()
 
     fun add(uri: Uri) {

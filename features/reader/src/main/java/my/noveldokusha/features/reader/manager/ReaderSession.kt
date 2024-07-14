@@ -33,7 +33,7 @@ import my.noveldokusha.features.reader.tools.ChaptersIsReadRoutine
 import my.noveldokusha.features.reader.ui.ReaderViewHandlersActions
 import my.noveldokusha.text_translator.domain.TranslationManager
 import my.noveldokusha.texttospeech.Utterance
-import my.noveldokusha.tooling.local_database.tables.Chapter
+import my.noveldokusha.feature.local_database.tables.Chapter
 import kotlin.properties.Delegates
 
 
@@ -43,7 +43,7 @@ internal class ReaderSession(
     private val appRepository: AppRepository,
     private val appPreferences: AppPreferences,
     private val readerRepository: ReaderRepository,
-    private val readerViewHandlersActions: ReaderViewHandlersActions,
+    readerViewHandlersActions: ReaderViewHandlersActions,
     @ApplicationContext private val context: Context,
     translationManager: TranslationManager,
 ) {
@@ -57,7 +57,7 @@ internal class ReaderSession(
     private val orderedChapters = mutableListOf<Chapter>()
 
     var bookTitle: String? = null
-    var bookCoverUrl: String? = null
+    private var bookCoverUrl: String? = null
 
     var currentChapter: ChapterState by Delegates.observable(
         ChapterState(
@@ -77,7 +77,7 @@ internal class ReaderSession(
 
     private enum class SavePositionMode { Reading, Speaking }
 
-    private val savePositionMode = derivedStateOf<SavePositionMode> {
+    private val savePositionMode = derivedStateOf {
         if (readerTextToSpeech.isSpeaking.value) SavePositionMode.Speaking else SavePositionMode.Reading
     }
 

@@ -15,7 +15,7 @@ import my.noveldoksuha.coreui.composableActions.onDoAskForImage
 import my.noveldoksuha.coreui.theme.Theme
 import my.noveldokusha.core.utils.Extra_String
 import my.noveldokusha.navigation.NavigationRoutes
-import my.noveldokusha.tooling.local_database.BookMetadata
+import my.noveldokusha.feature.local_database.BookMetadata
 import javax.inject.Inject
 
 @AndroidEntryPoint

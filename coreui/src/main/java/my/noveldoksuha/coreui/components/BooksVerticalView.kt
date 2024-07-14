@@ -31,7 +31,7 @@ import my.noveldokusha.core.appPreferences.ListLayoutMode
 import my.noveldokusha.core.domain.CloudfareVerificationBypassFailedException
 import my.noveldokusha.core.domain.WebViewCookieManagerInitializationFailedException
 import my.noveldokusha.core.rememberResolvedBookImagePath
-import my.noveldokusha.tooling.local_database.BookMetadata
+import my.noveldokusha.feature.local_database.BookMetadata
 
 @Composable
 fun BooksVerticalView(
@@ -53,8 +53,8 @@ fun BooksVerticalView(
     val columns by remember(layoutMode, cells) {
         derivedStateOf {
             when (layoutMode) {
-                ListLayoutMode.verticalList -> GridCells.Fixed(1)
-                ListLayoutMode.verticalGrid -> cells
+                ListLayoutMode.VerticalList -> GridCells.Fixed(1)
+                ListLayoutMode.VerticalGrid -> cells
             }
         }
     }
@@ -76,7 +76,7 @@ fun BooksVerticalView(
         items(list) {
             val interactionSource = remember { MutableInteractionSource() }
             when (layoutMode) {
-                ListLayoutMode.verticalList -> MyButton(
+                ListLayoutMode.VerticalList -> MyButton(
                     text = it.title,
                     onClick = { onBookClicked(it) },
                     onLongClick = { onBookLongClicked(it) },
@@ -85,7 +85,7 @@ fun BooksVerticalView(
                         .fillMaxWidth()
                         .bounceOnPressed(interactionSource)
                 )
-                ListLayoutMode.verticalGrid -> BookImageButtonView(
+                ListLayoutMode.VerticalGrid -> BookImageButtonView(
                     title = it.title,
                     coverImageModel = rememberResolvedBookImagePath(
                         bookUrl = it.url,

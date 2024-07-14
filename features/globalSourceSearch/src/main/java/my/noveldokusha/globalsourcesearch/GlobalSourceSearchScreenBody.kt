@@ -36,7 +36,7 @@ import my.noveldokusha.core.Response
 import my.noveldokusha.core.rememberResolvedBookImagePath
 import my.noveldokusha.scraper.domain.BookResult
 import my.noveldokusha.scraper.fixtures.fixturesCatalogList
-import my.noveldokusha.tooling.local_database.BookMetadata
+import my.noveldokusha.feature.local_database.BookMetadata
 
 @Composable
 internal fun GlobalSourceSearchScreenBody(

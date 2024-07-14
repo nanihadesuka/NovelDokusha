@@ -25,6 +25,7 @@ import my.noveldokusha.core.isContentUri
 import my.noveldokusha.core.isLocalUri
 import my.noveldokusha.core.utils.StateExtra_String
 import my.noveldokusha.core.utils.toState
+import my.noveldokusha.feature.local_database.ChapterWithContext
 import my.noveldokusha.scraper.Scraper
 import javax.inject.Inject
 
@@ -37,10 +38,10 @@ interface ChapterStateBundle {
 internal class ChaptersViewModel @Inject constructor(
     private val appRepository: AppRepository,
     private val appScope: AppCoroutineScope,
-    private val scraper: Scraper,
+    scraper: Scraper,
     private val toasty: Toasty,
-    private val appPreferences: AppPreferences,
-    private val appFileResolver: AppFileResolver,
+    appPreferences: AppPreferences,
+    appFileResolver: AppFileResolver,
     private val downloaderRepository: DownloaderRepository,
     private val chaptersRepository: ChaptersRepository,
     private val epubImporterRepository: EpubImporterRepository,
@@ -50,7 +51,7 @@ internal class ChaptersViewModel @Inject constructor(
     override val rawBookUrl by StateExtra_String(stateHandle)
     override val bookTitle by StateExtra_String(stateHandle)
 
-    val bookUrl = appFileResolver.getLocalIfContentType(rawBookUrl, bookFolderName = bookTitle)
+    private val bookUrl = appFileResolver.getLocalIfContentType(rawBookUrl, bookFolderName = bookTitle)
 
     @Volatile
     private var loadChaptersJob: Job? = null
@@ -215,7 +216,7 @@ internal class ChaptersViewModel @Inject constructor(
         }
     }
 
-    fun onSelectionModeChapterClick(chapter: my.noveldokusha.tooling.local_database.ChapterWithContext) {
+    fun onSelectionModeChapterClick(chapter: ChapterWithContext) {
         val url = chapter.chapter.url
         if (state.selectedChaptersUrl.containsKey(url)) {
             state.selectedChaptersUrl.remove(url)
@@ -229,7 +230,7 @@ internal class ChaptersViewModel @Inject constructor(
         appRepository.libraryBooks.saveImageAsCover(imageUri = uri, bookUrl = bookUrl)
     }
 
-    fun onSelectionModeChapterLongClick(chapter: my.noveldokusha.tooling.local_database.ChapterWithContext) {
+    fun onSelectionModeChapterLongClick(chapter: ChapterWithContext) {
         val url = chapter.chapter.url
         if (url != lastSelectedChapterUrl) {
             val indexOld = state.chapters.indexOfFirst { it.chapter.url == lastSelectedChapterUrl }
@@ -253,13 +254,13 @@ internal class ChaptersViewModel @Inject constructor(
         lastSelectedChapterUrl = url
     }
 
-    fun onChapterLongClick(chapter: my.noveldokusha.tooling.local_database.ChapterWithContext) {
+    fun onChapterLongClick(chapter: ChapterWithContext) {
         val url = chapter.chapter.url
         state.selectedChaptersUrl[url] = Unit
         lastSelectedChapterUrl = url
     }
 
-    fun onChapterDownload(chapter: my.noveldokusha.tooling.local_database.ChapterWithContext) {
+    fun onChapterDownload(chapter: ChapterWithContext) {
         if (state.isLocalSource.value) return
         appScope.launch {
             appRepository.chapterBody.fetchBody(chapter.chapter.url)

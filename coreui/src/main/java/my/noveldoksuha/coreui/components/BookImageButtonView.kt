@@ -1,6 +1,5 @@
 package my.noveldoksuha.coreui.components
 
-import android.widget.ImageView
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Indication
 import androidx.compose.foundation.LocalIndication
@@ -56,7 +55,7 @@ fun BookImageButtonView(
     onClick: () -> Unit,
     onLongClick: () -> Unit = { },
 ) {
-    Column(modifier = modifier.testTag(AppTestTags.bookImageButtonView)) {
+    Column(modifier = modifier.testTag(AppTestTags.BOOK_IMAGE_BUTTON_VIEW)) {
         Box(
             Modifier
                 .padding(4.dp)

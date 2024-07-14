@@ -56,7 +56,7 @@ class ScraperNetworkClient @Inject constructor(
         .readTimeout(30, TimeUnit.SECONDS)
         .build()
 
-    val clientWithRedirects = client
+    private val clientWithRedirects = client
         .newBuilder()
         .followRedirects(true)
         .followSslRedirects(true)

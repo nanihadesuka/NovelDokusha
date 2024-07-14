@@ -1,4 +1,4 @@
-package my.noveldokusha.tooling.local_database
+package my.noveldokusha.feature.local_database
 
 import android.content.Context
 import dagger.Module
@@ -7,9 +7,9 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import my.noveldokusha.feature.local_database.AppDatabase
-import my.noveldokusha.tooling.local_database.DAOs.ChapterBodyDao
-import my.noveldokusha.tooling.local_database.DAOs.ChapterDao
-import my.noveldokusha.tooling.local_database.DAOs.LibraryDao
+import my.noveldokusha.feature.local_database.DAOs.ChapterBodyDao
+import my.noveldokusha.feature.local_database.DAOs.ChapterDao
+import my.noveldokusha.feature.local_database.DAOs.LibraryDao
 import javax.inject.Singleton
 
 @InstallIn(SingletonComponent::class)

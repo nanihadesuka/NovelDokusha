@@ -90,7 +90,7 @@ class AppPreferences @Inject constructor(
         override var value by SharedPreference_Enum(
             name,
             preferences,
-            TernaryState.active
+            TernaryState.Active
         ) { enumValueOf(it) }
     }
     val SOURCES_LANGUAGES_ISO639_1 = object : Preference<Set<String>>("SOURCES_LANGUAGES") {
@@ -107,21 +107,21 @@ class AppPreferences @Inject constructor(
         override var value by SharedPreference_Enum(
             name,
             preferences,
-            TernaryState.inactive
+            TernaryState.Inactive
         ) { enumValueOf(it) }
     }
     val LIBRARY_SORT_LAST_READ = object : Preference<TernaryState>("LIBRARY_SORT_LAST_READ") {
         override var value by SharedPreference_Enum(
             name,
             preferences,
-            TernaryState.inverse
+            TernaryState.Inverse
         ) { enumValueOf(it) }
     }
     val BOOKS_LIST_LAYOUT_MODE = object : Preference<ListLayoutMode>("BOOKS_LIST_LAYOUT_MODE") {
         override var value by SharedPreference_Enum(
             name,
             preferences,
-            ListLayoutMode.verticalGrid
+            ListLayoutMode.VerticalGrid
         ) { enumValueOf(it) }
     }
     val GLOBAL_TRANSLATION_ENABLED = object : Preference<Boolean>("GLOBAL_TRANSLATION_ENABLED") {
@@ -163,7 +163,7 @@ class AppPreferences @Inject constructor(
         override var value by SharedPreference_Enum(
             name,
             preferences,
-            TernaryState.active
+            TernaryState.Active
         ) { enumValueOf(it) }
     }
 
@@ -209,7 +209,7 @@ class AppPreferences @Inject constructor(
         setter: (T) -> Unit
     ): MutableState<T> = object : MutableState<T> {
 
-        private val internalValue = mutableStateOf<T>(mapper(key))
+        private val internalValue = mutableStateOf(mapper(key))
         override var value: T
             get() = internalValue.value
             set(newValue) {

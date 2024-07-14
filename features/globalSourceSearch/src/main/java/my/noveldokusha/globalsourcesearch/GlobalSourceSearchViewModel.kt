@@ -12,7 +12,6 @@ import my.noveldoksuha.coreui.BaseViewModel
 import my.noveldoksuha.coreui.states.PagedListIteratorState
 import my.noveldoksuha.data.CatalogItem
 import my.noveldoksuha.data.ScraperRepository
-import my.noveldokusha.core.appPreferences.AppPreferences
 import my.noveldokusha.core.utils.StateExtra_String
 import my.noveldokusha.core.utils.asMutableStateOf
 import javax.inject.Inject
@@ -24,7 +23,6 @@ internal interface GlobalSourceSearchStateBundle {
 @HiltViewModel
 internal class GlobalSourceSearchViewModel @Inject constructor(
     state: SavedStateHandle,
-    val appPreferences: AppPreferences,
     private val scraperRepository: ScraperRepository,
 ) : BaseViewModel(), GlobalSourceSearchStateBundle {
     override val initialInput by StateExtra_String(state)

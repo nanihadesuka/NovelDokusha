@@ -9,10 +9,10 @@ internal fun Project.configureAndroid(
     commonExtension: CommonExtension<*, *, *, *, *>
 ) {
     commonExtension.apply {
-        compileSdk = appConfig.compileSdk
+        compileSdk = appConfig.COMPILE_SDK
 
         defaultConfig {
-            minSdk = appConfig.minSdk
+            minSdk = appConfig.MIN_SDK
 
             testInstrumentationRunnerArguments["clearPackageData"] = "true"
             testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -36,7 +36,7 @@ private fun Project.configureKotlin() {
     tasks.withType<KotlinCompile>().configureEach {
         kotlinOptions {
             // Set JVM target to 17
-            jvmTarget = appConfig.javaVersionString
+            jvmTarget = appConfig.JAVA_VERSION_STRING
             freeCompilerArgs = freeCompilerArgs + listOf(
                 "-opt-in=kotlin.RequiresOptIn",
                 "-Xjvm-default=all-compatibility",

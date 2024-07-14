@@ -121,7 +121,7 @@ class BestLightNovel(
                         index = index,
                         isLastPage = when (val nav = doc.selectFirst("div.phan-trang")) {
                             null -> true
-                            else -> nav.children().takeLast(2).first()?.`is`(".pageselect")
+                            else -> nav.children().takeLast(2).firstOrNull()?.`is`(".pageselect")
                                 ?: true
                         }
                     )
