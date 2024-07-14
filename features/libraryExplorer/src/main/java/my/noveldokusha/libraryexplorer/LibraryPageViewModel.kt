@@ -14,6 +14,7 @@ import my.noveldoksuha.data.AppRepository
 import my.noveldokusha.core.Toasty
 import my.noveldokusha.core.appPreferences.AppPreferences
 import my.noveldokusha.core.appPreferences.TernaryState
+import my.noveldokusha.core.domain.LibraryCategory
 import my.noveldokusha.core.utils.toState
 import javax.inject.Inject
 
@@ -56,7 +57,7 @@ internal class LibraryPageViewModel @Inject constructor(
         }
     }
 
-    fun onLibraryCategoryRefresh() {
+    fun onLibraryCategoryRefresh(libraryCategory: LibraryCategory) {
         showLoadingSpinner()
         toasty.show(R.string.updaing_library)
 

@@ -74,7 +74,7 @@ class RoyalRoad(
         bookUrl: String
     ): Response<List<ChapterResult>> = withContext(Dispatchers.Default) {
         tryConnect {
-            var chapterRows = networkClient.get(bookUrl)
+            val chapterRows = networkClient.get(bookUrl)
                 .toDocument()
                 .select(".chapter-row")
 
