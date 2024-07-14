@@ -18,6 +18,10 @@ internal fun Project.configureAndroid(
             testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         }
 
+        buildFeatures {
+            buildConfig = true
+        }
+
         compileOptions {
             sourceCompatibility = appConfig.javaVersion
             targetCompatibility = appConfig.javaVersion
