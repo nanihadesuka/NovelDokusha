@@ -108,7 +108,6 @@ class NovelBin(private val networkClient: NetworkClient) : SourceInterface.Catal
                     .toDocument()
                     .select("ul.list-chapter li a")
                     .map { ChapterResult(it.attr("title") ?: "", it.attr("href") ?: "") }
-                    .reversed()
             }
         }
 
