@@ -195,4 +195,5 @@
     <string name="please_open_web_view_and_try_verify_then_reload">Please open web view and try verify, then reload</string>
     <string name="cloudfare_firewall_failed_bypass">Cloudfare firewall failed bypass</string>
     <string name="tried_but_failed_to_bypass_cloudfare_firewall">Tried but failed to bypass cloudfare firewall</string>
+	<string name="features_reader_full_screen">Full screen</string>
 </resources>

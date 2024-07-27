@@ -24,6 +24,7 @@ internal fun ReaderScreenBottomBarDialogs(
     onFollowSystem: (Boolean) -> Unit,
     onThemeSelected: (Themes) -> Unit,
     onKeepScreenOn: (Boolean) -> Unit,
+    onFullScreen: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -52,7 +53,9 @@ internal fun ReaderScreenBottomBarDialogs(
                         allowTextSelection = settings.isTextSelectable.value,
                         onAllowTextSelectionChange = onSelectableTextChange,
                         keepScreenOn = settings.keepScreenOn.value,
-                        onKeepScreenOn = onKeepScreenOn
+                        onKeepScreenOn = onKeepScreenOn,
+                        fullScreen = settings.fullScreen.value,
+                        onFullScreen = onFullScreen,
                     )
                     ReaderScreenState.Settings.Type.None -> Unit
                 }

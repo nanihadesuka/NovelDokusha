@@ -26,6 +26,8 @@ import androidx.lifecycle.lifecycleScope
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChangedBy
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
@@ -77,7 +79,7 @@ class ReaderActivity : BaseActivity() {
     }
 
     @Inject
-    lateinit var navigationRoutes : NavigationRoutes
+    lateinit var navigationRoutes: NavigationRoutes
 
     @Inject
     internal lateinit var readerViewHandlersActions: ReaderViewHandlersActions
@@ -269,6 +271,7 @@ class ReaderActivity : BaseActivity() {
                     onKeepScreenOn = { appPreferences.READER_KEEP_SCREEN_ON.value = it },
                     onFollowSystem = { appPreferences.THEME_FOLLOW_SYSTEM.value = it },
                     onThemeSelected = { appPreferences.THEME_ID.value = it.toPreferenceTheme },
+                    onFullScreen = { appPreferences.READER_FULL_SCREEN.value = it },
                     onPressBack = {
                         viewModel.onCloseManually()
                         finish()
@@ -320,7 +323,16 @@ class ReaderActivity : BaseActivity() {
                 }
             })
 
-        setupSystemBar()
+        snapshotFlow { viewModel.state.settings.fullScreen.value }
+            .asLiveData()
+            .observe(this) { fullscreen ->
+                when {
+                    fullscreen -> setupFullScreenMode()
+                    else -> setupNormalScreenMode()
+                }
+            }
+        setupSystemBarAppearance()
+
 
         viewAdapter.listView.notifyDataSetChanged()
         lifecycleScope.launch {
@@ -355,27 +367,50 @@ class ReaderActivity : BaseActivity() {
         }
     }
 
-    private fun setupSystemBar() {
+    private fun setupNormalScreenMode() {
         enableEdgeToEdge()
-
-        // Fullscreen mode that ignores any cutout, notch etc.
-        WindowCompat.setDecorFitsSystemWindows(window, false)
+        WindowCompat.setDecorFitsSystemWindows(window, true)
         val controller = WindowInsetsControllerCompat(window, window.decorView)
-        controller.hide(WindowInsetsCompat.Type.displayCutout())
-        controller.hide(WindowInsetsCompat.Type.systemBars())
-
-        snapshotFlow { viewModel.state.showReaderInfo.value }
-            .asLiveData()
-            .observe(this) { show ->
-                if (show) controller.show(WindowInsetsCompat.Type.statusBars())
-                else controller.hide(WindowInsetsCompat.Type.statusBars())
-            }
-
+        controller.show(WindowInsetsCompat.Type.displayCutout())
+        controller.show(WindowInsetsCompat.Type.systemBars())
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
             window.attributes.layoutInDisplayCutoutMode =
                 WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES
         }
         window.statusBarColor = R.attr.colorSurface.colorAttrRes(this)
+    }
+
+    private fun setupFullScreenMode() {
+        enableEdgeToEdge()
+        // Fullscreen mode that ignores any cutout, notch etc.
+        WindowCompat.setDecorFitsSystemWindows(window, false)
+        val controller = WindowInsetsControllerCompat(window, window.decorView)
+        controller.hide(WindowInsetsCompat.Type.displayCutout())
+        controller.hide(WindowInsetsCompat.Type.systemBars())
+        controller.hide(WindowInsetsCompat.Type.navigationBars())
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            window.attributes.layoutInDisplayCutoutMode =
+                WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES
+        }
+        window.statusBarColor = R.attr.colorSurface.colorAttrRes(this)
+        controller.systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+
+    }
+
+    private fun setupSystemBarAppearance() {
+        val controller = WindowInsetsControllerCompat(window, window.decorView)
+        combine(
+            snapshotFlow { viewModel.state.showReaderInfo.value },
+            snapshotFlow { viewModel.state.settings.fullScreen.value }
+        ) { showReaderInfo, fullScreen -> showReaderInfo to fullScreen }
+            .distinctUntilChangedBy { (showReaderInfo, fullScreen) -> showReaderInfo || !fullScreen }
+            .asLiveData().observe(this) { (showReaderInfo, fullScreen) ->
+                val show = showReaderInfo || !fullScreen
+                when {
+                    show -> controller.show(WindowInsetsCompat.Type.statusBars())
+                    else -> controller.hide(WindowInsetsCompat.Type.statusBars())
+                }
+            }
     }
 
     private fun scrollToReadingPositionOptional(chapterIndex: Int, chapterItemPosition: Int) {

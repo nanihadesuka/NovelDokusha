@@ -2,6 +2,7 @@ package my.noveldokusha.features.reader.ui.settingDialogs
 
 import androidx.compose.foundation.clickable
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Fullscreen
 import androidx.compose.material.icons.outlined.LightMode
 import androidx.compose.material.icons.outlined.TouchApp
 import androidx.compose.material3.CardDefaults
@@ -24,7 +25,9 @@ internal fun MoreSettingDialog(
     allowTextSelection: Boolean,
     onAllowTextSelectionChange: (Boolean) -> Unit,
     keepScreenOn: Boolean,
-    onKeepScreenOn: (Boolean) -> Unit
+    onKeepScreenOn: (Boolean) -> Unit,
+    fullScreen: Boolean,
+    onFullScreen: (Boolean) -> Unit,
 ) {
     ElevatedCard(
         elevation = CardDefaults.elevatedCardElevation(defaultElevation = 12.dp)
@@ -73,6 +76,32 @@ internal fun MoreSettingDialog(
                 Switch(
                     checked = keepScreenOn,
                     onCheckedChange = onKeepScreenOn,
+                    colors = SwitchDefaults.colors(
+                        checkedThumbColor = ColorAccent,
+                        checkedBorderColor = MaterialTheme.colorScheme.onPrimary,
+                        uncheckedBorderColor = MaterialTheme.colorScheme.onPrimary,
+                    )
+                )
+            }
+        )
+        // Keep screen on
+        ListItem(
+            modifier = Modifier
+                .clickable { onFullScreen(!fullScreen) },
+            headlineContent = {
+                Text(text = stringResource(R.string.features_reader_full_screen))
+            },
+            leadingContent = {
+                Icon(
+                    Icons.Outlined.Fullscreen,
+                    null,
+                    tint = MaterialTheme.colorScheme.onPrimary
+                )
+            },
+            trailingContent = {
+                Switch(
+                    checked = fullScreen,
+                    onCheckedChange = onFullScreen,
                     colors = SwitchDefaults.colors(
                         checkedThumbColor = ColorAccent,
                         checkedBorderColor = MaterialTheme.colorScheme.onPrimary,

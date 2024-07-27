@@ -86,6 +86,10 @@ class AppPreferences @Inject constructor(
         override var value by SharedPreference_Boolean(name, preferences, false)
     }
 
+    val READER_FULL_SCREEN = object : Preference<Boolean>("READER_FULL_SCREEN") {
+        override var value by SharedPreference_Boolean(name, preferences, true)
+    }
+
     val CHAPTERS_SORT_ASCENDING = object : Preference<TernaryState>("CHAPTERS_SORT_ASCENDING") {
         override var value by SharedPreference_Enum(
             name,

@@ -63,6 +63,7 @@ internal class ReaderViewModel @Inject constructor(
             keepScreenOn = appPreferences.READER_KEEP_SCREEN_ON.state(viewModelScope),
             textToSpeech = readerSession.readerTextToSpeech.state,
             liveTranslation = readerSession.readerLiveTranslation.state,
+            fullScreen = appPreferences.READER_FULL_SCREEN.state(viewModelScope),
             style = ReaderScreenState.Settings.StyleSettingsData(
                 followSystem = appPreferences.THEME_FOLLOW_SYSTEM.state(viewModelScope),
                 currentTheme = derivedStateOf { themeId.value.toTheme },

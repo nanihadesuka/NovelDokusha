@@ -35,11 +35,13 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -61,9 +63,9 @@ import my.noveldokusha.features.reader.features.TextSynthesis
 import my.noveldokusha.features.reader.features.TextToSpeechSettingData
 import my.noveldokusha.features.reader.ui.ReaderScreenState.Settings.Type
 import my.noveldokusha.reader.R
-import my.noveldokusha.text_translator.domain.TranslationModelState
 import my.noveldokusha.text_to_speech.Utterance
 import my.noveldokusha.text_to_speech.VoiceData
+import my.noveldokusha.text_translator.domain.TranslationModelState
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -72,6 +74,7 @@ internal fun ReaderScreen(
     onSelectableTextChange: (Boolean) -> Unit,
     onKeepScreenOn: (Boolean) -> Unit,
     onFollowSystem: (Boolean) -> Unit,
+    onFullScreen: (Boolean) -> Unit,
     onThemeSelected: (Themes) -> Unit,
     onTextFontChanged: (String) -> Unit,
     onTextSizeChanged: (Float) -> Unit,
@@ -86,6 +89,7 @@ internal fun ReaderScreen(
 
     Scaffold(
         topBar = {
+            val fullScreen by rememberUpdatedState(state.showReaderInfo.value)
             AnimatedVisibility(
                 visible = state.showReaderInfo.value,
                 enter = expandVertically(initialHeight = { 0 }, expandFrom = Alignment.Top)
@@ -93,8 +97,16 @@ internal fun ReaderScreen(
                 exit = shrinkVertically(targetHeight = { 0 }, shrinkTowards = Alignment.Top)
                         + fadeOut(),
             ) {
-                Surface(color = MaterialTheme.colorApp.tintedSurface) {
-                    Column(modifier = Modifier.displayCutoutPadding()) {
+                Surface(
+                    color = MaterialTheme.colorApp.tintedSurface,
+                    modifier = Modifier.animateContentSize(),
+                ) {
+                    Column(
+                        modifier = when (fullScreen) {
+                            true -> Modifier.displayCutoutPadding()
+                            false -> Modifier
+                        }
+                    ) {
                         TopAppBar(
                             colors = TopAppBarDefaults.topAppBarColors(
                                 containerColor = MaterialTheme.colorApp.tintedSurface,
@@ -169,15 +181,13 @@ internal fun ReaderScreen(
                         onFollowSystem = onFollowSystem,
                         onThemeSelected = onThemeSelected,
                         onKeepScreenOn = onKeepScreenOn,
+                        onFullScreen = onFullScreen,
                         modifier = Modifier.padding(bottom = 8.dp)
                     )
                     BottomAppBar(
-                        modifier = Modifier.clip(
-                            RoundedCornerShape(
-                                topStart = 16.dp,
-                                topEnd = 16.dp
-                            )
-                        ),
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp))
+                            .animateContentSize(),
                         containerColor = MaterialTheme.colorApp.tintedSurface,
                     ) {
                         if (state.settings.liveTranslation.isAvailable) SettingIconItem(
@@ -338,6 +348,7 @@ private fun ViewsPreview(
                         liveTranslation = liveTranslationSettingData,
                         style = style,
                         selectedSetting = remember { mutableStateOf(data.selectedSetting) },
+                        fullScreen = remember { mutableStateOf(false) },
                     ),
                     showInvalidChapterDialog = remember { mutableStateOf(false) }
                 ),
@@ -350,6 +361,7 @@ private fun ViewsPreview(
                 onOpenChapterInWeb = {},
                 readerContent = {},
                 onKeepScreenOn = {},
+                onFullScreen = {},
             )
         }
     }
