@@ -64,7 +64,7 @@ internal fun StyleSettingDialog(
         var currentTextSize by remember { mutableFloatStateOf(state.textSize.value) }
         MySlider(
             value = currentTextSize,
-            valueRange = 8f..24f,
+            valueRange = 8f..32f,
             onValueChange = {
                 currentTextSize = it
                 onTextSizeChange(currentTextSize)
