@@ -15,9 +15,11 @@ import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.runtime.toMutableStateList
 import androidx.core.os.bundleOf
 import androidx.lifecycle.SavedStateHandle
+import androidx.lifecycle.viewmodel.compose.SavedStateHandleSaveableApi
 import androidx.lifecycle.viewmodel.compose.saveable
 import java.io.Serializable
 
+@OptIn(SavedStateHandleSaveableApi::class)
 fun <T> SavedStateHandle.asMutableStateOf(key: String, default: () -> T): MutableState<T> =
     object : MutableState<T> by saveable(key = key, init = { mutableStateOf(default()) }) {}
 

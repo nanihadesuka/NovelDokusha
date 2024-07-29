@@ -2,8 +2,8 @@ package my.noveldokusha.feature.local_database
 
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
-import my.noveldokusha.feature.local_database.migrations._1stKissNovelDomainChange_1_org
 import my.noveldokusha.feature.local_database.migrations.MigrationsList
+import my.noveldokusha.feature.local_database.migrations._1stKissNovelDomainChange_1_org
 import my.noveldokusha.feature.local_database.migrations.readLightNovelDomainChange_1_today
 import my.noveldokusha.feature.local_database.migrations.readLightNovelDomainChange_2_meme
 
@@ -29,5 +29,5 @@ internal fun databaseMigrations() = arrayOf(
 
 internal fun migration(vi: Int, migrate: (SupportSQLiteDatabase) -> Unit) =
     object : Migration(vi, vi + 1) {
-        override fun migrate(database: SupportSQLiteDatabase) = migrate(database)
+        override fun migrate(db: SupportSQLiteDatabase) = migrate(db)
     }
