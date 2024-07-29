@@ -108,7 +108,8 @@ internal fun LibraryScreenBody(
                 }
             )
             HorizontalPager(
-                state = pagerState
+                state = pagerState,
+                verticalAlignment = Alignment.Top,
             ) { page ->
                 // TODO: improve + make more generic (use database table?)
                 val showCompleted by remember {
