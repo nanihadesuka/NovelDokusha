@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.launch
+import me.nanihadesuka.algorithms.delimiterAwareTextSplitter
 
 interface Utterance<T : Utterance<T>> {
     enum class PlayState { PLAYING, FINISHED, LOADING }
@@ -36,6 +37,7 @@ class TextToSpeechManager<T : Utterance<T>>(
 ) {
     private val scope = CoroutineScope(Dispatchers.Default)
     private val _queueList = mutableMapOf<String, T>()
+    private val _queueListItemSize = mutableMapOf<String, Int>()
     private val _currentTextSpeakFlow = MutableSharedFlow<T>()
     val availableVoices = mutableStateListOf<VoiceData>()
     val voiceSpeed = mutableFloatStateOf(1f)
@@ -67,14 +69,25 @@ class TextToSpeechManager<T : Utterance<T>>(
     fun stop() {
         service.stop()
         _queueList.clear()
+        _queueListItemSize.clear()
     }
 
     fun speak(text: String, textSynthesis: T) {
+        val subItems = delimiterAwareTextSplitter(
+            fullText = text,
+            maxSliceLength = maxStringLengthPerTextUnit(),
+            charDelimiter = '.'
+        )
         _queueList[textSynthesis.utteranceId] = textSynthesis
-        val bundle = Bundle().apply {
-            putString(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, textSynthesis.utteranceId)
+        _queueListItemSize[textSynthesis.utteranceId] = subItems.size
+
+        subItems.forEachIndexed { index, textSlice ->
+            val uniqueID = "$index|${textSynthesis.utteranceId}"
+            val bundle = Bundle().apply {
+                putString(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, uniqueID)
+            }
+            service.speak(textSlice, TextToSpeech.QUEUE_ADD, bundle, uniqueID)
         }
-        service.speak(text, TextToSpeech.QUEUE_ADD, bundle, textSynthesis.utteranceId)
     }
 
     fun setCurrentSpeakState(textSynthesis: T) {
@@ -109,6 +122,10 @@ class TextToSpeechManager<T : Utterance<T>>(
         return false
     }
 
+    private fun maxStringLengthPerTextUnit(): Int {
+        return TextToSpeech.getMaxSpeechInputLength()
+    }
+
     private fun updateActiveVoice() {
         activeVoice.value = service.voice?.toVoiceData()
     }
@@ -128,9 +145,20 @@ class TextToSpeechManager<T : Utterance<T>>(
         service.setOnUtteranceProgressListener(object : UtteranceProgressListener() {
             override fun onStart(utteranceId: String?) {
                 if (utteranceId == null) return
-                val res: T = _queueList[utteranceId]
+
+                val itemUtteranceIndex = utteranceId
+                    .substringBefore('|', "")
+                    .toIntOrNull() ?: return
+                val isFirstSubItem = itemUtteranceIndex == 0
+                if (!isFirstSubItem) {
+                    return
+                }
+
+                val itemUtteranceId = utteranceId.substringAfter('|')
+                val res: T = _queueList[itemUtteranceId]
                     ?.copyWithState(playState = Utterance.PlayState.PLAYING)
                     ?: return
+
                 currentActiveItemState.value = res
                 scope.launch { _currentTextSpeakFlow.emit(res) }
             }
@@ -150,9 +178,24 @@ class TextToSpeechManager<T : Utterance<T>>(
 
             private fun onErrorCall(utteranceId: String?) {
                 if (utteranceId == null) return
-                val res: T = _queueList.remove(utteranceId)
+                val subItemUtteranceIndex = utteranceId
+                    .substringBefore('|', "")
+                    .toIntOrNull() ?: return
+                val itemUtteranceId = utteranceId.substringAfter('|')
+
+                val itemSize = _queueListItemSize[itemUtteranceId]?.minus(1) ?: return
+                val isSubItemLastIndex = itemSize == subItemUtteranceIndex
+                if (!isSubItemLastIndex) {
+                    return
+                }
+
+                val res: T = _queueList[itemUtteranceId]
                     ?.copyWithState(playState = Utterance.PlayState.FINISHED)
                     ?: return
+
+                _queueList.remove(itemUtteranceId)
+                _queueListItemSize.remove(itemUtteranceId)
+
                 currentActiveItemState.value = res
                 scope.launch { _currentTextSpeakFlow.emit(res) }
             }

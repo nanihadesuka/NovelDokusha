@@ -4,6 +4,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.withContext
+import me.nanihadesuka.algorithms.delimiterAwareTextSplitter
 import my.noveldokusha.core.BookTextMapper
 import my.noveldokusha.features.reader.domain.ImgEntry
 import my.noveldokusha.features.reader.domain.ReaderItem
@@ -17,6 +18,13 @@ internal suspend fun textToItemsConverter(
     val paragraphs = text
         .splitToSequence("\n\n")
         .filter { it.isNotBlank() }
+        .flatMap {
+            delimiterAwareTextSplitter(
+                fullText = it.trim(),
+                maxSliceLength = 512,
+                charDelimiter = '.'
+            )
+        }
         .toList()
 
     return@withContext paragraphs

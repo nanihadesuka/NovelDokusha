@@ -75,6 +75,7 @@ retrofit = "2.9.0"
 
 timber = "5.0.1"
 junitVersion = "1.2.1"
+jetbrainsKotlinJvm = "1.9.0"
 
 [libraries]
 
@@ -193,6 +194,7 @@ dependency-analysis = { id = "com.autonomousapps.dependency-analysis", version.r
 noveldokusha-android-application = { id = "noveldokusha.android.application", version = "unspecified" }
 noveldokusha-android-library = { id = "noveldokusha.android.library", version = "unspecified" }
 noveldokusha-android-compose = { id = "noveldokusha.android.compose", version = "unspecified" }
+jetbrains-kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "jetbrainsKotlinJvm" }
 
 [bundles]
 
