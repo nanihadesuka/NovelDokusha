@@ -1,4 +1,4 @@
-package my.noveldokusha.text_to_speech
+package me.nanihadesuka.algorithms
 
 import java.nio.CharBuffer
 
@@ -6,7 +6,7 @@ import java.nio.CharBuffer
  * Returns the text chunked in max sizes of maxSliceLength and tries to
  * preserve contiguity of text by slicing to the nearest charDelimiter
  */
-internal fun delimiterAwareTextSplitter(
+fun delimiterAwareTextSplitter(
     fullText: String,
     maxSliceLength: Int,
     charDelimiter: Char = '.',

@@ -1,4 +1,4 @@
-package my.noveldokusha.text_to_speech
+package my.nanihadesuka.algorithms
 
 import org.junit.Assert.assertEquals
 import org.junit.Test
@@ -8,7 +8,7 @@ class DelimiterAwareTextSplitterTest {
     @Test
     fun `no delimiter in text`() {
         val text = "hello how are you, fine you ?"
-        val result = delimiterAwareTextSplitter(
+        val result = me.nanihadesuka.algorithms.delimiterAwareTextSplitter(
             fullText = text,
             maxSliceLength = 40,
             charDelimiter = '.'
@@ -24,7 +24,7 @@ class DelimiterAwareTextSplitterTest {
     @Test
     fun `with delimiter in text`() {
         val text = "hello how are you. fine you ?"
-        val result = delimiterAwareTextSplitter(
+        val result = me.nanihadesuka.algorithms.delimiterAwareTextSplitter(
             fullText = text,
             maxSliceLength = 40,
             charDelimiter = '.'
@@ -40,7 +40,7 @@ class DelimiterAwareTextSplitterTest {
     @Test
     fun `with delimiter and sliced`() {
         val text = "hello how are you. fine you.. Mind taking a moment?."
-        val result = delimiterAwareTextSplitter(
+        val result = me.nanihadesuka.algorithms.delimiterAwareTextSplitter(
             fullText = text,
             maxSliceLength = 5,
             charDelimiter = '.'

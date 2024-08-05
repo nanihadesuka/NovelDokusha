@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.launch
+import me.nanihadesuka.algorithms.delimiterAwareTextSplitter
 
 interface Utterance<T : Utterance<T>> {
     enum class PlayState { PLAYING, FINISHED, LOADING }
