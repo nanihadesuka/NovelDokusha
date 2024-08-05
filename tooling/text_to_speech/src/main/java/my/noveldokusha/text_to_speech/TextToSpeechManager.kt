@@ -72,7 +72,7 @@ class TextToSpeechManager<T : Utterance<T>>(
     }
 
     fun speak(text: String, textSynthesis: T) {
-        val subItems = delimiterWareTextSplitter(
+        val subItems = delimiterAwareTextSplitter(
             fullText = text,
             maxSliceLength = maxStringLengthPerTextUnit(),
             charDelimiter = '.'

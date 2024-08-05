@@ -8,7 +8,7 @@ class DelimiterAwareTextSplitterTest {
     @Test
     fun `no delimiter in text`() {
         val text = "hello how are you, fine you ?"
-        val result = delimiterWareTextSplitter(
+        val result = delimiterAwareTextSplitter(
             fullText = text,
             maxSliceLength = 40,
             charDelimiter = '.'
@@ -24,14 +24,14 @@ class DelimiterAwareTextSplitterTest {
     @Test
     fun `with delimiter in text`() {
         val text = "hello how are you. fine you ?"
-        val result = delimiterWareTextSplitter(
+        val result = delimiterAwareTextSplitter(
             fullText = text,
             maxSliceLength = 40,
             charDelimiter = '.'
         )
         assertEquals(
             listOf(
-                "hello how are you, fine you ?",
+                "hello how are you. fine you ?",
             ), result
         )
         assertEquals(text, result.joinToString(""))
@@ -40,7 +40,7 @@ class DelimiterAwareTextSplitterTest {
     @Test
     fun `with delimiter and sliced`() {
         val text = "hello how are you. fine you.. Mind taking a moment?."
-        val result = delimiterWareTextSplitter(
+        val result = delimiterAwareTextSplitter(
             fullText = text,
             maxSliceLength = 5,
             charDelimiter = '.'
