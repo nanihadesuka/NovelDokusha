@@ -1,10 +1,15 @@
 package my.noveldokusha.features.main
 
+import android.Manifest
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.net.Uri
+import android.os.Build.VERSION
+import android.os.Build.VERSION_CODES
 import android.os.Bundle
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.animation.ExperimentalAnimationApi
@@ -22,6 +27,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.core.content.ContextCompat
 import androidx.core.content.IntentCompat
 import dagger.hilt.android.AndroidEntryPoint
 import my.noveldoksuha.coreui.BaseActivity
@@ -49,8 +55,15 @@ private val pages = listOf(
 @AndroidEntryPoint
 open class MainActivity : BaseActivity() {
 
+    private val requestNotificationPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission(),
+    ) { }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        requestPushNotificationPermission()
+
         setContent {
             var activePageIndex by rememberSaveable { mutableIntStateOf(0) }
 
@@ -91,6 +104,18 @@ open class MainActivity : BaseActivity() {
         }
 
         handleIntent(intent)
+    }
+
+    private fun requestPushNotificationPermission() {
+        // check if sdk level is more than 33
+        if (VERSION.SDK_INT < VERSION_CODES.TIRAMISU) {
+            return
+        }
+
+        val result = ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
+        if (result != PackageManager.PERMISSION_GRANTED) {
+            requestNotificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+        }
     }
 
     private fun handleIntent(intent: Intent) {
