@@ -79,31 +79,33 @@ class NovelBin(private val networkClient: NetworkClient) : SourceInterface.Catal
     override suspend fun getChapterList(bookUrl: String) =
         withContext(Dispatchers.Default) {
             tryConnect {
-                val keyId =
-                    networkClient
-                        .get(bookUrl)
-                        .toDocument()
-                        .selectFirst("a#btn-follow")!!
-                        .attr("data-id") ?: ""
+                val keyId = networkClient
+                    .get(bookUrl)
+                    .toDocument()
+                    .expectFirst("meta[property=og:url]")
+                    .attr("content")
+                    .toUrlBuilderSafe()
+                    .build()
+                    .lastPathSegment!!
 
                 getRequest(
-                        url =
-                            baseUrl
-                                .toUrlBuilderSafe()
-                                .addPath("ajax", "chapter-archive")
-                                .add("novelId" to keyId)
-                                .toString(),
-                        headers =
-                            Headers.Builder()
-                                .add("Accept", "*/*")
-                                .add("X-Requested-With", "XMLHttpRequest")
-                                .add(
-                                    "User-Agent",
-                                    "Mozilla/5.0 (Android 13; Mobile; rv:125.0) Gecko/125.0 Firefox/125.0"
-                                )
-                                .add("Referer", "$bookUrl#tab-chapters-title")
-                                .build()
-                    )
+                    url =
+                    baseUrl
+                        .toUrlBuilderSafe()
+                        .addPath("ajax", "chapter-archive")
+                        .add("novelId" to keyId)
+                        .toString(),
+                    headers =
+                    Headers.Builder()
+                        .add("Accept", "*/*")
+                        .add("X-Requested-With", "XMLHttpRequest")
+                        .add(
+                            "User-Agent",
+                            "Mozilla/5.0 (Android 13; Mobile; rv:125.0) Gecko/125.0 Firefox/125.0"
+                        )
+                        .add("Referer", "$bookUrl#tab-chapters-title")
+                        .build()
+                )
                     .let { networkClient.call(it) }
                     .toDocument()
                     .select("ul.list-chapter li a")
