@@ -1,5 +1,6 @@
 package my.noveldokusha.scraper.sources
 
+import android.util.Log
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import my.noveldokusha.core.LanguageCode
@@ -35,17 +36,27 @@ class RoyalRoad(
     override val catalogUrl = "https://www.royalroad.com/fictions/latest-updates?page=1"
     override val language = LanguageCode.ENGLISH
 
+    private val cssPattern = Regex("(?<class>\\.\\w+)\\s*\\{.*display: none;.*\\}", RegexOption.DOT_MATCHES_ALL)
+
     override suspend fun getChapterTitle(doc: Document): String? =
         withContext(Dispatchers.Default) {
             doc.selectFirst(".fic-headers h4")?.text()
         }
 
     override suspend fun getChapterText(doc: Document): String = withContext(Dispatchers.Default) {
+        val hiddenClasses = doc
+            .select("style")
+            .flatMap { style -> cssPattern
+                .findAll(style.data())
+                .map { match -> match.groups["class"]!!.value } }
+            .toSet()
+        Log.v("RoyalRoadScrapper", "Found hidden CSS classes: $hiddenClasses")
         doc.selectFirst(".chapter-content")!!.let {
             it.select("script").remove()
             it.select("a").remove()
             it.select(".ads-title").remove()
             it.select(".hidden").remove()
+            hiddenClasses.forEach { hc -> it.select(hc).remove() }
             TextExtractor.get(it)
         }
     }
