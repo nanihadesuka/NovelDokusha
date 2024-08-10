@@ -1,6 +1,5 @@
 package my.noveldokusha.scraper.sources
 
-import android.util.Log
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import my.noveldokusha.core.LanguageCode
@@ -48,9 +47,9 @@ class RoyalRoad(
             .select("style")
             .flatMap { style -> cssPattern
                 .findAll(style.data())
-                .map { match -> match.groups["class"]!!.value } }
+                .map { match -> match.groups["class"]?.value }
+                .filterNotNull()}
             .toSet()
-        Log.v("RoyalRoadScrapper", "Found hidden CSS classes: $hiddenClasses")
         doc.selectFirst(".chapter-content")!!.let {
             it.select("script").remove()
             it.select("a").remove()
