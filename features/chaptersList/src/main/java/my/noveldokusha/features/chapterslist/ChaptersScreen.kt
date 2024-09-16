@@ -20,6 +20,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Done
+import androidx.compose.material.icons.filled.DoneAll
+import androidx.compose.material.icons.filled.DoneOutline
 import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.PlayArrow
@@ -81,6 +83,8 @@ internal fun ChaptersScreen(
     onSelectedDownload: () -> Unit,
     onSelectedSetRead: () -> Unit,
     onSelectedSetUnread: () -> Unit,
+    onSelectedSetReadUpToChapterRead: () -> Unit,
+    onSelectedSetReadUpToChapterUnread: () -> Unit,
     onSelectedInvertSelection: () -> Unit,
     onSelectAllChapters: () -> Unit,
     onCloseSelectionBar: () -> Unit,
@@ -99,6 +103,9 @@ internal fun ChaptersScreen(
     var showBottomSheet by rememberSaveable { mutableStateOf(false) }
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     val lazyListState = rememberLazyListState()
+    val areSelectedChaptersRead = state.selectedChaptersUrl.keys.all { url ->
+        state.chapters.find { it.chapter.url == url }?.chapter?.read == true
+    }
 
     if (state.isInSelectionMode.value) BackHandler {
         onCloseSelectionBar()
@@ -281,17 +288,38 @@ internal fun ChaptersScreen(
                                 )
                             }
                         }
-                        IconButton(onClick = onSelectedSetRead) {
-                            Icon(
-                                Icons.Filled.Done,
-                                stringResource(id = R.string.set_as_read_selected_chapters)
-                            )
+                        if (areSelectedChaptersRead) {
+                            IconButton(onClick = onSelectedSetUnread) {
+                                Icon(
+                                    Icons.Filled.DoneOutline,
+                                    stringResource(id = R.string.set_as_not_read_selected_chapters)
+                                )
+                            }
+                        } else {
+                            IconButton(onClick = onSelectedSetRead) {
+                                Icon(
+                                    Icons.Filled.Done,
+                                    stringResource(id = R.string.set_as_read_selected_chapters)
+                                )
+                            }
                         }
-                        IconButton(onClick = onSelectedSetUnread) {
-                            Icon(
-                                Icons.Filled.RemoveDone,
-                                stringResource(id = R.string.set_as_not_read_selected_chapters)
-                            )
+                        if (state.selectedChaptersUrl.size <= 1) {
+                            if (areSelectedChaptersRead) {
+                                IconButton(onClick = onSelectedSetReadUpToChapterUnread) {
+                                    Icon(
+                                        Icons.Filled.RemoveDone,
+                                        stringResource(id = R.string.set_as_Unread_up_to_selected_chapter)
+                                    )
+                                }
+                            } else {
+                                IconButton(onClick = onSelectedSetReadUpToChapterRead) {
+                                    Icon(
+                                        Icons.Filled.DoneAll,
+                                        stringResource(id = R.string.set_as_read_up_to_selected_chapter)
+                                    )
+
+                                }
+                            }
                         }
                     }
                 }
