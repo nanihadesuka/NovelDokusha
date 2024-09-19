@@ -201,15 +201,11 @@ internal class ChaptersViewModel @Inject constructor(
     }
 
     fun setAsReadUpToSelected() {
-        // If more than one chapter is selected, do nothing
         if (state.selectedChaptersUrl.size > 1) return
-
-        // Find the index of the selected chapter
         val selectedIndex = state.selectedChaptersUrl.keys.firstOrNull()?.let { selectedUrl ->
             state.chapters.indexOfFirst { it.chapter.url == selectedUrl }
         } ?: return
 
-        // Mark all chapters up to the selected chapter as read
         if (selectedIndex != -1) {
             val chaptersToMarkAsRead = state.chapters.take(selectedIndex + 1).map { it.chapter.url }
             appScope.launch(Dispatchers.Default) {
@@ -219,15 +215,11 @@ internal class ChaptersViewModel @Inject constructor(
     }
 
     fun setAsReadUpToUnSelected() {
-        // If more than one chapter is selected, do nothing
         if (state.selectedChaptersUrl.size > 1) return
-
-        // Find the index of the selected chapter
         val selectedIndex = state.selectedChaptersUrl.keys.firstOrNull()?.let { selectedUrl ->
             state.chapters.indexOfFirst { it.chapter.url == selectedUrl }
         } ?: return
 
-        // Mark all chapters up to the selected chapter as unread
         if (selectedIndex != -1) {
             val chaptersToMarkAsUnread = state.chapters.take(selectedIndex + 1).map { it.chapter.url }
             appScope.launch(Dispatchers.Default) {
