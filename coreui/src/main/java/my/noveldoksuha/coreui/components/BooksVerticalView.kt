@@ -46,7 +46,7 @@ fun BooksVerticalView(
     onReload: () -> Unit = {},
     onCopyError: (String) -> Unit = {},
     onWebViewOpen: () -> Unit = {},
-    cells: GridCells = GridCells.Adaptive(160.dp),
+    cells: GridCells = GridCells.Adaptive(120.dp),
     innerPadding: PaddingValues = PaddingValues(),
 ) {
 

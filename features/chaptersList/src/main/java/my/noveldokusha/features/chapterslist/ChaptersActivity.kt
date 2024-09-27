@@ -54,6 +54,8 @@ class ChaptersActivity : BaseActivity() {
                     onSelectedDeleteDownloads = viewModel::deleteDownloadsSelected,
                     onSelectedDownload = viewModel::downloadSelected,
                     onSelectedSetRead = viewModel::setAsReadSelected,
+                    onSelectedSetReadUpToChapterRead = viewModel::setAsReadUpToSelected,
+                    onSelectedSetReadUpToChapterUnread = viewModel::setAsReadUpToUnSelected,
                     onSelectedSetUnread = viewModel::setAsUnreadSelected,
                     onSelectedInvertSelection = viewModel::invertSelection,
                     onSelectAllChapters = viewModel::selectAll,
