@@ -200,6 +200,34 @@ internal class ChaptersViewModel @Inject constructor(
         }
     }
 
+    fun setAsReadUpToSelected() {
+        if (state.selectedChaptersUrl.size > 1) return
+        val selectedIndex = state.selectedChaptersUrl.keys.firstOrNull()?.let { selectedUrl ->
+            state.chapters.indexOfFirst { it.chapter.url == selectedUrl }
+        } ?: return
+
+        if (selectedIndex != -1) {
+            val chaptersToMarkAsRead = state.chapters.take(selectedIndex + 1).map { it.chapter.url }
+            appScope.launch(Dispatchers.Default) {
+                appRepository.bookChapters.setAsRead(chaptersToMarkAsRead)
+            }
+        }
+    }
+
+    fun setAsReadUpToUnSelected() {
+        if (state.selectedChaptersUrl.size > 1) return
+        val selectedIndex = state.selectedChaptersUrl.keys.firstOrNull()?.let { selectedUrl ->
+            state.chapters.indexOfFirst { it.chapter.url == selectedUrl }
+        } ?: return
+
+        if (selectedIndex != -1) {
+            val chaptersToMarkAsUnread = state.chapters.take(selectedIndex + 1).map { it.chapter.url }
+            appScope.launch(Dispatchers.Default) {
+                appRepository.bookChapters.setAsUnread(chaptersToMarkAsUnread)
+            }
+        }
+    }
+
     fun downloadSelected() {
         if (state.isLocalSource.value) return
         val list = state.selectedChaptersUrl.toList()
