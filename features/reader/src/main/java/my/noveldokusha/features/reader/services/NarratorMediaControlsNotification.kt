@@ -8,6 +8,7 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.BitmapFactory
 import android.graphics.Color
+import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.MediaSessionCompat
 import android.support.v4.media.session.PlaybackStateCompat
 import androidx.compose.runtime.snapshotFlow
@@ -71,6 +72,10 @@ internal class NarratorMediaControlsNotification @Inject constructor(
             ComponentName(context, MediaButtonReceiver::class.java),
             mbrIntent
         ).also {
+            // https://stackoverflow.com/questions/59443133/disable-or-hide-seekbar-in-mediastyle-notifications
+            val mediaMetadata = MediaMetadataCompat.Builder().putLong(MediaMetadataCompat.METADATA_KEY_DURATION, -1L).build()
+            it.setMetadata(mediaMetadata)
+
             it.setCallback(NarratorMediaControlsCallback(readerSession.readerTextToSpeech))
             mediaSession = it
         }
