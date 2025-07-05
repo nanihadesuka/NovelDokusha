@@ -1,3 +1,9 @@
+
+## ⚠️ Project Status: No Longer Maintained
+
+This project is no longer actively maintained.
+Feel free to fork it or use it as-is, but note that no further updates, bug fixes, or support will be done.
+
 # NovelDokusha
 Android web novel reader. Reader focused on simplicity, improving reading immersion.
 Search from a large catalog of content, open your pick and just enjoy.
