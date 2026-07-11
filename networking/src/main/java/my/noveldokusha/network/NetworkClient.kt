@@ -4,6 +4,7 @@ import android.content.Context
 import android.net.Uri
 import dagger.hilt.android.qualifiers.ApplicationContext
 import my.noveldokusha.core.AppInternalState
+import my.noveldokusha.network.interceptors.BrowserHeadersInterceptor
 import my.noveldokusha.network.interceptors.CloudFareVerificationInterceptor
 import my.noveldokusha.network.interceptors.DecodeResponseInterceptor
 import my.noveldokusha.network.interceptors.UserAgentInterceptor
@@ -47,7 +48,20 @@ class ScraperNetworkClient @Inject constructor(
                 it.addInterceptor(okhttpLoggingInterceptor)
             } else it
         }
+        // Order matters:
+        //   1. UserAgentInterceptor   — sets the User-Agent header (must run
+        //      first so BrowserHeadersInterceptor can set Sec-CH-UA to match).
+        //   2. BrowserHeadersInterceptor — sets Accept, Accept-Language,
+        //      Sec-Fetch-*, Sec-CH-UA-*, etc. so the request looks like a
+        //      real Chrome navigation. This is the Tier 1 Cloudflare-evasion
+        //      layer: many sites never escalate to a JS challenge at all if
+        //      the initial request looks browser-like.
+        //   3. DecodeResponseInterceptor — decompresses gzip/br response
+        //      bodies so downstream code sees plain text.
+        //   4. CloudFareVerificationInterceptor — Tier 2/3: if the response
+        //      is a CF challenge, fire up a WebView to solve it and retry.
         .addInterceptor(UserAgentInterceptor())
+        .addInterceptor(BrowserHeadersInterceptor())
         .addInterceptor(DecodeResponseInterceptor())
         .addInterceptor(CloudFareVerificationInterceptor(appContext))
         .cookieJar(cookieJar)

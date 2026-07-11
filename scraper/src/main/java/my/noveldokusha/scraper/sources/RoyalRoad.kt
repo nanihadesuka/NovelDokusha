@@ -50,14 +50,13 @@ class RoyalRoad(
                 .map { match -> match.groups["class"]?.value }
                 .filterNotNull()}
             .toSet()
-        doc.selectFirst(".chapter-content")!!.let {
-            it.select("script").remove()
-            it.select("a").remove()
-            it.select(".ads-title").remove()
-            it.select(".hidden").remove()
-            hiddenClasses.forEach { hc -> it.select(hc).remove() }
-            TextExtractor.get(it)
-        }
+        val contentEl = doc.selectFirst(".chapter-content") ?: return@withContext ""
+        contentEl.select("script").remove()
+        contentEl.select("a").remove()
+        contentEl.select(".ads-title").remove()
+        contentEl.select(".hidden").remove()
+        hiddenClasses.forEach { hc -> contentEl.select(hc).remove() }
+        TextExtractor.get(contentEl)
     }
 
     override suspend fun getBookCoverImageUrl(
@@ -141,7 +140,14 @@ class RoyalRoad(
             if (input.isBlank() || index > 0)
                 return@tryConnect PagedList.createEmpty(index = index)
 
-            val request = getRequest("https://www.royalroad.com/fictions/search?title=${input}")
+            // Build the search URL with the title parameter properly URL-encoded
+            // so spaces, ampersands, and non-ASCII characters don't break the URL.
+            val searchUrl = "https://www.royalroad.com/".toUrlBuilderSafe()
+                .addPath("fictions", "search")
+                .add("title", input)
+                .toString()
+
+            val request = getRequest(searchUrl)
                 .addHeader("accept", "*/*")
                 .addHeader("accept-encoding", "gzip, deflate, br")
                 .addHeader(

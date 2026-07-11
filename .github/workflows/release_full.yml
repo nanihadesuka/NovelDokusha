@@ -1,0 +1,225 @@
+name: Release Full
+
+# Manually-triggered release build for the Full flavor (includes Gemini /
+# Google Translate integration).
+#
+# Required GitHub secrets (Settings → Secrets and variables → Actions):
+#   SIGNING_KEY         base64-encoded .jks keystore  (run: base64 -w0 keystore.jks)
+#   KEY_STORE_PASSWORD  keystore password
+#   ALIAS               key alias inside the keystore
+#   KEY_PASSWORD        key password
+
+on:
+  workflow_dispatch:
+    inputs:
+      version_name:
+        description: 'Version name (e.g. 2.2.9) — must match versionName in app/build.gradle.kts'
+        required: false
+        type: string
+
+jobs:
+  build:
+    name: Build, Sign & Release Full APK
+    runs-on: ubuntu-22.04
+    timeout-minutes: 60
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+          cache: gradle
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+        with:
+          sdk-platform: '34'
+          sdk-build-tools: '34.0.0'
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Verify gradle wrapper is present
+        run: |
+          chmod +x ./gradlew
+          if [ ! -s gradle/wrapper/gradle-wrapper.jar ]; then
+            echo "::error::gradle/wrapper/gradle-wrapper.jar is missing or empty."
+            exit 1
+          fi
+          echo "✓ gradle-wrapper.jar is present ($(stat -c%s gradle/wrapper/gradle-wrapper.jar) bytes)"
+
+      - name: "Fail-fast: verify applicationId in source"
+        run: |
+          if ! grep -Eq '^\s*applicationId = "com\.paras\.noveldokusha"' app/build.gradle.kts; then
+            echo "::error::applicationId in app/build.gradle.kts is NOT com.paras.noveldokusha."
+            echo "This is a publish-blocker. Fix it before triggering a release."
+            exit 1
+          fi
+          echo "✓ applicationId verified in source"
+
+      - name: Cache Gradle
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: gradle-release-full-${{ runner.os }}-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties', '**/libs.versions.toml') }}
+          restore-keys: |
+            gradle-release-full-${{ runner.os }}-
+
+      - name: Setup APK signing keystore
+        id: keystore
+        env:
+          SIGNING_KEY: ${{ secrets.SIGNING_KEY }}
+          KEY_STORE_PASSWORD: ${{ secrets.KEY_STORE_PASSWORD }}
+          ALIAS: ${{ secrets.ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        run: |
+          # Validate all 4 secrets are present
+          MISSING=""
+          [ -z "$SIGNING_KEY" ] && MISSING="$MISSING SIGNING_KEY"
+          [ -z "$KEY_STORE_PASSWORD" ] && MISSING="$MISSING KEY_STORE_PASSWORD"
+          [ -z "$ALIAS" ] && MISSING="$MISSING ALIAS"
+          [ -z "$KEY_PASSWORD" ] && MISSING="$MISSING KEY_PASSWORD"
+          if [ -n "$MISSING" ]; then
+            echo "::error::Missing GitHub secrets:$MISSING"
+            echo ""
+            echo "Add them under Settings → Secrets and variables → Actions."
+            echo "  SIGNING_KEY         = base64-encoded .jks file (run: base64 -w0 keystore.jks)"
+            echo "  KEY_STORE_PASSWORD  = keystore password"
+            echo "  ALIAS               = key alias"
+            echo "  KEY_PASSWORD        = key password"
+            exit 1
+          fi
+
+          # Decode the keystore
+          echo -n "$SIGNING_KEY" | base64 -d > app/parasdokusha-release.jks
+          if [ ! -s app/parasdokusha-release.jks ]; then
+            echo "::error::SIGNING_KEY decoded to an empty file."
+            echo "Make sure you base64-encoded the .jks with: base64 -w0 parasdokusha-release.jks"
+            exit 1
+          fi
+          echo "✓ Keystore decoded ($(stat -c%s app/parasdokusha-release.jks) bytes)"
+
+          # Write signing config for Gradle
+          {
+            echo "storeFile=parasdokusha-release.jks"
+            echo "storePassword=$KEY_STORE_PASSWORD"
+            echo "keyAlias=$ALIAS"
+            echo "keyPassword=$KEY_PASSWORD"
+          } > ci-signing.properties
+          echo "✓ Signing config created"
+
+      - name: Build release APK (Full flavor)
+        run: |
+          ./gradlew assembleFullRelease \
+            --no-daemon \
+            --no-configuration-cache \
+            --console=plain \
+            --stacktrace \
+            -PlocalPropertiesFilePath=ci-signing.properties
+
+      - name: Re-sign APK with v1 + v2 signature
+        env:
+          KEY_STORE_PASSWORD: ${{ secrets.KEY_STORE_PASSWORD }}
+          ALIAS: ${{ secrets.ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        run: |
+          BUILD_TOOLS=$ANDROID_HOME/build-tools/34.0.0
+          KEYSTORE=app/parasdokusha-release.jks
+
+          APK_LIST=$(find app/build/outputs/apk/full/release -name '*.apk')
+          if [ -z "$APK_LIST" ]; then
+            echo "::error::No Full release APK produced"
+            exit 1
+          fi
+
+          for apk in $APK_LIST; do
+            echo "=== Re-signing $apk ==="
+            cp "$apk" /tmp/unsigned.apk
+            (cd /tmp && zip -d unsigned.apk 'META-INF/*' > /dev/null)
+            $BUILD_TOOLS/zipalign -f 4 /tmp/unsigned.apk /tmp/aligned.apk
+            $BUILD_TOOLS/apksigner sign \
+              --ks "$KEYSTORE" \
+              --ks-key-alias "$ALIAS" \
+              --ks-pass "pass:$KEY_STORE_PASSWORD" \
+              --key-pass "pass:$KEY_PASSWORD" \
+              --v1-signing-enabled true \
+              --v2-signing-enabled true \
+              --v3-signing-enabled false \
+              --v4-signing-enabled false \
+              --min-sdk-version 23 \
+              --out "$apk" \
+              /tmp/aligned.apk
+            rm /tmp/unsigned.apk /tmp/aligned.apk
+          done
+
+      - name: "Fail-fast: verify v1+v2 signing + applicationId"
+        env:
+          EXPECTED_APP_ID: com.paras.noveldokusha
+        run: |
+          BUILD_TOOLS=$ANDROID_HOME/build-tools/34.0.0
+          for apk in app/build/outputs/apk/full/release/*.apk; do
+            echo "=== Verifying $apk ==="
+            $BUILD_TOOLS/apksigner verify --verbose --min-sdk-version 23 "$apk" > /tmp/verify.txt 2>&1 || {
+              echo "::error::apksigner verify failed"
+              cat /tmp/verify.txt
+              exit 1
+            }
+            cat /tmp/verify.txt | head -12
+            if ! grep -q "Verified using v1 scheme (JAR signing): true" /tmp/verify.txt; then
+              echo "::error::APK is NOT signed with v1 (JAR) scheme."
+              exit 1
+            fi
+            if ! grep -q "Verified using v2 scheme (APK Signature Scheme v2): true" /tmp/verify.txt; then
+              echo "::error::APK is NOT signed with v2 scheme."
+              exit 1
+            fi
+            echo "✓ v1 + v2 signing verified"
+            BADGE=$($BUILD_TOOLS/aapt dump badging "$apk" | grep -E "^package:" | head -1)
+            echo "$BADGE"
+            if ! echo "$BADGE" | grep -q "name='$EXPECTED_APP_ID'"; then
+              echo "::error::applicationId is NOT $EXPECTED_APP_ID"
+              exit 1
+            fi
+            echo "✓ applicationId verified"
+          done
+
+      - name: Rename APK and set env vars
+        run: python .github/build_scripts/extract_info.py
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: ParasDokusha v${{ env.APP_VERSION }} (Full)
+          tag_name: v${{ env.APP_VERSION }}-full
+          files: ${{ env.APK_FILE_PATH_full }}
+          generate_release_notes: true
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Clean up keystore
+        if: always()
+        run: |
+          rm -f app/parasdokusha-release.jks ci-signing.properties
+
+      - name: Upload build reports on failure
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: release-full-build-reports
+          path: |
+            **/build/reports/
+            **/build/outputs/logs/
+          if-no-files-found: warn
+          retention-days: 7

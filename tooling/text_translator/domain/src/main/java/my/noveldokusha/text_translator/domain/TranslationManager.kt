@@ -5,11 +5,23 @@ import java.util.Locale
 
 data class TranslationModelState(
     val language: String,
-    val available: Boolean,
-    val downloading: Boolean,
-    val downloadingFailed: Boolean,
+    val available: Boolean = true,
+    val downloading: Boolean = false,
+    val downloadingFailed: Boolean = false,
 ) {
-    val locale = Locale(language)
+    val locale: Locale = try {
+        Locale.forLanguageTag(language)
+    } catch (_: Exception) {
+        try { Locale(language) } catch (_: Exception) { Locale("en") }
+    }
+
+    val displayName: String
+        get() {
+            val full = locale.getDisplayName()
+                .takeIf { it.isNotBlank() && it != language }
+            if (full != null) return full
+            return LANGUAGE_DISPLAY_NAMES[language] ?: language.uppercase()
+        }
 }
 
 data class TranslatorState(
@@ -27,16 +39,17 @@ interface TranslationManager {
 
     val models: SnapshotStateList<TranslationModelState>
 
-    suspend fun hasModelDownloaded(language: String): TranslationModelState?
+    suspend fun hasModelDownloaded(language: String): TranslationModelState? =
+        models.firstOrNull { it.language == language }
 
-    /**
-     * Doesn't check if the model has been downloaded. Must be externally guaranteed.
-     * @param source language locale
-     * @param target language locale
-     */
-    fun getTranslator(source: String, target: String): TranslatorState
+    fun getTranslator(source: String, target: String, systemPromptOverride: String? = null): TranslatorState
 
-    fun downloadModel(language: String)
+    suspend fun translateBatch(
+        texts: List<String>,
+        sourceLanguage: String,
+        targetLanguage: String,
+        systemPromptOverride: String? = null,
+    ): Map<String, String>
 
-    fun removeModel(language: String)
+    suspend fun detectLanguage(text: String): String? = null
 }

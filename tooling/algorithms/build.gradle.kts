@@ -7,5 +7,5 @@ android {
 }
 
 dependencies {
-    implementation(libs.test.junit)
+    testImplementation(libs.test.junit)
 }

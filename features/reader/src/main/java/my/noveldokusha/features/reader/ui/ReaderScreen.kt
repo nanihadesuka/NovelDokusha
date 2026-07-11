@@ -272,10 +272,11 @@ private fun ViewsPreview(
                 )
             )
         },
+        activeProviderName = remember { mutableStateOf("Google Enhanced") },
         onTargetChange = {},
         onEnable = {},
         onSourceChange = {},
-        onDownloadTranslationModel = {}
+        onProviderChange = {}
     )
 
     val textToSpeechSettingData = TextToSpeechSettingData(

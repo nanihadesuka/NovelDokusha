@@ -98,6 +98,8 @@ internal fun ChaptersScreen(
     onChangeCover: () -> Unit,
     onOpenInBrowser: (url: String) -> Unit,
     onGlobalSearchClick: (input: String) -> Unit,
+    onSwitchSource: () -> Unit,
+    showSwitchSource: Boolean,
 ) {
     var showDropDown by rememberSaveable { mutableStateOf(false) }
     var showBottomSheet by rememberSaveable { mutableStateOf(false) }
@@ -178,6 +180,7 @@ internal fun ChaptersScreen(
                                     onDismissRequest = { showDropDown = false }) {
                                     ChaptersDropDown(
                                         isLocalSource = state.isLocalSource.value,
+                                        showSwitchSource = showSwitchSource,
                                         openInBrowser = {
                                             if (!state.book.value.url.isLocalUri) {
                                                 onOpenInBrowser(state.book.value.url)
@@ -186,6 +189,10 @@ internal fun ChaptersScreen(
                                         onSearchBookInDatabase = onSearchBookInDatabase,
                                         onResumeReading = onResumeReading,
                                         onChangeCover = onChangeCover,
+                                        onSwitchSource = {
+                                            showDropDown = false
+                                            onSwitchSource()
+                                        },
                                     )
                                 }
                             }

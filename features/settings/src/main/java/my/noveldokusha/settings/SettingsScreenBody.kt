@@ -31,7 +31,7 @@ import my.noveldokusha.settings.sections.LibraryAutoUpdate
 import my.noveldokusha.settings.sections.SettingsBackup
 import my.noveldokusha.settings.sections.SettingsData
 import my.noveldokusha.settings.sections.SettingsTheme
-import my.noveldokusha.settings.sections.SettingsTranslationModels
+import my.noveldokusha.settings.sections.SettingsTranslation
 
 @Composable
 internal fun SettingsScreenBody(
@@ -43,8 +43,6 @@ internal fun SettingsScreenBody(
     onCleanImageFolder: () -> Unit,
     onBackupData: () -> Unit,
     onRestoreData: () -> Unit,
-    onDownloadTranslationModel: (lang: String) -> Unit,
-    onRemoveTranslationModel: (lang: String) -> Unit,
     onCheckForUpdatesManual: () -> Unit,
 ) {
     Column(
@@ -70,10 +68,8 @@ internal fun SettingsScreenBody(
         )
         if (state.isTranslationSettingsVisible.value) {
             HorizontalDivider()
-            SettingsTranslationModels(
-                translationModelsStates = state.translationModelsStates,
-                onDownloadTranslationModel = onDownloadTranslationModel,
-                onRemoveTranslationModel = onRemoveTranslationModel
+            SettingsTranslation(
+                state = state.translationSettings
             )
         }
         HorizontalDivider()
@@ -127,6 +123,21 @@ private fun Preview() {
                     libraryAutoUpdate = SettingsScreenState.LibraryAutoUpdate(
                         autoUpdateEnabled = remember { mutableStateOf(true) },
                         autoUpdateIntervalHours = remember { mutableIntStateOf(24) },
+                    ),
+                    translationSettings = SettingsScreenState.TranslationSettings(
+                        provider = remember { mutableStateOf("GOOGLE_PA") },
+                        googlePaApiKeys = remember { mutableStateOf("") },
+                        geminiApiKey = remember { mutableStateOf("") },
+                        geminiModel = remember { mutableStateOf("gemini-2.5-flash") },
+                        geminiTemperature = remember { mutableStateOf(0.55f) },
+                        openAiApiKeys = remember { mutableStateOf("") },
+                        openAiBaseUrl = remember { mutableStateOf("https://api.openai.com/v1") },
+                        openAiModel = remember { mutableStateOf("gpt-4o-mini") },
+                        promptPreset = remember { mutableStateOf("Balanced (Default)") },
+                        activeSystemPrompt = remember { mutableStateOf("") },
+                        batchSize = remember { mutableStateOf(15) },
+                        maxOutputTokens = remember { mutableStateOf(8192) },
+                        useEnglishLocale = remember { mutableStateOf(false) },
                     )
                 ),
                 onFollowSystem = { },
@@ -135,8 +146,6 @@ private fun Preview() {
                 onCleanImageFolder = { },
                 onBackupData = { },
                 onRestoreData = { },
-                onDownloadTranslationModel = { },
-                onRemoveTranslationModel = { },
                 onCheckForUpdatesManual = { },
             )
         }

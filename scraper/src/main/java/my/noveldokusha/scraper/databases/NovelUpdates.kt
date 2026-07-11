@@ -39,7 +39,7 @@ class NovelUpdates(
             if (page > 1) appendPath("pg").appendPath(page.toString())
         }
 
-        getSearchList(page, url)
+        getSearchList(index, url)
     }
 
     override suspend fun getSearchFilters() = withContext(Dispatchers.Default) {
@@ -73,7 +73,7 @@ class NovelUpdates(
             if (page > 1) add("pg", page)
         }
 
-        getSearchList(page, url)
+        getSearchList(index, url)
     }
 
     override suspend fun searchByFilters(

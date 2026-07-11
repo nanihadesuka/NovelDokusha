@@ -1,0 +1,122 @@
+name: Debug Full
+
+# Manually-triggered Debug build for the Full flavor (includes Gemini /
+# Google Translate integration). Same as Debug FOSS but Full — useful when
+# you want to sideload a debuggable APK that exercises the translator
+# codepaths.
+
+on:
+  workflow_dispatch:
+    inputs:
+      bump_version:
+        description: 'Bump versionCode to 1000+commit-count (recommended)'
+        required: false
+        type: boolean
+        default: true
+
+concurrency:
+  group: debug-full-${{ github.ref }}-${{ github.run_id }}
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: Build Debug Full APK
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+          cache: gradle
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+        with:
+          sdk-platform: '34'
+          sdk-build-tools: '34.0.0'
+
+      - name: Verify gradle wrapper is present
+        run: |
+          chmod +x ./gradlew
+          if [ ! -s gradle/wrapper/gradle-wrapper.jar ]; then
+            echo "::error::gradle/wrapper/gradle-wrapper.jar is missing or empty."
+            exit 1
+          fi
+          echo "✓ gradle-wrapper.jar is present ($(stat -c%s gradle/wrapper/gradle-wrapper.jar) bytes)"
+
+      - name: Cache Gradle
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: gradle-debug-full-${{ runner.os }}-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties', '**/libs.versions.toml') }}
+          restore-keys: |
+            gradle-debug-full-${{ runner.os }}-
+
+      - name: Bump versionCode (commit-count) and versionName (dev suffix)
+        if: ${{ github.event.inputs.bump_version == 'true' }}
+        run: |
+          COMMITS=$(git rev-list --count HEAD)
+          NEW_VC=$((1000 + COMMITS))
+          export NEW_VC COMMITS
+
+          python3 - <<'PY'
+          import os, re, pathlib
+          new_vc = os.environ["NEW_VC"]
+          commits = os.environ["COMMITS"]
+          p = pathlib.Path("app/build.gradle.kts")
+          s = p.read_text()
+          s = re.sub(r'versionCode\s*=\s*\d+', f'versionCode = {new_vc}', s, count=1)
+          s = re.sub(r'versionName\s*=\s*"[^"]*"', f'versionName = "2.2.9-dev{commits}-full"', s, count=1)
+          p.write_text(s)
+          PY
+
+          echo "Bumped versionCode to $NEW_VC, versionName to 2.2.9-dev${COMMITS}-full"
+
+      - name: Build Full Debug APK
+        run: ./gradlew assembleFullDebug --no-daemon --no-configuration-cache --console=plain --stacktrace
+
+      - name: "Fail-fast: verify applicationId == com.paras.noveldokusha"
+        run: |
+          BUILD_TOOLS=$ANDROID_HOME/build-tools/34.0.0
+          APK=$(find app/build/outputs/apk/full/debug -name '*.apk' | head -1)
+          if [ -z "$APK" ]; then
+            echo "::error::No Full debug APK produced"
+            exit 1
+          fi
+          echo "APK: $APK"
+          BADGE=$($BUILD_TOOLS/aapt dump badging "$APK" | grep -E "^package:" | head -1)
+          echo "$BADGE"
+          if ! echo "$BADGE" | grep -q "name='com.paras.noveldokusha'"; then
+            echo "::error::applicationId is NOT com.paras.noveldokusha — refusing to publish."
+            exit 1
+          fi
+          echo "✓ applicationId verified"
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: ParasDokusha-debug-full
+          path: app/build/outputs/apk/full/debug/*.apk
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Upload build reports on failure
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: debug-full-build-reports
+          path: |
+            **/build/reports/
+            **/build/outputs/logs/
+          if-no-files-found: warn
+          retention-days: 7

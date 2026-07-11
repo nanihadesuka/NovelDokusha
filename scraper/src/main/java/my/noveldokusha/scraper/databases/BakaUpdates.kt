@@ -37,7 +37,7 @@ class BakaUpdates(
             add("perpage", 50)
             add("orderby", "rating")
         }
-        getSearchList(page, url)
+        getSearchList(index, url)
     }
 
     override suspend fun getAuthorData(authorUrl: String) = withContext(Dispatchers.Default) {
@@ -100,7 +100,7 @@ class BakaUpdates(
             add("search", input)
         }
 
-        getSearchList(page, url)
+        getSearchList(index, url)
     }
 
     override suspend fun searchByFilters(

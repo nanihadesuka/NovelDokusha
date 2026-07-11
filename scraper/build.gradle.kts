@@ -12,10 +12,13 @@ dependencies {
     implementation(projects.strings)
     implementation(projects.core)
     implementation(projects.networking)
+    implementation(projects.tooling.luaEngine)
 
-    implementation(libs.androidx.core.ktx)
     implementation(libs.jsoup)
     implementation(libs.gson)
     implementation(libs.okhttp)
+    implementation(libs.luaj)
+    implementation(libs.kotlinx.coroutines.core)
+    implementation(libs.timber)
     androidTestImplementation(libs.test.androidx.espresso.core)
 }

@@ -3,8 +3,8 @@ package my.noveldoksuha.data
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.flowOn
 import my.noveldokusha.core.appPreferences.AppPreferences
 import my.noveldokusha.core.LanguageCode
 import my.noveldokusha.scraper.Scraper
@@ -25,26 +25,51 @@ class ScraperRepository @Inject constructor(
         return scraper.databasesList.toList()
     }
 
+    /**
+     * Reactive flow of catalog sources filtered by active languages and
+     * sorted by pinned status.
+     *
+     * Combines THREE flows:
+     *   1. SOURCES_LANGUAGES_ISO639_1 — user's active language filters
+     *   2. FINDER_SOURCES_PINNED — user's pinned source IDs
+     *   3. scraper.sourcesListFlow — the source list itself (emits when
+     *      built-in sources are loaded at startup AND when external Lua
+     *      sources are loaded asynchronously from HnDK0's GitHub repo)
+     *
+     * Without observing the source list flow, external Lua sources loaded
+     * after app start would never appear in the UI.
+     */
     fun sourcesCatalogListFlow(): Flow<List<CatalogItem>> {
         return combine(
             appPreferences.SOURCES_LANGUAGES_ISO639_1.flow(),
-            appPreferences.FINDER_SOURCES_PINNED.flow()
-        ) { activeLanguages, pinnedSourcesIds ->
-            scraper.sourcesCatalogsList
+            appPreferences.FINDER_SOURCES_PINNED.flow(),
+            scraper.sourcesListFlow
+        ) { activeLanguages, pinnedSourcesIds, sourcesList ->
+            sourcesList
+                .filterIsInstance<SourceInterface.Catalog>()
                 .filter { it.language == null || it.language?.iso639_1 in activeLanguages }
                 .map { CatalogItem(catalog = it, pinned = it.id in pinnedSourcesIds) }
                 .sortedByDescending { it.pinned }
         }.flowOn(Dispatchers.Default)
     }
 
+    /**
+     * Reactive flow of available source languages with active status.
+     * Also observes scraper.sourcesListFlow so new languages appear when
+     * external Lua sources are loaded.
+     */
     fun sourcesLanguagesListFlow(): Flow<List<LanguageItem>> {
-        return appPreferences.SOURCES_LANGUAGES_ISO639_1.flow()
-            .map { activeLanguages ->
-                scraper
-                    .sourcesCatalogsLanguagesList
-                    .map {
-                        LanguageItem(it, active = activeLanguages.contains(it.iso639_1))
-                    }
-            }
+        return combine(
+            appPreferences.SOURCES_LANGUAGES_ISO639_1.flow(),
+            scraper.sourcesListFlow
+        ) { activeLanguages, sourcesList ->
+            sourcesList
+                .filterIsInstance<SourceInterface.Catalog>()
+                .mapNotNull { it.language }
+                .toSet()
+                .map { language ->
+                    LanguageItem(language, active = activeLanguages.contains(language.iso639_1))
+                }
+        }
     }
 }

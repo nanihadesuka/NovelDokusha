@@ -43,10 +43,14 @@ android {
     }
 
     defaultConfig {
-        applicationId = "my.noveldokusha"
-        versionCode = 18
-        versionName = "2.2.0"
-        setProperty("archivesBaseName", "NovelDokusha_v$versionName")
+        // IMPORTANT: applicationId MUST stay "com.paras.noveldokusha".
+        // Do NOT revert to "my.noveldokusha" — the v2.2.x release line is published
+        // under this ID and changing it breaks update compatibility and forces a
+        // fresh install on every device. See BUILD.md §Precautions.
+        applicationId = "com.paras.noveldokusha"
+        versionCode = 31
+        versionName = "3.0.1"
+        setProperty("archivesBaseName", "ParasDokusha_v$versionName")
     }
 
     signingConfigs {
@@ -55,6 +59,14 @@ android {
             storePassword = defaultSigningConfigData.getProperty("storePassword")
             keyAlias = defaultSigningConfigData.getProperty("keyAlias")
             keyPassword = defaultSigningConfigData.getProperty("keyPassword")
+            // AGP 8.2 ignores these flags when minSdk >= 24 — release APKs MUST be
+            // re-signed manually with apksigner (v1+v2) to keep TV/OEM package
+            // installers working. See BUILD.md §Signing. The flags are kept here
+            // as documentation; they do not override AGP's default behavior.
+            enableV1Signing = true
+            enableV2Signing = true
+            enableV3Signing = false
+            enableV4Signing = false
         }
     }
 
@@ -97,17 +109,16 @@ android {
         }
     }
 
-    buildFeatures {
-        viewBinding = true
-    }
     namespace = "my.noveldokusha"
+
+    // Disable lint on release builds to avoid OOM on memory-constrained
+    // build environments. Lint is still run in CI via the dedicated
+    // lint workflows.
+    lint {
+        checkReleaseBuilds = false
+        abortOnError = false
+    }
 }
-
-fun DependencyHandler.fullImplementation(dependencyNotation: Any): Dependency? =
-    add("fullImplementation", dependencyNotation)
-
-fun DependencyHandler.fossImplementation(dependencyNotation: Any): Dependency? =
-    add("fossImplementation", dependencyNotation)
 
 dependencies {
 
@@ -137,23 +148,11 @@ dependencies {
     implementation(projects.strings)
     implementation(projects.scraper)
 
-    // Translation feature
-    fullImplementation(projects.tooling.textTranslator.translator)
-    fossImplementation(projects.tooling.textTranslator.translatorNop)
+    // Translation feature — both flavors use the cloud translator (no MLKit)
+    implementation(projects.tooling.textTranslator.translatorNop)
 
     // Kotlin
     implementation(libs.kotlinx.coroutines.core)
-    implementation(libs.kotlin.script.runtime)
-    implementation(libs.kotlin.stdlib)
-
-    // Lifecycle components
-    implementation(libs.androidx.lifecycle.viewmodel.ktx)
-    implementation(libs.androidx.lifecycle.livedata.ktx)
-    implementation(libs.androidx.lifecycle.common.java8)
-    implementation(libs.androidx.coordinatorlayout)
-
-    // Local storage directory access
-    implementation(libs.androidx.documentfile)
 
     // Android SDK
     implementation(libs.androidx.workmanager)
@@ -161,12 +160,6 @@ dependencies {
 
     // UI
     implementation(libs.androidx.appcompat)
-    implementation(libs.test.androidx.core.ktx)
-    implementation(libs.androidx.navigation.fragment.ktx)
-    implementation(libs.androidx.navigation.ui.ktx)
-    implementation(libs.androidx.activity.ktx)
-    implementation(libs.androidx.fragment.ktx)
-    implementation(libs.androidx.constraintlayout)
     implementation(libs.material)
 
     // Test
@@ -182,42 +175,13 @@ dependencies {
     androidTestImplementation(libs.test.androidx.runner)
     androidTestUtil(libs.test.androidx.orchestrator)
 
-    // Serialization
-    implementation(libs.gson)
-    implementation(libs.moshi)
-    implementation(libs.moshi.kotlin)
-    implementation(libs.kotlinx.serialization.json)
-    implementation(libs.retrofit)
-
-    // Dependency injection
-    implementation(libs.hilt.workmanager)
-
-    // HTML text extractor
-    implementation(libs.crux)
-    implementation(libs.readability4j)
-    implementation(libs.jsoup)
-
     // Jetpack compose
     implementation(libs.compose.androidx.activity)
     implementation(libs.compose.androidx.animation)
-    implementation(libs.compose.androidx.runtime.livedata)
-    implementation(libs.compose.androidx.lifecycle.viewmodel)
-    implementation(libs.compose.androidx.constraintlayout)
-    implementation(libs.compose.androidx.material.icons.extended)
     implementation(libs.compose.material3.android)
-    implementation(libs.compose.accompanist.systemuicontroller)
-    implementation(libs.compose.accompanist.swiperefresh)
-    implementation(libs.compose.accompanist.insets)
-    implementation(libs.compose.accompanist.pager)
-    implementation(libs.compose.accompanist.pager.indicators)
-    implementation(libs.compose.landscapist.glide)
     implementation(libs.compose.coil)
-    implementation(libs.compose.lazyColumnScrollbar)
 
     // Networking
-    implementation(libs.okhttp)
-    implementation(libs.okhttp.interceptor.brotli)
-    implementation(libs.okhttp.interceptor.logging)
     implementation(libs.okhttp.glideIntegration)
 
     // Logging

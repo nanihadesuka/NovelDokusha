@@ -54,8 +54,7 @@ class LightNovelsTranslations(
     ): Response<String?> = withContext(Dispatchers.Default) {
         tryConnect {
             networkClient.get(bookUrl).toDocument()
-                .selectFirst(".novel_text")!!
-                .let {
+                .selectFirst(".novel_text")?.let {
                     it.select(".alternate_titles").remove()
                     TextExtractor.get(it).trim()
                 }

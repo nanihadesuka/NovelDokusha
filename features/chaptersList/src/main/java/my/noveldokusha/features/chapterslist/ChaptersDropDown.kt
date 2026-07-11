@@ -5,6 +5,7 @@ import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.outlined.Public
 import androidx.compose.material.icons.outlined.Search
+import androidx.compose.material.icons.outlined.SwapHoriz
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -15,10 +16,12 @@ import my.noveldokusha.chapterslist.R
 @Composable
 internal fun ChaptersDropDown(
     isLocalSource: Boolean,
+    showSwitchSource: Boolean,
     openInBrowser: () -> Unit,
     onSearchBookInDatabase: () -> Unit,
     onResumeReading: () -> Unit,
     onChangeCover: () -> Unit,
+    onSwitchSource: () -> Unit,
 ) {
     if (!isLocalSource) DropdownMenuItem(
         onClick = openInBrowser,
@@ -62,6 +65,22 @@ internal fun ChaptersDropDown(
             Icon(
                 Icons.Filled.Image,
                 stringResource(R.string.change_cover),
+            )
+        }
+    )
+    // "Switch source" — only shown for TimoTxt sources (where alternative
+    // TimoTxt sources exist to switch to). Enables cross-source transfer:
+    // a novel favorited on TimoTxt can be opened in TimoTxtTranslate or
+    // TimoTxtGemini, and vice versa.
+    if (showSwitchSource) DropdownMenuItem(
+        onClick = onSwitchSource,
+        text = {
+            Text(text = stringResource(R.string.switch_source))
+        },
+        leadingIcon = {
+            Icon(
+                Icons.Outlined.SwapHoriz,
+                stringResource(R.string.switch_source),
             )
         }
     )

@@ -37,8 +37,7 @@ class ReadNovelFull(
     override suspend fun getChapterTitle(doc: Document): String? = null
 
     override suspend fun getChapterText(doc: Document): String = withContext(Dispatchers.Default) {
-        doc.selectFirst("#chr-content")!!
-            .let { TextExtractor.get(it) }
+        doc.selectFirst("#chr-content")?.let { TextExtractor.get(it) } ?: ""
     }
 
     override suspend fun getBookCoverImageUrl(
@@ -66,7 +65,8 @@ class ReadNovelFull(
     ): Response<List<ChapterResult>> = withContext(Dispatchers.Default) {
         tryConnect {
             val doc = networkClient.get(bookUrl).toDocument()
-            val id = doc.selectFirst("#rating")!!.attr("data-novel-id")
+            val id = doc.selectFirst("#rating")?.attr("data-novel-id")
+                ?: return@tryConnect emptyList()
             val url = "https://readnovelfull.com/ajax/chapter-archive"
                 .toUrlBuilderSafe()
                 .add("novelId", id)
@@ -126,7 +126,9 @@ class ReadNovelFull(
         index: Int
     ): Response<PagedList<BookResult>> = withContext(Dispatchers.Default) {
         tryConnect {
-            doc.selectFirst(".col-novel-main.archive")!!
+            val archiveEl = doc.selectFirst(".col-novel-main.archive")
+                ?: return@tryConnect PagedList(list = emptyList(), index = index, isLastPage = true)
+            archiveEl
                 .select(".row")
                 .mapNotNull {
                     val link = it.selectFirst("a[href]") ?: return@mapNotNull null

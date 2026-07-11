@@ -13,8 +13,8 @@ class DebugGoToReader : AppCompatActivity() {
         startActivity(
             ReaderActivity.IntentData(
                 this,
-                bookUrl = "https://bestlightnovel.com/novel_888169055",
-                chapterUrl = "https://bestlightnovel.com/novel_888169055/chapter_2"
+                bookUrl = "https://novelfire.net/book/alchemy-emperor-of-the-divine-dao",
+                chapterUrl = "https://novelfire.net/book/alchemy-emperor-of-the-divine-dao/chapter-1"
             )
         )
     }

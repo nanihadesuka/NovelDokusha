@@ -10,7 +10,10 @@ import dagger.hilt.android.HiltAndroidApp
 import my.noveldokusha.di.HiltAppEntryPoint
 import my.noveldokusha.network.NetworkClient
 import my.noveldokusha.network.ScraperNetworkClient
+import my.noveldokusha.scraper.Scraper
 import my.noveldokusha.tooling.application_workers.setup.PeriodicWorkersInitializer
+import my.noveldokusha.core.AppCoroutineScope
+import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -24,12 +27,26 @@ class App : Application(), ImageLoaderFactory, Configuration.Provider {
     @Inject
     lateinit var periodicWorkersInitializer: PeriodicWorkersInitializer
 
+    @Inject
+    lateinit var scraper: Scraper
+
+    @Inject
+    lateinit var appCoroutineScope: AppCoroutineScope
+
     override fun onCreate() {
         super.onCreate()
         if (BuildConfig.DEBUG) {
             Timber.plant(Timber.DebugTree())
         }
         periodicWorkersInitializer.init()
+
+        // Load external Lua source plugins from HnDK0's GitHub repo.
+        // This is async — sources appear in the catalog explorer as they
+        // load. On network failure, cached plugins from a previous run
+        // are used.
+        appCoroutineScope.launch {
+            scraper.loadExternalSources()
+        }
     }
 
     override fun newImageLoader(): ImageLoader = when (val networkClient = networkClient) {

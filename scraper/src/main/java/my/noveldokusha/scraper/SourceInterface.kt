@@ -18,8 +18,35 @@ sealed interface SourceInterface {
     val isLocalSource: Boolean get() = true
     val requiresLogin: Boolean get() = false
 
-    // Transform current url to preferred url
+    /**
+     * Optional display name that overrides [nameStrId] when non-null.
+     * Used by dynamically-loaded sources (e.g. Lua plugins from HnDK0)
+     * whose names aren't known at compile time.
+     */
+    val displayName: String? get() = null
+
+    /**
+     * Transform a chapter URL for OkHttp fetching (the in-app reader).
+     *
+     * Override in sources whose stored URL is a routing key that doesn't
+     * directly serve content (e.g. TimoTxtTranslate stores translate.goog
+     * URLs but fetches from timotxt.com; TimoTxtGemini stores gemini.goog
+     * URLs but fetches from timotxt.com).
+     */
     suspend fun transformChapterUrl(url: String): String = url
+
+    /**
+     * Transform a chapter URL for opening in the in-app WebView browser.
+     *
+     * Override in sources whose stored URL won't render usefully in a
+     * browser without modification (e.g. TimoTxt sources convert to the
+     * translate.goog proxy with `_x_tr_*` params so the proxy's JS
+     * translates the page to English in the browser; Reddit converts to
+     * old.reddit.com).
+     *
+     * Default: return the URL unchanged.
+     */
+    suspend fun transformWebviewUrl(url: String): String = url
 
     suspend fun getChapterTitle(doc: Document): String? = null
     suspend fun getChapterText(doc: Document): String? = null

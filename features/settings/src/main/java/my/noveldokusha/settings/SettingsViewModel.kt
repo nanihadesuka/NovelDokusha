@@ -65,6 +65,21 @@ internal class SettingsViewModel @Inject constructor(
             autoUpdateIntervalHours = appPreferences.GLOBAL_APP_AUTOMATIC_LIBRARY_UPDATES_INTERVAL_HOURS.state(
                 viewModelScope
             )
+        ),
+        translationSettings = SettingsScreenState.TranslationSettings(
+            provider = appPreferences.TRANSLATION_PROVIDER.state(viewModelScope),
+            googlePaApiKeys = appPreferences.TRANSLATION_GOOGLE_PA_API_KEYS.state(viewModelScope),
+            geminiApiKey = appPreferences.TRANSLATION_GEMINI_API_KEY.state(viewModelScope),
+            geminiModel = appPreferences.TRANSLATION_GEMINI_MODEL.state(viewModelScope),
+            geminiTemperature = appPreferences.GEMINI_TEMPERATURE.state(viewModelScope),
+            openAiApiKeys = appPreferences.TRANSLATION_OPENAI_API_KEYS.state(viewModelScope),
+            openAiBaseUrl = appPreferences.TRANSLATION_OPENAI_BASE_URL.state(viewModelScope),
+            openAiModel = appPreferences.TRANSLATION_OPENAI_MODEL.state(viewModelScope),
+            promptPreset = appPreferences.TRANSLATION_PROMPT_PRESET.state(viewModelScope),
+            activeSystemPrompt = appPreferences.TRANSLATION_ACTIVE_SYSTEM_PROMPT.state(viewModelScope),
+            batchSize = appPreferences.TRANSLATION_BATCH_SIZE.state(viewModelScope),
+            maxOutputTokens = appPreferences.TRANSLATION_MAX_OUTPUT_TOKENS.state(viewModelScope),
+            useEnglishLocale = appPreferences.TRANSLATION_PROMPT_USE_ENGLISH_LOCALE.state(viewModelScope),
         )
     )
 
@@ -77,14 +92,6 @@ internal class SettingsViewModel @Inject constructor(
                 updateImagesFolderSize()
             }
         }
-    }
-
-    fun downloadTranslationModel(lang: String) {
-        translationManager.downloadModel(lang)
-    }
-
-    fun removeTranslationModel(lang: String) {
-        translationManager.removeModel(lang)
     }
 
     fun cleanDatabase() = appScope.launch(Dispatchers.IO) {

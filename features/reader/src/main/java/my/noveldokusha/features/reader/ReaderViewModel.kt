@@ -15,6 +15,7 @@ import my.noveldokusha.core.utils.StateExtra_String
 import my.noveldokusha.features.reader.manager.ReaderManager
 import my.noveldokusha.features.reader.ui.ReaderScreenState
 import my.noveldokusha.features.reader.ui.ReaderViewHandlersActions
+import my.noveldokusha.scraper.Scraper
 import javax.inject.Inject
 import kotlin.properties.Delegates
 
@@ -30,6 +31,7 @@ internal class ReaderViewModel @Inject constructor(
     appPreferences: AppPreferences,
     private val readerManager: ReaderManager,
     readerViewHandlersActions: ReaderViewHandlersActions,
+    private val scraper: Scraper,
 ) : BaseViewModel(), ReaderStateBundle {
 
     override var bookUrl by StateExtra_String(stateHandler)
@@ -114,4 +116,25 @@ internal class ReaderViewModel @Inject constructor(
 
     fun markChapterEndAsSeen(chapterUrl: String) =
         readerSession.markChapterEndAsSeen(chapterUrl = chapterUrl)
+
+    /**
+     * Transform a chapter URL for opening in WebView.
+     *
+     * Sources like TimoTxt, TimoTxtTranslate, and TimoTxtGemini store
+     * URLs using their own routing domains (timotxt.com,
+     * translate.goog, gemini.goog). The WebView needs a real, fetchable
+     * URL that the browser can load and translate.
+     *
+     * `transformWebviewUrl()` converts the stored routing URL to a
+     * browser-friendly URL:
+     * - TimoTxt: timotxt.com → translate.goog with params (JS translates)
+     * - TimoTxtTranslate: translate.goog (no params) → translate.goog with params
+     * - TimoTxtGemini: gemini.goog → translate.goog with params
+     * - Reddit: www.reddit.com → old.reddit.com
+     * - Other sources: URL unchanged
+     */
+    suspend fun transformUrlForWeb(url: String): String {
+        val source = scraper.getCompatibleSource(url) ?: return url
+        return source.transformWebviewUrl(url)
+    }
 }

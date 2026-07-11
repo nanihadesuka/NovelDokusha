@@ -167,7 +167,13 @@ class Saikai(
                     PagedList(
                         list = it,
                         index = index,
-                        isLastPage = false
+                        // The API returns 12 items per page (per_page=12).
+                        // If we got fewer than 12, this is the last page.
+                        // If we got exactly 12, there might be more — but
+                        // we can't know for sure without the total count.
+                        // Using < 12 as the "last page" signal is safe
+                        // because the API never returns more than per_page.
+                        isLastPage = it.size < 12
                     )
                 }
         }

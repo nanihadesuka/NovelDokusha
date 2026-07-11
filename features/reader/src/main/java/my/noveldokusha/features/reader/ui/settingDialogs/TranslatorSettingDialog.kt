@@ -11,17 +11,15 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowRightAlt
-import androidx.compose.material.icons.filled.CloudDownload
-import androidx.compose.material.icons.outlined.CloudDownload
+import androidx.compose.material.icons.filled.SwapHoriz
+import androidx.compose.material3.AssistChip
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -59,27 +57,53 @@ internal fun TranslatorSettingDialog(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
+                .padding(vertical = 4.dp)
                 .onGloballyPositioned { layoutCoordinates ->
                     rowSize = layoutCoordinates.size.toSize()
                 },
-            horizontalArrangement = Arrangement.Center,
+            horizontalArrangement = Arrangement.SpaceEvenly,
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Row(
-                horizontalArrangement = Arrangement.Center,
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                FilterChip(
-                    selected = state.enable.value,
-                    label = {
-                        Text(text = stringResource(R.string.translate))
-                    },
-                    onClick = { state.onEnable(!state.enable.value) },
-                )
-                AnimatedVisibility(visible = state.enable.value) {
+            // ── Enable toggle ────────────────────────────────────────────
+            FilterChip(
+                selected = state.enable.value,
+                label = {
+                    Text(text = stringResource(R.string.translate))
+                },
+                onClick = { state.onEnable(!state.enable.value) },
+            )
+
+            AnimatedVisibility(visible = state.enable.value) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.padding(horizontal = 8.dp)
+                ) {
+                    // ── Provider chip (tap to cycle, long-press for dropdown) ──
+                    Box(
+                        modifier = Modifier
+                            .padding(end = 8.dp)
+                    ) {
+                        AssistChip(
+                            onClick = { state.onProviderChange() },
+                            label = {
+                                Text(
+                                    text = state.activeProviderName.value,
+                                    style = MaterialTheme.typography.labelSmall
+                                )
+                            },
+                            leadingIcon = {
+                                Icon(
+                                    Icons.Filled.SwapHoriz,
+                                    contentDescription = "Switch provider",
+                                    modifier = Modifier.size(16.dp)
+                                )
+                            }
+                        )
+                    }
+
+                    // ── Source → Target language pickers ────────────────────
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.padding(horizontal = 16.dp)
                     ) {
                         Box(
                             modifier = Modifier
@@ -115,77 +139,44 @@ internal fun TranslatorSettingDialog(
                     }
                 }
             }
+        }
 
-            DropdownMenu(
-                expanded = modelSelectorExpanded,
-                onDismissRequest = { modelSelectorExpanded = false },
-                offset = DpOffset(0.dp, 10.dp),
-                modifier = Modifier
-                    .heightIn(max = 300.dp)
-                    .width(with(LocalDensity.current) { rowSize.width.toDp() })
-            ) {
-
-                DropdownMenuItem(
-                    onClick = {
-                        if (modelSelectorExpandedForTarget) state.onTargetChange(null)
-                        else state.onSourceChange(null)
-                    },
-                    text = {
-                        Text(
-                            text = stringResource(R.string.language_clear_selection),
-                            textAlign = TextAlign.Center,
-                            modifier = Modifier.fillMaxWidth()
-                        )
-                    }
-                )
-
-                HorizontalDivider()
-
-                state.listOfAvailableModels.forEach { item ->
-                    DropdownMenuItem(
-                        onClick = {
-                            if (modelSelectorExpandedForTarget) state.onTargetChange(item)
-                            else state.onSourceChange(item)
-                            modelSelectorExpanded = false
-                        },
-                        enabled = item.available,
-                        trailingIcon = {
-                            when {
-                                item.downloadingFailed -> IconButton(
-                                    onClick = { state.onDownloadTranslationModel(item.language) },
-                                ) {
-                                    Icon(
-                                        Icons.Outlined.CloudDownload,
-                                        null,
-                                        tint = MaterialTheme.colorScheme.error
-                                    )
-                                }
-                                item.downloading -> IconButton(
-                                    onClick = { },
-                                    enabled = false
-                                ) {
-                                    CircularProgressIndicator(
-                                        modifier = Modifier.size(22.dp),
-                                        color = MaterialTheme.colorScheme.onPrimary
-                                    )
-                                }
-                                item.available -> IconButton(
-                                    onClick = { state.onDownloadTranslationModel(item.language) },
-                                ) {
-                                    Icon(Icons.Filled.CloudDownload, null)
-                                }
-                                else -> IconButton(
-                                    onClick = { state.onDownloadTranslationModel(item.language) },
-                                ) {
-                                    Icon(Icons.Outlined.CloudDownload, null)
-                                }
-                            }
-                        },
-                        text = {
-                            Text(text = item.locale.displayLanguage)
-                        }
+        // ── Language dropdown ────────────────────────────────────────────
+        DropdownMenu(
+            expanded = modelSelectorExpanded,
+            onDismissRequest = { modelSelectorExpanded = false },
+            offset = DpOffset(0.dp, 10.dp),
+            modifier = Modifier
+                .heightIn(max = 300.dp)
+                .width(with(LocalDensity.current) { rowSize.width.toDp() })
+        ) {
+            DropdownMenuItem(
+                onClick = {
+                    if (modelSelectorExpandedForTarget) state.onTargetChange(null)
+                    else state.onSourceChange(null)
+                },
+                text = {
+                    Text(
+                        text = stringResource(R.string.language_clear_selection),
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.fillMaxWidth()
                     )
                 }
+            )
+            HorizontalDivider()
+
+            state.listOfAvailableModels.forEach { item ->
+                DropdownMenuItem(
+                    onClick = {
+                        if (modelSelectorExpandedForTarget) state.onTargetChange(item)
+                        else state.onSourceChange(item)
+                        modelSelectorExpanded = false
+                    },
+                    enabled = true,
+                    text = {
+                        Text(text = item.locale.displayLanguage)
+                    }
+                )
             }
         }
     }

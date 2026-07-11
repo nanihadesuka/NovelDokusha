@@ -1,0 +1,261 @@
+ParasDokusha v3.0.0 Changelog
+==============================
+Previous: v2.2.9 (versionCode 22)
+Current:  v3.0.0 (versionCode 30)
+
+===============================================================================
+PHASE 1: Critical Bug Fixes
+===============================================================================
+
+1. Wtrlab — empty chapters (Chinese instead of English)
+   File: scraper/.../sources/Wtrlab.kt
+   Bug:   POST body used "translate":"web" which returns raw Chinese text.
+          Changed to "translate":"ai" which returns AI-translated English.
+   Impact: Wtrlab chapters now display in English instead of Chinese.
+
+2. External Lua sources — all resolve to wrong URL (allnovel.org)
+   File: scraper/.../sources/RemoteSourceLoader.kt
+   Bug:   createAdapter() used src.baseUrl (always null — baseUrl is in the
+          .lua file, not index.yaml). All Lua sources got baseUrl=
+          "https://example.com/" so getCompatibleSource() never matched.
+   Fix:   createAdapter() now calls parseBaseUrlFromLua(luaScript) to extract
+          the real baseUrl from each plugin's Lua global variable.
+   Impact: All external Lua sources now resolve correctly. Clicking SonicMTL
+          opens SonicMTL, not AllNovel.
+
+3. Response.toDocument() — doc.location() returns empty string
+   File: networking/.../okhttpExtensions.kt
+   Bug:   Jsoup.parse(html) was called without the base URI parameter, so
+          doc.location() returned "". Wtrlab's getChapterText() uses
+          doc.location() to extract the novel ID and chapter number — with
+          empty string, it couldn't make its POST API call.
+   Fix:   Jsoup.parse(html, request.url.toString()) — document now knows its URL.
+   Impact: Wtrlab chapter text now loads correctly.
+
+===============================================================================
+PHASE 2: Remove MLKit + Port 4 Cloud Translation Providers
+===============================================================================
+
+MLKit (com.google.mlkit:translate) was REMOVED. It was slow, bloated the APK
+by ~40MB, required downloading language models, and only supported ~30
+languages. Replaced with 4 cloud-based providers ported from the NoveLA fork
+(https://github.com/HnDK0/NoveLA):
+
+1. Google Translate Enhanced (TranslationManagerGooglePA.kt — 455 lines)
+   - Endpoint: translate-pa.googleapis.com/v1/translateHtml
+   - Auto-fetches API key from wtr-lab.com (scrapes Next.js JS bundles)
+   - Caches key for 24 hours
+   - HTML-chunk translation (preserves formatting)
+   - Default provider
+
+2. Google Translate Free (TranslationManagerGoogleFree.kt — 299 lines)
+   - Endpoint: translate.googleapis.com/translate_a/single
+   - No API key needed
+   - Cookie-seeding retry on HTTP 429
+   - Language detection support
+
+3. Google Gemini (TranslationManagerGemini.kt — 514 lines)
+   - Endpoint: generativelanguage.googleapis.com/v1beta/models/{model}:generateContent
+   - BLOCK_NONE for all 5 safety categories (including CIVIC_INTEGRITY)
+   - Numbered-list protocol for batch translation
+   - 5 built-in prompt presets (MINIMAL, BALANCED, DETAILED, ADULT, DIRECT_ASIAN)
+   - Content-filter fallback prompt
+   - Multi-key rotation
+
+4. OpenAI-compatible (TranslationManagerOpenAI.kt — 366 lines)
+   - Works with OpenAI, OpenRouter, Mistral, DeepSeek, Ollama
+   - Configurable baseUrl and model
+   - Multi-key round-robin via AtomicInteger
+
+Supporting files:
+   - TranslationManagerComposite.kt — provider dispatcher (routes to active provider)
+   - TranslationUtils.kt — 5 prompt presets with {source_language}/{target_language} templates
+   - SupportedLanguages.kt — 226 BCP-47 language codes
+   - TranslationPolicies.kt — retry policy
+   - PromptPreset.kt — serializable prompt preset
+   - FossModule.kt — Hilt module providing TranslationManagerComposite
+
+Build changes:
+   - app/build.gradle.kts: full flavor now uses translator_nop (same as foss)
+   - translator_nop/build.gradle.kts: added okhttp, gson, com.github.therealbush:translator:1.1.1
+   - settings.gradle.kts: tooling:lua_engine module added
+
+New AppPreferences:
+   - TRANSLATION_PROVIDER (GOOGLE_PA / GOOGLE_FREE / GEMINI / OPENAI)
+   - OPENAI_API_KEY, OPENAI_BASE_URL, OPENAI_MODEL
+   - TRANSLATION_PROMPT_PRESET, TRANSLATION_BATCH_SIZE, TRANSLATION_MAX_OUTPUT_TOKENS
+   - TRANSLATION_ACTIVE_SYSTEM_PROMPT
+   - TRANSLATION_GEMINI_API_KEY, TRANSLATION_GEMINI_MODEL
+   - TRANSLATION_GOOGLE_PA_API_KEYS, TRANSLATION_GOOGLE_PA_CACHED_KEY, TRANSLATION_GOOGLE_PA_KEY_LAST_CHECKED
+   - TRANSLATION_OPENAI_API_KEYS, TRANSLATION_OPENAI_BASE_URL, TRANSLATION_OPENAI_MODEL
+   - TRANSLATION_PROMPT_USE_ENGLISH_LOCALE
+
+Adaptations for our codebase:
+   - resolveUserAgent(appPreferences) replaced with hardcoded Chrome UA string
+   - TRANSLATION_GOOGLE_PA_KEY_LAST_CHECKED changed from Long to String (no SharedPreference_Long delegate)
+   - Removed TranslationManagerEmpty.kt (replaced by TranslationManagerComposite)
+
+===============================================================================
+PHASE 3: ChapterTranslation DB Caching
+===============================================================================
+
+New Room entity for caching translated chapter text:
+
+   ChapterTranslation.kt:
+   - @Entity with unique index on (chapterUrl, sourceLang, targetLang)
+   - Fields: id, chapterUrl, sourceLang, targetLang, translatedParagraphs (JSON array),
+     titleTranslation, timestamp
+
+   ChapterTranslationDao.kt:
+   - getTranslations(chapterUrl, sourceLang, targetLang)
+   - insertReplace(translation) / insertReplace(translations)
+   - deleteChapterTranslations(chapterUrl)
+   - deleteTranslationsByBookUrls(bookUrls)
+   - deleteTranslationsByLanguagePair(sourceLang, targetLang)
+   - getTranslatedTitlesFlow(bookUrl, targetLang) — live chapter-list updates
+   - count(), getChunk(limit, offset)
+
+Database changes:
+   - AppDatabase.kt: version 9 → 10, registered ChapterTranslation entity + DAO
+   - Migrations.kt: migration 9→10 (CREATE TABLE + CREATE UNIQUE INDEX)
+   - LocalDatabaseModule.kt: provides ChapterTranslationDao via Hilt
+
+===============================================================================
+PHASE 4: CPS Calibration (Dynamic Reading Time Estimation)
+===============================================================================
+
+Ported EMA-smoothed CPS (characters-per-second) calibration from NoveLA:
+
+   ReaderTextToSpeech.kt:
+   - baseCharactersPerSecond: mutableStateOf(13.0f) — dynamically calibrated
+   - paragraphStartTimeMs: tracks when current paragraph started playing
+   - chapterCharacterCount: derived state, total chars in current chapter
+   - chapterWordCount: derived state, chars / 5
+   - remainingCharacterCount: derived state, chars from current position to end
+   - estimatedWpm: baseCps * speed * 12
+   - estimatedTotalSeconds: totalChars / (baseCps * speed)
+   - estimatedRemainingSeconds: remainingChars / (baseCps * speed)
+
+   EMA calibration loop (on each paragraph FINISHED):
+   - Measure durationMs since paragraph start
+   - Compute measuredCps = charCount * 1000 / durationMs
+   - Divide by voiceSpeed to get base rate
+   - EMA smooth: 0.2 * newCps + 0.8 * oldCps
+   - Clamp to 3-40 cps
+
+===============================================================================
+AUDIT FIXES (3 CRITICAL + 5 HIGH + 10 MEDIUM)
+===============================================================================
+
+CRITICAL:
+
+C3 — ReaderSession leak on Activity destroy
+   File: features/reader/.../ReaderActivity.kt
+   Bug:   ReaderActivity.onDestroy() only called readerViewHandlersActions.invalidate().
+          readerManager.close() was only called from onBackPressed(). If the user
+          navigated up via toolbar or system gesture, the session leaked (TTS engine,
+          foreground service, 5 coroutines, translation providers) until process death.
+   Fix:   onDestroy() now calls viewModel.onCloseManually() when isFinishing is true.
+
+C2 — ForegroundServiceDidNotStartInTimeException crash
+   File: features/reader/.../services/NarratorMediaControlsService.kt
+   Bug:   onCreate() called createNotificationMediaControls(this) which could return
+          null (race between ReaderSession.close() and startForegroundService()).
+          When null, startForeground() was never called → system crash within 5 seconds.
+   Fix:   Always call startForeground() with a placeholder notification before
+          checking for null session. If null, stopSelf().
+
+HIGH:
+
+H1 — LuaEngine runBlocking blocks Default threads
+   File: tooling/lua_engine/.../LuaEngine.kt
+   Bug:   runBlocking { networkClient.call(...) } blocked Dispatchers.Default threads
+          (sized max(2, CPU cores)). Global-source-search over 30+ Lua sources
+          could starve the pool, freezing the app.
+   Fix:   Changed to runBlocking(Dispatchers.IO) { ... }.
+
+H2 — ReaderChaptersLoader SupervisorJob not cancelled
+   File: features/reader/.../manager/ReaderSession.kt
+   Bug:   close() called cancelChildren() on the loader's context but never
+          cancelled the Job itself. Orphan coroutines could still launch.
+   Fix:   Added (coroutineContext[Job])?.cancel() after cancelChildren().
+
+H4 — Gemini default model mismatch
+   File: tooling/text_translator/translator_nop/.../TranslationManagerGemini.kt
+   Bug:   getApiEndpoint() defaulted to "gemini-2.5-flash-lite" but AppPreferences
+          defaulted to "gemini-2.5-flash". Clearing the model field silently
+          switched to a cheaper, lower-quality model.
+   Fix:   Changed default to "gemini-2.5-flash".
+
+MEDIUM:
+
+M1 — AppPreferences toFlow() leaks CoroutineScope per call
+   File: core/.../appPreferences/AppPreferences.kt
+   Bug:   Each toFlow() call allocated CoroutineScope(Dispatchers.Default) captured
+          by the listener. onCompletion unregistered the listener but never cancelled
+          the scope. ~40 preferences leaked ~40 SupervisorJob instances forever.
+   Fix:   Removed the inner CoroutineScope. MutableStateFlow.value is set directly
+          from the SharedPreferences listener (thread-safe).
+
+M2 — AppPreferences preferencesChangeListeners not thread-safe
+   File: core/.../appPreferences/AppPreferences.kt
+   Bug:   mutableSetOf() is LinkedHashSet, not thread-safe. Concurrent modification
+          between onSubscription and onCompletion could corrupt the set.
+   Fix:   Changed to Collections.synchronizedSet(mutableSetOf()).
+
+M9 — Migration SQL uses IF NOT EXISTS
+   File: tooling/local_database/.../Migrations.kt
+   Bug:   CREATE TABLE IF NOT EXISTS / CREATE UNIQUE INDEX IF NOT EXISTS silently
+          skip creation if a table/index with that name already exists — even if
+          its schema is wrong. Room's schema validation later throws.
+   Fix:   Removed IF NOT EXISTS from migration SQL.
+
+M10 — Unnecessary @Transaction on DAO @Insert methods
+   File: tooling/local_database/.../DAOs/ChapterTranslationDao.kt
+   Bug:   @Transaction on single @Insert methods creates redundant nested transactions.
+   Fix:   Removed @Transaction annotations (Room already wraps @Insert in its own
+          transaction). Also removed unused Transaction import.
+
+===============================================================================
+KNOWN ISSUES (deferred to future session)
+===============================================================================
+
+1. Translation providers use blocking OkHttp execute() (C1 from audit)
+   - All 4 providers use client.newCall(req).execute() instead of suspend call()
+   - Blocks IO threads and doesn't propagate coroutine cancellation
+   - Will be fixed in next session by replacing with networkClient.call()
+
+2. TranslationManagerGooglePA key invalidation on auth failure (M6)
+   - Cached key is not cleared on HTTP 401/403
+   - Dead key persists for 24-hour cache window
+
+3. TranslationManagerOpenAI retry policy tied to key count (H5)
+   - With 1 key, any 429/5xx fails immediately with no retry
+   - maxAttempts should be decoupled from keys.size
+
+4. Floating TTS mini-player not ported (Phase 4 deferred)
+   - Requires NoveLA-specific InternalTheme/DarkMode/AppTheme adaptations
+   - 1098 lines across 3 files, too large to port safely in one pass
+
+5. Parallel translation display not ported (Phase 4 deferred)
+   - Requires XML layout changes + adapter changes + new preferences
+   - Complex UI change that could destabilize the reader
+
+6. Settings UI for translation provider selection not ported
+   - User can change provider via SharedPreferences directly for now
+   - Requires porting 1129 lines of NoveLA settings UI code
+
+7. Per-novel prompt system not ported
+   - Requires TRANSLATION_NOVEL_PROMPTS pref + editor UI + ReaderLiveTranslation rewrite
+
+8. TimoTxtGemini captures API key at Scraper construction (H3)
+   - Key is read once from AppPreferences and never updated if user changes it in Settings
+   - Should pass AppPreferences (or Preference<String>) and read lazily
+
+===============================================================================
+VERSION
+===============================================================================
+
+versionCode: 22 → 30
+versionName: "2.2.9" → "3.0.0"
+applicationId: com.paras.noveldokusha (unchanged)

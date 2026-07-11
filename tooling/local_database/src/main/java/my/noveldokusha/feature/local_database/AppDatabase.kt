@@ -9,10 +9,12 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import my.noveldokusha.feature.local_database.DAOs.ChapterBodyDao
 import my.noveldokusha.feature.local_database.DAOs.ChapterDao
+import my.noveldokusha.feature.local_database.DAOs.ChapterTranslationDao
 import my.noveldokusha.feature.local_database.DAOs.LibraryDao
 import my.noveldokusha.feature.local_database.tables.Book
 import my.noveldokusha.feature.local_database.tables.Chapter
 import my.noveldokusha.feature.local_database.tables.ChapterBody
+import my.noveldokusha.feature.local_database.tables.ChapterTranslation
 import java.io.InputStream
 
 
@@ -20,6 +22,7 @@ interface AppDatabase {
     fun libraryDao(): LibraryDao
     fun chapterDao(): ChapterDao
     fun chapterBodyDao(): ChapterBodyDao
+    fun chapterTranslationDao(): ChapterTranslationDao
     val name: String
 
     fun closeDatabase()
@@ -56,15 +59,17 @@ interface AppDatabase {
     entities = [
         Book::class,
         Chapter::class,
-        ChapterBody::class
+        ChapterBody::class,
+        ChapterTranslation::class
     ],
-    version = 5,
+    version = 10,
     exportSchema = false
 )
 internal abstract class AppRoomDatabase : RoomDatabase(), AppDatabase {
     abstract override fun libraryDao(): LibraryDao
     abstract override fun chapterDao(): ChapterDao
     abstract override fun chapterBodyDao(): ChapterBodyDao
+    abstract override fun chapterTranslationDao(): ChapterTranslationDao
 
     override lateinit var name: String
 

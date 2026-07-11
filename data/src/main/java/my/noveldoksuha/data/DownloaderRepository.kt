@@ -25,11 +25,11 @@ class DownloaderRepository @Inject constructor(
     ): Response<String?> = withContext(Dispatchers.Default) {
         val error by lazy {
             """
-			Incompatible source.
-			
-			Can't find compatible source for:
-			$bookUrl
-		""".trimIndent()
+                        Incompatible source.
+                        
+                        Can't find compatible source for:
+                        $bookUrl
+                """.trimIndent()
         }
 
         // Return if can't find compatible source for url
@@ -46,11 +46,11 @@ class DownloaderRepository @Inject constructor(
     ): Response<String?> = withContext(Dispatchers.Default) {
         val error by lazy {
             """
-			Incompatible source.
-			
-			Can't find compatible source for:
-			$bookUrl
-		""".trimIndent()
+                        Incompatible source.
+                        
+                        Can't find compatible source for:
+                        $bookUrl
+                """.trimIndent()
         }
 
         // Return if can't find compatible source for url
@@ -66,30 +66,49 @@ class DownloaderRepository @Inject constructor(
         chapterUrl: String,
     ): Response<my.noveldokusha.scraper.ChapterDownload> = withContext(Dispatchers.Default) {
         my.noveldokusha.network.tryFlatConnect {
-            val request = my.noveldokusha.network.getRequest(chapterUrl)
-            val realUrl = networkClient
-                .call(request, followRedirects = true)
-                .request.url
-                .toString()
+            // Resolve source from the ORIGINAL chapter URL first, before following
+            // redirects. This is critical for sources like TimoTxtTranslate and
+            // TimoTxtGemini where the stored URL domain (translate.goog / gemini.goog)
+            // differs from the content domain (timotxt.com). If we follow redirects
+            // first, the proxy redirects to timotxt.com, causing getCompatibleSource
+            // to match the original TimoTxt source (which has no translation).
+            val originalSource = scraper.getCompatibleSource(chapterUrl)
 
+            val realUrl = if (originalSource != null) {
+                // Source found for original URL — use it as-is.
+                // The source's transformChapterUrl() will handle any URL
+                // transformations needed (e.g. translate.goog → timotxt.com).
+                chapterUrl
+            } else {
+                // No source matched the original URL — follow redirects in case
+                // the URL is a shortener or alias that redirects to a known domain.
+                // Use .use {} to ensure the Response (and its connection) is
+                // released back to the pool even if reading the URL throws.
+                val request = my.noveldokusha.network.getRequest(chapterUrl)
+                networkClient
+                    .call(request, followRedirects = true)
+                    .use { it.request.url.toString() }
+            }
+
+            val source = originalSource ?: scraper.getCompatibleSource(realUrl)
 
             val error by lazy {
                 """
-				Unable to load chapter from url:
-				$chapterUrl
-				
-				Redirect url:
-				$realUrl
-				
-				Source not supported
-			""".trimIndent()
+                                Unable to load chapter from url:
+                                $chapterUrl
+                                
+                                Redirect url:
+                                $realUrl
+                                
+                                Source not supported
+                        """.trimIndent()
             }
 
-            scraper.getCompatibleSource(realUrl)?.also { source ->
-                val doc = networkClient.get(source.transformChapterUrl(realUrl)).toDocument()
+            source?.also {
+                val doc = networkClient.get(it.transformChapterUrl(realUrl)).toDocument()
                 val data = my.noveldokusha.scraper.ChapterDownload(
-                    body = source.getChapterText(doc) ?: return@also,
-                    title = source.getChapterTitle(doc)
+                    body = it.getChapterText(doc) ?: return@also,
+                    title = it.getChapterTitle(doc)
                 )
                 return@tryFlatConnect Response.Success(data)
             }
@@ -112,11 +131,11 @@ class DownloaderRepository @Inject constructor(
     ): Response<List<Chapter>> = withContext(Dispatchers.Default) {
         val error by lazy {
             """
-			Incompatible source.
-			
-			Can't find compatible source for:
-			$bookUrl
-		""".trimIndent()
+                        Incompatible source.
+                        
+                        Can't find compatible source for:
+                        $bookUrl
+                """.trimIndent()
         }
 
         // Return if can't find compatible source for url

@@ -30,9 +30,7 @@ class NovelHall(
     override suspend fun getChapterTitle(doc: Document): String? = null
 
     override suspend fun getChapterText(doc: Document): String {
-        return doc
-            .selectFirst("div#htmlContent")!!
-            .let { TextExtractor.get(it) }
+        return doc.selectFirst("div#htmlContent")?.let { TextExtractor.get(it) } ?: ""
     }
 
     override suspend fun getBookCoverImageUrl(

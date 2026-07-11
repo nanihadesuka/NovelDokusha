@@ -37,7 +37,22 @@ internal class NarratorMediaControlsService : Service() {
     override fun onCreate() {
         super.onCreate()
 
-        val notification = narratorNotification.createNotificationMediaControls(this) ?: return
+        // Always call startForeground FIRST with a placeholder notification
+        // to satisfy the 5-second ForegroundServiceDidNotStartInTimeException
+        // deadline. If readerManager.session is null (race condition between
+        // ReaderSession.close() and startForegroundService()), we still need
+        // to call startForeground — otherwise the system crashes the app.
+        val notification = narratorNotification.createNotificationMediaControls(this)
+            ?: run {
+                // Session is null — create a minimal notification and stop
+                val placeholder = androidx.core.app.NotificationCompat.Builder(this, "reader_narrator")
+                    .setContentTitle("ParasDokusha")
+                    .setSmallIcon(my.noveldokusha.reader.R.drawable.ic_media_control_play)
+                    .build()
+                startForeground(narratorNotification.notificationId, placeholder)
+                stopSelf()
+                return
+            }
 
         startForeground(narratorNotification.notificationId, notification)
     }

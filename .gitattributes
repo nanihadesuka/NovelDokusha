@@ -1,0 +1,29 @@
+# Mark binary files as binary so git doesn't try line-ending conversion.
+# This prevents the "Could not find or load main class
+# org.gradle.wrapper.GradleWrapperMain" CI error caused by CRLF conversion
+# corrupting the wrapper jar.
+
+*.jar   binary
+*.jks   binary
+*.png   binary
+*.jpg   binary
+*.jpeg  binary
+*.webp  binary
+*.gif   binary
+*.ico   binary
+*.pdf   binary
+*.zip   binary
+*.apk   binary
+*.aab   binary
+*.keystore binary
+*.p12   binary
+*.db    binary
+*.woff  binary
+*.woff2 binary
+*.ttf   binary
+*.otf   binary
+
+# Shell scripts and gradlew must keep LF line endings (not CRLF) so they
+# run on Linux runners / Docker images.
+*.sh    text eol=lf
+gradlew text eol=lf

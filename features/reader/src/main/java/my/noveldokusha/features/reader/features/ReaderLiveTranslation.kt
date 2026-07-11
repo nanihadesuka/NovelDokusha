@@ -21,10 +21,11 @@ internal data class LiveTranslationSettingData(
     val listOfAvailableModels: SnapshotStateList<TranslationModelState>,
     val source: MutableState<TranslationModelState?>,
     val target: MutableState<TranslationModelState?>,
+    val activeProviderName: MutableState<String>,
     val onEnable: (Boolean) -> Unit,
     val onSourceChange: (TranslationModelState?) -> Unit,
     val onTargetChange: (TranslationModelState?) -> Unit,
-    val onDownloadTranslationModel: (language: String) -> Unit,
+    val onProviderChange: () -> Unit,
 )
 
 internal class ReaderLiveTranslation(
@@ -40,10 +41,11 @@ internal class ReaderLiveTranslation(
         enable = mutableStateOf(appPreferences.GLOBAL_TRANSLATION_ENABLED.value),
         source = mutableStateOf(null),
         target = mutableStateOf(null),
+        activeProviderName = mutableStateOf(getActiveProviderName()),
         onEnable = ::onEnable,
         onSourceChange = ::onSourceChange,
         onTargetChange = ::onTargetChange,
-        onDownloadTranslationModel = translationManager::downloadModel
+        onProviderChange = ::cycleProvider
     )
 
     var translatorState: TranslatorState? = null
@@ -116,6 +118,33 @@ internal class ReaderLiveTranslation(
     private fun onTargetChange(it: TranslationModelState?) {
         state.target.value = it
         appPreferences.GLOBAL_TRANSLATION_PREFERRED_TARGET.value = it?.language ?: ""
+        val update = updateTranslatorState()
+        if (update) scope.launch {
+            _onTranslatorChanged.emit(Unit)
+        }
+    }
+
+    private fun getActiveProviderName(): String = when (appPreferences.TRANSLATION_PROVIDER.value) {
+        "GEMINI"      -> "Gemini"
+        "GOOGLE_FREE" -> "Google Free"
+        "OPENAI"      -> "OpenAI"
+        else          -> "Google Enhanced"
+    }
+
+    /**
+     * Cycles through the 4 providers when the user taps the provider button.
+     * GOOGLE_PA → GOOGLE_FREE → GEMINI → OPENAI → GOOGLE_PA
+     */
+    private fun cycleProvider() {
+        val current = appPreferences.TRANSLATION_PROVIDER.value
+        val next = when (current) {
+            "GOOGLE_PA"   -> "GOOGLE_FREE"
+            "GOOGLE_FREE" -> "GEMINI"
+            "GEMINI"      -> "OPENAI"
+            else          -> "GOOGLE_PA"
+        }
+        appPreferences.TRANSLATION_PROVIDER.value = next
+        state.activeProviderName.value = getActiveProviderName()
         val update = updateTranslatorState()
         if (update) scope.launch {
             _onTranslatorChanged.emit(Unit)

@@ -1,0 +1,139 @@
+name: Debug FOSS
+
+# Auto-run on every commit / PR — builds a debug FOSS APK with a bumped
+# versionCode (commit-count based) so each commit produces a unique,
+# installable APK. Does NOT sign with the release key (debug key is fine
+# for sideloading). Does NOT create a GitHub Release.
+#
+# The debug FOSS APK is the "smoke test" — if this build breaks, fix it
+# before merging.
+
+on:
+  push:
+    branches: [master, main]
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
+      - '.github/**.md'
+  pull_request:
+    branches: [master, main]
+  workflow_dispatch:
+
+concurrency:
+  group: debug-foss-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build Debug FOSS APK
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # full history — needed for commit-count versionCode bump
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+          cache: gradle
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+        with:
+          sdk-platform: '34'
+          sdk-build-tools: '34.0.0'
+
+      - name: Verify gradle wrapper is present
+        run: |
+          chmod +x ./gradlew
+          if [ ! -s gradle/wrapper/gradle-wrapper.jar ]; then
+            echo "::error::gradle/wrapper/gradle-wrapper.jar is missing or empty."
+            echo "This is the most common cause of 'Could not find or load main class"
+            echo "org.gradle.wrapper.GradleWrapperMain' on CI. Re-add the jar (do NOT"
+            echo "gitignore it) and push again."
+            exit 1
+          fi
+          echo "✓ gradle-wrapper.jar is present ($(stat -c%s gradle/wrapper/gradle-wrapper.jar) bytes)"
+
+      - name: Cache Gradle
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: gradle-debug-foss-${{ runner.os }}-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties', '**/libs.versions.toml') }}
+          restore-keys: |
+            gradle-debug-foss-${{ runner.os }}-
+
+      - name: Bump versionCode (commit-count) and versionName (dev suffix)
+        run: |
+          # Each commit gets a unique, monotonically increasing versionCode.
+          # Base of 1000 + commit count keeps it well clear of the release
+          # versionCode (currently 22) so debug installs never collide with
+          # release installs of the same app.
+          COMMITS=$(git rev-list --count HEAD)
+          NEW_VC=$((1000 + COMMITS))
+          export NEW_VC COMMITS
+
+          # Patch app/build.gradle.kts in place. Use python so the regex is
+          # tolerant of whitespace around `=`. Values are passed via env vars
+          # (NOT bash expansion) so the heredoc can be quoted — this avoids
+          # f-string / shell-variable confusion.
+          python3 - <<'PY'
+          import os, re, pathlib
+          new_vc = os.environ["NEW_VC"]
+          commits = os.environ["COMMITS"]
+          p = pathlib.Path("app/build.gradle.kts")
+          s = p.read_text()
+          s = re.sub(r'versionCode\s*=\s*\d+', f'versionCode = {new_vc}', s, count=1)
+          s = re.sub(r'versionName\s*=\s*"[^"]*"', f'versionName = "2.2.9-dev{commits}"', s, count=1)
+          p.write_text(s)
+          PY
+
+          echo "Bumped versionCode to $NEW_VC, versionName to 2.2.9-dev$COMMITS"
+          grep -E 'versionCode|versionName' app/build.gradle.kts | head -4
+
+      - name: Build FOSS Debug APK
+        run: ./gradlew assembleFossDebug --no-daemon --no-configuration-cache --console=plain --stacktrace
+
+      - name: "Fail-fast: verify applicationId == com.paras.noveldokusha"
+        run: |
+          BUILD_TOOLS=$ANDROID_HOME/build-tools/34.0.0
+          APK=$(find app/build/outputs/apk/foss/debug -name '*.apk' | head -1)
+          if [ -z "$APK" ]; then
+            echo "::error::No FOSS debug APK produced"
+            exit 1
+          fi
+          echo "APK: $APK"
+          BADGE=$($BUILD_TOOLS/aapt dump badging "$APK" | grep -E "^package:" | head -1)
+          echo "$BADGE"
+          if ! echo "$BADGE" | grep -q "name='com.paras.noveldokusha'"; then
+            echo "::error::applicationId is NOT com.paras.noveldokusha — refusing to publish."
+            echo "The applicationId in app/build.gradle.kts has been reverted. Fix it before merging."
+            exit 1
+          fi
+          echo "✓ applicationId verified"
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: ParasDokusha-debug-foss
+          path: app/build/outputs/apk/foss/debug/*.apk
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Upload build reports on failure
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: debug-foss-build-reports
+          path: |
+            **/build/reports/
+            **/build/outputs/logs/
+          if-no-files-found: warn
+          retention-days: 7

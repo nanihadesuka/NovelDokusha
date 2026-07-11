@@ -5,6 +5,7 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
+import androidx.appcompat.app.AlertDialog
 import androidx.core.view.WindowCompat
 import androidx.lifecycle.lifecycleScope
 import dagger.hilt.android.AndroidEntryPoint
@@ -16,6 +17,8 @@ import my.noveldoksuha.coreui.theme.Theme
 import my.noveldokusha.core.utils.Extra_String
 import my.noveldokusha.navigation.NavigationRoutes
 import my.noveldokusha.feature.local_database.BookMetadata
+import my.noveldokusha.scraper.Scraper
+import my.noveldokusha.chapterslist.R
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -37,11 +40,21 @@ class ChaptersActivity : BaseActivity() {
     @Inject
     internal lateinit var navigationRoutes: NavigationRoutes
 
+    @Inject
+    internal lateinit var scraper: Scraper
+
     private val viewModel by viewModels<ChaptersViewModel>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         WindowCompat.setDecorFitsSystemWindows(window, false)
+
+        // Compute whether the "Switch source" option should be shown.
+        // It's only shown for TimoTxt sources (where alternative TimoTxt
+        // sources exist to switch to).
+        val alternatives = scraper.getAlternativeSources(viewModel.bookUrl)
+        val showSwitchSource = alternatives.isNotEmpty()
+
         setContent {
             Theme(themeProvider = themeProvider) {
                 SetSystemBarTransparent()
@@ -69,10 +82,55 @@ class ChaptersActivity : BaseActivity() {
                     onCoverLongClick = { searchBookInDatabase(input = viewModel.bookTitle) },
                     onChangeCover = onDoAskForImage { viewModel.saveImageAsCover(it) },
                     onOpenInBrowser = { navigationRoutes.webView(this, url = it).let(::startActivity) },
-                    onGlobalSearchClick = { navigationRoutes.globalSearch(this, text = it).let(::startActivity) }
+                    onGlobalSearchClick = { navigationRoutes.globalSearch(this, text = it).let(::startActivity) },
+                    onSwitchSource = { showSwitchSourceDialog(alternatives) },
+                    showSwitchSource = showSwitchSource,
                 )
             }
         }
+    }
+
+    /**
+     * Show a dialog listing alternative TimoTxt sources for the current book.
+     * When the user picks one, launch a new ChaptersActivity with the
+     * converted URL — this "transfers" the novel to the selected source.
+     *
+     * The book is NOT removed from the original source; the user can switch
+     * back at any time. Both sources will show the same novel in their
+     * respective catalogs/library.
+     */
+    private fun showSwitchSourceDialog(
+        alternatives: List<Pair<my.noveldokusha.scraper.SourceInterface.Catalog, String>>
+    ) {
+        if (alternatives.isEmpty()) return
+
+        val labels = alternatives.map { (_, url) ->
+            // Derive a human-readable source name from the URL host
+            val host = runCatching {
+                android.net.Uri.parse(url).host ?: url
+            }.getOrDefault(url)
+            when {
+                host.contains("translate.goog") -> "TimoTxt (Google Translate)"
+                host.contains("gemini.goog") -> "TimoTxt (Gemini AI)"
+                host.contains("timotxt.com") -> "TimoTxt (Original Chinese)"
+                else -> host
+            }
+        }.toTypedArray()
+
+        AlertDialog.Builder(this)
+            .setTitle(R.string.switch_source_dialog_title)
+            .setItems(labels) { _, which ->
+                val (_, convertedUrl) = alternatives[which]
+                // Launch a new ChaptersActivity with the converted URL.
+                // This opens the same novel in the alternative source.
+                val bookMetadata = BookMetadata(
+                    url = convertedUrl,
+                    title = viewModel.state.book.value.title
+                )
+                ChaptersActivity.IntentData(this, bookMetadata).let(::startActivity)
+            }
+            .setNegativeButton(android.R.string.cancel, null)
+            .show()
     }
 
     private fun onOpenLastActiveChapter() {

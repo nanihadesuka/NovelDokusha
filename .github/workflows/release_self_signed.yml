@@ -1,0 +1,288 @@
+name: Release (Self-Signed, Both Flavors)
+
+# This workflow builds BOTH Full and FOSS release APKs, signs them with a
+# keystore generated inside the workflow itself, and publishes a single
+# GitHub Release containing both APKs.
+#
+# NO GitHub secrets required — the keystore is created fresh on each run.
+# This means:
+#   ✅ No secret setup needed
+#   ✅ Works on any fork without configuration
+#   ⚠️ The keystore is different each run, so users CANNOT upgrade over
+#      a previous self-signed build — they must uninstall first. For
+#      production releases with upgrade compatibility, use release_full.yml
+#      / release_foss.yml with your own keystore stored in GitHub secrets.
+
+on:
+  workflow_dispatch:
+    inputs:
+      version_name:
+        description: 'Version name (e.g. 2.2.9) — must match versionName in app/build.gradle.kts'
+        required: false
+        type: string
+
+jobs:
+  build:
+    name: Build, Sign & Release Both APKs
+    runs-on: ubuntu-22.04
+    timeout-minutes: 90
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+          cache: gradle
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+        with:
+          sdk-platform: '34'
+          sdk-build-tools: '34.0.0'
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Verify gradle wrapper is present
+        run: |
+          chmod +x ./gradlew
+          if [ ! -s gradle/wrapper/gradle-wrapper.jar ]; then
+            echo "::error::gradle/wrapper/gradle-wrapper.jar is missing or empty."
+            exit 1
+          fi
+          echo "✓ gradle-wrapper.jar is present ($(stat -c%s gradle/wrapper/gradle-wrapper.jar) bytes)"
+
+      - name: "Fail-fast: verify applicationId in source"
+        run: |
+          if ! grep -Eq '^\s*applicationId = "com\.paras\.noveldokusha"' app/build.gradle.kts; then
+            echo "::error::applicationId in app/build.gradle.kts is NOT com.paras.noveldokusha."
+            exit 1
+          fi
+          echo "✓ applicationId verified in source"
+
+      - name: Cache Gradle
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: gradle-release-self-${{ runner.os }}-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties', '**/libs.versions.toml') }}
+          restore-keys: |
+            gradle-release-self-${{ runner.os }}-
+
+      # ─── Generate a fresh keystore inside the workflow ─────────────
+      # No secrets needed — keytool is bundled with JDK 17.
+      # The keystore lives only for the duration of this workflow run.
+      - name: Generate signing keystore
+        id: keystore
+        run: |
+          KEYSTORE=app/parasdokusha-self-signed.jks
+          STORE_PASS="parasdokusha-ci-$(date +%s)"
+          KEY_PASS="$STORE_PASS"
+          ALIAS="parasdokusha"
+
+          keytool -genkeypair \
+            -keystore "$KEYSTORE" \
+            -storetype JKS \
+            -keyalg RSA \
+            -keysize 2048 \
+            -validity 36500 \
+            -alias "$ALIAS" \
+            -storepass "$STORE_PASS" \
+            -keypass "$KEY_PASS" \
+            -dname "CN=ParasDokusha CI, OU=App, O=ParasDokusha, L=Local, ST=Local, C=US"
+
+          echo "✓ Keystore generated: $KEYSTORE ($(stat -c%s $KEYSTORE) bytes)"
+
+          # Write signing config for Gradle
+          {
+            echo "storeFile=parasdokusha-self-signed.jks"
+            echo "storePassword=$STORE_PASS"
+            echo "keyAlias=$ALIAS"
+            echo "keyPassword=$KEY_PASS"
+          } > ci-signing.properties
+
+          # Save passwords to env for the re-sign step
+          echo "STORE_PASS=$STORE_PASS" >> $GITHUB_ENV
+          echo "KEY_PASS=$KEY_PASS" >> $GITHUB_ENV
+          echo "ALIAS=$ALIAS" >> $GITHUB_ENV
+
+      # ─── Build both flavors in parallel-ish (sequential, cached) ───
+      - name: Build Full release APK
+        run: |
+          ./gradlew assembleFullRelease \
+            --no-daemon \
+            --no-configuration-cache \
+            --console=plain \
+            --stacktrace \
+            -PlocalPropertiesFilePath=ci-signing.properties
+
+      - name: Build FOSS release APK
+        run: |
+          ./gradlew assembleFossRelease \
+            --no-daemon \
+            --no-configuration-cache \
+            --console=plain \
+            --stacktrace \
+            -PlocalPropertiesFilePath=ci-signing.properties
+
+      # ─── Re-sign both APKs with v1 + v2 ────────────────────────────
+      - name: Re-sign APKs with v1 + v2 signature
+        run: |
+          BUILD_TOOLS=$ANDROID_HOME/build-tools/34.0.0
+          KEYSTORE=app/parasdokusha-self-signed.jks
+
+          sign_apk() {
+            local apk="$1"
+            echo "=== Re-signing $apk ==="
+            cp "$apk" /tmp/unsigned.apk
+            (cd /tmp && zip -d unsigned.apk 'META-INF/*' > /dev/null)
+            $BUILD_TOOLS/zipalign -f 4 /tmp/unsigned.apk /tmp/aligned.apk
+            $BUILD_TOOLS/apksigner sign \
+              --ks "$KEYSTORE" \
+              --ks-key-alias "$ALIAS" \
+              --ks-pass "pass:$STORE_PASS" \
+              --key-pass "pass:$KEY_PASS" \
+              --v1-signing-enabled true \
+              --v2-signing-enabled true \
+              --v3-signing-enabled false \
+              --v4-signing-enabled false \
+              --min-sdk-version 23 \
+              --out "$apk" \
+              /tmp/aligned.apk
+            rm /tmp/unsigned.apk /tmp/aligned.apk
+          }
+
+          # Sign Full APK
+          for apk in app/build/outputs/apk/full/release/*.apk; do
+            sign_apk "$apk"
+          done
+
+          # Sign FOSS APK
+          for apk in app/build/outputs/apk/foss/release/*.apk; do
+            sign_apk "$apk"
+          done
+
+      # ─── Verify both APKs ──────────────────────────────────────────
+      - name: Verify signatures and applicationId
+        env:
+          EXPECTED_APP_ID: com.paras.noveldokusha
+        run: |
+          BUILD_TOOLS=$ANDROID_HOME/build-tools/34.0.0
+
+          for apk in app/build/outputs/apk/*/release/*.apk; do
+            echo "=== Verifying $apk ==="
+            $BUILD_TOOLS/apksigner verify --verbose --min-sdk-version 23 "$apk" > /tmp/verify.txt 2>&1 || {
+              echo "::error::apksigner verify failed for $apk"
+              cat /tmp/verify.txt
+              exit 1
+            }
+            cat /tmp/verify.txt | head -8
+
+            if ! grep -q "Verified using v1 scheme (JAR signing): true" /tmp/verify.txt; then
+              echo "::error::$apk is NOT signed with v1 (JAR) scheme."
+              exit 1
+            fi
+            if ! grep -q "Verified using v2 scheme (APK Signature Scheme v2): true" /tmp/verify.txt; then
+              echo "::error::$apk is NOT signed with v2 scheme."
+              exit 1
+            fi
+            echo "✓ v1 + v2 signing verified"
+
+            BADGE=$($BUILD_TOOLS/aapt dump badging "$apk" | grep -E "^package:" | head -1)
+            if ! echo "$BADGE" | grep -q "name='$EXPECTED_APP_ID'"; then
+              echo "::error::applicationId is NOT $EXPECTED_APP_ID"
+              exit 1
+            fi
+            echo "✓ applicationId verified"
+            echo ""
+          done
+
+      # ─── Rename APKs and extract version ───────────────────────────
+      - name: Rename APKs and set env vars
+        run: python .github/build_scripts/extract_info.py
+
+      # ─── Debug: list all APK files found ───────────────────────────
+      - name: List APK files (debug)
+        run: |
+          echo "=== All APK files in build outputs ==="
+          find app/build/outputs/apk -name "*.apk" -type f 2>/dev/null || echo "(none found)"
+          echo ""
+          echo "=== Env vars set by extract_info.py ==="
+          echo "APP_VERSION=${APP_VERSION:-<not set>}"
+          echo "APK_FILE_PATH_full=${APK_FILE_PATH_full:-<not set>}"
+          echo "APK_FILE_PATH_foss=${APK_FILE_PATH_foss:-<not set>}"
+
+      # ─── Upload both APKs as artifacts (always, even if release fails) ─
+      - name: Upload APKs as artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: parasdokusha-release-apks
+          path: |
+            app/build/outputs/apk/*/release/*.apk
+          if-no-files-found: error
+          retention-days: 30
+
+      # ─── Create GitHub Release with both APKs ──────────────────────
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: ParasDokusha v${{ env.APP_VERSION }} (Self-Signed)
+          tag_name: v${{ env.APP_VERSION }}-self-signed
+          files: |
+            ${{ env.APK_FILE_PATH_full }}
+            ${{ env.APK_FILE_PATH_foss }}
+          body: |
+            ## ParasDokusha v${{ env.APP_VERSION }} — Self-Signed Build
+
+            This release was built and signed automatically by the
+            `release_self_signed.yml` workflow. The signing keystore was
+            generated fresh inside the workflow — **no GitHub secrets
+            required**.
+
+            ### Downloads
+
+            | File | Flavor | Translation |
+            |------|--------|-------------|
+            | `ParasDokusha_v${{ env.APP_VERSION }}_full-release.apk` | Full | MLKit + Gemini AI |
+            | `ParasDokusha_v${{ env.APP_VERSION }}_foss-release.apk` | FOSS | No translation |
+
+            ### ⚠️ Self-Signed Warning
+
+            The keystore is different on every run. If you're upgrading
+            from a previous self-signed build, you MUST uninstall first
+            (Android refuses to install an APK signed with a different
+            key than the one already installed).
+
+            For upgrade-compatible releases, use `release_full.yml` or
+            `release_foss.yml` with your own keystore stored in GitHub
+            secrets.
+          generate_release_notes: true
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Clean up keystore
+        if: always()
+        run: |
+          rm -f app/parasdokusha-self-signed.jks ci-signing.properties
+
+      - name: Upload build reports on failure
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: release-self-signed-build-reports
+          path: |
+            **/build/reports/
+            **/build/outputs/logs/
+          if-no-files-found: warn
+          retention-days: 7

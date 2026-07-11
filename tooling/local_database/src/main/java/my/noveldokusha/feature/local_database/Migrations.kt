@@ -6,6 +6,7 @@ import my.noveldokusha.feature.local_database.migrations.MigrationsList
 import my.noveldokusha.feature.local_database.migrations._1stKissNovelDomainChange_1_org
 import my.noveldokusha.feature.local_database.migrations.readLightNovelDomainChange_1_today
 import my.noveldokusha.feature.local_database.migrations.readLightNovelDomainChange_2_meme
+import my.noveldokusha.feature.local_database.migrations.wuxiaDomainChange_blog_to_click
 
 internal fun databaseMigrations() = arrayOf(
     migration(1) {
@@ -25,6 +26,25 @@ internal fun databaseMigrations() = arrayOf(
     migration(5, MigrationsList::readLightNovelDomainChange_1_today),
     migration(6, MigrationsList::readLightNovelDomainChange_2_meme),
     migration(7, MigrationsList::_1stKissNovelDomainChange_1_org),
+    migration(8, MigrationsList::wuxiaDomainChange_blog_to_click),
+    migration(9) {
+        // Create ChapterTranslation table for cloud translation caching
+        it.execSQL("""
+            CREATE TABLE ChapterTranslation (
+                id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                chapterUrl TEXT NOT NULL,
+                sourceLang TEXT NOT NULL,
+                targetLang TEXT NOT NULL,
+                translatedParagraphs TEXT NOT NULL,
+                titleTranslation TEXT NOT NULL DEFAULT '',
+                timestamp INTEGER NOT NULL DEFAULT 0
+            )
+        """.trimIndent())
+        it.execSQL("""
+            CREATE UNIQUE INDEX index_ChapterTranslation_chapterUrl_sourceLang_targetLang
+            ON ChapterTranslation(chapterUrl, sourceLang, targetLang)
+        """.trimIndent())
+    },
 )
 
 internal fun migration(vi: Int, migrate: (SupportSQLiteDatabase) -> Unit) =

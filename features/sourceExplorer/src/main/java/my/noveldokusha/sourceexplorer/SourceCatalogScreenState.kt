@@ -9,6 +9,7 @@ import my.noveldokusha.feature.local_database.BookMetadata
 
 internal data class SourceCatalogScreenState(
     val sourceCatalogNameStrId: State<Int>,
+    val sourceCatalogDisplayName: State<String?>,
     val searchTextInput: MutableState<String>,
     val fetchIterator: PagedListIteratorState<BookMetadata>,
     val toolbarMode: MutableState<ToolbarMode>,

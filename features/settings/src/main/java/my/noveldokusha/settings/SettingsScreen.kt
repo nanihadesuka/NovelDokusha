@@ -57,8 +57,6 @@ fun SettingsScreen() {
                 onCleanImageFolder = viewModel::cleanImagesFolder,
                 onBackupData = onBackupCreate(),
                 onRestoreData = onBackupRestore(),
-                onDownloadTranslationModel = viewModel::downloadTranslationModel,
-                onRemoveTranslationModel = viewModel::removeTranslationModel,
                 onCheckForUpdatesManual = viewModel::onCheckForUpdatesManual,
                 modifier = Modifier.padding(innerPadding),
             )

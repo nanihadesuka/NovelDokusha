@@ -11,7 +11,6 @@ import my.noveldokusha.network.addPath
 import my.noveldokusha.network.ifCase
 import my.noveldokusha.network.postRequest
 import my.noveldokusha.network.toDocument
-import my.noveldokusha.network.toUrlBuilder
 import my.noveldokusha.network.toUrlBuilderSafe
 import my.noveldokusha.network.tryConnect
 import my.noveldokusha.scraper.R
@@ -56,11 +55,12 @@ class WuxiaWorld(
     ): Response<List<ChapterResult>> = withContext(Dispatchers.Default) {
         tryConnect {
             val url = bookUrl
-                .toUrlBuilder()
-                ?.addPath("ajax")
-                ?.addPath("chapters")
+                .toUrlBuilderSafe()
+                .addPath("ajax")
+                .addPath("chapters")
+                .toString()
 
-            val request = postRequest(url.toString())
+            val request = postRequest(url)
             networkClient.call(request)
                 .toDocument()
                 .select(".wp-manga-chapter > a[href]")

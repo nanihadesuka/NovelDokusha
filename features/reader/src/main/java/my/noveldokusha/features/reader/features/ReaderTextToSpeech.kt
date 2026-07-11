@@ -126,6 +126,42 @@ internal class ReaderTextToSpeech(
     val isActive = derivedStateOf { state.isThereActiveItem.value || state.isPlaying.value }
     val isSpeaking = derivedStateOf { state.isThereActiveItem.value && state.isPlaying.value }
 
+    // ── CPS calibration (ported from NoveLA) ─────────────────────────
+    // Dynamically calibrates characters-per-second by measuring each
+    // paragraph's spoken duration and EMA-smoothing the base rate.
+    private val baseCharactersPerSecond = mutableStateOf(13.0f)
+    private var paragraphStartTimeMs = 0L
+
+    val chapterCharacterCount = derivedStateOf {
+        items.count { it is ReaderItem.Text }
+            .let { count -> if (count > 0) items.filterIsInstance<ReaderItem.Text>().sumOf { it.textToDisplay.length } else 0 }
+    }
+
+    val chapterWordCount = derivedStateOf {
+        (chapterCharacterCount.value / 5).coerceAtLeast(0)
+    }
+
+    private val remainingCharacterCount = derivedStateOf {
+        val currentPos = currentTextPlaying.value.itemPos.chapterItemPosition
+        items.filterIsInstance<ReaderItem.Text>()
+            .filter { it.chapterItemPosition >= currentPos }
+            .sumOf { it.textToDisplay.length }
+    }
+
+    val estimatedWpm = derivedStateOf {
+        (baseCharactersPerSecond.value * manager.voiceSpeed.floatValue * 12.0f).toInt().coerceAtLeast(30)
+    }
+
+    val estimatedTotalSeconds = derivedStateOf {
+        val cps = baseCharactersPerSecond.value * manager.voiceSpeed.floatValue
+        if (cps > 0f) (chapterCharacterCount.value / cps).toInt() else 0
+    }
+
+    val estimatedRemainingSeconds = derivedStateOf {
+        val cps = baseCharactersPerSecond.value * manager.voiceSpeed.floatValue
+        if (cps > 0f) (remainingCharacterCount.value / cps).toInt() else 0
+    }
+
     init {
         coroutineScope.launch {
             manager
@@ -148,6 +184,28 @@ internal class ReaderTextToSpeech(
                 .currentTextSpeakFlow
                 .filter { it.playState == Utterance.PlayState.FINISHED }
                 .collect {
+                    // ── CPS calibration ──────────────────────────────
+                    // Measure duration of the just-finished paragraph and
+                    // EMA-smooth the base characters-per-second rate.
+                    val now = System.currentTimeMillis()
+                    if (paragraphStartTimeMs > 0) {
+                        val durationMs = now - paragraphStartTimeMs
+                        val item = items.getOrNull(currentTextPlaying.value.itemPos.chapterItemPosition) as? ReaderItem.Text
+                        val text = item?.textToDisplay ?: ""
+                        val charCount = text.length
+                        if (charCount > 10 && durationMs > 200) {
+                            val measuredCps = (charCount * 1000.0f) / durationMs
+                            val currentSpeed = manager.voiceSpeed.floatValue
+                            if (currentSpeed > 0f) {
+                                val baseCps = measuredCps / currentSpeed
+                                if (baseCps in 3.0f..40.0f) {
+                                    baseCharactersPerSecond.value = 0.2f * baseCps + 0.8f * baseCharactersPerSecond.value
+                                }
+                            }
+                        }
+                    }
+                    paragraphStartTimeMs = now
+
                     withContext(Dispatchers.Main) {
                         when (manager.queueList.size) {
                             halfBuffer -> {

@@ -51,7 +51,8 @@ internal fun GlobalSourceSearchScreenBody(
     ) {
         items(listSources) { entry ->
             Text(
-                text = stringResource(id = entry.source.catalog.nameStrId),
+                text = entry.source.catalog.displayName
+                    ?: stringResource(id = entry.source.catalog.nameStrId),
                 style = MaterialTheme.typography.titleMedium,
                 modifier = Modifier
                     .padding(start = 12.dp)

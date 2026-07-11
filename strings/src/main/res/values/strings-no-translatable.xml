@@ -1,16 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string translatable="false" name="source_name_1stkissnovel">1stKissNovel</string>
-    <string translatable="false" name="source_name_at">AT</string>
-    <string translatable="false" name="source_name_bestlightnovel">BestLightNovel</string>
     <string translatable="false" name="source_name_box_novel">Box Novel</string>
-    <string translatable="false" name="source_name_korean_novels_mtl">Korean Novels MTL</string>
     <string translatable="false" name="source_name_light_novel_translations">Light Novel Translations</string>
     <string translatable="false" name="source_name_light_novel_world">Light Novel World</string>
-    <string translatable="false" name="source_name_mtlnovel">MTLNovel</string>
     <string translatable="false" name="source_name_novelhall">NovelHall</string>
     <string translatable="false" name="source_name_novel_updates">Novel Updates</string>
-    <string translatable="false" name="source_name_read_light_novel">Read Light Novel</string>
     <string translatable="false" name="source_name_read_novel_full">Read Novel Full</string>
     <string translatable="false" name="source_name_reddit">Reddit</string>
     <string translatable="false" name="source_name_royal_road">Royal Road</string>
@@ -18,6 +12,11 @@
     <string translatable="false" name="source_name_sousetsuka">Sousetsuka</string>
     <string translatable="false" name="source_name_wuxia">Wuxia</string>
     <string translatable="false" name="source_name_wuxia_world">Wuxia World</string>
+    <string translatable="false" name="source_name_novel_fire">Novel Fire</string>
+    <string translatable="false" name="source_name_novel_phoenix">Novel Phoenix</string>
+    <string translatable="false" name="source_name_novel_cool">Novel Cool</string>
+    <string translatable="false" name="source_name_lnori">Lnori</string>
+    <string translatable="false" name="source_name_wuxia_box">Wuxia Box</string>
     <string translatable="false" name="database_name_baka_updates">Baka-Updates</string>
     <string translatable="false" name="database_name_novel_updates">Novel Updates</string>
     <string translatable="false" name="source_name_indo_webnovel">Indonesia Webnovel</string>
@@ -25,8 +24,11 @@
     <string translatable="false" name="source_name_sakura_novel">Sakura Novel</string>
     <string translatable="false" name="source_name_meio_novel">Meio Novel</string>
     <string translatable="false" name="source_name_more_novel">More Novel</string>
-    <string translatable="false" name="source_name_novelbin">NovelBin</string>
     <string translatable="false" name="source_name_novelku">NovelKu</string>
     <string translatable="false" name="source_name_wb_novel">Wb Novel</string>
+    <string translatable="false" name="source_name_timotxt">TimoTxt</string>
+    <string translatable="false" name="source_name_timotxt_translate">TimoTxt (Translated)</string>
+    <string translatable="false" name="source_name_timotxt_gemini">TimoTxt (Gemini)</string>
+    <string translatable="false" name="source_name_wtrlab">WTR-LAB</string>
 
 </resources>

@@ -112,7 +112,7 @@ internal fun CatalogList(
                     .animateItemPlacement(),
                 headlineContent = {
                     Text(
-                        text = stringResource(id = it.catalog.nameStrId),
+                        text = it.catalog.displayName ?: stringResource(id = it.catalog.nameStrId),
                         style = MaterialTheme.typography.titleSmall,
                     )
                 },

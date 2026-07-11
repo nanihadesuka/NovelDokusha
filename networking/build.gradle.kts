@@ -15,14 +15,10 @@ dependencies {
     implementation(libs.okhttp)
     implementation(libs.okhttp.interceptor.brotli)
     implementation(libs.okhttp.interceptor.logging)
-    implementation(libs.okhttp.glideIntegration)
 
     // Logging
     implementation(libs.timber)
 
     implementation(libs.jsoup)
     implementation(libs.gson)
-
-    implementation(libs.androidx.core.ktx)
-    implementation(libs.androidx.appcompat)
 }

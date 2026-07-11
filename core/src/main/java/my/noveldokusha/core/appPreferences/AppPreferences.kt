@@ -36,7 +36,7 @@ class AppPreferences @Inject constructor(
 ) {
     private val preferences = PreferenceManager.getDefaultSharedPreferences(context)
     private val preferencesChangeListeners =
-        mutableSetOf<SharedPreferences.OnSharedPreferenceChangeListener>()
+        java.util.Collections.synchronizedSet(mutableSetOf<SharedPreferences.OnSharedPreferenceChangeListener>())
 
     val THEME_ID = object : Preference<PreferenceThemes>("THEME_ID") {
         override var value by SharedPreference_Enum(name, preferences, PreferenceThemes.Light) {
@@ -155,6 +155,88 @@ class AppPreferences @Inject constructor(
             override var value by SharedPreference_Int(name, preferences, 24)
         }
 
+    // ── Gemini AI Translation settings ──────────────────────────────────
+
+    val GEMINI_API_KEY = object : Preference<String>("GEMINI_API_KEY") {
+        override var value by SharedPreference_String(name, preferences, "")
+    }
+
+    val GEMINI_MODEL = object : Preference<String>("GEMINI_MODEL") {
+        override var value by SharedPreference_String(name, preferences, "gemini-2.5-flash")
+    }
+
+    val GEMINI_TEMPERATURE = object : Preference<Float>("GEMINI_TEMPERATURE") {
+        override var value by SharedPreference_Float(name, preferences, 0.55f)
+    }
+
+    // ── Cloud Translation Provider settings (ported from NoveLA) ────────
+
+    /**
+     * Active translation provider:
+     * "GOOGLE_PA"   — Google Translate Enhanced (default, auto-fetches API key)
+     * "GOOGLE_FREE" — Google Translate Free (no key needed)
+     * "GEMINI"      — Google Gemini API (requires GEMINI_API_KEY)
+     * "OPENAI"      — OpenAI-compatible API (requires TRANSLATION_OPENAI_API_KEYS)
+     */
+    val TRANSLATION_PROVIDER = object : Preference<String>("TRANSLATION_PROVIDER") {
+        override var value by SharedPreference_String(name, preferences, "GOOGLE_PA")
+    }
+
+    val TRANSLATION_PROMPT_PRESET = object : Preference<String>("TRANSLATION_PROMPT_PRESET") {
+        override var value by SharedPreference_String(name, preferences, "Balanced (Default)")
+    }
+
+    val TRANSLATION_BATCH_SIZE = object : Preference<Int>("TRANSLATION_BATCH_SIZE") {
+        override var value by SharedPreference_Int(name, preferences, 15)
+    }
+
+    val TRANSLATION_MAX_OUTPUT_TOKENS = object : Preference<Int>("TRANSLATION_MAX_OUTPUT_TOKENS") {
+        override var value by SharedPreference_Int(name, preferences, 8192)
+    }
+
+
+
+    // ── Additional translation provider prefs (NoveLA-compatible names) ──
+
+    val TRANSLATION_ACTIVE_SYSTEM_PROMPT = object : Preference<String>("TRANSLATION_ACTIVE_SYSTEM_PROMPT") {
+        override var value by SharedPreference_String(name, preferences, "")
+    }
+
+    val TRANSLATION_GEMINI_API_KEY = object : Preference<String>("TRANSLATION_GEMINI_API_KEY") {
+        override var value by SharedPreference_String(name, preferences, "")
+    }
+
+    val TRANSLATION_GEMINI_MODEL = object : Preference<String>("TRANSLATION_GEMINI_MODEL") {
+        override var value by SharedPreference_String(name, preferences, "gemini-2.5-flash")
+    }
+
+    val TRANSLATION_GOOGLE_PA_API_KEYS = object : Preference<String>("TRANSLATION_GOOGLE_PA_API_KEYS") {
+        override var value by SharedPreference_String(name, preferences, "")
+    }
+
+    val TRANSLATION_GOOGLE_PA_CACHED_KEY = object : Preference<String>("TRANSLATION_GOOGLE_PA_CACHED_KEY") {
+        override var value by SharedPreference_String(name, preferences, "")
+    }
+
+    val TRANSLATION_GOOGLE_PA_KEY_LAST_CHECKED = object : Preference<String>("TRANSLATION_GOOGLE_PA_KEY_LAST_CHECKED") {
+        override var value by SharedPreference_String(name, preferences, "0")
+    }
+
+    val TRANSLATION_OPENAI_API_KEYS = object : Preference<String>("TRANSLATION_OPENAI_API_KEYS") {
+        override var value by SharedPreference_String(name, preferences, "")
+    }
+
+    val TRANSLATION_OPENAI_BASE_URL = object : Preference<String>("TRANSLATION_OPENAI_BASE_URL") {
+        override var value by SharedPreference_String(name, preferences, "https://api.openai.com/v1")
+    }
+
+    val TRANSLATION_OPENAI_MODEL = object : Preference<String>("TRANSLATION_OPENAI_MODEL") {
+        override var value by SharedPreference_String(name, preferences, "gpt-4o-mini")
+    }
+
+    val TRANSLATION_PROMPT_USE_ENGLISH_LOCALE = object : Preference<Boolean>("TRANSLATION_PROMPT_USE_ENGLISH_LOCALE") {
+        override var value by SharedPreference_Boolean(name, preferences, false)
+    }
 
     @Deprecated("Removed", level = DeprecationLevel.HIDDEN)
     val LOCAL_SOURCES_URI_DIRECTORIES =
@@ -186,10 +268,9 @@ class AppPreferences @Inject constructor(
      */
     private fun <T> toFlow(key: String, mapper: (String) -> T): Flow<T> {
         val flow = MutableStateFlow(mapper(key))
-        val scope = CoroutineScope(Dispatchers.Default)
         val listener = SharedPreferences.OnSharedPreferenceChangeListener { _, vkey ->
             if (key == vkey)
-                scope.launch { flow.value = mapper(vkey) }
+                flow.value = mapper(vkey)
         }
 
         return flow

@@ -17,7 +17,6 @@ dependencies {
     implementation(projects.tooling.epubParser)
     implementation(projects.tooling.localDatabase)
 
-    implementation(libs.timber)
     implementation(libs.androidx.documentfile)
     implementation(libs.compose.androidx.activity)
     implementation(libs.compose.material3.android)

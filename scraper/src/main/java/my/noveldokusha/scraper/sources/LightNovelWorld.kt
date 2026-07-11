@@ -68,7 +68,11 @@ class LightNovelWorld(
                 .toUrlBuilderSafe()
                 .addPath("chapters")
 
-            for (page in 1..Int.MAX_VALUE) {
+            // Safety cap at 200 pages (200 * ~100 chapters/page = 20,000
+            // chapters max). Without this, a site layout change that
+            // returns non-empty pages with no matching selectors would
+            // loop forever.
+            for (page in 1..200) {
                 val urlBuilder = baseChaptersUrl.addPath("page-$page")
 
                 val res = networkClient.get(urlBuilder)
