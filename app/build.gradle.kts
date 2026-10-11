@@ -1,4 +1,3 @@
-import org.jetbrains.kotlin.konan.properties.hasProperty
 import java.util.Properties
 
 plugins {
@@ -32,7 +31,7 @@ android {
         if (localPropertiesFile.exists())
             load(localPropertiesFile.inputStream())
     }
-    val hasDefaultSigningConfigData = defaultSigningConfigData.hasProperty("storeFile")
+    val hasDefaultSigningConfigData = defaultSigningConfigData.containsKey("storeFile")
     println("hasDefaultSigningConfigData: $hasDefaultSigningConfigData")
 
     if (cliCustomSettings.splitByAbi) splits {
@@ -46,7 +45,6 @@ android {
         applicationId = "my.noveldokusha"
         versionCode = 18
         versionName = "2.2.0"
-        setProperty("archivesBaseName", "NovelDokusha_v$versionName")
     }
 
     signingConfigs {
@@ -67,22 +65,17 @@ android {
         }
 
         named("debug") {
-            postprocessing {
-                isRemoveUnusedCode = false
-                isObfuscate = false
-                isOptimizeCode = false
-                isRemoveUnusedResources = false
-            }
+            isMinifyEnabled = false
+            isShrinkResources = false
         }
 
         named("release") {
-            postprocessing {
-                proguardFile("proguard-rules.pro")
-                isRemoveUnusedCode = true
-                isObfuscate = false
-                isOptimizeCode = true
-                isRemoveUnusedResources = true
-            }
+            isMinifyEnabled = true
+            isShrinkResources = true
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
         }
     }
 
@@ -101,6 +94,10 @@ android {
         viewBinding = true
     }
     namespace = "my.noveldokusha"
+}
+
+base {
+    archivesName = "NovelDokusha_v${android.defaultConfig.versionName}"
 }
 
 fun DependencyHandler.fullImplementation(dependencyNotation: Any): Dependency? =

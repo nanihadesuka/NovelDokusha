@@ -16,7 +16,7 @@ import com.google.accompanist.systemuicontroller.rememberSystemUiController
 @Composable
 fun Theme(
     themeProvider: ThemeProvider,
-    content: @Composable () -> @Composable Unit,
+    content: @Composable () -> Unit,
 ) {
     val followSystemsTheme by themeProvider.followSystem(rememberCoroutineScope())
     val selectedTheme by themeProvider.currentTheme(rememberCoroutineScope())

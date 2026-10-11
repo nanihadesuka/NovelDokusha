@@ -1,19 +1,17 @@
 [versions]
 
-kotlin = "1.9.23"
-kotlin-compose-compilerVersion = "1.5.13"
+kotlin = "2.4.20"
 
-plugin-agp = "8.2.2"
-plugin-autonomousapps = "1.31.0"
+plugin-agp = "9.4.0"
 
-hilt = "2.49"
+hilt = "2.60.1"
 hilt-androidx = "1.2.0"
 
-ksp = "1.9.23-1.0.20"
+ksp = "2.3.12"
 
 kotlinx-coroutines-core = "1.7.3"
 kotlinx-coroutines-playServices = "1.7.3"
-kotlinx-serialization-json = "1.5.1"
+kotlinx-serialization-json = "1.11.0"
 
 testing-mockito-kotlin = "5.0.0"
 
@@ -63,7 +61,7 @@ gson = "2.10.1"
 jsoup = "1.17.2"
 translate = "17.0.2"
 moshi = "1.15.0"
-room = "2.6.1"
+room = "2.8.5"
 junit = "4.13.2"
 
 okhttp = "5.0.0-alpha.11"
@@ -75,7 +73,6 @@ retrofit = "2.9.0"
 
 timber = "5.0.1"
 junitVersion = "1.2.1"
-jetbrainsKotlinJvm = "1.9.0"
 
 [libraries]
 
@@ -179,6 +176,7 @@ android-gradlePlugin = { group = "com.android.tools.build", name = "gradle", ver
 android-tools-common = { group = "com.android.tools", name = "common", version.ref = "androidTools" }
 kotlin-gradlePlugin = { group = "org.jetbrains.kotlin", name = "kotlin-gradle-plugin", version.ref = "kotlin" }
 ksp-gradlePlugin = { group = "com.google.devtools.ksp", name = "com.google.devtools.ksp.gradle.plugin", version.ref = "ksp" }
+compose-compiler-gradlePlugin = { group = "org.jetbrains.kotlin", name = "compose-compiler-gradle-plugin", version.ref = "kotlin" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "plugin-agp" }
@@ -186,15 +184,13 @@ android-library = { id = "com.android.library", version.ref = "plugin-agp" }
 hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-parcelize = { id = "org.jetbrains.kotlin.plugin.parcelize", version.ref = "kotlin" }
-kotlin-scripting = { id = "org.jetbrains.kotlin.plugin.scripting", version.ref = "kotlin" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
-dependency-analysis = { id = "com.autonomousapps.dependency-analysis", version.ref = "plugin-autonomousapps" }
 
 noveldokusha-android-application = { id = "noveldokusha.android.application", version = "unspecified" }
 noveldokusha-android-library = { id = "noveldokusha.android.library", version = "unspecified" }
 noveldokusha-android-compose = { id = "noveldokusha.android.compose", version = "unspecified" }
-jetbrains-kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "jetbrainsKotlinJvm" }
 
 [bundles]
 

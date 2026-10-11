@@ -12,7 +12,6 @@ class NoveldokushaAndroidApplicationBestPracticesConventionPlugin : Plugin<Proje
         with(target) {
             with(pluginManager) {
                 apply("com.android.application")
-                apply("org.jetbrains.kotlin.android")
             }
             applyHilt()
 
