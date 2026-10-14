@@ -4,6 +4,8 @@
 This project is no longer actively maintained.
 Feel free to fork it or use it as-is, but note that no further updates, bug fixes, or support will be done.
 
+> **⚡ Active Alternative:** If you are looking for a maintained version with new features (like Gemini/DeepSeek translation, Cloudflare bypass, and Lua plugins), check out [NoveLA by HnDK0](https://github.com/HnDK0/NoveLA), which is a modern spiritual successor to this project.
+
 # NovelDokusha
 Android web novel reader. Reader focused on simplicity, improving reading immersion.
 Search from a large catalog of content, open your pick and just enjoy.
